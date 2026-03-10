@@ -10,7 +10,7 @@ cat(sprintf("Started: %s\n\n", Sys.time()))
 # Load data and analysis results
 cat("Loading data...\n")
 #load("cached/syphilis.manager.rdata")
-strat_results_path <- Sys.getenv("STRAT_RESULTS_PATH", "Q:/data_managers/stratification_analysis_results_county_based.rdata")
+strat_results_path <- file.path(Q_ROOT, "data_managers/stratification_analysis_results_county_based.rdata")
 load(strat_results_path)
 
 cat(sprintf("Found %d problematic combinations to remove\n\n", length(problematic_combinations)))

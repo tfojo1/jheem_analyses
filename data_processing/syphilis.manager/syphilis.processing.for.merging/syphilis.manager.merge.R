@@ -9,7 +9,8 @@
 # MERGE -------------------------------------------------------------------
 
 #LOAD the saved sections of the syphilis manager (after you've made the changes to a particular section)
-section_dir <- Sys.getenv("SECTION_DIR", "Q:/data_managers/data.manager.merge")
+Q_ROOT <- Sys.getenv("Q_ROOT", "Q:")
+section_dir <- Sys.getenv("SECTION_DIR", file.path(Q_ROOT, "data_managers/data.manager.merge"))
 section1 = load.data.manager(name="syphilis.manager_section1", file=file.path(section_dir, "syphilis.manager_section1.rdata"))
 section2 = load.data.manager(name="syphilis.manager_section2", file=file.path(section_dir, "syphilis.manager_section2.rdata"))
 section3 = load.data.manager(name="syphilis.manager_section3", file=file.path(section_dir, "syphilis.manager_section3.rdata"))
@@ -82,7 +83,7 @@ cached_dir <- Sys.getenv("CACHED_DIR", "../../cached")
 save(syphilis.manager, file=file.path(cached_dir, "syphilis.manager.rdata"))
 
 #SAVE Final, Complete Syphilis Manager to Q Drive
-output_dir <- Sys.getenv("OUTPUT_DIR", "Q:/data_managers")
+output_dir <- Sys.getenv("OUTPUT_DIR", file.path(Q_ROOT, "data_managers"))
 save(syphilis.manager, file=file.path(output_dir, "syphilis.manager.rdata"))
 
 #SAVE Final, Complete Syphilis Manager, Archive a dated version to the Q Drive#

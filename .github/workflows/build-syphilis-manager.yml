@@ -3,15 +3,20 @@ name: Build Syphilis Manager
 on:
   workflow_dispatch:
     inputs:
-      inputs_release_tag:
-        description: 'Release tag for build inputs (e.g. syphilis-manager-inputs-v1.0.0)'
+      sections_release_tag:
+        description: 'Release tag for section files'
         required: true
-        default: 'syphilis-manager-inputs-v1.0.0'
+        default: 'syphilis-sections-latest'
         type: string
-      surveillance_release_tag:
-        description: 'Release tag for surveillance manager (e.g. surveillance-manager-v1.0.0-alpha)'
+      raw_data_release_tag:
+        description: 'Release tag for raw data'
         required: true
-        default: 'surveillance-manager-v1.0.0-alpha'
+        default: 'data-raw-v2026.03.09'
+        type: string
+      deps_release_tag:
+        description: 'Release tag for manager dependencies'
+        required: true
+        default: 'data-managers-v2026.03.09'
         type: string
       jheem2_ref:
         description: 'jheem2 branch or tag to use'
@@ -71,38 +76,55 @@ jobs:
           remotes::install_local("_jheem2", upgrade = "never")
         shell: Rscript {0}
 
-      - name: Download build inputs
+      - name: Download section files
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mkdir -p _ci_inputs/sections _ci_inputs/birth_data
-          gh release download "${{ inputs.inputs_release_tag }}" \
+          mkdir -p _ci_inputs/sections
+          gh release download "${{ inputs.sections_release_tag }}" \
             --dir _ci_inputs/sections \
             --pattern "syphilis.manager_section*.rdata"
-          gh release download "${{ inputs.inputs_release_tag }}" \
-            --dir _ci_inputs/birth_data \
-            --pattern "*.xlsx"
-          gh release download "${{ inputs.inputs_release_tag }}" \
-            --dir _ci_inputs \
-            --pattern "stratification_analysis_results_county_based.rdata"
+          echo "Section files:"
+          ls -lh _ci_inputs/sections/
 
-      - name: Download surveillance manager
+      - name: Download raw data
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release download "${{ inputs.surveillance_release_tag }}" \
-            --dir _ci_inputs \
-            --pattern "surveillance.manager.rdata"
+          mkdir -p _ci_inputs/raw
+          gh release download "${{ inputs.raw_data_release_tag }}" \
+            --dir _ci_inputs/raw
+          tar -xzf _ci_inputs/raw/data-raw-*.tar.gz -C _ci_inputs/raw
+          echo "Raw data extracted:"
+          ls -lh _ci_inputs/raw/data_raw/
+
+      - name: Download manager dependencies
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p _ci_inputs/deps
+          gh release download "${{ inputs.deps_release_tag }}" \
+            --dir _ci_inputs/deps
+          echo "Dependency files:"
+          ls -lh _ci_inputs/deps/
+
+      - name: Arrange CI inputs into Q_ROOT layout
+        run: |
+          mkdir -p _ci_root/data_managers/data.manager.merge
+          cp _ci_inputs/sections/*.rdata _ci_root/data_managers/data.manager.merge/
+          cp _ci_inputs/deps/*.rdata _ci_root/data_managers/
+          if [ -d _ci_inputs/raw/data_raw ]; then
+            ln -s "$(pwd)/_ci_inputs/raw/data_raw" _ci_root/data_raw
+          fi
+          echo "Q_ROOT layout:"
+          find _ci_root -maxdepth 3 -type f | head -20
 
       - name: Run merge pipeline
         env:
-          SECTION_DIR: _ci_inputs/sections
+          Q_ROOT: _ci_root
           OUTPUT_DIR: _ci_outputs
           ARCHIVE_DIR: _ci_outputs
           CACHED_DIR: _ci_outputs
-          BIRTH_DATA_DIR: _ci_inputs/birth_data
-          SURVEILLANCE_MANAGER_PATH: _ci_inputs/surveillance.manager.rdata
-          STRAT_RESULTS_PATH: _ci_inputs/stratification_analysis_results_county_based.rdata
         run: |
           mkdir -p _ci_outputs
           Rscript -e "
@@ -138,8 +160,9 @@ jobs:
           git diff --cached --quiet && echo "No spec changes" || \
             git commit -m "Update syphilis manager spec from CI build
 
-          Inputs: ${{ inputs.inputs_release_tag }}
-          Surveillance: ${{ inputs.surveillance_release_tag }}
+          Sections: ${{ inputs.sections_release_tag }}
+          Raw data: ${{ inputs.raw_data_release_tag }}
+          Dependencies: ${{ inputs.deps_release_tag }}
           jheem2: ${{ inputs.jheem2_ref }}"
           git push
 
@@ -177,8 +200,9 @@ jobs:
           NOTES="## Build Info
           | | |
           |---|---|
-          | **Inputs** | \`${{ inputs.inputs_release_tag }}\` |
-          | **Surveillance** | \`${{ inputs.surveillance_release_tag }}\` |
+          | **Sections** | \`${{ inputs.sections_release_tag }}\` |
+          | **Raw Data** | \`${{ inputs.raw_data_release_tag }}\` |
+          | **Dependencies** | \`${{ inputs.deps_release_tag }}\` |
           | **jheem2** | \`${{ inputs.jheem2_ref }}\` |
           | **Commit** | \`${GITHUB_SHA:0:7}\` |
           | **Status** | $SPEC_NOTE |

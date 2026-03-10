@@ -7,7 +7,7 @@ library(jheem2)
 cat("Loading data managers...\n")
 
 # Load both managers
-surv_path <- Sys.getenv("SURVEILLANCE_MANAGER_PATH", "Q:/data_managers/surveillance.manager.rdata")
+surv_path <- file.path(Q_ROOT, "data_managers/surveillance.manager.rdata")
 surveillance.manager <- load.data.manager(surv_path)
 #syphilis.manager <- load.data.manager("Q:/data_managers/syphilis.manager.rdata")
 
