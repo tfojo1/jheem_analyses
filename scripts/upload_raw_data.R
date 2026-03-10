@@ -1,8 +1,7 @@
 # Upload a snapshot of raw data from the NAS/Q: drive to a GitHub Release.
 #
-# Creates a compressed tarball of everything under data_raw/ and uploads
-# it as a versioned, immutable release. Any manager build pipeline can
-# reference it.
+# Creates one compressed tarball per data_raw/ subdirectory and uploads
+# them as assets on a single versioned, immutable release.
 #
 # Usage:
 #   Rscript scripts/upload_raw_data.R Q:                       # Windows
@@ -48,10 +47,12 @@ if (system2("gh", c("release", "view", release_tag, "--repo", REPO),
          "or delete the existing release if it was created in error.")
 }
 
-# --- Survey contents ---
+# --- Survey and compress each subdirectory ---
 cat("=== Scanning", data_raw, "===\n\n")
 
 top_dirs <- list.dirs(data_raw, recursive = FALSE, full.names = FALSE)
+tarball_info <- list()
+
 for (d in top_dirs) {
     full_path <- file.path(data_raw, d)
     files <- list.files(full_path, recursive = TRUE)
@@ -60,53 +61,89 @@ for (d in top_dirs) {
                 format(structure(total_bytes, class = "object_size"), units = "auto")))
 }
 
-# --- Create tarball ---
-tarball_name <- paste0("data-raw-", version_tag, ".tar.gz")
-tarball_path <- file.path(tempdir(), tarball_name)
+cat("\n=== Compressing each subdirectory ===\n\n")
 
-cat("\nCompressing all of data_raw/ ...\n")
-cat("This may take several minutes for large datasets.\n\n")
+for (d in top_dirs) {
+    tarball_name <- paste0("data-raw-", d, ".tar.gz")
+    tarball_path <- file.path(tempdir(), tarball_name)
 
-old_wd <- setwd(nas_root)
-tar(tarball_path, files = "data_raw", compression = "gzip")
-setwd(old_wd)
+    cat(sprintf("Compressing %s/ ... ", d))
 
-tarball_size <- file.info(tarball_path)$size
-cat(sprintf("Archive: %s (%s)\n", tarball_name,
-            format(structure(tarball_size, class = "object_size"), units = "auto")))
+    old_wd <- setwd(nas_root)
+    tar(tarball_path, files = file.path("data_raw", d), compression = "gzip")
+    setwd(old_wd)
 
-# --- Check 2GB limit ---
-if (tarball_size > 2 * 1024^3) {
-    stop("Archive exceeds GitHub's 2GB per-file limit (",
-         round(tarball_size / 1024^3, 1), " GB).\n",
-         "The raw data may need to be split into multiple archives.")
+    tarball_size <- file.info(tarball_path)$size
+    cat(sprintf("%s\n", format(structure(tarball_size, class = "object_size"), units = "auto")))
+
+    if (tarball_size > 2 * 1024^3) {
+        stop("Archive for ", d, " exceeds GitHub's 2GB per-file limit (",
+             round(tarball_size / 1024^3, 1), " GB). ",
+             "This subdirectory may need further splitting.")
+    }
+
+    tarball_info[[d]] <- list(name = tarball_name, path = tarball_path, size = tarball_size)
 }
 
-# --- Upload ---
+total_size <- sum(sapply(tarball_info, `[[`, "size"))
+cat(sprintf("\nTotal: %d archives, %s compressed\n",
+            length(tarball_info),
+            format(structure(total_size, class = "object_size"), units = "auto")))
+
+# --- Create release with all assets ---
 cat("\nCreating release:", release_tag, "\n")
 cat("Repository:", REPO, "\n\n")
 
 notes <- paste0(
     "## Raw Data Snapshot\n\n",
+    "One archive per `data_raw/` subdirectory.\n\n",
     "**Source:** `", data_raw, "`\n",
     "**Created:** ", format(Sys.time(), "%Y-%m-%d %H:%M %Z"), "\n",
-    "**Size:** ", format(structure(tarball_size, class = "object_size"), units = "auto"),
-    " compressed\n\n",
+    "**Total:** ", format(structure(total_size, class = "object_size"), units = "auto"),
+    " compressed (", length(tarball_info), " archives)\n\n",
     "### Contents\n",
-    paste(sprintf("- `data_raw/%s/`", top_dirs), collapse = "\n"), "\n"
+    paste(sprintf("- `%s` (%s)", sapply(tarball_info, `[[`, "name"),
+                  sapply(tarball_info, function(x) format(structure(x$size, class = "object_size"), units = "auto"))),
+          collapse = "\n"), "\n\n",
+    "### Extraction\n",
+    "```bash\n",
+    "# Extract all archives into a directory:\n",
+    "for f in data-raw-*.tar.gz; do tar -xzf \"$f\" -C .; done\n",
+    "# Result: data_raw/{subdirectory}/...\n",
+    "```\n"
 )
 
 notes_file <- file.path(tempdir(), "release_notes.md")
 writeLines(notes, notes_file)
 
+# Create the release (no assets yet)
 result <- system2("gh", c(
     "release", "create", release_tag,
     "--repo", REPO,
     "--title", shQuote(paste("Raw Data", version_tag)),
-    "--notes-file", notes_file,
-    tarball_path
+    "--notes-file", notes_file
 ))
-
 if (result != 0) stop("Failed to create release. Check gh CLI authentication.")
+
+# Upload each tarball as an asset
+for (d in names(tarball_info)) {
+    info <- tarball_info[[d]]
+    cat(sprintf("Uploading %s (%s) ... ", info$name,
+                format(structure(info$size, class = "object_size"), units = "auto")))
+
+    result <- system2("gh", c(
+        "release", "upload", release_tag,
+        "--repo", REPO,
+        info$path
+    ))
+
+    if (result != 0) {
+        cat("FAILED\n")
+        warning("Failed to upload ", info$name, ". You can retry with:\n",
+                "  gh release upload ", release_tag, " --repo ", REPO, " ", info$path)
+    } else {
+        cat("OK\n")
+    }
+}
 
 cat("\nDone. Release:", release_tag, "\n")

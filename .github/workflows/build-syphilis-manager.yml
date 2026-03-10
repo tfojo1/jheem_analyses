@@ -11,12 +11,12 @@ on:
       raw_data_release_tag:
         description: 'Release tag for raw data'
         required: true
-        default: 'data-raw-v2026.03.09'
+        default: 'data-raw-v2026.03.10'
         type: string
       deps_release_tag:
         description: 'Release tag for manager dependencies'
         required: true
-        default: 'data-managers-v2026.03.09'
+        default: 'data-managers-v2026.03.10'
         type: string
       jheem2_ref:
         description: 'jheem2 branch or tag to use'
@@ -93,8 +93,11 @@ jobs:
         run: |
           mkdir -p _ci_inputs/raw
           gh release download "${{ inputs.raw_data_release_tag }}" \
-            --dir _ci_inputs/raw
-          tar -xzf _ci_inputs/raw/data-raw-*.tar.gz -C _ci_inputs/raw
+            --dir _ci_inputs/raw \
+            --pattern "data-raw-*.tar.gz"
+          for f in _ci_inputs/raw/data-raw-*.tar.gz; do
+            tar -xzf "$f" -C _ci_inputs/raw
+          done
           echo "Raw data extracted:"
           ls -lh _ci_inputs/raw/data_raw/
 
