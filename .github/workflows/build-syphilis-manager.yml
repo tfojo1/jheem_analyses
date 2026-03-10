@@ -96,8 +96,10 @@ jobs:
             --dir _ci_inputs/raw \
             --pattern "data-raw-*.tar.gz"
           for f in _ci_inputs/raw/data-raw-*.tar.gz; do
-            tar -xzf "$f" -C _ci_inputs/raw --no-same-permissions
+            tar -xzf "$f" -C _ci_inputs/raw --no-same-owner --no-same-permissions --delay-directory-restore
           done
+          # Ensure all directories are writable (NAS preserves read-only dirs)
+          find _ci_inputs/raw/data_raw -type d -exec chmod u+rwx {} +
           echo "Raw data extracted:"
           ls -lh _ci_inputs/raw/data_raw/
 
