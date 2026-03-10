@@ -96,7 +96,7 @@ jobs:
             --dir _ci_inputs/raw \
             --pattern "data-raw-*.tar.gz"
           for f in _ci_inputs/raw/data-raw-*.tar.gz; do
-            tar -xzf "$f" -C _ci_inputs/raw
+            tar -xzf "$f" -C _ci_inputs/raw --no-same-permissions
           done
           echo "Raw data extracted:"
           ls -lh _ci_inputs/raw/data_raw/
