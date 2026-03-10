@@ -73,7 +73,7 @@ register.model.element(
     name = 'mean.fraction.index.diagnoses.that.yield.a.positive.contact',
     get.value.function = function(location){
         if (location=="AL")
-            0.03
+            0.20 #change from .03 test 
         else if (location=='LA')
             0.006
         else
