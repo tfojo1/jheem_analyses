@@ -862,6 +862,58 @@ proportion_msm_likelihood_instructions <-
             )
         }
     )
+proportion_msm_stratified_likelihood_instructions <-
+    create.custom.likelihood.instructions(
+        name = "proportion_msm_stratified_likelihood",
+        compute.function = function(sim, data, log = TRUE, debug = F) {
+            if (debug) browser()
+            
+            get_instr <- data$get_instr
+            years <- data$years
+            weight <- data$weight
+            
+            vals <- sim$optimized.get(get_instr)
+            
+            prp_msm <- apply(vals, c("year", "race"), function(x) {
+                x["msm"] / sum(x)
+            })
+            prp_msm <- vals[,"msm"] / rowSums(vals)
+            
+            # Normal band edges; likelihood is constant inside the band
+            band_mean <- 0.6
+            band_sd <- 0.05 # Probably want to set this wider for stratified
+            
+            lo <- band_mean - 2 * band_sd
+            
+            total_log_likelihood <- sum(pmin(dnorm(lo, band_mean, band_sd, log=T),
+                                             dnorm(prp_msm, band_mean, band_sd, log=T)))
+            
+            # Apply weight
+            total_log_likelihood <- weight * total_log_likelihood
+            
+            if (log) total_log_likelihood else exp(total_log_likelihood)
+        },
+        get.data.function = function(version, location) {
+            sim_metadata <- get.simulation.metadata(version = version, location = location)
+            
+            start_year <- 2019L
+            end_year <- 2022L
+            years <- seq(start_year, end_year)
+            
+            get_instr <- sim_metadata$prepare.optimized.get.instructions(
+                outcome = "diagnosis.ps",
+                dimension.values = list(year = years, sex = c("heterosexual_male", "msm")),
+                keep.dimensions = c("year", "sex", "race"),
+                drop.single.sim.dimension = TRUE
+            )
+            
+            list(
+                get_instr = get_instr,
+                years = years,
+                weight = STAGE.1.WEIGHT
+            )
+        }
+    )
 ## EARLY Diagnosis ----
 # data from 1941-2022 (cdc.pdf.report) for national model Only (total)
 # data from 2000-2023 (cdc.sti) for county; state; national level (total; sex; race; age group; age group+sex; age group + race; race+sex)
