@@ -483,8 +483,10 @@ get.general.mortality.rates <- function(location,
     rates.by.state = map.value.ontology(deaths, target.dim.names=target.dim.names, na.rm = T) / 
       map.value.ontology(population, target.dim.names=target.dim.names, na.rm = T)
     
-    if (any(is.na(rates.by.state)))
-      stop("getting NA values in rates.by.state in get.general.mortality.rates()")
+    # This is not a useful check since some states like WV might actually have
+    # zero population for some strata.
+    # if (any(is.na(rates.by.state)))
+    #   stop("getting NA values in rates.by.state in get.general.mortality.rates()")
     
     if (length(states)==1)
       rates.by.state[1,,,]
@@ -510,7 +512,9 @@ get.general.mortality.rates <- function(location,
         sum(county.populations[counties.in.state.and.loc], na.rm=T)/total.population
       })
       
-      apply(state.weights * rates.by.state, c('age','race','sex'), sum)
+      # Will sum with na.rm=T to allow for when stratified populations might have
+      # been zero, such as in West Virginia (for C.47900)
+      apply(state.weights * rates.by.state, c('age','race','sex'), sum, na.rm=T)
     }
   }
 }
