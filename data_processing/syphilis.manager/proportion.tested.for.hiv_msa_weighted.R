@@ -259,7 +259,21 @@ data.list.brfss.msa.sex = lapply(data.list.brfss.msa.clean, function(file){
   data$value = data$proportion_tested
   
   data <- data %>%
-    select(outcome, year, location, sum_tested, n_weighted, value, sex, `_MMSAWT`)
+    select(outcome, year, location, sum_tested, n_weighted, value, sex, `_MMSAWT`)%>%
+  
+  #Add in blank rows for MSM sex dimension so that proportion.tested.for.hiv ontologies can be the same for state and MSA
+  complete(
+      year,
+      location,
+      outcome,
+      sex = union(sex, "msm"),
+      fill = list(
+          sum_tested = NA,
+          n_weighted = NA,
+          value = NA,
+          `_MMSAWT` = NA
+      )
+  )
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -447,7 +461,7 @@ for (data in msa.sex.num) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'brfss',
+    ontology.name = 'brfss.shield',
     source = 'brfss',
     dimension.values = list(),
     url = 'https://www.cdc.gov/brfss/index.html',
@@ -500,7 +514,7 @@ for (data in msa.sex.denom) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'brfss',
+    ontology.name = 'brfss.shield',
     source = 'brfss',
     dimension.values = list(),
     url = 'https://www.cdc.gov/brfss/index.html',
@@ -640,7 +654,7 @@ for (data in prop.tested.variance.sex) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'brfss',
+    ontology.name = 'brfss.shield',
     source = 'brfss',
     metric = 'variance',
     dimension.values = list(),
