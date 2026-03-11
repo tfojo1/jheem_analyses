@@ -505,7 +505,7 @@ for (data in state.total.num) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'brfss',
+    ontology.name = 'brfss.shield',
     source = 'brfss',
     dimension.values = list(),
     url = 'https://www.cdc.gov/brfss/index.html',
@@ -519,7 +519,7 @@ for (data in state.age.num) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'brfss',
+    ontology.name = 'brfss.shield',
     source = 'brfss',
     dimension.values = list(),
     url = 'https://www.cdc.gov/brfss/index.html',
@@ -532,7 +532,7 @@ for (data in state.race.num) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'brfss',
+    ontology.name = 'brfss.shield',
     source = 'brfss',
     dimension.values = list(),
     url = 'https://www.cdc.gov/brfss/index.html',
@@ -546,7 +546,7 @@ for (data in state.total.denom) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'brfss',
+    ontology.name = 'brfss.shield',
     source = 'brfss',
     dimension.values = list(),
     url = 'https://www.cdc.gov/brfss/index.html',
@@ -560,7 +560,7 @@ for (data in state.age.denom) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'brfss',
+    ontology.name = 'brfss.shield',
     source = 'brfss',
     dimension.values = list(),
     url = 'https://www.cdc.gov/brfss/index.html',
@@ -573,7 +573,7 @@ for (data in state.race.denom) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'brfss',
+    ontology.name = 'brfss.shield',
     source = 'brfss',
     dimension.values = list(),
     url = 'https://www.cdc.gov/brfss/index.html',
@@ -884,7 +884,7 @@ for (data in prop.tested.variance.state) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'brfss',
+    ontology.name = 'brfss.shield',
     source = 'brfss',
     metric = 'variance',
     dimension.values = list(),
@@ -926,7 +926,7 @@ for (data in prop.tested.variance.age.state) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'brfss',
+    ontology.name = 'brfss.shield',
     source = 'brfss',
     metric = 'variance',
     dimension.values = list(),
@@ -940,7 +940,7 @@ for (data in prop.tested.variance.race.state) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'brfss',
+    ontology.name = 'brfss.shield',
     source = 'brfss',
     metric = 'variance',
     dimension.values = list(),

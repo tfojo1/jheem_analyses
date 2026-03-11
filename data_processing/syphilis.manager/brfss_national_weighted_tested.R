@@ -452,7 +452,7 @@ for (data in national.total.num) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'brfss',
+    ontology.name = 'brfss.shield',
     source = 'brfss',
     dimension.values = list(),
     url = 'https://www.cdc.gov/brfss/index.html',
@@ -466,7 +466,7 @@ for (data in national.age.num) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'brfss',
+    ontology.name = 'brfss.shield',
     source = 'brfss',
     dimension.values = list(),
     url = 'https://www.cdc.gov/brfss/index.html',
@@ -479,7 +479,7 @@ for (data in national.race.num) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'brfss',
+    ontology.name = 'brfss.shield',
     source = 'brfss',
     dimension.values = list(),
     url = 'https://www.cdc.gov/brfss/index.html',
@@ -494,7 +494,7 @@ for (data in national.total.denom) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'brfss',
+    ontology.name = 'brfss.shield',
     source = 'brfss',
     dimension.values = list(),
     url = 'https://www.cdc.gov/brfss/index.html',
@@ -508,7 +508,7 @@ for (data in national.age.denom) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'brfss',
+    ontology.name = 'brfss.shield',
     source = 'brfss',
     dimension.values = list(),
     url = 'https://www.cdc.gov/brfss/index.html',
@@ -521,7 +521,7 @@ for (data in national.race.denom) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'brfss',
+    ontology.name = 'brfss.shield',
     source = 'brfss',
     dimension.values = list(),
     url = 'https://www.cdc.gov/brfss/index.html',
