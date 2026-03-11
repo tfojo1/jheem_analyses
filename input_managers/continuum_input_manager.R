@@ -93,8 +93,8 @@ get.suppression.functional.form <- function(specification.metadata,
     slope.data.values = intercept.data.values
     slope.data.values$year = 1
     
-    intercept = suppressWarnings(predict(fit, newdata=intercept.data.values, type='link'))
-    slope = suppressWarnings(predict(fit, newdata=slope.data.values, type='link')) - intercept
+    intercept = suppressWarnings(predict(fit, newdata=intercept.data.values))
+    slope = suppressWarnings(predict(fit, newdata=slope.data.values)) - intercept
     
     dim(intercept) = dim(slope) = sapply(dim.names, length)
     dimnames(intercept) = dimnames(slope) = dim.names

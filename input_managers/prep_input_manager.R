@@ -447,9 +447,9 @@ get.prep.indication.functional.form <- function(specification.metadata,
     # Plug in from MSM fit
     msm.subset = reshape2::melt(int[,,'msm',])
     msm.subset$year = 0
-    int.msm = predict(fit.msm, msm.subset, type='link')
+    int.msm = predict(fit.msm, msm.subset)
     msm.subset$year = 1
-    slope.msm = predict(fit.msm, msm.subset, type='link') - int.msm
+    slope.msm = predict(fit.msm, msm.subset) - int.msm
     
     int[,,'msm',] = int.msm
     slope[,,'msm',] = slope.msm
@@ -460,9 +460,9 @@ get.prep.indication.functional.form <- function(specification.metadata,
     
     idu.subset = reshape2::melt(int[,,non.msm.sex,idu.states])
     idu.subset$year = 0
-    int.idu = predict(fit.idu, idu.subset, type='link')
+    int.idu = predict(fit.idu, idu.subset)
     idu.subset$year = 1
-    slope.idu = predict(fit.idu, idu.subset, type='link') - int.idu
+    slope.idu = predict(fit.idu, idu.subset) - int.idu
 
     int[,,non.msm.sex,idu.states] = int.idu
     slope[,,non.msm.sex,idu.states] = slope.idu
@@ -572,16 +572,19 @@ get.prep.persistence.functional.form <- function(specification.metadata,
     
     # Plug in from MSM fit
     values.long = reshape2::melt(value)
-    predicted.long = predict(fit, values.long, type='response')
+    #predicted.long = predict(fit, values.long, type='response') # for some reason, this stopped giving predicted p's and started giving predicted log odds on 3/10/26. So we switched to the line below
+    predicted.long.logit = predict(fit, values.long)
     
-    value[] = predicted.long
+    #value[] = predicted.long
+    value[] = predicted.long.logit
     
     create.static.functional.form(
         value = value,
         link = 'logit',
         min = min.persistence,
         max = max.persistence,
-        value.is.on.transformed.scale = F
+        value.is.on.transformed.scale = T
+        #value.is.on.transformed.scale = F
     )
 }
 
