@@ -35,10 +35,6 @@ source('data_processing/syphilis.manager/syphilis.processing.for.merging/new.agg
 #Aggregate syphilis data into total.syphilis.diagnoses (Nick):
 source('data_processing/syphilis.manager/data_quality_fix/test_total_with_restratification.R')
 
-#Remove certain racial data that doesn't sum to proper totals (Nick):
-source('data_processing/syphilis.manager/data_quality_fix/implement_removals.R')
-
-
 # Inspect Marginals QA Check ----------------------------------------------
 syphilis.manager$inspect_marginals()
 
