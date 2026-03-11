@@ -76,6 +76,29 @@ remove.data(
     url.for.removal = "url"
 )
 
+#removing ps.syphilis diagnoses for DC due to reporting issue:
+remove.data(
+    data.manager=syphilis.manager,
+    outcome = "ps.syphilis.diagnoses",
+    source= "cdc.sti",
+    ontology.name = "cdc.sti",
+    dimension.values = list(location="11001", year=c("2014", "2015", "2016")),
+    metric = "estimate",
+    details.for.removal = "removed",
+    url.for.removal = "url"
+)
+
+remove.data(
+    data.manager=syphilis.manager,
+    outcome = "ps.syphilis.diagnoses",
+    source= "cdc.aggregated.county",
+    ontology.name = "cdc.sti",
+    dimension.values = list(location="C.47900", year=c("2014", "2015", "2016")),
+    metric = "estimate",
+    details.for.removal = "removed",
+    url.for.removal = "url"
+)
+
 # Save: -------------------------------------------------------------------
  
 #SAVE Final, Complete Syphilis Manager to Cached
