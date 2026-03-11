@@ -106,3 +106,15 @@ When a structural change is intentional (e.g., new outcome, ontology switch):
 4. Commit both the code change and the updated spec
 
 The spec should only change when the structure changes. If it drifts without a corresponding code change, something unexpected happened.
+
+## CI Integration
+
+Validation runs automatically in the **Build Syphilis Manager** workflow (`.github/workflows/build-syphilis-manager.yml`). Structural validation gates the build — failures prevent release publication.
+
+When the workflow runs with `update_spec=true`, it:
+1. Validates against the **old** spec to capture what changed (the "spec diff")
+2. Regenerates the spec from the new manager
+3. Validates against the **new** spec to confirm it passes
+4. Commits the updated spec and includes the diff summary in the release notes
+
+See `scripts/README.md` for the full pipeline reference.

@@ -142,11 +142,28 @@ jobs:
             source('data_processing/syphilis.manager/syphilis.processing.for.merging/syphilis.manager.merge.R')
           " 2>&1 | tee _ci_outputs/build_log.txt
 
+      - name: Diff against old spec (when updating)
+        if: inputs.update_spec
+        run: |
+          # Run validation against the OLD spec to capture what changed.
+          # This will fail (exit 1) if there are structural changes — that's expected.
+          Rscript data_processing/syphilis.manager/validation/run_validation.R \
+            _ci_outputs/syphilis.manager.rdata \
+            2>&1 | tee _ci_outputs/spec_diff.txt || true
+
       - name: Update spec from build
         if: inputs.update_spec
         run: |
           Rscript data_processing/syphilis.manager/validation/generate_spec.R \
             _ci_outputs/syphilis.manager.rdata
+
+      - name: Validate against new spec
+        if: inputs.update_spec
+        run: |
+          set -o pipefail
+          Rscript data_processing/syphilis.manager/validation/run_validation.R \
+            _ci_outputs/syphilis.manager.rdata \
+            2>&1 | tee _ci_outputs/validation_report.txt
 
       - name: Run validation
         if: ${{ !inputs.update_spec }}
@@ -179,6 +196,7 @@ jobs:
           path: |
             _ci_outputs/build_log.txt
             _ci_outputs/validation_report.txt
+            _ci_outputs/spec_diff.txt
 
       - name: Create versioned release
         if: success()
@@ -213,6 +231,22 @@ jobs:
           | **Status** | $SPEC_NOTE |
 
           > To promote this build to \`latest\`, run the **Promote Syphilis Manager** workflow with tag \`$VERSION_TAG\`."
+
+          if [ -f _ci_outputs/spec_diff.txt ]; then
+            DIFF=$(cat _ci_outputs/spec_diff.txt)
+            NOTES="$NOTES
+
+          <details>
+          <summary>Spec Changes (click to expand)</summary>
+
+          What changed from the previous spec:
+
+          \`\`\`
+          $DIFF
+          \`\`\`
+
+          </details>"
+          fi
 
           if [ -f _ci_outputs/validation_report.txt ]; then
             REPORT=$(cat _ci_outputs/validation_report.txt)
