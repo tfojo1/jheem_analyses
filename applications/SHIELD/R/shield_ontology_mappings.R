@@ -1,7 +1,17 @@
 
 # BRFSS & SHIELD ----
-#This maps SHILED to BRFSS data (because the BRFSS data only has male and MSM as risk+sex)
-register.ontology.mapping('shiled.to.brfss.sex.risk',
+
+#This maps shield to BRFSS.SHIELD ontology
+register.ontology.mapping('shield.to.brfss.shield.sex',
+                          from.dimensions = "sex",
+                          to.dimensions = "sex",
+                          mappings = rbind(c("msm", "msm"),
+                                           c("msm", "male"),
+                                           c("heterosexual_male", "male"),
+                                           c("female", "female")))
+
+#This maps shield to BRFSS data (because the BRFSS data only has male and MSM as risk+sex)
+register.ontology.mapping('shield.to.brfss.sex.risk',
                           from.dimensions = c('sex'),
                           to.dimensions = c('sex', 'risk'),
                           mappings = rbind(c('msm', 'male', 'msm'),
@@ -23,8 +33,8 @@ register.ontology.mapping('brfss.to.shield.race',
                                            c('white', 'other')))
 
 # CDC & SHIELD ----
-#Maps racial categories from CDC data to the races we use in SHILED
-register.ontology.mapping('cdc.to.shiled.race1',
+#Maps racial categories from CDC data to the races we use in shield
+register.ontology.mapping('cdc.to.shield.race1',
                           from.dimensions = 'race',
                           to.dimensions = 'race',
                           mappings = rbind(c('american indian/alaska native', 'other'),
@@ -34,7 +44,7 @@ register.ontology.mapping('cdc.to.shiled.race1',
                                            c('native hawaiian/other pacific islander', 'other'),
                                            c('white', 'other'))
 )
-#Maps racial categories from CDC MSA Surveillance Reports to races we use for SHILED
+#Maps racial categories from CDC MSA Surveillance Reports to races we use for shield
 register.ontology.mapping('cdc.to.shield.race2',
                           from.dimensions = 'race',
                           to.dimensions = 'race',
