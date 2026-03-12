@@ -2,6 +2,7 @@
 library(jheem2)
 library(tidyverse)
 library(locations)
+library(readxl)
 
 data.manager = create.data.manager('ryan.white.data.manager', description='ryan.white.data.manager')
 
@@ -89,6 +90,24 @@ data.manager$register.outcome(
     units = '%',
     description = "ADAP Suppressed Proportion of Diagnosed"), denominator.outcome = 'diagnosed.prevalence')
 
+data.manager$register.outcome(
+    'adap.income.distribution',
+    metadata = create.outcome.metadata(
+        scale = 'proportion',
+        display.name = 'ADAP Income Distribution',
+        axis.name = 'ADAP Income Distribution',
+        units = '%',
+        description = "ADAP Income Distribution"), denominator.outcome = 'adap.clients')
+
+data.manager$register.outcome(
+    'adap.clients.service.distribution',
+    metadata = create.outcome.metadata(
+        scale = 'proportion',
+        display.name = 'ADAP Clients Service Distribution',
+        axis.name = 'ADAP Clients Service Distribution',
+        units = '%',
+        description = "ADAP Clients Service Distribution"), denominator.outcome = 'adap.clients')
+
 #Register Sources:
 data.manager$register.parent.source('HRSA', full.name = 'Health Resources and Services Administration', short.name= "HRSA") #parent
 data.manager$register.parent.source('NASTAD', full.name = 'National Alliance of State and Territorial AIDS Directors', short.name= "NASTAD") #parent
@@ -113,6 +132,23 @@ data.manager$register.ontology(
     service.received = c('full pay medication support', 'insurance premium assistance', 'medication co pay/deductible', 'multiple services')
   ))
 
+data.manager$register.ontology( #This is for data from NASTAD reports where different years have different FPL levels; this is for older years
+    'nastad.fpl.1',
+    ont = ontology(
+        year= NULL,
+        location= NULL,
+        fpl = c('0-100', '101-138', '139-200', '201-300', '301-400', '>400')
+    ))
+
+data.manager$register.ontology( #This is for data from NASTAD reports where different years have different FPL levels; this is for more recent years.
+    'nastad.fpl.2',
+    ont = ontology(
+        year= NULL,
+        location= NULL,
+        fpl = c('0-100', '101-138', '139-200', '201-300', '301-400', '401-500', '>500'),
+        service.type = c('full.pay', 'insurance.only')
+    ))
+
 data.manager$register.ontology(
   'cdc',
   ont = ontology(
@@ -123,6 +159,8 @@ data.manager$register.ontology(
     sex=c('male','female'),
     risk=c('msm','idu','msm_idu','heterosexual','other')
   ))
+
+
 
 # Source ------------------------------------------------------------------
 source('data_processing/ryan.white.data.manager/ryan.white.total.and.stratified.level.R') #oucome = non.adap.clients; adap.clients
