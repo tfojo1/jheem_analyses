@@ -169,6 +169,7 @@ source('data_processing/ryan.white.data.manager/ryan.white.ambulatory.R') #outco
 source('data_processing/ryan.white.data.manager/ryan.white.adap.proportion.R') #outcome = adap.proportion
 source('data_processing/ryan.white.data.manager/ryan.white.adap.suppression.R') #outcome = adap.suppression
 source('data_processing/ryan.white.data.manager/proportions.of.diagnosed.R') #outcomes = diagnosed.prevalence; adap.proportion.of.diagnosed; adap.suppressed.proportion.of.diagnosed
+source('data_processing/ryan.white.data.manager/fl.va.adap.temp.R') #outcome = adap.income.distribution; adap.suppression; adap.clients
 
 # Save --------------------------------------------------------------------
 save(data.manager, file="Q:/data_managers/ryan.white.data.manager.rdata")
