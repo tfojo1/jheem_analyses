@@ -61,7 +61,16 @@ register.calibration.info('calib.3.2.stage1.az',
                                               STI.TESTING.PARAMETERS.PRIOR@var.names),
                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-#STAGE2  
+#STAGE2
+register.calibration.info('calib.3.12.stage2.az',
+                          preceding.calibration.codes = 'calib.3.12.stage1.az',
+                          likelihood.instructions = lik.inst.stage2,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
 register.calibration.info('calib.3.3.stage2.woFT',
                           preceding.calibration.codes = 'calib.3.2.stage1.az',
                           likelihood.instructions = lik.inst.stage2,
