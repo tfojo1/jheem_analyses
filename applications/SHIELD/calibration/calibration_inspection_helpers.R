@@ -39,10 +39,15 @@ assign_simset_vars <- function(locations,
                                                    calibration.code = calibration.codes[j])
         for (i in seq_along(locations)) {
             
+            if (!(locations[i] %in% names(msa_var_names))) {
+                print(paste0("Skipping '", locations[i], "': MSA name not found in list for affixes"))
+                next
+            }
+            
             print(paste0("On '", locations[i],"' for calibration '", calibration.codes[j], "'"))
             
             if (is.na(calib_progress[locations[i],1])) {
-                print(paste0("Skipping '",  "' for calibration '", calibration.codes[j], "' -- no data"))
+                print(paste0("Skipping '", locations[i], "' for calibration '", calibration.codes[j], "' -- no data"))
                 next
             }
             
@@ -75,7 +80,7 @@ assign_simset_vars <- function(locations,
             if (is.null(tmp)) next
             
             affix <- paste0(msa_var_names[locations[i]], names(calibration.codes)[j])
-
+            
             # Make whole simset
             assign(x = paste0("simset", affix),
                    value = tmp,
@@ -150,4 +155,36 @@ if (1 == 2) {
        simsetB, lastB, B20)
     assign_simset_vars(c("C.47900", "C.12060", "C.12580"),
                        calibration.codes = "calib.3.10.stage0.az")
+}
+
+stg0simplot <- function(sim1,
+                        sim2= NULL,
+                        sim3= NULL,
+                        split.by=NULL,
+                        outcomes = c("population", "diagnosis.ps"),
+                        facet.by=NULL,
+                        dimension.values = list(year=1990:2035),
+                        ...) {
+    if (is.null(sim2) && is.null(sim3))
+        simplot(sim1, outcomes, split.by=split.by, facet.by=facet.by, dimension.values=dimension.values, ...)
+    else if (is.null(sim3))
+        simplot(sim1, sim2, outcomes, split.by=split.by, facet.by=facet.by, dimension.values=dimension.values, ...)
+    else
+        simplot(sim1, sim2, sim3, outcomes, split.by=split.by, facet.by=facet.by, dimension.values=dimension.values, ...)
+}
+
+stg1simplot <- function(sim1,
+                        sim2= NULL,
+                        sim3= NULL,
+                        split.by=NULL,
+                        outcomes = c("diagnosis.total", "diagnosis.ps", "diagnosis.el.misclassified", "diagnosis.ll.misclassified", "hiv.testing", "sti.screening"),
+                        facet.by=NULL,
+                        dimension.values = list(year=1990:2035),
+                        ...) {
+    if (is.null(sim2) && is.null(sim3))
+        simplot(sim1, outcomes, split.by=split.by, facet.by=facet.by, dimension.values=dimension.values, ...)
+    else if (is.null(sim3))
+        simplot(sim1, sim2, outcomes, split.by=split.by, facet.by=facet.by, dimension.values=dimension.values, ...)
+    else
+        simplot(sim1, sim2, sim3, outcomes, split.by=split.by, facet.by=facet.by, dimension.values=dimension.values, ...)
 }
