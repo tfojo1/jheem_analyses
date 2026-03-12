@@ -1230,10 +1230,7 @@ lik.inst.stage1=join.likelihood.instructions(
     late.diagnosis.total.likelihood.instructions,
     late.diagnosis.by.strata.stage1.likelihood.instructions,
     #
-    create.ifelse.likelihood.instructions(
-        hiv.testing.by.strata.stage1.likelihood.instructions,
-        proportion.tested.by.strata.stage1.nested.likelihood.instructions
-    ),
+    proportion.tested.by.strata.stage1.nested.likelihood.instructions,
     #
     historical.diagnosis.likelihood.instructions,
     #
@@ -1256,11 +1253,8 @@ lik.inst.stage2=join.likelihood.instructions(
     # 
     late.diagnosis.total.likelihood.instructions,
     late.diagnosis.by.strata.stage2.likelihood.instructions,
-    # 
-    create.ifelse.likelihood.instructions(
-        hiv.testing.by.strata.stage2.likelihood.instructions,
-        proportion.tested.by.strata.stage2.nested.likelihood.instructions
-    ),
+    #
+    proportion.tested.by.strata.stage2.nested.likelihood.instructions,
     #
     historical.diagnosis.likelihood.instructions,
     #
