@@ -17,7 +17,8 @@ assign_simset_vars <- function(locations,
                                calibration.codes,
                                n.sim = 400,
                                version="shield",
-                               assemble.if.incomplete = T) {
+                               assemble.if.incomplete = T,
+                               sim.id="") {
     
     error.prefix <- "Error assigning simset vars: "
     
@@ -78,8 +79,8 @@ assign_simset_vars <- function(locations,
             }
             
             if (is.null(tmp)) next
-            
-            affix <- paste0(msa_var_names[locations[i]], names(calibration.codes)[j])
+           
+            affix <- paste0(msa_var_names[locations[i]], names(calibration.codes)[j],sim.id)
             
             # Make whole simset
             assign(x = paste0("simset", affix),
