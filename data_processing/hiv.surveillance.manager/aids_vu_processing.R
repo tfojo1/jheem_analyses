@@ -21,6 +21,8 @@ data.list.prep.total = lapply(data.list.prep, function(file){
   data=file[["data"]]
   filename = file[["filename"]]
   
+  names(data) <- gsub("[\n]", " ", names(data))
+  
   #Formatting all files will need#
     data$year = data$Year 
     data$outcome = "prep"
@@ -69,6 +71,8 @@ data.list.prep.sex = lapply(data.list.prep, function(file){
   data=file[["data"]]
   filename = file[["filename"]]
   
+  names(data) <- gsub("[\n]", " ", names(data))
+  
   #Formatting all files will need#
   data$year = data$Year 
   data$outcome = "prep"
@@ -113,6 +117,8 @@ data.list.prep.age = lapply(data.list.prep, function(file){
   data=file[["data"]]
   filename = file[["filename"]]
   
+  names(data) <- gsub("[\n]", " ", names(data))
+  
   #Formatting all files will need#
   data$year = data$Year 
   data$outcome = "prep"
@@ -131,10 +137,11 @@ data.list.prep.age = lapply(data.list.prep, function(file){
   data$`25-34 years`= data$`Age 25-34 PrEP Users`
   data$`35-44 years` = data$`Age 35-44 PrEP Users`
   data$`45-54 years`= data$`Age 45-54 PrEP Users`
-  data$`55+ years` = data$`Age 55+ PrEP Users`
+  data$`55-64 years` = data$`Age 55-64 PrEP Users`
+  data$`65+ years` = data$`Age 65+ PrEP Users`
 
   data <- data %>%
-   pivot_longer(cols=c("13-24 years", "25-34 years", "35-44 years", "45-54 years", "55+ years"),
+   pivot_longer(cols=c("13-24 years", "25-34 years", "35-44 years", "45-54 years", "55-64 years", "65+ years"),
                   names_to = "age",
                   values_to = "value")
   
@@ -157,12 +164,14 @@ data.list.prep.age = lapply(data.list.prep, function(file){
             ###Note race is not available at the county level###
 ################################################################################
 
-data.list.prep.state = data.list.prep[11:20] #Subset to just have state level data#
+data.list.prep.state = data.list.prep[14:26] #Subset to just have state level data#
 
 data.list.prep.race = lapply(data.list.prep.state, function(file){
   
   data=file[["data"]]
   filename = file[["filename"]]
+  
+  names(data) <- gsub("[\n]", " ", names(data))
   
   #Formatting all files will need#
   data$year = data$Year 
