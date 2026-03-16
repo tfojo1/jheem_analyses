@@ -73,9 +73,51 @@ register.model.element(
     name = 'mean.fraction.index.diagnoses.that.yield.a.positive.contact',
     get.value.function = function(location){
         if (location=="AL")
-            0.20 #change from .03 test 
+            0.07 #change from .07 test 
         else if (location=='LA')
-            0.006
+            0.007
+        else if (location == 'MO')
+            .04
+        else if (location == 'MS')
+            .014
+        else if (location == 'MI')
+            .006
+        else if (location == 'TN')
+            .02
+        else if (location == 'AZ')
+            .005
+        else if (location == 'GA')
+            .05
+        else if (location == 'TX')
+            .005
+        else if (location == 'MA')
+            .016
+        else if (location == 'CA')
+            .003
+        else if (location == 'OH')
+            .06
+        else if (location == 'PA')
+            .02
+        else if (location == 'FL')
+            .004
+        else if (location == 'NV')
+            .016
+        else if (location == 'NY')
+            .009
+        else if (location == 'WI')
+            .005
+        else if (location == 'KY')
+            .011
+        else if (location == 'IL')
+            .008
+        else if (location == 'MD')
+            .0013
+        else if (location == 'WA')
+            .005
+        else if (location == 'IN')
+            .006
+        else if (location == 'NJ')
+            .004
         else
             stop("We are only set up to accomodate LA or AL at this time")
     },
