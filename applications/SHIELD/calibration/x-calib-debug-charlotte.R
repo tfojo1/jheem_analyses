@@ -76,6 +76,7 @@ simplot(
     # outcomes="deaths"
 )
 
+s
 # LIKELIHOOD
 likCT=lik.inst.stage0$instantiate.likelihood('shield','C.16740')
 
