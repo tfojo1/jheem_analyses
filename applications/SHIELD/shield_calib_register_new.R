@@ -16,16 +16,18 @@ par.aliases.transmission = list(
 
 # STAGE 0 Demographics thin 50
 
-register.calibration.info("calib.3.12.stage1.az",
-                          preceding.calibration.codes = 'calib.2.19.stage0.az',
-                          likelihood.instructions = lik.inst.stage1,
+# Has 1/32 weight
+register.calibration.info("calib.3.13.stage0.az",
+                          likelihood.instructions = lik.inst.stage0,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
-                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                              STI.TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c("global.transmission.rate"=2.05), # median is 2.2
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          parameter.aliases = par.aliases.transmission,
                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
-                          
-                          )
+)
 
 register.calibration.info("calib.3.10.stage0.az",
                           likelihood.instructions = lik.inst.stage0,
@@ -50,7 +52,6 @@ register.calibration.info("calib.2.19.stage0.az",
                           parameter.aliases = par.aliases.transmission,
                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-# without future trend ----
 #STAGE1  
 register.calibration.info('calib.3.2.stage1.az',
                           preceding.calibration.codes = 'calib.2.19.stage0.az',
@@ -60,6 +61,26 @@ register.calibration.info('calib.3.2.stage1.az',
                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
                                               STI.TESTING.PARAMETERS.PRIOR@var.names),
                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info("calib.3.12.stage1.az",
+                          preceding.calibration.codes = 'calib.2.19.stage0.az',
+                          likelihood.instructions = lik.inst.stage1,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+                          
+)
+register.calibration.info("calib.3.16.stage1.az",
+                          preceding.calibration.codes = 'calib.2.19.stage0.az',
+                          likelihood.instructions = lik.inst.stage1,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+                          
 )
 #STAGE2
 register.calibration.info('calib.3.12.stage2.az',
