@@ -48,6 +48,7 @@ data.manager$put.long.form(
     ontology.name = 'nastad.fpl.1',
     source = 'nastad.adap',
     dimension.values.to.distribute = list(fpl=('Unknown')),
+    allow.distributing.on.proportion.scale=T,
     url = 'https://nastad.org/adap-monitoring-project',
     details = 'NASTAD PDF Reports')
     
@@ -83,6 +84,7 @@ data.manager$put.long.form(
     data = nastad.income.2.clean,
     ontology.name = 'nastad.fpl.2',
     source = 'nastad.adap',
+    allow.distributing.on.proportion.scale=T,
     dimension.values.to.distribute = list(fpl=('Unknown')),
     url = 'https://nastad.org/adap-monitoring-project',
     details = 'NASTAD PDF Reports')
