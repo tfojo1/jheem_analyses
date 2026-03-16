@@ -214,6 +214,7 @@ rw.adap.total <- as.data.frame(rw.adap.total)
             fpl == "251%-400% FPL Count" ~"251-400",
             fpl == ">400% FPL Count" ~">400"))
     
+    rw.adap.fpl <- as.data.frame(rw.adap.fpl)
     
     data.manager$put.long.form(
         data = rw.adap.fpl,
