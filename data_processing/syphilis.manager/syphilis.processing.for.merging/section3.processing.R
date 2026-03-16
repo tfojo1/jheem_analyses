@@ -232,6 +232,15 @@ data.manager$register.ontology(
     incomplete.dimensions = c("year", "location")
   ))
 
+data.manager$register.ontology(     #This is for death data pulled from cdc wonder
+    'cdc.wonder.adjusted',
+    ont = ontology(
+        year= NULL,
+        location= NULL,
+        age=c('0-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-54 years', '55-64 years', '65+ years'),
+        race=c('american indian or alaska native', 'asian or pacific islander', 'black or african american', 'white', 'hispanic'),
+        sex=c('male','female')
+    ))
 
 #Codes:
 source('data_processing/syphilis.manager/cached.census.data.R')
@@ -241,6 +250,7 @@ source('data_processing/syphilis.manager/national_immigration.R')
 source('data_processing/syphilis.manager/restratify.immigration.age.R') #This code restratifies the age groups from census data to match SHIELD
 source('data_processing/syphilis.manager/prenatal.care.cdc.wonder.R')
 source('data_processing/syphilis.manager/prenatal.screening.denominator.R')
+source('data_processing/syphilis.manager/cdc.wonder.deaths.R')
 
 
 #Aggregate Outcomes to MSA 
