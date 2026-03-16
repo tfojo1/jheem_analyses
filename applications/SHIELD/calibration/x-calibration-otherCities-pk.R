@@ -7,10 +7,6 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 location.style.manager = create.style.manager(color.data.by = "location.type")
 source.style.manager   = create.style.manager( shape.data.by = "source",color.data.by = "stratum")
 stratum.style.manager  = create.style.manager(color.data.by = "stratum")
-
-
-
-
 source('../jheem_analyses/applications/SHIELD/calibration/calibration_inspection_helpers.R')
 
 # READ STATUS of ongoing runs
