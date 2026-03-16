@@ -75,7 +75,6 @@ nastad.income.2.clean <- nastad.income.2%>%
         fpl == "Unknown FPL" ~"Unknown"))%>%
     mutate(value = readr::parse_number(value))
 
-nastad.income.2.clean$value <- as.numeric(format(nastad.income.2.clean$value, scientific = FALSE))
 
 nastad.income.2.clean <- as.data.frame(nastad.income.2.clean)
 
@@ -192,6 +191,8 @@ rw.adap.clean <- RW_ADAP%>%
 rw.adap.total <- rw.adap.clean%>%
     rename(value = `Total (N)`)%>%
     select(year, location, value, outcome)
+
+rw.adap.total <- as.data.frame(rw.adap.total)
 
     data.manager$put.long.form(
         data = rw.adap.total,
