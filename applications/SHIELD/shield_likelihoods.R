@@ -16,7 +16,7 @@ diagnosis_cv=PS_CV #we will use this error variance for all diagnosis categories
 # STAGE.2: Diagnosis (race, sex, age stratified) +other likelihoods
 # WEIGHTS: The weights are used to weaken the likelihoods for better mixing 
 #
-STAGE.0.WEIGHT= 1/16 
+STAGE.0.WEIGHT= 1/32 # lowered by half on 3/13/2026 
 STAGE.1.WEIGHT= 1/8
 STAGE.2.WEIGHT= 1/8 
 
@@ -70,7 +70,8 @@ population.likelihood.instructions =
                                          observation.correlation.form = 'autoregressive.1', # errors in consecutive time periods are more strongly correlated, but this correlation weakens over time
                                          #
                                          correlation.different.years = 0.5, # default #'@PK
-                                         correlation.different.strata = 0.1, # default #'@PK
+                                         # correlation.different.strata = 0.1, # default #'@PK
+                                         correlation.different.strata = 0,
                                          # correlation.different.sources = 0, # default  
                                          correlation.same.source.different.details = 0.3, # default: 
                                          
@@ -774,21 +775,27 @@ proportion_ps_male_among_msm_likelihood_instructions <-
         name = "proportion_msm_likelihood",
         compute.function = function(sim, data, log = TRUE, debug = F) {
             if (debug) browser()
-            #
+            
             get_instr <- data$get_instr
             years <- data$years
             weight <- data$weight
-            #
+            
             vals <- sim$optimized.get(get_instr)
-            #
+            
             prp_msm <- vals[,"msm"] / rowSums(vals) #proportion of male diagnosis among MSM:
-            #
+            
+            # Because it is possible to have 0 diagnoses in some simulations,
+            # we will have to set the ratio to something between 0 and 1.
+            # Extreme ends are good so that having any diagnoses at all will
+            # improve this likelihood.
+            prp_msm[is.na(prp_msm)] <- 1
+            
             # Normal band edges; likelihood is constant inside the band
             band_mean <- 0.6 # mean value in 2022 (from national data)
             band_sd <- 0.05 # assuming a 0.05 sd, which puts 2sd band at 0.1
             # the lower threshold is set at 0.6 - 2*.05 = 0.5 (penalizing sims where prop of male diagnosis among MSM is less than 0.5)
             lo <- band_mean - 2 * band_sd
-            # 
+            
             total_log_likelihood <- sum(pmin(dnorm(lo, band_mean, band_sd, log=T),
                                              dnorm(prp_msm, band_mean, band_sd, log=T)))
             # Apply weight
@@ -1149,8 +1156,8 @@ proportion.tested.by.strata.stage1.nested.likelihood.instructions =
                                                      within.location.n.error.correlation = 0.5, #Default: ratio of tests outside MSA to those inside MSA (for MSA we usually dont have fully stratified numbers)
                                                      #
                                                      observation.correlation.form = 'compound.symmetry',
-                                                     p.error.variance.term = 0.5,
-                                                     p.error.variance.type = 'cv', 
+                                                     p.error.variance.term = NULL, # this was cv=50% until "calib.3.16.stage1.az"
+                                                     p.error.variance.type = "data.variance", 
                                                      #
                                                      partitioning.function = SHIELD.PARTITIONING.FUNCTION,
                                                      #
@@ -1180,8 +1187,8 @@ proportion.tested.by.strata.stage2.nested.likelihood.instructions =
                                                      within.location.n.error.correlation = 0.5, #Default: ratio of tests outside MSA to those inside MSA (for MSA we usually dont have fully stratified numbers)
                                                      #
                                                      observation.correlation.form = 'compound.symmetry',
-                                                     p.error.variance.term = 0.5,
-                                                     p.error.variance.type = 'cv', 
+                                                     p.error.variance.term = NULL,
+                                                     p.error.variance.type = "data.variance", 
                                                      #
                                                      partitioning.function = SHIELD.PARTITIONING.FUNCTION,
                                                      #

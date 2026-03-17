@@ -16,6 +16,19 @@ par.aliases.transmission = list(
 
 # STAGE 0 Demographics thin 50
 
+# Has 1/32 weight AND correlation between strata = 0 for population
+register.calibration.info("calib.3.17.stage0.az",
+                          likelihood.instructions = lik.inst.stage0,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          fixed.initial.parameter.values = c("global.transmission.rate"=2.05), # median is 2.2
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          parameter.aliases = par.aliases.transmission,
+                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
 # Has 1/32 weight
 register.calibration.info("calib.3.13.stage0.az",
                           likelihood.instructions = lik.inst.stage0,
