@@ -2,17 +2,24 @@ library(ggplot2)
 
 # Fitting for truncated normal
 
-params.adap = fit.tobit.normal.distribution.to.quantiles(p = adap.income.dist.2023,
-                                                                   upper.limit = 500)
+# params.adap.basic = fit.tobit.normal.distribution.to.quantiles(p = adap.income.dist.2023,
+#                                                                   upper.limit = 500)
+params.adap = fit.tobit.normal.distribution.with.ssi.to.quantiles(p = adap.income.dist.2023,
+                                                                  upper.limit = 500)
 
-params.adap.black = fit.tobit.normal.distribution.to.quantiles(p = adap.black.income.dist.2023,
-                                                                   upper.limit = 500)
+params.adap.black = fit.tobit.normal.distribution.with.ssi.to.quantiles(p = adap.black.income.dist.2023,
+                                                                        upper.limit = 500)
 
-params.adap.white = fit.tobit.normal.distribution.to.quantiles(p = adap.white.income.dist.2023,
-                                                                   upper.limit = 500)
+params.adap.white = fit.tobit.normal.distribution.with.ssi.to.quantiles(p = adap.white.income.dist.2023,
+                                                                        upper.limit = 500)
 
-params.adap.hispanic = fit.tobit.normal.distribution.to.quantiles(p = adap.hispanic.income.dist.2023,
-                                                                      upper.limit = 500)
+params.adap.hispanic = fit.tobit.normal.distribution.with.ssi.to.quantiles(p = adap.hispanic.income.dist.2023,
+                                                                           upper.limit = 500)
+
+
+
+est.p.full.pay.of.adap = pmin(1-frac.on.medicaid.by.income,
+                              full.pay.income.counts.2023 / (full.pay.income.counts.2023 + adap.insurance.income.counts.2023))
 
 sim.df.inc = data.frame(
     value = c(adap.black.income.dist.2023,
@@ -42,9 +49,6 @@ z = cbind(
     hispanic = as.numeric(params.adap.hispanic)
 )
 
-
-est.p.full.pay.of.adap = pmin(1-frac.on.medicaid.by.income,
-                              full.pay.income.counts.2023 / (full.pay.income.counts.2023 + adap.insurance.income.counts.2023))
 
 params.logistic = fit.logistic.parameters.to.p.distribution(
     dist.parameters = list(

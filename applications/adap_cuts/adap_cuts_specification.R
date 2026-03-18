@@ -1,10 +1,10 @@
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
 
-ADAP.SPECIFICATION = create.jheem.specification(version='adapcuts',
+ADAP.SPECIFICATION = create.jheem.specification(version='adap',
                                               iteration = '1',
                                               description='Model to study the impacts of cuts to ADAP on HIV transmission',
                                               parent.version = 'ehe',
-                                              compartments.for.outcomes = list(income=c('0-100', '101-138', '139-200', '201-250', '251-300','301-400','401-500','500+')))
+                                              compartments.for.outcomes = list(income=c('0-100', '101-138', '139-200', '201-250', '251-300','301-400','401-500','>500')))
 
 
 
@@ -294,48 +294,42 @@ calculate.baseline.proportion.pwh.with.adap.full.pay <- function(baseline.propor
     apply(adap.income.proportions.single.fpl, non.income.dimensions, sum) * baseline.proportion.pwh.with.adap
 }
 
-calculate.baseline.proportion.adap.full.pay.clients.above.new.fpl.threshold <- function(baseline.adap.full.pay.income.proportions.single.fpl,
-                                                                                        adap.full.pay.fpl.threshold)
+calculate.baseline.proportion.above.new.fpl.threshold <- function(baseline.income.proportions.single.fpl,
+                                                                  fpl.threshold)
 {
-    adap.full.pay.fpl.threshold = ceiling(dim(baseline.adap.full.pay.income.proportions.single.fpl)['income'])
-    n.income.values = dim(baseline.adap.full.pay.income.proportions.single.fpl)['income']
+    fpl.threshold = floor(fpl.threshold)
+    n.income.values = dim(baseline.income.proportions.single.fpl)['income']
     
-    non.income.dimensions = setdiff(names(dim(baseline.adap.full.pay.income.proportions.single.fpl)), 'income')
-    if (adap.full.pay.fpl.threshold >= n.income.values)
+    non.income.dimensions = setdiff(names(dim(baseline.income.proportions.single.fpl)), 'income')
+    if (fpl.threshold >= n.income.values)
     {
-        array(0, dim=dim(baseline.adap.full.pay.income.proportions.single.fpl)[non.income.dimensions],
+        array(1, dim=dim(baseline.income.proportions.single.fpl)[non.income.dimensions],
               dimnames = dimnames(baseline.adap.full.pay.income.proportions.single.fpl)[non.income.dimensions])
     }         
     else
     {
-        above.threshold.indices = (adap.full.pay.fpl.threshold+1):n.income.values
+        above.threshold.indices = (fpl.threshold+1):n.income.values
         
-        rv = apply(baseline.adap.full.pay.income.proportions.single.fpl, non.income.dimensions, function(x){
+        rv = apply(baseline.income.proportions.single.fpl, non.income.dimensions, function(x){
             sum(x[above.threshold.indices])
-        }) / apply(baseline.adap.full.pay.income.proportions.single.fpl, non.income.dimensions, sum)    
+        }) / apply(baseline.income.proportions.single.fpl, non.income.dimensions, sum)    
     }
 }
 
-calculate.baseline.proportion.adap.insurance.clients.above.new.fpl.threshold <- function(baseline.adap.insurance.income.proportions.single.fpl,
-                                                                               adap.insurance.fpl.threshold)
+calculate.baseline.proportion.adap.full.pay.clients.above.new.fpl.threshold <- function(baseline.adap.full.pay.income.proportions.single.fpl,
+                                                                                        adap.full.pay.fpl.threshold)
 {
-    adap.insurance.fpl.threshold = ceiling(dim(baseline.adap.insurance.income.proportions.single.fpl)['income'])
-    n.income.values = dim(baseline.adap.insurance.income.proportions.single.fpl)['income']
-    
-    non.income.dimensions = setdiff(names(dim(baseline.adap.insurance.income.proportions.single.fpl)), 'income')
-    if (adap.insurance.fpl.threshold >= n.income.values)
-    {
-        array(0, dim=dim(baseline.adap.insurance.income.proportions.single.fpl)[non.income.dimensions],
-              dimnames = dimnames(baseline.adap.insurance.income.proportions.single.fpl)[non.income.dimensions])
-    }         
-    else
-    {
-        above.threshold.indices = (adap.insurance.fpl.threshold+1):n.income.values
-        
-        apply(baseline.adap.insurance.income.proportions.single.fpl, non.income.dimensions, function(x){
-            sum(x[above.threshold.indices])
-        }) / apply(baseline.adap.insurance.income.proportions.single.fpl, non.income.dimensions, sum)    
-    }
+    calculate.baseline.proportion.above.new.fpl.threshold(
+        baseline.income.proportions.single.fpl = baseline.adap.full.pay.income.proportions.single.fpl,
+        fpl.threshold = adap.full.pay.fpl.threshold)
+}
+
+calculate.baseline.proportion.adap.insurance.clients.above.new.fpl.threshold <- function(baseline.adap.insurance.income.proportions.single.fpl,
+                                                                                         adap.insurance.fpl.threshold)
+{
+    calculate.baseline.proportion.above.new.fpl.threshold(
+        baseline.income.proportions.single.fpl = baseline.adap.insurance.income.proportions.single.fpl,
+        fpl.threshold = adap.insurance.fpl.threshold)
 }
 
 ##---------------------------##
@@ -456,6 +450,57 @@ register.model.quantity(ADAP.SPECIFICATION,
 ##-- CALCULATED: TO SUPPORT INCOME OUTPUTS --##
 ##-------------------------------------------##
 
+calculate.adap.full.pay.income.distribution <- function(baseline.adap.full.pay.income.proportions.single.fpl,
+                                                        adap.full.pay.fpl.threshold,
+                                                        cutpoints = c(0, 100, 138, 200, 250, 300, 400, 500, Inf))
+{
+    calculate.income.distribution(income.proportions.single.fpl = baseline.adap.full.pay.income.proportions.single.fpl,
+                                  cutpoints = cutpoints,
+                                  fpl.threshold = adap.full.pay.fpl.threshold)
+}
+
+calculate.income.distribution <- function(income.proportions.single.fpl,
+                                          fpl.threshold,
+                                          cutpoints = c(0, 100, 138, 200, 250, 300, 400, 500, Inf))
+{
+    n.incomes = dim(income.proportions.single.fpl)['income']
+    fpl.threshold = floor(fpl.threshold)
+    fpl.threshold.index = min(fpl.threshold+1, n.incomes)
+    non.income.dimensions = setdiff(names(dim(income.proportions.single.fpl)), 'income')
+    
+    lower.indices = cutpoints[-length(cutpoints)] + 1
+    lower.indices[-1] = lower.indices[-1]+1
+    lower.indices = pmin(fpl.threshold.index, lower.indices)
+    
+    upper.indices = pmin(fpl.threshold.index, cutpoints[-1]+1)
+    
+    rv = apply(income.proportions.single.fpl, non.income.dimensions, function(income.proportions){
+        
+        total.below.threshold = sum(income.proportions[1:fpl.threshold.index])
+        
+        sapply(1:length(lower.indices), function(i){
+            
+            if (lower.indices[i]==upper.indices[i])
+                0
+            else
+                sum(income.proportions[lower.indices[i]:upper.indices[i]]) / total.below.threshold
+        })
+    })
+    
+    income.names = paste0(lower.indices-1, "-", upper.indices-1)
+    if (cutpoints[length(cutpoints)]==Inf)
+        income.names[length(income.names)] = paste0(">", lower.indices[length(lower.indices)]-1)
+    
+    dim.names = c(
+        list(income=income.names),
+        dimnames(income.proportions.single.fpl)[non.income.dimensions])
+    
+    dim(rv) = vapply(dim.names, length, FUN.VALUE=integer(1))
+    dimnames(rv) = dim.names
+    
+    rv
+}
+
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'general.fpl.median',
                         value = expression(adap.fpl.median * general.over.adap.fpl.median.multiplier), 
@@ -470,18 +515,11 @@ register.model.quantity(ADAP.SPECIFICATION,
 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'adap.full.pay.income.distribution',
-                        value = 0)
-
-register.model.quantity.subset(ADAP.SPECIFICATION,
-                               name = 'adap.full.pay.income.distribution',
-                               applies.to = list(income='0-100'),
-                               value = 1
-                               )
-
+                        value = calculate.adap.full.pay.income.distribution)
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.with.adap.by.income',
-                        value = expression(adap.full.pay.income.distribution * proportion.pwh.with.adap))
+                        name = 'proportion.pwh.with.adap.full.pay.by.income',
+                        value = expression(adap.full.pay.income.distribution * proportion.pwh.with.adap.full.pay))
 
 
 ##--------------##
@@ -501,8 +539,32 @@ track.integrated.outcome(ADAP.SPECIFICATION,
                                                                     units = 'people',
                                                                     singular.unit = 'person'),
                          value.to.integrate = 'infected',
-                         multiply.by = 'proportion.pwh.with.adap.full.pay',
+                         multiply.by = 'proportion.pwh.with.adap.full.pay.by.income',
                          subset.dimension.values = list(continuum='diagnosed.states'),
+                         allow.expand.dimensions = 'income',
+                         keep.dimensions = c('location','age','race','sex','risk','income'),
+                         corresponding.data.outcome = 'adap.full.pay.clients',
+                         save = T)
+
+track.cumulative.outcome(ADAP.SPECIFICATION,
+                         name = 'total.adap.full.pay.clients',
+                         scale = 'non.negative.number',
+                         value = 'adap.full.pay.clients',
+                         exclude.dimensions = 'income',
+                         save = F)
+
+track.cumulative.outcome(ADAP.SPECIFICATION,
+                         name = 'adap.full.pay.income.distribution',
+                         outcome.metadata = create.outcome.metadata(display.name = 'ADAP Full-Pay Income Distribution',
+                                                                    description = "Number of Individuals Receiving ADAP Full-Pay Medication Services",
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'Clients',
+                                                                    units = 'people',
+                                                                    singular.unit = 'person'),
+                         value = 'adap.full.pay.clients',
+                         value.is.numerator = T,
+                         denominator.outcome = 'total.adap.full.pay.clients',
+                         allow.expand.denominator.dimensions = 'income',
                          keep.dimensions = c('location','age','race','sex','risk','income'),
                          corresponding.data.outcome = 'adap.full.pay.clients',
                          save = T)

@@ -8,6 +8,8 @@ parse.income.brackets <- function(brackets)
     split = strsplit(brackets, '-')
     
     lowers = as.numeric(sapply(split, function(x){x[1]}))
+    lowers[!upper.is.infinite] = lowers[!upper.is.infinite]-1
+    lowers[lowers<0] = 0
     uppers = as.numeric(sapply(split, function(x){x[2]}))
     uppers[upper.is.infinite] = Inf
     
@@ -79,6 +81,72 @@ fit.tobit.normal.distribution.to.quantiles <-  function(p,
     
     list(mean = mean, sd = sd, upper.limit = upper.limit, type='tobit.normal')
 }
+
+fit.tobit.normal.distribution.with.ssi.to.quantiles <-  function(p,
+                                                                 upper.limit,
+                                                                 ssi.benefit = 995*12 / 15960,
+                                                                 ssi.breakeven = 2073*12 / 15960,
+                                                                 p.ssi.if.income.eligible = 587 / (1106+449),
+                                                                 print.summary = T)
+{
+    parsed.bounds = parse.income.brackets(names(p))
+    parsed.bounds$lower[parsed.bounds$lower==0] = -Inf
+    
+    objective.fn = function(params){
+        
+        mean = params[1]
+        sd = params[2]
+        
+        
+        all.bounds = c(parsed.bounds$upper, parsed.bounds$lower, upper.limit)
+        all.bounds.before.ssi.benefit = (all.bounds - ssi.benefit) * ssi.breakeven  / (ssi.breakeven - ssi.benefit)
+        
+        p.for.bounds = pnorm(all.bounds, mean, sd)
+        p.for.bounds[all.bounds<=ssi.benefit] = (1-p.ssi.if.income.eligible) * p.for.bounds[all.bounds<=ssi.benefit]
+        p.for.bounds[all.bounds>ssi.benefit & all.bounds<ssi.breakeven] = (1-p.ssi.if.income.eligible) * p.for.bounds[all.bounds>ssi.benefit & all.bounds<ssi.breakeven] +
+            p.ssi.if.income.eligible * pnorm(all.bounds.before.ssi.benefit[all.bounds>ssi.benefit & all.bounds<ssi.breakeven], mean, sd)
+        
+        upper.p = p.for.bounds[length(p.for.bounds)]
+        
+        p.for.bounds = pmin(p.for.bounds, upper.p) / upper.p   
+        
+        sim.p = p.for.bounds[1:length(parsed.bounds$upper)] -
+            p.for.bounds[length(parsed.bounds$upper) + 1:length(parsed.bounds$lower)]
+
+        score = sum( (p-sim.p)^2 )
+    }
+    
+    optim.result = optim(par = c(upper.limit/2, upper.limit/4),
+                         fn = objective.fn)
+    
+    mean = optim.result$par[1]
+    sd = optim.result$par[2]
+    
+    upper.p = pnorm(q=upper.limit, mean, sd)
+    
+    sim.p = (pmin(pnorm(q=parsed.bounds$upper, mean, sd), upper.p) -
+                 pmin(pnorm(q=parsed.bounds$lower, mean, sd), upper.p)) /
+        upper.p
+    
+    if (print.summary)
+    {
+        print(
+            round(rbind(
+                '<0' = c(obs.p = NA, sim.p=pnorm(0, mean, sd) / pnorm(upper.limit, mean, sd)),
+                cbind(
+                    obs.p = p,
+                    sim.p = sim.p
+                )), 4)
+        )
+    }
+    
+    list(mean = mean, sd = sd, upper.limit = upper.limit,
+         ssi.benefit = ssi.benefit,
+         ssi.breakeven = ssi.breakeven,
+         p.ssi.if.income.eligible = p.ssi.if.income.eligible,
+         type='tobit.normal.with.ssi')
+}
+
 
 
 fit.zero.inflated.lognormal.distribution.to.quantiles <-  function(p,
@@ -257,10 +325,12 @@ get.distribution.p <- function(x, dist.parameters)
     
     if (dist.parameters$type=='tobit.normal')
         get.tobit.normal.distribution.p(x, dist.parameters)
+    else if (dist.parameters$type=='tobit.normal.with.ssi')
+        get.tobit.normal.distribution.with.ssi.p(x, dist.parameters)
     else if (dist.parameters$type=='zero.inflated.lognormal')
         get.zero.inflated.lognormal.distribution.p(x, dist.parameters)
     else
-        stop("'dist.parameters' must have type 'tobit.normal' or 'zero.inflated.lognormal")
+        stop("'dist.parameters' must have type 'tobit.normal', 'tobit.normal.with.ssi', or 'zero.inflated.lognormal")
 }
 
 get.tobit.normal.distribution.p <- function(x, tobit.normal.parameters)
@@ -268,7 +338,26 @@ get.tobit.normal.distribution.p <- function(x, tobit.normal.parameters)
     p = pnorm(pmax(0, x), tobit.normal.parameters$mean, tobit.normal.parameters$sd) / 
         pnorm(tobit.normal.parameters$upper.limit, tobit.normal.parameters$mean, tobit.normal.parameters$sd)
     
-    p[p < 0] = 0
+    p[x < 0] = 0
+    
+    p
+}
+
+get.tobit.normal.distribution.with.ssi.p <- function(x, tobit.normal.parameters)
+{
+    x.plus = c(x, tobit.normal.parameters$upper.limit)
+    
+    p = pnorm(x.plus, tobit.normal.parameters$mean, tobit.normal.parameters$sd)
+    p[x.plus<=tobit.normal.parameters$ssi.benefit] = (1-tobit.normal.parameters$p.ssi.if.income.eligible) * p[x.plus<=tobit.normal.parameters$ssi.benefit]
+    p[x.plus>tobit.normal.parameters$ssi.benefit & x.plus<tobit.normal.parameters$ssi.breakeven] = 
+        (1-tobit.normal.parameters$p.ssi.if.income.eligible) * p[x.plus>tobit.normal.parameters$ssi.benefit & x.plus<tobit.normal.parameters$ssi.breakeven] +
+        tobit.normal.parameters$p.ssi.if.income.eligible * pnorm(x.plus[x.plus>tobit.normal.parameters$ssi.benefit & x.plus<tobit.normal.parameters$ssi.breakeven], tobit.normal.parameters$mean, tobit.normal.parameters$sd)
+    
+    upper.p = p[length(p)]
+    
+    p = pmin(upper.p, p[-length(p)]) / upper.p
+    
+    p[x < 0] = 0
     
     p
 }
