@@ -41,8 +41,9 @@ wonder.data.clean = lapply(wonder.data, function(file){
     if(grepl("_age", filename)) {
         data <- data %>%
             filter(Five.Year.Age.Groups != "Not Stated")%>% #There's a few people without age
-            mutate(fixed.age = ifelse(Five.Year.Age.Groups %in% c("85-89 years", "90-94 years", "95-99 years", "100+ years"), "85+ years", Five.Year.Age.Groups))%>%
-            group_by(year, location, fixed.age)%>%
+            mutate(age = ifelse(Five.Year.Age.Groups %in% c("85-89 years", "90-94 years", "95-99 years", "100+ years"), "85+ years", Five.Year.Age.Groups))%>%
+            mutate(age = ifelse(age == "60-64 years ", "60-64 years", age))%>%
+            group_by(year, location, age)%>%
             mutate(fixed.death.count = sum(value))%>%
             select(-value)%>%
             rename(value = fixed.death.count)
