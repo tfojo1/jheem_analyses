@@ -61,8 +61,8 @@ mean.ci.rel.total.infections.averted.int.by.city = cbind(
 )
 
 # Report out # and % infections averted for specific state
-mean.ci.abs.total.infections.averted.end.by.city["NY",]
-mean.ci.rel.total.infections.averted.end.by.city["NY",]
+mean.ci.abs.total.infections.averted.end.by.city["FL",]
+mean.ci.rel.total.infections.averted.end.by.city["FL",]
 
 mean.ci.abs.total.infections.averted.int.by.city["NY",]
 mean.ci.rel.total.infections.averted.int.by.city["NY",]
@@ -182,7 +182,7 @@ View(table.city)
     names(urbanicity) = c("Alabama","California","Florida","Georgia","Illinois","Louisiana","Missouri",
                           "Mississippi","New.York","Texas","Wisconsin")
     
-    # df.city.summ comes from betwee_city_variation_secondary.R; run through line 106
+    # df.city.summ comes from between_city_variation_secondary.R; run through line 106
     df.city.summ$urbanicity = c(as.numeric(urbanicity))
     
     rw.clients.corr = cor(df.city.summ$excess, df.city.summ$rw.clients)

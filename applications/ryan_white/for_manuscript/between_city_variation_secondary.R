@@ -3,12 +3,12 @@ library(ggplot2)
 library(tibble)
 
 
-CUMULATIVE.YEARS = as.character(2025:2030)
-BASELINE.YEAR = as.character(2025)
+CUMULATIVE.YEARS = YEARS.TO.CONSIDER
+BASELINE.YEAR = YEARS.TO.CONSIDER[1]
 PRE.BASELINE.YEAR = as.character(2016)
 
 
-excess.incidence.end.vs.noint = (apply(total.incidence[CUMULATIVE.YEARS,,,'rw.end',drop=F] - total.incidence[CUMULATIVE.YEARS,,,'noint',drop=F], c('location','sim'), sum, na.rm=T)) / 
+excess.incidence.end.vs.noint = (apply(total.incidence[CUMULATIVE.YEARS,,,END.NAME,drop=F] - total.incidence[CUMULATIVE.YEARS,,,'noint',drop=F], c('location','sim'), sum, na.rm=T)) / 
   apply(total.incidence[CUMULATIVE.YEARS,,,'noint',drop=F], c('location','sim'), sum, na.rm=T)
 mean.excess.incidence.end.vs.noint = apply(excess.incidence.end.vs.noint, 'location', mean, na.rm=T)
 
@@ -64,7 +64,7 @@ df.city.summ$new.per.pop = df.city.summ$new / df.city.summ$population
 df.city.summ$new.per.prev = df.city.summ$new / df.city.summ$diagnosed.prevalence
 
 if (1==2)
-    df.city.summ$awareness = apply(total.awareness['2025',,,'rw.end'], 'location', mean)
+    df.city.summ$awareness = apply(total.awareness['2025',,,END.NAME], 'location', mean)
 
 pcc.df = df.city.summ[,c('rw.clients',
                  #        'adap.clients',
@@ -627,14 +627,14 @@ if (1==2)
 {
     exp.locations = dimnames(df.city.summ)[[1]][df.city.summ$medicaid=='Expansion State']
     nonexp.locations = dimnames(df.city.summ)[[1]][df.city.summ$medicaid!='Expansion State']
-    lose.adap.n.exp = total.results['2025',,'adap.suppression',exp.locations,'rw.end'] * all.parameters['lose.adap.expansion.effect',,exp.locations,'rw.end']
-    lose.adap.n.nonexp = total.results['2025',,'adap.suppression',nonexp.locations,'rw.end'] * all.parameters['lose.adap.nonexpansion.effect',,nonexp.locations,'rw.end']
+    lose.adap.n.exp = total.results['2025',,'adap.suppression',exp.locations,END.NAME] * all.parameters['lose.adap.expansion.effect',,exp.locations,END.NAME]
+    lose.adap.n.nonexp = total.results['2025',,'adap.suppression',nonexp.locations,END.NAME] * all.parameters['lose.adap.nonexpansion.effect',,nonexp.locations,END.NAME]
     
-    adap.n.exp = total.results['2025',,'adap.clients',exp.locations,'rw.end']
-    adap.n.nonexp = total.results['2025',,'adap.clients',nonexp.locations,'rw.end']
+    adap.n.exp = total.results['2025',,'adap.clients',exp.locations,END.NAME]
+    adap.n.nonexp = total.results['2025',,'adap.clients',nonexp.locations,END.NAME]
     
-    supp.n.exp = total.results['2025',,'suppression',exp.locations,'rw.end']
-    supp.n.nonexp = total.results['2025',,'suppression',nonexp.locations,'rw.end']
+    supp.n.exp = total.results['2025',,'suppression',exp.locations,END.NAME]
+    supp.n.nonexp = total.results['2025',,'suppression',nonexp.locations,END.NAME]
     
     adap.suppression.loss.exp = rowSums(lose.adap.n.exp) / rowSums(supp.n.exp)
     adap.suppression.loss.nonexp = rowSums(lose.adap.n.nonexp) / rowSums(supp.n.nonexp)
@@ -643,10 +643,10 @@ if (1==2)
     mean(adap.suppression.loss.nonexp)
     
     
-    prev.2025 = total.results['2025',,'diagnosed.prevalence',,'rw.end']
-    prev.2026 = total.results['2026',,'diagnosed.prevalence',,'rw.end']
-    unsuppressed.2025 = prev.2025 - total.results['2025',,'suppression',,'rw.end']
-    unsuppressed.2026 = prev.2026 - total.results['2026',,'suppression',,'rw.end']
+    prev.2025 = total.results['2025',,'diagnosed.prevalence',,END.NAME]
+    prev.2026 = total.results['2026',,'diagnosed.prevalence',,END.NAME]
+    unsuppressed.2025 = prev.2025 - total.results['2025',,'suppression',,END.NAME]
+    unsuppressed.2026 = prev.2026 - total.results['2026',,'suppression',,END.NAME]
     
     delta.suppression = rowSums(unsuppressed.2025)/rowSums(prev.2025) - rowSums(unsuppressed.2026)/rowSums(prev.2026)
     delta.suppression.exp = rowSums(unsuppressed.2026[,exp.locations])/rowSums(prev.2026[,exp.locations]) / ( rowSums(unsuppressed.2025[,exp.locations])/rowSums(prev.2025[,exp.locations]) )
