@@ -1,4 +1,5 @@
 source.style.manager   = create.style.manager( shape.data.by = "source",color.data.by = "stratum")
+#' @Andrew: can you revise the color theme for this plot to look more different for stratum? right now, they both look grayish
 
 # Example for Baltimore:
 sim.last=lastB
@@ -93,7 +94,8 @@ for (outcome in c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified",
         ggsave(file_png, plot = p, width = 8, height = 5, dpi = 300)
     }}
 # Two_way Stratification ----
-for (outcome in c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.ll.misclassified","hiv.testing")){
+#@Andrew: we should only include outcomes with two way stratification data  (not hiv.testing)
+for (outcome in c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.ll.misclassified")){
     print(outcome)
     p=simplot(
         last20,
@@ -126,7 +128,7 @@ for (outcome in c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified",
     ggsave(file_png, plot = p, width = 8, height = 5, dpi = 300)
 }
 
-
+#OTHER Plots of interest:
 # # One_way- simonly for Sex ----
 # for (outcome in c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.ll.misclassified","hiv.testing")){
 #     for (strata in c("sex")){
