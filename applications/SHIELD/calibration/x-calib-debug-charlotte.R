@@ -13,7 +13,7 @@ source('../jheem_analyses/applications/SHIELD/calibration/calibration_inspection
 
 # read older stage0 calib for CT
 assign_simset_vars("C.16740", calibration.codes = "calib.3.10.stage0.az",sim.id = "10")
-assign_simset_vars("C.16740", calibration.codes = "calib.3.13.stage0.az",sim.id = "13")
+# assign_simset_vars("C.16740", calibration.codes = "calib.3.13.stage0.az",sim.id = "13")
 
 simplot(
     lastCT10,
@@ -62,10 +62,10 @@ simManual=engineCT$run(paramManual)
 #
 simplot(
     simCalib,simManual,
-    outcomes = "population"
+    # outcomes = "population"
     # outcomes = "population",facet.by = "race"
     # outcomes = "population",split.by = "race",facet.by="sex"
-    # outcomes = "population",split.by = "race",facet.by = "age"
+    outcomes = "population",split.by = "race",facet.by = "age"
     # outcomes = "population",split.by = "sex",facet.by = "age"
     
     # outcomes = "fertility.rate",split.by = "race",facet.by = "age"
@@ -76,12 +76,16 @@ simplot(
     # outcomes="deaths"
 )
 
-s
 # LIKELIHOOD
 likCT=lik.inst.stage0$instantiate.likelihood('shield','C.16740')
-
 likCT$compare.sims(sim1 = simManual,sim2 = simCalib,piecewise = F,log=T)
-# exp(likCT$compare.sims(sim1 = simManual,sim2 = simCalib,piecewise = F,log=T))
+likCT$compare.sims(sim1 = simManual,sim2 = simCalib,piecewise = T,log=T)
+
+
+simManualMac<-simManual
+save.simulation.set(simManualMac)
+
+# exp(likCT$cosimManualMac# exp(likCT$compare.sims(sim1 = simManual,sim2 = simCalib,piecewise = F,log=T))
 likCT$compare.sims(sim1 = simManual,sim2 = simCalib,piecewise = F,log=F)
 likCT$compare.sims(sim1 = simManual,sim2 = simCalib,piecewise = T,log=T)
 # likCT$compare.sims(sim1 = simManual,sim2 = simCalib,piecewise = T,log=T)
