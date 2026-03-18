@@ -336,7 +336,8 @@ read.adap.data <- function(root.dir)
 read.rw.table <- function(data, column.dimension, year, location, 
                           n.per.col = 2,
                           get.nth.per.col = 1,
-                          fixed.dimension.values = list())
+                          fixed.dimension.values = list(),
+                          remove.income = T)
 {
     subtotal.mask = grepl("total", data[,1], ignore.case = T)
     data = data[!subtotal.mask,]
@@ -404,11 +405,15 @@ read.rw.table <- function(data, column.dimension, year, location,
     
     category.dimensions[grepl('poverty', categories, ignore.case = T)] = 'income'
     
+    category.dimensions[grepl('Sex', categories, ignore.case = T)] = 'sex'
+    
     if (any(is.na(category.dimensions)))
         stop(paste0("Don't know how to interpret the dimension from row heading(s): ",
                     collapse.with.and("'", categories[is.na(category.dimensions)], "'")))
     
-    keep.mask = category.dimensions != 'income'
+    if(remove.income){
+        keep.mask = category.dimensions != 'income'    
+    }
     category.row.indices = category.row.indices[keep.mask]
     categories = categories[keep.mask]
     category.data.row.indices = category.data.row.indices[keep.mask]
@@ -462,6 +467,93 @@ convert.rw.age.names <- function(age.names)
     
     paste0(age.names, " years")
 }
+
+read.adap.income.data = function(root.dir,
+                                 dimension,
+                                 years=2020:2023){
+    # pull one file just to set up the array before the for loop
+    sub.dir = paste0(root.dir,"/",years[1],"_national")
+    
+    files = list.files(sub.dir)
+    file = files[grepl(dimension,files)]
+
+    dimension.to.pull = dimension # to allow a separate dimension to pull for age/total
+    
+    if(dimension %in% c("race","sex")){
+        income.index = 3 # to pull the correct income array out of the standard "read.rw.table" list    
+    } else if(dimension=="service"){
+        income.index = 4
+    } else if(dimension %in% c("age","total")){
+        file = files[grepl("age",files)]
+        dimension.to.pull = "income"
+        income.index = 1
+    } else stop ("dimension can only be total, race, sex, age, or service")
+    
+    one.table = read.csv(file.path(sub.dir, file), stringsAsFactors = F)    
+    one.array = read.rw.table(data=one.table,
+                              column.dimension=dimension.to.pull,
+                              year=years[1],
+                              location='US',
+                              fixed.dimension.values = list(),
+                              remove.income = F)[[income.index]]
+    
+    if(dimension.to.pull=="income"){
+        one.array = aperm(one.array,c(1,2,4,3))
+        dimnames(one.array)$income = c("0–100%","101–138%","139–250%","251–400%",">400%")
+    }
+    
+    dim.names = dimnames(one.array)[-2]
+    dim.names$year = years
+    
+    full.array = array(NA,
+                       dim = sapply(dim.names,length),
+                       dimnames = dim.names)
+    
+    for (i in 1:length(years))
+    {
+        year = years[i]
+        sub.dir = paste0(root.dir,"/",year,"_national")
+        
+        files = list.files(sub.dir)
+        file = files[grepl(dimension,files)]
+        
+        dimension.to.pull = dimension
+        
+        if(dimension %in% c("race","sex")){
+            income.index = 3
+        } else if(dimension=="service"){
+            income.index = 4
+        } else if(dimension %in% c("age","total")){
+            file = files[grepl("age",files)]
+            dimension.to.pull = "income"
+            income.index = 1
+        } else stop ("dimension can only be total, race, sex, age, or service")
+        
+        table = read.csv(file.path(sub.dir, file), stringsAsFactors = F)    
+        array = read.rw.table(data=table,
+                              column.dimension=dimension.to.pull,
+                              year=year,
+                              location='US',
+                              fixed.dimension.values = list(),
+                              remove.income = F)[[income.index]][1,1,,] # pull the income element of the list, then only 1 year/location (US)
+        
+        if(dimension.to.pull=="income"){
+            array = aperm(array)
+            dimnames(full.array)$income = c("0–100%","101–138%","139–250%","251–400%",">400%")
+        }
+        
+        full.array[as.character(year),,] = array
+        
+    }
+    
+    if(dimension=="total"){
+        full.array = apply(full.array,c("year","income"),sum)
+    }
+    
+    full.array
+    
+}
+
 
 RW.SEX.MAPPINGS = c(
   'Male' = 'male',

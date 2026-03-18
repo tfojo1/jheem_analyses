@@ -2,10 +2,22 @@
 
 # DIAGNOSED.PREVALENCE ------------------------------------------------------
 DATA.DIR.PREVALENCE="Q:/data_raw/prevalence"
+
 prevalence_files <- Sys.glob(paste0(DATA.DIR.PREVALENCE, '/*.csv'))
+
 data.list.prevalence <- lapply(prevalence_files, function(x){
-  skip=10
-  list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
+    
+    lines <- readLines(x, n = 50)
+    header_line <- grep("Indicator", lines)[1]
+    skip <- header_line - 1
+    
+    list(
+        filename = x,
+        data = read.csv(x,
+                        skip = skip,
+                        header = TRUE,
+                        colClasses = c(FIPS = "character"))
+    )
 })
 
 outcome.mappings = c('HIV diagnoses'='diagnoses',

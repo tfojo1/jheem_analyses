@@ -48,6 +48,7 @@ data.manager$put.long.form(
     ontology.name = 'nastad.fpl.1',
     source = 'nastad.adap',
     dimension.values.to.distribute = list(fpl=('Unknown')),
+    allow.distributing.on.proportion.scale=T,
     url = 'https://nastad.org/adap-monitoring-project',
     details = 'NASTAD PDF Reports')
     
@@ -74,7 +75,6 @@ nastad.income.2.clean <- nastad.income.2%>%
         fpl == "Unknown FPL" ~"Unknown"))%>%
     mutate(value = readr::parse_number(value))
 
-nastad.income.2.clean$value <- as.numeric(format(nastad.income.2.clean$value, scientific = FALSE))
 
 nastad.income.2.clean <- as.data.frame(nastad.income.2.clean)
 
@@ -83,6 +83,7 @@ data.manager$put.long.form(
     data = nastad.income.2.clean,
     ontology.name = 'nastad.fpl.2',
     source = 'nastad.adap',
+    allow.distributing.on.proportion.scale=T,
     dimension.values.to.distribute = list(fpl=('Unknown')),
     url = 'https://nastad.org/adap-monitoring-project',
     details = 'NASTAD PDF Reports')
@@ -191,6 +192,8 @@ rw.adap.total <- rw.adap.clean%>%
     rename(value = `Total (N)`)%>%
     select(year, location, value, outcome)
 
+rw.adap.total <- as.data.frame(rw.adap.total)
+
     data.manager$put.long.form(
         data = rw.adap.total,
         ontology.name = 'ryan.white.pdfs',
@@ -211,6 +214,7 @@ rw.adap.total <- rw.adap.clean%>%
             fpl == "251%-400% FPL Count" ~"251-400",
             fpl == ">400% FPL Count" ~">400"))
     
+    rw.adap.fpl <- as.data.frame(rw.adap.fpl)
     
     data.manager$put.long.form(
         data = rw.adap.fpl,

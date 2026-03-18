@@ -5,6 +5,7 @@ parse.income.brackets <- function(brackets)
     orig.brackets = brackets
     upper.is.infinite = grepl("[>+]", brackets)
     brackets = gsub("[%>+]", "", brackets)
+    brackets = gsub("–", "-", brackets)
     split = strsplit(brackets, '-')
     
     lowers = as.numeric(sapply(split, function(x){x[1]}))
