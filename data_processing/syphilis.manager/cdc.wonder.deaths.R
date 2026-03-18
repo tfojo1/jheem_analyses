@@ -6,15 +6,6 @@ wonder.data <- lapply(wonder_files, function(x){
     list(filename=x, data=read.csv(x, header=TRUE))
 })
 
-# Mappings ----------------------------------------------------------------
-
-wonder.age.mappings = c('13-24' = '13-24 years',
-                          '25-34' = '25-34 years',
-                          '35-44' = '35-44 years',
-                          '45-54' = '45-54 years',
-                          '55-64' = '55-64 years',
-                          '65+' = '65+ years')
-
 # Clean -------------------------------------------------------------------
 
 wonder.data.clean = lapply(wonder.data, function(file){
@@ -48,26 +39,38 @@ wonder.data.clean = lapply(wonder.data, function(file){
     }
     
     if(grepl("_age", filename)) {
-
         data <- data %>%
             filter(Five.Year.Age.Groups != "Not Stated")%>% #There's a few people without age
-            mutate(fixed.age = case_when(
-                Five.Year.Age.Groups %in% c("< 1 year", "1-4 years", "5-9 years", "10-14 years") ~ "0-14 years",
-                Five.Year.Age.Groups %in% c("15-19 years") ~ "15-19 years",
-                Five.Year.Age.Groups %in% c("20-24 years") ~ "20-24 years",
-                Five.Year.Age.Groups %in% c("25-29 years") ~ "25-29 years",
-                Five.Year.Age.Groups %in% c("30-34 years") ~ "30-34 years",
-                Five.Year.Age.Groups %in% c("35-39 years") ~ "35-39 years",
-                Five.Year.Age.Groups %in% c("40-44 years") ~ "40-44 years",
-                Five.Year.Age.Groups %in% c("45-49 years", "50-54 years") ~ "45-54 years",
-                Five.Year.Age.Groups %in% c("55-59 years", "60-64 years " ) ~ "55-64 years",
-                Five.Year.Age.Groups %in% c("65-69 years","70-74 years","75-79 years", "80-84 years", "85-89 years", "90-94 years", "95-99 years", "100+ years") ~ "65+ years"))%>%
+            mutate(fixed.age = ifelse(Five.Year.Age.Groups %in% c("85-89 years", "90-94 years", "95-99 years", "100+ years"), "85+ years", Five.Year.Age.Groups))%>%
             group_by(year, location, fixed.age)%>%
-            mutate(fixed.death.count = sum(value))
+            mutate(fixed.death.count = sum(value))%>%
+            select(-value)%>%
+            rename(value = fixed.death.count)
     }
-    if(grepl("_raceeth", filename)) {
+    
+    if(grepl("bridgedrace", filename)) {
         data$race = tolower(data$Race)
-        data$race = ifelse(data$`Hispanic.Origin` == "Hispanic or Latino", "hispanic", data$race)
+        data$ethnicity = tolower(data$Hispanic.Origin)
+    }
+    
+    if(grepl("singlerace", filename)) {
+        data$original.race = tolower(data$Single.Race.6)
+        data$ethnicity = tolower(data$Hispanic.Origin)
+
+        data <- data %>%
+            mutate(race = case_when(
+                original.race == "american indian or alaska native" ~ "american indian or alaska native",
+                original.race == "asian" ~ "asian or pacific islander",
+                original.race == "black or african american" ~ "black or african american",
+                original.race == "native hawaiian or other pacific islander" ~ "asian or pacific islander", #sum this
+                original.race == "white" ~ "white",
+                original.race == "more than one race" ~ "more than one race",
+                original.race == "not available" ~ "not available"
+            ))%>%
+            group_by(year, location, ethnicity, race)%>%
+            mutate(fixed.race.count = sum(value))%>%
+            select(-value)%>%
+            rename(value = fixed.race.count)
     }
     
     data= as.data.frame(data)
@@ -75,7 +78,6 @@ wonder.data.clean = lapply(wonder.data, function(file){
     list(filename, data)
     
 })
-
 
 # Put ---------------------------------------------------------------------
 
@@ -85,9 +87,9 @@ for (data in wonder.data.put ) {
     
     data.manager$put.long.form(
         data = data,
-        ontology.name = 'cdc.wonder.adjusted',
+        ontology.name = 'census.cdc.wonder.births.deaths',
         source = 'cdc_wonder',
-        #dimension.values.to.distribute = list(race=c('more than one race', 'not reported', 'unknown or not stated', 'not available'), ethnicity ='not stated'),
+        dimension.values.to.distribute = list(race=c('more than one race', 'not reported', 'unknown or not stated', 'not available'), ethnicity ='not stated'),
         url = 'https://wonder.cdc.gov/',
         details = 'CDC Wonder')
 }
