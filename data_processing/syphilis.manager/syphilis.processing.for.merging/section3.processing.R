@@ -183,7 +183,7 @@ data.manager$register.ontology(
     ethnicity = c('hispanic or latino', 'not hispanic or latino')
   ))
 
-data.manager$register.ontology(     #This is for the births+births denominator data pulled from Census
+data.manager$register.ontology(     #This is for the births+births denominator data pulled from Census (as well as for CDC Wonder data for deaths)
   'census.cdc.wonder.births.deaths',
   ont = ontology(
     year= NULL,
@@ -231,16 +231,6 @@ data.manager$register.ontology(
     sex=c('male','female'),
     incomplete.dimensions = c("year", "location")
   ))
-
-data.manager$register.ontology(     #This is for death data pulled from cdc wonder
-    'cdc.wonder.adjusted',
-    ont = ontology(
-        year= NULL,
-        location= NULL,
-        age=c('0-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-54 years', '55-64 years', '65+ years'),
-        race=c('american indian or alaska native', 'asian or pacific islander', 'black or african american', 'white', 'hispanic'),
-        sex=c('male','female')
-    ))
 
 #Codes:
 source('data_processing/syphilis.manager/cached.census.data.R')
