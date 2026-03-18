@@ -185,6 +185,31 @@ exp(year.comparison.sex)
 exp(year.comparison.service)
 
 
+income.dist = income.total/rowSums(income.total)
+
+params.total.2020 = fit.tobit.normal.distribution.to.quantiles(p = income.dist["2020",],
+                                                               upper.limit = 500)
+
+params.total.2021 = fit.tobit.normal.distribution.to.quantiles(p = income.dist["2021",],
+                                                               upper.limit = 500)
+
+params.total.2022 = fit.tobit.normal.distribution.to.quantiles(p = income.dist["2022",],
+                                                               upper.limit = 500)
+
+params.total.2023 = fit.tobit.normal.distribution.to.quantiles(p = income.dist["2023",],
+                                                               upper.limit = 500)
+rbind(params.total.2020,
+      params.total.2021,
+      params.total.2022,
+      params.total.2023
+)
+
+params.total.all.years = fit.tobit.normal.distribution.to.quantiles(p = c(income.dist["2020",],
+                                                                          income.dist["2021",],
+                                                                          income.dist["2022",],
+                                                                          income.dist["2023",]),
+                                                                    upper.limit = 500)
+
 
 
 
