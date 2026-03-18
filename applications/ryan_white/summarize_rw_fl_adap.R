@@ -1,9 +1,12 @@
 
 FL.PLOT.DIR = '../../results/ryan_whit_fl_adap'
 
-simset.end = retrieve.simulation.set('rw','FL','final.ehe.state',1000,'fl.adap.end.26')
+INTERVENTION.CODE = 'rw.bik.end.26' # 'fl.adap.end.26', 'fl.adap.end.cons.26'
+INTERVENTION.DESCRIPTION =  "Lose Biktarvy Access" # "50% Cut to ADAP"
+PLOT.TITLE = "Lose Biktarvy Access"  # "Cessation"
+PLOT.FILE.NAME = 'fl_no_biktarvy' #' fl_adap_cut'
 
-simset.end = retrieve.simulation.set('rw','FL','final.ehe.state',1000,'fl.adap.end.cons.26')
+simset.end = retrieve.simulation.set('rw','FL','final.ehe.state',1000,INTERVENTION.CODE)
 
 simset.noint = retrieve.simulation.set('rw','FL','final.ehe.state',1000,'noint')
 
@@ -66,7 +69,7 @@ SIMSET.COLORS = c(
 
 SIMSET.NAMES = c(
     simset.noint = 'Continuation',
-    simset.end = "50% Cut to ADAP"
+    simset.end = INTERVENTION.DESCRIPTION
 )
 
 PROJ.YUPPER = NA
@@ -80,10 +83,10 @@ plot = simplot(simset.noint,
     scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
     scale_y_continuous(labels=function(y){format(y, big.mark=',')}, limits=c(0, PROJ.YUPPER)) +
     scale_linetype_discrete(guide='none') +
-    ylab("Infections (n)") + ggtitle("Cessation"); plot
+    ylab("Infections (n)") + ggtitle(PLOT.TITLE); plot
 
 ggsave(plot = plot, 
-       filename = file.path(FL.PLOT.DIR, 'fl_adap_cut.png'),
+       filename = file.path(FL.PLOT.DIR, paste0(PLOT.FILE.NAME,'.png')),
        height = TWO.PANEL.HEIGHT, width = TWO.PANEL.WIDTH,
        dpi = PLOT.DPI, device = PLOT.DEVICE)
 
@@ -106,10 +109,10 @@ plot = simplot(simset.noint,
     scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
     scale_y_continuous(labels=function(y){format(y, big.mark=',')}, limits=c(0, PROJ.YUPPER)) +
     scale_linetype_discrete(guide='none') +
-    ylab("Infections (n)") + ggtitle("Cessation"); plot
+    ylab("Infections (n)") + ggtitle(PLOT.TITLE); plot 
 
 ggsave(plot = plot, 
-       filename = file.path(FL.PLOT.DIR, 'fl_adap_cut_shaded.png'),
+       filename = file.path(FL.PLOT.DIR, paste0(PLOT.FILE.NAME,'_shaded.png')),
        height = TWO.PANEL.HEIGHT, width = TWO.PANEL.WIDTH,
        dpi = PLOT.DPI, device = PLOT.DEVICE)
 
