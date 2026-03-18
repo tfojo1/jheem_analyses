@@ -1,3 +1,4 @@
+library(ggplot2)
 
 FL.PLOT.DIR = '../../results/ryan_whit_fl_adap'
 
