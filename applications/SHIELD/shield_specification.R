@@ -1470,7 +1470,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION, #expensive
                       dynamic.quantity.name = 'mortality', #internal JHEEM construct for deaths
                       corresponding.data.outcome = 'deaths',
                       groups = NULL, 
-                      keep.dimensions = c('location'), #'age','race','sex' <saving on time>
+                      keep.dimensions = c('location','age','race','sex'),# <saving on time>
                       exclude.tags = 'emigration',
 )
 
