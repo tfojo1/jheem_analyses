@@ -53,7 +53,7 @@ data.manager$register.outcome(
 
 data.manager$register.outcome(
   'deaths',
-  metadata = create.outcome.metadata(  #This represent deaths from the census
+  metadata = create.outcome.metadata(  #This represent deaths from the census (and from CDC wonder)
     scale = 'non.negative.number',
     display.name = 'Deaths',
     axis.name = 'Deaths',
