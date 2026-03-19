@@ -1,23 +1,18 @@
 # Script to find global transmission rate optimal start value
 # 3-18-2026
 
+##### TO USE ####
+# 1. open a terminal in the SHIELD/inputs directory
+# 2. launch "\.launch_global_trate_multithreaded.bat"
+# 3. run this script when that's finished
+
+#### #####
+
 # For each city, make an engine.
 # For each candidate value, run the engine in each city
 # with just the global transmission rate changed
 # Then assess, somehow. Maybe do sim$get diagnosis.ps totals
 # in 2020 and compare to data.
-
-# engine_list <- lapply(MSAS.OF.INTEREST, function(msa) {
-#     create.jheem.engine("shield", msa, 2030)
-# })
-# 
-# og_engine_list <- engine_list
-
-my_cities <- c("C.12580", "C.12060", "C.35620")
-engine_list <- setNames(lapply(my_cities, function(msa) {
-    create.jheem.engine("shield", msa, 2030)
-}), my_cities)
-original_params <- get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
 
 # # prior is lognormal with meanlog log(2.2) and sdlog log(10)/2,
 # # meaning 95% interval varies by a factor of 100 (10x or 0.1x)
@@ -32,19 +27,7 @@ original_params <- get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
 
 candidate_values <- seq(1.8, 2.6, 0.1)
 
-# Now run each candidate for each city.
-sims_by_candidates <- lapply(candidate_values, function(candidate_value) {
-    print(paste0("Running engines with candidate value: ", candidate_value))
-    sims <- setNames(lapply(my_cities, function(msa) {
-        print(paste0("Running engine for location: ", msa))
-        params <- original_params
-        params["global.transmission.rate"] <- candidate_value
-        trCatch(
-            {engine_list[[msa]]$run(params)},
-            error=function(e) {NULL}
-        )
-    }), my_cities)
-})
+my_cities <- MSAS.OF.INTEREST
 
 # Then check to see if they have any diagnosis.ps in 2020.
 # Or, find benchmark value and see if it reaches 20% at least,
@@ -53,7 +36,24 @@ benchmark_values <- setNames(sapply(my_cities, function(msa) {
     SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.aggregated.county$cdc.sti$year__location["2020",msa]
 }), my_cities)
 
-simulation_values <- lapply(sims_by_candidates, function(sims_this_candidate) {
+# Now consolidate threads
+# thread_groupings <- c("1-11", "12-22", "23-33")
+thread_groupings <- sapply(0:10, function(i) {paste(i * 3 + 1, i * 3 + 3, sep = "-")})
+all_threads <- lapply(thread_groupings, function(grouping) {
+    tryCatch({get(load(file = paste0("../jheem_analyses/applications/SHIELD/inputs/temp/msas_", grouping, ".Rdata")))},
+             error = function(e) {NULL})
+})
+
+# Check for NULL
+any(sapply(all_threads, length)==0)
+
+sims_unthreaded <- lapply(seq_along(candidate_values), function(i) {
+    unlist(lapply(all_threads, function(grouped_sims) {
+        grouped_sims[i]
+    }))
+})
+
+simulation_values <- lapply(sims_unthreaded, function(sims_this_candidate) {
     setNames(sapply(my_cities, function(msa) {
         sims_this_candidate[[msa]]$get("diagnosis.ps",
                                        keep.dimensions = NULL,
@@ -67,3 +67,5 @@ candidate_success_rate <- sapply(simulation_values, function(values_this_candida
         values_this_candidate / benchmark_values > 0.2 &
             values_this_candidate / benchmark_values < 20)
 })
+
+candidate_values[candidate_success_rate==max(candidate_success_rate)]
