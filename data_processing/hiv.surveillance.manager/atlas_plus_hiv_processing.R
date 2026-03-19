@@ -22,7 +22,8 @@ age.mappings = c('13-24' = '13-24 years',
                  '25-34' = '25-34 years',
                  '35-44' = '35-44 years',
                  '45-54' = '45-54 years',
-                 '55+' = '55+ years')
+                 '55-64' = '55-64 years',
+                 '65+' = '65+ years')
 
 national.age.mappings = c('13-24' = '13-24 years',
                           '25-34' = '25-34 years',
@@ -30,10 +31,6 @@ national.age.mappings = c('13-24' = '13-24 years',
                           '45-54' = '45-54 years',
                           '55-64' = '55-64 years',
                           '65+' = '65+ years')
-
-#record possible values for the incomplete dimensions, year and location
-locations = c()
-years = c()
 
 ################################################################################
 #---Clean Diagnoses---#
@@ -74,6 +71,7 @@ data.list.clean.diagnoses = lapply(data.list.diagnoses, function(file){
     
     data$cbsa = substring(data$FIPS, 1, 5)
     data$location = paste("C", data$cbsa, sep=".")
+
   }
   
   if(grepl("allcounty", filename)) {
@@ -107,7 +105,7 @@ data.list.clean.diagnoses = lapply(data.list.diagnoses, function(file){
   
   list(filename, data) #what to return#
   
-} )
+})
 
 #---Clean Deaths---#
 
@@ -352,7 +350,7 @@ data.list.clean.sle = lapply(data.list.sle, function(file){
     data$location = as.character(data$FIPS)
   }  
   
-  if(grepl("age", filename)) {
+  if(grepl("_age", filename)) {
     data$age = age.mappings[data$Age.Group]
   }
   if(grepl("race", filename)) {
