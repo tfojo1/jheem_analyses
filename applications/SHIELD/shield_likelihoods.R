@@ -100,7 +100,7 @@ deaths.likelihood.instructions =
                                          na.rm =T
     )
 
-#** FETILITY RATE **  ----
+#** FERTILITY RATE **  ----
 # For county; MSA; national data available by age & race (2007-2023)
 fertility.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "fertility.rate",
@@ -142,8 +142,8 @@ immigration.likelihood.instructions =
 emigration.likelihood.instructions = 
     create.basic.likelihood.instructions( outcome.for.sim = "emigration",
                                           outcome.for.data = "emigration", 
-                                          dimensions = c("age","race"), 
-                                          levels.of.stratification = c(0,1,2),
+                                          dimensions = c("age","race", "sex"), ### WHY NOT SEX? AND WHY 2 WAY? WE HAVE SAME LEVELS OF DATA AS IMMIGRATION!
+                                          levels.of.stratification = c(0,1),
                                           from.year = 2011, 
                                           to.year=2020,
                                           #
