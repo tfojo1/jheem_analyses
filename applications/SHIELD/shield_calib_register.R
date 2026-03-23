@@ -16,6 +16,19 @@ par.aliases.transmission = list(
 
 # STAGE 0 Demographics thin 50
 
+# Built on calib.3.17.stage0.az, making global trate = 2.3. Expecting some cities' diagnoses to go too high since it was 2.05 before.
+register.calibration.info("calib.3.22.stage0.az",
+                          likelihood.instructions = lik.inst.stage0,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          fixed.initial.parameter.values = c("global.transmission.rate"=2.3), # median is 2.2
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          parameter.aliases = par.aliases.transmission,
+                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
 # Has 1/32 weight AND correlation between strata = 0 for population
 register.calibration.info("calib.3.17.stage0.az",
                           likelihood.instructions = lik.inst.stage0,
@@ -105,12 +118,13 @@ register.calibration.info('calib.3.12.stage2.az',
                                               STI.TESTING.PARAMETERS.PRIOR@var.names),
                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-register.calibration.info('calib.3.3.stage2.woFT',
-                          preceding.calibration.codes = 'calib.3.2.stage1.az',
+register.calibration.info("calib.3.23.stage2.az",
+                          preceding.calibration.codes = 'calib.3.16.stage1.az',
                           likelihood.instructions = lik.inst.stage2,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
                                               STI.TESTING.PARAMETERS.PRIOR@var.names),
                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+                          
 )
