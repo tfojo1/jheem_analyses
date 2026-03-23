@@ -40,14 +40,15 @@ prepare_simsets_for_plots <- function(calibration.code, locations, assemble.inco
                                                                            location = location,
                                                                            calibration.code = calibration.code,
                                                                            allow.incomplete = T)},
-                                    error = function(e) {print(paste0(e, "... Skipping")); next})
+                                    error = function(e) {print(paste0(e, "... Skipping")); return(NULL)})
         } else {
             full_simset <- tryCatch({retrieve.simulation.set(version = "shield",
                                                              location = location,
                                                              calibration.code = calibration.code,
                                                              n.sim = n_sim)},
-                                    error = function(e) {print(paste0(e, "... Skipping")); next})
+                                    error = function(e) {print(paste0(e, "... Skipping")); return(NULL)})
         }
+        if (is.null(full_simset)) return(NULL)
         last20_sims <- full_simset$subset((n_sim - 20) : (n_sim - 1))
         last_sim <- full_simset$last.sim()
         
@@ -95,8 +96,8 @@ create_plots_for_stage0_calibration <- function(calibration.code, simset.data, c
         tryCatch({
             make_stage0_plots_for_location(last20_sims, last_sim, plotting_path, title.suffix = title_suffix)
             successful_locations <- c(successful_locations, location)},
-                 # error = function(e) {browser()})
-                 error = function(e) {print(paste0("Error generating stage 0 plots for '", location, "' and '", calibration.code, "'... Skipping"))})
+            # error = function(e) {browser()})
+            error = function(e) {print(paste0("Error generating stage 0 plots for '", location, "' and '", calibration.code, "'... Skipping"))})
     }
     
     # Return vector of successful locations
@@ -110,7 +111,8 @@ make_total_plot <- function(outcome, last20, lastsim, style.manager, plotting.pa
         last20, lastsim,
         outcomes = outcome,
         style.manager = style.manager,
-        title.suffix = title.suffix
+        title.suffix = title.suffix,
+        dimension.values = list(year=1995:2030)
     )
     file_png  <- file.path(paste0(plotting.path , gsub("\\.", "-", outcome), ".png"))
     ggsave(file_png, plot = p, width = 8, height = 5, dpi = 300)
@@ -125,7 +127,8 @@ make_facet_plot <- function(outcome, last20, lastsim, facet.vars, style.manager,
             outcomes = outcome,
             facet.by = facet_var,
             style.manager = style.manager,
-            title.suffix = title.suffix
+            title.suffix = title.suffix,
+            dimension.values = list(year=1995:2030)
         )
         file_png  <- file.path(paste0(plotting.path , gsub("\\.", "-", outcome),"_",facet_var, ".png"))
         ggsave(file_png, plot = p, width = 8, height = 5, dpi = 300)
@@ -142,7 +145,8 @@ make_split_facet_plot <- function(outcome, last20, lastsim, split.facet.pairs, s
             split.by = split_facet_pair[1],
             facet.by = split_facet_pair[2],
             style.manager = style.manager,
-            title.suffix = title.suffix
+            title.suffix = title.suffix,
+            dimension.values = list(year=1995:2030)
         )
         file_png  <- file.path(paste0(plotting.path ,
                                       gsub("\\.", "-", outcome),
@@ -181,14 +185,14 @@ make_stage0_plots_for_location <- function(last20, lastsim, plotting.path, title
 # USAGE ----
 if (1==2) {
     
-    # Define style managers to use
+    # Define style managers to use. You'll need to reference them in the "STAGE 0 OUTCOMES" section.
     source.style.manager = create.style.manager( shape.data.by = "source",color.data.by = "stratum")
     
-    # Retrive and/or assemble simsets. Only need to run once per session.
+    # Retrieve and/or assemble simsets. Only need to run once per session.
     simset_data <- prepare_simsets_for_plots(calibration.code = "calib.3.22.stage0.az", locations = c("C.12580", "C.41860"), assemble.incomplete = T)
     
-    # Create and save the plots. To change what plots are generated, go to the "STAGE 0 OUTCOMES" section.
-    create_plots_for_stage0_calibration("calib.3.22.stage0.az", simset_data, create.dirs = T)
+    # Create and save the plots. To change which plots are generated, go to the "STAGE 0 OUTCOMES" section.
+    x <- create_plots_for_stage0_calibration("calib.3.22.stage0.az", simset_data, create.dirs = T)
 }
 
 # stage 0 likelihoods:
@@ -260,3 +264,8 @@ if (1==2) {
 # }
 # 
 # #OTHER Plots of interest:
+if (1==2) {
+    source.style.manager = create.style.manager( shape.data.by = "source",color.data.by = "stratum")
+    simset_d2 <- prepare_simsets_for_plots(calibration.code = "calib.3.22.stage0.az", locations = MSAS.OF.INTEREST, assemble.incomplete = F)
+    x <- create_plots_for_stage0_calibration("calib.3.22.stage0.az", simset_d2, create.dirs = T)
+}
