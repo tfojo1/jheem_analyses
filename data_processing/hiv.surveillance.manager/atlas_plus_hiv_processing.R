@@ -36,75 +36,100 @@ national.age.mappings = c('13-24' = '13-24 years',
 #---Clean Diagnoses---#
 
 data.list.clean.diagnoses = lapply(data.list.diagnoses, function(file){
-  
-  data=file[["data"]]
-  filename = file[["filename"]]
-  
-  #Universal Cleaning#
-  data$outcome = outcome.mappings[data$Indicator]
-  data = data[!is.na(data$outcome),]
-  
-  names(data)[names(data)=='Year'] = 'year'   
-  data$year = substring(data$year,1, 4)                                          
-  data$year = as.character(data$year)
-  
-  data$Cases[data$Cases %in% c("Data suppressed")] = NA    
-  data$Cases[data$Cases %in% c("Data not available")] = NA  
-  data$value = as.numeric(gsub(",", '', data$Cases))   
-  
-  #Location conditionals#
-  if(grepl("state", filename)) {
-    names(state.abb) <- state.name 
-    data$Geography= gsub('[^[:alnum:] ]',"",data$Geography) #some states have ^ for preliminary data#
-    names(data)[names(data)=='Geography'] = 'state'
-    data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
-  }
-  if(grepl("ehe", filename)) {
-    data$location = as.character(data$FIPS)
-  }
-  
-  if(grepl("msa", filename)) {
-    data$msa_indicator= substring(data$FIPS, 6, 10)
     
-    data$msa_keep = ifelse(data$msa_indicator == "00000", "keep", "drop")
-    data = subset(data,data$msa_keep == "keep")   #Can make this shorter once you check over everything#
+    data=file[["data"]]
+    filename = file[["filename"]]
     
-    data$cbsa = substring(data$FIPS, 1, 5)
-    data$location = paste("C", data$cbsa, sep=".")
-
-  }
-  
-  if(grepl("allcounty", filename)) {
-    data$location = as.character(data$FIPS)
-  }
-  
-  ##Demographic conditionals##
-  
-  if(grepl("age", filename)) {
-    data$age = age.mappings[data$Age.Group]
-  }
-  if(grepl("race", filename)) {
-    names(data)[names(data)=='Race.Ethnicity'] = 'race'
-    data$race = tolower(data$race)
-  }
-  if(grepl("sex", filename)) {
-    names(data)[names(data)=='Sex'] = 'sex'
-    data$sex = tolower(data$sex)
-  }
-  if(grepl("male", filename)) {
-    names(data)[names(data)=='Sex'] = 'sex'
-    data$sex = tolower(data$sex)
-  }
-  if(grepl("female", filename)) {
-    names(data)[names(data)=='Sex'] = 'sex'
-    data$sex = tolower(data$sex)
-  }
-  if(grepl("risk", filename)) {
-    data$risk = risk.mappings[data$Transmission.Category]
-  }
-  
-  list(filename, data) #what to return#
-  
+    #Universal Cleaning#
+    data$outcome = outcome.mappings[data$Indicator]
+    data = data[!is.na(data$outcome),]
+    
+    names(data)[names(data)=='Year'] = 'year'   
+    data$year = substring(data$year,1, 4)                                          
+    data$year = as.character(data$year)
+    
+    data$Cases[data$Cases %in% c("Data suppressed")] = NA    
+    data$Cases[data$Cases %in% c("Data not available")] = NA  
+    data$value = as.numeric(gsub(",", '', data$Cases))   
+    
+    #Location conditionals#
+    if(grepl("state", filename)) {
+        names(state.abb) <- state.name 
+        data$Geography= gsub('[^[:alnum:] ]',"",data$Geography) #some states have ^ for preliminary data#
+        names(data)[names(data)=='Geography'] = 'state'
+        data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
+    }
+    if(grepl("ehe", filename)) {
+        data$location = as.character(data$FIPS)
+    }
+    
+    if(grepl("msa", filename)) {
+        data$msa_indicator= substring(data$FIPS, 6, 10)
+        
+        data$msa_keep = ifelse(data$msa_indicator == "00000", "keep", "drop")
+        data = subset(data,data$msa_keep == "keep")   #Can make this shorter once you check over everything#
+        
+        data$cbsa = substring(data$FIPS, 1, 5)
+        data$location = paste("C", data$cbsa, sep=".")
+        
+    }
+    
+    if(grepl("allcounty", filename)) {
+        data$location = as.character(data$FIPS)
+    }
+    
+    if(grepl("national", filename)) {
+        data$location = "US"
+    }
+    
+    ##Demographic conditionals##
+    
+    if(grepl("age", filename)) {
+        data$age = age.mappings[data$Age.Group]
+    }
+    if(grepl("race", filename)) {
+        names(data)[names(data)=='Race.Ethnicity'] = 'race'
+        data$race = tolower(data$race)
+    }
+    if(grepl("sex", filename)) {
+        names(data)[names(data)=='Sex'] = 'sex'
+        data$sex = tolower(data$sex)
+    }
+    if(grepl("male", filename)) {
+        names(data)[names(data)=='Sex'] = 'sex'
+        data$sex = tolower(data$sex)
+    }
+    if(grepl("female", filename)) {
+        names(data)[names(data)=='Sex'] = 'sex'
+        data$sex = tolower(data$sex)
+    }
+    if(grepl("risk", filename)) {
+        data$risk = risk.mappings[data$Transmission.Category]
+    }
+    
+    
+    if(grepl("msa", filename)) { 
+        
+        data$location <- dplyr::case_when(
+            data$location %in% c("C.39100", "C.28880") ~ "C.39100", #Poughkeepsie MSA has a new designation
+            data$location %in% c("C.17460", "C.17410") ~ "C.17460", #Cleveland MSA changed their FIPS in 2023
+            TRUE ~ data$location
+        )
+        
+        # # Columns you WANT to group by   #NOTE: This chunk of code would sum together the values for the above MSAs but bc their data changed for one year I don't think it's necessary
+        # desired_cols <- c("outcome", "year", "location", "age", "race", "sex", "risk")
+        # 
+        # # Keep only those that exist in this dataframe
+        # group_cols <- intersect(desired_cols, names(data))
+        # 
+        # data <- data %>%
+        #     dplyr::group_by(dplyr::across(all_of(group_cols))) %>%
+        #     dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop")
+    }
+    
+    data = as.data.frame(data)
+    list(filename, data)
+    
 })
 
 #---Clean Deaths---#
