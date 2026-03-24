@@ -1,0 +1,8 @@
+{
+    "syphilis.manager.rdata": {
+        "source": "github-release",
+        "repo": "tfojo1/jheem_analyses",
+        "latest_tag": "syphilis-manager-latest",
+        "asset": "syphilis.manager.rdata"
+    }
+}

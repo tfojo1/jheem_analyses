@@ -2,6 +2,9 @@
 if (nchar(system.file(package = "httr2")) == 0) {
     install.packages("httr2")
 }
+if (nchar(system.file(package = "jsonlite")) == 0) {
+    install.packages("jsonlite")
+}
 
 JHEEM.CACHE.DIR <- NULL
 if (dir.exists("../../cached")) {
@@ -11,6 +14,7 @@ if (dir.exists("../jheem_analyses/cached")) {
     JHEEM.CACHE.DIR <- "../jheem_analyses/cached"
 }
 DATA.MANAGER.CACHE.METADATA.FILE <- "../jheem_analyses/commoncode/data_manager_cache_metadata.Rdata"
+DATA.MANAGER.SOURCES.FILE <- "../jheem_analyses/commoncode/data_manager_sources.json"
 PACKAGE.VERSION.CACHE.FILE <- "../jheem_analyses/commoncode/package_version_cache.Rdata"
 
 if (is.null(JHEEM.CACHE.DIR)) {
@@ -21,39 +25,25 @@ if (is.null(JHEEM.CACHE.DIR)) {
 
 #' @title Load Data Manager From Cache
 #' @description
-#' Loads a data manager for which there is cached metadata, downloading the most recent copy if necessary.
-#' 
+#' Loads a data manager, downloading the most recent copy if necessary.
+#' Managers listed in data_manager_sources.json are fetched from GitHub Releases.
+#' All others use the legacy OneDrive path via data_manager_cache_metadata.Rdata.
+#'
 #' @param file Name of a data manager file, with its extension, that can be appended to the JHEEM.CACHE.DIR path.
 #' @param set.as.default Should this data manager be set as the default data manager for this session?
 #' @param offline If TRUE, having a missing or out of date data manager will not trigger a download from the internet. Use if offline to avoid errors.
 load.data.manager.from.cache <- function(file, set.as.default = F, offline=F) {
     error.prefix <- "Cannot load.data.manager.from.cache(): "
-    cache.metadata <- get.data.manager.cache.metadata(pretty.print=F)
-    if (!(file %in% names(cache.metadata))) {
-        stop(paste0(error.prefix, "'", file, "' is not one of our cached files. Call 'get.data.manager.cache.metadata()' to check what files are cached. File names are capitalization-sensitive."))
+
+    # Check if this manager has a GitHub Release source
+    gh.source <- get.github.release.source(file)
+
+    if (!is.null(gh.source)) {
+        return(load.data.manager.from.github(file, gh.source, set.as.default, offline, error.prefix))
     }
-    # Download it if it doesn't exist or it exists but is out of date
-    if (!file.exists(file.path(JHEEM.CACHE.DIR, file))) {
-        if (offline) {
-            stop(paste0(error.prefix, "File not found, and cannot download the latest copy from the OneDrive if 'offline' is set to TRUE"))
-        } else {
-            cat("File not found, so downloading the latest copy from the OneDrive...\n")
-            download.data.manager.from.onedrive(file.path(JHEEM.CACHE.DIR, file), cache.metadata[[file]]$onedrive.link, error.prefix)
-            loaded.data.manager <- load.data.manager(file.path(JHEEM.CACHE.DIR, file), set.as.default = set.as.default)
-        }
-    } else {
-        loaded.data.manager <- load.data.manager(file.path(JHEEM.CACHE.DIR, file), set.as.default = set.as.default)
-        if (is.cached.data.manager.out.of.date(file, loaded.data.manager, error.prefix = error.prefix)) {
-            if (offline) {
-                warning(paste0("The local copy of '", file, "' is out of date (", loaded.data.manager$last.modified.date, " and needs ", cache.metadata[[file]]$last.modified.date, "), but the latest copy cannot be downloaded from the OneDrive if 'offline' is set to TRUE"))
-            } else {
-                print(paste0("Local copy is out of date (", loaded.data.manager$last.modified.date, " and needs ", cache.metadata[[file]]$last.modified.date, "), so downloading the latest copy from the OneDrive...\n"))
-                download.data.manager.from.onedrive(file.path(JHEEM.CACHE.DIR, file), cache.metadata[[file]]$onedrive.link, error.prefix)
-                loaded.data.manager <- load.data.manager(file.path(JHEEM.CACHE.DIR, file), set.as.default = set.as.default)
-            }
-        }
-    }    
-    loaded.data.manager
+
+    # Fall back to legacy OneDrive path
+    load.data.manager.from.onedrive.cache(file, set.as.default, offline, error.prefix)
 }
 
 #' @title Get Data Manager Cache Metadata
@@ -79,6 +69,14 @@ get.data.manager.cache.metadata <- function(pretty.print=T, error.prefix = "") {
 #' @inheritParams load.data.manager.from.cache
 update.data.manager <- function(file) {
     error.prefix <- "Cannot update.data.manager(): "
+
+    # Check if this manager has a GitHub Release source
+    gh.source <- get.github.release.source(file)
+    if (!is.null(gh.source)) {
+        download.data.manager.from.github.release(file, gh.source, error.prefix)
+        return(0)
+    }
+
     cache.metadata <- get.data.manager.cache.metadata(pretty.print=F)
     if (!(file %in% names(cache.metadata))) {
         stop(paste0(error.prefix, "'", file, "' is not one of our cached files. Call 'get.data.manager.cache.metadata()' to check what files are cached. File names are capitalization-sensitive."))
@@ -92,7 +90,7 @@ update.data.manager <- function(file) {
 #' Install the JHEEM2 package if the version is too old, or if it is not
 #' installed at all.
 #' @param upgrade.dependencies "default", "ask", "always", or "never", defaulting to "never" try to upgrade dependendencies. Avoids annoyances.
-#' 
+#'
 update.jheem2.package <- function(upgrade.dependencies=c("default", "ask", "always", "never")[4]) {
     if (nchar(system.file(package = "jheem2")) == 0) {
         "Package 'jheem2' not found. Installing from Github..."
@@ -207,24 +205,159 @@ sync.package.version <- function(package="jheem2", allow.flag=F) {
     save(cache.file, file = PACKAGE.VERSION.CACHE.FILE)
 }
 
-## INTERNAL USE ONLY ----
+## GITHUB RELEASE FUNCTIONS ----
+
+get.github.release.source <- function(file) {
+    if (!file.exists(DATA.MANAGER.SOURCES.FILE)) return(NULL)
+    sources <- jsonlite::fromJSON(DATA.MANAGER.SOURCES.FILE)
+    if (!(file %in% names(sources))) return(NULL)
+    entry <- sources[[file]]
+    if (is.null(entry$source) || entry$source != "github-release") return(NULL)
+    entry
+}
+
+load.data.manager.from.github <- function(file, gh.source, set.as.default, offline, error.prefix) {
+    local.path <- file.path(JHEEM.CACHE.DIR, file)
+    version.file <- paste0(local.path, ".version")
+
+    if (!file.exists(local.path)) {
+        if (offline) {
+            stop(paste0(error.prefix, "File not found, and cannot download if 'offline' is set to TRUE"))
+        }
+        cat(file, "not found locally. Downloading from GitHub Release...\n")
+        download.data.manager.from.github.release(file, gh.source, error.prefix)
+        return(load.data.manager(local.path, set.as.default = set.as.default))
+    }
+
+    # File exists locally — check if it's current
+    if (offline) {
+        return(load.data.manager(local.path, set.as.default = set.as.default))
+    }
+
+    local.version <- if (file.exists(version.file)) trimws(readLines(version.file, n = 1)) else NULL
+    remote.version <- get.github.release.version(gh.source, error.prefix)
+
+    if (is.null(remote.version)) {
+        # Couldn't reach GitHub — use local copy with a warning
+        warning("Could not check GitHub for updates to '", file, "'. Using local copy.")
+        return(load.data.manager(local.path, set.as.default = set.as.default))
+    }
+
+    if (is.null(local.version) || local.version != remote.version) {
+        if (!is.null(local.version)) {
+            cat("Updating ", file, " (", local.version, " -> ", remote.version, ")...\n", sep = "")
+        } else {
+            cat("Updating ", file, " (unknown local version -> ", remote.version, ")...\n", sep = "")
+        }
+        download.data.manager.from.github.release(file, gh.source, error.prefix)
+    } else {
+        cat(file, "is up to date (", local.version, ")\n")
+    }
+
+    load.data.manager(local.path, set.as.default = set.as.default)
+}
+
+get.github.release.version <- function(gh.source, error.prefix) {
+    api.url <- paste0("https://api.github.com/repos/", gh.source$repo,
+                       "/releases/tags/", gh.source$latest_tag)
+    tryCatch({
+        resp <- httr2::request(api.url) |>
+            httr2::req_headers("Accept" = "application/vnd.github.v3+json",
+                               "User-Agent" = "jheem-cache-manager") |>
+            httr2::req_perform()
+        release.info <- jsonlite::fromJSON(httr2::resp_body_string(resp))
+        # Extract the source version tag from the release body
+        # The promotion workflow writes "**Promoted from:** `syphilis-manager-v2026.03.11`"
+        body <- release.info$body
+        promoted.match <- regmatches(body, regexpr("Promoted from:.*?`([^`]+)`", body, perl = TRUE))
+        if (length(promoted.match) == 1) {
+            return(gsub(".*`([^`]+)`.*", "\\1", promoted.match, perl = TRUE))
+        }
+        # Fallback: use the published_at timestamp as version identifier
+        release.info$published_at
+    }, error = function(e) {
+        NULL
+    })
+}
+
+download.data.manager.from.github.release <- function(file, gh.source, error.prefix) {
+    local.path <- file.path(JHEEM.CACHE.DIR, file)
+    version.file <- paste0(local.path, ".version")
+    asset.name <- if (!is.null(gh.source$asset)) gh.source$asset else file
+
+    download.url <- paste0("https://github.com/", gh.source$repo,
+                           "/releases/download/", gh.source$latest_tag,
+                           "/", asset.name)
+
+    tryCatch({
+        resp <- httr2::request(download.url) |>
+            httr2::req_headers("User-Agent" = "jheem-cache-manager") |>
+            httr2::req_perform()
+        if (httr2::resp_status(resp) == 200) {
+            writeBin(httr2::resp_body_raw(resp), local.path)
+        } else {
+            stop("HTTP ", httr2::resp_status(resp))
+        }
+    }, error = function(e) {
+        stop(paste0(error.prefix, "Failed to download '", file, "' from GitHub Release: ", e$message))
+    })
+
+    # Write the version sidecar
+    remote.version <- get.github.release.version(gh.source, error.prefix)
+    if (!is.null(remote.version)) {
+        writeLines(remote.version, version.file)
+    }
+
+    cat("Downloaded", file, "from GitHub Release (", gh.source$latest_tag, ")\n")
+}
+
+## LEGACY ONEDRIVE FUNCTIONS ----
+
+load.data.manager.from.onedrive.cache <- function(file, set.as.default, offline, error.prefix) {
+    cache.metadata <- get.data.manager.cache.metadata(pretty.print=F)
+    if (!(file %in% names(cache.metadata))) {
+        stop(paste0(error.prefix, "'", file, "' is not one of our cached files. Call 'get.data.manager.cache.metadata()' to check what files are cached. File names are capitalization-sensitive."))
+    }
+    # Download it if it doesn't exist or it exists but is out of date
+    if (!file.exists(file.path(JHEEM.CACHE.DIR, file))) {
+        if (offline) {
+            stop(paste0(error.prefix, "File not found, and cannot download the latest copy from the OneDrive if 'offline' is set to TRUE"))
+        } else {
+            cat("File not found, so downloading the latest copy from the OneDrive...\n")
+            download.data.manager.from.onedrive(file.path(JHEEM.CACHE.DIR, file), cache.metadata[[file]]$onedrive.link, error.prefix)
+            loaded.data.manager <- load.data.manager(file.path(JHEEM.CACHE.DIR, file), set.as.default = set.as.default)
+        }
+    } else {
+        loaded.data.manager <- load.data.manager(file.path(JHEEM.CACHE.DIR, file), set.as.default = set.as.default)
+        if (is.cached.data.manager.out.of.date(file, loaded.data.manager, error.prefix = error.prefix)) {
+            if (offline) {
+                warning(paste0("The local copy of '", file, "' is out of date (", loaded.data.manager$last.modified.date, " and needs ", cache.metadata[[file]]$last.modified.date, "), but the latest copy cannot be downloaded from the OneDrive if 'offline' is set to TRUE"))
+            } else {
+                print(paste0("Local copy is out of date (", loaded.data.manager$last.modified.date, " and needs ", cache.metadata[[file]]$last.modified.date, "), so downloading the latest copy from the OneDrive...\n"))
+                download.data.manager.from.onedrive(file.path(JHEEM.CACHE.DIR, file), cache.metadata[[file]]$onedrive.link, error.prefix)
+                loaded.data.manager <- load.data.manager(file.path(JHEEM.CACHE.DIR, file), set.as.default = set.as.default)
+            }
+        }
+    }
+    loaded.data.manager
+}
 
 is.cached.data.manager.out.of.date <- function(file, data.manager, error.prefix = "") {
     # browser()
     if (!R6::is.R6(data.manager) || !is(data.manager, "jheem.data.manager")) {
         stop(paste0(error.prefix, "'load.data.manager.from.cache' can only be called on JHEEM Data Manager objects"))
     }
-    
+
     if (!file.exists(DATA.MANAGER.CACHE.METADATA.FILE)) {
         stop(paste0(error.prefix, "The 'data.manager.cache.metadata.Rdata' file is missing from commoncode - this probably requires a pull"))
     }
-    
+
     data.manager.cache.metadata <- get(load(DATA.MANAGER.CACHE.METADATA.FILE))
-    
+
     if (!(file %in% names(data.manager.cache.metadata))) {
         stop(paste0(error.prefix, "'", file, "' is not one of our cached files. Call 'get.data.manager.cache.metadata()' to check what files are cached. File names are capitalization-sensitive."))
     }
-    
+
     # Check if the creation date and last modified date are both at least as new as the cached dates
     if (!is.null(data.manager.cache.metadata[[file]][["creation.date"]])) {
         if (is.null(data.manager[["creation.date"]]))
@@ -240,7 +373,7 @@ is.cached.data.manager.out.of.date <- function(file, data.manager, error.prefix 
             return(TRUE)
         }
     }
-    
+
     FALSE
 }
 
