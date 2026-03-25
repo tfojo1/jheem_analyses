@@ -8,8 +8,9 @@ cat("=== TOTAL DIAGNOSIS WITH AGE RESTRATIFICATION ===\n")
 # load("Q:/data_managers/syphilis.manager.rdata")
 
 # Target: cdc.aggregated.county source, cdc.sti ontology (10 age groups)
-source_name <- 'cdc.aggregated.county'
+source_name <- 'cdc.sti'
 target_ontology <- 'cdc.sti'
+put_source <- 'cdc.summed'
 
 cat(sprintf("Target: %s source, %s ontology\n", source_name, target_ontology))
 
@@ -113,7 +114,7 @@ for (stratification in available_stratifications) {
     syphilis.manager$put(
       data = total_data,
       outcome = 'total.syphilis.diagnoses', 
-      source = source_name,
+      source = put_source,
       ontology.name = target_ontology,
       url = "https://gis.cdc.gov/grasp/nchhstpatlas/main.html",
       details = "Sum of PS + Early + Unknown Duration/Late syphilis diagnoses from CDC AtlasPlus (Early/Unknown restratified to match PS age groups)"

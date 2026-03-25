@@ -118,6 +118,7 @@ data.manager$register.source('cdc.aggregated.county', parent.source= "NHSS", ful
 data.manager$register.source('cdc.sti.surveillance.reports', parent.source= "DHHS", full.name = "CDC Sexually Transmitted Disease Surveillance", short.name='cdc.sti.surveillance.reports')
 data.manager$register.source('cdc_wonder', parent.source= "NCHS", full.name = "CDC Wonder", short.name='cdc_wonder')
 data.manager$register.source('lhd', parent.source= "LHD", full.name = "Local Health Department", short.name='lhd')
+data.manager$register.source('cdc.wonder.aggregated.population', parent.source= "NNDSS", full.name = 'CDC Wonder Aggregated Adult Population', short.name = 'cdc.wonder.agg.pop') #Thsi is data from atlas summed into total syphilis dx
 
 #Register Ontologies:
 data.manager$register.ontology(
