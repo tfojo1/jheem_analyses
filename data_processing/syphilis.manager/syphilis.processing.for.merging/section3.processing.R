@@ -265,6 +265,19 @@ put.msa.data.as.new.source.NEW(outcome = 'deaths',
                            source.for.relative.contribution = 'census.population',
                            ontology.for.relative.contribution = 'census') 
 
+put.msa.data.as.new.source.NEW(outcome = 'deaths',
+                               from.source.name= 'cdc_wonder',
+                               to.source.name = 'cdc.wonder.aggregated.population', 
+                               to.locations = MSAS.OF.INTEREST,
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'CBSA',
+                               details.for.new.data = 'estimated from county data',
+                               required.coverage=0.95,
+                               data.manager= syphilis.manager,
+                               outcome.for.relative.contribution = 'population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census') 
+
 fifty.states <- state.abb
 
 put.msa.data.as.new.source.NEW(outcome = 'population',
