@@ -1,4 +1,4 @@
-DATA.DIR.CDC.WONDER.DEATHS="Q:/data_raw/syphilis.manager/cdc.wonder.deaths"
+DATA.DIR.CDC.WONDER.DEATHS=file.path(Q_ROOT, "data_raw/syphilis.manager/cdc.wonder.deaths")
 
 wonder_files <- Sys.glob(paste0(DATA.DIR.CDC.WONDER.DEATHS, '/*.csv'))
 

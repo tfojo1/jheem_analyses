@@ -30,7 +30,7 @@ source('data_processing/syphilis.manager/proportion.of.congenital.syphilis.birth
 source('data_processing/transfer_adult_population_to_syphilis_manager.R')
 
 #Aggregate syphilis data into total.syphilis.diagnoses (Nick):
-syphilis.manager$register.source('cdc.summed', parent.source= "NNDSS", full.name = 'CDC Summed Data', short.name = 'cdc.summed') #Thsi is data from atlas summed into total syphilis dx
+syphilis.manager$register.source('cdc.summed', parent.source= "NNDSS", full.name = 'CDC Summed Data', short.name = 'cdc.summed') #This is data from atlas summed into total syphilis dx
 source('data_processing/syphilis.manager/data_quality_fix/test_total_with_restratification.R')
 
 # Aggregate Outcomes from County to MSA using a New Method-2026 (Andrew) 

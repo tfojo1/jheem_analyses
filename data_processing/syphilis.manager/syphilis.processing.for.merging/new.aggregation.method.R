@@ -1,10 +1,10 @@
 source('data_processing/aggregate_county_to_msa_new.R') #This aggregates county level data to other locations
-
+Q_ROOT <- Sys.getenv("Q_ROOT", "Q:")
 # -------------------------------------------------------------------------
 
  #3-25-26: Parastu wants ps.syphilis and total.syphilis for all msas:
-list1_2023 <- read_excel("Q:/data_raw/syphilis.manager/all.msas/list1_2023.xlsx", 
-                         sheet = "Unique MSAs")
+list1_2023 <- read_excel(file.path(Q_ROOT, ("data_raw/syphilis.manager/all.msas/list1_2023.xlsx", 
+                         sheet = "Unique MSAs"))
 
 list1_2023$msa <- paste0("C.", list1_2023$msa)
 
