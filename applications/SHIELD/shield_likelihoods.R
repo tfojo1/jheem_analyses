@@ -87,8 +87,9 @@ population.likelihood.instructions =
 #*For national: also available by age, race/eth, sex (2001-2020)
 deaths.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "deaths",
-                                         outcome.for.data = "deaths", 
-                                         levels.of.stratification = c(0), 
+                                         outcome.for.data = "deaths",
+                                         dimensions = c("age", "race", "sex"),
+                                         levels.of.stratification = c(0, 1, 3), # we have three-way and one-way but not two-way it appears 
                                          from.year = 2010, 
                                          #
                                          error.variance.type = 'function.sd',
@@ -304,7 +305,7 @@ ps.diagnosis.stage0.total.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'autoregressive.1',
                                          #
-                                         weights = STAGE.0.WEIGHT,
+                                         weights = STAGE.0.WEIGHT * 4, # changed for calib.3.24.stage0.az
                                          equalize.weight.by.year = T
                                          # minimum.error.sd = 1  
     )
