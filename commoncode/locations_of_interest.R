@@ -59,7 +59,7 @@ JACKSON.MSA = 'C.27140'
 ##-- LUMP THEM INTO VECTORS --##
 ##----------------------------##
 
-# Every MSA we have represented in the code anywhere
+# Our set of typically used MSAs.
 MSAS.OF.INTEREST = c(NYC=NYC.MSA,
                      Miami=MIAMI.MSA,
                      LA=LA.MSA,
@@ -91,10 +91,9 @@ MSAS.OF.INTEREST = c(NYC=NYC.MSA,
                      Columbus=COLUMBUS.MSA,
                      Baton_Rouge=BATON.ROUGE.MSA,
                      Sacramento=SACRAMENTO.MSA,
-                     Cleveland=CLEVELAND.MSA,
-                     St_Louis=ST.LOUIS.MSA)
+                     Cleveland=CLEVELAND.MSA)
 
-# Just the ones for EHE counties
+# Same as the above; kept for backwards compatibility.
 EHE.MSAS = MSAS.OF.INTEREST[1:32]
 
 
