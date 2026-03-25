@@ -41,15 +41,17 @@ prepare_simsets_for_plots <- function(calibration.code, locations, assemble.inco
                                                                            calibration.code = calibration.code,
                                                                            allow.incomplete = T)},
                                     error = function(e) {print(paste0(e, "... Skipping")); return(NULL)})
+            n_sim_effective <- full_simset$n.sim
         } else {
             full_simset <- tryCatch({retrieve.simulation.set(version = "shield",
                                                              location = location,
                                                              calibration.code = calibration.code,
                                                              n.sim = n_sim)},
                                     error = function(e) {print(paste0(e, "... Skipping")); return(NULL)})
+            n_sim_effective <- n_sim
         }
         if (is.null(full_simset)) return(NULL)
-        last20_sims <- full_simset$subset((n_sim - 20) : (n_sim - 1))
+        last20_sims <- full_simset$subset((n_sim_effective - 20) : (n_sim_effective - 1))
         last_sim <- full_simset$last.sim()
         
         # Give a title suffix for plots to indicate calibration code and percent completion, if needed
@@ -112,10 +114,10 @@ make_total_plot <- function(outcome, last20, lastsim, style.manager, plotting.pa
         outcomes = outcome,
         style.manager = style.manager,
         title.suffix = title.suffix,
-        dimension.values = list(year=1995:2030)
+        dimension.values = list(year=2000:2030)
     )
     file_png  <- file.path(paste0(plotting.path , gsub("\\.", "-", outcome), ".png"))
-    ggsave(file_png, plot = p, width = 8, height = 5, dpi = 300)
+    ggsave(file_png, plot = p, width = 12, height = 7, dpi = 300)
 }
 
 #' @title Make a One-Way Stratified Plot
@@ -128,10 +130,10 @@ make_facet_plot <- function(outcome, last20, lastsim, facet.vars, style.manager,
             facet.by = facet_var,
             style.manager = style.manager,
             title.suffix = title.suffix,
-            dimension.values = list(year=1995:2030)
+            dimension.values = list(year=2000:2030)
         )
         file_png  <- file.path(paste0(plotting.path , gsub("\\.", "-", outcome),"_",facet_var, ".png"))
-        ggsave(file_png, plot = p, width = 8, height = 5, dpi = 300)
+        ggsave(file_png, plot = p, width = 12, height = 7, dpi = 300)
     }
 }
 
@@ -146,7 +148,7 @@ make_split_facet_plot <- function(outcome, last20, lastsim, split.facet.pairs, s
             facet.by = split_facet_pair[2],
             style.manager = style.manager,
             title.suffix = title.suffix,
-            dimension.values = list(year=1995:2030)
+            dimension.values = list(year=2000:2030)
         )
         file_png  <- file.path(paste0(plotting.path ,
                                       gsub("\\.", "-", outcome),
@@ -155,7 +157,7 @@ make_split_facet_plot <- function(outcome, last20, lastsim, split.facet.pairs, s
                                       "_",
                                       split_facet_pair[2],
                                       ".png"))
-        ggsave(file_png, plot = p, width = 8, height = 5, dpi = 300)
+        ggsave(file_png, plot = p, width = 12, height = 7, dpi = 300)
     }
 }
 
@@ -264,8 +266,3 @@ if (1==2) {
 # }
 # 
 # #OTHER Plots of interest:
-if (1==2) {
-    source.style.manager = create.style.manager( shape.data.by = "source",color.data.by = "stratum")
-    simset_d2 <- prepare_simsets_for_plots(calibration.code = "calib.3.22.stage0.az", locations = MSAS.OF.INTEREST, assemble.incomplete = F)
-    x <- create_plots_for_stage0_calibration("calib.3.22.stage0.az", simset_d2, create.dirs = T)
-}
