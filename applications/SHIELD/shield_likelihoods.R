@@ -255,7 +255,7 @@ total.diagnosis.likelihood.instructions =
 total.diagnosis.by.strata.stage1.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.total",
                                          outcome.for.data = "total.syphilis.diagnoses",
-                                         levels.of.stratification = c(0,1,2),
+                                         levels.of.stratification = c(0,1,2), # why 0 again?
                                          dimensions = c("sex","race"),
                                          from.year = 2019,
                                          to.year = 2022,
@@ -1004,43 +1004,6 @@ late.diagnosis.by.strata.stage2.likelihood.instructions =
                                          minimum.error.sd = 1
     )
 
-##** HIV TESTS ** ----
-##---- Strata Stage1 2014-2019 ----
-hiv.testing.by.strata.stage1.likelihood.instructions =
-    create.basic.likelihood.instructions(outcome.for.sim = "hiv.testing",
-                                         outcome.for.data = "proportion.tested.for.hiv", 
-                                         dimensions = c("race","sex"), # also fit for MSM
-                                         levels.of.stratification = c(0,1),
-                                         from.year = 2014,
-                                         to.year = 2019,
-                                         #
-                                         error.variance.type = 'cv',
-                                         error.variance.term = 0.05,
-                                         #
-                                         observation.correlation.form = 'compound.symmetry', #short duration of data warrants using the CS
-                                         #
-                                         weights = STAGE.1.WEIGHT, # start by increasing the weight to double what it is now
-                                         equalize.weight.by.year = T
-    )
-
-##---- Strata Stage2 2014-2019 ----
-hiv.testing.by.strata.stage2.likelihood.instructions =
-    create.basic.likelihood.instructions(outcome.for.sim = "hiv.testing",
-                                         outcome.for.data = "proportion.tested.for.hiv", 
-                                         dimensions = c("race","sex","age"),
-                                         levels.of.stratification = c(0,1),
-                                         from.year = 2014,
-                                         to.year = 2019,
-                                         #
-                                         error.variance.type = 'cv',
-                                         error.variance.term = 0.05,
-                                         #
-                                         observation.correlation.form = 'compound.symmetry', #short duration of data warrants using the CS
-                                         #
-                                         weights = STAGE.2.WEIGHT,
-                                         equalize.weight.by.year = T
-    )
-
 ##** PROPORTION TESTED ** ----
 ## State-level: for situations where MSA level data is not available 
 # need to figure out how to write this for MSM and Heterosexual
@@ -1158,7 +1121,8 @@ proportion.tested.by.strata.stage1.nested.likelihood.instructions =
                                                      #
                                                      observation.correlation.form = 'compound.symmetry',
                                                      p.error.variance.term = NULL, # this was cv=50% until "calib.3.16.stage1.az"
-                                                     p.error.variance.type = "data.variance", 
+                                                     p.error.variance.type = "data.variance",
+                                                     minimum.error.sd = 0.01, # to fix two Houston points where variance data says 0
                                                      #
                                                      partitioning.function = SHIELD.PARTITIONING.FUNCTION,
                                                      #
@@ -1189,7 +1153,8 @@ proportion.tested.by.strata.stage2.nested.likelihood.instructions =
                                                      #
                                                      observation.correlation.form = 'compound.symmetry',
                                                      p.error.variance.term = NULL,
-                                                     p.error.variance.type = "data.variance", 
+                                                     p.error.variance.type = "data.variance",
+                                                     minimum.error.sd = 0.01,
                                                      #
                                                      partitioning.function = SHIELD.PARTITIONING.FUNCTION,
                                                      #
