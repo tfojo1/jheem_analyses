@@ -1161,19 +1161,6 @@ proportion.tested.by.strata.stage2.nested.likelihood.instructions =
                                                      weights = STAGE.2.WEIGHT,
                                                      equalize.weight.by.year = T
     )
-##---- State Strata Stage1 ----
-state.HIV.tested.by.strata.stage1.likelihood.instructions =
-    create.ifelse.likelihood.instructions(
-        hiv.testing.by.strata.stage1.likelihood.instructions,
-        proportion.tested.by.strata.stage1.nested.likelihood.instructions
-    )
-##---- State Strata Stage2 ----
-state.HIV.tested.by.strata.stage2.likelihood.instructions =
-    create.ifelse.likelihood.instructions(
-        hiv.testing.by.strata.stage2.likelihood.instructions,
-        proportion.tested.by.strata.stage2.nested.likelihood.instructions
-    )
-
 
 #-- LIKELIHOODS --# ----
 ## STAGE0 ----
