@@ -16,10 +16,13 @@
 #' @param marginals.outcomes Character vector of outcome names to run
 #'   inspect.marginals on, or NULL to auto-detect (all non.negative.number
 #'   outcomes). Set to character(0) to skip.
+#' @param known.issues.file Path to a JSON file listing known dimension sanity
+#'   issues to suppress. NULL to show all warnings.
 #' @return A report list with sections for each check type
 report_data_quality <- function(manager,
                                 component.checks = NULL,
-                                marginals.outcomes = NULL) {
+                                marginals.outcomes = NULL,
+                                known.issues.file = NULL) {
 
   report <- list(
     generated_at = format(Sys.time(), "%Y-%m-%d %H:%M:%S"),
@@ -31,7 +34,11 @@ report_data_quality <- function(manager,
   report$sections$na_analysis <- analyze_na_patterns(manager)
 
   # Section 2: Dimension value sanity
-  report$sections$dimension_sanity <- check_dimension_sanity(manager)
+  known.issues <- load_known_issues(known.issues.file)
+  all_issues <- check_dimension_sanity(manager, known.issues = NULL)
+  filtered_issues <- check_dimension_sanity(manager, known.issues)
+  report$sections$dimension_sanity <- filtered_issues
+  report$sections$known_issues_suppressed <- length(all_issues) - length(filtered_issues)
 
   # Section 3: Component consistency
   if (!is.null(component.checks)) {
@@ -99,8 +106,12 @@ analyze_na_patterns <- function(manager) {
 #' Flags cases where dimension values don't match expected patterns — e.g.,
 #' year dimensions containing non-year values, which indicates dimension
 #' labels may have been swapped during data processing.
+#'
+#' @param manager A jheem data manager object
+#' @param known.issues List of known issue entries (from load_known_issues).
+#'   Matching warnings are suppressed. NULL to show all.
 #' @keywords internal
-check_dimension_sanity <- function(manager) {
+check_dimension_sanity <- function(manager, known.issues = NULL) {
 
   results <- list()
   year_pattern <- "^\\d{4}$"
@@ -114,14 +125,16 @@ check_dimension_sanity <- function(manager) {
         for (strat in names(estimate_data[[source]][[ontology]])) {
           arr <- estimate_data[[source]][[ontology]][[strat]]
           dims <- dimnames(arr)
+          path <- paste(outcome, source, ontology, strat, sep = " > ")
 
           # Check year dimension: all values should be 4-digit years
           if ("year" %in% names(dims)) {
             year_vals <- dims[["year"]]
             bad_years <- year_vals[!grepl(year_pattern, year_vals)]
+            bad_years <- filter_known_values(bad_years, "non_year_values", path, known.issues)
             if (length(bad_years) > 0) {
               results[[length(results) + 1]] <- list(
-                path = paste(outcome, source, ontology, strat, sep = " > "),
+                path = path,
                 dimension = "year",
                 issue = "non_year_values",
                 bad_values = bad_years,
@@ -138,9 +151,10 @@ check_dimension_sanity <- function(manager) {
             loc_vals <- dims[["location"]]
             loc_pattern <- "^([A-Z]{2}|\\d{5}|C\\.\\d{5}|US)$"
             bad_locs <- loc_vals[!grepl(loc_pattern, loc_vals)]
+            bad_locs <- filter_known_values(bad_locs, "unrecognized_location_codes", path, known.issues)
             if (length(bad_locs) > 0) {
               results[[length(results) + 1]] <- list(
-                path = paste(outcome, source, ontology, strat, sep = " > "),
+                path = path,
                 dimension = "location",
                 issue = "unrecognized_location_codes",
                 bad_values = bad_locs,
@@ -157,6 +171,56 @@ check_dimension_sanity <- function(manager) {
   }
 
   results
+}
+
+#' Load known issues from a JSON file
+#' @keywords internal
+load_known_issues <- function(file) {
+  if (is.null(file) || !file.exists(file)) return(NULL)
+  config <- jsonlite::fromJSON(file, simplifyVector = FALSE)
+  config$dimension_sanity
+}
+
+#' Filter out bad values that match known issue entries
+#'
+#' For each known issue, checks if the issue type matches and if the path
+#' matches any of the entry's path patterns (using * as wildcard for path
+#' segments). If so, removes bad values matching the entry's value pattern.
+#' @keywords internal
+filter_known_values <- function(bad_values, issue_type, path, known.issues) {
+  if (is.null(known.issues) || length(bad_values) == 0) return(bad_values)
+
+  for (entry in known.issues) {
+    if (entry$issue != issue_type) next
+    if (!path_matches_any(path, entry$paths)) next
+    # Remove values matching this entry's pattern
+    bad_values <- bad_values[!grepl(entry$pattern, bad_values, perl = TRUE)]
+    if (length(bad_values) == 0) break
+  }
+
+  bad_values
+}
+
+#' Check if a data path matches any of the given path patterns
+#'
+#' Path patterns use " > " as separator (matching the data path format).
+#' A "*" segment matches any single path segment.
+#' @keywords internal
+path_matches_any <- function(path, patterns) {
+  path_parts <- strsplit(path, " > ")[[1]]
+  for (pat in patterns) {
+    pat_parts <- strsplit(pat, " > ")[[1]]
+    if (length(pat_parts) != length(path_parts)) next
+    match <- TRUE
+    for (i in seq_along(pat_parts)) {
+      if (pat_parts[i] != "*" && pat_parts[i] != path_parts[i]) {
+        match <- FALSE
+        break
+      }
+    }
+    if (match) return(TRUE)
+  }
+  FALSE
 }
 
 
@@ -419,16 +483,26 @@ print_quality_report <- function(report) {
 
   # -- Dimension Value Sanity --
   dim_results <- report$sections$dimension_sanity
+  known_suppressed <- report$sections$known_issues_suppressed
   if (length(dim_results) > 0) {
     cat("--- Dimension Value Sanity ---\n")
-    cat(sprintf("  %d issue(s) found:\n", length(dim_results)))
+    cat(sprintf("  %d issue(s) found", length(dim_results)))
+    if (!is.null(known_suppressed) && known_suppressed > 0) {
+      cat(sprintf(" (%d known issue(s) suppressed)", known_suppressed))
+    }
+    cat(":\n")
     for (item in dim_results) {
       cat(sprintf("  WARNING: %s\n", item$message))
       cat(sprintf("    at: %s\n", item$path))
     }
     cat("\n")
   } else {
-    cat("--- Dimension Value Sanity ---\n  All dimension values look reasonable\n\n")
+    cat("--- Dimension Value Sanity ---\n")
+    if (!is.null(known_suppressed) && known_suppressed > 0) {
+      cat(sprintf("  All clear (%d known issue(s) suppressed)\n\n", known_suppressed))
+    } else {
+      cat("  All dimension values look reasonable\n\n")
+    }
   }
 
   # -- Component Consistency --

@@ -1,0 +1,17 @@
+{
+    "_comment": "Known dimension value issues that have been reviewed and accepted. The dimension sanity check suppresses warnings matching these entries. Remove an entry to start flagging it again.",
+    "dimension_sanity": [
+        {
+            "issue": "non_year_values",
+            "pattern": "^\\d{4}-\\d{4}$",
+            "paths": ["* > cdc.sdh > cdc.sdh > *", "* > census.population > census.immigration > *"],
+            "reason": "CDC SDH data and census immigration data use year ranges (e.g. '2018-2022', '2011-2015') as intentional encodings, not data errors."
+        },
+        {
+            "issue": "unrecognized_location_codes",
+            "pattern": "^[A-Z]{2}\\.\\d+[A-Z]?$",
+            "paths": ["adult.population > census.aggregated.adult.population > * > *"],
+            "reason": "Sub-state region codes (e.g. 'AR.3', 'CA.11') from surveillance manager transfer. These are valid surveillance regions, not standard FIPS/CBSA codes."
+        }
+    ]
+}

@@ -44,9 +44,11 @@ syphilis_component_checks <- list(
   )
 )
 
+known_issues_file <- "data_processing/syphilis.manager/validation/known_issues.json"
 quality_report <- report_data_quality(
   syphilis.manager,
-  component.checks = syphilis_component_checks
+  component.checks = syphilis_component_checks,
+  known.issues.file = known_issues_file
 )
 print_quality_report(quality_report)
 
