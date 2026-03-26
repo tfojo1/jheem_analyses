@@ -12,7 +12,7 @@ setwd("../../../jheem_analyses")
 
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
 source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
-source('../jheem_analyses/applications/SHIELD/shield_calib_register_new.R')
+source('../jheem_analyses/applications/SHIELD/shield_calib_register.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases for locations C.12580=Blatimore MSA
 
 VERSION='shield'
@@ -20,7 +20,7 @@ set.seed(00000)
 CACHE.FREQ= 500 # how often should write the results to disk (Default: 100)
 UPDATE.FREQ= 50 # how often to print messages (Default: 50)
 
-CALIBRATIONS.TO.RUN = c("calib.3.3.stage2.wFT")
+CALIBRATIONS.TO.RUN = c("calib.3.24.stage0.az")
 START_FROM_SCRATCH = T
 
 for (CALIBRATION.NAME in CALIBRATIONS.TO.RUN) {
@@ -45,12 +45,29 @@ for (CALIBRATION.NAME in CALIBRATIONS.TO.RUN) {
     # Run calibration ----
     start.time = Sys.time()
     print(paste0("STARTING MCMC RUN OF ", LOCATION, " (", locations::get.location.name(LOCATION), ") AT ", Sys.time()))
-    mcmc = run.calibration(version = VERSION,
-                           location = LOCATION,
-                           calibration.code = CALIBRATION.NAME,
-                           chains = 1,
-                           update.frequency = UPDATE.FREQ,
-                           update.detail = 'med')
+    
+    # Wrap this in a loop that will re-try it if a write step ever gets interrupted
+    attempts <- 1
+    while (attempts < 100) {
+        finished <- F
+        tryCatch({
+            mcmc <- run.calibration(version = VERSION,
+                                    location = LOCATION,
+                                    calibration.code = CALIBRATION.NAME,
+                                    chains = 1,
+                                    update.frequency = UPDATE.FREQ,
+                                    update.detail = 'med')
+            finished <- T
+        },
+        error = function(e) {
+            print("MCMC was probably interrupted during write step. Sleeping 5 minutes before retrying...")
+            Sys.sleep(60 * 5)
+        })
+        if (finished) break
+        attempts <- attempts + 1
+        print(paste0("Retrying (attempt #", attempts, ")..."))
+    }
+    
     end.time = Sys.time()
     run.time = as.numeric(end.time) - as.numeric(start.time)
     
