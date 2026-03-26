@@ -238,12 +238,12 @@ data.manager$register.ontology(
     sex=c('male','female')
   ))
 
-data.manager$register.ontology(
-  'cdc.new',
+data.manager$register.ontology( #Represents the older age groups used in Atlas Plus data which we updated 3-26-26
+  'cdc.old',
   ont = ontology(
     year= NULL,
     location= NULL,
-    age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years','55-64 years', "65+ years"),
+    age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years', "55+ years"),
     race=c('american indian/alaska native', 'asian', 'black/african american', 'hispanic/latino', 'native hawaiian/other pacific islander', 'white'),
     sex=c('male','female'),
     risk=c('msm','idu','msm_idu','heterosexual','other')

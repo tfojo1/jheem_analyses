@@ -193,8 +193,27 @@ data.list.clean.deaths = lapply(data.list.deaths, function(file){
   }
   if(grepl("risk", filename)) {
     data$risk = risk.mappings[data$Transmission.Category]
-    
   }
+  
+  if(grepl("msa", filename)) { 
+      
+      data$location <- dplyr::case_when(
+          data$location %in% c("C.39100", "C.28880") ~ "C.39100", #Poughkeepsie MSA has a new designation
+          data$location %in% c("C.17460", "C.17410") ~ "C.17460", #Cleveland MSA changed their FIPS in 2023
+          TRUE ~ data$location
+      )
+      
+      # # Columns you WANT to group by   #NOTE: This chunk of code would sum together the values for the above MSAs but bc their data changed for one year I don't think it's necessary
+      # desired_cols <- c("outcome", "year", "location", "age", "race", "sex", "risk")
+      # 
+      # # Keep only those that exist in this dataframe
+      # group_cols <- intersect(desired_cols, names(data))
+      # 
+      # data <- data %>%
+      #     dplyr::group_by(dplyr::across(all_of(group_cols))) %>%
+      #     dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop")
+  }
+  
   list(filename, data) 
   
 } )
@@ -306,6 +325,10 @@ data.list.clean.prevalence = lapply(data.list.prevalence, function(file){
     data$location = as.character(data$FIPS)
   } 
   
+  if(grepl("national", filename)) {
+      data$location = "US"
+  }
+  
   if(grepl("age", filename)) {
     data$age = age.mappings[data$Age.Group]
   }
@@ -329,6 +352,26 @@ data.list.clean.prevalence = lapply(data.list.prevalence, function(file){
     data$risk = risk.mappings[data$Transmission.Category]
   }
   
+  if(grepl("msa", filename)) { 
+      
+      data$location <- dplyr::case_when(
+          data$location %in% c("C.39100", "C.28880") ~ "C.39100", #Poughkeepsie MSA has a new designation
+          data$location %in% c("C.17460", "C.17410") ~ "C.17460", #Cleveland MSA changed their FIPS in 2023
+          TRUE ~ data$location
+      )
+      
+      # # Columns you WANT to group by   #NOTE: This chunk of code would sum together the values for the above MSAs but bc their data changed for one year I don't think it's necessary
+      # desired_cols <- c("outcome", "year", "location", "age", "race", "sex", "risk")
+      # 
+      # # Keep only those that exist in this dataframe
+      # group_cols <- intersect(desired_cols, names(data))
+      # 
+      # data <- data %>%
+      #     dplyr::group_by(dplyr::across(all_of(group_cols))) %>%
+      #     dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop")
+  }
+  
+  data = as.data.frame(data)
   list(filename, data) 
   
 } )
@@ -361,6 +404,7 @@ data.list.clean.sle = lapply(data.list.sle, function(file){
   }
   if(grepl("ehe", filename)) {
     data$location = as.character(data$FIPS)
+    data$location = str_pad(data$location, width = 5, side = "left", pad = "0")
   }
   if(grepl("msa", filename)) {
     data$msa_indicator= substring(data$FIPS, 6, 10)
@@ -373,6 +417,7 @@ data.list.clean.sle = lapply(data.list.sle, function(file){
   }
   if(grepl("allcounty", filename)) {
     data$location = as.character(data$FIPS)
+    data$location = str_pad(data$location, width = 5, side = "left", pad = "0")
   }  
   
   if(grepl("_age", filename)) {
@@ -397,6 +442,25 @@ data.list.clean.sle = lapply(data.list.sle, function(file){
   }
   if(grepl("risk", filename)) {
     data$risk = risk.mappings[data$Transmission.Category]
+  }
+  
+  if(grepl("msa", filename)) { 
+      
+      data$location <- dplyr::case_when(
+          data$location %in% c("C.39100", "C.28880") ~ "C.39100", #Poughkeepsie MSA has a new designation
+          data$location %in% c("C.17460", "C.17410") ~ "C.17460", #Cleveland MSA changed their FIPS in 2023
+          TRUE ~ data$location
+      )
+      
+      # # Columns you WANT to group by   #NOTE: This chunk of code would sum together the values for the above MSAs but bc their data changed for one year I don't think it's necessary
+      # desired_cols <- c("outcome", "year", "location", "age", "race", "sex", "risk")
+      # 
+      # # Keep only those that exist in this dataframe
+      # group_cols <- intersect(desired_cols, names(data))
+      # 
+      # data <- data %>%
+      #     dplyr::group_by(dplyr::across(all_of(group_cols))) %>%
+      #     dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop")
   }
   
   list(filename, data) 
@@ -852,7 +916,7 @@ for (data in national_suppression_all) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc.new',
+    ontology.name = 'cdc',
     source = 'cdc.hiv',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
