@@ -1191,22 +1191,12 @@ lik.inst.stage0 =join.likelihood.instructions(
 ### without future trend -----
 # stage1 likelihoods without future trends
 lik.inst.stage1=join.likelihood.instructions(
-    total.diagnosis.likelihood.instructions,
     total.diagnosis.by.strata.stage1.likelihood.instructions,
-    #
-    ps.diagnosis.total.likelihood.instructions,
     ps.diagnosis.by.strata.stage1.likelihood.instructions,
-    #
-    early.diagnosis.total.likelihood.instructions,
     early.diagnosis.by.strata.stage1.likelihood.instructions,
-    #
-    late.diagnosis.total.likelihood.instructions,
     late.diagnosis.by.strata.stage1.likelihood.instructions,
-    #
     proportion.tested.by.strata.stage1.nested.likelihood.instructions,
-    #
     historical.diagnosis.likelihood.instructions,
-    #
     proportion_ps_male_among_msm_likelihood_instructions
     
 )
@@ -1215,22 +1205,12 @@ lik.inst.stage1=join.likelihood.instructions(
 ### without future trend -----
 #total syphilis +stage 2 stratas (by age, sex, race)
 lik.inst.stage2=join.likelihood.instructions(
-    total.diagnosis.likelihood.instructions,
     total.diagnosis.by.strata.stage2.likelihood.instructions,
-    #
-    ps.diagnosis.total.likelihood.instructions,
     ps.diagnosis.by.strata.stage2.likelihood.instructions,
-    # 
-    early.diagnosis.total.likelihood.instructions,
     early.diagnosis.by.strata.stage2.likelihood.instructions,
-    # 
-    late.diagnosis.total.likelihood.instructions,
     late.diagnosis.by.strata.stage2.likelihood.instructions,
-    #
     proportion.tested.by.strata.stage2.nested.likelihood.instructions,
-    #
     historical.diagnosis.likelihood.instructions,
-    #
     proportion_ps_male_among_msm_likelihood_instructions
 
 )
