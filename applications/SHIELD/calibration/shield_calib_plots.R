@@ -34,7 +34,7 @@ prepare_simsets_for_plots <- function(calibration.code, locations, assemble.inco
         if (!assemble.incomplete && percent_completion < 100)
         {print(paste0("Error: Simset for '", location, "' and '", calibration.code, "' is incomplete and 'assemble.incomplete' is set to FALSE... Skipping")); return(NULL)}
         
-        # Fetch or assemble simset (later: should have this done up front outside this function so that we never repeat it unless we have to)
+        # Fetch or assemble simset
         if (percent_completion < 100) {
             full_simset <- tryCatch({assemble.simulations.from.calibration(version = "shield",
                                                                            location = location,
@@ -67,9 +67,10 @@ prepare_simsets_for_plots <- function(calibration.code, locations, assemble.inco
     }), locations)
 }
 
+#' @param stage 0, 1, or 2
 #' @param create.dirs Recommended to start with this set to FALSE to make sure you're in the right working directory (jheem_analyses). Then, set to TRUE so that you can make new directories for city/calibration combinations.
 #' @returns After generating plots, this function returns a vector of locations which succeeded so that you can record which failed.
-create_plots_for_stage0_calibration <- function(calibration.code, simset.data, create.dirs = F) {
+create_plots_for_calibration <- function(stage, calibration.code, simset.data, create.dirs = F) {
     
     # Will return a vector of successful locations
     successful_locations <- character(0)
@@ -94,12 +95,14 @@ create_plots_for_stage0_calibration <- function(calibration.code, simset.data, c
         }
         
         # Generate and save plots
-        print(paste0("Generating stage 0 plots for '", location, "' and '", calibration.code, "'"))
+        print(paste0("Generating plots for '", location, "' and '", calibration.code, "'"))
         tryCatch({
-            make_stage0_plots_for_location(last20_sims, last_sim, plotting_path, title.suffix = title_suffix)
+            if (stage == 0) make_stage0_plots_for_location(last20_sims, last_sim, plotting_path, title.suffix = title_suffix)
+            if (stage == 1) make_stage1_plots_for_location(last20_sims, last_sim, plotting_path, title.suffix = title_suffix)
+            if (stage == 2) make_stage2_plots_for_location(last20_sims, last_sim, plotting_path, title.suffix = title_suffix)
             successful_locations <- c(successful_locations, location)},
             # error = function(e) {browser()})
-            error = function(e) {print(paste0("Error generating stage 0 plots for '", location, "' and '", calibration.code, "'... Skipping"))})
+            error = function(e) {print(paste0("Error generating plots for '", location, "' and '", calibration.code, "'... Skipping"))})
     }
     
     # Return vector of successful locations
@@ -170,18 +173,84 @@ make_stage0_plots_for_location <- function(last20, lastsim, plotting.path, title
                                                                                   c("race", "age"),
                                                                                   c("race", "sex")),
                           style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    
     # DEATHS
     make_total_plot("deaths", last20, lastsim, style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    
     # FERTILITY RATE
     make_split_facet_plot("fertility.rate", last20, lastsim, split.facet.pairs = list(c("race", "age")), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    
     # IMMIGRATION
     make_total_plot("immigration", last20, lastsim, style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
     make_facet_plot("immigration", last20, lastsim, facet.vars = c("sex", "race", "age"), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    
     # EMIGRATION
     make_total_plot("emigration", last20, lastsim, style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
     make_facet_plot("emigration", last20, lastsim, facet.vars = c("sex", "race", "age"), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    
     # PS.DIAGNOSIS
     make_total_plot("diagnosis.ps", last20, lastsim, style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+}
+
+# STAGE 1 OUTCOMES ----
+make_stage1_plots_for_location <- function(last20, lastsim, plotting.path, title.suffix) {
+    # TOTAL DIAGNOSIS
+    make_total_plot("diagnosis.total", last20, lastsim, style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    make_facet_plot("diagnosis.total", last20, lastsim, facet.vars = c("sex", "race"), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    make_split_facet_plot("diagnosis.total", last20, lastsim, split.facet.pairs = list(c("sex", "race")), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    
+    # PS.DIAGNOSIS
+    make_total_plot("diagnosis.ps", last20, lastsim, style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    make_facet_plot("diagnosis.ps", last20, lastsim, facet.vars = c("sex", "race"), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    make_split_facet_plot("diagnosis.ps", last20, lastsim, split.facet.pairs = list(c("sex", "race")), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    
+    # EARLY LATENT
+    make_total_plot("diagnosis.el.misclassified", last20, lastsim, style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    make_facet_plot("diagnosis.el.misclassified", last20, lastsim, facet.vars = c("sex", "race"), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    make_split_facet_plot("diagnosis.el.misclassified", last20, lastsim, split.facet.pairs = list(c("sex", "race")), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    
+    # LATE LATENT
+    make_total_plot("diagnosis.late.misclassified", last20, lastsim, style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    make_facet_plot("diagnosis.late.misclassified", last20, lastsim, facet.vars = c("sex", "race"), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    make_split_facet_plot("diagnosis.late.misclassified", last20, lastsim, split.facet.pairs = list(c("sex", "race")), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    
+    # PROPORTION TESTED
+    make_total_plot("hiv.testing", last20, lastsim, style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    make_facet_plot("hiv.testing", last20, lastsim, facet.vars = c("sex", "race"), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+}
+# STAGE 2 OUTCOMES ----
+make_stage2_plots_for_location <- function(last20, lastsim, plotting.path, title.suffix) {
+    # TOTAL DIAGNOSIS
+    make_total_plot("diagnosis.total", last20, lastsim, style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    make_facet_plot("diagnosis.total", last20, lastsim, facet.vars = c("sex", "race", "age"), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    make_split_facet_plot("diagnosis.total", last20, lastsim, split.facet.pairs = list(c("sex", "age"),
+                                                                                       c("race", "age"),
+                                                                                       c("race", "sex")), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    
+    # PS.DIAGNOSIS
+    make_total_plot("diagnosis.ps", last20, lastsim, style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    make_facet_plot("diagnosis.ps", last20, lastsim, facet.vars = c("sex", "race", "age"), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    make_split_facet_plot("diagnosis.ps", last20, lastsim, split.facet.pairs = list(c("sex", "age"),
+                                                                                    c("race", "age"),
+                                                                                    c("race", "sex")), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    
+    # EARLY LATENT
+    make_total_plot("diagnosis.el.misclassified", last20, lastsim, style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    make_facet_plot("diagnosis.el.misclassified", last20, lastsim, facet.vars = c("sex", "race", "age"), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    make_split_facet_plot("diagnosis.el.misclassified", last20, lastsim, split.facet.pairs = list(c("sex", "age"),
+                                                                                                  c("race", "age"),
+                                                                                                  c("race", "sex")), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    
+    # LATE LATENT
+    make_total_plot("diagnosis.late.misclassified", last20, lastsim, style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    make_facet_plot("diagnosis.late.misclassified", last20, lastsim, facet.vars = c("sex", "race", "age"), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    make_split_facet_plot("diagnosis.late.misclassified", last20, lastsim, split.facet.pairs = list(c("sex", "age"),
+                                                                                                    c("race", "age"),
+                                                                                                    c("race", "sex")), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    
+    # PROPORTION TESTED
+    make_total_plot("hiv.testing", last20, lastsim, style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    make_facet_plot("hiv.testing", last20, lastsim, facet.vars = c("sex", "race", "age"), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
 }
 
 # USAGE ----
@@ -191,78 +260,8 @@ if (1==2) {
     source.style.manager = create.style.manager( shape.data.by = "source",color.data.by = "stratum")
     
     # Retrieve and/or assemble simsets. Only need to run once per session.
-    simset_data <- prepare_simsets_for_plots(calibration.code = "calib.3.22.stage0.az", locations = c("C.12580", "C.41860"), assemble.incomplete = T)
+    simset_data <- prepare_simsets_for_plots(calibration.code = "calib.3.23.stage2.az", MSAS.OF.INTEREST, assemble.incomplete = F)
     
     # Create and save the plots. To change which plots are generated, go to the "STAGE 0 OUTCOMES" section.
-    x <- create_plots_for_stage0_calibration("calib.3.22.stage0.az", simset_data, create.dirs = T)
+    x <- create_plots_for_calibration(2, "calib.3.23.stage2.az", simset_data, create.dirs = T)
 }
-
-# stage 0 likelihoods:
-# population (age/race/sex 0,1,2), deaths (0 currently), fertility (age/race 0,1,2), immigration (age/race/sex 0,1), emigration (age/race 0,1,2), ps.diagnosis (0)
-
-
-
-# # STAGE1 OUTCOMES ----
-# ## Totals
-# for (outcome in c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.ll.misclassified","hiv.testing")){
-#     print(outcome)
-#     p=simplot(
-#         last20,
-#         outcomes=outcome,
-#         style.manager = source.style.manager
-#     )
-#     # Save in multiple formats (adjust width/height as needed)
-#     file_png  <- file.path(get.jheem.root.directory(), paste0(plotting_path , outcome, ".png"))
-#     ggsave(file_png, plot = p, width = 8, height = 5, dpi = 300)
-# }
-# 
-# # Oneway Stratification ----
-# for (outcome in c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.ll.misclassified","hiv.testing")){
-#     for (strata in c("sex","race","age")){
-#         print(outcome)
-#         p=simplot(
-#             last20,
-#             outcomes=outcome,
-#             facet.by =strata,
-#             style.manager = source.style.manager
-#         )
-#         # Save in multiple formats (adjust width/height as needed)
-#         file_png  <- file.path(get.jheem.root.directory(), paste0(plotting_path , outcome,"_",strata, ".png"))
-#         ggsave(file_png, plot = p, width = 8, height = 5, dpi = 300)
-#     }}
-# # Two_way Stratification ----
-# #@Andrew: we should only include outcomes with two way stratification data  (not hiv.testing)
-# for (outcome in c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.ll.misclassified")){
-#     print(outcome)
-#     p=simplot(
-#         last20,
-#         outcomes=outcome,
-#         facet.by ="age",
-#         split.by = "race",
-#         style.manager = source.style.manager 
-#     )
-#     file_png  <- file.path(get.jheem.root.directory(), paste0(plotting_path , outcome,"_age_race", ".png"))
-#     ggsave(file_png, plot = p, width = 8, height = 5, dpi = 300)
-#     #
-#     p=simplot(
-#         last20,
-#         outcomes=outcome,
-#         facet.by ="age",
-#         split.by = "sex",
-#         style.manager = source.style.manager 
-#     )
-#     file_png  <- file.path(get.jheem.root.directory(), paste0(plotting_path , outcome,"_age_sex", ".png"))
-#     ggsave(file_png, plot = p, width = 8, height = 5, dpi = 300)
-#     #
-#     p=simplot(
-#         last20,
-#         outcomes=outcome,
-#         facet.by ="sex",
-#         split.by = "race",
-#         style.manager = source.style.manager 
-#     )
-#     file_png  <- file.path(get.jheem.root.directory(), paste0(plotting_path , outcome,"_sex_race", ".png"))
-#     ggsave(file_png, plot = p, width = 8, height = 5, dpi = 300)
-# }
-# 
-# #OTHER Plots of interest:
