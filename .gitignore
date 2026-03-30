@@ -22,3 +22,4 @@ applications/*.DS_Store
 !commoncode/package_version_cache.Rdata
 Rplots.pdf
 jheem_analyses.Rproj
+.RData

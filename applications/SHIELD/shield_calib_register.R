@@ -2,7 +2,7 @@
 
 cat("*** Registering SHIELD calibration ***\n")
 source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
-N_ITER=20000
+N_ITER=15000
 
 # this lets us tune the transmission multipliers for MSM and het in each timepoint together 
 par.aliases.transmission = list(
@@ -14,7 +14,19 @@ par.aliases.transmission = list(
     trate.5 = c("transmission.rate.multiplier.msm2017", "transmission.rate.multiplier.heterosexual2017")
 )
 
-# STAGE 0 Demographics thin 50
+# STAGE0 ----
+# Repeating after the new revisions to symptomatic testing
+register.calibration.info("calib.3.30.stage0.pk",
+                          likelihood.instructions = lik.inst.stage0,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          fixed.initial.parameter.values = c("global.transmission.rate"=2.3),  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          parameter.aliases = par.aliases.transmission,
+                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
 
 # Built on calib.3.17.stage0.az, making global trate = 2.3. Expecting some cities' diagnoses to go too high since it was 2.05 before.
 register.calibration.info("calib.3.22.stage0.az",
@@ -78,7 +90,18 @@ register.calibration.info("calib.2.19.stage0.az",
                           parameter.aliases = par.aliases.transmission,
                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-#STAGE1  
+#STAGE1  ----
+# Repeating after the new revisions to symptomatic testing
+register.calibration.info('calib.3.30.stage1.pk',
+                          preceding.calibration.codes = 'calib.3.30.stage0.pk',
+                          likelihood.instructions = lik.inst.stage1,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
 register.calibration.info('calib.3.2.stage1.az',
                           preceding.calibration.codes = 'calib.2.19.stage0.az',
                           likelihood.instructions = lik.inst.stage1,
@@ -108,23 +131,36 @@ register.calibration.info("calib.3.16.stage1.az",
                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
                           
 )
-#STAGE2
-register.calibration.info('calib.3.12.stage2.az',
-                          preceding.calibration.codes = 'calib.3.12.stage1.az',
+#STAGE2 ----
+# Repeating after the new revisions to symptomatic testing
+register.calibration.info('calib.3.30.stage2.pk',
+                          preceding.calibration.codes = 'calib.3.30.stage1.pk',
                           likelihood.instructions = lik.inst.stage2,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                              STI.TESTING.PARAMETERS.PRIOR@var.names),
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-register.calibration.info("calib.3.23.stage2.az",
-                          preceding.calibration.codes = 'calib.3.16.stage1.az',
-                          likelihood.instructions = lik.inst.stage2,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                              STI.TESTING.PARAMETERS.PRIOR@var.names),
-                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
-                          
-)
+# @andrew: how come you didnt have the TRANS.BY.AGE.SAMPLING.PRIOR in stage2 before? 
+
+# register.calibration.info('calib.3.12.stage2.az',
+#                           preceding.calibration.codes = 'calib.3.12.stage1.az',
+#                           likelihood.instructions = lik.inst.stage2,
+#                           data.manager = SURVEILLANCE.MANAGER,
+#                           end.year = 2030,
+#                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+#                                               STI.TESTING.PARAMETERS.PRIOR@var.names),
+#                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+# )
+# register.calibration.info("calib.3.23.stage2.az",
+#                           preceding.calibration.codes = 'calib.3.16.stage1.az',
+#                           likelihood.instructions = lik.inst.stage2,
+#                           data.manager = SURVEILLANCE.MANAGER,
+#                           end.year = 2030,
+#                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+#                                               STI.TESTING.PARAMETERS.PRIOR@var.names),
+#                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+#                           
+# )

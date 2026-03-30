@@ -30,15 +30,9 @@ set.seed(00000)
 CACHE.FREQ= 500 # how often should write the results to disk (Default: 100)
 UPDATE.FREQ= 50 # how often to print messages (Default: 50)
 
-# CALIBRATION.NAME = 'calib.12.02.stage0.pk'
-# CALIBRATION.NAME = 'calib.1.19.stage0.az'
-# CALIBRATION.NAME = 'calib.1.20.stage1.az'
-# CALIBRATION.NAME = 'calib.2.7.stage0.az'
-# CALIBRATION.NAME = 'calib.2.7.stage1X.az'
 
-# CALIBRATIONS.TO.RUN = c("calib.2.13.stage0.az", "calib.2.13.stage1.az")
-CALIBRATIONS.TO.RUN = "calib.3.23.stage2.az"
-# CALIBRATIONS.TO.RUN = "calib.2.17.stage1.az"
+CALIBRATIONS.TO.RUN = c("calib.3.30.stage0.pk", "calib.3.30.stage1.pk","calib.3.30.stage2.pk")
+
 START_FROM_SCRATCH = T
 
 for (CALIBRATION.NAME in CALIBRATIONS.TO.RUN) {

@@ -972,6 +972,8 @@ AGING.SAMPLING.BLOCKS = list(
 TRANSMISSION.SAMPLING.BLOCKS = list(
   global.transmission.rate=c("global.transmission.rate"),
   #
+  age.mixing.sd.mult=("age.mixing.sd.mult"),
+  #
   relapse=c("prop.early.latent.to.secondary"),
   #
   infectiousness=c("el.rel.secondary.transmissibility"),
@@ -1082,12 +1084,7 @@ STI.TESTING.SAMPLING.BLOCKS = list(
   )
   
 )
-## SD.MULT.SAMPLING.BLOCKS ----
-SD.MULT.SAMPLING.BLOCKS = list(
-  age.mixing.transmission=(
-    "age.mixing.sd.mult"
-  )
-)
+ 
 ## AGE.TRANS.TEST.SAMPLING.BLOCKS ----
 TRANS.BY.AGE.SAMPLING.BLOCKS = list(
   age.transmission.young<-c(
@@ -1210,22 +1207,28 @@ PRENATAL.SAMPLING.BLOCKS=list(
 # SUMMARIZE ---- 
 #these will be registered in the specification 
 SHIELD.FULL.PARAMETERS.PRIOR = distributions::join.distributions(
-  POPULATION.PARAMETERS.PRIOR,
+  #stage0
+    POPULATION.PARAMETERS.PRIOR,
   AGING.PARAMETERS.PRIOR,
+  
+  #stage1
   TRANSMISSION.PARAMETERS.PRIOR,
   STI.TESTING.PARAMETERS.PRIOR,
-  TRANS.BY.AGE.SAMPLING.PRIOR,
+  TRANS.BY.AGE.SAMPLING.PRIOR, #stage2
+  
   PRENATAL.PARAMETERS.PRIOR
 )
 
 SHIELD.FULL.PARAMETERS.SAMPLING.BLOCKS=c(
   POPULATION.SAMPLING.BLOCKS,
   AGING.SAMPLING.BLOCKS ,
+  
   TRANSMISSION.SAMPLING.BLOCKS,
   STI.TESTING.SAMPLING.BLOCKS,
   TRANS.BY.AGE.SAMPLING.BLOCKS,
-  PRENATAL.SAMPLING.BLOCKS,
-  SD.MULT.SAMPLING.BLOCKS #we have seperated this for now.
+  
+  PRENATAL.SAMPLING.BLOCKS
+ 
   
 )
 
