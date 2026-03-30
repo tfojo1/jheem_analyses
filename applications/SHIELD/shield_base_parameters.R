@@ -185,27 +185,15 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.t
                                       citation = "untreated_syphilis_progression_rates.R")
 
 ## ---- SYMPTOMATIC INFECTIONS ----                        
-## Proportion of incident cases presenting with symptomatic primary or secondary disease: 
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.msm.est',
-                                      0.25, 0.2, 0.29, #data from MSM 
-                                      citation = "syphilis_natural_history.docx")
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.secondary.msm.est',
-                                      0.16, 0.15, 0.17, #data from MSM
-                                      citation = "syphilis_natural_history.docx")
-#'@Andrew: the rest of parameters are copies of MSM. we need better estimates 
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.heterosexual_male.est',
-                                      0.25, 0,0,# 0.2, 0.29, 
-                                      citation = "syphilis_natural_history.docx")
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.secondary.heterosexual_male.est',
-                                      0.16, 0,0, # 0.15, 0.17,  
-                                      citation = "syphilis_natural_history.docx")
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.female.est',
-                                      0.25, 0,0, #  0.2, 0.29,  
-                                      citation = "syphilis_natural_history.docx")
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.secondary.female.est',
-                                      0.16, 0,0, #  0.15, 0.17, 
-                                      citation = "syphilis_natural_history.docx")
-
+## Fraction with symptomatic disesase: changed as calib params
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.msm',
+                                      0.25, 0,0)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.female.rr',
+                                       0.66, 0,0)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.heterosexual_male.rr',
+                                      1, 0,0)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.secondary',
+                                      0.16, 0,0)                                      
 
 # *** HIV TESTING ---- ##-----
 # what fraction of tests reported in 15-19 agegroup are carried among 18-19 year olds
@@ -245,7 +233,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.ll.miscla
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.screening', 
                                       0.89,0,0)
 
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.testing.symptomatic', 
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.symptomatic.testing', 
                                       0.89,0,0,
                                       citation = "syphilis_natural_history.docx")
 #differences by stage of infection (early vs late) was too small to include 

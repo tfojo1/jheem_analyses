@@ -268,21 +268,31 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
 
 ## STI.TESTING.PARAMETERS.PRIOR ----
 STI.TESTING.PARAMETERS.PRIOR=join.distributions( 
-  ## Proportion Symptomatic (Testing) ----
-  # Stratify intercept by race and sex 
-  #'@Andrew: it doesnt make sense to me to seperate this by stage
-  # 
-  or.symptomatic.ps.msm = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
-  or.symptomatic.ps.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
-  or.symptomatic.ps.female = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
+  ## Fraction Symptomatic ----
+  ## Data source: Study of MSM followed at PrEP clinics: Proportion of incident syphilis presenting with symptomatic primary 25% or secondary at 16% disease
+  # >> we use this to inform the prior for MSM and het_male
+  # >> for female, we compute the ratio_group = (primary diagnoses) / (primary + secondary diagnoses) as a proxy for proportion of 
+  # primary disease that is symptomatic and use ratio_female/ratio_male to compute females relative to MSM (see input_prop_symp_primary.R ~ 0.66)
+  ### Primary Stage by Sex ----
+  prp.symptomatic.primary.msm=Logitnormal.Distribution(meanlogit = logit(0.25),sdlogit = log(2)/2), #
+  #relative ratio of female & het_male to MSM
+  prp.symptomatic.primary.female.rr=Logitnormal.Distribution(meanlogit = logit( 0.66), sdlogit = (log(2)/2)),# data range is from .57-0.81, which is close to this interval (0.49-.79)
+  prp.symptomatic.primary.heterosexual_male.rr=Lognormal.Distribution(meanlog = log(1),sdlog = log(1.2)/2), #we manually set the sd so that the interval ranges from 0.8-1.2
+  
+  ### Secondary stage (total) ---- #assuming a single parameter accross all groups
+  prp.symptomatic.secondary=Logitnormal.Distribution(meanlogit = logit(0.16),sdlogit = log(2)/2), 
+  
+  ## Careseeking among Symptomatic cases (by sex and race) ---- #a Logistic Linear function (Intercept by race and sex, Slope)
+  or.careseeking.symptomatic.ps.msm = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
+  or.careseeking.symptomatic.ps.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
+  or.careseeking.symptomatic.ps.female = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
   #
-  or.symptomatic.ps.black = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
-  or.symptomatic.ps.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
-  or.symptomatic.ps.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
-
+  or.careseeking.symptomatic.ps.black = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
+  or.careseeking.symptomatic.ps.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
+  or.careseeking.symptomatic.ps.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
   # Changing the slope for everyone (We avoid sampling slopes across many dimensions at once, because small changes in the slope
   # can lead to very large increases in the odds ratio)
-  or.slope.symptomatic.ps = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/10), 
+  or.slope.careseeking.symptomatic.ps = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/10), #smaller sd for slopes 
   
   ## STI Screening ----
   # Stratify intercept by race and sex
@@ -674,47 +684,29 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
   )
   
   
-  ## Symptomatic Testing ----
+  ## Symptomatic Testing ---- Logit Linear function 
   # changes in intercept by sex
   set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "prp.symptomatic.primary",
+                                                 element.name = "prob.careseek.if.symptomatic.ps",
                                                  alpha.name = "intercept",
-                                                 values = parameters[paste0("or.symptomatic.ps.", sexes)],
-                                                 dimension = "sex", #recipient
+                                                 values = parameters[paste0("or.careseeking.symptomatic.ps.", sexes)],
+                                                 dimension = "sex", 
                                                  applies.to.dimension.values = sexes)
   # changes in intercept by race
   set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "prp.symptomatic.primary",
+                                                 element.name = "prob.careseek.if.symptomatic.ps",
                                                  alpha.name = "intercept",
-                                                 values = parameters[paste0("or.symptomatic.ps.", races)],
-                                                 dimension = "race", #recipient
-                                                 applies.to.dimension.values = races)
-  # same changes for secondary:
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "prp.symptomatic.secondary",
-                                                 alpha.name = "intercept",
-                                                 values = parameters[paste0("or.symptomatic.ps.", sexes)],
-                                                 dimension = "sex", #recipient
-                                                 applies.to.dimension.values = sexes)
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "prp.symptomatic.secondary",
-                                                 alpha.name = "intercept",
-                                                 values = parameters[paste0("or.symptomatic.ps.", races)],
-                                                 dimension = "race", #recipient
+                                                 values = parameters[paste0("or.careseeking.symptomatic.ps.", races)],
+                                                 dimension = "race",  
                                                  applies.to.dimension.values = races)
   # changing the slope
   set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "prp.symptomatic.primary",
+                                                 element.name = "prob.careseek.if.symptomatic.ps",
                                                  alpha.name = "slope",
-                                                 values = parameters["or.slope.symptomatic.ps"],
-                                                 dimension = "all", #recipient
-                                                 applies.to.dimension.values = "all")
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "prp.symptomatic.secondary",
-                                                 alpha.name = "slope",
-                                                 values = parameters["or.slope.symptomatic.ps"],
-                                                 dimension = "all", #recipient
-                                                 applies.to.dimension.values = "all")
+                                                 values = parameters["or.slope.careseeking.symptomatic.ps"],
+                                                 dimension = "all", 
+                                                 applies.to.dimension.values = "all") 
+  
   ## STI Screening  ----
   # Change intercept and slope 
   set.element.functional.form.main.effect.alphas(model.settings,
@@ -750,7 +742,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                  values = parameters[paste0("or.syphilis.to.hiv.testing.", races)],
                                                  dimension = "race", #recipient
                                                  applies.to.dimension.values = races)
-
+  
   set.element.functional.form.main.effect.alphas(model.settings,
                                                  element.name = "ratio.syphilis.screening.to.hiv.tests",
                                                  alpha.name = "slope",
@@ -1047,32 +1039,35 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
 
 ## STI.TESTING.SAMPLING.BLOCKS ----
 STI.TESTING.SAMPLING.BLOCKS = list(
-  prp.sympt.ps.sex.slope = c(
-    "or.symptomatic.ps.msm",
-    "or.symptomatic.ps.heterosexual_male",
-    "or.symptomatic.ps.female",
-    "or.slope.symptomatic.ps"
+  prp.sym.ps=c(
+    "prp.symptomatic.primary.msm",
+    "prp.symptomatic.primary.female.rr",
+    "prp.symptomatic.primary.heterosexual_male.rr",
+    "prp.symptomatic.secondary"
   ),
-  #
-  prp.sympt.ps.race = c(
-    "or.symptomatic.ps.black",
-    "or.symptomatic.ps.hispanic",
-    "or.symptomatic.ps.other"
+  or.careseeking.sym.sex=c(
+    "or.careseeking.symptomatic.ps.msm",
+    "or.careseeking.symptomatic.ps.heterosexual_male",
+    "or.careseeking.symptomatic.ps.female"
   ),
-  #
-  sti.testing.sex.slope = c(
-    "or.sti.screening.msm",
-    "or.sti.screening.heterosexual_male",
-    "or.sti.screening.female",
-    "or.slope.sti.screening"),
-  #
-  sti.testing.race= c(
-    "or.sti.screening.black",
-    "or.sti.screening.hispanic",
-    "or.sti.screening.other"),
-  #
+  or.careseeking.sym.race.slope=c(
+    "or.careseeking.symptomatic.ps.black",
+    "or.careseeking.symptomatic.ps.hispanic",
+    "or.careseeking.symptomatic.ps.other",
+    "or.slope.careseeking.symptomatic.ps"
+  ),
+  #######
+  or.sti.screening.sex<-c(
+    'or.sti.screening.msm',  
+    'or.sti.screening.heterosexual_male',
+    'or.sti.screening.female'),
+  or.sti.screening.race.slope<-c(
+    'or.sti.screening.black',  
+    'or.sti.screening.hispanic',
+    'or.sti.screening.other',
+    'or.slope.sti.screening'),
   
-  
+  #######
   syphilis.to.hiv.testing.ratio.sex.slope<-c(
     "or.syphilis.to.hiv.testing.msm",
     "or.syphilis.to.hiv.testing.heterosexual_male",
