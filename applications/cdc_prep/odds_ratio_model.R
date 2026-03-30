@@ -177,26 +177,26 @@ get.fraction.positive.contacts <- function(specification.metadata)
     df$sex <- relevel(factor(df$sex), ref = "all")
     
     #Logistic regression
-    oddsratio_model <- suppressWarnings(glm(eligible ~ as.factor(race)*year + as.factor(age)*year + as.factor(sex)*year, data = df, weights = number, family = binomial(link = "logit")))
+    oddsratio_model <- suppressWarnings(glm(contacts ~ as.factor(race)*year + as.factor(age)*year + as.factor(sex)*year, data = df, weights = number, family = binomial(link = "logit")))
     summary(oddsratio_model)
     
     
     dummy.for.intercept = as.data.frame(get.every.combination(dim.names))
-    dummy.for.intercept$year = 2019
-    eligible.intercept = predict(oddsratio_model,newdata = dummy.for.intercept)
+    dummy.for.intercept$year = 2018
+    contact.intercept = predict(oddsratio_model,newdata = dummy.for.intercept)
     
     dummy.for.slope = dummy.for.intercept 
-    dummy.for.slope$year = 2020
-    eligible.slope = predict(oddsratio_model,newdata = dummy.for.slope) - eligible.intercept
+    dummy.for.slope$year = 2019
+    contact.slope = predict(oddsratio_model,newdata = dummy.for.slope) - contact.intercept
     
-    dim(eligible.intercept) = sapply(dim.names,length)
-    dimnames(eligible.intercept) = dim.names
+    dim(contact.intercept) = sapply(dim.names,length)
+    dimnames(contact.intercept) = dim.names
     
-    dim(eligible.slope) = sapply(dim.names,length)
-    dimnames(eligible.slope) = dim.names
+    dim(contact.slope) = sapply(dim.names,length)
+    dimnames(contact.slope) = dim.names
     
-    create.logistic.linear.functional.form(intercept = eligible.intercept, 
-                                           slope = eligible.slope, 
+    create.logistic.linear.functional.form(intercept = contact.intercept, 
+                                           slope = 0,
                                            anchor.year = 2019, 
                                            parameters.are.on.logit.scale = TRUE)
 }

@@ -15,8 +15,8 @@ transmuter = create.jheem.transmuter(sim, to.version = 'cdcp', from.year = 2010,
 params = get.medians(CDC.PREP.PARAMETERS.PRIOR)
 
 library(dplyr)
-# setdiff <- base::setdiff
-# find("setdiff")
+#setdiff <- base::setdiff
+#find("setdiff")
 
 sim.cdcp = transmuter$transmute(1, parameters = params)
 range(sim.cdcp$cdc.nonfunded.general.population.testing)
@@ -44,6 +44,7 @@ simplot(results$last.sim(),results,"total.cdc.hiv.test.positivity",dimension.val
 simplot(results$last.sim(),results,"cdc.funded.tests",dimension.values = list(year = 2014:2035))
 simplot(results$last.sim(),results,"cumulative.cdc.prep.eligible",dimension.values = list(year = 2014:2035))
 simplot(results$last.sim(),results,"cdc.fraction.prep.referred.of.eligible",dimension.values = list(year = 2014:2035))
+simplot(results$last.sim(),results,"number.partners.positive",dimension.values = list(year = 2014:2035))
 
 #Louisiana 
 
@@ -77,7 +78,7 @@ results = set.up.transmute.calibration('cdcp',
                                        allow.overwrite.cache = TRUE,
                                        return.simulations = T)
 
-results.LA <- results
+#results.LA <- results
 
 #results.by.state[[results$location]] = results
 
@@ -91,4 +92,5 @@ simplot(results$last.sim(),results,"total.cdc.hiv.test.positivity",dimension.val
 simplot(results$last.sim(),results,"cdc.funded.tests",dimension.values = list(year = 2014:2035))
 simplot(results$last.sim(),results,"cumulative.cdc.prep.eligible",dimension.values = list(year = 2014:2035))
 simplot(results$last.sim(),results,"cdc.fraction.prep.referred.of.eligible",dimension.values = list(year = 2014:2035))
+simplot(results$last.sim(),results,"number.partners.positive",dimension.values = list(year = 2014:2035))
 

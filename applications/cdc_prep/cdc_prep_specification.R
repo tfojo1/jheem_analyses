@@ -67,76 +67,82 @@ register.model.element(CDCP.SPECIFICATION, name = "fraction.cdc.tested.prep.elig
 #                       functional.form.from.time = 2010)
 
 #-- Contact Tracing --#
+# 
+# register.model.element(
+#     CDCP.SPECIFICATION,
+#     name = 'mean.fraction.index.diagnoses.that.yield.a.positive.contact',
+#     get.value.function = function(location){
+#         if (location=="AL")
+#             0.07
+#         else if (location=='LA')
+#             0.007
+#         else if (location == 'MO')
+#             .04
+#         else if (location == 'MS')
+#             .014
+#         else if (location == 'MI')
+#             .006
+#         else if (location == 'TN')
+#             .02
+#         else if (location == 'AZ')
+#             .005
+#         else if (location == 'GA')
+#             .05
+#         else if (location == 'TX')
+#             .005
+#         else if (location == 'MA')
+#             .016
+#         else if (location == 'CA')
+#             .003
+#         else if (location == 'OH')
+#             .06
+#         else if (location == 'PA')
+#             .02
+#         else if (location == 'FL')
+#             .004
+#         else if (location == 'NV')
+#             .016
+#         else if (location == 'NY')
+#             .009
+#         else if (location == 'WI')
+#             .005
+#         else if (location == 'KY')
+#             .011
+#         else if (location == 'IL')
+#             .008
+#         else if (location == 'MD')
+#             .0013
+#         else if (location == 'WA')
+#             .005
+#         else if (location == 'IN')
+#             .006
+#         else if (location == 'NJ')
+#             .004
+#         else
+#             stop("We are only set up to accomodate LA or AL at this time")
+#     },
+#     scale = 'proportion'
+# )
 
-register.model.element(
-    CDCP.SPECIFICATION,
-    name = 'mean.fraction.index.diagnoses.that.yield.a.positive.contact',
-    get.value.function = function(location){
-        if (location=="AL")
-            0.07 #change from .07 test 
-        else if (location=='LA')
-            0.007
-        else if (location == 'MO')
-            .04
-        else if (location == 'MS')
-            .014
-        else if (location == 'MI')
-            .006
-        else if (location == 'TN')
-            .02
-        else if (location == 'AZ')
-            .005
-        else if (location == 'GA')
-            .05
-        else if (location == 'TX')
-            .005
-        else if (location == 'MA')
-            .016
-        else if (location == 'CA')
-            .003
-        else if (location == 'OH')
-            .06
-        else if (location == 'PA')
-            .02
-        else if (location == 'FL')
-            .004
-        else if (location == 'NV')
-            .016
-        else if (location == 'NY')
-            .009
-        else if (location == 'WI')
-            .005
-        else if (location == 'KY')
-            .011
-        else if (location == 'IL')
-            .008
-        else if (location == 'MD')
-            .0013
-        else if (location == 'WA')
-            .005
-        else if (location == 'IN')
-            .006
-        else if (location == 'NJ')
-            .004
-        else
-            stop("We are only set up to accomodate LA or AL at this time")
-    },
-    scale = 'proportion'
-)
+# register.model.element(
+#     CDCP.SPECIFICATION,
+#     name = 'rr.fraction.index.diagnoses.that.yield.a.positive.contact',
+#     value = 1,
+#     scale = 'ratio'
+# )
 
-register.model.element(
-    CDCP.SPECIFICATION,
-    name = 'rr.fraction.index.diagnoses.that.yield.a.positive.contact',
-    value = 1,
-    scale = 'ratio'
-)
+# register.model.quantity(
+#     CDCP.SPECIFICATION,
+#     name = 'fraction.index.diagnoses.that.yield.a.positive.contact',
+#     value = expression(mean.fraction.index.diagnoses.that.yield.a.positive.contact * rr.fraction.index.diagnoses.that.yield.a.positive.contact),
+#     scale = 'proportion'
+# )
 
-register.model.quantity(
-    CDCP.SPECIFICATION,
-    name = 'fraction.index.diagnoses.that.yield.a.positive.contact',
-    value = expression(mean.fraction.index.diagnoses.that.yield.a.positive.contact * rr.fraction.index.diagnoses.that.yield.a.positive.contact),
-    scale = 'proportion'
-)
+register.model.element(CDCP.SPECIFICATION, name = "fraction.diagnoses.from.contact.tracing",
+                       get.functional.form.function = get.fraction.positive.contacts,
+                       scale = "proportion",
+                       functional.form.from.time = 2010) 
+
 
 #-- CDC Effects --#
 
@@ -186,9 +192,9 @@ register.model.quantity(CDCP.SPECIFICATION, name = "cdc.funded.testing.of.undiag
                         value = expression(super.testing.of.undiagnosed * fraction.diagnoses.from.cdc * cdc.testing.effect),
                         scale = 'rate')
 
-register.model.quantity(CDCP.SPECIFICATION, name = 'fraction.diagnoses.from.contact.tracing',
-                        scale = 'proportion',
-                        value = expression(fraction.index.diagnoses.that.yield.a.positive.contact / (1+fraction.index.diagnoses.that.yield.a.positive.contact)))
+# register.model.quantity(CDCP.SPECIFICATION, name = 'fraction.diagnoses.from.contact.tracing',
+#                         scale = 'proportion',
+#                         value = expression(fraction.index.diagnoses.that.yield.a.positive.contact / (1+fraction.index.diagnoses.that.yield.a.positive.contact)))
 
 register.model.quantity(CDCP.SPECIFICATION, name = "cdc.nonfunded.testing.of.undiagnosed",
                         value = expression(super.testing.of.undiagnosed * 
@@ -313,6 +319,30 @@ track.cumulative.outcome(CDCP.SPECIFICATION,
                          value = expression(cdc.funded.diagnoses + cdc.funded.tests.in.uninfected),
                          keep.dimensions = c('location'),
                          corresponding.data.outcome = "hiv.tests")
+
+
+track.integrated.outcome(CDCP.SPECIFICATION,
+                         name = 'cumulative.fraction.diagnoses.from.contact.tracing',
+                         outcome.metadata = NULL,
+                         scale = 'non.negative.number',
+                         value.to.integrate = 'infected',
+                         multiply.by = 'fraction.diagnoses.from.contact.tracing',
+                         keep.dimensions = c('location'),
+                         save = F)
+
+track.cumulative.outcome(CDCP.SPECIFICATION,
+                         name = 'number.partners.positive',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Number of Partners Testing Positive',
+                                                                    description = "Number of Partners Testing Positive",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'People',
+                                                                    units = 'people',
+                                                                    singular.unit = 'person'),
+                         scale = 'non.negative.number',
+                         value = expression(new*cumulative.fraction.diagnoses.from.contact.tracing),
+                         keep.dimensions = c('location'),
+                         corresponding.data.outcome = "partner.positive")
+
 
 # track.integrated.outcome(CDCP.SPECIFICATION,
 #                          name = 'cumulative.fraction.cdc.funded.tests.in.non.healthcare.settings',
