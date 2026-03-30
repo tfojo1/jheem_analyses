@@ -1036,38 +1036,17 @@ oes.to.proportions <- function(oes, population)
   raw / rowSums(raw)
 }
 
-
-
-#-- PRP SYMPTOMATIC P&S --# ----
-get_prp_symptomatic_primary_functional_form <- function(specification.metadata) {
-  base.prp.symptomatic.primary = array(
-    c(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.heterosexual_male.est'],
-      SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.female.est'],
-      SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.msm.est']),dim = c(sex = 3),dimnames = list(sex = c("heterosexual_male","female","msm")))
-  #
-  prp_symptomatic_primary_functional_form <- create.logistic.linear.functional.form(intercept = base.prp.symptomatic.primary,
-                                                                                    slope = 1,
+#-- PROB CARESEEK SYMPTOMATIC P&S --# ----
+get_prob_careseek_symptomatic_ps_functional_form<-function(specification.metadata) {
+  prob_careseek_symptomatic_ps_functional_form <- create.logistic.linear.functional.form(intercept = .75, #what prp of sym cases seek care? 
+                                                                                    slope = 1, 
                                                                                     max = 1,
-                                                                                    anchor.year = 2010,
+                                                                                    anchor.year = 1970, 
                                                                                     parameters.are.on.logit.scale = F)
-  
-  prp_symptomatic_primary_functional_form
+  prob_careseek_symptomatic_ps_functional_form
 }
-get_prp_symptomatic_secondary_functional_form <- function(specification.metadata) {
-  base.prp.symptomatic.secondary = array(
-    c(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.heterosexual_male.est'],
-      SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.female.est'],
-      SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.msm.est']),dim = c(sex = 3),dimnames = list(sex = c("heterosexual_male","female","msm")))
-  #
-  prp_symptomatic_secondary_functional_form <- create.logistic.linear.functional.form(intercept = base.prp.symptomatic.secondary,
-                                                                                      slope = 1, #odd ratio
-                                                                                      max = 1,
-                                                                                      anchor.year = 2010, #
-                                                                                      parameters.are.on.logit.scale = F
-                                                                                      )
-  
-  prp_symptomatic_secondary_functional_form
-}
+
+ 
 
 #-- STI SCREENING --# ----
 get_sti_screening_functional_form <- function(specification.metadata) {

@@ -967,56 +967,91 @@ register.transition(SHIELD.SPECIFICATION,
                     tag = 'progression.ll.cns')
 #*** CONTINUUM TRANSISION *** ----
 ##---- 1-SYMPTHOMATIC TESTING ----
-# Register "Effective" symptomatic proportions for primary and secondary stages
-# We assume 100% care seeking and testing rate for "symptomatic" cases in Primary&Secondary Stage (effective proportion) 
-# Those who don’t notice the symptoms or don’t seek care based on symptoms are treated as asymptomatic.
-register.model.element(SHIELD.SPECIFICATION,
+# Modeling proportions Symptomatic in the primary and secondary stages
+# A fraction of symptomatic cases seek care 
+# Asymptomatic cases that are diagnosed through screening diagnosed as Early Latent
+# Symptomatic cases that are diagnosed through screening diagnosed as PS correctly -#????
+
+###---- Proportion Symptomatic ---- 
+# Se these as Elements and read from Base params first. This element is linked to sampled parameter in the Calib Params which will set it's final value in the simulation
+register.model.element(SHIELD.SPECIFICATION, 
+                       name="prp.symptomatic.primary.msm",
+                       scale = "proportion",
+                       value=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.msm'])
+register.model.element(SHIELD.SPECIFICATION,  
+                       name="prp.symptomatic.primary.female.rr",
+                       scale = "proportion",
+                       value=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.female.rr'])
+register.model.element(SHIELD.SPECIFICATION,  
+                       name="prp.symptomatic.primary.heterosexual_male.rr",
+                       scale = "proportion",
+                       value=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.heterosexual_male.rr'])
+## Now we build the quantity:
+register.model.quantity(SHIELD.SPECIFICATION,
                        name = "prp.symptomatic.primary",
                        scale = "proportion",
-                       functional.form.from.time = 1970,
-                       get.functional.form.function = get_prp_symptomatic_primary_functional_form)
-
+                       value = 0)
+register.model.quantity.subset(SHIELD.SPECIFICATION, #can we do this as a list? 
+                        name = "prp.symptomatic.primary",
+                        applies.to = list(sex="msm"),
+                        value = "prp.symptomatic.primary.msm")
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = "prp.symptomatic.primary",
+                               applies.to = list(sex="female"),
+                               value = expression(prp.symptomatic.primary.female.rr *prp.symptomatic.primary.msm))
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = "prp.symptomatic.primary",
+                               applies.to = list(sex="heterosexual_male"),
+                               value = expression(prp.symptomatic.primary.heterosexual_male.rr *prp.symptomatic.primary.msm))
+#
 register.model.element(SHIELD.SPECIFICATION,
                        name = "prp.symptomatic.secondary",
                        scale = "proportion",
-                       functional.form.from.time = 1970,
-                       get.functional.form.function = get_prp_symptomatic_secondary_functional_form)
+                       value=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary'])
 
+###---- Probability of CareSeeking if Symptomatic ---- 
+register.model.element(SHIELD.SPECIFICATION,
+                       name = "prob.careseek.if.symptomatic.ps",
+                       scale = "proportion",
+                       functional.form.from.time = 1970,
+                       get.functional.form.function = get_prob_careseek_symptomatic_ps_functional_form)
+
+###---- Rate of Symptomatic Testing -----
 # For now, we assume 100% test.sensitivity as well. 
-# proportion of symp.testing that are successfully diagnosed: 
+# proportion of symptomatic.testing that are successfully diagnosed: 
 register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'prp.diagnosed.sym.testing.primary',
+                        name = 'prp.symtomatic.testing.primary',
                         scale = 'proportion',
                         value = 0 )
 register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'prp.diagnosed.sym.testing.primary',
+                               name = 'prp.symtomatic.testing.primary',
                                applies.to = list(stage='primary'),
-                               value = 'prp.symptomatic.primary') # can also add: *sensitivity of test in primary * care seeking behavior
+                               value = expression(prp.symptomatic.primary* prob.careseek.if.symptomatic.ps)) # can also add: *sensitivity of test  
 register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'prp.diagnosed.sym.testing.secondary',
+                        name = 'prp.symtomatic.testing.secondary',
                         scale = 'proportion',
                         value =0)
 register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'prp.diagnosed.sym.testing.secondary',
+                               name = 'prp.symtomatic.testing.secondary',
                                applies.to = list(stage='secondary'),
-                               value = 'prp.symptomatic.secondary') # can also add: *sensitivity of test in primary * care seeking behavior
+                               value = expression(prp.symptomatic.secondary * prob.careseek.if.symptomatic.ps)) # can also add: *sensitivity of test  
 
-# Symp.Testing happens "during the PS stages", i.e. during the months of secondary disease. 
+# symptomatic.testing happens "during the PS stages", i.e. during the months of secondary disease. 
 # So we need to convert the proportion to a gradual rate of exit for this stage
 # p= 1-exp(-rt) -> r=-log(1-p)/t
 # we calculate the rate here, and model the transitions below 
 register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'rate.testing.symptomatic',
+                        name = 'rate.symptomatic.testing',
                         scale = 'rate',
                         value = 0)
 register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'rate.testing.symptomatic',
+                               name = 'rate.symptomatic.testing',
                                applies.to = list(stage='primary'),
-                               value = expression(-log(1-prp.diagnosed.sym.testing.primary)/duration.primary))
+                               value = expression(-log(1-prp.symtomatic.testing.primary)/duration.primary))
 register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'rate.testing.symptomatic',
+                               name = 'rate.symptomatic.testing',
                                applies.to = list(stage='secondary'),
-                               value = expression(-log(1-prp.diagnosed.sym.testing.secondary)/duration.secondary))
+                               value = expression(-log(1-prp.symtomatic.testing.secondary)/duration.secondary))
 
 # Tertiary state is always symptomatic and care seeking happens after the first month (duration = 1month)
 register.model.element(SHIELD.SPECIFICATION,
@@ -1024,7 +1059,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        scale = 'non.negative.number',
                        value =SHIELD_BASE_PARAMETER_VALUES['duration.tertiary'] )
 register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'rate.testing.symptomatic',
+                               name = 'rate.symptomatic.testing',
                                applies.to = list(stage=c('tertiary')),
                                value =expression(1/duration.tertiary))
 register.model.element(SHIELD.SPECIFICATION,
@@ -1032,7 +1067,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        scale = 'rate',
                        value =SHIELD_BASE_PARAMETER_VALUES['duration.cns'] )
 register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'rate.testing.symptomatic',
+                               name = 'rate.symptomatic.testing',
                                applies.to = list(stage=c('cns')),
                                value =expression(1/duration.cns))
 
@@ -1156,7 +1191,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                value = 'prp.infected.contacts.in.late.latent')
 
 # Calculating index cases diagnosis rates that can trigger contact tracing for those indexes:  
-# a function of symp.testing, sti.screening and prenatal.screening.
+# a function of symptomatic.testing, sti.screening and prenatal.screening.
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'index.case.diagnosis.rate',
                         scale='rate',
@@ -1165,15 +1200,15 @@ register.model.quantity(SHIELD.SPECIFICATION,
 register.model.quantity.subset(SHIELD.SPECIFICATION, 
                                name = 'index.case.diagnosis.rate',
                                applies.to = list(sex=c('msm','heterosexual_male'),age='all.ages', stage=c('primary','secondary','early.latent')),
-                               value = expression(rate.testing.symptomatic + rate.sti.screening ))
+                               value = expression(rate.symptomatic.testing + rate.sti.screening ))
 register.model.quantity.subset(SHIELD.SPECIFICATION, 
                                name = 'index.case.diagnosis.rate',
                                applies.to = list(sex=c('female'),age=NON.FERTILE.AGES, stage=c('primary','secondary','early.latent')),
-                               value = expression(rate.testing.symptomatic + rate.sti.screening ))
+                               value = expression(rate.symptomatic.testing + rate.sti.screening ))
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'index.case.diagnosis.rate',
                                applies.to = list(sex='female',age=FERTILE.AGES,stage=c('primary','secondary','early.latent')),
-                               value =expression(rate.testing.symptomatic + rate.sti.screening + rate.prenatal.care))
+                               value =expression(rate.symptomatic.testing + rate.sti.screening + rate.prenatal.care))
 
 # Mapping contact tracing rates from index cases to their contacts:
 register.model.quantity(SHIELD.SPECIFICATION,
@@ -1194,57 +1229,34 @@ register.model.quantity(SHIELD.SPECIFICATION,
                                                contacts.empirically.treated.infected.per.index.case *
                                                prp.infected.contacts.by.stage))
 
-#*** TREATMENT *** --#----
-# a proportion will receive immediate treatment, another group will be delayed
-# we need to separate this for each testing because the treatment is different
-
-
-# ##---- Time-varying treatment multiplier (applies to all trt routes) ----
-# 
-# register.model.element(
-#     SHIELD.SPECIFICATION,
-#     name  = 'treatment.multiplier',
-#     scale = 'ratio',
-#     functional.form.from.time = 1970,
-#     functional.form = create.natural.spline.functional.form(
-#         knot.times  = c("1970"=1970, "1990"=1990, "1995"=1995, "2000"=2000, "2010"=2010, "2020"=2020, "2030"=2030),
-#         knot.values = list("1970"=0,   "1990"=0,  "1995"=0,   "2000"=0,   "2010"=0,   "2020"=0,   "2030"=0),
-#         knots.are.on.transformed.scale = TRUE, 
-#         knot.link = 'log',
-#         link = 'identity',
-#         min = 0    # keep multiplier non-negative after transform
-#     )
-# )
-
+#*** DIAGNOSIS/TREATMENT *** --#----
+# Diagnosis is followed by immediate or delayed treatment
+# we will track each one separately
+# We further breakdown each one into those that were diagnosed by symptomatic testing, or other means
 ##---- Immediate Treatments ----
+# modeling all immediate treatments via #1-testing, 2-sti.screeing, 3-contact tracing
+# (prenatal is screening and treatment is separately modeled below)
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'prp.treated.immediately.following.screening',
                        scale = 'proportion',
                        value = SHIELD_BASE_PARAMETER_VALUES['prp.treated.immediately.following.screening'])
-
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'prp.treated.immediately.following.testing.symptomatic',
+                       name = 'prp.treated.immediately.following.symptomatic.testing',
                        scale = 'proportion',
-                       value = SHIELD_BASE_PARAMETER_VALUES['prp.treated.immediately.following.testing.symptomatic']) 
-
-# All immediate treatments except prenatal: #1-testing, 2-sti.screeing, 3-contact tracing
-# & then adding all those receiving prenatal screening
+                       value = SHIELD_BASE_PARAMETER_VALUES['prp.treated.immediately.following.symptomatic.testing']) 
+# 
 register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'rate.diagnosis.immediate.treatment',
-                        value = expression(rate.testing.symptomatic * prp.treated.immediately.following.testing.symptomatic + 
-                                               rate.sti.screening * prp.treated.immediately.following.screening + 
+                        name = 'rate.diagnosis.immediate.treatment.symptomatic.testing',
+                        value = expression(rate.symptomatic.testing * prp.treated.immediately.following.symptomatic.testing
+                        ))
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'rate.diagnosis.immediate.treatment.other',
+                        value = expression(    rate.sti.screening * prp.treated.immediately.following.screening + 
                                                rate.infected.contacts.diagnosed.treated 
                         ))
-
-
-# register.model.quantity(SHIELD.SPECIFICATION,
-#                         name  = 'rate.diagnosis.immediate.treatment.scaled',
-#                         scale = 'rate',
-#                         value = expression(rate.diagnosis.immediate.treatment * treatment.multiplier)
-# )
-
+# adding prenatal:
 register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'rate.diagnosis.immediate.treatment',
+                               name = 'rate.diagnosis.immediate.treatment.other',
                                apply.function = 'add',
                                applies.to = list(sex='female',age=FERTILE.AGES),
                                value= expression(rate.prenatal.care )
@@ -1261,18 +1273,18 @@ register.model.quantity(SHIELD.SPECIFICATION,
 register.remission(SHIELD.SPECIFICATION,
                    applies.to = list(continuum = 'undiagnosed'),
                    all.remissions.into.compartments = list(profile = 'diagnosed.treated'),
-                   remission.rate.value = 'rate.diagnosis.immediate.treatment',
+                   remission.rate.value = 'rate.diagnosis.immediate.treatment.symptomatic.testing',
                    remission.proportions.value = 'remission.prp',
-                   tag = 'remission.treated.immediately')
+                   tag = 'remission.treated.immediately.symptomatic.testing')
 
-## 2) "No Diagnosis & Emperical Treatment"
+register.remission(SHIELD.SPECIFICATION,
+                   applies.to = list(continuum = 'undiagnosed'),
+                   all.remissions.into.compartments = list(profile = 'diagnosed.treated'),
+                   remission.rate.value = 'rate.diagnosis.immediate.treatment.other',
+                   remission.proportions.value = 'remission.prp',
+                   tag = 'remission.treated.immediately.other')
 
-# register.model.quantity(SHIELD.SPECIFICATION,
-#                         name  = 'rate.infected.contacts.empirically.treated.scaled',
-#                         scale = 'rate',
-#                         value = expression(rate.infected.contacts.empirically.treated * treatment.multiplier)
-# )
-
+## 2) "Emperical Treatment without Formal Diagnosis (Contact Tracing)"
 register.remission(SHIELD.SPECIFICATION,
                    applies.to = list(continuum = 'undiagnosed'),
                    all.remissions.into.compartments = list(profile = 'diagnosed.treated'),
@@ -1280,40 +1292,39 @@ register.remission(SHIELD.SPECIFICATION,
                    remission.proportions.value = 'remission.prp',
                    tag = 'remission.treated.emperically.post.ct')
 
-
-
-
 ##---- Delayed Treatments ----
-# only for sym.testing and sti.screening:
+# only modeled for those diagnosed via symptomatic testing and STI screening
 # assuming that all prenatal care results in immediate treatment and those delayed treatment failing to avert congenital syphilis are accounted in the outcome
 register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'rate.diagnosis.delayed.treatment',
-                        value = expression(rate.testing.symptomatic * (1-prp.treated.immediately.following.testing.symptomatic)+
-                                               rate.sti.screening * (1- prp.treated.immediately.following.screening )
+                        name = 'rate.diagnosis.delayed.treatment.symptomatic.testing',
+                        value = expression(rate.symptomatic.testing * (1-prp.treated.immediately.following.symptomatic.testing)
                         ))
-
-
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'rate.diagnosis.delayed.treatment.other',
+                        value = expression(rate.sti.screening * (1- prp.treated.immediately.following.screening )
+                        ))
+#
 register.transition(SHIELD.SPECIFICATION,
                     dimension = 'continuum',
                     groups = 'infected',
                     from.compartments =  'undiagnosed',
                     to.compartments = 'diagnosed.untreated',
-                    value = 'rate.diagnosis.delayed.treatment',
-                    tag='progression.undiagnosed.to.diagnosedUntreated')
+                    value = 'rate.diagnosis.delayed.treatment.symptomatic.testing',
+                    tag='progression.undiagnosed.to.diagnosedUntreated.symptomatic.testing')
+register.transition(SHIELD.SPECIFICATION,
+                    dimension = 'continuum',
+                    groups = 'infected',
+                    from.compartments =  'undiagnosed',
+                    to.compartments = 'diagnosed.untreated',
+                    value = 'rate.diagnosis.delayed.treatment.other',
+                    tag='progression.undiagnosed.to.diagnosedUntreated.other')
 
 # how long will it take for someone to get treated after a positive diagnosis? 
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'rate.treatment.after.delay',
                        scale = 'rate',
                        value = SHIELD_BASE_PARAMETER_VALUES['rate.treatment.after.delay']) 
-
-# register.model.quantity(
-#     SHIELD.SPECIFICATION,
-#     name  = 'rate.treatment.after.delay.scaled',
-#     scale = 'rate',
-#     value = expression(rate.treatment.after.delay * treatment.multiplier)
-# )
-
+#
 register.remission(SHIELD.SPECIFICATION,
                    applies.to = list(continuum = 'diagnosed.untreated'),
                    all.remissions.into.compartments = list(profile = 'diagnosed.treated'),
@@ -1470,89 +1481,11 @@ track.dynamic.outcome(SHIELD.SPECIFICATION, #expensive
                       dynamic.quantity.name = 'mortality', #internal JHEEM construct for deaths
                       corresponding.data.outcome = 'deaths',
                       groups = NULL, 
-                      keep.dimensions = c('location','age','race','sex'),# <saving on time>
+                      keep.dimensions = c('location','age','race','sex'), 
                       exclude.tags = 'emigration',
 )
 
-##---- Migration ----
-# We can track stratified values directly, but to save the speed, we estiamte total rate first, and 
-# approximate age,sex,race stratifications by multiplying migration * population
-# track.dynamic.outcome(SHIELD.SPECIFICATION,
-#                       name = 'immigration.total',
-#                       outcome.metadata = create.outcome.metadata(display.name = 'Immigration',
-#                                                                  description = "Number of People Immigrating into the Population in the Past Year",
-#                                                                  scale = 'non.negative.number',
-#                                                                  axis.name = 'Number Immigrating',
-#                                                                  units = 'individuals'),
-#                       dynamic.quantity.name = 'births',
-#                       corresponding.data.outcome = 'immigration', 
-#                       include.tags = "immigration",
-#                       keep.dimensions = c('location')
-# )  
-# # total immigration rate
-# track.cumulative.outcome(SHIELD.SPECIFICATION,
-#                          name = 'immigration.rate',
-#                          value = expression(emigration.total/population),
-#                          outcome.metadata = create.outcome.metadata(display.name = 'Immigration',
-#                                                                     description = "Number of People Immigrating into the Population in the Past Year",
-#                                                                     scale = 'rate',
-#                                                                     axis.name = 'Rate',
-#                                                                     units = 'rate'),
-#                          denominator.outcome = 'population',
-#                          corresponding.data.outcome = 'immigration' ,
-#                          keep.dimensions = c('location')
-# )
-# # stratified immigration values: 
-# track.cumulative.outcome(SHIELD.SPECIFICATION,
-#                          name = 'immigration',
-#                          value = expression(immigration.rate * population),
-#                          outcome.metadata = create.outcome.metadata(display.name = 'Immigration',
-#                                                                     description = "Number of People Immigrating into the Population in the Past Year",
-#                                                                     scale = 'non.negative.number',
-#                                                                     axis.name = 'Number Emigrating',
-#                                                                     units = 'individuals'),
-#                          scale='non.negative.number',
-#                          corresponding.data.outcome = 'immigration' ,
-#                          keep.dimensions = c('location','age','race','sex')
-# )
-# total emigration value by location:
-# track.dynamic.outcome(SHIELD.SPECIFICATION,
-#                       name = 'emigration.total',
-#                       outcome.metadata = create.outcome.metadata(display.name = 'Emigration',
-#                                                                  description = "Number of People Emigrating from the Population in the Past Year",
-#                                                                  scale = 'non.negative.number',
-#                                                                  axis.name = 'Number Emigrating',
-#                                                                  units = 'individuals'),
-#                       dynamic.quantity.name = 'mortality',
-#                       corresponding.data.outcome = 'emigration', 
-#                       include.tags = "emigration",
-#                       keep.dimensions = c('location'))
-# total emigration rate
-# track.cumulative.outcome(SHIELD.SPECIFICATION,
-#                          name = 'emigration.rate',
-#                          value = expression(emigration.total/population),
-#                          outcome.metadata = create.outcome.metadata(display.name = 'Emigration',
-#                                                                     description = "Rate People Emigrating from the Population in the Past Year",
-#                                                                     scale = 'rate',
-#                                                                     axis.name = 'Rate',
-#                                                                     units = 'rate'),
-#                          denominator.outcome = 'population',
-#                          corresponding.data.outcome = 'emigration' ,
-#                          keep.dimensions = c('location')
-# )
-# # statified emigration values: 
-# track.cumulative.outcome(SHIELD.SPECIFICATION,
-#                          name = 'emigration',
-#                          value = expression(emigration.rate * population),
-#                          outcome.metadata = create.outcome.metadata(display.name = 'Emigration',
-#                                                                     description = "Number of People Emigrating from the Population in the Past Year",
-#                                                                     scale = 'non.negative.number',
-#                                                                     axis.name = 'Number Emigrating',
-#                                                                     units = 'individuals'),
-#                          scale='non.negative.number',
-#                          corresponding.data.outcome = 'emigration' ,
-#                          keep.dimensions = c('location','age','race','sex')
-# )
+##---- Migration    ----
 track.dynamic.outcome(SHIELD.SPECIFICATION,
                       name = 'immigration',
                       outcome.metadata = create.outcome.metadata(display.name = 'Immigration',
@@ -1585,9 +1518,8 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
                                                                     scale = 'non.negative.number',
                                                                     axis.name = 'Persons',
                                                                     units = 'persons',
-                                                                    singular.unit = 'person'), #will read the scale from metadata
+                                                                    singular.unit = 'person'),  
                          value.to.integrate = 'infected',
-                         # corresponding.data.outcome = 'population' ,
                          keep.dimensions = c('location','age','race','sex','stage','continuum')
 )
 ##---- Sexual Transmission Rates ----
@@ -1610,12 +1542,10 @@ track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,
                                                                                  scale = 'proportion',
                                                                                  axis.name = 'Proportion Tested',
                                                                                  units = '%'),
-                                      rate.value = 'rate.sti.screening', # Make sure this is the name of the quantity we made.
+                                      rate.value = 'rate.sti.screening',
                                       denominator.outcome =  'population',
-                                      keep.dimensions = c('location','age','race','sex'), # @Andrew removed stage
-                                      # force.dim.names.to.keep.dimensions = T, #forces to keep the dimensions that we specify
-                                      # corresponding.data.outcome = 'proportion.tested.for.hiv'
-)
+                                      keep.dimensions = c('location','age','race','sex') 
+                                      )
 
 ##---- HIV Testing -----
 track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,
@@ -1755,23 +1685,36 @@ register.model.element(SHIELD.SPECIFICATION,
 ### Diagnosis & Treatment ----
 #  diagnosis and treatment (both immediate and delayed)
 track.dynamic.outcome(SHIELD.SPECIFICATION,
-                      name = 'diagnosis.immediate.treatment',
-                      outcome.metadata = create.outcome.metadata(display.name = 'Number of Individuals Diagnosed and Immediately Treated in the Past Year',
-                                                                 description = 'Number of Individuals Diagnosed and Immediately Treated in the Past Year',
+                      name = 'diagnosis.immediate.treatment.symptomatic.testing',
+                      outcome.metadata = create.outcome.metadata(display.name = 'Number of Individuals Diagnosed (via Symptomatic Testing) and Immediately Treated in the Past Year',
+                                                                 description = 'Number of Individuals Diagnosed (via Symptomatic Testing) and Immediately Treated in the Past Year',
                                                                  scale = 'non.negative.number',
                                                                  axis.name = 'Cases',
                                                                  units = 'cases',
                                                                  singular.unit = 'case'),
                       scale='non.negative.number',
                       dynamic.quantity.name = 'remission.from', 
-                      corresponding.data.outcome = 'total.syphilis.diagnoses'  , #<just for comparison>
-                      exclude.tags = c('remission.treated.emperically.post.ct','remission.treated.after.delay'), #excluding those emperically treated post contact tracing and delayed treatment 
-                      keep.dimensions = c('location','age','race','sex','stage') #have to keep these dimensions because they're used for ps and other stages below
+                      include.tags=c('remission.treated.immediately.symptomatic.testing'),
+                      keep.dimensions = c('location','age','race','sex','stage') 
 )
+track.dynamic.outcome(SHIELD.SPECIFICATION,
+                      name = 'diagnosis.immediate.treatment.other',
+                      outcome.metadata = create.outcome.metadata(display.name = 'Number of Individuals Diagnosed (via Other Routes) and Immediately Treated in the Past Year',
+                                                                 description = 'Number of Individuals Diagnosed (via Other Routes) and Immediately Treated in the Past Year',
+                                                                 scale = 'non.negative.number',
+                                                                 axis.name = 'Cases',
+                                                                 units = 'cases',
+                                                                 singular.unit = 'case'),
+                      scale='non.negative.number',
+                      dynamic.quantity.name = 'remission.from', 
+                      exclude.tags = c('remission.treated.immediately.symptomatic.testing','remission.treated.emperically.post.ct','remission.treated.after.delay'), #excluding those empirically treated post contact tracing and delayed treatment 
+                      keep.dimensions = c('location','age','race','sex','stage') 
+                      )
+
 track.transition(SHIELD.SPECIFICATION,
-                 name = 'diagnosis.delayed.treatment',
-                 outcome.metadata = create.outcome.metadata(display.name = 'Number of Individuals Diagnosed but Remained Untreated in the Past Year',
-                                                            description = 'Number of Individuals Diagnosed but Remained Untreated in the Past Year',
+                 name = 'diagnosis.delayed.treatment.symptomatic.testing',
+                 outcome.metadata = create.outcome.metadata(display.name = 'Number of Individuals Diagnosed (via Symptomatic Testing) but Remained Untreated in the Past Year',
+                                                            description = 'Number of Individuals Diagnosed (via Symptomatic Testing) but Remained Untreated in the Past Year',
                                                             scale = 'non.negative.number',
                                                             axis.name = 'Cases',
                                                             units = 'cases',
@@ -1779,14 +1722,29 @@ track.transition(SHIELD.SPECIFICATION,
                  dimension = 'continuum',
                  from.compartments = 'undiagnosed',
                  to.compartments = 'diagnosed.untreated',
-                 corresponding.data.outcome = 'total.syphilis.diagnoses'  , #<just for comparison>
+                 include.tags=c('progression.undiagnosed.to.diagnosedUntreated.symptomatic.testing'),
+                 keep.dimensions = c('location','age','race','sex','stage')
+)
+track.transition(SHIELD.SPECIFICATION,
+                 name = 'diagnosis.delayed.treatment.other',
+                 outcome.metadata = create.outcome.metadata(display.name = 'Number of Individuals Diagnosed (via Other Routes) but Remained Untreated in the Past Year',
+                                                            description = 'Number of Individuals Diagnosed (via Other Routes) but Remained Untreated in the Past Year',
+                                                            scale = 'non.negative.number',
+                                                            axis.name = 'Cases',
+                                                            units = 'cases',
+                                                            singular.unit = 'case'),
+                 dimension = 'continuum',
+                 from.compartments = 'undiagnosed',
+                 to.compartments = 'diagnosed.untreated',
+                 exclude.tags=c("progression.undiagnosed.to.diagnosedUntreated.symptomatic.testing"),
                  keep.dimensions = c('location','age','race','sex','stage')
 )
 
 ### TOTAL Diagnoses ----
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'diagnosis.total', 
-                         value = expression(diagnosis.immediate.treatment+diagnosis.delayed.treatment),
+                         value = expression(diagnosis.immediate.treatment.symptomatic.testing+diagnosis.immediate.treatment.other+
+                                                diagnosis.delayed.treatment.symptomatic.testing+diagnosis.delayed.treatment.other),
                          outcome.metadata = create.outcome.metadata(display.name = 'Total Diagnosis', # 'Number of Individuals with a Diagnosis of Non-Congenital Syphilis in the Past Year',
                                                                     description = 'Number of Individuals with a Diagnosis of Non-Congenital Syphilis in the Past Year',
                                                                     scale = 'non.negative.number',
@@ -1797,26 +1755,100 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          corresponding.data.outcome = 'total.syphilis.diagnoses',  
                          keep.dimensions = c('location','age','race','sex','stage') 
 )
+
 ### PS Diagnosis ----
 track.cumulative.outcome(SHIELD.SPECIFICATION,
+                         name = 'diagnosis.primary.symptomatic', 
+                         value = expression(diagnosis.immediate.treatment.symptomatic.testing+diagnosis.delayed.treatment.symptomatic.testing+
+                                               (diagnosis.immediate.treatment.other+diagnosis.delayed.treatment.other) * prp.symptomatic.primary),
+                         subset.dimension.values = list(stage='primary'),  
+                         outcome.metadata = create.outcome.metadata(display.name = 'Primary Diagnosis with Symptomatic Disease',
+                                                                    description = 'Number of Individuals with a Diagnosis of Symptomatic Primary Syphilis in the Past Year',
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Cases',
+                                                                    units = 'cases',
+                                                                    singular.unit = 'case'),
+                         scale='non.negative.number', 
+                         corresponding.data.outcome = 'primary.syphilis.diagnoses',
+                         keep.dimensions = c('location','age','race','sex')
+)
+track.cumulative.outcome(SHIELD.SPECIFICATION,
+                         name = 'diagnosis.primary.asymptomatic', #those with asymptomatic infections that will be missclassified as EL
+                         value = expression((diagnosis.immediate.treatment.other+diagnosis.delayed.treatment.other) * (1-prp.symptomatic.primary)),
+                         subset.dimension.values = list(stage='primary'),  
+                         outcome.metadata = create.outcome.metadata(display.name = 'Primary Diagnosis with Asymptomatic Disease',
+                                                                    description = 'Number of Individuals with a Diagnosis of Asymptomatic Primary Syphilis in the Past Year',
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Cases',
+                                                                    units = 'cases',
+                                                                    singular.unit = 'case'),
+                         scale='non.negative.number', 
+                         keep.dimensions = c('location','age','race','sex')
+)
+track.cumulative.outcome(SHIELD.SPECIFICATION,
+                         name = 'diagnosis.secondary.symptomatic',
+                         value = expression(diagnosis.immediate.treatment.symptomatic.testing+diagnosis.delayed.treatment.symptomatic.testing+
+                                                (diagnosis.immediate.treatment.other+diagnosis.delayed.treatment.other) * prp.symptomatic.secondary),
+                         subset.dimension.values = list(stage='secondary'),  
+                         outcome.metadata = create.outcome.metadata(display.name = 'Secondary Diagnosis with Symptomatic Disease',
+                                                                    description = 'Number of Individuals with a Diagnosis of Symptomatic Secondary Syphilis in the Past Year',
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Cases',
+                                                                    units = 'cases',
+                                                                    singular.unit = 'case'),
+                         scale='non.negative.number', 
+                         corresponding.data.outcome = 'secondary.syphilis.diagnoses',
+                         keep.dimensions = c('location','age','race','sex')
+)
+track.cumulative.outcome(SHIELD.SPECIFICATION,
+                         name = 'diagnosis.secondary.asymptomatic', #those with asymptomatic infections that will be missclassified as EL
+                         value = expression((diagnosis.immediate.treatment.other+diagnosis.delayed.treatment.other) * (1-prp.symptomatic.secondary)),
+                         subset.dimension.values = list(stage='secondary'),  
+                         outcome.metadata = create.outcome.metadata(display.name = 'Secondary Diagnosis with Asymptomatic Disease',
+                                                                    description = 'Number of Individuals with a Diagnosis of Asymptomatic Secondary Syphilis in the Past Year',
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Cases',
+                                                                    units = 'cases',
+                                                                    singular.unit = 'case'),
+                         scale='non.negative.number', 
+                         keep.dimensions = c('location','age','race','sex')
+)
+# PS diagnosis (symptomatic disease) 
+# those who dont have a symptom and are discovered through screening or other means are diagnosed with EL
+track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'diagnosis.ps',
+                         value = expression(diagnosis.primary.symptomatic + diagnosis.secondary.symptomatic),
+                         outcome.metadata = create.outcome.metadata(display.name = 'Primary & Secondary Diagnosis (Symptomatic Disease)',
+                                                                    description = 'Number of Individuals with a Diagnosis of Primary and Secondary (Symptomatic) Syphilis in the Past Year',
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Cases',
+                                                                    units = 'cases',
+                                                                    singular.unit = 'case'),
+                         scale='non.negative.number', 
+                         corresponding.data.outcome = 'ps.syphilis.diagnoses',
+                         keep.dimensions = c('location','age','race','sex')
+                         )
+
+### Early Latent Syphilis: True Estimate ----
+# Just counting those in early stage 
+track.cumulative.outcome(SHIELD.SPECIFICATION,
+                         name = 'diagnosis.el1', #all those truely in EL stage 
                          value = expression(diagnosis.total),
-                         subset.dimension.values = list(stage='ps.stages'),  
-                         outcome.metadata = create.outcome.metadata(display.name = 'PS Diagnosis', #'1 Number of Individuals with a Diagnosis of Primary and Secondary Syphilis in the Past Year',
-                                                                    description = 'Number of Individuals with a Diagnosis of Primary and Secondary Syphilis in the Past Year',
+                         subset.dimension.values = list(stage='early.latent'),  
+                         outcome.metadata = create.outcome.metadata(display.name = 'EL1 Diagnosis (just for those EL stage)', 
+                                                                    description = 'Number of Individuals with EL1',
                                                                     scale = 'non.negative.number',
                                                                     axis.name = 'Cases',
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
-                         corresponding.data.outcome = 'ps.syphilis.diagnoses' ,
-                         keep.dimensions = c('location','age','race','sex')
+                         keep.dimensions = c('location','age','race','sex') 
 )
-### Early Latent Syphilis: True Estimate ----
+# adding those in PS stages who are not symptomatic 
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'diagnosis.el.true',
-                         value = expression(diagnosis.total),
-                         subset.dimension.values = list(stage='early.latent'),  
+                         value = expression(diagnosis.el1 + diagnosis.primary.asymptomatic+ diagnosis.secondary.asymptomatic),
+                         # subset.dimension.values = list(stage='early.latent'),  
                          outcome.metadata = create.outcome.metadata(display.name = 'EL (true) Diagnosis', #Number of Individuals with a Diagnosis of Early Latent Syphilis in the Past Year',
                                                                     description = 'Number of Individuals with a Diagnosis of Early Latent Syphilis in the Past Year',
                                                                     scale = 'non.negative.number',
@@ -1886,7 +1918,6 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
-                         # corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses', #<just for comparison>
                          keep.dimensions = c('location','age','race','sex') 
 ) 
 
@@ -1903,7 +1934,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
-                         # corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses', #<just for comparison>
+                         corresponding.data.outcome = 'cns.syphilis.diagnoses', 
                          keep.dimensions = c('location','age','race','sex') 
 ) 
 ### Late Syphilis True ----
@@ -1919,7 +1950,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
-                         corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses',#<just for comparison>
+                         corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses', 
                          keep.dimensions = c('location','age','race','sex')
 )
 
