@@ -176,6 +176,12 @@ make_stage0_plots_for_location <- function(last20, lastsim, plotting.path, title
     
     # DEATHS
     make_total_plot("deaths", last20, lastsim, style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    make_facet_plot("deaths", last20, lastsim, facet.vars = c("sex", "race", "age"), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    make_split_facet_plot("deaths", last20, lastsim, split.facet.pairs = list(c("sex", "age"),
+                                                                              c("race", "age"),
+                                                                              c("race", "sex")),
+                          style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    
     
     # FERTILITY RATE
     make_split_facet_plot("fertility.rate", last20, lastsim, split.facet.pairs = list(c("race", "age")), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
