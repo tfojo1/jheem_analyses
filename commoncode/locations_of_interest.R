@@ -96,5 +96,5 @@ MSAS.OF.INTEREST = c(NYC=NYC.MSA,
 # Same as the above; kept for backwards compatibility.
 EHE.MSAS = MSAS.OF.INTEREST[1:32]
 
-SHIELD.EIGHT.MSAS = MSAS.OF.INTEREST[sort(c("NYC", "Miami", "Chicago", "Phoenix", "Houston", "Dallas", "Atlanta", "Baltimore"))]
+SHIELD.EIGHT.MSAS = MSAS.OF.INTEREST[sort(c("NYC", "Miami", "Chicago", "Phoenix", "Houston", "LA", "Atlanta", "Baltimore"))]
 
