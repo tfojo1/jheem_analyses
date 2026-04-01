@@ -3,6 +3,7 @@ DO.FOR.CONSERVATIVE.ANALYSIS = F
 YEARS.TO.CONSIDER = as.character(2026:2031)
 PLOT.DIR = file.path(RW.ROOT.PLOT.DIR, paste0('shaded_table_boxplot_', tolower(RW.LOCATION.DESCRIPTOR), 
                                               ifelse(DO.FOR.CONSERVATIVE.ANALYSIS, '_conservative', '')))
+#PLOT.DIR = "../../results/ryan_white_50_adap"
 
 total.infections.continue.by.city = apply(total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
 

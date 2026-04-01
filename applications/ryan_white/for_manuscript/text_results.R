@@ -3,12 +3,16 @@
 
 YEARS.TO.CONSIDER2 = as.character(2025:2035)
 
+REPORT.CONSERVATIVE.RESULTS = F
+REPORT.INTERRUPTION.RESULTS = F
+USE.B.INTR = F # to remove brief interruption
+
 if(NEW.TIMELINE){
-    END.NAME = 'rw.end.26'
+    END.NAME = "adap.50.end.26" #'rw.end.26'
     CONS.END.NAME = 'rw.end.cons.26' 
     P.INTR.NAME = 'rw.p.intr.26' 
     P.INTR.CONS.NAME = 'rw.p.intr.cons.26' 
-    YEARS.TO.CONSIDER = as.character(2026:2031)
+    YEARS.TO.CONSIDER = as.character(2026:2030) # as.character(2026:2031)
 } else {
     END.NAME = 'rw.end' # rw.end.26
     CONS.END.NAME = 'rw.end.cons' # rw.end.cons.26
@@ -21,7 +25,7 @@ if(NEW.TIMELINE){
 
 
 
-USE.B.INTR = F # to remove brief interruption
+
 
 #-- Description if RW Continues --#
 
@@ -85,34 +89,36 @@ print(paste0("Relative Increase in Infections 2026-2031 if Ryan White Ends Indef
 #              "$", format(round(quantile(total.rw.costs.cess.per.infection, probs=.975, na.rm=T)), big.mark=','),
 #              "]"))
 
-print("")
-print("CESSATION (Conservative): ")
-
-
-print(paste0("Total Suppression post-drop in 2027 (CONSERVATIVE ESTIMATES): ",
-             round(100*mean(total.suppression['2027',,CONS.END.NAME])), '%',
-             " [", round(100*quantile(total.suppression['2027',,CONS.END.NAME], probs=.025)),
-             " - ", round(100*quantile(total.suppression['2027',,CONS.END.NAME], probs=.975)),
-             "%]"))
-
-abs.delta.cessation.tot.inf.noint1.cons = apply(total.incidence[YEARS.TO.CONSIDER,,,CONS.END.NAME,drop=F], c('sim'), sum, na.rm=T) - tot.inf.noint1
-rel.delta.cessation.tot.inf.noint1.cons = abs.delta.cessation.tot.inf.noint1.cons / tot.inf.noint1
-
-print(paste0("Absolute Increase in Infections 2026-2031 if Ryan White Ends Indefinitely (CONSERVATIVE ESTIMATES):", 
-             format(round(mean(abs.delta.cessation.tot.inf.noint1.cons, na.rm=T)), big.mark=','),
-             " [",
-             format(round(quantile(abs.delta.cessation.tot.inf.noint1.cons, probs=.025, na.rm=T)), big.mark=','),
-             " - ",
-             format(round(quantile(abs.delta.cessation.tot.inf.noint1.cons, probs=.975, na.rm=T)), big.mark=','),
-             "]"))
-
-print(paste0("Relative Increase in Infections 2026-2031 if Ryan White Ends Indefinitely (CONSERVATIVE ESTIMATES): ", 
-             format(round(mean(rel.delta.cessation.tot.inf.noint1.cons, na.rm=T)*100), big.mark=','),
-             "% [",
-             format(round(quantile(rel.delta.cessation.tot.inf.noint1.cons, probs=.025, na.rm=T)*100), big.mark=','),
-             " - ",
-             format(round(quantile(rel.delta.cessation.tot.inf.noint1.cons, probs=.975, na.rm=T)*100), big.mark=','),
-             "%]"))
+if(REPORT.CONSERVATIVE.RESULTS){
+    print("")
+    print("CESSATION (Conservative): ")
+    
+    
+    print(paste0("Total Suppression post-drop in 2027 (CONSERVATIVE ESTIMATES): ",
+                 round(100*mean(total.suppression['2027',,CONS.END.NAME])), '%',
+                 " [", round(100*quantile(total.suppression['2027',,CONS.END.NAME], probs=.025)),
+                 " - ", round(100*quantile(total.suppression['2027',,CONS.END.NAME], probs=.975)),
+                 "%]"))
+    
+    abs.delta.cessation.tot.inf.noint1.cons = apply(total.incidence[YEARS.TO.CONSIDER,,,CONS.END.NAME,drop=F], c('sim'), sum, na.rm=T) - tot.inf.noint1
+    rel.delta.cessation.tot.inf.noint1.cons = abs.delta.cessation.tot.inf.noint1.cons / tot.inf.noint1
+    
+    print(paste0("Absolute Increase in Infections 2026-2031 if Ryan White Ends Indefinitely (CONSERVATIVE ESTIMATES):", 
+                 format(round(mean(abs.delta.cessation.tot.inf.noint1.cons, na.rm=T)), big.mark=','),
+                 " [",
+                 format(round(quantile(abs.delta.cessation.tot.inf.noint1.cons, probs=.025, na.rm=T)), big.mark=','),
+                 " - ",
+                 format(round(quantile(abs.delta.cessation.tot.inf.noint1.cons, probs=.975, na.rm=T)), big.mark=','),
+                 "]"))
+    
+    print(paste0("Relative Increase in Infections 2026-2031 if Ryan White Ends Indefinitely (CONSERVATIVE ESTIMATES): ", 
+                 format(round(mean(rel.delta.cessation.tot.inf.noint1.cons, na.rm=T)*100), big.mark=','),
+                 "% [",
+                 format(round(quantile(rel.delta.cessation.tot.inf.noint1.cons, probs=.025, na.rm=T)*100), big.mark=','),
+                 " - ",
+                 format(round(quantile(rel.delta.cessation.tot.inf.noint1.cons, probs=.975, na.rm=T)*100), big.mark=','),
+                 "%]"))
+}
 
 
 abs.total.infections.averted.end.by.city = apply(total.incidence[YEARS.TO.CONSIDER,,,END.NAME,drop=F] - total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
@@ -208,105 +214,105 @@ print(paste0("Medicaid NON-Expansion vs Expansion Relative Increase in Infection
              "%]"))
 
 
-
-if(USE.B.INTR){
+if(REPORT.INTERRUPTION.RESULTS){
+    
+    if(USE.B.INTR){
+        print("")
+        print("BRIEF INTERRUPTION (Primary)")
+        
+        
+        abs.delta.b.intr.tot.inf.noint1 = apply(total.incidence[YEARS.TO.CONSIDER,,,'rw.b.intr',drop=F], c('sim'), sum, na.rm=T) - tot.inf.noint1
+        rel.delta.b.intr.tot.inf.noint1 = abs.delta.b.intr.tot.inf.noint1 / tot.inf.noint1
+        
+        print(paste0("Absolute Increase in Infections 2025-2030 in Ryan White Brief Interruption: ", 
+                     format(round(mean(abs.delta.b.intr.tot.inf.noint1, na.rm=T)), big.mark=','),
+                     " [",
+                     format(round(quantile(abs.delta.b.intr.tot.inf.noint1, probs=.025, na.rm=T)), big.mark=','),
+                     " - ",
+                     format(round(quantile(abs.delta.b.intr.tot.inf.noint1, probs=.975, na.rm=T)), big.mark=','),
+                     "]"))
+        
+        print(paste0("Relative Increase in Infections 2025-2030 in Ryan White Brief Interruption: ", 
+                     format(round(mean(rel.delta.b.intr.tot.inf.noint1, na.rm=T)*100), big.mark=','),
+                     "% [",
+                     format(round(quantile(rel.delta.b.intr.tot.inf.noint1, probs=.025, na.rm=T)*100), big.mark=','),
+                     " - ",
+                     format(round(quantile(rel.delta.b.intr.tot.inf.noint1, probs=.975, na.rm=T)*100), big.mark=','),
+                     "%]"))
+        
+        print("")
+        print("BRIEF INTERRUPTION (Conservative)")
+        
+        
+        abs.delta.b.intr.tot.inf.noint1.cons = apply(total.incidence[YEARS.TO.CONSIDER,,,'rw.b.intr.cons',drop=F], c('sim'), sum, na.rm=T) - tot.inf.noint1
+        rel.delta.b.intr.tot.inf.noint1.cons = abs.delta.b.intr.tot.inf.noint1.cons / tot.inf.noint1
+        
+        print(paste0("Absolute Increase in Infections 2025-2030 in Ryan White Brief Interruption (CONSERVATIVE ESTIMATES): ", 
+                     format(round(mean(abs.delta.b.intr.tot.inf.noint1.cons, na.rm=T)), big.mark=','),
+                     " [",
+                     format(round(quantile(abs.delta.b.intr.tot.inf.noint1.cons, probs=.025, na.rm=T)), big.mark=','),
+                     " - ",
+                     format(round(quantile(abs.delta.b.intr.tot.inf.noint1.cons, probs=.975, na.rm=T)), big.mark=','),
+                     "]"))
+        
+        print(paste0("Relative Increase in Infections 2025-2030 in Ryan White Brief Interruption (CONSERVATIVE.ESTIMATES): ", 
+                     format(round(mean(rel.delta.b.intr.tot.inf.noint1.cons, na.rm=T)*100), big.mark=','),
+                     "% [",
+                     format(round(quantile(rel.delta.b.intr.tot.inf.noint1.cons, probs=.025, na.rm=T)*100), big.mark=','),
+                     " - ",
+                     format(round(quantile(rel.delta.b.intr.tot.inf.noint1.cons, probs=.975, na.rm=T)*100), big.mark=','),
+                     "%]"))
+        
+        
+    }
+    
+    
     print("")
-    print("BRIEF INTERRUPTION (Primary)")
+    print("PROLONGED INTERRUPTION (Primary)")
     
     
-    abs.delta.b.intr.tot.inf.noint1 = apply(total.incidence[YEARS.TO.CONSIDER,,,'rw.b.intr',drop=F], c('sim'), sum, na.rm=T) - tot.inf.noint1
-    rel.delta.b.intr.tot.inf.noint1 = abs.delta.b.intr.tot.inf.noint1 / tot.inf.noint1
+    abs.delta.p.intr.tot.inf.noint1 = apply(total.incidence[YEARS.TO.CONSIDER,,,P.INTR.NAME,drop=F], c('sim'), sum, na.rm=T) - tot.inf.noint1
+    rel.delta.p.intr.tot.inf.noint1 = abs.delta.p.intr.tot.inf.noint1 / tot.inf.noint1
     
-    print(paste0("Absolute Increase in Infections 2025-2030 in Ryan White Brief Interruption: ", 
-                 format(round(mean(abs.delta.b.intr.tot.inf.noint1, na.rm=T)), big.mark=','),
+    print(paste0("Absolute Increase in Infections 2026-2031 in Ryan White Prolonged Interruption: ", 
+                 format(round(mean(abs.delta.p.intr.tot.inf.noint1, na.rm=T)), big.mark=','),
                  " [",
-                 format(round(quantile(abs.delta.b.intr.tot.inf.noint1, probs=.025, na.rm=T)), big.mark=','),
+                 format(round(quantile(abs.delta.p.intr.tot.inf.noint1, probs=.025, na.rm=T)), big.mark=','),
                  " - ",
-                 format(round(quantile(abs.delta.b.intr.tot.inf.noint1, probs=.975, na.rm=T)), big.mark=','),
+                 format(round(quantile(abs.delta.p.intr.tot.inf.noint1, probs=.975, na.rm=T)), big.mark=','),
                  "]"))
     
-    print(paste0("Relative Increase in Infections 2025-2030 in Ryan White Brief Interruption: ", 
-                 format(round(mean(rel.delta.b.intr.tot.inf.noint1, na.rm=T)*100), big.mark=','),
+    print(paste0("Relative Increase in Infections 2026-2031 in Ryan White Prolonged Interruption: ", 
+                 format(round(mean(rel.delta.p.intr.tot.inf.noint1, na.rm=T)*100), big.mark=','),
                  "% [",
-                 format(round(quantile(rel.delta.b.intr.tot.inf.noint1, probs=.025, na.rm=T)*100), big.mark=','),
+                 format(round(quantile(rel.delta.p.intr.tot.inf.noint1, probs=.025, na.rm=T)*100), big.mark=','),
                  " - ",
-                 format(round(quantile(rel.delta.b.intr.tot.inf.noint1, probs=.975, na.rm=T)*100), big.mark=','),
+                 format(round(quantile(rel.delta.p.intr.tot.inf.noint1, probs=.975, na.rm=T)*100), big.mark=','),
                  "%]"))
     
     print("")
-    print("BRIEF INTERRUPTION (Conservative)")
+    print("PROLONGED INTERRUPTION (Conservative)")
     
     
-    abs.delta.b.intr.tot.inf.noint1.cons = apply(total.incidence[YEARS.TO.CONSIDER,,,'rw.b.intr.cons',drop=F], c('sim'), sum, na.rm=T) - tot.inf.noint1
-    rel.delta.b.intr.tot.inf.noint1.cons = abs.delta.b.intr.tot.inf.noint1.cons / tot.inf.noint1
+    abs.delta.p.intr.tot.inf.noint1.cons = apply(total.incidence[YEARS.TO.CONSIDER,,,P.INTR.CONS.NAME,drop=F], c('sim'), sum, na.rm=T) - tot.inf.noint1
+    rel.delta.p.intr.tot.inf.noint1.cons = abs.delta.p.intr.tot.inf.noint1.cons / tot.inf.noint1
     
-    print(paste0("Absolute Increase in Infections 2025-2030 in Ryan White Brief Interruption (CONSERVATIVE ESTIMATES): ", 
-                 format(round(mean(abs.delta.b.intr.tot.inf.noint1.cons, na.rm=T)), big.mark=','),
+    print(paste0("Absolute Increase in Infections 2026-2031 in Ryan White Prolonged Interruption (CONSERVATIVE ESTIMATES): ", 
+                 format(round(mean(abs.delta.p.intr.tot.inf.noint1.cons, na.rm=T)), big.mark=','),
                  " [",
-                 format(round(quantile(abs.delta.b.intr.tot.inf.noint1.cons, probs=.025, na.rm=T)), big.mark=','),
+                 format(round(quantile(abs.delta.p.intr.tot.inf.noint1.cons, probs=.025, na.rm=T)), big.mark=','),
                  " - ",
-                 format(round(quantile(abs.delta.b.intr.tot.inf.noint1.cons, probs=.975, na.rm=T)), big.mark=','),
+                 format(round(quantile(abs.delta.p.intr.tot.inf.noint1.cons, probs=.975, na.rm=T)), big.mark=','),
                  "]"))
     
-    print(paste0("Relative Increase in Infections 2025-2030 in Ryan White Brief Interruption (CONSERVATIVE.ESTIMATES): ", 
-                 format(round(mean(rel.delta.b.intr.tot.inf.noint1.cons, na.rm=T)*100), big.mark=','),
+    print(paste0("Relative Increase in Infections 2026-2031 in Ryan White Prolonged Interruption (CONSERVATIVE ESTIMATES): ", 
+                 format(round(mean(rel.delta.p.intr.tot.inf.noint1.cons, na.rm=T)*100), big.mark=','),
                  "% [",
-                 format(round(quantile(rel.delta.b.intr.tot.inf.noint1.cons, probs=.025, na.rm=T)*100), big.mark=','),
+                 format(round(quantile(rel.delta.p.intr.tot.inf.noint1.cons, probs=.025, na.rm=T)*100), big.mark=','),
                  " - ",
-                 format(round(quantile(rel.delta.b.intr.tot.inf.noint1.cons, probs=.975, na.rm=T)*100), big.mark=','),
+                 format(round(quantile(rel.delta.p.intr.tot.inf.noint1.cons, probs=.975, na.rm=T)*100), big.mark=','),
                  "%]"))
-    
-    
 }
-
-
-print("")
-print("PROLONGED INTERRUPTION (Primary)")
-
-
-abs.delta.p.intr.tot.inf.noint1 = apply(total.incidence[YEARS.TO.CONSIDER,,,P.INTR.NAME,drop=F], c('sim'), sum, na.rm=T) - tot.inf.noint1
-rel.delta.p.intr.tot.inf.noint1 = abs.delta.p.intr.tot.inf.noint1 / tot.inf.noint1
-
-print(paste0("Absolute Increase in Infections 2026-2031 in Ryan White Prolonged Interruption: ", 
-             format(round(mean(abs.delta.p.intr.tot.inf.noint1, na.rm=T)), big.mark=','),
-             " [",
-             format(round(quantile(abs.delta.p.intr.tot.inf.noint1, probs=.025, na.rm=T)), big.mark=','),
-             " - ",
-             format(round(quantile(abs.delta.p.intr.tot.inf.noint1, probs=.975, na.rm=T)), big.mark=','),
-             "]"))
-
-print(paste0("Relative Increase in Infections 2026-2031 in Ryan White Prolonged Interruption: ", 
-             format(round(mean(rel.delta.p.intr.tot.inf.noint1, na.rm=T)*100), big.mark=','),
-             "% [",
-             format(round(quantile(rel.delta.p.intr.tot.inf.noint1, probs=.025, na.rm=T)*100), big.mark=','),
-             " - ",
-             format(round(quantile(rel.delta.p.intr.tot.inf.noint1, probs=.975, na.rm=T)*100), big.mark=','),
-             "%]"))
-
-print("")
-print("PROLONGED INTERRUPTION (Conservative)")
-
-
-abs.delta.p.intr.tot.inf.noint1.cons = apply(total.incidence[YEARS.TO.CONSIDER,,,P.INTR.CONS.NAME,drop=F], c('sim'), sum, na.rm=T) - tot.inf.noint1
-rel.delta.p.intr.tot.inf.noint1.cons = abs.delta.p.intr.tot.inf.noint1.cons / tot.inf.noint1
-
-print(paste0("Absolute Increase in Infections 2026-2031 in Ryan White Prolonged Interruption (CONSERVATIVE ESTIMATES): ", 
-             format(round(mean(abs.delta.p.intr.tot.inf.noint1.cons, na.rm=T)), big.mark=','),
-             " [",
-             format(round(quantile(abs.delta.p.intr.tot.inf.noint1.cons, probs=.025, na.rm=T)), big.mark=','),
-             " - ",
-             format(round(quantile(abs.delta.p.intr.tot.inf.noint1.cons, probs=.975, na.rm=T)), big.mark=','),
-             "]"))
-
-print(paste0("Relative Increase in Infections 2026-2031 in Ryan White Prolonged Interruption (CONSERVATIVE ESTIMATES): ", 
-             format(round(mean(rel.delta.p.intr.tot.inf.noint1.cons, na.rm=T)*100), big.mark=','),
-             "% [",
-             format(round(quantile(rel.delta.p.intr.tot.inf.noint1.cons, probs=.025, na.rm=T)*100), big.mark=','),
-             " - ",
-             format(round(quantile(rel.delta.p.intr.tot.inf.noint1.cons, probs=.975, na.rm=T)*100), big.mark=','),
-             "%]"))
-
-
 
 
 
@@ -375,6 +381,38 @@ print(paste0("Relative Increase in Infections 2026-2031 FOR AGE 1 in Cessation: 
              format(round(mean.ci.rel.delta.cessation.age.inf.noint1[1,2]*100), big.mark=','),
              " - ",
              format(round(mean.ci.rel.delta.cessation.age.inf.noint1[1,3]*100), big.mark=','),
+             "%]"))
+
+print(paste0("Relative Increase in Infections 2026-2031 FOR AGE 2 in Cessation: ", 
+             format(round(mean.ci.rel.delta.cessation.age.inf.noint1[2,1]*100), big.mark=','),
+             "% [",
+             format(round(mean.ci.rel.delta.cessation.age.inf.noint1[2,2]*100), big.mark=','),
+             " - ",
+             format(round(mean.ci.rel.delta.cessation.age.inf.noint1[2,3]*100), big.mark=','),
+             "%]"))
+
+print(paste0("Relative Increase in Infections 2026-2031 FOR AGE 3 in Cessation: ", 
+             format(round(mean.ci.rel.delta.cessation.age.inf.noint1[3,1]*100), big.mark=','),
+             "% [",
+             format(round(mean.ci.rel.delta.cessation.age.inf.noint1[3,2]*100), big.mark=','),
+             " - ",
+             format(round(mean.ci.rel.delta.cessation.age.inf.noint1[3,3]*100), big.mark=','),
+             "%]"))
+
+print(paste0("Relative Increase in Infections 2026-2031 FOR AGE 4 in Cessation: ", 
+             format(round(mean.ci.rel.delta.cessation.age.inf.noint1[4,1]*100), big.mark=','),
+             "% [",
+             format(round(mean.ci.rel.delta.cessation.age.inf.noint1[4,2]*100), big.mark=','),
+             " - ",
+             format(round(mean.ci.rel.delta.cessation.age.inf.noint1[4,3]*100), big.mark=','),
+             "%]"))
+
+print(paste0("Relative Increase in Infections 2026-2031 FOR AGE 5 in Cessation: ", 
+             format(round(mean.ci.rel.delta.cessation.age.inf.noint1[5,1]*100), big.mark=','),
+             "% [",
+             format(round(mean.ci.rel.delta.cessation.age.inf.noint1[5,2]*100), big.mark=','),
+             " - ",
+             format(round(mean.ci.rel.delta.cessation.age.inf.noint1[5,3]*100), big.mark=','),
              "%]"))
 
 print(paste0("Relative Increase in Infections 2026-2031 FOR AGE 2-4 in Cessation: ", 
@@ -479,31 +517,34 @@ print(paste0("Relative Increase in Diagnoses 2026-2031 in Ryan White Cessation: 
              " - ",
              format(round(quantile(rel.delta.cessation.tot.dx.noint1, probs=.975, na.rm=T)*100), big.mark=','),
              "%]"))
-
-if(USE.B.INTR){
-    abs.delta.b.intr.tot.dx.noint1 = apply(total.new[YEARS.TO.CONSIDER,,,'rw.b.intr',drop=F], c('sim'), sum, na.rm=T) - tot.dx.noint1
-    rel.delta.b.intr.tot.dx.noint1 = abs.delta.b.intr.tot.dx.noint1 / tot.dx.noint1
+if(REPORT.INTERRUPTION.RESULTS){
     
-    print(paste0("Relative Increase in Diagnoses 2025-2030 in Ryan White Brief Interruption: ", 
-                 format(round(mean(rel.delta.b.intr.tot.dx.noint1, na.rm=T)*100), big.mark=','),
+    if(USE.B.INTR){
+        abs.delta.b.intr.tot.dx.noint1 = apply(total.new[YEARS.TO.CONSIDER,,,'rw.b.intr',drop=F], c('sim'), sum, na.rm=T) - tot.dx.noint1
+        rel.delta.b.intr.tot.dx.noint1 = abs.delta.b.intr.tot.dx.noint1 / tot.dx.noint1
+        
+        print(paste0("Relative Increase in Diagnoses 2025-2030 in Ryan White Brief Interruption: ", 
+                     format(round(mean(rel.delta.b.intr.tot.dx.noint1, na.rm=T)*100), big.mark=','),
+                     "% [",
+                     format(round(quantile(rel.delta.b.intr.tot.dx.noint1, probs=.025, na.rm=T)*100), big.mark=','),
+                     " - ",
+                     format(round(quantile(rel.delta.b.intr.tot.dx.noint1, probs=.975, na.rm=T)*100), big.mark=','),
+                     "%]"))
+        
+    }
+    
+    abs.delta.p.intr.tot.dx.noint1 = apply(total.new[YEARS.TO.CONSIDER,,,P.INTR.NAME,drop=F], c('sim'), sum, na.rm=T) - tot.dx.noint1
+    rel.delta.p.intr.tot.dx.noint1 = abs.delta.p.intr.tot.dx.noint1 / tot.dx.noint1
+    
+    print(paste0("Relative Increase in Diagnoses 2026-2031 in Ryan White Prolonged Interruption: ", 
+                 format(round(mean(rel.delta.p.intr.tot.dx.noint1, na.rm=T)*100), big.mark=','),
                  "% [",
-                 format(round(quantile(rel.delta.b.intr.tot.dx.noint1, probs=.025, na.rm=T)*100), big.mark=','),
+                 format(round(quantile(rel.delta.p.intr.tot.dx.noint1, probs=.025, na.rm=T)*100), big.mark=','),
                  " - ",
-                 format(round(quantile(rel.delta.b.intr.tot.dx.noint1, probs=.975, na.rm=T)*100), big.mark=','),
+                 format(round(quantile(rel.delta.p.intr.tot.dx.noint1, probs=.975, na.rm=T)*100), big.mark=','),
                  "%]"))
     
 }
-
-abs.delta.p.intr.tot.dx.noint1 = apply(total.new[YEARS.TO.CONSIDER,,,P.INTR.NAME,drop=F], c('sim'), sum, na.rm=T) - tot.dx.noint1
-rel.delta.p.intr.tot.dx.noint1 = abs.delta.p.intr.tot.dx.noint1 / tot.dx.noint1
-
-print(paste0("Relative Increase in Diagnoses 2026-2031 in Ryan White Prolonged Interruption: ", 
-             format(round(mean(rel.delta.p.intr.tot.dx.noint1, na.rm=T)*100), big.mark=','),
-             "% [",
-             format(round(quantile(rel.delta.p.intr.tot.dx.noint1, probs=.025, na.rm=T)*100), big.mark=','),
-             " - ",
-             format(round(quantile(rel.delta.p.intr.tot.dx.noint1, probs=.975, na.rm=T)*100), big.mark=','),
-             "%]"))
 
 ##-- DEATHS (for discussion) --##
 # 
