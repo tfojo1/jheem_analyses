@@ -10,31 +10,31 @@ source.style.manager   = create.style.manager( shape.data.by = "source",color.da
 stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 
 # READ STATUS of ongoing runs
-# for(x in names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N")] ){
-#     print(MSAS.OF.INTEREST[MSAS.OF.INTEREST==x])
-#     status<-get.calibration.progress('shield', locations = x, calibration.code = "calib.3.30.stage1.pk")
-#     print(status)
-# }
+for(x in names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N")] ){
+    print(MSAS.OF.INTEREST[MSAS.OF.INTEREST==x])
+    status<-get.calibration.progress('shield', locations = x, calibration.code = "calib.3.30.stage2.pk")
+    print(status)
+}
 # (msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N")]
 #    
 
-# # Reads complete runs from andrew
+# # Reads complete runs simSet1
 assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N")],
-                   calibration.codes = "calib.3.16.stage1.az",sim.id = 1)
-
-simM2<-extract.last.simulation.from.calibration('shield', location = "C.33100", calibration.code = "calib.3.30.stage1.pk",allow.incomplete = T,include.first.sim = T)
-simH2<-extract.last.simulation.from.calibration('shield', location = "C.26420", calibration.code = "calib.3.30.stage1.pk",allow.incomplete = T,include.first.sim = T)
-simC2<-extract.last.simulation.from.calibration('shield', location = "C.16980", calibration.code = "calib.3.30.stage1.pk",allow.incomplete = T,include.first.sim = T)
-simA2<-extract.last.simulation.from.calibration('shield', location = "C.12060", calibration.code = "calib.3.30.stage1.pk",allow.incomplete = T,include.first.sim = T)
-simP2<-extract.last.simulation.from.calibration('shield', location = "C.38060", calibration.code = "calib.3.30.stage1.pk",allow.incomplete = T,include.first.sim = T)
-simN2<-extract.last.simulation.from.calibration('shield', location = "C.35620", calibration.code = "calib.3.30.stage1.pk",allow.incomplete = T,include.first.sim = T)
-simL2<-extract.last.simulation.from.calibration('shield', location = "C.31080", calibration.code = "calib.3.30.stage1.pk",allow.incomplete = T,include.first.sim = T)
-
-simN1<-extract.last.simulation.from.calibration('shield', location = "C.35620", calibration.code = "calib.3.16.stage1.az",allow.incomplete = T,include.first.sim = T)
-
-# # Reads complete runs Sim1
+                   calibration.codes = "calib.3.16.stage1.az",sim.id = 0)
 assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N")],
-                   calibration.codes = "calib.3.16.stage1.az")
+                   calibration.codes = "calib.3.30.stage1.pk",sim.id = 1)
+assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N")],
+                   calibration.codes = "calib.3.30.stage2.pk",sim.id = 2)
+# #
+# simM2<-extract.last.simulation.from.calibration('shield', location = "C.33100", calibration.code = "calib.3.30.stage1.pk",allow.incomplete = T,include.first.sim = T)
+# simH2<-extract.last.simulation.from.calibration('shield', location = "C.26420", calibration.code = "calib.3.30.stage1.pk",allow.incomplete = T,include.first.sim = T)
+# simC2<-extract.last.simulation.from.calibration('shield', location = "C.16980", calibration.code = "calib.3.30.stage1.pk",allow.incomplete = T,include.first.sim = T)
+# simA2<-extract.last.simulation.from.calibration('shield', location = "C.12060", calibration.code = "calib.3.30.stage1.pk",allow.incomplete = T,include.first.sim = T)
+# simP2<-extract.last.simulation.from.calibration('shield', location = "C.38060", calibration.code = "calib.3.30.stage1.pk",allow.incomplete = T,include.first.sim = T)
+# simN2<-extract.last.simulation.from.calibration('shield', location = "C.35620", calibration.code = "calib.3.30.stage1.pk",allow.incomplete = T,include.first.sim = T)
+# simL2<-extract.last.simulation.from.calibration('shield', location = "C.31080", calibration.code = "calib.3.30.stage1.pk",allow.incomplete = T,include.first.sim = T)
+
+
 # new sims: Sim2
 sim2=simA2;sim1=simsetA1
 sim2=simM2;sim1=simsetM1
