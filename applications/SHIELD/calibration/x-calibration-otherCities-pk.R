@@ -18,36 +18,64 @@ for(x in names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","
 # (msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N")]
 #    
 
-# # Reads complete runs simSet1
-assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N")],
-                   calibration.codes = "calib.3.16.stage1.az",sim.id = 0)
-assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N")],
-                   calibration.codes = "calib.3.30.stage1.pk",sim.id = 1)
-assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N")],
-                   calibration.codes = "calib.3.30.stage2.pk",sim.id = 2)
+# # Reads complete runs simSet0 Andrew
+# assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N")],
+#                    calibration.codes = "calib.3.30.stage1.pk",sim.id = 9)
+
+# STAGE0
+for ( x in c("A","H","C","L")){
+    location= names(msa_var_names)[msa_var_names %in% x]
+    assign(
+        paste0("simset",x,0),
+        retrieve.simulation.set('shield',location = location,calibration.code = "calib.3.30.stage0.pk",n.sim = 300))
+    paste("read ",x," ")
+}
+
+# STAGE1
+for ( x in c("A","H","C","L")){  
+    location= names(msa_var_names)[msa_var_names %in% x]
+    assign(
+        paste0("simset",x,1),
+        retrieve.simulation.set('shield',location = location,calibration.code = "calib.3.30.stage1.pk",n.sim = 300))
+    paste("read ",x," ")
+}
+
+# Simset2 PK
+for ( x in c("A","H","C","L")){ 
+    location= names(msa_var_names)[msa_var_names %in% x]
+    assign(
+        paste0("simset",x,2),
+        retrieve.simulation.set('shield',location = location,calibration.code = "calib.3.30.stage2.pk",n.sim = 300))
+    paste("read ",x," ")
+}
+
 # #
 # simM2<-extract.last.simulation.from.calibration('shield', location = "C.33100", calibration.code = "calib.3.30.stage1.pk",allow.incomplete = T,include.first.sim = T)
-# simH2<-extract.last.simulation.from.calibration('shield', location = "C.26420", calibration.code = "calib.3.30.stage1.pk",allow.incomplete = T,include.first.sim = T)
-# simC2<-extract.last.simulation.from.calibration('shield', location = "C.16980", calibration.code = "calib.3.30.stage1.pk",allow.incomplete = T,include.first.sim = T)
-# simA2<-extract.last.simulation.from.calibration('shield', location = "C.12060", calibration.code = "calib.3.30.stage1.pk",allow.incomplete = T,include.first.sim = T)
-# simP2<-extract.last.simulation.from.calibration('shield', location = "C.38060", calibration.code = "calib.3.30.stage1.pk",allow.incomplete = T,include.first.sim = T)
-# simN2<-extract.last.simulation.from.calibration('shield', location = "C.35620", calibration.code = "calib.3.30.stage1.pk",allow.incomplete = T,include.first.sim = T)
-# simL2<-extract.last.simulation.from.calibration('shield', location = "C.31080", calibration.code = "calib.3.30.stage1.pk",allow.incomplete = T,include.first.sim = T)
-
-
-# new sims: Sim2
-sim2=simA2;sim1=simsetA1
-sim2=simM2;sim1=simsetM1
-# sim2=simB2;sim1=simsetB1
-sim2=simL2;sim1=simsetL1
-# sim2=simN2;sim1=simsetN1
-sim2=simP2;sim1=simsetP1
-sim2=simH2;sim1=simsetH1
-sim2=simC2;sim1=simsetC1
+ 
 
 simplot(
-    sim1$last.sim(), #sim1$first.sim(),
-    sim2$last.sim(), #sim2$first.sim(),
+    # simsetL0$last.sim(), #sim1$first.sim(),
+    # simsetL1$last.sim(), simsetL1$first.sim(),
+    simsetL1$subset(142),
+    # simsetL1$subset(144),
+    simsetL1$subset(145),
+    # simsetL2$last.sim(), #sim2$first.sim(),
     # outcomes = c("diagnosis.primary.symptomatic","diagnosis.secondary.symptomatic","diagnosis.primary.asymptomatic","diagnosis.secondary.asymptomatic")
     outcomes = c("diagnosis.total", "diagnosis.ps", "diagnosis.el.misclassified","diagnosis.late.misclassified","hiv.testing")
+    # ,split.by="sex"
+     ,split.by="race"
+    # ,plot.which="sim.only"
 )    
+
+lik1=lik.inst.stage1$instantiate.likelihood(VERSION,LOCATION)
+lik1$compare.sims( simsetL1$subset(142),simsetL1$subset(145) )
+simsetL1$subset(c(140:145))$traceplot("trans")
+simset
+### looking into LA:
+LOCATION= "C.31080"
+VERSION='shield'
+
+simsetL0$traceplot("trans")
+simsetL1$traceplot("prp.symptomatic.")
+lastL0=simsetL0$last.sim(); lastL0$get.params()
+p

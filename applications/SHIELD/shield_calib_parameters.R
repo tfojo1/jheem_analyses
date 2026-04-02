@@ -276,8 +276,8 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
   ### Primary Stage by Sex ----
   prp.symptomatic.primary.msm=Logitnormal.Distribution(meanlogit = logit(0.25),sdlogit = log(2)/2), #
   #relative ratio of female & het_male to MSM
-  prp.symptomatic.primary.female.rr=Logitnormal.Distribution(meanlogit = logit( 0.66), sdlogit = (log(2)/2)),# data range is from .57-0.81, which is close to this interval (0.49-.79)
-  prp.symptomatic.primary.heterosexual_male.rr=Lognormal.Distribution(meanlog = log(1),sdlog = log(1.2)/2), #we manually set the sd so that the interval ranges from 0.8-1.2
+  rr.prp.symptomatic.primary.female=Logitnormal.Distribution(meanlogit = logit( 0.66), sdlogit = (log(2)/2)),# data range is from .57-0.81, which is close to this interval (0.49-.79)
+  rr.prp.symptomatic.primary.heterosexual_male=Lognormal.Distribution(meanlog = log(1),sdlog = log(1.2)/2), #we manually set the sd so that the interval ranges from 0.8-1.2
   
   ### Secondary stage (total) ---- #assuming a single parameter accross all groups
   prp.symptomatic.secondary=Logitnormal.Distribution(meanlogit = logit(0.16),sdlogit = log(2)/2), 
@@ -1043,8 +1043,8 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
 STI.TESTING.SAMPLING.BLOCKS = list(
   prp.sym.ps=c(
     "prp.symptomatic.primary.msm",
-    "prp.symptomatic.primary.female.rr",
-    "prp.symptomatic.primary.heterosexual_male.rr",
+    "rr.prp.symptomatic.primary.female",
+    "rr.prp.symptomatic.primary.heterosexual_male",
     "prp.symptomatic.secondary"
   ),
   or.careseeking.sym.sex=c(
