@@ -113,6 +113,7 @@ fertility.likelihood.instructions =
                                          error.variance.type = 'function.sd',
                                          error.variance.term = population.error.sd.shield,  
                                          #
+                                         correlation.different.strata = 0, # to stay consistent with population
                                          observation.correlation.form = 'compound.symmetry',
                                          #
                                          weights = STAGE.0.WEIGHT ,
