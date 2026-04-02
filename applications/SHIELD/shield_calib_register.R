@@ -92,6 +92,17 @@ register.calibration.info("calib.2.19.stage0.az",
 )
 #STAGE1  ----
 # Repeating after the new revisions to symptomatic testing
+# fixed an error with rr.prp.sym. scale for het male
+register.calibration.info('calib.4.2.stage1.pk',
+                          preceding.calibration.codes = 'calib.3.30.stage0.pk',
+                          likelihood.instructions = lik.inst.stage1,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+# Repeating after the new revisions to symptomatic testing
 register.calibration.info('calib.3.30.stage1.pk',
                           preceding.calibration.codes = 'calib.3.30.stage0.pk',
                           likelihood.instructions = lik.inst.stage1,
@@ -132,6 +143,18 @@ register.calibration.info("calib.3.16.stage1.az",
                           
 )
 #STAGE2 ----
+# Repeating after the new revisions to symptomatic testing
+# fixed an error with rr.prp.sym. scale for het male
+register.calibration.info('calib.4.2.stage2.pk',
+                          preceding.calibration.codes = 'calib.4.2.stage1.pk',
+                          likelihood.instructions = lik.inst.stage2,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
 # Repeating after the new revisions to symptomatic testing
 register.calibration.info('calib.3.30.stage2.pk',
                           preceding.calibration.codes = 'calib.3.30.stage1.pk',
