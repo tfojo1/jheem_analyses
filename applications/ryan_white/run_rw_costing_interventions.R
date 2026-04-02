@@ -4,6 +4,8 @@ library(jheem2)
 print("Sourcing code prior to running interventions")
 
 source('../jheem_analyses/applications/ryan_white/ryan_white_main.R')
+source('../jheem_analyses/commoncode/file_paths.R')
+set.jheem.root.directory(ROOT.DIR)
 
 LOCATIONS = RW.LOCATIONS # 'FL' 
 FORCE.OVERWRITE = T #FORCE.REDO
