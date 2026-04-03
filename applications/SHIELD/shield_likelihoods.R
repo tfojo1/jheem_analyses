@@ -69,11 +69,8 @@ population.likelihood.instructions =
                                          #CORRELATION STRUCTURE: if census data is off in one year, how much is it off the next year or different strata?
                                          observation.correlation.form = 'autoregressive.1', # errors in consecutive time periods are more strongly correlated, but this correlation weakens over time
                                          #
-                                         correlation.different.years = 0.5, # default
                                          correlation.different.strata = 0, # default is 0.1. We added this to address an issue with calibration where racial data didnt comply well
-                                         # correlation.different.sources = 0, # default
-                                         correlation.same.source.different.details = 0.3, # default:
-                                         
+
                                          # WEIGHTS: higher weights for decennial counts and lower for annual estimates: 
                                          # weights = w.population, #above
                                          weights = STAGE.0.WEIGHT,

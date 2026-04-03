@@ -12,7 +12,7 @@ stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 # READ STATUS of ongoing runs
 for(x in names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N")] ){
     print(MSAS.OF.INTEREST[MSAS.OF.INTEREST==x])
-    status<-get.calibration.progress('shield', locations = x, calibration.code = "calib.3.30.stage2.pk")
+    status<-get.calibration.progress('shield', locations = x, calibration.code = "calib.4.2.stage1.pk")
     print(status)
 }
 # (msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N")]
