@@ -5,6 +5,9 @@ if (nchar(system.file(package = "httr2")) == 0) {
 if (nchar(system.file(package = "jsonlite")) == 0) {
     install.packages("jsonlite")
 }
+if (nchar(system.file(package = "filelock")) == 0) {
+    install.packages("filelock")
+}
 
 JHEEM.CACHE.DIR <- NULL
 if (dir.exists("../../cached")) {
@@ -219,37 +222,51 @@ get.github.release.source <- function(file) {
 load.data.manager.from.github <- function(file, gh.source, set.as.default, offline, error.prefix) {
     local.path <- file.path(JHEEM.CACHE.DIR, file)
     version.file <- paste0(local.path, ".version")
+    lock.file <- paste0(local.path, ".lock")
 
-    if (!file.exists(local.path)) {
-        if (offline) {
-            stop(paste0(error.prefix, "File not found, and cannot download if 'offline' is set to TRUE"))
-        }
-        cat(file, "not found locally. Downloading from GitHub Release...\n")
-        download.data.manager.from.github.release(file, gh.source, error.prefix)
+    # Offline mode: skip all network checks
+    if (file.exists(local.path) && offline) {
         return(load.data.manager(local.path, set.as.default = set.as.default))
     }
+    if (!file.exists(local.path) && offline) {
+        stop(paste0(error.prefix, "File not found, and cannot download if 'offline' is set to TRUE"))
+    }
 
-    # File exists locally — check if it's current
-    if (offline) {
-        return(load.data.manager(local.path, set.as.default = set.as.default))
+    # Check remote version before acquiring lock (fast, read-only)
+    remote.version <- get.github.release.version(gh.source, error.prefix)
+    if (is.null(remote.version)) {
+        if (file.exists(local.path)) {
+            warning("Could not check GitHub for updates to '", file, "'. Using local copy.")
+            return(load.data.manager(local.path, set.as.default = set.as.default))
+        }
+        stop(paste0(error.prefix, "File not found locally and could not reach GitHub to download it"))
     }
 
     local.version <- if (file.exists(version.file)) trimws(readLines(version.file, n = 1)) else NULL
-    remote.version <- get.github.release.version(gh.source, error.prefix)
+    needs.update <- !file.exists(local.path) || is.null(local.version) || local.version != remote.version
 
-    if (is.null(remote.version)) {
-        # Couldn't reach GitHub — use local copy with a warning
-        warning("Could not check GitHub for updates to '", file, "'. Using local copy.")
-        return(load.data.manager(local.path, set.as.default = set.as.default))
-    }
-
-    if (is.null(local.version) || local.version != remote.version) {
-        if (!is.null(local.version)) {
-            cat("Updating ", file, " (", local.version, " -> ", remote.version, ")...\n", sep = "")
-        } else {
-            cat("Updating ", file, " (unknown local version -> ", remote.version, ")...\n", sep = "")
+    if (needs.update) {
+        # Acquire exclusive lock — if another process is downloading, we wait here
+        lck <- filelock::lock(lock.file, timeout = 300000)
+        if (is.null(lck)) {
+            stop(paste0(error.prefix, "Could not acquire lock to download '", file, "' (timed out after 5 minutes)"))
         }
-        download.data.manager.from.github.release(file, gh.source, error.prefix)
+        on.exit(filelock::unlock(lck), add = TRUE)
+
+        # Re-check after acquiring lock — another process may have finished the download
+        local.version <- if (file.exists(version.file)) trimws(readLines(version.file, n = 1)) else NULL
+        if (file.exists(local.path) && !is.null(local.version) && local.version == remote.version) {
+            cat(file, "is up to date (", local.version, ") — updated by another process\n")
+        } else {
+            if (!is.null(local.version)) {
+                cat("Updating ", file, " (", local.version, " -> ", remote.version, ")...\n", sep = "")
+            } else if (file.exists(local.path)) {
+                cat("Updating ", file, " (unknown local version -> ", remote.version, ")...\n", sep = "")
+            } else {
+                cat(file, "not found locally. Downloading from GitHub Release...\n")
+            }
+            download.data.manager.from.github.release(file, gh.source, error.prefix)
+        }
     } else {
         cat(file, "is up to date (", local.version, ")\n")
     }
@@ -289,16 +306,21 @@ download.data.manager.from.github.release <- function(file, gh.source, error.pre
                            "/releases/download/", gh.source$latest_tag,
                            "/", asset.name)
 
+    # Download to a temp file first, then atomically rename into place.
+    # This prevents other processes from reading a partially-written file.
+    tmp.path <- paste0(local.path, ".download.", Sys.getpid())
     tryCatch({
         resp <- httr2::request(download.url) |>
             httr2::req_headers("User-Agent" = "jheem-cache-manager") |>
             httr2::req_perform()
         if (httr2::resp_status(resp) == 200) {
-            writeBin(httr2::resp_body_raw(resp), local.path)
+            writeBin(httr2::resp_body_raw(resp), tmp.path)
+            file.rename(tmp.path, local.path)
         } else {
             stop("HTTP ", httr2::resp_status(resp))
         }
     }, error = function(e) {
+        unlink(tmp.path)
         stop(paste0(error.prefix, "Failed to download '", file, "' from GitHub Release: ", e$message))
     })
 
