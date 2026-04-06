@@ -265,33 +265,18 @@ make_stage2_plots_for_location <- function(last20, lastsim, plotting.path, title
 # USAGE ----
 if (1==1) {
     
-    # Define style managers to use. You'll need to reference them in the "STAGE 0 OUTCOMES" section.
-    source.style.manager = create.style.manager( shape.data.by = "source",color.data.by = "stratum")
-    
     stage=1
     calibname="calib.4.3.stage1.pk"
     
+    # Define style managers to use. You'll need to reference them in the "STAGE 0 OUTCOMES" section.
+    source.style.manager = create.style.manager( shape.data.by = "source",color.data.by = "stratum")
+    
     # Retrieve and/or assemble simsets. Only need to run once per session.1
     simset_data <- prepare_simsets_for_plots(calibration.code = calibname, 
-                                             names(msa_var_names)[msa_var_names %in% c("B","M","A","H","C","L","N")], 
+                                             names(msa_var_names)[msa_var_names %in% c("M", "N")], 
                                              assemble.incomplete = F)
     
     # Create and save the plots. To change which plots are generated, go to the "STAGE 0 OUTCOMES" section.
     x <- create_plots_for_calibration(stage, calibname, simset_data, create.dirs = T)
 }
-if (1==1) {
-    
-    # Define style managers to use. You'll need to reference them in the "STAGE 0 OUTCOMES" section.
-    source.style.manager = create.style.manager( shape.data.by = "source",color.data.by = "stratum")
-    
-    stage=1
-    calibname="calib.4.3.stage1.pk"
-    
-    # Retrieve and/or assemble simsets. Only need to run once per session.1
-    simset_data <- prepare_simsets_for_plots(calibration.code = calibname, 
-                                             names(msa_var_names)[msa_var_names %in% c("M","N")], 
-                                             assemble.incomplete = F)
-    
-    # Create and save the plots. To change which plots are generated, go to the "STAGE 0 OUTCOMES" section.
-    x <- create_plots_for_calibration(stage, calibname, simset_data, create.dirs = T)
-}
+ 
