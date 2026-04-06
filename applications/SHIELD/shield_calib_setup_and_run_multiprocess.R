@@ -17,7 +17,7 @@ set.seed(00000)
 CACHE.FREQ= 500 # how often should write the results to disk (Default: 100)
 UPDATE.FREQ= 50 # how often to print messages (Default: 50)
 #
-CALIBRATIONS.TO.RUN = c( "calib.4.3.stage0.pk","calib.4.3.stage1.pk","calib.4.3.stage2.pk")
+CALIBRATIONS.TO.RUN = c( "calib.4.6.stage0.pk")
 START_FROM_SCRATCH = T
 #
 print(paste0("Starting ", LOCATION, " at ", Sys.time()))
