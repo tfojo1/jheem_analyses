@@ -18,9 +18,9 @@ for(x in names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","
 # (msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N")]
 #    
 
-# # Reads complete runs simSet0 Andrew
-# assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N")],
-#                    calibration.codes = "calib.3.30.stage1.pk",sim.id = 9)
+# Reads complete runs simSet0 Andrew
+assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N")],
+                   calibration.codes = "calib.3.30.stage1.pk",n.sim = 300)
 
 # STAGE0
 for ( x in c("A","H","C","L")){
