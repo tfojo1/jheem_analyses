@@ -25,6 +25,8 @@ prepare_simsets_for_plots <- function(calibration.code, locations, assemble.inco
     
     simset_data <- setNames(lapply(locations, function(location) {
         
+        print(paste0("Retrieving/assembling simset for '", location, "' and '", calibration.code, "'"))
+        
         # Check that a simset exists for this location and calibration code
         percent_completion <- calib_progress[location,]
         
@@ -184,7 +186,6 @@ make_stage0_plots_for_location <- function(last20, lastsim, plotting.path, title
                                                                               c("race", "age"),
                                                                               c("race", "sex")),
                           style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
-    
     
     # FERTILITY RATE
     make_split_facet_plot("fertility.rate", last20, lastsim, split.facet.pairs = list(c("race", "age")), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
