@@ -277,7 +277,8 @@ total.diagnosis.by.strata.stage2.likelihood.instructions =
                                          to.year = 2022,
                                          #
                                          error.variance.type = 'cv',
-                                         error.variance.term = diagnosis_cv,   
+                                         error.variance.term = diagnosis_cv,
+                                         correlation.different.strata = 0,
                                          #
                                          observation.correlation.form = 'compound.symmetry',  #short time frame
                                          #
@@ -356,7 +357,8 @@ ps.diagnosis.by.strata.stage2.likelihood.instructions =
                                          to.year = 2022,
                                          #
                                          error.variance.type = c('cv'),
-                                         error.variance.term = list(diagnosis_cv),  
+                                         error.variance.term = list(diagnosis_cv),
+                                         correlation.different.strata = 0,
                                          #
                                          observation.correlation.form = 'compound.symmetry', #short timeframe
                                          #
@@ -930,7 +932,8 @@ early.diagnosis.by.strata.stage2.likelihood.instructions =
                                          to.year = 2022,
                                          #
                                          error.variance.type = 'cv',
-                                         error.variance.term = diagnosis_cv, 
+                                         error.variance.term = diagnosis_cv,
+                                         correlation.different.strata = 0,
                                          #
                                          observation.correlation.form = 'compound.symmetry',
                                          #
@@ -988,12 +991,13 @@ late.diagnosis.by.strata.stage2.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
                                          outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
                                          dimensions = c("race","sex","age"),
-                                         levels.of.stratification = c(0,1,2),
+                                         levels.of.stratification = c(1,2),
                                          from.year = 2019,
                                          to.year = 2022,
                                          #
                                          error.variance.type = 'cv',
-                                         error.variance.term = diagnosis_cv,  
+                                         error.variance.term = diagnosis_cv,
+                                         correlation.different.strata = 0,
                                          #
                                          observation.correlation.form = 'compound.symmetry',
                                          #
