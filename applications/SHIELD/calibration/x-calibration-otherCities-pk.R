@@ -86,8 +86,8 @@ simplot(
     # simsetB1$last.sim(),  simsetB2$last.sim(),
     # simsetH1$last.sim(),  simsetH2$last.sim(),
     # simsetA1$last.sim(),  simsetA2$last.sim(),
-    simsetL1$last.sim(),  simsetL2$last.sim(),
-    
+    # simsetL1$last.sim(),  simsetL2$last.sim(),
+    simsetM1$last.sim(),  simsetM2$last.sim(),
     # outcomes=c("immigration")# facet.by = "age",split.by = "race"
     # outcomes=c("population","diagnosis.ps") 
     # outcomes = c("diagnosis.primary.symptomatic","diagnosis.secondary.symptomatic","diagnosis.primary.asymptomatic","diagnosis.secondary.asymptomatic")
