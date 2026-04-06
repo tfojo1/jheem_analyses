@@ -278,7 +278,7 @@ total.diagnosis.by.strata.stage2.likelihood.instructions =
                                          #
                                          error.variance.type = 'cv',
                                          error.variance.term = diagnosis_cv,
-                                         correlation.different.strata = 0,
+                                         correlation.different.strata = 0, #after adding age-specific targets in stage2, the model didnt fit to overall targets as well as before. 
                                          #
                                          observation.correlation.form = 'compound.symmetry',  #short time frame
                                          #
@@ -358,7 +358,7 @@ ps.diagnosis.by.strata.stage2.likelihood.instructions =
                                          #
                                          error.variance.type = c('cv'),
                                          error.variance.term = list(diagnosis_cv),
-                                         correlation.different.strata = 0,
+                                         correlation.different.strata = 0,#after adding age-specific targets in stage2, the model didnt fit to overall targets as well as before.
                                          #
                                          observation.correlation.form = 'compound.symmetry', #short timeframe
                                          #
@@ -933,7 +933,7 @@ early.diagnosis.by.strata.stage2.likelihood.instructions =
                                          #
                                          error.variance.type = 'cv',
                                          error.variance.term = diagnosis_cv,
-                                         correlation.different.strata = 0,
+                                         correlation.different.strata = 0,#after adding age-specific targets in stage2, the model didnt fit to overall targets as well as before.
                                          #
                                          observation.correlation.form = 'compound.symmetry',
                                          #
@@ -997,7 +997,7 @@ late.diagnosis.by.strata.stage2.likelihood.instructions =
                                          #
                                          error.variance.type = 'cv',
                                          error.variance.term = diagnosis_cv,
-                                         correlation.different.strata = 0,
+                                         correlation.different.strata = 0,#after adding age-specific targets in stage2, the model didnt fit to overall targets as well as before.
                                          #
                                          observation.correlation.form = 'compound.symmetry',
                                          #
