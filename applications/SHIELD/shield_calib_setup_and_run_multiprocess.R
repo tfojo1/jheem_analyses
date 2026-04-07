@@ -80,15 +80,28 @@ for (CALIBRATION.NAME in CALIBRATIONS.TO.RUN) {
                                                    calibration.code = CALIBRATION.NAME,
                                                    allow.incomplete = T)
      
-    # Save sim locally
-    filename=paste0("prelim_results/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
-    save(simset,file=filename)
+    # # Save sim locally
+    # filename=paste0("prelim_results/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
+    # save(simset,file=filename)
     
     # Save sim on Q drive
     # filename=paste0(get.jheem.root.directory(),"/shield/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
     # save(simset,file =filename )
-    save.simulation.set(simset)
     
+    attemps <- 1
+    while (attemps < 5) {
+        finished <- F
+        tryCatch({
+            save.simulation.set(simset)
+            finished <- T
+        },
+        error = function(e) {
+            print("Calibration was probably interrupted during the final simset save step. Sleeping 5 minutes before retrying...")
+            Sys.sleep(60 * 5)
+        })
+        if (finished) break
+        attempts <- attempts + 1
+    }
     #
     print(paste0("Simset was saved on disk at ", Sys.time(), " as:   ", filename))
 }
