@@ -317,7 +317,11 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
   or.syphilis.to.hiv.testing.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
   or.syphilis.to.hiv.testing.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
   #
-  or.slope.syphilis.to.hiv.testing = Lognormal.Distribution(meanlog = 0, sdlog = (log(1.25)/2)/10) # changed from 2 to make change slower
+  or.slope.syphilis.to.hiv.testing = Lognormal.Distribution(meanlog = 0, sdlog = (log(1.25)/2)/10), # changed from 2 to make change slower
+  
+  ## Misclassification Error ----
+  fraction.el.misclassified.ll =Logitnormal.Distribution(meanlogit = log(0.096), sdlogit =  log(2)) , #IQR: 0.025 0.27
+  fraction.ll.misclassified.el =Logitnormal.Distribution(meanlogit = log(0.27), sdlogit =  log(2)) #IQR: 0.064 0.51
 )
 
 ###--------------------------------------------------------------------------###
@@ -1081,8 +1085,12 @@ STI.TESTING.SAMPLING.BLOCKS = list(
     "or.syphilis.to.hiv.testing.black",
     "or.syphilis.to.hiv.testing.hispanic",
     "or.syphilis.to.hiv.testing.other"
+  ),
+  #######
+  misclas.error<-c(
+      "fraction.el.misclassified.ll",
+      "fraction.ll.misclassified.el"
   )
-  
 )
  
 ## AGE.TRANS.TEST.SAMPLING.BLOCKS ----
