@@ -1,4 +1,5 @@
 
+###### Needed to work on SHIELD server #########################################
 library(jheem2)
 
 print("Sourcing code prior to running interventions")
@@ -6,10 +7,12 @@ print("Sourcing code prior to running interventions")
 source('../jheem_analyses/applications/ryan_white/ryan_white_main.R')
 source('../jheem_analyses/commoncode/file_paths.R')
 set.jheem.root.directory(ROOT.DIR)
+################################################################################
+################################################################################
 
-LOCATIONS = RW.LOCATIONS # 'FL' 
+LOCATIONS = 'FL'      # RW.LOCATIONS
 FORCE.OVERWRITE = T #FORCE.REDO
-INTERVENTION.CODES = c('adap.100.end.26') 
+INTERVENTION.CODES = c('adap.end.survey.26','adap.end.survey.no.trate.26','adap.end.50.26','adap.end.50.no.trate.26') 
 
 print(paste0("Doing locations: ",
              paste0(LOCATIONS, collapse=', ')))
