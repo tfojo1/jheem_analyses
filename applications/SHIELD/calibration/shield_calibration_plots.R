@@ -264,7 +264,7 @@ make_stage2_plots_for_location <- function(last20, lastsim, plotting.path, title
 }
 
 # USAGE ----
-if (1==1) {
+if (1==2) {
     
     stage=1
     calibname="calib.4.3.stage1.pk"
