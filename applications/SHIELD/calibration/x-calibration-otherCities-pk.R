@@ -19,13 +19,13 @@ stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 #    
 
 # Reads completed runs
-# assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N")],calibration.codes = "calib.4.3.stage0.pk",n.sim = 300,sim.id = 0)
-# assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("B","M","A","H","C","L","N")],calibration.codes = "calib.4.3.stage1.pk",n.sim = 300,sim.id = 1)
-# assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("B","M","A","H","C","L","N")],calibration.codes = "calib.4.3.stage2.pk",n.sim = 300,sim.id = 2)
+assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N")],calibration.codes = "calib.4.8.stage0.az",n.sim = 300,sim.id = 0)
+assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("B","M","A","H","C","L","N")],calibration.codes = "calib.4.8.stage1.az",n.sim = 300,sim.id = 1)
+assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("B","M","A","H","C","L","N")],calibration.codes = "calib.4.8.stage2.az",n.sim = 300,sim.id = 2)
 
-assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("P")],calibration.codes = "calib.4.6.stage0.pk",n.sim = 300)
-simsetP0=assemble.simulations.from.calibration('shield',location = 'C.38060',calibration.code = "calib.4.6.stage0.pk",allow.incomplete = T)
-save.simulation.set(simsetP0)
+#before change
+assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("B","M","A","H","C","L","N")],calibration.codes = "calib.4.3.stage1.pk",n.sim = 300,sim.id=10)
+assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("B","M","A","H","C","L","N")],calibration.codes = "calib.4.3.stage2.pk",n.sim = 300,sim.id=20)
 
 # for ( x in c("B","M","A","H","C","L","N")){
 #     location= names(msa_var_names)[msa_var_names %in% x]
