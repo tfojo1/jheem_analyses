@@ -188,9 +188,9 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.t
 ## Fraction with symptomatic disesase: changed as calib params
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.msm',
                                       0.25, 0,0)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.female.rr',
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.prp.symptomatic.primary.female',
                                        0.66, 0,0)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.heterosexual_male.rr',
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.prp.symptomatic.primary.heterosexual_male',
                                       1, 0,0)
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.secondary',
                                       0.16, 0,0)                                      
@@ -219,13 +219,11 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.conta
 
 #*** MISCLASSIFICATION ERROR **** ## -----
 # source("applications/SHIELD/inputs/input_syphilis_misclassification_error.R")
-percent.misclassified.el.as.llu=0.096
-percent.misclassified.llu.as.el =  0.272
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.el.misclassified.ll',
-                                      percent.misclassified.el.as.llu, 0,0)
+                                      0.096, 0,0)
 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.ll.misclassified.el',
-                                      percent.misclassified.llu.as.el, 0,0)
+                                      0.272, 0,0)
 
 
 #*** TREATMENTS INITIATION  **** ## ---- 

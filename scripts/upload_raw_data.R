@@ -147,3 +147,33 @@ for (d in names(tarball_info)) {
 }
 
 cat("\nDone. Release:", release_tag, "\n")
+
+# --- Update latest tag ---
+LATEST_TAG <- paste0(TAG_PREFIX, "-latest")
+cat("\nUpdating", LATEST_TAG, "to point to this release...\n")
+
+system2("gh", c("release", "delete", LATEST_TAG, "--repo", REPO,
+                "--cleanup-tag", "--yes"),
+        stdout = FALSE, stderr = FALSE)  # OK if it doesn't exist yet
+
+latest_notes <- paste0(notes, "\n**Points to:** `", release_tag, "`\n")
+latest_notes_file <- file.path(tempdir(), "latest_release_notes.md")
+writeLines(latest_notes, latest_notes_file)
+
+# Create the latest release (no assets yet)
+result <- system2("gh", c(
+    "release", "create", LATEST_TAG,
+    "--repo", REPO,
+    "--title", shQuote("Raw Data (Latest)"),
+    "--notes-file", latest_notes_file
+))
+if (result != 0) {
+    warning("Failed to create ", LATEST_TAG, " — versioned release is still available at ", release_tag)
+} else {
+    # Upload each tarball
+    for (d in names(tarball_info)) {
+        info <- tarball_info[[d]]
+        system2("gh", c("release", "upload", LATEST_TAG, "--repo", REPO, info$path))
+    }
+    cat("Done. Latest:", LATEST_TAG, "\n")
+}

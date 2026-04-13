@@ -979,13 +979,13 @@ register.model.element(SHIELD.SPECIFICATION,
                        scale = "proportion",
                        value=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.msm'])
 register.model.element(SHIELD.SPECIFICATION,  
-                       name="prp.symptomatic.primary.female.rr",
+                       name="rr.prp.symptomatic.primary.female",
                        scale = "proportion",
-                       value=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.female.rr'])
+                       value=SHIELD_BASE_PARAMETER_VALUES['rr.prp.symptomatic.primary.female'])
 register.model.element(SHIELD.SPECIFICATION,  
-                       name="prp.symptomatic.primary.heterosexual_male.rr",
-                       scale = "proportion",
-                       value=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.heterosexual_male.rr'])
+                       name="rr.prp.symptomatic.primary.heterosexual_male",
+                       scale = "ratio",
+                       value=SHIELD_BASE_PARAMETER_VALUES['rr.prp.symptomatic.primary.heterosexual_male'])
 ## Now we build the quantity:
 register.model.quantity(SHIELD.SPECIFICATION,
                        name = "prp.symptomatic.primary",
@@ -998,11 +998,11 @@ register.model.quantity.subset(SHIELD.SPECIFICATION, #can we do this as a list?
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = "prp.symptomatic.primary",
                                applies.to = list(sex="female"),
-                               value = expression(prp.symptomatic.primary.female.rr *prp.symptomatic.primary.msm))
+                               value = expression(rr.prp.symptomatic.primary.female *prp.symptomatic.primary.msm))
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = "prp.symptomatic.primary",
                                applies.to = list(sex="heterosexual_male"),
-                               value = expression(prp.symptomatic.primary.heterosexual_male.rr *prp.symptomatic.primary.msm))
+                               value = expression(rr.prp.symptomatic.primary.heterosexual_male *prp.symptomatic.primary.msm))
 #
 register.model.element(SHIELD.SPECIFICATION,
                        name = "prp.symptomatic.secondary",

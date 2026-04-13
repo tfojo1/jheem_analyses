@@ -1,7 +1,10 @@
 library(ggrepel)
 
 # first make sure RW.IS.STATE.LEVEL = T in ryan_white_main.R
-source("../jheem_analyses/applications/ryan_white/for_manuscript/load_survey_results.R")
+source('../jheem_analyses/applications/ryan_white/ryan_white_main.R')
+files = list.files("Q:results/ryan_white/", full.names = T)
+files = files[grepl('state', files)]
+
 print(paste0("RW.IS.STATE.LEVEL is set to ",RW.IS.STATE.LEVEL))
 
 NEW.TIMELINE = T
@@ -31,6 +34,8 @@ if(!NEW.TIMELINE){
 if(NEW.TIMELINE){
     #file = files[6] # 9/11 is the revised timeframe - for CROI 
     file = files[7] # reran 1/15/26 to keep years prior to 2026 (results should match 9/11)
+    
+    #file = files[10] # for 50% ADAP cut analysis 
     load(file)
 }
 

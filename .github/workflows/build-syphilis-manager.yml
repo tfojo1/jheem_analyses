@@ -11,20 +11,20 @@ on:
       raw_data_release_tag:
         description: 'Release tag for raw data'
         required: true
-        default: 'data-raw-v2026.03.10'
+        default: 'data-raw-latest'
         type: string
       deps_release_tag:
         description: 'Release tag for manager dependencies'
         required: true
-        default: 'data-managers-v2026.03.10'
+        default: 'data-managers-latest'
         type: string
       jheem2_ref:
         description: 'jheem2 branch or tag to use'
         required: false
         default: 'dev'
         type: string
-      update_spec:
-        description: 'Regenerate the structural spec from this build (use when structure changes intentionally)'
+      force_update_spec:
+        description: 'Force spec regeneration even on regressions (use only when regressions are intentional)'
         required: false
         default: false
         type: boolean
@@ -142,45 +142,42 @@ jobs:
             source('data_processing/syphilis.manager/syphilis.processing.for.merging/syphilis.manager.merge.R')
           " 2>&1 | tee _ci_outputs/build_log.txt
 
-      - name: Diff against old spec (when updating)
-        if: inputs.update_spec
+      - name: Validate structure
+        id: validation
         run: |
-          # Run validation against the OLD spec to capture what changed.
-          # This will fail (exit 1) if there are structural changes — that's expected.
+          set +e
           Rscript data_processing/syphilis.manager/validation/run_validation.R \
             _ci_outputs/syphilis.manager.rdata \
-            2>&1 | tee _ci_outputs/spec_diff.txt || true
+            2>&1 | tee _ci_outputs/validation_report.txt
+          EXIT_CODE=$?
+          set -e
 
-      - name: Update spec from build
-        if: inputs.update_spec
+          # Exit codes: 0 = clean pass, 1 = regressions, 2 = pass with additions
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "spec_action=none" >> "$GITHUB_OUTPUT"
+          elif [ $EXIT_CODE -eq 2 ]; then
+            echo "spec_action=auto_update" >> "$GITHUB_OUTPUT"
+          elif [ $EXIT_CODE -eq 1 ] && [ "${{ inputs.force_update_spec }}" = "true" ]; then
+            echo "spec_action=force_update" >> "$GITHUB_OUTPUT"
+          else
+            echo "Structural regressions detected. If these are intentional, re-run with force_update_spec=true."
+            exit 1
+          fi
+
+      - name: Auto-update spec
+        if: steps.validation.outputs.spec_action == 'auto_update' || steps.validation.outputs.spec_action == 'force_update'
         run: |
+          # Save current report as the diff (shows what changed before regeneration)
+          cp _ci_outputs/validation_report.txt _ci_outputs/spec_diff.txt
+
           Rscript data_processing/syphilis.manager/validation/generate_spec.R \
             _ci_outputs/syphilis.manager.rdata
 
-      - name: Validate against new spec
-        if: inputs.update_spec
-        run: |
-          set -o pipefail
-          Rscript data_processing/syphilis.manager/validation/run_validation.R \
-            _ci_outputs/syphilis.manager.rdata \
-            2>&1 | tee _ci_outputs/validation_report.txt
-
-      - name: Run validation
-        if: ${{ !inputs.update_spec }}
-        run: |
-          set -o pipefail
-          Rscript data_processing/syphilis.manager/validation/run_validation.R \
-            _ci_outputs/syphilis.manager.rdata \
-            2>&1 | tee _ci_outputs/validation_report.txt
-
-      - name: Commit updated spec
-        if: inputs.update_spec
-        run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data_processing/syphilis.manager/validation/syphilis_manager_spec.json
           git diff --cached --quiet && echo "No spec changes" || \
-            git commit -m "Update syphilis manager spec from CI build
+            git commit -m "Auto-update syphilis manager spec
 
           Sections: ${{ inputs.sections_release_tag }}
           Raw data: ${{ inputs.raw_data_release_tag }}
@@ -214,9 +211,11 @@ jobs:
           fi
 
           # Build release notes with embedded validation report
-          SPEC_NOTE=""
-          if [ "${{ inputs.update_spec }}" = "true" ]; then
-            SPEC_NOTE="Spec: UPDATED (review commit)"
+          SPEC_ACTION="${{ steps.validation.outputs.spec_action }}"
+          if [ "$SPEC_ACTION" = "auto_update" ]; then
+            SPEC_NOTE="Spec: auto-updated (additive changes)"
+          elif [ "$SPEC_ACTION" = "force_update" ]; then
+            SPEC_NOTE="Spec: force-updated (review commit)"
           else
             SPEC_NOTE="Validation: PASSED"
           fi

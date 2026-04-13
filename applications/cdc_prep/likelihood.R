@@ -93,6 +93,24 @@ cdc.prep.referred.likelihood.instructions = create.basic.likelihood.instructions
                                                                                    weights = 4
 )
 
+cdc.prep.contact.tracing.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "partner.positive", 
+                                                                                 outcome.for.sim = "number.partners.positive",
+                                                                                 dimensions = character(), #total
+                                                                                 levels.of.stratification = 0,
+                                                                                 from.year = 2018,
+                                                                                 to.year = 2021,
+                                                                                 omit.years = c(2020),
+                                                                                 observation.correlation.form = 'compound.symmetry',
+                                                                                 correlation.different.years = 0.5,
+                                                                                 error.variance.term = 0.009, #half of inter-region variance + additional varaition between healthcare/non health care settings
+                                                                                 error.variance.type = c('sd'),
+                                                                                 weights = 4
+)
+
+
+
+
+
 
 future.test.likelihood.instructions <- create.custom.likelihood.instructions(name = "cdc.funded.test.ratio",
     get.data.function = function(version, location){
@@ -150,8 +168,5 @@ future.test.likelihood.instructions <- create.custom.likelihood.instructions(nam
 )
 
 
-cdc.prep.joint.likelihood.instructions = join.likelihood.instructions(cdc.test.positivity.likelihood.instructions,cdc.tests.likelihood.instructions,cdc.prep.referred.likelihood.instructions,cdc.prep.eligible.likelihood.instructions,future.test.likelihood.instructions)
-
-# cdc.prep.joint.likelihood.instructions.AL = join.likelihood.instructions(cdc.test.positivity.likelihood.instructions,cdc.nonhealthcare.tests.likelihood.instructions.AL,cdc.tests.likelihood.instructions,cdc.prep.referred.likelihood.instructions,cdc.prep.eligible.likelihood.instructions,future.test.likelihood.instructions)
-# cdc.prep.joint.likelihood.instructions.LA = join.likelihood.instructions(cdc.test.positivity.likelihood.instructions,cdc.nonhealthcare.tests.likelihood.instructions.LA,cdc.tests.likelihood.instructions,cdc.prep.referred.likelihood.instructions,cdc.prep.eligible.likelihood.instructions,future.test.likelihood.instructions)
+cdc.prep.joint.likelihood.instructions = join.likelihood.instructions(cdc.test.positivity.likelihood.instructions,cdc.tests.likelihood.instructions,cdc.prep.referred.likelihood.instructions,cdc.prep.eligible.likelihood.instructions,future.test.likelihood.instructions,cdc.prep.contact.tracing.likelihood.instructions)
 

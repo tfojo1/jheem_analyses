@@ -276,8 +276,8 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
   ### Primary Stage by Sex ----
   prp.symptomatic.primary.msm=Logitnormal.Distribution(meanlogit = logit(0.25),sdlogit = log(2)/2), #
   #relative ratio of female & het_male to MSM
-  prp.symptomatic.primary.female.rr=Logitnormal.Distribution(meanlogit = logit( 0.66), sdlogit = (log(2)/2)),# data range is from .57-0.81, which is close to this interval (0.49-.79)
-  prp.symptomatic.primary.heterosexual_male.rr=Lognormal.Distribution(meanlog = log(1),sdlog = log(1.2)/2), #we manually set the sd so that the interval ranges from 0.8-1.2
+  rr.prp.symptomatic.primary.female=Logitnormal.Distribution(meanlogit = logit( 0.66), sdlogit = (log(2)/2)),# data range is from .57-0.81, which is close to this interval (0.49-.79)
+  rr.prp.symptomatic.primary.heterosexual_male=Lognormal.Distribution(meanlog = log(1),sdlog = log(1.2)/2), #we manually set the sd so that the interval ranges from 0.8-1.2
   
   ### Secondary stage (total) ---- #assuming a single parameter accross all groups
   prp.symptomatic.secondary=Logitnormal.Distribution(meanlogit = logit(0.16),sdlogit = log(2)/2), 
@@ -317,7 +317,11 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
   or.syphilis.to.hiv.testing.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
   or.syphilis.to.hiv.testing.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
   #
-  or.slope.syphilis.to.hiv.testing = Lognormal.Distribution(meanlog = 0, sdlog = (log(1.25)/2)/10) # changed from 2 to make change slower
+  or.slope.syphilis.to.hiv.testing = Lognormal.Distribution(meanlog = 0, sdlog = (log(1.25)/2)/10), # changed from 2 to make change slower
+  
+  ## Misclassification Error ----
+  fraction.el.misclassified.ll =Logitnormal.Distribution(meanlogit = logit(0.096), sdlog =  log(2)) , #IQR: 0.025 0.27
+  fraction.ll.misclassified.el =Logitnormal.Distribution(meanlogit = logit(0.27), sdlog =  log(2)) #IQR: 0.064 0.51
 )
 
 ###--------------------------------------------------------------------------###
@@ -972,6 +976,8 @@ AGING.SAMPLING.BLOCKS = list(
 TRANSMISSION.SAMPLING.BLOCKS = list(
   global.transmission.rate=c("global.transmission.rate"),
   #
+  age.mixing.sd.mult=("age.mixing.sd.mult"),
+  #
   relapse=c("prop.early.latent.to.secondary"),
   #
   infectiousness=c("el.rel.secondary.transmissibility"),
@@ -1041,8 +1047,8 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
 STI.TESTING.SAMPLING.BLOCKS = list(
   prp.sym.ps=c(
     "prp.symptomatic.primary.msm",
-    "prp.symptomatic.primary.female.rr",
-    "prp.symptomatic.primary.heterosexual_male.rr",
+    "rr.prp.symptomatic.primary.female",
+    "rr.prp.symptomatic.primary.heterosexual_male",
     "prp.symptomatic.secondary"
   ),
   or.careseeking.sym.sex=c(
@@ -1079,15 +1085,14 @@ STI.TESTING.SAMPLING.BLOCKS = list(
     "or.syphilis.to.hiv.testing.black",
     "or.syphilis.to.hiv.testing.hispanic",
     "or.syphilis.to.hiv.testing.other"
-  )
-  
-)
-## SD.MULT.SAMPLING.BLOCKS ----
-SD.MULT.SAMPLING.BLOCKS = list(
-  age.mixing.transmission=(
-    "age.mixing.sd.mult"
+  ),
+  #######
+  misclas.error<-c(
+      "fraction.el.misclassified.ll",
+      "fraction.ll.misclassified.el"
   )
 )
+ 
 ## AGE.TRANS.TEST.SAMPLING.BLOCKS ----
 TRANS.BY.AGE.SAMPLING.BLOCKS = list(
   age.transmission.young<-c(
@@ -1210,22 +1215,28 @@ PRENATAL.SAMPLING.BLOCKS=list(
 # SUMMARIZE ---- 
 #these will be registered in the specification 
 SHIELD.FULL.PARAMETERS.PRIOR = distributions::join.distributions(
-  POPULATION.PARAMETERS.PRIOR,
+  #stage0
+    POPULATION.PARAMETERS.PRIOR,
   AGING.PARAMETERS.PRIOR,
+  
+  #stage1
   TRANSMISSION.PARAMETERS.PRIOR,
   STI.TESTING.PARAMETERS.PRIOR,
-  TRANS.BY.AGE.SAMPLING.PRIOR,
+  TRANS.BY.AGE.SAMPLING.PRIOR, #stage2
+  
   PRENATAL.PARAMETERS.PRIOR
 )
 
 SHIELD.FULL.PARAMETERS.SAMPLING.BLOCKS=c(
   POPULATION.SAMPLING.BLOCKS,
   AGING.SAMPLING.BLOCKS ,
+  
   TRANSMISSION.SAMPLING.BLOCKS,
   STI.TESTING.SAMPLING.BLOCKS,
   TRANS.BY.AGE.SAMPLING.BLOCKS,
-  PRENATAL.SAMPLING.BLOCKS,
-  SD.MULT.SAMPLING.BLOCKS #we have seperated this for now.
+  
+  PRENATAL.SAMPLING.BLOCKS
+ 
   
 )
 

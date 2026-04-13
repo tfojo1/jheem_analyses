@@ -207,16 +207,54 @@ validate_manager_structure <- function(manager, spec,
     }
   }
 
-  # -- Check for unexpected items in manager (not in spec) --
+  # -- Check for new items in manager not in spec --
   for (outcome_name in names(manager$data)) {
     if (!(outcome_name %in% names(spec$outcomes))) {
       add_notice(outcome_name,
-                 sprintf("Outcome '%s' present in manager but not in spec", outcome_name))
+                 sprintf("New outcome '%s' in manager (not in spec)", outcome_name))
+      next
+    }
+
+    estimate_data <- manager$data[[outcome_name]][["estimate"]]
+    if (is.null(estimate_data)) next
+    outcome_spec <- spec$outcomes[[outcome_name]]
+
+    for (source_name in names(estimate_data)) {
+      if (!(source_name %in% names(outcome_spec$sources))) {
+        add_notice(paste(outcome_name, source_name, sep = " > "),
+                   sprintf("New source '%s' in outcome '%s' (not in spec)",
+                           source_name, outcome_name))
+        next
+      }
+
+      source_spec <- outcome_spec$sources[[source_name]]
+
+      for (ontology_name in names(estimate_data[[source_name]])) {
+        if (!(ontology_name %in% names(source_spec$ontologies))) {
+          add_notice(paste(outcome_name, source_name, ontology_name, sep = " > "),
+                     sprintf("New ontology '%s' in %s > %s (not in spec)",
+                             ontology_name, outcome_name, source_name))
+          next
+        }
+
+        ontology_spec <- source_spec$ontologies[[ontology_name]]
+
+        for (strat_name in names(estimate_data[[source_name]][[ontology_name]])) {
+          if (!(strat_name %in% names(ontology_spec$stratifications))) {
+            add_notice(paste(outcome_name, source_name, ontology_name, strat_name, sep = " > "),
+                       sprintf("New stratification '%s' in %s > %s > %s (not in spec)",
+                               strat_name, outcome_name, source_name, ontology_name))
+          }
+        }
+      }
     }
   }
 
+  has_additions <- length(notices) > 0 || length(warnings) > 0
+
   list(
     passed = length(failures) == 0,
+    has_additions = has_additions,
     n_checks = n_checks,
     n_passed = n_checks - length(failures),
     n_failed = length(failures),
@@ -368,8 +406,12 @@ print_validation_results <- function(results) {
     cat("\n")
   }
 
-  if (results$passed) {
-    cat("RESULT: PASS\n")
+  if (results$passed && !results$has_additions) {
+    cat("RESULT: PASS (no changes)\n")
+  } else if (results$passed && results$has_additions) {
+    cat(sprintf("RESULT: PASS with additions (%d warning%s, %d notice%s — spec will be auto-updated)\n",
+                length(results$warnings), ifelse(length(results$warnings) == 1, "", "s"),
+                length(results$notices), ifelse(length(results$notices) == 1, "", "s")))
   } else {
     cat(sprintf("RESULT: FAIL (%d failure%s, %d warning%s)\n",
                 results$n_failed, ifelse(results$n_failed == 1, "", "s"),

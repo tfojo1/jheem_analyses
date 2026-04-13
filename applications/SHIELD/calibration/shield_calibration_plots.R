@@ -25,6 +25,8 @@ prepare_simsets_for_plots <- function(calibration.code, locations, assemble.inco
     
     simset_data <- setNames(lapply(locations, function(location) {
         
+        print(paste0("Retrieving/assembling simset for '", location, "' and '", calibration.code, "'"))
+        
         # Check that a simset exists for this location and calibration code
         percent_completion <- calib_progress[location,]
         
@@ -76,13 +78,13 @@ create_plots_for_calibration <- function(stage, calibration.code, simset.data, c
     successful_locations <- character(0)
     
     for (location in names(simset.data)) {
-        
+        # browser()
         # Check file path and create directories if needed
-        plotting_path <- paste0(get.jheem.root.directory(), "shield/calibrationPlots/", calibration.code, "/", location, "/")
+        plotting_path <- paste0(get.jheem.root.directory(), "/shield/calibrationPlots/", calibration.code, "/", location, "/")
         if (!dir.exists(plotting_path)) {
             if (!create.dirs)
                 stop(paste0("Error: directory for '", location, "' and '", calibration.code, "' does not exist. Check that get.jheem.root.directory() shows the right place, then try again with 'create.dirs' set to TRUE."))
-            dir.create(plotting_path, recursive = T)
+            dir.create(plotting_path, recursive = T,showWarnings = F)
             print(paste0("Generating directories for '", location, "' and '", calibration.code, "'"))
         }
         
@@ -96,6 +98,7 @@ create_plots_for_calibration <- function(stage, calibration.code, simset.data, c
         
         # Generate and save plots
         print(paste0("Generating plots for '", location, "' and '", calibration.code, "'"))
+        # browser()
         tryCatch({
             if (stage == 0) make_stage0_plots_for_location(last20_sims, last_sim, plotting_path, title.suffix = title_suffix)
             if (stage == 1) make_stage1_plots_for_location(last20_sims, last_sim, plotting_path, title.suffix = title_suffix)
@@ -112,6 +115,7 @@ create_plots_for_calibration <- function(stage, calibration.code, simset.data, c
 # INTERNAL HELPERS ----
 #' @title Make an Unstratified Plot
 make_total_plot <- function(outcome, last20, lastsim, style.manager, plotting.path, title.suffix) {
+    # browser()
     p <- simplot(
         last20, lastsim,
         outcomes = outcome,
@@ -166,6 +170,7 @@ make_split_facet_plot <- function(outcome, last20, lastsim, split.facet.pairs, s
 
 # STAGE 0 OUTCOMES ----
 make_stage0_plots_for_location <- function(last20, lastsim, plotting.path, title.suffix) {
+    # browser()
     # POPULATION
     make_total_plot("population", last20, lastsim, style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
     make_facet_plot("population", last20, lastsim, facet.vars = c("sex", "race", "age"), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
@@ -176,6 +181,11 @@ make_stage0_plots_for_location <- function(last20, lastsim, plotting.path, title
     
     # DEATHS
     make_total_plot("deaths", last20, lastsim, style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    make_facet_plot("deaths", last20, lastsim, facet.vars = c("sex", "race", "age"), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
+    make_split_facet_plot("deaths", last20, lastsim, split.facet.pairs = list(c("sex", "age"),
+                                                                              c("race", "age"),
+                                                                              c("race", "sex")),
+                          style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
     
     # FERTILITY RATE
     make_split_facet_plot("fertility.rate", last20, lastsim, split.facet.pairs = list(c("race", "age")), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
@@ -256,12 +266,18 @@ make_stage2_plots_for_location <- function(last20, lastsim, plotting.path, title
 # USAGE ----
 if (1==2) {
     
+    stage=1
+    calibname="calib.4.3.stage1.pk"
+    
     # Define style managers to use. You'll need to reference them in the "STAGE 0 OUTCOMES" section.
     source.style.manager = create.style.manager( shape.data.by = "source",color.data.by = "stratum")
     
-    # Retrieve and/or assemble simsets. Only need to run once per session.
-    simset_data <- prepare_simsets_for_plots(calibration.code = "calib.3.23.stage2.az", MSAS.OF.INTEREST, assemble.incomplete = F)
+    # Retrieve and/or assemble simsets. Only need to run once per session.1
+    simset_data <- prepare_simsets_for_plots(calibration.code = calibname, 
+                                             names(msa_var_names)[msa_var_names %in% c("M", "N")], 
+                                             assemble.incomplete = F)
     
     # Create and save the plots. To change which plots are generated, go to the "STAGE 0 OUTCOMES" section.
-    x <- create_plots_for_calibration(2, "calib.3.23.stage2.az", simset_data, create.dirs = T)
+    x <- create_plots_for_calibration(stage, calibname, simset_data, create.dirs = T)
 }
+ 
