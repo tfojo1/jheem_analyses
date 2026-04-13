@@ -760,35 +760,32 @@ register.model.element(SHIELD.SPECIFICATION,
 
 ##---- DOXY PEP ----
 # relative risk: default=1 no protection
-# Susceptibility of uninfected persons
 
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'doxy.rr',
-                       scale = 'ratio',
-                       value = 0.2
-)
-
+# Modeling Doxy Coverage
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'doxy.coverage',
                        scale = 'proportion',
-                       value = 0,
-             )
+                       get.functional.form.function = get_doxy_coverage_functional_form,
+                       functional.form.from.time = 2022
+                       )
 
-
-
+# effectiveness in reducing transmissions (operationalized as reduction in susceptibility toward new infection)
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'doxy.effectiveness', #calib param
+                       scale = 'proportion',
+                       value = 0.8 # range 1- (0.08, 0.48)
+)
 
 register.model.quantity(SHIELD.SPECIFICATION,
                                name = 'sexual.susceptibility',
                                value = 1
 )
 
-
 ## MSM: apply doxy coverage + RR
 ## this is the ONLY place doxy.coverage & doxy.rr are used
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                         name = 'sexual.susceptibility',
-                        applies.to = list(sex = 'msm'),
-                        value = expression((1 - doxy.coverage) + doxy.coverage * doxy.rr)
+                        value = expression((1 - doxy.coverage) + doxy.coverage * (1-doxy.effectiveness))
 )
 
 
