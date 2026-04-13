@@ -12,7 +12,7 @@ phoenix= (C.38060)
 script="./shield_calib_setup_and_run_multiprocess.R"
 mkdir -p logs
 
-for loc in "${phoenix[@]}"; do
+for loc in "${all_except_selected_cities[@]}"; do
 echo "Launching $loc"
 Rscript "$script" "$loc" >"logs/${loc}.out" 2>&1 &
 done

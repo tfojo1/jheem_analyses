@@ -14,6 +14,18 @@ par.aliases.transmission = list(
 )
 
 # STAGE0 ----
+# running calibration for all cities 
+register.calibration.info("calib.4.13.stage0.pk",
+                          likelihood.instructions = lik.inst.stage0,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          fixed.initial.parameter.values = c("global.transmission.rate"=2.3),  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          parameter.aliases = par.aliases.transmission,
+                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
 
 # now sampling the misclassification fractions in stages 1 and 2.
 register.calibration.info("calib.4.8.stage0.az",
@@ -130,6 +142,16 @@ register.calibration.info("calib.4.3.stage0.pk",
 #                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 # )
 #STAGE1  ----
+# now sampling the misclassification fractions in stages 1 and 2.
+register.calibration.info('calib.4.13.stage1.pk',
+                          preceding.calibration.codes = 'calib.4.13.stage0.pk',
+                          likelihood.instructions = lik.inst.stage1,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
 
 # now sampling the misclassification fractions in stages 1 and 2.
 register.calibration.info('calib.4.8.stage1.az',
@@ -204,6 +226,17 @@ register.calibration.info('calib.4.3.stage1.pk',
 #                           
 # )
 #STAGE2 ----
+# now sampling the misclassification fractions in stages 1 and 2.
+register.calibration.info('calib.4.13.stage2.pk',
+                          preceding.calibration.codes = 'calib.4.13.stage1.pk',
+                          likelihood.instructions = lik.inst.stage2,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
 
 # now sampling the misclassification fractions in stages 1 and 2.
 register.calibration.info('calib.4.8.stage2.az',
