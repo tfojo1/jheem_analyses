@@ -14,7 +14,7 @@ list1_2023 <- list1_2023%>%
     filter(msa != "C.10380")%>%
     filter(msa != "C.11200")%>%
     filter(msa != "C.11640")%>%
-    filter(msa != "C.17410")%>%
+    filter(msa != "C.17410")%>% #This is the new cleveland
     filter(msa != "C.25020")%>%
     filter(msa != "C.28450")%>%
     filter(msa != "C.28880")%>%
