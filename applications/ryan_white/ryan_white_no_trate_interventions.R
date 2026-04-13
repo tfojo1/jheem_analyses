@@ -5,14 +5,30 @@ no.transmission.effect = create.intervention.effect(quantity.name = 'global.trat
                                                     start.time = ADAP.START.YEAR,
                                                     effect.values = 0,
                                                     apply.effects.as = 'value',
-                                                    scale = 'proportion',
+                                                    scale = 'rate',
                                                     times = ADAP.START.YEAR,
                                                     allow.values.less.than.otherwise = T,
                                                     allow.values.greater.than.otherwise = F )
 
-# Effect on ADAP only -- concrete 50% lose coverage + no transmission cost
-noint.no.trate = create.intervention(adap.cessation.50.effect,
-                                     no.transmission.effect,
+adap.coverage.50.exp.effect = create.intervention.effect(quantity.name = 'adap.suppression.expansion.effect',
+                                                         start.time = ADAP.START.YEAR,
+                                                         effect.values = expression(1-lose.adap.fraction*0.5 + 0*lose.adap.expansion.effect),
+                                                         apply.effects.as = 'value',
+                                                         scale = 'proportion',
+                                                         times = ADAP.START.YEAR + LOSS.LAG,
+                                                         allow.values.less.than.otherwise = T,
+                                                         allow.values.greater.than.otherwise = F )
+adap.coverage.50.nexp.effect = create.intervention.effect(quantity.name = 'adap.suppression.nonexpansion.effect',
+                                                          start.time = ADAP.START.YEAR,
+                                                          effect.values = expression(1-lose.adap.fraction*0.5 + 0*lose.adap.nonexpansion.effect),
+                                                          apply.effects.as = 'value',
+                                                          scale = 'proportion',
+                                                          times = ADAP.START.YEAR + LOSS.LAG,
+                                                          allow.values.less.than.otherwise = T,
+                                                          allow.values.greater.than.otherwise = F )
+
+
+noint.no.trate = create.intervention(no.transmission.effect,
                                      parameters = rbind(
                                          RW.effect.values[c(1,4),],
                                          LOSE.ADAP.FRACTION),
@@ -20,13 +36,15 @@ noint.no.trate = create.intervention(adap.cessation.50.effect,
                                      code = paste0("noint.no.trate",rw.intervention.suffix))
 
 
-adap.cessation.50.trate = create.intervention(adap.cessation.50.effect,
-                                              no.transmission.effect,
-                                              parameters = rbind(
-                                                  RW.effect.values[c(1,4),],
-                                                  LOSE.ADAP.FRACTION),
-                                              WHOLE.POPULATION, 
-                                              code = paste0("adap.end.50.no.trate",rw.intervention.suffix))
+
+adap.coverage.50.trate = create.intervention(adap.coverage.50.exp.effect,
+                                             adap.coverage.50.nexp.effect, 
+                                             no.transmission.effect,
+                                             parameters = rbind(
+                                                 RW.effect.values[c(1,4),],
+                                                 LOSE.ADAP.FRACTION),
+                                             WHOLE.POPULATION, 
+                                             code = paste0("adap.end.50.no.trate",rw.intervention.suffix))
 
 
 
