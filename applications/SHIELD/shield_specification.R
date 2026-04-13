@@ -783,10 +783,10 @@ register.model.quantity(SHIELD.SPECIFICATION,
 
 ## MSM: apply doxy coverage + RR
 ## this is the ONLY place doxy.coverage & doxy.rr are used
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                        name = 'sexual.susceptibility',
-                        value = expression((1 - doxy.coverage) + doxy.coverage * (1-doxy.effectiveness))
-)
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                         name = 'sexual.susceptibility',
+#                         value = expression((1 - doxy.coverage) + doxy.coverage * (1-doxy.effectiveness))
+# )
 
 
 
