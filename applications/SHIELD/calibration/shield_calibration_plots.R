@@ -1,4 +1,14 @@
+# Load Required Libraries and Commoncode----
+library(plotly)
+library(patchwork)
 
+source('../jheem_analyses/applications/SHIELD/shield_specification.R')
+source('../jheem_analyses/commoncode/locations_of_interest.R')
+source('../jheem_analyses/applications/SHIELD/calibration/shield_calibration_inspection_helpers.R')
+# Set Plotting Styles ----
+location.style.manager = create.style.manager(color.data.by = "location.type")
+source.style.manager   = create.style.manager( shape.data.by = "source",color.data.by = "stratum")
+stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 #----------------------------------------------#
 ### AUTOMATICALLY GENERATE CALIBRATION PLOTS ###
 #----------------------------------------------#
@@ -78,7 +88,6 @@ create_plots_for_calibration <- function(stage, calibration.code, simset.data, c
     successful_locations <- character(0)
     
     for (location in names(simset.data)) {
-        # browser()
         # Check file path and create directories if needed
         plotting_path <- paste0(get.jheem.root.directory(), "/shield/calibrationPlots/", calibration.code, "/", location, "/")
         if (!dir.exists(plotting_path)) {
@@ -98,13 +107,11 @@ create_plots_for_calibration <- function(stage, calibration.code, simset.data, c
         
         # Generate and save plots
         print(paste0("Generating plots for '", location, "' and '", calibration.code, "'"))
-        # browser()
         tryCatch({
             if (stage == 0) make_stage0_plots_for_location(last20_sims, last_sim, plotting_path, title.suffix = title_suffix)
             if (stage == 1) make_stage1_plots_for_location(last20_sims, last_sim, plotting_path, title.suffix = title_suffix)
             if (stage == 2) make_stage2_plots_for_location(last20_sims, last_sim, plotting_path, title.suffix = title_suffix)
             successful_locations <- c(successful_locations, location)},
-            # error = function(e) {browser()})
             error = function(e) {print(paste0("Error generating plots for '", location, "' and '", calibration.code, "'... Skipping"))})
     }
     
@@ -112,10 +119,66 @@ create_plots_for_calibration <- function(stage, calibration.code, simset.data, c
     successful_locations
 }
 
+#' @description Compare two calibrations side by side for a fixed set of outcomes (stage-independent).
+#' @param create.dirs Recommended to start with this set to FALSE to make sure you're in the right working directory (jheem_analyses). Then, set to TRUE so that you can make new directories for city/calibration combinations.
+#' @returns After generating plots, this function returns a vector of locations which succeeded so that you can record which failed.
+create_plots_for_calibration_comparison <- function(calibration.code1, simset.data1,
+                                                    calibration.code2, simset.data2,
+                                                    create.dirs = F) {
+    successful_locations <- character(0)
+    
+    for (location in names(simset.data1)) {
+        plotting_path <- paste0(get.jheem.root.directory(),
+                                "/shield/calibrationPlots/comparison/",
+                                calibration.code1, "_vs_", calibration.code2,
+                                "/", location, "/")
+        if (!dir.exists(plotting_path)) {
+            if (!create.dirs)
+                stop(paste0("Error: directory for '", location, "' does not exist. ",
+                            "Check that get.jheem.root.directory() shows the right place, ",
+                            "then try again with 'create.dirs' set to TRUE."))
+            dir.create(plotting_path, recursive = T, showWarnings = F)
+            print(paste0("Generating directories for '", location, "'"))
+        }
+        
+        last20_sims1 <- simset.data1[[location]]$last20_sims
+        last_sim1    <- simset.data1[[location]]$last_sim
+        last20_sims2 <- simset.data2[[location]]$last20_sims
+        last_sim2    <- simset.data2[[location]]$last_sim
+        title_suffix <- simset.data1[[location]]$title_suffix
+        
+        if (is.null(last20_sims1)) {
+            print(paste0("No simset found for '", location, "' and '", calibration.code1, "'... Skipping")); next
+        }
+        if (is.null(last20_sims2)) {
+            print(paste0("No simset found for '", location, "' and '", calibration.code2, "'... Skipping")); next
+        }
+        
+        print(paste0("Generating comparison plots for '", location,
+                     "': ", calibration.code1, " vs ", calibration.code2))
+        
+        tryCatch({
+            make_comparison_plots_for_location(last20_sims1, last_sim1,
+                                               last20_sims2, last_sim2,
+                                               calib.code1 = calibration.code1,
+                                               calib.code2 = calibration.code2,
+                                               plotting.path = plotting_path,
+                                               title.suffix = title_suffix)
+            successful_locations <- c(successful_locations, location)
+        },
+        error = function(e) {
+            print(paste0("Error generating comparison plots for '", location,
+                         "': ", calibration.code1, " vs ", calibration.code2, "... Skipping"))
+        })
+    }
+    
+    successful_locations
+}
+
+
 # INTERNAL HELPERS ----
 #' @title Make an Unstratified Plot
 make_total_plot <- function(outcome, last20, lastsim, style.manager, plotting.path, title.suffix) {
-    # browser()
     p <- simplot(
         last20, lastsim,
         outcomes = outcome,
@@ -125,6 +188,50 @@ make_total_plot <- function(outcome, last20, lastsim, style.manager, plotting.pa
     )
     file_png  <- file.path(paste0(plotting.path , gsub("\\.", "-", outcome), ".png"))
     ggsave(file_png, plot = p, width = 12, height = 7, dpi = 300)
+}
+
+#' @title Make a Comparison Total Plot (two calibrations side by side)
+make_comparison_total_plot <- function(outcome, last20_1, lastsim_1, last20_2, lastsim_2,
+                                       calib.code1, calib.code2,
+                                       style.manager, plotting.path, title.suffix) {
+    p1 <- simplot(
+        last20_1, lastsim_1,
+        outcomes = outcome,
+        style.manager = style.manager,
+        title.suffix = paste0(": ", calib.code1),
+        dimension.values = list(year = 2000:2030)
+    )
+    
+    p2 <- simplot(
+        last20_2, lastsim_2,
+        outcomes = outcome,
+        style.manager = style.manager,
+        title.suffix = paste0(": ", calib.code2),
+        dimension.values = list(year = 2000:2030)
+    )
+    
+    combined <- p1 + p2 + plot_layout(ncol = 2)
+    
+    file_png <- file.path(paste0(plotting.path, gsub("\\.", "-", outcome), "_comparison.png"))
+    ggsave(file_png, plot = combined, width = 20, height = 7, dpi = 300)
+}
+
+#' @title Make All Comparison Plots for a Single Location
+make_comparison_plots_for_location <- function(last20_1, lastsim_1, last20_2, lastsim_2,
+                                               calib.code1, calib.code2,
+                                               plotting.path, title.suffix) {
+    outcomes <- c("diagnosis.total", "diagnosis.ps", "diagnosis.el.misclassified",
+                  "diagnosis.late.misclassified", "hiv.testing")
+    
+    for (outcome in outcomes) {
+        make_comparison_total_plot(outcome,
+                                   last20_1, lastsim_1,
+                                   last20_2, lastsim_2,
+                                   calib.code1, calib.code2,
+                                   style.manager = source.style.manager,
+                                   plotting.path = plotting.path,
+                                   title.suffix = title.suffix)
+    }
 }
 
 #' @title Make a One-Way Stratified Plot
@@ -170,7 +277,6 @@ make_split_facet_plot <- function(outcome, last20, lastsim, split.facet.pairs, s
 
 # STAGE 0 OUTCOMES ----
 make_stage0_plots_for_location <- function(last20, lastsim, plotting.path, title.suffix) {
-    # browser()
     # POPULATION
     make_total_plot("population", last20, lastsim, style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
     make_facet_plot("population", last20, lastsim, facet.vars = c("sex", "race", "age"), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
@@ -264,20 +370,42 @@ make_stage2_plots_for_location <- function(last20, lastsim, plotting.path, title
 }
 
 # USAGE ----
+
+# --- Single calibration plots ---
 if (1==2) {
     
     stage=1
-    calibname="calib.4.3.stage1.pk"
+    calibname="calib.4.8.stage1.az"
     
-    # Define style managers to use. You'll need to reference them in the "STAGE 0 OUTCOMES" section.
+    # Define style managers to use.
     source.style.manager = create.style.manager( shape.data.by = "source",color.data.by = "stratum")
     
-    # Retrieve and/or assemble simsets. Only need to run once per session.1
+    # Retrieve and/or assemble simsets. Only need to run once per session.
     simset_data <- prepare_simsets_for_plots(calibration.code = calibname, 
-                                             names(msa_var_names)[msa_var_names %in% c("M", "N")], 
+                                             names(msa_var_names)[msa_var_names %in% c("B","M","A","H","C","L","N")], 
                                              assemble.incomplete = F)
     
-    # Create and save the plots. To change which plots are generated, go to the "STAGE 0 OUTCOMES" section.
+    # Create and save the plots.
     x <- create_plots_for_calibration(stage, calibname, simset_data, create.dirs = T)
 }
- 
+
+# --- Comparison plots (stage-independent) ---
+if (1==2) {
+    
+    calibname1="calib.4.8.stage2.az"
+    calibname2="calib.4.6.stage2.az"
+    
+    # Define style managers to use.
+    source.style.manager = create.style.manager( shape.data.by = "source",color.data.by = "stratum")
+    
+    # Retrieve and/or assemble simsets. Only need to run once per session.
+    simset_data1 <- prepare_simsets_for_plots(calibration.code = calibname1, 
+                                              names(msa_var_names)[msa_var_names %in% c("B","M","A","H","C","L","N")], 
+                                              assemble.incomplete = F)
+    simset_data2 <- prepare_simsets_for_plots(calibration.code = calibname2, 
+                                              names(msa_var_names)[msa_var_names %in% c("B","M","A","H","C","L","N")], 
+                                              assemble.incomplete = F)
+    
+    # Create and save the comparison plots.
+    x <- create_plots_for_calibration_comparison(calibname1, simset_data1, calibname2, simset_data2, create.dirs = T)
+}
