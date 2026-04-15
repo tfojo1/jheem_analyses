@@ -1,5 +1,5 @@
 #syphilis.manager = load.data.manager(name="syphilis.manager", file="../../cached/syphilis.manager.rdata")
-#source('commoncode/locations_of_interest.R') #Source locations of interest to create MSA vectors
+#source('applications/SHIELD/R/shield_locations_of_interest.r') #Source locations of interest to create MSA vectors
 
 
 # This code creates a 'completeness' variable which tells how much data we have available to make up the entire MSA for prenatal care
@@ -20,7 +20,7 @@
 
 
 #1
-counties.in.each.msa = locations::get.contained.locations(MSAS.OF.INTEREST, "COUNTY", return.list = T)
+counties.in.each.msa = locations::get.contained.locations(SHIELD.MSAS.OF.INTEREST, "COUNTY", return.list = T)
 counties.in.each.msa.df = stack(counties.in.each.msa)%>% rename(county.code = values) %>% rename(msa = ind)
 
 # #unlist
@@ -40,7 +40,7 @@ prenatal.counties <- prenatal.counties %>%
 #3
 total.msa.population = as.data.frame.table(data.manager$data$population$estimate$census.aggregated.population$census$year__location)
 
-total.msa.population$msa.indicator = (total.msa.population$location %in% MSAS.OF.INTEREST) 
+total.msa.population$msa.indicator = (total.msa.population$location %in% SHIELD.MSAS.OF.INTEREST) 
 
 total.msa.population <- total.msa.population %>%
   filter(msa.indicator == T)%>%

@@ -86,7 +86,7 @@ for (data in birth.data.clean.put) {
 
 
 # Aggregate births to MSA level -------------------------------------------
-source('commoncode/locations_of_interest.R') #Source locations of interest to create MSA vectors
+source('applications/SHIELD/R/shield_locations_of_interest.r') #Source locations of interest to create MSA vectors
 source('../jheem2/R/HELPERS_array_helpers.R') 
 
 source('data_processing/put_msa_data_as_new_source_script.R') #This aggregates county level data to other locations
@@ -94,7 +94,7 @@ source('data_processing/put_msa_data_as_new_source_script.R') #This aggregates c
 put.msa.data.as.new.source(outcome = 'births.denominator.for.congenital.syphilis.proportion',
                            from.source.name= 'cdc.wonder.natality',
                            to.source.name = 'cdc.aggregated.county',
-                           to.locations = MSAS.OF.INTEREST,
+                           to.locations = SHIELD.MSAS.OF.INTEREST,
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
