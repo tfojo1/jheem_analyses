@@ -760,36 +760,33 @@ register.model.element(SHIELD.SPECIFICATION,
 
 ##---- DOXY PEP ----
 # relative risk: default=1 no protection
-# Susceptibility of uninfected persons
 
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'doxy.rr',
-                       scale = 'ratio',
-                       value = 0.2
-)
-
+# Modeling Doxy Coverage
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'doxy.coverage',
                        scale = 'proportion',
-                       value = 0,
-             )
+                       get.functional.form.function = get_doxy_coverage_functional_form,
+                       functional.form.from.time = 2022
+                       )
 
-
-
+# effectiveness in reducing transmissions (operationalized as reduction in susceptibility toward new infection)
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'doxy.effectiveness', #calib param
+                       scale = 'proportion',
+                       value = 0.8 # range 1- (0.08, 0.48)
+)
 
 register.model.quantity(SHIELD.SPECIFICATION,
                                name = 'sexual.susceptibility',
                                value = 1
 )
 
-
 ## MSM: apply doxy coverage + RR
 ## this is the ONLY place doxy.coverage & doxy.rr are used
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                        name = 'sexual.susceptibility',
-                        applies.to = list(sex = 'msm'),
-                        value = expression((1 - doxy.coverage) + doxy.coverage * doxy.rr)
-)
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                         name = 'sexual.susceptibility',
+#                         value = expression((1 - doxy.coverage) + doxy.coverage * (1-doxy.effectiveness))
+# )
 
 
 
@@ -979,13 +976,13 @@ register.model.element(SHIELD.SPECIFICATION,
                        scale = "proportion",
                        value=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.msm'])
 register.model.element(SHIELD.SPECIFICATION,  
-                       name="prp.symptomatic.primary.female.rr",
+                       name="rr.prp.symptomatic.primary.female",
                        scale = "proportion",
-                       value=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.female.rr'])
+                       value=SHIELD_BASE_PARAMETER_VALUES['rr.prp.symptomatic.primary.female'])
 register.model.element(SHIELD.SPECIFICATION,  
-                       name="prp.symptomatic.primary.heterosexual_male.rr",
-                       scale = "proportion",
-                       value=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.heterosexual_male.rr'])
+                       name="rr.prp.symptomatic.primary.heterosexual_male",
+                       scale = "ratio",
+                       value=SHIELD_BASE_PARAMETER_VALUES['rr.prp.symptomatic.primary.heterosexual_male'])
 ## Now we build the quantity:
 register.model.quantity(SHIELD.SPECIFICATION,
                        name = "prp.symptomatic.primary",
@@ -998,11 +995,11 @@ register.model.quantity.subset(SHIELD.SPECIFICATION, #can we do this as a list?
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = "prp.symptomatic.primary",
                                applies.to = list(sex="female"),
-                               value = expression(prp.symptomatic.primary.female.rr *prp.symptomatic.primary.msm))
+                               value = expression(rr.prp.symptomatic.primary.female *prp.symptomatic.primary.msm))
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = "prp.symptomatic.primary",
                                applies.to = list(sex="heterosexual_male"),
-                               value = expression(prp.symptomatic.primary.heterosexual_male.rr *prp.symptomatic.primary.msm))
+                               value = expression(rr.prp.symptomatic.primary.heterosexual_male *prp.symptomatic.primary.msm))
 #
 register.model.element(SHIELD.SPECIFICATION,
                        name = "prp.symptomatic.secondary",

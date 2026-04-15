@@ -52,5 +52,12 @@ quality_report <- report_data_quality(
 )
 print_quality_report(quality_report)
 
-# Exit code based on structural validation only
-if (!structural_results$passed) quit(status = 1)
+# Exit codes:
+#   0 = pass (no changes, or additions only)
+#   1 = fail (regressions detected)
+#   2 = pass with additions (spec needs auto-update)
+if (!structural_results$passed) {
+  quit(status = 1)
+} else if (structural_results$has_additions) {
+  quit(status = 2)
+}

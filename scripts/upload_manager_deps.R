@@ -99,3 +99,29 @@ result <- system2("gh", c(
 if (result != 0) stop("Failed to create release. Check gh CLI authentication.")
 
 cat("\nDone. Release:", release_tag, "\n")
+
+# --- Update latest tag ---
+LATEST_TAG <- paste0(TAG_PREFIX, "-latest")
+cat("\nUpdating", LATEST_TAG, "to point to this release...\n")
+
+system2("gh", c("release", "delete", LATEST_TAG, "--repo", REPO,
+                "--cleanup-tag", "--yes"),
+        stdout = FALSE, stderr = FALSE)  # OK if it doesn't exist yet
+
+latest_notes <- paste0(notes, "\n**Points to:** `", release_tag, "`\n")
+latest_notes_file <- file.path(tempdir(), "latest_release_notes.md")
+writeLines(latest_notes, latest_notes_file)
+
+result <- system2("gh", c(
+    "release", "create", LATEST_TAG,
+    "--repo", REPO,
+    "--title", shQuote(paste("Manager Dependencies (Latest)")),
+    "--notes-file", latest_notes_file,
+    full_paths
+))
+
+if (result != 0) {
+    warning("Failed to update ", LATEST_TAG, " — versioned release is still available at ", release_tag)
+} else {
+    cat("Done. Latest:", LATEST_TAG, "\n")
+}
