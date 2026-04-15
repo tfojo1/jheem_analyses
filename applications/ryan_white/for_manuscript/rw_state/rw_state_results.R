@@ -66,11 +66,11 @@ mean.ci.rel.total.infections.averted.int.by.city = cbind(
 )
 
 # Report out # and % infections averted for specific state
-mean.ci.abs.total.infections.averted.end.by.city["FL",]
-mean.ci.rel.total.infections.averted.end.by.city["FL",]
+mean.ci.abs.total.infections.averted.end.by.city["LA",]
+mean.ci.rel.total.infections.averted.end.by.city["LA",]
 
-mean.ci.abs.total.infections.averted.int.by.city["NY",]
-mean.ci.rel.total.infections.averted.int.by.city["NY",]
+mean.ci.abs.total.infections.averted.int.by.city["LA",]
+mean.ci.rel.total.infections.averted.int.by.city["LA",]
 
 # check cumulative infections for website
 apply(apply(total.incidence[YEARS.TO.CONSIDER,,,END.NAME,drop=F], c('sim','location'), sum, na.rm=T), 'location', mean, na.rm=T)
