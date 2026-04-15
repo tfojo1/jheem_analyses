@@ -111,7 +111,7 @@ flowchart TB
 | Transition | Rate | Notes |
 |------------|------|-------|
 | Never → On | Recruitment rate | **Primary policy lever.** Applied to diagnosed, age-eligible population. Varied in scenarios. |
-| On → Recently | ~2/year (= 1/6 months) | Fixed, based on program duration. |
+| On → Recently | 1/(6 months) | Fixed, based on program duration. |
 | On → Distantly | Dropout rate | Based on trial completion rates (~80-90% completed all visits). |
 | Recently → Distantly | Waning rate | **Key sensitivity parameter.** Governs how long the full effect persists. |
 
