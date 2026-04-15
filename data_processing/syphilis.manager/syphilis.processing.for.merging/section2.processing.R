@@ -168,36 +168,6 @@ source('applications/SHIELD/R/shield_locations_of_interest.r') #Source locations
 source('commoncode/additional_locations_of_interest.R') #Additional locations of interest
 source('../jheem2/R/HELPERS_array_helpers.R') 
 
-##//Commenting this out as we test Andrew's new aggregation code: 1-30-26//**
-
-# source('data_processing/put_msa_data_as_new_source_script.R') #This aggregates county level data to other locations
-# 
-# put.msa.data.as.new.source(outcome = 'ps.syphilis.diagnoses',
-#                            from.source.name = 'cdc.sti',
-#                            to.source.name = 'cdc.aggregated.county',
-#                            to.locations =  SHIELD.MSAS.OF.INTEREST,  #Think of this as containing location 
-#                            geographic.type.from = 'COUNTY',
-#                            geographic.type.to = 'CBSA',
-#                            details.for.new.data = 'estimated from county data',
-#                            data.manager = syphilis.manager)
-# 
-# put.msa.data.as.new.source(outcome = 'early.syphilis.diagnoses',
-#                            from.source.name = 'cdc.sti',
-#                            to.source.name = 'cdc.aggregated.county',
-#                            to.locations =  SHIELD.MSAS.OF.INTEREST,  #Think of this as containing location 
-#                            geographic.type.from = 'COUNTY',
-#                            geographic.type.to = 'CBSA',
-#                            details.for.new.data = 'estimated from county data',
-#                            data.manager = syphilis.manager)
-# 
-# put.msa.data.as.new.source(outcome = 'unknown.duration.or.late.syphilis.diagnoses',
-#                            from.source.name = 'cdc.sti',
-#                            to.source.name = 'cdc.aggregated.county',
-#                            to.locations =  SHIELD.MSAS.OF.INTEREST,  #Think of this as containing location 
-#                            geographic.type.from = 'COUNTY',
-#                            geographic.type.to = 'CBSA',
-#                            details.for.new.data = 'estimated from county data',
-#                            data.manager = syphilis.manager)
 
 #Save:
 save(syphilis.manager, file=Sys.getenv("SECTION_OUTPUT", file.path(Q_ROOT, "data_managers/data.manager.merge/syphilis.manager_section2.rdata")))
