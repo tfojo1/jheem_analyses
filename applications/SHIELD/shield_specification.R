@@ -763,11 +763,22 @@ register.model.element(SHIELD.SPECIFICATION,
 
 # Modeling Doxy Coverage
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'doxy.coverage',
+                       name = 'doxy.uptake',
                        scale = 'proportion',
-                       get.functional.form.function = get_doxy_coverage_functional_form,
-                       functional.form.from.time = 2022
+                       # get.functional.form.function = get_doxy_coverage_functional_form,
+                       value = 0
+                       # functional.form.from.time = 2022
                        )
+
+# Need to find value for this to replace 1
+register.model.element(SHIELD.SPECIFICATION,
+                       name = "doxy.persistence",
+                       value = 1,
+                       scale = "proportion")
+
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = "doxy.coverage",
+                        value = expression(doxy.uptake * doxy.persistence))
 
 # effectiveness in reducing transmissions (operationalized as reduction in susceptibility toward new infection)
 register.model.element(SHIELD.SPECIFICATION,
@@ -781,14 +792,35 @@ register.model.quantity(SHIELD.SPECIFICATION,
                                value = 1
 )
 
-## MSM: apply doxy coverage + RR
-## this is the ONLY place doxy.coverage & doxy.rr are used
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                         name = 'sexual.susceptibility',
-#                         value = expression((1 - doxy.coverage) + doxy.coverage * (1-doxy.effectiveness))
-# )
+# MSM: apply doxy coverage + RR
+# this is the ONLY place doxy.coverage & doxy.rr are used
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                        name = 'sexual.susceptibility',
+                        applies.to = list(sex="msm"),
+                        value = expression((1 - doxy.coverage) + doxy.coverage * (1-doxy.effectiveness))
+)
+
+# Change to doxy coverage as product of doxy uptake and persistence
+# If start 100 people today, how many still taking it in one year?
+# Whereas, adherence is reflected in the 80% effectiveness measure
+# Look in literature for an estimate of Doxy-PEP persistence
+# see Parastu document she sent
 
 
+
+register.model.element(SHIELD.SPECIFICATION,
+                       name = "doxy.eligibility",
+                       value = 1,
+                       scale = "proportion")
+
+# # Placeholder for later complexification
+# register.model.quantity(SHIELD.SPECIFICATION,
+#                         name = "doxy.uptake",
+#                         value = expression(doxy.coverage)) # assumes that people are perfectly persistent
+
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = "doxy.uptake.times.eligibility",
+                        value = expression(doxy.uptake * doxy.eligibility))
 
 ## Infectiousness ----
 # Secondary stage has max infection, the primary and EL infectiousness is set as a ratio relative to secondary
@@ -2092,21 +2124,37 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       keep.dimensions = c('location','age','race','sex','stage') #have to keep these dimensions because they're used for ps and other stages below
 )
 
-## Doxy-PEP treatment
-track.cumulative.outcome(SHIELD.SPECIFICATION,
-                         name = 'prop.sexual.susceptibile',
-                         value = expression(sexual.susceptibility * population),
-                         denominator.outcome = 'population',
-                         keep.dimensions = c('location','sex'),
-                         outcome.metadata = create.outcome.metadata(
-                             display.name = 'Fraction Sexual Susceptibile',
-                             description = 'Should be <100% for MSM only when Doxy-PEP active',
-                             scale = 'proportion', 
-                             axis.name = 'Susceptibility',
-                             units = '%',
-                             singular.unit = '%'
-                         )
-)
+## Doxy-PEP treatment ----
+
+track.integrated.outcome(SHIELD.SPECIFICATION,
+                         name = "doxy.uptake",
+                         outcome.metadata = create.outcome.metadata(display.name = 'Doxy-PEP Uptake',
+                                                                    description = 'Number of MSM Using Doxy-PEP in a Year',
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Persons',
+                                                                    units = 'persons',
+                                                                    singular.unit = 'person'),
+                         value.to.integrate = "point.population",
+                         multiply.by = "doxy.uptake.times.eligibility",
+                         keep.dimensions = c("location", "age", "race", "sex"),
+                         subset.dimension.values = list(sex = "msm"),
+                         corresponding.data.outcome = "doxy.uptake") # waiting for it to be added
+
+# track.cumulative.outcome(SHIELD.SPECIFICATION,
+#                          name = 'prop.sexual.susceptibile',
+#                          value = expression(sexual.susceptibility * population),
+#                          denominator.outcome = 'population',
+#                          keep.dimensions = c('location','sex'),
+#                          outcome.metadata = create.outcome.metadata(
+#                              display.name = 'Fraction Sexual Susceptibile',
+#                              description = 'Should be <100% for MSM only when Doxy-PEP active',
+#                              scale = 'proportion', 
+#                              axis.name = 'Susceptibility',
+#                              units = '%',
+#                              singular.unit = '%'
+#                          )
+# )
+
 
 ##** REGISTER THE SPECIFICATION ----
 register.model.specification(SHIELD.SPECIFICATION)
