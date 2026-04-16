@@ -44,13 +44,20 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
     outcome_url_all_ontologies <- data.manager$url[[outcome]][[metric]][[from.source.name]]
     
     if (debug) browser()
-    if (scale == "proportion") {
+    if (scale %in% c("proportion", "rate")) {
+        # Need to have these arguments supplied, or use same as proportion
+        if (is.null(source.for.denominator)) {
+            source.for.denominator <- from.source.name
+        }
+        
         denominator_outcome <- data.manager$outcome.info[[outcome]]$denominator.outcome
-        denominator_data_for_ontology <- data.manager$data[[denominator_outcome]][["estimate"]][[source.for.denominator]][[ontology.for.denominator]]
+        tryCatch({denominator_data_for_source <- data.manager$data[[denominator_outcome]][["estimate"]][[source.for.denominator]]},
+                 error = function(e) {stop(paste0(error_prefix, "No data exists for the denominator outcome and source for denominator specified"))})
+        
     }
     
     for (to_location in to.locations) {
-        
+        # if (debug) browser()
         from_locations <- locations::get.contained.locations(to_location, geographic.type.from)
         
         error_prefix <- paste0("Cannot aggregate ", geographic.type.from, " data for 'to.location' ", to_location, ": ")
@@ -79,13 +86,16 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
         
         for (ont_name in names(outcome_data_all_ontologies)) {
             
-            if (scale == "proportion" && ont_name != ontology.for.denominator) next
+            if (scale %in% c("proportion", "rate")) {
+                if (!(ont_name %in% names(denominator_data_for_source))) next
+                denominator_data_for_ontology <- denominator_data_for_source[[ont_name]]
+            }
             
             for (strat_name in names(outcome_data_all_ontologies[[ont_name]])) {
                 
                 # if (strat_name == "year__location__race") browser()
-                
-                if (scale == "proportion" && !(strat_name %in% names(denominator_data_for_ontology))) next
+                # if (debug) browser()
+                if (scale %in% c("proportion", "rate") && !(strat_name %in% names(denominator_data_for_ontology))) next
                 
                 strat_data <- outcome_data_all_ontologies[[ont_name]][[strat_name]]
                 strat_url <- outcome_url_all_ontologies[[ont_name]][[strat_name]]
@@ -140,7 +150,7 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
                     
                 }
                 
-                if (scale == "proportion") {
+                if (scale %in% c("proportion", "rate")) {
                     
                     # if locs A,B,C in prop data, but locs A,B,D in denom data, but there actually exist A:E,
                     # we will do weighted average of A and B IF
