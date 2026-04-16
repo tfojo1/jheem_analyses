@@ -38,7 +38,7 @@ DOXY.PARAMS <- matrix(1-doxy_rr_draws, nrow = 1)
 rownames(DOXY.PARAMS) <- "doxy.effectiveness"
 # coverage scenario: 10%
 coverage.effect.10 =  create.intervention.effect(
-    quantity.name    = "doxy.coverage",
+    quantity.name    = "doxy.uptake",
     start.time       = DOXY.START,
     effect.values    = 0.10,
     # times            = DOXY.END, # actually means when the rollout finishes
