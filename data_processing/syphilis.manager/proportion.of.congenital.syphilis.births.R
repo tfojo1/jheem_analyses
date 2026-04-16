@@ -89,17 +89,20 @@ for (data in birth.data.clean.put) {
 source('applications/SHIELD/R/shield_locations_of_interest.r') #Source locations of interest to create MSA vectors
 source('../jheem2/R/HELPERS_array_helpers.R') 
 
-source('data_processing/put_msa_data_as_new_source_script.R') #This aggregates county level data to other locations
+source('data_processing/aggregate_county_to_msa_new.R') #This aggregates county level data to other locations
 
-put.msa.data.as.new.source(outcome = 'births.denominator.for.congenital.syphilis.proportion',
-                           from.source.name= 'cdc.wonder.natality',
-                           to.source.name = 'cdc.aggregated.county',
-                           to.locations = SHIELD.MSAS.OF.INTEREST,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'CBSA',
-                           details.for.new.data = 'estimated from county data',
-                           aggregate.counts.with.whatever.we.have = T,
-                           data.manager= syphilis.manager)
+put.msa.data.as.new.source.NEW(outcome = 'births.denominator.for.congenital.syphilis.proportion',
+                               from.source.name= 'cdc.wonder.natality',
+                               to.source.name = 'cdc.aggregated.county', 
+                               to.locations = SHIELD.MSAS.OF.INTEREST,
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'CBSA',
+                               details.for.new.data = 'estimated from county data',
+                               required.coverage=0.95,
+                               data.manager= syphilis.manager,
+                               outcome.for.relative.contribution = 'population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census') 
 
 
 # LHD Data Processing (For MSA Level, numerator) --------------------------
