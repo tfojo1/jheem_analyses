@@ -17,6 +17,7 @@
 #' @param skip.coverage.condition Should a proportion be aggregated with
 #' available data even if the available counties aren't sufficient according to 
 #' coverage? Can also be used on counts, though caution is advised.
+#' @param source.for.denominator If aggregating a proportion or rate, this will default to the "from.source.name" unless specified.
 #' 
 put.msa.data.as.new.source.NEW <- function(data.manager,
                                            outcome,
@@ -33,7 +34,6 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
                                            skip.coverage.condition=F,
                                            metric = 'estimate',
                                            source.for.denominator=NULL,
-                                           ontology.for.denominator=NULL,
                                            debug=F) {
     
     error_prefix <- paste0("Cannot estimate ", geographic.type.to, " ", outcome, " data from ", geographic.type.from, " data: ")
