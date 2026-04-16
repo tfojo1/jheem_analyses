@@ -246,7 +246,7 @@ source('data_processing/syphilis.manager/cdc.wonder.deaths.R')
 #Aggregate Outcomes to MSA 
 syphilis.manager = data.manager
 source('applications/SHIELD/R/shield_locations_of_interest.r') #Source locations of interest to create MSA vectors
-source('commoncode/additional_locations_of_interest.R') #Additional locations of interest
+#source('commoncode/additional_locations_of_interest.R') #Additional locations of interest
 source('../jheem2/R/HELPERS_array_helpers.R') 
 source('data_processing/put_msa_data_as_new_source_script.R') #This aggregates county level data to other locations
 
@@ -268,7 +268,7 @@ put.msa.data.as.new.source.NEW(outcome = 'deaths',
 put.msa.data.as.new.source.NEW(outcome = 'deaths',
                                from.source.name= 'cdc_wonder',
                                to.source.name = 'cdc.wonder.aggregated.population', 
-                               to.locations = MSAS.OF.INTEREST,
+                               to.locations = SHIELD.MSAS.OF.INTEREST,
                                geographic.type.from = 'COUNTY',
                                geographic.type.to = 'CBSA',
                                details.for.new.data = 'estimated from county data',
@@ -331,7 +331,7 @@ put.msa.data.as.new.source.NEW(outcome = 'prenatal.screening.denominator',
 
 put.msa.data.as.new.source.NEW(outcome = 'no.prenatal.care',
                                from.source.name= 'cdc.wonder.natality',
-                               to.source.name = 'cdc.aggregated.county', 
+                               to.source.name = 'cdc.wonder.aggregated.population', 
                                to.locations = SHIELD.MSAS.OF.INTEREST,
                                geographic.type.from = 'COUNTY',
                                geographic.type.to = 'CBSA',
