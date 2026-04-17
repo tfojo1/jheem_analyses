@@ -164,10 +164,5 @@ source('data_processing/syphilis.manager/local.health.department.syphilis.data.R
 # Aggregate Outcomes to MSA 
 syphilis.manager = data.manager
 
-source('applications/SHIELD/R/shield_locations_of_interest.r') #Source locations of interest to create MSA vectors
-source('commoncode/additional_locations_of_interest.R') #Additional locations of interest
-source('../jheem2/R/HELPERS_array_helpers.R') 
-
-
 #Save:
 save(syphilis.manager, file=Sys.getenv("SECTION_OUTPUT", file.path(Q_ROOT, "data_managers/data.manager.merge/syphilis.manager_section2.rdata")))
