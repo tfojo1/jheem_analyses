@@ -206,7 +206,7 @@ data.manager$register.ontology(
   ont = ontology(
     year= NULL,
     location= NULL,
-    age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years','55+ years'),
+    age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years','55-64 years', '65+ years'),
     race=c('american indian/alaska native', 'asian', 'black/african american', 'hispanic/latino', 'native hawaiian/other pacific islander', 'white'),
     sex=c('male','female'),
     risk=c('msm','idu','msm_idu','heterosexual','other')
@@ -221,55 +221,28 @@ data.manager$register.ontology(
     sex=c('male','female'),
     risk=c('msm','idu','msm_idu','heterosexual','other')
   ))
+
 data.manager$register.ontology(
-  'aidsvu',
-  ont = ontology(
-    year= NULL,
-    location= NULL,
-    age=c('>24 years', '25-34 years', '35-44 years', '45-54 years','55+ years'),
-    race=c('black', 'hispanic', 'white'),
-    sex=c('male','female')
-  ))
+    'aidsvu',
+    ont = ontology(
+        year= NULL,
+        location= NULL,
+        age=c("13-24 years", "25-34 years", "35-44 years", "45-54 years", "55-64 years", "65+ years"),
+        race=c('black', 'hispanic', 'white'),
+        sex=c('male','female')
+    ))
 
 #Codes:
 surveillance.manager = load.data.manager(name="surveillance.manager", file=file.path(Q_ROOT, "data_managers/surveillance.manager.rdata"))
 source('data_processing/syphilis.manager/social.determinants.of.health.R')
-source('data_processing/syphilis.manager/hiv.data.for.syphilis.manager.R')
-source('data_processing/syphilis.manager/prep.data.R')
+source('data_processing/syphilis.manager/hiv.data.for.syphilis.manager.new.R')
+source('data_processing/syphilis.manager/prep.data.new.R')
 
 syphilis.manager = data.manager
 
 #Clean up prep data from AIDS Vu due to missing racial groups for some states:
 #This also creates the 'prep.proportion' outcome
 source('data_processing/syphilis.manager/prep.data.QA.R')
-
-#Aggregate Outcomes to MSA:
-source('applications/SHIELD/R/shield_locations_of_interest.r') #Source locations of interest to create MSA vectors
-source('commoncode/additional_locations_of_interest.R') #Additional locations of interest
-source('../jheem2/R/HELPERS_array_helpers.R') 
-source('data_processing/put_msa_data_as_new_source_script.R') #This aggregates county level data to other locations
-
-
-put.msa.data.as.new.source(outcome = 'hiv.diagnoses',
-                           from.source.name = 'cdc.hiv',
-                           to.source.name = 'cdc.aggregated.county',
-                           to.locations =  SHIELD.MSAS.OF.INTEREST,  #Think of this as containing location 
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'CBSA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = syphilis.manager)
-
-
-put.msa.data.as.new.source(outcome = 'hiv.suppression',
-                           from.source.name= 'cdc.hiv',
-                           to.source.name = 'cdc.aggregated.proportion',
-                           to.locations = SHIELD.MSAS.OF.INTEREST,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'CBSA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager= syphilis.manager,
-                           source.for.denominator= 'cdc.hiv',
-                           ontology.for.denominator= 'cdc') 
 
 
 #Save:
