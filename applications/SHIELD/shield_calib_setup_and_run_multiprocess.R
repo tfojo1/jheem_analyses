@@ -88,8 +88,8 @@ for (CALIBRATION.NAME in CALIBRATIONS.TO.RUN) {
     # filename=paste0(get.jheem.root.directory(),"/shield/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
     # save(simset,file =filename )
     
-    attemps <- 1
-    while (attemps < 5) {
+    attempts <- 1
+    while (attempts < 5) {
         finished <- F
         tryCatch({
             save.simulation.set(simset)
