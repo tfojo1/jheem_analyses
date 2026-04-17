@@ -103,7 +103,7 @@ for (CALIBRATION.NAME in CALIBRATIONS.TO.RUN) {
         attempts <- attempts + 1
     }
     #
-    print(paste0("Simset was saved on disk at ", Sys.time(), " as:   ", filename))
+    # print(paste0("Simset was saved on disk at ", Sys.time(), " as:   ", filename))
 }
 
 print(paste0(" ***************** ","Done with ", LOCATION, " at ", Sys.time()," ***************** "))
