@@ -30,5 +30,16 @@ ten_year_ratio <- unlist(lapply(ten_year_ratio_start_years, function(start_year)
 
 ten_year_ratio <- ten_year_ratio[!is.na(ten_year_ratio)]
 
+# hist(ten_year_ratio)
+# hist(log(ten_year_ratio)) #looks like a lognormal dist
+
+# range(ten_year_ratio)
+
+# We estimated the 10-year ratio of ps.diagnosis across all MSAs. The log of this ratio was well approximated by a lognormal distribution. 
+# We used the mean and standard deviation of log(x) to characterize this distribution. The observed values ranged from 0.3 to 9.4, 
+# Based on this, we assumed an upper threshold corresponding to a 10-fold increase. Simulations producing values outside this range were penalized accordingly.
+# To avoid redundant calculations, this ratio computed only once by comparing simulations in 2030 to 2020 and penalizing sims that fall outside of the 10X increase
+
 (mean(log(ten_year_ratio))) # 0.938
 (sd(log(ten_year_ratio))) # 0.588
+

@@ -369,16 +369,20 @@ ps.diagnosis.by.strata.stage2.likelihood.instructions =
     )
 
 ##---- New Future Penalty ----
+# We estimated the 10-year ratio of ps.diagnosis across all MSAs. The log of this ratio was well approximated by a lognormal distribution. 
+# We used the mean and standard deviation of log(x) to characterize this distribution. The observed values ranged from 0.3 to 9.4, 
+# so we assumed an upper threshold corresponding to a 10-fold increase. Simulations producing values outside this range were penalized accordingly.
+# To avoid redundant calculations, this ratio computed only once by comparing simulations in 2030 to 2020 and penalizing sims that fall outside of the 10X increase
 future.change.likelihood.instructions =
     create.custom.likelihood.instructions(
         name = "future.change.likelihood",
         compute.function = function(sim, data, log = T) {
             get.instr = data$get.instr
-            start_year = data$start_year
-            end_year = data$end_year
-            meanlog = data$meanlog
-            sdlog = data$sdlog
-            penalty_cutoff = data$penalty_cutoff
+            start_year = data$start_year #2020
+            end_year = data$end_year #2030
+            meanlog = data$meanlog #0.938
+            sdlog = data$sdlog #0.587
+            penalty_cutoff = data$penalty_cutoff #10-fold
             weight <- data$weight
             
             vals <- sim$optimized.get(get.instr)
@@ -386,25 +390,21 @@ future.change.likelihood.instructions =
             # 10-year ratio
             ratio <- vals[end_year] / vals[start_year]
             
-            # We will use the weight to tighten the variance,
-            # but this won't change where our cutoff point is.
-            # So, we will be modifying "sdlog", but the inverse variance
-            # weighting typically applies to a normal distribution, I think,
-            # so we probably need to figure out how the sd of the dnorm would
-            # change and then convert to the lognormal's sdlog. That might take some
-            # math derivation.
-            
+            # penalty_cutoff is the upper threshold, we will penalize sims that fall outside of it.
             unpenalized_lik <- dlnorm(log(penalty_cutoff),
                                       meanlog = meanlog,
                                       sdlog = sdlog,
                                       log=T)
-            
+            lik= 0 #the dafault value in the log scale
+
+            # 
             if (ratio > penalty_cutoff) {
-                lik <- dlnorm(log(ratio),
+                lik <- weight*
+                    (dlnorm(log(ratio),
                               meanlog = meanlog,
                               sdlog = sdlog,
                               log=T) -
-                    unpenalized_lik
+                    unpenalized_lik)
             }
             
             if (log) lik else exp(lik)
@@ -414,7 +414,7 @@ future.change.likelihood.instructions =
             
             start_year  <- 2020L
             end_year    <- 2030L
-            
+
             get.instr <- sim.meta$prepare.optimized.get.instructions(
                 outcome                   = "diagnosis.ps",
                 dimension.values          = list(year = c(start_year, end_year)),
@@ -428,6 +428,7 @@ future.change.likelihood.instructions =
                 end_year    = end_year,
                 meanlog     = 0.938, # from input_future_change_ten_year_ratio_likelihood
                 sdlog       = 0.588,
+                penalty_cutoff=10, # penalizing sims falling outside of 10X increase
                 weight = STAGE.2.WEIGHT
             )
         }
