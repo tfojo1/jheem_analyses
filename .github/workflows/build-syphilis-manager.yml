@@ -131,6 +131,7 @@ jobs:
           ARCHIVE_DIR: _ci_outputs
           CACHED_DIR: _ci_outputs
         run: |
+          set -o pipefail
           mkdir -p _ci_outputs
           Rscript -e "
             library(jheem2)
@@ -146,6 +147,7 @@ jobs:
         id: validation
         run: |
           set +e
+          set -o pipefail
           Rscript data_processing/syphilis.manager/validation/run_validation.R \
             _ci_outputs/syphilis.manager.rdata \
             2>&1 | tee _ci_outputs/validation_report.txt
