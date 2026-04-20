@@ -592,8 +592,8 @@ national.sex.clean = lapply(national.sex, function(file){
                  names_to = "year",
                  values_to = "value")
   
-  data$value = gsub(",", '', data$value)
-  data$value = as.numeric(data$value)
+  #data$value = gsub(",", '', data$value)
+  data$value = readr::parse_number(data$value)
   
   data$year = gsub("X", "", data$year)
   
