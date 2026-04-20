@@ -69,7 +69,7 @@ put.msa.data.as.new.source.NEW(outcome = 'unknown.duration.or.late.syphilis.diag
                                source.for.relative.contribution = 'census.population',
                                ontology.for.relative.contribution = 'census')
 
-ut.msa.data.as.new.source.NEW(outcome = 'hiv.diagnoses',
+put.msa.data.as.new.source.NEW(outcome = 'hiv.diagnoses',
                               from.source.name = 'cdc.hiv',
                               to.source.name = 'cdc.aggregated.county',
                               to.locations =  SHIELD.MSAS.OF.INTEREST,  #Think of this as containing location 
