@@ -245,7 +245,7 @@ source('data_processing/syphilis.manager/cdc.wonder.deaths.R')
 
 #Aggregate Outcomes to MSA 
 syphilis.manager = data.manager
-source('applications/SHIELD/R/shield_locations_of_interest.r') #Source locations of interest to create MSA vectors
+source('applications/SHIELD/R/shield_locations_of_interest.R') #Source locations of interest to create MSA vectors
 #source('commoncode/additional_locations_of_interest.R') #Additional locations of interest
 source('../jheem2/R/HELPERS_array_helpers.R') 
 source('data_processing/put_msa_data_as_new_source_script.R') #This aggregates county level data to other locations
