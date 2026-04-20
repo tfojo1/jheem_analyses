@@ -388,7 +388,7 @@ future.change.likelihood.instructions =
             vals <- sim$optimized.get(get.instr)
             
             # 10-year ratio
-            ratio <- vals[end_year] / vals[start_year]
+            ratio <- vals[as.character(end_year)] / vals[as.character(start_year)]
             
             # penalty_cutoff is the upper threshold, we will penalize sims that fall outside of it.
             unpenalized_lik <- dlnorm(log(penalty_cutoff),
@@ -1231,6 +1231,7 @@ lik.inst.stage1=join.likelihood.instructions(
     late.diagnosis.by.strata.stage1.likelihood.instructions,
     
     proportion.tested.by.strata.stage1.nested.likelihood.instructions,
+
     historical.diagnosis.likelihood.instructions,
     proportion_ps_male_among_msm_likelihood_instructions
     
@@ -1253,7 +1254,30 @@ lik.inst.stage2=join.likelihood.instructions(
     late.diagnosis.by.strata.stage2.likelihood.instructions,
     
     proportion.tested.by.strata.stage2.nested.likelihood.instructions,
+    
     historical.diagnosis.likelihood.instructions,
     proportion_ps_male_among_msm_likelihood_instructions
 
+)
+### with future trend -----
+#total syphilis +stage 2 stratas (by age, sex, race)
+lik.inst.stage2.wFC=join.likelihood.instructions(
+    total.diagnosis.likelihood.instructions,
+    total.diagnosis.by.strata.stage2.likelihood.instructions,
+    
+    ps.diagnosis.total.likelihood.instructions,
+    ps.diagnosis.by.strata.stage2.likelihood.instructions,
+    
+    early.diagnosis.total.likelihood.instructions,
+    early.diagnosis.by.strata.stage2.likelihood.instructions,
+    
+    late.diagnosis.total.likelihood.instructions,
+    late.diagnosis.by.strata.stage2.likelihood.instructions,
+    
+    proportion.tested.by.strata.stage2.nested.likelihood.instructions,
+    
+    historical.diagnosis.likelihood.instructions,
+    proportion_ps_male_among_msm_likelihood_instructions,
+    # Future change penalty
+    future.change.likelihood.instructions
 )

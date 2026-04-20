@@ -11,10 +11,12 @@ stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 
 # READ STATUS of ongoing runs
 # for(x in names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N")] ){
-#     print(MSAS.OF.INTEREST[MSAS.OF.INTEREST==x])
-#     status<-get.calibration.progress('shield', locations = x, calibration.code = "calib.4.3.stage1.pk")
-#     print(status)
-# }
+    for(x in MSAS.OF.INTEREST  ){
+        
+    # print(MSAS.OF.INTEREST[MSAS.OF.INTEREST==x])
+    status<-get.calibration.progress('shield', locations = x, calibration.code = "calib.4.13.stage1.pk")
+    print(status)
+}
 #names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N")]
 #    
 
@@ -69,3 +71,16 @@ simsetL0$traceplot("trans")
 simsetL1$traceplot("prp.symptomatic.")
 lastL0=simsetL0$last.sim(); lastL0$get.params()
 p
+
+assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("A")],calibration.codes = "calib.4.8.stage2.az",n.sim = 300,sim.id = 2)
+lik1=lik.inst.stage2$instantiate.likelihood("shield","C.12060")
+lik2=lik.inst.stage2.wFC$instantiate.likelihood("shield","C.12060")
+lik1$compute(simsetN2$subset(296))
+lik2$compute(simsetN2$subset(296))
+
+simplot(simsetA2$subset(280:300),
+        outcomes ="diagnosis.ps")
+ make_total_plot("diagnosis.total", 
+                simsetA2$subset(280:300), lastA2, 
+                style.manager = source.style.manager)
+        
