@@ -78,8 +78,10 @@ lik2=lik.inst.stage2.wFC$instantiate.likelihood("shield","C.12060")
 lik1$compute(simsetN2$subset(296))
 lik2$compute(simsetN2$subset(296))
 
-simplot(simsetA2$subset(280:300),
+assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("A")],calibration.codes = "calib.4.8.stage2.az",n.sim = 300)
+simplot(simsetA$subset(280:300),
         outcomes ="diagnosis.ps")
+
  make_total_plot("diagnosis.total", 
                 simsetA2$subset(280:300), lastA2, 
                 style.manager = source.style.manager)
