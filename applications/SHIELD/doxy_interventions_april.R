@@ -44,7 +44,7 @@ persistence_samples<-draw_persistance_uniform(10000)
 discont_rate_samples = -log(persistence_samples)
 
 # Putting them together ----
-DOXY.PARAMS <- matrix(list(effectiveness_samples,discont_rate_samples), nrow = 2)
+DOXY.PARAMS <- rbind(effectiveness_samples,discont_rate_samples)
 rownames(DOXY.PARAMS) <- c("doxy.effectiveness","doxy.discontinuationRate")
 
 
@@ -62,28 +62,28 @@ coverage.effect.10 =  create.intervention.effect(
     quantity.name    = "doxy.coverage",
     start.time       = DOXY.START,
     effect.values    = 0.10,
-    times            = DOXY.END, # actually means when the rollout finishes
+    times            = DOXY.END, # when scale up ends
     scale            = "proportion",
     apply.effects.as = "value",
     allow.values.less.than.otherwise  = FALSE,
     allow.values.greater.than.otherwise = TRUE
 )
-
+ 
+clear.interventions()
 # coverage scenario: 10%
 doxyPEP_10 <- create.intervention(
         coverage.effect.10,
     parameters = DOXY.PARAMS,
-    WHOLE.POPULATION, #????
-    code = "doxyPEP.10"#???
+    WHOLE.POPULATION, 
+    code = "doxyPEP.10"
 )
-clear.interventions()
+
 
 # NEW ----
-if (1==2)
+if (1==1)
 {simset <- retrieve.simulation.set(version = "shield",location = "C.12580", calibration.code = "calib.4.8.stage2.az", 300)}
 
 no.intervention = get.null.intervention()
-
 
 sim_doxy10  <- doxyPEP_10$run(sim,  start.year = 2022, end.year = 2030)
 simplot(sim, sim_doxy10, "diagnosis.ps")
