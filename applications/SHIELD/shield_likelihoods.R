@@ -70,7 +70,7 @@ population.likelihood.instructions =
                                          observation.correlation.form = 'autoregressive.1', # errors in consecutive time periods are more strongly correlated, but this correlation weakens over time
                                          #
                                          correlation.different.strata = 0, # default is 0.1. We added this to address an issue with calibration where racial data didnt comply well
-
+                                         
                                          # WEIGHTS: higher weights for decennial counts and lower for annual estimates: 
                                          # weights = w.population, #above
                                          weights = STAGE.0.WEIGHT,
@@ -389,23 +389,11 @@ future.change.likelihood.instructions =
             
             # 10-year ratio
             ratio <- vals[as.character(end_year)] / vals[as.character(start_year)]
-            
-            # penalty_cutoff is the upper threshold, we will penalize sims that fall outside of it.
-            unpenalized_lik <- dlnorm(log(penalty_cutoff),
-                                      meanlog = meanlog,
-                                      sdlog = sdlog,
-                                      log=T)
-            lik= 0 #the dafault value in the log scale
-
-            # 
-            if (ratio > penalty_cutoff) {
-                lik <- weight*
-                    (dlnorm(log(ratio),
-                              meanlog = meanlog,
-                              sdlog = sdlog,
-                              log=T) -
-                    unpenalized_lik)
-            }
+            # browser()
+            lik <- dlnorm(max(ratio, penalty_cutoff),
+                          meanlog = meanlog,
+                          sdlog = sdlog/sqrt(weight),
+                          log=T)
             
             if (log) lik else exp(lik)
         },
@@ -414,7 +402,7 @@ future.change.likelihood.instructions =
             
             start_year  <- 2020L
             end_year    <- 2030L
-
+            
             get.instr <- sim.meta$prepare.optimized.get.instructions(
                 outcome                   = "diagnosis.ps",
                 dimension.values          = list(year = c(start_year, end_year)),
@@ -1231,7 +1219,7 @@ lik.inst.stage1=join.likelihood.instructions(
     late.diagnosis.by.strata.stage1.likelihood.instructions,
     
     proportion.tested.by.strata.stage1.nested.likelihood.instructions,
-
+    
     historical.diagnosis.likelihood.instructions,
     proportion_ps_male_among_msm_likelihood_instructions
     
@@ -1257,7 +1245,7 @@ lik.inst.stage2=join.likelihood.instructions(
     
     historical.diagnosis.likelihood.instructions,
     proportion_ps_male_among_msm_likelihood_instructions
-
+    
 )
 ### with future trend -----
 #total syphilis +stage 2 stratas (by age, sex, race)
