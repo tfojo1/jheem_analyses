@@ -226,6 +226,19 @@ register.calibration.info('calib.4.3.stage1.pk',
 #                           
 # )
 #STAGE2 ----
+
+# Trying the new future change penalty likelihood for Houston and NYC to compare with the 4/8 calib
+register.calibration.info('calib.4.21.stage2.az',
+                          preceding.calibration.codes = 'calib.4.8.stage1.az',
+                          likelihood.instructions = lik.inst.stage2.wFC,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
 # now sampling the misclassification fractions in stages 1 and 2.
 register.calibration.info('calib.4.13.stage2.pk',
                           preceding.calibration.codes = 'calib.4.13.stage1.pk',
