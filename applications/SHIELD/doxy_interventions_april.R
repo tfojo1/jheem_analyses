@@ -1,9 +1,8 @@
 # New Doxy Intervention code
 # 4-14-2026
+# inputs and sources are: ~/jheem/code/jheem_analyses/applications/SHIELD/inputs/input_doxy_pep_parameters.R
 
 # source("applications/SHIELD/shield_specification.R")
-
-# (COPIED FROM ORIGINAL) ----
 
 # Single target population for all MSM
 WHOLE.POPULATION = create.target.population(name = 'Whole Population') #MSM?
