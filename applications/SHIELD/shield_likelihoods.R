@@ -18,7 +18,8 @@ diagnosis_cv=PS_CV #we will use this error variance for all diagnosis categories
 #
 STAGE.0.WEIGHT= 1/32 # lowered by half on 3/13/2026 
 STAGE.1.WEIGHT= 1/8
-STAGE.2.WEIGHT= 1/8 
+STAGE.2.WEIGHT= 1/8
+FUTURE.CHANGE.LIKELIHOOD.WEIGHT = 8 # representing the eight points we would have post 2022 (eight times as many points)
 
 
 #** POPULATION SIZES ** ---- 
@@ -417,7 +418,7 @@ future.change.likelihood.instructions =
                 meanlog     = 0.938, # from input_future_change_ten_year_ratio_likelihood
                 sdlog       = 0.588,
                 penalty_cutoff=10, # penalizing sims falling outside of 10X increase
-                weight = STAGE.2.WEIGHT
+                weight = STAGE.2.WEIGHT * FUTURE.CHANGE.LIKELIHOOD.WEIGHT
             )
         }
     )
