@@ -9,6 +9,7 @@ cat('*** Running shield_specification.R ***\n')
 
 # Working directory is set to the main JHEEM_Analysis folder:
 source('applications/SHIELD/shield_source_code.R')
+source('applications/SHIELD/R/shield_locations_of_interest.R')
 
 
 # Caching required objects: 

@@ -2,7 +2,7 @@
 # 4-14-2026
 # inputs and sources are: ~/jheem/code/jheem_analyses/applications/SHIELD/inputs/input_doxy_pep_parameters.R
 
- source("applications/SHIELD/shield_specification.R")
+source("applications/SHIELD/shield_specification.R")
 
 # Single target population for all MSM
 WHOLE.POPULATION = create.target.population(name = 'Whole Population') #MSM?
@@ -26,9 +26,16 @@ draw_rr_lnorm <- function(n,
     rr_samples
 }
 
-# generate 1000 values of Doxy effectiveness
+generate 1000 values of Doxy effectiveness
 rr_samples <- draw_rr_lnorm(n = 1000, rr_meanlog = -1.540424,rr_sdlog =0.2510223,cap_at_one = T )
 effectiveness_samples=1-rr_samples
+
+# draw_effectiveness_uniform<-function(n){
+#     persistence_samples = runif(n,1,1)
+#     persistence_samples
+# }
+# rr_samples<-draw_effectiveness_uniform(1000)
+# effectiveness_samples=rr_samples
 
 
 # PERSISTANCE and DISCONTINUATION RATE #----
@@ -82,16 +89,18 @@ no_intervention = get.null.intervention()
 # NEW ----
 if (1==2)
 {
-#     simset <- retrieve.simulation.set(version = "shield",location = "C.12580", calibration.code = "calib.4.8.stage2.az", 300)
-# lastB=simset$last.sim()
-engine=create.jheem.engine('shield', "C.12580", end.year = 2030)
-simB=engine$run(lastB$get.params())
-
-sim_int  <- uptake_intervention$run(simB,  start.year = 2022, end.year = 2030)
-sim_noInt  <- no_intervention$run(simB,  start.year = 2022, end.year = 2030)
-
-simplot(simB,sim_noInt,sim_int, outcomes = c("diagnosis.ps","doxy.uptake"),dimension.values = list(year=2020:2030))
-
+    simset <- retrieve.simulation.set(version = "shield",location = "C.12580", calibration.code = "calib.4.8.stage2.az", 300)
+    lastB=simset$last.sim()
+    engine=create.jheem.engine('shield', "C.12580", end.year = 2030)
+    simB=engine$run(lastB$get.params())
+    
+    sim_int  <- uptake_intervention$run(simB,  start.year = 2022, end.year = 2030)
+    sim_noInt  <- no_intervention$run(simB,  start.year = 2022, end.year = 2030)
+    
+    simplot(simB,sim_noInt,sim_int, 
+            outcomes = c("diagnosis.ps","doxy.uptake"),
+            dimension.values = list(year=2020:2030),split.by = "sex",plot.which = "sim.only")
+    
 }
 # Make an intervention by supplying a target population and an intervention effect.
 # 
