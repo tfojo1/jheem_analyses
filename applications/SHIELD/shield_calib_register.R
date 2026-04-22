@@ -14,6 +14,20 @@ par.aliases.transmission = list(
 )
 
 # STAGE0 ----
+
+# repeating stage0 for Phoenix again, AGAIN. With only 10,000 iterations to finish a bit quicker.
+register.calibration.info("calib.4.6.stage0.az",
+                          likelihood.instructions = lik.inst.stage0,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          fixed.initial.parameter.values = c("global.transmission.rate"=2.3),  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          parameter.aliases = par.aliases.transmission,
+                          n.iter = 10000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
 # running calibration for all cities 
 register.calibration.info("calib.4.13.stage0.pk",
                           likelihood.instructions = lik.inst.stage0,
