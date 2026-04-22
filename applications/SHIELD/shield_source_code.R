@@ -48,6 +48,7 @@ source('../jheem_analyses/commoncode/age_mappings.R')
 source('../jheem_analyses/commoncode/cache_object_for_version_functions.R')
 source('../jheem_analyses/commoncode/logitnorm_helpers.R')
 source('../jheem_analyses/commoncode/file_paths.R')
+source('../jheem_analyses/commoncode/locations_of_interest.R')
 
 
 # The file to source to load all necessary packages, cached data, code
