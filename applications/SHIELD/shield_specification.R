@@ -759,11 +759,18 @@ register.model.element(SHIELD.SPECIFICATION,
 
 
 ##---- DOXY PEP ----
-# intervention control coverage directly
+# intervention control uptake directly
+# C = U/(1+r): C is coverage; r is discontinuation rate, U is uptake
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'doxy.uptake',
+                        scale = 'proportion',
+                        value = 0)
+
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = "doxy.coverage",
-                        value = 0,
-                        scale="proportion")
+                        scale="proportion",
+                        value = expression(doxy.uptake/(1+ doxy.discontinuationRate))
+                        )
 
 # we are sampling effectiveness & discontinuation in the intervention code from appropriate distributions
 register.model.element(SHIELD.SPECIFICATION,
@@ -771,7 +778,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        scale = 'proportion',
                        value = 0
 )
-register.model.element(    SHIELD.SPECIFICATION,
+register.model.element(SHIELD.SPECIFICATION,
                            name = "doxy.discontinuationRate",
                            scale="rate",
                            value = 0
@@ -786,15 +793,6 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                         name = 'sexual.susceptibility',
                         applies.to = list(sex="msm"),
                         value = expression((1 - doxy.coverage) + doxy.coverage * (1-doxy.effectiveness))
-)
-
-# now we calculate uptake representing people who fill a prescription for Doxy
-# we will calibrate this to marketscan data available literature
-# U= C* (1+r) : C is coverage; r is discontinuation rate
-register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'doxy.uptake',
-                        scale = 'proportion',
-                        value = expression(doxy.coverage * (1+ doxy.discontinuationRate))
 )
 
 # register.model.element(SHIELD.SPECIFICATION,
