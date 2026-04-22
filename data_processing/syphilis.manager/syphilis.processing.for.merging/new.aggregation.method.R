@@ -1,4 +1,7 @@
 source('data_processing/aggregate_county_to_msa_new.R') #This aggregates county level data to other locations
+source('applications/SHIELD/R/shield_locations_of_interest.R') #Source locations of interest to create MSA vectors
+source('../jheem2/R/HELPERS_array_helpers.R') 
+
 Q_ROOT <- Sys.getenv("Q_ROOT", "Q:")
 # -------------------------------------------------------------------------
 
