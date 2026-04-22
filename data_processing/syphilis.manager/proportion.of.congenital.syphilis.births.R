@@ -102,7 +102,8 @@ put.msa.data.as.new.source.NEW(outcome = 'births.denominator.for.congenital.syph
                                data.manager= syphilis.manager,
                                outcome.for.relative.contribution = 'population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census') 
+                               ontology.for.relative.contribution = 'census',
+                               skip.coverage.condition = T) 
 
 
 # LHD Data Processing (For MSA Level, numerator) --------------------------

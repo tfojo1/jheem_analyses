@@ -248,7 +248,7 @@ syphilis.manager = data.manager
 source('applications/SHIELD/R/shield_locations_of_interest.R') #Source locations of interest to create MSA vectors
 #source('commoncode/additional_locations_of_interest.R') #Additional locations of interest
 source('../jheem2/R/HELPERS_array_helpers.R') 
-source('data_processing/put_msa_data_as_new_source_script.R') #This aggregates county level data to other locations
+#source('data_processing/put_msa_data_as_new_source_script.R') #This aggregates county level data to other locations
 
 source('data_processing/aggregate_county_to_msa_new.R') #Applying new aggregation method to population and deaths
 
@@ -327,7 +327,8 @@ put.msa.data.as.new.source.NEW(outcome = 'prenatal.screening.denominator',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census')
+                               ontology.for.relative.contribution = 'census',
+                               skip.coverage.condition = T)
 
 put.msa.data.as.new.source.NEW(outcome = 'no.prenatal.care',
                                from.source.name= 'cdc.wonder.natality',
@@ -340,7 +341,8 @@ put.msa.data.as.new.source.NEW(outcome = 'no.prenatal.care',
                                data.manager= syphilis.manager,
                                outcome.for.relative.contribution = 'population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census') 
+                               ontology.for.relative.contribution = 'census',
+                               skip.coverage.condition = T) 
 
 put.msa.data.as.new.source.NEW(outcome = 'prenatal.care.initiation.first.trimester',
                                from.source.name= 'cdc.wonder.natality',
@@ -353,7 +355,8 @@ put.msa.data.as.new.source.NEW(outcome = 'prenatal.care.initiation.first.trimest
                                data.manager= syphilis.manager,
                                outcome.for.relative.contribution = 'population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census') 
+                               ontology.for.relative.contribution = 'census',
+                               skip.coverage.condition = T) 
 
 put.msa.data.as.new.source.NEW(outcome = 'prenatal.care.initiation.second.trimester',
                                from.source.name= 'cdc.wonder.natality',
@@ -366,7 +369,8 @@ put.msa.data.as.new.source.NEW(outcome = 'prenatal.care.initiation.second.trimes
                                data.manager= syphilis.manager,
                                outcome.for.relative.contribution = 'population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census') 
+                               ontology.for.relative.contribution = 'census',
+                               skip.coverage.condition = T) 
 
 put.msa.data.as.new.source.NEW(outcome = 'prenatal.care.initiation.third.trimester',
                                from.source.name= 'cdc.wonder.natality',
@@ -379,7 +383,8 @@ put.msa.data.as.new.source.NEW(outcome = 'prenatal.care.initiation.third.trimest
                                data.manager= syphilis.manager,
                                outcome.for.relative.contribution = 'population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census') 
+                               ontology.for.relative.contribution = 'census',
+                               skip.coverage.condition = T) 
 
 
 #The code 'fertility.rate.msa' sources another code 'aggregate.county.to.msa' which aggregates the fertility rate to MSA by aggregating
@@ -396,7 +401,8 @@ put.msa.data.as.new.source.NEW(outcome = 'female.population.denominator.for.fert
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census')
+                               ontology.for.relative.contribution = 'census',
+                               skip.coverage.condition = T)
 
 put.msa.data.as.new.source.NEW(outcome = 'births.numerator.for.fertility.rate',
                                from.source.name = 'cdc.wonder.natality',
@@ -409,7 +415,8 @@ put.msa.data.as.new.source.NEW(outcome = 'births.numerator.for.fertility.rate',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census')
+                               ontology.for.relative.contribution = 'census',
+                               skip.coverage.condition = T)
 
 #Save:
 save(syphilis.manager, file=Sys.getenv("SECTION_OUTPUT", file.path(Q_ROOT, "data_managers/data.manager.merge/syphilis.manager_section3.rdata")))

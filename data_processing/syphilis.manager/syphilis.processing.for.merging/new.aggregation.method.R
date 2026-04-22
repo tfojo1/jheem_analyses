@@ -97,7 +97,7 @@ put.msa.data.as.new.source.NEW(outcome = 'hiv.diagnosed.prevalence',
 
 put.msa.data.as.new.source.NEW(outcome = 'hiv.suppression',
                                from.source.name = 'cdc.hiv',
-                               to.source.name = 'cdc.aggregated.county',
+                               to.source.name = 'cdc.aggregated.proportion',
                                to.locations =  SHIELD.MSAS.OF.INTEREST,  #Think of this as containing location 
                                geographic.type.from = 'COUNTY',
                                geographic.type.to = 'CBSA',
