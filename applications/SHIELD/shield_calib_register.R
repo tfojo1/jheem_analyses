@@ -241,6 +241,18 @@ register.calibration.info('calib.4.3.stage1.pk',
 # )
 #STAGE2 ----
 
+# No future pen likelihood for now, to get the 7 workable for Doxy
+register.calibration.info('calib.4.22.stage2.WO.fut',
+                          preceding.calibration.codes = 'calib.4.8.stage1.az',
+                          likelihood.instructions = lik.inst.stage2,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
 # Like 4.21.stage2.az, but with 8x weight for future change lik
 register.calibration.info('calib.4.22.stage2.az',
                           preceding.calibration.codes = 'calib.4.8.stage1.az',
