@@ -274,39 +274,6 @@ register.calibration.info('calib.4.24.stage2.az',
                                               TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-# Houston with 16x weight on the fut pen likelihood
-register.calibration.info('calib.4.23.stage2.16x',
-                          preceding.calibration.codes = 'calib.4.8.stage1.az',
-                          likelihood.instructions = lik.inst.stage2.wFC.16x,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
-                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
-                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
-)
-# Houston with 24x weight on the fut pen likelihood
-register.calibration.info('calib.4.23.stage2.24x',
-                          preceding.calibration.codes = 'calib.4.8.stage1.az',
-                          likelihood.instructions = lik.inst.stage2.wFC.24x,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
-                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
-                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
-)
-# Houston with 32x weight on the fut pen likelihood
-register.calibration.info('calib.4.23.stage2.32x',
-                          preceding.calibration.codes = 'calib.4.8.stage1.az',
-                          likelihood.instructions = lik.inst.stage2.wFC.32x,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
-                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
-                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
-)
 
 # No future pen likelihood for now, to get the 7 workable for Doxy
 register.calibration.info('calib.4.22.stage2.WO.fut',
