@@ -19,6 +19,12 @@ diagnosis_cv=PS_CV #we will use this error variance for all diagnosis categories
 STAGE.0.WEIGHT= 1/32 # lowered by half on 3/13/2026 
 STAGE.1.WEIGHT= 1/8
 STAGE.2.WEIGHT= 1/8
+
+# To avoid having to make a new version of every likelihood just to change the weight, we'll cancel out the stage 1 or 2 weights.
+# We want this to be 1, but each of these likelihoods has STAGE.1.WEIGHT or STAGE.2.WEIGHT (currently both 1/8)
+if (STAGE.1.WEIGHT != STAGE.2.WEIGHT) stop("Error: assumption that stage 1 and 2 have same weight is broken")
+STAGE.3.WEIGHT= 1/STAGE.2.WEIGHT # Intended to produce 1 when multiplied in each likelihood definition
+
 FUTURE.CHANGE.LIKELIHOOD.WEIGHT = 8 # representing the eight points we would have post 2022 (eight times as many points)
 
 
@@ -419,151 +425,6 @@ future.change.likelihood.instructions =
                 sdlog       = 0.588,
                 penalty_cutoff=10, # penalizing sims falling outside of 10X increase
                 weight = STAGE.2.WEIGHT * FUTURE.CHANGE.LIKELIHOOD.WEIGHT
-            )
-        }
-    )
-future.change.likelihood.instructions.16x =
-    create.custom.likelihood.instructions(
-        name = "future.change.likelihood",
-        compute.function = function(sim, data, log = T) {
-            get.instr = data$get.instr
-            start_year = data$start_year #2020
-            end_year = data$end_year #2030
-            meanlog = data$meanlog #0.938
-            sdlog = data$sdlog #0.587
-            penalty_cutoff = data$penalty_cutoff #10-fold
-            weight <- data$weight
-            
-            vals <- sim$optimized.get(get.instr)
-            
-            # 10-year ratio
-            ratio <- vals[as.character(end_year)] / vals[as.character(start_year)]
-            # browser()
-            lik <- dlnorm(max(ratio, penalty_cutoff),
-                          meanlog = meanlog,
-                          sdlog = sdlog/sqrt(weight),
-                          log=T)
-            
-            if (log) lik else exp(lik)
-        },
-        get.data.function = function(version, location) {
-            sim.meta <- get.simulation.metadata(version = version, location = location)
-            
-            start_year  <- 2020L
-            end_year    <- 2030L
-            
-            get.instr <- sim.meta$prepare.optimized.get.instructions(
-                outcome                   = "diagnosis.ps",
-                dimension.values          = list(year = c(start_year, end_year)),
-                keep.dimensions           = "year",
-                drop.single.sim.dimension = TRUE
-            )
-            
-            list(
-                get.instr   = get.instr,
-                start_year  = start_year,
-                end_year    = end_year,
-                meanlog     = 0.938, # from input_future_change_ten_year_ratio_likelihood
-                sdlog       = 0.588,
-                penalty_cutoff=10, # penalizing sims falling outside of 10X increase
-                weight = STAGE.2.WEIGHT * FUTURE.CHANGE.LIKELIHOOD.WEIGHT * 2
-            )
-        }
-    )
-
-future.change.likelihood.instructions.24x =
-    create.custom.likelihood.instructions(
-        name = "future.change.likelihood",
-        compute.function = function(sim, data, log = T) {
-            get.instr = data$get.instr
-            start_year = data$start_year #2020
-            end_year = data$end_year #2030
-            meanlog = data$meanlog #0.938
-            sdlog = data$sdlog #0.587
-            penalty_cutoff = data$penalty_cutoff #10-fold
-            weight <- data$weight
-            
-            vals <- sim$optimized.get(get.instr)
-            
-            # 10-year ratio
-            ratio <- vals[as.character(end_year)] / vals[as.character(start_year)]
-            # browser()
-            lik <- dlnorm(max(ratio, penalty_cutoff),
-                          meanlog = meanlog,
-                          sdlog = sdlog/sqrt(weight),
-                          log=T)
-            
-            if (log) lik else exp(lik)
-        },
-        get.data.function = function(version, location) {
-            sim.meta <- get.simulation.metadata(version = version, location = location)
-            
-            start_year  <- 2020L
-            end_year    <- 2030L
-            
-            get.instr <- sim.meta$prepare.optimized.get.instructions(
-                outcome                   = "diagnosis.ps",
-                dimension.values          = list(year = c(start_year, end_year)),
-                keep.dimensions           = "year",
-                drop.single.sim.dimension = TRUE
-            )
-            
-            list(
-                get.instr   = get.instr,
-                start_year  = start_year,
-                end_year    = end_year,
-                meanlog     = 0.938, # from input_future_change_ten_year_ratio_likelihood
-                sdlog       = 0.588,
-                penalty_cutoff=10, # penalizing sims falling outside of 10X increase
-                weight = STAGE.2.WEIGHT * FUTURE.CHANGE.LIKELIHOOD.WEIGHT * 3
-            )
-        }
-    )
-future.change.likelihood.instructions.32x =
-    create.custom.likelihood.instructions(
-        name = "future.change.likelihood",
-        compute.function = function(sim, data, log = T) {
-            get.instr = data$get.instr
-            start_year = data$start_year #2020
-            end_year = data$end_year #2030
-            meanlog = data$meanlog #0.938
-            sdlog = data$sdlog #0.587
-            penalty_cutoff = data$penalty_cutoff #10-fold
-            weight <- data$weight
-            
-            vals <- sim$optimized.get(get.instr)
-            
-            # 10-year ratio
-            ratio <- vals[as.character(end_year)] / vals[as.character(start_year)]
-            # browser()
-            lik <- dlnorm(max(ratio, penalty_cutoff),
-                          meanlog = meanlog,
-                          sdlog = sdlog/sqrt(weight),
-                          log=T)
-            
-            if (log) lik else exp(lik)
-        },
-        get.data.function = function(version, location) {
-            sim.meta <- get.simulation.metadata(version = version, location = location)
-            
-            start_year  <- 2020L
-            end_year    <- 2030L
-            
-            get.instr <- sim.meta$prepare.optimized.get.instructions(
-                outcome                   = "diagnosis.ps",
-                dimension.values          = list(year = c(start_year, end_year)),
-                keep.dimensions           = "year",
-                drop.single.sim.dimension = TRUE
-            )
-            
-            list(
-                get.instr   = get.instr,
-                start_year  = start_year,
-                end_year    = end_year,
-                meanlog     = 0.938, # from input_future_change_ten_year_ratio_likelihood
-                sdlog       = 0.588,
-                penalty_cutoff=10, # penalizing sims falling outside of 10X increase
-                weight = STAGE.2.WEIGHT * FUTURE.CHANGE.LIKELIHOOD.WEIGHT * 4
             )
         }
     )
@@ -1415,7 +1276,8 @@ lik.inst.stage2.wFC=join.likelihood.instructions(
     # Future change penalty
     future.change.likelihood.instructions
 )
-lik.inst.stage2.wFC.16x=join.likelihood.instructions(
+## STAGE3 ----
+lik.inst.stage3=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
     total.diagnosis.by.strata.stage2.likelihood.instructions,
     
@@ -1432,46 +1294,7 @@ lik.inst.stage2.wFC.16x=join.likelihood.instructions(
     
     historical.diagnosis.likelihood.instructions,
     proportion_ps_male_among_msm_likelihood_instructions,
-    # Future change penalty
-    future.change.likelihood.instructions.16x
-)
-lik.inst.stage2.wFC.24x=join.likelihood.instructions(
-    total.diagnosis.likelihood.instructions,
-    total.diagnosis.by.strata.stage2.likelihood.instructions,
     
-    ps.diagnosis.total.likelihood.instructions,
-    ps.diagnosis.by.strata.stage2.likelihood.instructions,
-    
-    early.diagnosis.total.likelihood.instructions,
-    early.diagnosis.by.strata.stage2.likelihood.instructions,
-    
-    late.diagnosis.total.likelihood.instructions,
-    late.diagnosis.by.strata.stage2.likelihood.instructions,
-    
-    proportion.tested.by.strata.stage2.nested.likelihood.instructions,
-    
-    historical.diagnosis.likelihood.instructions,
-    proportion_ps_male_among_msm_likelihood_instructions,
-    # Future change penalty
-    future.change.likelihood.instructions.24x
-)
-lik.inst.stage2.wFC.32x=join.likelihood.instructions(
-    total.diagnosis.likelihood.instructions,
-    total.diagnosis.by.strata.stage2.likelihood.instructions,
-    
-    ps.diagnosis.total.likelihood.instructions,
-    ps.diagnosis.by.strata.stage2.likelihood.instructions,
-    
-    early.diagnosis.total.likelihood.instructions,
-    early.diagnosis.by.strata.stage2.likelihood.instructions,
-    
-    late.diagnosis.total.likelihood.instructions,
-    late.diagnosis.by.strata.stage2.likelihood.instructions,
-    
-    proportion.tested.by.strata.stage2.nested.likelihood.instructions,
-    
-    historical.diagnosis.likelihood.instructions,
-    proportion_ps_male_among_msm_likelihood_instructions,
-    # Future change penalty
-    future.change.likelihood.instructions.32x
+    future.change.likelihood.instructions,
+    additional.weights = STAGE.3.WEIGHT
 )

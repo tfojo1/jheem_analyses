@@ -14,6 +14,18 @@ par.aliases.transmission = list(
 )
 
 # STAGE0 ----
+# Attempting a full top-to-bottom calibration
+register.calibration.info("calib.4.24.stage0.az",
+                          likelihood.instructions = lik.inst.stage0,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          fixed.initial.parameter.values = c("global.transmission.rate"=2.3),  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          parameter.aliases = par.aliases.transmission,
+                          n.iter = 10000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
 
 # repeating stage0 for Phoenix again, AGAIN. With only 10,000 iterations to finish a bit quicker.
 register.calibration.info("calib.4.6.stage0.az",
@@ -155,7 +167,18 @@ register.calibration.info("calib.4.3.stage0.pk",
 #                           parameter.aliases = par.aliases.transmission,
 #                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 # )
-#STAGE1  ----
+# STAGE1  ----
+# Attempting a full top-to-bottom calibration
+register.calibration.info('calib.4.24.stage1.az',
+                          preceding.calibration.codes = 'calib.4.24.stage0.az',
+                          likelihood.instructions = lik.inst.stage1,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
 # now sampling the misclassification fractions in stages 1 and 2.
 register.calibration.info('calib.4.13.stage1.pk',
                           preceding.calibration.codes = 'calib.4.13.stage0.pk',
@@ -239,8 +262,18 @@ register.calibration.info('calib.4.3.stage1.pk',
 #                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 #                           
 # )
-#STAGE2 ----
-
+# STAGE2 ----
+# Attempting a top-to-bottom calibration. Here, uses 8x on future penalty likelihood.
+register.calibration.info('calib.4.24.stage2.az',
+                          preceding.calibration.codes = 'calib.4.24.stage1.az',
+                          likelihood.instructions = lik.inst.stage2.wFC,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
 # Houston with 16x weight on the fut pen likelihood
 register.calibration.info('calib.4.23.stage2.16x',
                           preceding.calibration.codes = 'calib.4.8.stage1.az',
@@ -401,3 +434,15 @@ register.calibration.info('calib.4.3.stage2.pk',
 #                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 #                           
 # )
+# STAGE3 ----
+# Attempting a top-to-bottom calibration. Here will use weight 1. Hope to end with 100 simulations.
+register.calibration.info('calib.4.24.stage3.az',
+                          preceding.calibration.codes = 'calib.4.24.stage2.az',
+                          likelihood.instructions = lik.inst.stage3,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2035,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = 10000, thin = 50, is.preliminary = F, max.run.time.seconds = 30, description = "NA"
+)
