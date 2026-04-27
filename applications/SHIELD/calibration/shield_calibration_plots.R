@@ -2,7 +2,7 @@
 library(plotly)
 library(patchwork)
 
-source('../jheem_analyses/applications/SHIELD/shield_specification.R')
+# source('../jheem_analyses/applications/SHIELD/shield_specification.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 source('../jheem_analyses/applications/SHIELD/calibration/shield_calibration_inspection_helpers.R')
 # Set Plotting Styles ----
@@ -81,8 +81,9 @@ prepare_simsets_for_plots <- function(calibration.code, locations, assemble.inco
 
 #' @param stage 0, 1, or 2
 #' @param create.dirs Recommended to start with this set to FALSE to make sure you're in the right working directory (jheem_analyses). Then, set to TRUE so that you can make new directories for city/calibration combinations.
+#' @param full.simset If FALSE (default), only the last twenty sims are plotted. Either way, the last sim is also plotted.
 #' @returns After generating plots, this function returns a vector of locations which succeeded so that you can record which failed.
-create_plots_for_calibration <- function(stage, calibration.code, simset.data, create.dirs = F) {
+create_plots_for_calibration <- function(stage, calibration.code, simset.data, create.dirs = F, full.simset = F) {
     
     # Will return a vector of successful locations
     successful_locations <- character(0)
@@ -105,12 +106,14 @@ create_plots_for_calibration <- function(stage, calibration.code, simset.data, c
             print(paste0("No simset found for '", location, "' and '", calibration.code, "'... Skipping")); next
         }
         
+        use_sims <- if (full.simset) simset.data[[location]]$full_simset else last20_sims
+        
         # Generate and save plots
         print(paste0("Generating plots for '", location, "' and '", calibration.code, "'"))
         tryCatch({
-            if (stage == 0) make_stage0_plots_for_location(last20_sims, last_sim, plotting_path, title.suffix = title_suffix)
-            if (stage == 1) make_stage1_plots_for_location(last20_sims, last_sim, plotting_path, title.suffix = title_suffix)
-            if (stage == 2) make_stage2_plots_for_location(last20_sims, last_sim, plotting_path, title.suffix = title_suffix)
+            if (stage == 0) make_stage0_plots_for_location(use_sims, last_sim, plotting_path, title.suffix = title_suffix)
+            if (stage == 1) make_stage1_plots_for_location(use_sims, last_sim, plotting_path, title.suffix = title_suffix)
+            if (stage == 2) make_stage2_plots_for_location(use_sims, last_sim, plotting_path, title.suffix = title_suffix)
             successful_locations <- c(successful_locations, location)},
             error = function(e) {print(paste0("Error generating plots for '", location, "' and '", calibration.code, "'... Skipping"))})
     }

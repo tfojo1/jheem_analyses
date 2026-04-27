@@ -1,4 +1,7 @@
 source('data_processing/aggregate_county_to_msa_new.R') #This aggregates county level data to other locations
+source('applications/SHIELD/R/shield_locations_of_interest.R') #Source locations of interest to create MSA vectors
+source('../jheem2/R/HELPERS_array_helpers.R') 
+
 Q_ROOT <- Sys.getenv("Q_ROOT", "Q:")
 # -------------------------------------------------------------------------
 
@@ -69,7 +72,7 @@ put.msa.data.as.new.source.NEW(outcome = 'unknown.duration.or.late.syphilis.diag
                                source.for.relative.contribution = 'census.population',
                                ontology.for.relative.contribution = 'census')
 
-ut.msa.data.as.new.source.NEW(outcome = 'hiv.diagnoses',
+put.msa.data.as.new.source.NEW(outcome = 'hiv.diagnoses',
                               from.source.name = 'cdc.hiv',
                               to.source.name = 'cdc.aggregated.county',
                               to.locations =  SHIELD.MSAS.OF.INTEREST,  #Think of this as containing location 
@@ -97,7 +100,7 @@ put.msa.data.as.new.source.NEW(outcome = 'hiv.diagnosed.prevalence',
 
 put.msa.data.as.new.source.NEW(outcome = 'hiv.suppression',
                                from.source.name = 'cdc.hiv',
-                               to.source.name = 'cdc.aggregated.county',
+                               to.source.name = 'cdc.aggregated.proportion',
                                to.locations =  SHIELD.MSAS.OF.INTEREST,  #Think of this as containing location 
                                geographic.type.from = 'COUNTY',
                                geographic.type.to = 'CBSA',

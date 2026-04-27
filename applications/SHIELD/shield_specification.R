@@ -9,6 +9,7 @@ cat('*** Running shield_specification.R ***\n')
 
 # Working directory is set to the main JHEEM_Analysis folder:
 source('applications/SHIELD/shield_source_code.R')
+source('applications/SHIELD/R/shield_locations_of_interest.R')
 
 
 # Caching required objects: 
@@ -759,65 +760,57 @@ register.model.element(SHIELD.SPECIFICATION,
 
 
 ##---- DOXY PEP ----
-# relative risk: default=1 no protection
-
-# Modeling Doxy Coverage
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'doxy.uptake',
-                       scale = 'proportion',
-                       # get.functional.form.function = get_doxy_coverage_functional_form,
-                       value = 0
-                       # functional.form.from.time = 2022
-                       )
-
-# Need to find value for this to replace 1
-register.model.element(SHIELD.SPECIFICATION,
-                       name = "doxy.persistence",
-                       value = 1,
-                       scale = "proportion")
+# intervention control uptake directly
+# C = U/(1+r): C is coverage; r is discontinuation rate, U is uptake
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'doxy.uptake',
+                        scale = 'proportion',
+                        value = 0)
 
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = "doxy.coverage",
-                        value = expression(doxy.uptake * doxy.persistence))
+                        scale="proportion",
+                        value = expression(doxy.uptake/(1+ doxy.discontinuationRate))
+                        )
 
-# effectiveness in reducing transmissions (operationalized as reduction in susceptibility toward new infection)
+# we are sampling effectiveness & discontinuation in the intervention code from appropriate distributions
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'doxy.effectiveness', #calib param
+                       name = 'doxy.effectiveness', 
                        scale = 'proportion',
-                       value = 0.8 # range 1- (0.08, 0.48)
+                       value = 0
+)
+register.model.element(SHIELD.SPECIFICATION,
+                           name = "doxy.discontinuationRate",
+                           scale="rate",
+                           value = 0
 )
 
+# Doxy impacts susceptibility to our new infections
 register.model.quantity(SHIELD.SPECIFICATION,
                                name = 'sexual.susceptibility',
                                value = 1
 )
-
-# MSM: apply doxy coverage + RR
-# this is the ONLY place doxy.coverage & doxy.rr are used
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                         name = 'sexual.susceptibility',
                         applies.to = list(sex="msm"),
                         value = expression((1 - doxy.coverage) + doxy.coverage * (1-doxy.effectiveness))
 )
 
-# Change to doxy coverage as product of doxy uptake and persistence
-# If start 100 people today, how many still taking it in one year?
-# Whereas, adherence is reflected in the 80% effectiveness measure
-# Look in literature for an estimate of Doxy-PEP persistence
-# see Parastu document she sent
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = "doxy.persistence",
+#                        scale = "proportion",
+#                        value= expression(-exp('doxy.discontinuationRate')))
 
-
+# to calculate the final number fill a prescription, we need to know what proportion of population are eligible for Doxy? (experience the uptake)
+# if uptake is 10% and we have 100 MSM > assuming they're all eligible for Doxy > #new fills= 10%*100=10
+# assuming 50% all eligible for Doxy > #new fills= 10%*50%*100=5
+# this definition here is tied to definition of coverage: when we change the coverage, are we talking about coverage among all MSM or eligible MSM?
 
 register.model.element(SHIELD.SPECIFICATION,
                        name = "doxy.eligibility",
-                       value = 1,
-                       scale = "proportion")
-
-# # Placeholder for later complexification
-# register.model.quantity(SHIELD.SPECIFICATION,
-#                         name = "doxy.uptake",
-#                         value = expression(doxy.coverage)) # assumes that people are perfectly persistent
-
+                       scale = "proportion",
+                       value=1)
+# we will need to inform the output below
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = "doxy.uptake.times.eligibility",
                         value = expression(doxy.uptake * doxy.eligibility))

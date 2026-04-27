@@ -4,7 +4,7 @@ DATA.DIR.SYPHILIS=file.path(Q_ROOT, "data_raw/syphilis.manager/syphilis")
 syphilis_files <- Sys.glob(paste0(DATA.DIR.SYPHILIS, '/*.csv'))
 syphilis.data <- lapply(syphilis_files, function(x){
   skip=7
-  list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
+  list(filename=x, data=suppressWarnings(read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character"))))
 })
 
 # Mappings ----------------------------------------------------------------

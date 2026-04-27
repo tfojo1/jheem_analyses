@@ -55,9 +55,64 @@ BIRMINGHAM.MSA = 'C.13820'
 MOBILE.MSA = 'C.33660'
 JACKSON.MSA = 'C.27140'
 
+#Adding SHIELD specific MSAs:
+DENVER.MSA = "C.19740"
+PORTLAND.MSA = "C.38900" 
+KANSAS.CITY.MSA ="C.28140"
+ST.LOUIS.MSA = "C.41180"
+MINNEAPOLIS.MSA = "C.33460" 
+OKLAHOMA.CITY.MSA = "C.36420" 
+ALBUQUERQUE.MSA = "C.10740"
+MILWAUKEE.MSA = "C.33340" 
+BIRMINGHAM.MSA = "C.13820"
+ROCHESTER.MSA = "C.40380"
+
+
 ##----------------------------##
 ##-- LUMP THEM INTO VECTORS --##
 ##----------------------------##
+
+# Our set of typically used MSAs for SHIELD.
+SHIELD.MSAS.OF.INTEREST = c(NYC=NYC.MSA,
+                            Miami=MIAMI.MSA,
+                            LA=LA.MSA,
+                            Atlanta=ATLANTA.MSA,
+                            Houston=HOUSTON.MSA,
+                            Dallas=DALLAS.MSA,
+                            Chicago=CHICAGO.MSA,
+                            DC=DC.MSA,
+                            Philadelphia=PHILADELPHIA.MSA,
+                            Orlando=ORLANDO.MSA,
+                            SF=SF.MSA,
+                            Phoenix=PHOENIX.MSA,
+                            Tampa=TAMPA.MSA,
+                            Riverside=RIVERSIDE.MSA,
+                            Detroit=DETROIT.MSA,
+                            Baltimore=BALTIMORE.MSA,
+                            Vegas=VEGAS.MSA,
+                            Boston=BOSTON.MSA,
+                            San_Diego=SAN.DIEGO.MSA,
+                            Charlotte=CHARLOTTE.MSA,
+                            San_Antonio=SAN.ANTONIO.MSA,
+                            Jacksonville=JACKSONVILLE.MSA,
+                            New_Orleans=NEW.ORLEANS.MSA,
+                            Memphis=MEMPHIS.MSA,
+                            Seattle=SEATTLE.MSA,
+                            Austin=AUSTIN.MSA,
+                            Cincinatti=CINCINATTI.MSA,
+                            Columbus=COLUMBUS.MSA,
+                            Baton_Rouge=BATON.ROUGE.MSA,
+                            Sacramento=SACRAMENTO.MSA,
+                            Denver = DENVER.MSA,
+                            Portland = PORTLAND.MSA,
+                            Kansas_City = KANSAS.CITY.MSA,
+                            St_Louis = ST.LOUIS.MSA,
+                            Minneapolis = MINNEAPOLIS.MSA,
+                            Oklahoma_City = OKLAHOMA.CITY.MSA,
+                            Albuquerque = ALBUQUERQUE.MSA,
+                            Milwaukee = MILWAUKEE.MSA,
+                            Birmingham = BIRMINGHAM.MSA,
+                            Rochester = ROCHESTER.MSA)
 
 # Our set of typically used MSAs.
 MSAS.OF.INTEREST = c(NYC=NYC.MSA,
