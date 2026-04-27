@@ -372,116 +372,56 @@ make_stage2_plots_for_location <- function(last20, lastsim, plotting.path, title
     make_facet_plot("hiv.testing", last20, lastsim, facet.vars = c("sex", "race", "age"), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
 }
 
-# COMPARE by LOCATION ----
-#' @title Create Multi-Panel Location Comparison Plot
+# COMPARE by LOCATION ----#' @title Create Multi-Panel Location Comparison Plot
 #' @description Creates a multi-panel figure comparing the fit to one outcome across all locations.
 #' @param outcome Character string specifying the outcome to plot (e.g., "diagnosis.total")
 #' @param simset.data List of simset data as returned by prepare_simsets_for_plots()
+#' @param calibration.code Character string for the calibration code (used for save path)
+#' @param facet.by Optional character string specifying the variable to facet by (e.g., "sex", "race", "age")
+#' @param split.by Optional character string specifying a variable to split by (for two-way stratification)
 #' @param style.manager Style manager for the plots
+#' @param summary.type Type of summary to display (default "median.and.interval")
 #' @param nrow Number of rows in the panel layout (default 2)
 #' @param ncol Number of columns in the panel layout (default 5, for 10 locations)
 #' @param years Vector of years to include (default 2000:2030)
 #' @param width Plot width in inches (default 24)
 #' @param height Plot height in inches (default 10)
-#' @param save.path Optional path to save the plot. If NULL, returns the plot object.
+#' @param create.dirs If TRUE, creates directories if they don't exist
 #' @param use.full.simset If TRUE, uses full simset; if FALSE (default), uses last 20 sims
-#' @returns A patchwork combined plot object (if save.path is NULL) or saves to file
+#' @returns A patchwork combined plot object (invisibly if saved)
 create_multipanel_location_comparison <- function(outcome,
                                                   simset.data,
+                                                  calibration.code,
+                                                  facet.by = NULL,
+                                                  split.by = NULL,
                                                   style.manager = NULL,
+                                                  summary.type = "median.and.interval",
                                                   nrow = 2,
                                                   ncol = 5,
                                                   years = 2000:2030,
                                                   width = 24,
                                                   height = 10,
-                                                  save.path = NULL,
+                                                  create.dirs = FALSE,
                                                   use.full.simset = FALSE) {
     
     if (is.null(style.manager)) {
         style.manager <- create.style.manager(shape.data.by = "source", color.data.by = "stratum")
     }
     
-    # Get valid locations (those with non-null simset data)
-    valid_locations <- names(simset.data)[!sapply(simset.data, is.null)]
+    # Set up save path
+    plotting_path <- paste0(get.jheem.root.directory(), 
+                            "/shield/calibrationPlots/", 
+                            calibration.code, 
+                            "/compare_by_location/")
     
-    if (length(valid_locations) == 0) {
-        stop("No valid simset data found for any location")
-    }
-    
-    # Create individual plots for each location
-    plot_list <- lapply(valid_locations, function(location) {
-        
-        if (use.full.simset) {
-            sims <- simset.data[[location]]$full_simset
-        } else {
-            sims <- simset.data[[location]]$last20_sims
+    if (!dir.exists(plotting_path)) {
+        if (!create.dirs) {
+            stop(paste0("Error: directory '", plotting_path, "' does not exist. ",
+                        "Check that get.jheem.root.directory() shows the right place, ",
+                        "then try again with 'create.dirs' set to TRUE."))
         }
-        last_sim <- simset.data[[location]]$last_sim
-        
-        # Get a nice location name for the title
-        location_name <- get.location.name(location)
-        
-        p <- simplot(
-            sims, last_sim,
-            outcomes = outcome,
-            style.manager = style.manager,
-            dimension.values = list(year = years)
-        ) + 
-            ggtitle(location_name) +
-            theme(plot.title = element_text(size = 10, hjust = 0.5))
-        
-        return(p)
-    })
-    
-    # Combine plots using patchwork
-    combined_plot <- wrap_plots(plot_list, nrow = nrow, ncol = ncol) +
-        plot_annotation(
-            title = paste0("Comparison of '", outcome, "' Across Locations"),
-            theme = theme(plot.title = element_text(size = 14, hjust = 0.5, face = "bold"))
-        )
-    
-    # Save or return
-    if (!is.null(save.path)) {
-        ggsave(save.path, plot = combined_plot, width = width, height = height, dpi = 300)
-        print(paste0("Plot saved to: ", save.path))
-        return(invisible(combined_plot))
-    } else {
-        return(combined_plot)
-    }
-}
-
-
-#' @title Create Multi-Panel Location Comparison Plot with Faceting
-#' @description Creates a multi-panel figure comparing the fit to one outcome across all locations,
-#'              with the outcome split/faceted by a factor within each location panel.
-#' @param outcome Character string specifying the outcome to plot (e.g., "diagnosis.total")
-#' @param simset.data List of simset data as returned by prepare_simsets_for_plots()
-#' @param facet.by Character string specifying the variable to facet by within each location (e.g., "sex", "race", "age")
-#' @param split.by Optional character string specifying a variable to split by (for two-way stratification)
-#' @param style.manager Style manager for the plots
-#' @param nrow Number of rows in the panel layout (default 2)
-#' @param ncol Number of columns in the panel layout (default 5, for 10 locations)
-#' @param years Vector of years to include (default 2000:2030)
-#' @param width Plot width in inches (default 30)
-#' @param height Plot height in inches (default 14)
-#' @param save.path Optional path to save the plot. If NULL, returns the plot object.
-#' @param use.full.simset If TRUE, uses full simset; if FALSE (default), uses last 20 sims
-#' @returns A patchwork combined plot object (if save.path is NULL) or saves to file
-create_multipanel_location_comparison_faceted <- function(outcome,
-                                                          simset.data,
-                                                          facet.by,
-                                                          split.by = NULL,
-                                                          style.manager = NULL,
-                                                          nrow = 2,
-                                                          ncol = 5,
-                                                          years = 2000:2030,
-                                                          width = 30,
-                                                          height = 14,
-                                                          save.path = NULL,
-                                                          use.full.simset = FALSE) {
-    
-    if (is.null(style.manager)) {
-        style.manager <- create.style.manager(shape.data.by = "source", color.data.by = "stratum")
+        dir.create(plotting_path, recursive = TRUE, showWarnings = FALSE)
+        print(paste0("Created directory: ", plotting_path))
     }
     
     # Get valid locations (those with non-null simset data)
@@ -504,22 +444,41 @@ create_multipanel_location_comparison_faceted <- function(outcome,
         # Get a nice location name for the title
         location_name <- get.location.name(location)
         
-        # Build the simplot call based on whether split.by is provided
-        if (is.null(split.by)) {
+        # Build the simplot call based on whether facet.by and split.by are provided
+        if (is.null(facet.by) && is.null(split.by)) {
             p <- simplot(
-                sims, last_sim,
+                sims,  
+                outcomes = outcome,
+                style.manager = style.manager,
+                summary.type = summary.type,
+                dimension.values = list(year = years)
+            )
+        } else if (is.null(split.by)) {
+            p <- simplot(
+                sims,  
                 outcomes = outcome,
                 facet.by = facet.by,
                 style.manager = style.manager,
+                summary.type = summary.type,
+                dimension.values = list(year = years)
+            )
+        } else if (is.null(facet.by)) {
+            p <- simplot(
+                sims,  
+                outcomes = outcome,
+                split.by = split.by,
+                style.manager = style.manager,
+                summary.type = summary.type,
                 dimension.values = list(year = years)
             )
         } else {
             p <- simplot(
-                sims, last_sim,
+                sims,  
                 outcomes = outcome,
                 split.by = split.by,
                 facet.by = facet.by,
                 style.manager = style.manager,
+                summary.type = summary.type,
                 dimension.values = list(year = years)
             )
         }
@@ -531,11 +490,19 @@ create_multipanel_location_comparison_faceted <- function(outcome,
         return(p)
     })
     
-    # Build title based on stratification
-    if (is.null(split.by)) {
+    # Build title and filename based on stratification
+    if (is.null(facet.by) && is.null(split.by)) {
+        title_text <- paste0("Comparison of '", outcome, "' Across Locations")
+        filename <- paste0(gsub("\\.", "-", outcome), ".png")
+    } else if (is.null(split.by)) {
         title_text <- paste0("Comparison of '", outcome, "' by ", facet.by, " Across Locations")
+        filename <- paste0(gsub("\\.", "-", outcome), "_", facet.by, ".png")
+    } else if (is.null(facet.by)) {
+        title_text <- paste0("Comparison of '", outcome, "' by ", split.by, " Across Locations")
+        filename <- paste0(gsub("\\.", "-", outcome), "_", split.by, ".png")
     } else {
         title_text <- paste0("Comparison of '", outcome, "' by ", split.by, " and ", facet.by, " Across Locations")
+        filename <- paste0(gsub("\\.", "-", outcome), "_", split.by, "_", facet.by, ".png")
     }
     
     # Combine plots using patchwork
@@ -545,14 +512,12 @@ create_multipanel_location_comparison_faceted <- function(outcome,
             theme = theme(plot.title = element_text(size = 14, hjust = 0.5, face = "bold"))
         )
     
-    # Save or return
-    if (!is.null(save.path)) {
-        ggsave(save.path, plot = combined_plot, width = width, height = height, dpi = 300)
-        print(paste0("Plot saved to: ", save.path))
-        return(invisible(combined_plot))
-    } else {
-        return(combined_plot)
-    }
+    # Save the plot
+    save_path <- file.path(plotting_path, filename)
+    ggsave(save_path, plot = combined_plot, width = width, height = height, dpi = 300)
+    print(paste0("Plot saved to: ", save_path))
+    
+    return(invisible(combined_plot))
 }
 
 
@@ -560,18 +525,14 @@ create_multipanel_location_comparison_faceted <- function(outcome,
 #' @description Convenience function to create all relevant multi-panel comparison plots for a given stage.
 #' @param stage 0, 1, or 2
 #' @param simset.data List of simset data as returned by prepare_simsets_for_plots()
-#' @param plotting.path Directory path where plots will be saved
+#' @param calibration.code Character string for the calibration code
+#' @param summary.type Type of summary to display (default "median.and.interval")
 #' @param create.dirs If TRUE, creates the directory if it doesn't exist
-create_multipanel_plots_for_stage <- function(stage, simset.data, plotting.path, create.dirs = FALSE) {
-    
-    if (!dir.exists(plotting.path)) {
-        if (!create.dirs) {
-            stop(paste0("Error: directory '", plotting.path, "' does not exist. ",
-                        "Try again with 'create.dirs' set to TRUE."))
-        }
-        dir.create(plotting.path, recursive = TRUE, showWarnings = FALSE)
-        print(paste0("Created directory: ", plotting.path))
-    }
+create_multipanel_plots_for_stage <- function(stage, 
+                                              simset.data, 
+                                              calibration.code, 
+                                              summary.type = "median.and.interval",
+                                              create.dirs = FALSE) {
     
     style.manager <- create.style.manager(shape.data.by = "source", color.data.by = "stratum")
     
@@ -583,6 +544,10 @@ create_multipanel_plots_for_stage <- function(stage, simset.data, plotting.path,
             immigration = c("sex", "race", "age"),
             emigration = c("sex", "race", "age")
         )
+        split_facet_outcomes <- list(
+            population = list(c("sex", "age"), c("race", "age"), c("race", "sex")),
+            deaths = list(c("sex", "age"), c("race", "age"), c("race", "sex"))
+        )
     } else if (stage == 1) {
         outcomes <- c("diagnosis.total", "diagnosis.ps", "diagnosis.el.misclassified", 
                       "diagnosis.late.misclassified", "hiv.testing")
@@ -592,6 +557,12 @@ create_multipanel_plots_for_stage <- function(stage, simset.data, plotting.path,
             diagnosis.el.misclassified = c("sex", "race"),
             diagnosis.late.misclassified = c("sex", "race"),
             hiv.testing = c("sex", "race")
+        )
+        split_facet_outcomes <- list(
+            diagnosis.total = list(c("sex", "race")),
+            diagnosis.ps = list(c("sex", "race")),
+            diagnosis.el.misclassified = list(c("sex", "race")),
+            diagnosis.late.misclassified = list(c("sex", "race"))
         )
     } else if (stage == 2) {
         outcomes <- c("diagnosis.total", "diagnosis.ps", "diagnosis.el.misclassified", 
@@ -603,6 +574,12 @@ create_multipanel_plots_for_stage <- function(stage, simset.data, plotting.path,
             diagnosis.late.misclassified = c("sex", "race", "age"),
             hiv.testing = c("sex", "race", "age")
         )
+        split_facet_outcomes <- list(
+            diagnosis.total = list(c("sex", "age"), c("race", "age"), c("race", "sex")),
+            diagnosis.ps = list(c("sex", "age"), c("race", "age"), c("race", "sex")),
+            diagnosis.el.misclassified = list(c("sex", "age"), c("race", "age"), c("race", "sex")),
+            diagnosis.late.misclassified = list(c("sex", "age"), c("race", "age"), c("race", "sex"))
+        )
     } else {
         stop("Stage must be 0, 1, or 2")
     }
@@ -610,37 +587,64 @@ create_multipanel_plots_for_stage <- function(stage, simset.data, plotting.path,
     # Create total (unstratified) plots
     for (outcome in outcomes) {
         print(paste0("Creating multi-panel plot for: ", outcome))
-        save_path <- file.path(plotting.path, paste0("multipanel_", gsub("\\.", "-", outcome), ".png"))
         
         tryCatch({
             create_multipanel_location_comparison(
                 outcome = outcome,
                 simset.data = simset.data,
+                calibration.code = calibration.code,
                 style.manager = style.manager,
-                save.path = save_path
+                summary.type = summary.type,
+                create.dirs = create.dirs
             )
         }, error = function(e) {
             print(paste0("Error creating plot for ", outcome, ": ", e$message))
         })
     }
     
-    # Create faceted plots
+    # Create one-way faceted plots
     for (outcome in names(facet_outcomes)) {
         for (facet_var in facet_outcomes[[outcome]]) {
             print(paste0("Creating multi-panel plot for: ", outcome, " by ", facet_var))
-            save_path <- file.path(plotting.path, 
-                                   paste0("multipanel_", gsub("\\.", "-", outcome), "_", facet_var, ".png"))
             
             tryCatch({
-                create_multipanel_location_comparison_faceted(
+                create_multipanel_location_comparison(
                     outcome = outcome,
                     simset.data = simset.data,
+                    calibration.code = calibration.code,
                     facet.by = facet_var,
                     style.manager = style.manager,
-                    save.path = save_path
+                    summary.type = summary.type,
+                    create.dirs = create.dirs
                 )
             }, error = function(e) {
                 print(paste0("Error creating plot for ", outcome, " by ", facet_var, ": ", e$message))
+            })
+        }
+    }
+    
+    # Create two-way split/faceted plots
+    for (outcome in names(split_facet_outcomes)) {
+        for (split_facet_pair in split_facet_outcomes[[outcome]]) {
+            split_var <- split_facet_pair[1]
+            facet_var <- split_facet_pair[2]
+            print(paste0("Creating multi-panel plot for: ", outcome, " by ", split_var, " and ", facet_var))
+            
+            tryCatch({
+                create_multipanel_location_comparison(
+                    outcome = outcome,
+                    simset.data = simset.data,
+                    calibration.code = calibration.code,
+                    split.by = split_var,
+                    facet.by = facet_var,
+                    style.manager = style.manager,
+                    summary.type = summary.type,
+                    width = 30,
+                    height = 14,
+                    create.dirs = create.dirs
+                )
+            }, error = function(e) {
+                print(paste0("Error creating plot for ", outcome, " by ", split_var, " and ", facet_var, ": ", e$message))
             })
         }
     }
@@ -692,58 +696,40 @@ if (1==2) {
 if (1==2) {
     
     calibname <- "calib.4.24.stage2.az"
-    
-    # Define style managers to use.
-    source.style.manager <- create.style.manager(shape.data.by = "source", color.data.by = "stratum")
-    
+    # plot.which = c("sim.and.data", "sim.only")[1],
+    # summary.type = c("individual.simulation", "mean.and.interval",
+    #                  "median.and.interval")[1],
     # Retrieve and/or assemble simsets (same as before)
-    # simset_data <- prepare_simsets_for_plots(
-    #     calibration.code = calibname, 
-    #     locations = names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N","S","PH")], 
-    #     assemble.incomplete = F
-    # )
-    
-    # Example 1: Simple total outcome comparison across all locations
-    p1 <- create_multipanel_location_comparison(
-        outcome = "diagnosis.total",
-        simset.data = simset_data,
-        nrow = 2, ncol = 5
-    )
-    print(p1)
-    
-    # Example 2: Save to file
-    create_multipanel_location_comparison(
-        outcome = "diagnosis.total",
-        simset.data = simset_data,
-        nrow = 2, ncol = 5,
-        save.path = "multipanel_diagnosis_total.png"
+    simset_data <- prepare_simsets_for_plots(
+        calibration.code = calibname, 
+        locations = names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N","S","PH")], 
+        assemble.incomplete = F
     )
     
-    # Example 3: Outcome faceted by a factor (e.g., race) across all locations
-    p2 <- create_multipanel_location_comparison_faceted(
-        outcome = "diagnosis.total",
-        simset.data = simset_data,
-        facet.by = "race",
-        nrow = 2, ncol = 5
-    )
-    print(p2)
+    # Example 1: Create multi-panel plots for selected outputs
+    outcomes <- c("diagnosis.total", "diagnosis.ps", "diagnosis.el.misclassified", 
+                  "diagnosis.late.misclassified", "hiv.testing")
+    for( o in outcomes){
+        create_multipanel_location_comparison(
+            outcome = o,
+            simset.data = simset_data,
+            calibration.code = calibname,
+            summary.type = "mean.and.interval",
+            # summary.type = "individual.simulation",
+            nrow = 2, ncol = 5,
+            # width = 36, height = 16,
+            
+            create.dirs = TRUE
+        )
+    }
     
-    # Example 4: Two-way stratification (split by sex, facet by race)
-    p3 <- create_multipanel_location_comparison_faceted(
-        outcome = "diagnosis.total",
-        simset.data = simset_data,
-        facet.by = "race",
-        split.by = "sex",
-        nrow = 2, ncol = 5,
-        width = 36, height = 16
-    )
-    print(p3)
     
-    # Example 5: Create all multi-panel plots for a stage
+    # Example 2: Create all multi-panel plots for a stage with custom summary type
     create_multipanel_plots_for_stage(
         stage = 2,
         simset.data = simset_data,
-        plotting.path = paste0(get.jheem.root.directory(), "/shield/calibrationPlots/", calibname, "/multipanel/"),
+        calibration.code = calibname,
+        summary.type = "mean.and.interval",
         create.dirs = TRUE
     )
 }
