@@ -1,14 +1,22 @@
 ADAP.START.YEAR = 2026 + 2/12
 
 set.seed(12345)
-no.transmission.effect = create.intervention.effect(quantity.name = 'global.trate',
-                                                    start.time = ADAP.START.YEAR,
-                                                    effect.values = 0,
-                                                    apply.effects.as = 'value',
-                                                    scale = 'rate',
-                                                    times = ADAP.START.YEAR,
-                                                    allow.values.less.than.otherwise = T,
-                                                    allow.values.greater.than.otherwise = F )
+LOSE.ADAP.FRACTION = rep(1,1000)
+dim(LOSE.ADAP.FRACTION) = c(1,1000)
+dimnames(LOSE.ADAP.FRACTION) = list('lose.adap.fraction',NULL)
+
+no.transmission.effect = create.intervention.effect(
+    quantity.name = 'global.trate',
+    start.time = ADAP.START.YEAR,
+    effect.values = 0,
+    apply.effects.as = 'value',
+    scale = 'proportion',
+    times = ADAP.START.YEAR,
+    allow.values.less.than.otherwise = TRUE,
+    allow.values.greater.than.otherwise = FALSE
+)
+
+
 
 adap.coverage.50.exp.effect = create.intervention.effect(quantity.name = 'adap.suppression.expansion.effect',
                                                          start.time = ADAP.START.YEAR,
@@ -37,14 +45,14 @@ noint.no.trate = create.intervention(no.transmission.effect,
 
 
 
-adap.coverage.50.trate = create.intervention(adap.coverage.50.exp.effect,
-                                             adap.coverage.50.nexp.effect, 
-                                             no.transmission.effect,
-                                             parameters = rbind(
-                                                 RW.effect.values[c(1,4),],
-                                                 LOSE.ADAP.FRACTION),
-                                             WHOLE.POPULATION, 
-                                             code = paste0("adap.end.50.no.trate",rw.intervention.suffix))
+adap.coverage.50.no.trate = create.intervention(no.transmission.effect, 
+                                                adap.coverage.50.exp.effect,
+                                                adap.coverage.50.nexp.effect,
+                                                parameters = rbind(
+                                                    RW.effect.values[c(1,4),],
+                                                    LOSE.ADAP.FRACTION),
+                                                WHOLE.POPULATION, 
+                                                code = paste0("adap.end.50.no.trate",rw.intervention.suffix))
 
 
 
