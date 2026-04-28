@@ -1298,3 +1298,66 @@ lik.inst.stage3=join.likelihood.instructions(
     future.change.likelihood.instructions,
     additional.weights = STAGE.3.WEIGHT
 )
+lik.inst.stage3.CTRL=join.likelihood.instructions(
+    total.diagnosis.likelihood.instructions,
+    total.diagnosis.by.strata.stage2.likelihood.instructions,
+    
+    ps.diagnosis.total.likelihood.instructions,
+    ps.diagnosis.by.strata.stage2.likelihood.instructions,
+    
+    early.diagnosis.total.likelihood.instructions,
+    early.diagnosis.by.strata.stage2.likelihood.instructions,
+    
+    late.diagnosis.total.likelihood.instructions,
+    late.diagnosis.by.strata.stage2.likelihood.instructions,
+    
+    proportion.tested.by.strata.stage2.nested.likelihood.instructions,
+    
+    historical.diagnosis.likelihood.instructions,
+    proportion_ps_male_among_msm_likelihood_instructions,
+    
+    future.change.likelihood.instructions,
+    additional.weights = 1
+)
+lik.inst.stage3.half=join.likelihood.instructions(
+    total.diagnosis.likelihood.instructions,
+    total.diagnosis.by.strata.stage2.likelihood.instructions,
+    
+    ps.diagnosis.total.likelihood.instructions,
+    ps.diagnosis.by.strata.stage2.likelihood.instructions,
+    
+    early.diagnosis.total.likelihood.instructions,
+    early.diagnosis.by.strata.stage2.likelihood.instructions,
+    
+    late.diagnosis.total.likelihood.instructions,
+    late.diagnosis.by.strata.stage2.likelihood.instructions,
+    
+    proportion.tested.by.strata.stage2.nested.likelihood.instructions,
+    
+    historical.diagnosis.likelihood.instructions,
+    proportion_ps_male_among_msm_likelihood_instructions,
+    
+    future.change.likelihood.instructions,
+    additional.weights = STAGE.3.WEIGHT / 2
+)
+lik.inst.stage3.quarter=join.likelihood.instructions(
+    total.diagnosis.likelihood.instructions,
+    total.diagnosis.by.strata.stage2.likelihood.instructions,
+    
+    ps.diagnosis.total.likelihood.instructions,
+    ps.diagnosis.by.strata.stage2.likelihood.instructions,
+    
+    early.diagnosis.total.likelihood.instructions,
+    early.diagnosis.by.strata.stage2.likelihood.instructions,
+    
+    late.diagnosis.total.likelihood.instructions,
+    late.diagnosis.by.strata.stage2.likelihood.instructions,
+    
+    proportion.tested.by.strata.stage2.nested.likelihood.instructions,
+    
+    historical.diagnosis.likelihood.instructions,
+    proportion_ps_male_among_msm_likelihood_instructions,
+    
+    future.change.likelihood.instructions,
+    additional.weights = STAGE.3.WEIGHT / 4
+)

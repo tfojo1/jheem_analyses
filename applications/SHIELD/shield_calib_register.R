@@ -413,3 +413,33 @@ register.calibration.info('calib.4.24.stage3.az',
                                               TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
                           n.iter = 10000, thin = 50, is.preliminary = F, max.run.time.seconds = 30, description = "NA"
 )
+register.calibration.info('calib.4.24.stage3.CTRL',
+                          preceding.calibration.codes = 'calib.4.24.stage2.az',
+                          likelihood.instructions = lik.inst.stage3.CTRL,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2035,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = 10000, thin = 50, is.preliminary = F, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info('calib.4.24.stage3.hf',
+                          preceding.calibration.codes = 'calib.4.24.stage2.az',
+                          likelihood.instructions = lik.inst.stage3.half,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2035,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = 10000, thin = 50, is.preliminary = F, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info('calib.4.24.stage3.qtr',
+                          preceding.calibration.codes = 'calib.4.24.stage2.az',
+                          likelihood.instructions = lik.inst.stage3.quarter,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2035,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = 10000, thin = 50, is.preliminary = F, max.run.time.seconds = 30, description = "NA"
+)
