@@ -2,14 +2,20 @@
 #
 # USAGE
 #   Launch over SSH (survives logout):
-#       nohup bash launch_shield_calib_multiprocess.sh > logs/launcher.out 2>&1 &
-# <connect to server via ssh : ssh username@10.253.170.91:8787  (SHIELD1) & ssh username@10.253.170.89:8787 (SHIELD2) 
+#       nohup bash applications/SHIELD/launch_shield_multiprocess.sh > applications/SHIELD/logs/launcher.out 2>&1 &
+#   Kill Runs: 
+#       pkill -u pkasaie1 -x R
+#       pkill -u pkasaie1 -f "Rscript"
+#
+#   Connect to server via SSH:
+#       ssh username@10.253.170.91  (SHIELD1)
+#       ssh username@10.253.170.89  (SHIELD2)
 #
 #   Monitor overall progress:
-#       tail -f logs/launcher.out
+#       tail -f applications/SHIELD/logs/launcher.out
 #
 #   Check a specific city+stage log:
-#       tail -f logs/C.19100_calib.4.24.stage1.az.out
+#       tail -f applications/SHIELD/logs/C.19100_calib.4.24.stage1.az.out
 #
 # HOW IT WORKS
 #   Each city gets its own subshell that runs all stages sequentially.
@@ -23,6 +29,14 @@
 #   The failed city prints to stderr and releases its slot.
 #   All other cities keep running untouched.
 #   Check logs/<loc>_<stage>.out for the R-level error message.
+
+
+# ── resolve paths relative to this script's location ──────────────────────────
+# This ensures logs/ is always created next to the script,
+# regardless of which directory you launch from.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOG_DIR="$SCRIPT_DIR/logs"
+mkdir -p "$LOG_DIR"
 
 
 # ── thread settings ────────────────────────────────────────────────────────────
@@ -50,7 +64,6 @@ all_except_ten_cities=(
     C.26900 C.17140 C.18140 C.12940 C.40900 C.17460
 )
 
- 
 # Stages run sequentially per city — each is a separate Rscript process
 # so the OS fully reclaims memory between them
 stages=(
@@ -59,9 +72,8 @@ stages=(
     calib.4.24.stage2.az
 )
 
-script="./shield_calib_setup_and_run_multiprocess.R"
+script="$SCRIPT_DIR/shield_calib_setup_and_run.R"
 MAX_JOBS=15
-mkdir -p logs
 
 
 # ── per-city pipeline ──────────────────────────────────────────────────────────
@@ -70,13 +82,14 @@ mkdir -p logs
 # If any stage fails, logs the error and skips remaining stages for that city.
 run_city() {
     local loc="$1"
+    shift                   # drop the city argument so "$@" contains only the stage names
 
-    for stage in "$@"; do   # "$@" is now the list of stages: iterate over whatever stages were passed in
+    for stage in "$@"; do   # iterate over whatever stages were passed in — no dependency on a global array name
 
         echo "[$(date '+%F %T')] START   $loc :: $stage"
 
         # Run this stage; redirect both stdout and stderr to the city+stage log file
-        Rscript "$script" "$loc" "$stage" > "logs/${loc}_${stage}.out" 2>&1
+        Rscript "$script" "$loc" "$stage" > "$LOG_DIR/${loc}_${stage}.out" 2>&1
         local rc=$?          # capture exit code (0 = success, non-zero = failure)
 
         if (( rc != 0 )); then
@@ -99,7 +112,7 @@ run_city() {
 # Uses bash 5.1+ wait -n -p (available on RHEL 9 / bash 5.1.8).
 running=0
 
-for loc in "${all_except_selected_cities[@]}"; do
+for loc in "${all_except_ten_cities[@]}"; do
 
     # Before launching a new city, check if we are already at the limit.
     # If yes, stay in this while-loop and keep waiting.
