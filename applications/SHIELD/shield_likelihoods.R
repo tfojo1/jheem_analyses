@@ -837,7 +837,8 @@ lik.inst.stg3.nondemographics=join.likelihood.instructions(
     late.diagnosis.total.likelihood.instructions,
     late.diagnosis.by.strata.stage2.likelihood.instructions,
     #
-    proportion.tested.by.strata.stage2.nested.likelihood.instructions,
+    proportion.tested.total.by.age.race.nested.likelihood.instructions,
+    proportion.tested.by.sex.nested.likelihood.instructions,
     #
     historical.diagnosis.likelihood.instructions,
     proportion_ps_male_among_msm_likelihood_instructions,
