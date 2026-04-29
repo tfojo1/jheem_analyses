@@ -1,9 +1,12 @@
 # ============================================================================
 # DoxyPEP Intervention Analysis
 # ============================================================================
+source('../jheem_analyses/applications/SHIELD/shield_specification.R')
+# source('../jheem_analyses/commoncode/locations_of_interest.R')
 source("../jheem_analyses/applications/SHIELD/intervention/intervention_definitions.R")
 # --- Settings ---
-LOCATIONS <- SHIELD.TEN.MSAS  # or your DOXY.LOCATIONS vector
+# LOCATIONS <- SHIELD.TEN.MSAS  # or your DOXY.LOCATIONS vector
+LOCATIONS <- "C.12580"
 CALIBRATION.CODE <- "calib.4.24.stage2.az"  # Replace with your calibration code
 N.SIM <- 300  # or your desired number of simulations
 FORCE.OVERWRITE <- TRUE
@@ -29,7 +32,7 @@ sim.collection$run(
     2030, 
     verbose = TRUE, 
     stop.for.errors = FALSE, 
-    overwrite.prior = FORCE.OVERWRITE, 
+    # overwrite.prior = FORCE.OVERWRITE, 
     keep.from.year = 2024
 )
 
@@ -44,6 +47,16 @@ PRIMARY.OUTCOMES <- c(
     "population",                   # Population size
     "doxy.uptake"                   # DoxyPEP uptake
 )
+
+
+
+
+# --- Simplot ----
+# uses individual simsets 
+
+# need a function to load the sims
+# and then some function to generate plots
+
 
 # --- Pull Total Results ---
 print("PULLING TOTALS...")
@@ -85,7 +98,7 @@ incidence.by.sex.risk <- sim.collection$get(
     outcomes = 'incidence',
     output = 'numerator',
     dimension.values = list(year = 2020:2040),
-    keep.dimensions = c('year', 'sex', 'risk'),
+    keep.dimensions = c('year', 'sex', 'race'),
     verbose = VERBOSE
 )
 

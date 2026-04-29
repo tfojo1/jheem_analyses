@@ -63,7 +63,7 @@ for (uptake in c(10,20)){
     uptake.effect =  create.intervention.effect(
         quantity.name    = "doxy.uptake",
         start.time       = DOXY.START,
-        effect.values    = uptake,
+        effect.values    = uptake/100,
         times            = DOXY.END, # when scale up ends
         scale            = "proportion",
         apply.effects.as = "value",
@@ -75,7 +75,7 @@ for (uptake in c(10,20)){
         uptake.effect,
         parameters = DOXY.PARAMS,
         WHOLE.POPULATION, 
-        code = paste0("doxyPEP.",uptake)
+        code = paste0("doxypep.",uptake)
     )
 }
 
