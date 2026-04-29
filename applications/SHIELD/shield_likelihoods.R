@@ -178,7 +178,7 @@ emigration.likelihood.instructions =
 historical.diagnosis.likelihood.instructions <-
     create.custom.likelihood.instructions(
         name = "historical.diagnosis.likelihood",
-        compute.function = function(sim, data, log = T) {
+        compute.function = function(sim, data, weights, log = T) {
             vals  <- sim$optimized.get(data$get.instr) #get simulated values
             years <- data$years #get years
             # ratio of total diagnosis from 1970-1989 to diagnosis in 1990:
@@ -199,12 +199,12 @@ historical.diagnosis.likelihood.instructions <-
                 # if fall below min threshold: penalize with a lognormal centered at min_r
                 if (r  < min_r) {
                     μ_low <- log(min_r)
-                    logp_annual  <- dlnorm(r, meanlog = μ_low, sdlog = σ_low, log = TRUE)
+                    logp_annual  <- dlnorm(r, meanlog = μ_low, sdlog = σ_low/sqrt(weights), log = TRUE)
                 }
                 # if fall over max threshold:  penalize with a lognormal centered at max_r
                 if (r > max_r) {
                     μ_high <- log(max_r)
-                    logp_annual   <- dlnorm(r, meanlog = μ_high, sdlog = σ_high/sqrt(STAGE.1.WEIGHT), log = TRUE)
+                    logp_annual   <- dlnorm(r, meanlog = μ_high, sdlog = σ_high/sqrt(weights), log = TRUE)
                 }
                 #
                 logp_annual
@@ -233,7 +233,8 @@ historical.diagnosis.likelihood.instructions <-
                 min.ratio   = min_ratio_hist,
                 sdlog           = sdlog_hist
             )
-        }
+        },
+        weights = STAGE.1.WEIGHT
     )
 
 ##---- Overall 1993-2022 ----
@@ -383,14 +384,13 @@ ps.diagnosis.by.strata.stage2.likelihood.instructions =
 future.change.likelihood.instructions =
     create.custom.likelihood.instructions(
         name = "future.change.likelihood",
-        compute.function = function(sim, data, log = T) {
+        compute.function = function(sim, data, weights, log = T) {
             get.instr = data$get.instr
             start_year = data$start_year #2020
             end_year = data$end_year #2030
             meanlog = data$meanlog #0.938
             sdlog = data$sdlog #0.587
             penalty_cutoff = data$penalty_cutoff #10-fold
-            weight <- data$weight
             
             vals <- sim$optimized.get(get.instr)
             
@@ -399,7 +399,7 @@ future.change.likelihood.instructions =
             # browser()
             lik <- dlnorm(max(ratio, penalty_cutoff),
                           meanlog = meanlog,
-                          sdlog = sdlog/sqrt(weight),
+                          sdlog = sdlog/sqrt(weights),
                           log=T)
             
             if (log) lik else exp(lik)
@@ -423,411 +423,11 @@ future.change.likelihood.instructions =
                 end_year    = end_year,
                 meanlog     = 0.938, # from input_future_change_ten_year_ratio_likelihood
                 sdlog       = 0.588,
-                penalty_cutoff=10, # penalizing sims falling outside of 10X increase
-                weight = STAGE.2.WEIGHT * FUTURE.CHANGE.LIKELIHOOD.WEIGHT
+                penalty_cutoff=10 # penalizing sims falling outside of 10X increase
             )
-        }
-    )
-
-##---- Old Future Penalty ----
-# future.change.likelihood.instructions =
-#     create.custom.likelihood.instructions(
-#         name = "future.change.likelihood",
-#         compute.function = function(sim, data, log = TRUE) {
-#             
-#             get.instr   = data$get.instr
-#             years       = data$years
-#             start_year  = data$start_year
-#             end_year    = data$end_year
-#             window_len  = data$window_len
-#             meanlog     = data$meanlog 
-#             sdlog       = data$sdlog 
-#             sd.width   = data$sd.width             # ±2 SD band (ln space)
-#             weight =  data$weight
-#             
-#             
-#             vals  <- sim$optimized.get(get.instr)
-#             years <- years
-#             
-#             # rolling 5-yr ratios
-#             ratio <- vals / dplyr::lag(vals, window_len)
-#             ratio <- ratio[names(ratio) %in% as.character(years)]
-#             
-#             # use windows whose *start* year >= 2020 and *end* year <= 2030
-#             use <- years >= (start_year + window_len) &
-#                 years <=  end_year &
-#                 is.finite(ratio) & (ratio > 0)
-#             
-#             if (!any(use)) return(if (log) 0 else 1)
-#             
-#             ratio <- ratio[use]
-#             
-#             
-#             
-#             # band edges on the ratio scale corresponding to μ ± k·σ in ln-space
-#             lo <- exp(meanlog - sd.width*sdlog)
-#             hi <- exp(meanlog + sd.width*sdlog)
-#             
-#             # make the penalty 0 at the band edges 
-#             lp_lo <- dlnorm(lo, meanlog = meanlog, sdlog = sdlog, log = TRUE)
-#             lp_hi <- dlnorm(hi, meanlog = meanlog, sdlog = sdlog, log = TRUE)
-#             
-#             pen <- numeric(length(ratio))
-#             below <- ratio < lo
-#             above <- ratio > hi
-#             if (any(below)) pen[below] <- dlnorm(ratio[below], meanlog = meanlog, sdlog = sdlog, log = TRUE) - lp_lo
-#             if (any(above)) pen[above] <- dlnorm(ratio[above], meanlog = meanlog, sdlog = sdlog, log = TRUE) - lp_hi
-#             # inside [lo, hi] => 0
-#             #inverse variance weighting (to reflect how uncertainty in the underlying data reflects in the penalty we pay for each city)
-#             ivar <- 1 / (sdlog^2)
-#             w    <- weight * ivar
-#             total.logp <- w*sum(pen, na.rm = TRUE)   # ≤ 0; more negative = stronger penalty
-#             if (log) total.logp else exp(total.logp)
-#         },
-#         
-#         get.data.function = function(version, location) {
-#             sim.meta <- get.simulation.metadata(version = version, location = location)
-#             
-#             start_year  <- 2018L 
-#             end_year    <- 2030L
-#             window_len  <- 5L
-#             # need years 2020..2030 so t=2025..2030 ratios are computable
-#             years <- seq(start_year, end_year)
-#             
-#             get.instr <- sim.meta$prepare.optimized.get.instructions(
-#                 outcome                   = "diagnosis.ps",
-#                 dimension.values          = list(year = years),
-#                 keep.dimensions           = "year",
-#                 drop.single.sim.dimension = TRUE
-#             )
-#             
-#             list(
-#                 get.instr   = get.instr,
-#                 years       = years,
-#                 start_year  = start_year,
-#                 end_year    = end_year,
-#                 window_len  = window_len,
-#                 meanlog     = 0.522, # hard coded for years 2012 - 2022
-#                 sdlog       = 0.357,
-#                 sd.width   = 2,
-#                 weight = STAGE.1.WEIGHT  
-#             )
-#         }
-#     )
-# 
-# 
-# future.change.strata.likelihood.instructions =
-#     create.custom.likelihood.instructions(
-#         name = "future.change.5y.strata.counts",
-#         
-#         compute.function = function(sim, data, log = TRUE) {
-#             get.instr  <- data$get.instr
-#             years      <- data$years
-#             start_year <- data$start_year
-#             end_year   <- data$end_year
-#             h          <- data$window_len       # = 5
-#             meanlog    <- data$meanlog
-#             sdlog      <- data$sdlog
-#             sd.width   <- data$sd.width         # ±k·sd band (ln space)
-#             weight     <- data$weight
-#             min_count  <- data$min_count
-#             
-#             # vals expected dims: [year, sex, race] in counts
-#             vals <- sim$optimized.get(get.instr)
-#             
-#             # Ensure YEAR is first dimension
-#             dn <- names(dimnames(vals))
-#             year_idx <- match("year", dn)
-#             if (!is.na(year_idx) && year_idx != 1L) {
-#                 ord <- c(year_idx, setdiff(seq_along(dn), year_idx))
-#                 vals <- aperm(vals, ord)
-#                 dn <- dn[ord]
-#             }
-#             
-#             # Per (sex,race) time-series penalty on 5y backward ratio of COUNTS
-#             per_vec_pen <- function(v, yrs) {
-#                 v <- as.numeric(v); names(v) <- yrs
-#                 
-#                 R1 <- v / dplyr::lag(v, h)              
-#                 
-#                 v_lag <- dplyr::lag(v, h)
-#                 use <- yrs >= (start_year + h) &
-#                     yrs <=  end_year &
-#                     is.finite(R1) & (R1 > 0) &
-#                     is.finite(v) & is.finite(v_lag) &
-#                     (v >= min_count) & (v_lag >= min_count)
-#                 
-#                 if (!any(use)) return(0)
-#                 R1 <- R1[use]
-#                 
-#                 # Lognormal band edges on R1 scale; zero penalty at edges
-#                 lo <- exp(meanlog - sd.width*sdlog)
-#                 hi <- exp(meanlog + sd.width*sdlog)
-#                 lp_lo <- dlnorm(lo, meanlog = meanlog, sdlog = sdlog, log = TRUE)
-#                 lp_hi <- dlnorm(hi, meanlog = meanlog, sdlog = sdlog, log = TRUE)
-#                 
-#                 pen <- numeric(length(R1))
-#                 below <- R1 < lo; above <- R1 > hi
-#                 if (any(below)) pen[below] <- dlnorm(R1[below], meanlog, sdlog, log = TRUE) - lp_lo
-#                 if (any(above)) pen[above] <- dlnorm(R1[above], meanlog, sdlog, log = TRUE) - lp_hi
-#                 
-#                 sum(pen, na.rm = TRUE)
-#             }
-#             
-#             # Sum penalties over sex×race strata (if present)
-#             margin_idx <- match(c("sex","race"), dn, nomatch = 0L)
-#             margin_idx <- margin_idx[margin_idx > 0L]
-#             
-#             total_pen <-
-#                 if (length(margin_idx) == 0L) {
-#                     per_vec_pen(drop(vals), years)
-#                 } else {
-#                     sum(apply(vals, margin_idx, per_vec_pen, yrs = years), na.rm = TRUE)
-#                 }
-#             
-#             # Inverse-variance weighting (same as your other likelihoods)
-#             ivar <- 1 / (sdlog^2)
-#             w    <- weight * ivar
-#             total.logp <- w * total_pen
-#             if (log) total.logp else exp(total.logp)
-#         },
-#         
-#         get.data.function = function(version, location) {
-#             sim.meta   <- get.simulation.metadata(version = version, location = location)
-#             
-#             start_year <- 2018L     
-#             end_year   <- 2030L
-#             window_len <- 5L
-#             years      <- seq(start_year, end_year)
-#             
-#             get.instr <- sim.meta$prepare.optimized.get.instructions(
-#                 outcome                   = "diagnosis.ps",            # COUNTS
-#                 dimension.values          = list(year = years),
-#                 keep.dimensions           = c("year","sex","race"),    # stratified
-#                 drop.single.sim.dimension = TRUE
-#             )
-#             
-#             list(
-#                 get.instr   = get.instr,
-#                 years       = years,
-#                 start_year  = start_year,
-#                 end_year    = end_year,
-#                 window_len  = window_len,
-#                 meanlog     =  0.522,   
-#                 sdlog       =  0.357,   
-#                 sd.width    =  2,
-#                 weight      = STAGE.1.WEIGHT,
-#                 min_count   = 30L
-#             )
-#         }
-#     )
-
-##---- U-Turn Penalty ----
-U.turn.likelihood.instructions =
-    create.custom.likelihood.instructions(
-        name = "U.turn.likelihood",
-        compute.function = function(sim, data, log = TRUE) {
-            
-            get.instr  <- data$get.instr
-            years      <- data$years
-            start_year <- data$start_year
-            end_year   <- data$end_year
-            h          <- data$window_len        # = 5
-            meanlog    <- data$meanlog
-            sdlog      <- data$sdlog
-            Q25        <- data$Q25 
-            Q75        <- data$Q75    
-            weight     <- data$weight
-            
-            # pull yearly values (named by year)
-            vals <- sim$optimized.get(get.instr)
-            
-            # 5-yr backward ratio: R_t = v_t / v_{t-5}
-            R <- vals / dplyr::lag(vals, h)
-            
-            # 5-yr double-delta at anchor t: DD5_t = R_{t+5} / R_t
-            dd5 <- dplyr::lead(R, h) / R
-            
-            # align to requested years
-            dd5 <- dd5[as.character(years)]
-            
-            # use anchors with both legs present: t in [start+h, end-h]
-            use <- years >= (start_year + h) &
-                years <= (end_year   - h) &
-                is.finite(dd5) & (dd5 > 0)
-            
-            if (!any(use)) return(if (log) 0 else 1)
-            
-            dd5 <- dd5[use]
-            
-            # lognormal band edges on DD5 scale
-            lo <- Q25
-            hi <- Q75
-            
-            # make penalty 0 at the band edges
-            lp_lo <- dlnorm(lo, meanlog = meanlog, sdlog = sdlog, log = TRUE)
-            lp_hi <- dlnorm(hi, meanlog = meanlog, sdlog = sdlog, log = TRUE)
-            
-            pen <- numeric(length(dd5))
-            below <- dd5 < lo
-            above <- dd5 > hi
-            if (any(below))
-                pen[below] <- dlnorm(dd5[below], meanlog = meanlog, sdlog = sdlog, log = TRUE) - lp_lo
-            if (any(above))
-                pen[above] <- dlnorm(dd5[above], meanlog = meanlog, sdlog = sdlog, log = TRUE) - lp_hi
-            # inside [lo, hi] => 0
-            
-            # inverse-variance weighting
-            ivar <- 1 / (sdlog^2)
-            w    <- weight * ivar
-            
-            total.logp <- w * sum(pen, na.rm = TRUE)  # ≤ 0
-            if (log) total.logp else exp(total.logp)
         },
-        
-        get.data.function = function(version, location) {
-            sim.meta <- get.simulation.metadata(version = version, location = location)
-            
-            start_year <- 2013L 
-            end_year   <- 2030L
-            window_len <- 5L
-            years <- seq(start_year, end_year)
-            
-            get.instr <- sim.meta$prepare.optimized.get.instructions(
-                outcome                   = "diagnosis.ps",
-                dimension.values          = list(year = years),
-                keep.dimensions           = "year",
-                drop.single.sim.dimension = TRUE
-            )
-            
-            list(
-                get.instr   = get.instr,
-                years       = years,
-                start_year  = start_year,
-                end_year    = end_year,
-                window_len  = window_len,
-                meanlog     = 0.280,   
-                sdlog       = 0.630,   # 2*SD [0.3753111-4.66459]
-                Q25         = 0.6590209,
-                Q75         = 1.879489,
-                weight      = STAGE.1.WEIGHT
-            )
-        }
+        weights = STAGE.2.WEIGHT * FUTURE.CHANGE.LIKELIHOOD.WEIGHT
     )
-
-
-U.turn.strata.likelihood.instructions = create.custom.likelihood.instructions(
-    name = "u.turn.strata.5y",
-    
-    compute.function = function(sim, data, log = TRUE) {
-        get.instr  <- data$get.instr
-        years      <- data$years
-        start_year <- data$start_year
-        end_year   <- data$end_year
-        h          <- data$window_len        
-        meanlog    <- data$meanlog           
-        sdlog      <- data$sdlog             
-        Q25        <- data$Q25 
-        Q75        <- data$Q75         
-        weight     <- data$weight
-        min_count  <- data$min_count         
-        
-        # vals: array [year, sex, race]
-        vals <- sim$optimized.get(get.instr)
-        
-        # ensure YEAR is first dimension
-        dn <- names(dimnames(vals))
-        year_idx <- match("year", dn)
-        if (!is.na(year_idx) && year_idx != 1L) {
-            ord <- c(year_idx, setdiff(seq_along(dn), year_idx))
-            vals <- aperm(vals, ord)
-            dn <- dn[ord]
-        }
-        
-        # helper for (sex,race) time series
-        per_vec_pen <- function(v, yrs) {
-            v   <- as.numeric(v) 
-            names(v) <- yrs
-            
-            # 1y backward ratio and double-delta
-            R   <- v / dplyr::lag(v, h)
-            dd1 <- dplyr::lead(R, h) / R
-            dd1 <- dd1[as.character(yrs)]
-            
-            # require both legs present and count guardrail on v, v_{t-1}, v_{t+1}
-            v_lag  <- dplyr::lag(v, 5)
-            v_lead <- dplyr::lead(v, 5)
-            use <- yrs >= (start_year + h) &
-                yrs <= (end_year   - h) &
-                is.finite(dd1) & (dd1 > 0) &
-                is.finite(v) & is.finite(v_lag) & is.finite(v_lead) &
-                (v >= min_count) & (v_lag >= min_count) & (v_lead >= min_count)
-            
-            if (!any(use)) return(0)
-            dd1 <- dd1[use]
-            
-            # lognormal band edges on DD1 scale
-            lo <- Q25
-            hi <- Q75
-            lp_lo <- dlnorm(lo, meanlog = meanlog, sdlog = sdlog, log = TRUE)
-            lp_hi <- dlnorm(hi, meanlog = meanlog, sdlog = sdlog, log = TRUE)
-            
-            pen <- numeric(length(dd1))
-            below <- dd1 < lo; above <- dd1 > hi
-            if (any(below)) pen[below] <- dlnorm(dd1[below], meanlog = meanlog, sdlog = sdlog, log = TRUE) - lp_lo
-            if (any(above)) pen[above] <- dlnorm(dd1[above], meanlog = meanlog, sdlog = sdlog, log = TRUE) - lp_hi
-            
-            sum(pen, na.rm = TRUE)
-        }
-        
-        margin_idx <- match(c("sex","race"), dn, nomatch = 0L)
-        margin_idx <- margin_idx[margin_idx > 0L]
-        
-        total_pen <-
-            if (length(margin_idx) == 0L) {
-                per_vec_pen(drop(vals), years)
-            } else {
-                # sum penalties over all sex×race strata
-                sum(apply(vals, margin_idx, per_vec_pen, yrs = years), na.rm = TRUE)
-            }
-        
-        # same inverse-variance & weight handling as your original block
-        ivar <- 1 / (sdlog^2)
-        w    <- weight * ivar
-        total.logp <- w * total_pen
-        if (log) total.logp else exp(total.logp)
-    },
-    
-    get.data.function = function(version, location) {
-        sim.meta <- get.simulation.metadata(version = version, location = location)
-        
-        start_year <- 2013L    
-        end_year   <- 2030L
-        window_len <- 5L        
-        years <- seq(start_year, end_year)
-        
-        get.instr <- sim.meta$prepare.optimized.get.instructions(
-            outcome                   = "diagnosis.ps",
-            dimension.values          = list(year = years),
-            keep.dimensions           = c("year","sex","race"),   # key change
-            drop.single.sim.dimension = TRUE
-        )
-        
-        list(
-            get.instr   = get.instr,
-            years       = years,
-            start_year  = start_year,
-            end_year    = end_year,
-            window_len  = window_len,
-            meanlog     = 0.280,   
-            sdlog       = 0.630,  
-            Q25         = 0.6590209,
-            Q75         = 1.879489,               
-            weight      = STAGE.1.WEIGHT,       
-            min_count   = 30L                   
-        )
-    }
-)
 
 ##---- Proportion of Male Diagnosis among MSM ----
 # Penalizing simulations where the proportion of Male diagnosis among MSM falls below a certain threshold  (2018-2022):last 5 years
@@ -836,12 +436,11 @@ U.turn.strata.likelihood.instructions = create.custom.likelihood.instructions(
 proportion_ps_male_among_msm_likelihood_instructions <-
     create.custom.likelihood.instructions(
         name = "proportion_msm_likelihood",
-        compute.function = function(sim, data, log = TRUE, debug = F) {
+        compute.function = function(sim, data, weights, log = TRUE, debug = F) {
             if (debug) browser()
             
             get_instr <- data$get_instr
             years <- data$years
-            weight <- data$weight
             
             vals <- sim$optimized.get(get_instr)
             
@@ -859,11 +458,9 @@ proportion_ps_male_among_msm_likelihood_instructions <-
             # the lower threshold is set at 0.6 - 2*.05 = 0.5 (penalizing sims where prop of male diagnosis among MSM is less than 0.5)
             lo <- band_mean - 2 * band_sd
             
-            total_log_likelihood <- sum(pmin(dnorm(lo, band_mean, band_sd, log=T),
-                                             dnorm(prp_msm, band_mean, band_sd, log=T)))
-            # Apply weight
-            total_log_likelihood <- weight * total_log_likelihood
-            
+            total_log_likelihood <- sum(pmin(dnorm(lo, band_mean, band_sd/sqrt(weights), log=T),
+                                             dnorm(prp_msm, band_mean, band_sd/sqrt(weights), log=T)))
+
             if (log) total_log_likelihood else exp(total_log_likelihood)
         },
         get.data.function = function(version, location) {
@@ -882,62 +479,10 @@ proportion_ps_male_among_msm_likelihood_instructions <-
             #
             list(
                 get_instr = get_instr,
-                years = years,
-                weight = STAGE.1.WEIGHT
+                years = years
             )
-        }
-    )
-proportion_ps_male_among_msm_stratified_likelihood_instructions <-
-    create.custom.likelihood.instructions(
-        name = "proportion_msm_stratified_likelihood",
-        compute.function = function(sim, data, log = TRUE, debug = F) {
-            if (debug) browser()
-            
-            get_instr <- data$get_instr
-            years <- data$years
-            weight <- data$weight
-            
-            vals <- sim$optimized.get(get_instr)
-            
-            prp_msm <- apply(vals, c("year", "race"), function(x) {
-                x["msm"] / sum(x)
-            })
-            prp_msm <- vals[,"msm"] / rowSums(vals)
-            
-            # Normal band edges; likelihood is constant inside the band
-            band_mean <- 0.6
-            band_sd <- 0.05 # Probably want to set this wider for stratified
-            
-            lo <- band_mean - 2 * band_sd
-            
-            total_log_likelihood <- sum(pmin(dnorm(lo, band_mean, band_sd, log=T),
-                                             dnorm(prp_msm, band_mean, band_sd, log=T)))
-            
-            # Apply weight
-            total_log_likelihood <- weight * total_log_likelihood
-            
-            if (log) total_log_likelihood else exp(total_log_likelihood)
         },
-        get.data.function = function(version, location) {
-            sim_metadata <- get.simulation.metadata(version = version, location = location)
-            
-            start_year <- 2018L
-            end_year <- 2022L
-            years <- seq(start_year, end_year)
-            
-            get_instr <- sim_metadata$prepare.optimized.get.instructions(
-                outcome = "diagnosis.ps",
-                dimension.values = list(year = years, sex = c("heterosexual_male", "msm")),
-                keep.dimensions = c("year", "sex", "race"),
-                drop.single.sim.dimension = TRUE
-            )
-            
-            list(
-                get_instr = get_instr,
-                years = years,
-                weight = STAGE.1.WEIGHT
-            )
-        }
+        weights = STAGE.1.WEIGHT
     )
 ## EARLY Diagnosis ----
 # data from 1941-2022 (cdc.pdf.report) for national model Only (total)
