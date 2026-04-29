@@ -442,7 +442,7 @@ proportion_ps_male_among_msm_likelihood_instructions <-
             
             total_log_likelihood <- sum(pmin(dnorm(lo, band_mean, band_sd/sqrt(weights), log=T),
                                              dnorm(prp_msm, band_mean, band_sd/sqrt(weights), log=T)))
-
+            
             if (log) total_log_likelihood else exp(total_log_likelihood)
         },
         get.data.function = function(version, location) {
@@ -802,7 +802,19 @@ lik.inst.stage2.wFC=join.likelihood.instructions(
     additional.weights = STAGE.2.WEIGHT
 )
 ## STAGE3 ----
-lik.inst.stage3=join.likelihood.instructions(
+
+# STAGE 3 now has demographics split into a separate group
+# so that you can set different weights for them if you want.
+lik.inst.stg3.demographics=join.likelihood.instructions(
+    population.likelihood.instructions,
+    deaths.likelihood.instructions,
+    fertility.likelihood.instructions,
+    immigration.likelihood.instructions,
+    emigration.likelihood.instructions,
+    
+    additional.weights = STAGE.3.WEIGHT # consider lowering
+)
+lik.inst.stg3.nondemographics=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
     total.diagnosis.by.strata.stage2.likelihood.instructions,
     
@@ -820,48 +832,31 @@ lik.inst.stage3=join.likelihood.instructions(
     historical.diagnosis.likelihood.instructions,
     proportion_ps_male_among_msm_likelihood_instructions,
     
-    future.change.likelihood.instructions,
     additional.weights = STAGE.3.WEIGHT
 )
-lik.inst.stage3.half=join.likelihood.instructions(
-    total.diagnosis.likelihood.instructions,
-    total.diagnosis.by.strata.stage2.likelihood.instructions,
-    
-    ps.diagnosis.total.likelihood.instructions,
-    ps.diagnosis.by.strata.stage2.likelihood.instructions,
-    
-    early.diagnosis.total.likelihood.instructions,
-    early.diagnosis.by.strata.stage2.likelihood.instructions,
-    
-    late.diagnosis.total.likelihood.instructions,
-    late.diagnosis.by.strata.stage2.likelihood.instructions,
-    
-    proportion.tested.by.strata.stage2.nested.likelihood.instructions,
-    
-    historical.diagnosis.likelihood.instructions,
-    proportion_ps_male_among_msm_likelihood_instructions,
-    
-    future.change.likelihood.instructions,
-    additional.weights = STAGE.3.WEIGHT / 2
+lik.inst.stage3 = join.likelihood.instructions(
+    lik.inst.stg3.demographics,
+    lik.inst.stg3.nondemographics
 )
-lik.inst.stage3.quarter=join.likelihood.instructions(
-    total.diagnosis.likelihood.instructions,
-    total.diagnosis.by.strata.stage2.likelihood.instructions,
-    
-    ps.diagnosis.total.likelihood.instructions,
-    ps.diagnosis.by.strata.stage2.likelihood.instructions,
-    
-    early.diagnosis.total.likelihood.instructions,
-    early.diagnosis.by.strata.stage2.likelihood.instructions,
-    
-    late.diagnosis.total.likelihood.instructions,
-    late.diagnosis.by.strata.stage2.likelihood.instructions,
-    
-    proportion.tested.by.strata.stage2.nested.likelihood.instructions,
-    
-    historical.diagnosis.likelihood.instructions,
-    proportion_ps_male_among_msm_likelihood_instructions,
-    
-    future.change.likelihood.instructions,
-    additional.weights = STAGE.3.WEIGHT / 4
-)
+
+# lik.inst.stage3=join.likelihood.instructions(
+#     total.diagnosis.likelihood.instructions,
+#     total.diagnosis.by.strata.stage2.likelihood.instructions,
+#     
+#     ps.diagnosis.total.likelihood.instructions,
+#     ps.diagnosis.by.strata.stage2.likelihood.instructions,
+#     
+#     early.diagnosis.total.likelihood.instructions,
+#     early.diagnosis.by.strata.stage2.likelihood.instructions,
+#     
+#     late.diagnosis.total.likelihood.instructions,
+#     late.diagnosis.by.strata.stage2.likelihood.instructions,
+#     
+#     proportion.tested.by.strata.stage2.nested.likelihood.instructions,
+#     
+#     historical.diagnosis.likelihood.instructions,
+#     proportion_ps_male_among_msm_likelihood_instructions,
+#     
+#     future.change.likelihood.instructions,
+#     additional.weights = STAGE.3.WEIGHT
+# )
