@@ -67,9 +67,7 @@ all_except_ten_cities=(
 # Stages run sequentially per city — each is a separate Rscript process
 # so the OS fully reclaims memory between them
 stages=(
-    calib.4.24.stage0.az
-    calib.4.24.stage1.az
-    calib.4.24.stage2.az
+    calib.4.29.stage2.pk
 )
 
 script="$SCRIPT_DIR/shield_calib_setup_and_run.R"
@@ -112,7 +110,7 @@ run_city() {
 # Uses bash 5.1+ wait -n -p (available on RHEL 9 / bash 5.1.8).
 running=0
 
-for loc in "${all_except_ten_cities[@]}"; do
+for loc in "${ten_cities[@]}"; do
 
     # Before launching a new city, check if we are already at the limit.
     # If yes, stay in this while-loop and keep waiting.
