@@ -79,10 +79,7 @@ simset <- assemble.simulations.from.calibration(version = VERSION,
                                                location = LOCATION,
                                                calibration.code = CALIBRATION.NAME,
                                                allow.incomplete = T)
-filename<-paste0("prelim_results/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
-
-save(simset,file=filename) #@Andrew: why do we have two saves? 
 save.simulation.set(simset)
 
-print(paste0("Simset was saved on disk as:   ", filename))
+
 
