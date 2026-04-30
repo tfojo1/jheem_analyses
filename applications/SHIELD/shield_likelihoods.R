@@ -747,7 +747,39 @@ proportion.tested.by.sex.nested.likelihood.instructions =
                                                      weights = HIV.TESTING.BY.SEX.WEIGHT,
                                                      #
                                                      equalize.weight.by.year = T
-    ) 
+    )
+
+##---- Original (all groups)----
+proportion.tested.total.by.age.race.sex.nested.likelihood.instructions <-
+    create.nested.proportion.likelihood.instructions(outcome.for.data = "proportion.tested.for.hiv",
+                                                     outcome.for.sim = "hiv.testing",
+                                                     denominator.outcome.for.data = "adult.population",
+                                                     #
+                                                     location.types = c('STATE','CBSA'),
+                                                     minimum.geographic.resolution.type = 'COUNTY',
+                                                     #
+                                                     dimensions = c("age", "race", "sex"),
+                                                     levels.of.stratification = c(0,1),
+                                                     from.year = 2010,
+                                                     to.year = 2019,
+                                                     #
+                                                     p.bias.inside.location = 0,
+                                                     p.bias.outside.location = proportion.tested.bias.estimates$out.mean,
+                                                     p.bias.sd.inside.location = proportion.tested.bias.estimates$out.sd,
+                                                     p.bias.sd.outside.location = proportion.tested.bias.estimates$out.sd,
+                                                     #
+                                                     within.location.p.error.correlation = 0.5, #Default: correlation from one year to other in the bias in the city and outside the city
+                                                     within.location.n.error.correlation = 0.5, #Default: ratio of tests outside MSA to those inside MSA (for MSA we usually dont have fully stratified numbers)
+                                                     #
+                                                     observation.correlation.form = 'compound.symmetry',
+                                                     p.error.variance.term = NULL, # this was cv=50% until "calib.3.16.stage1.az"
+                                                     p.error.variance.type = "data.variance",
+                                                     minimum.error.sd = 0.01, # to fix two Houston points where variance data says 0
+                                                     #
+                                                     partitioning.function = SHIELD.PARTITIONING.FUNCTION,
+                                                     #
+                                                     equalize.weight.by.year = T
+    )
 #-- LIKELIHOODS --# ----
 ## STAGE0 ----
 # popualtion targets+total ps
@@ -837,8 +869,9 @@ lik.inst.stg3.nondemographics=join.likelihood.instructions(
     late.diagnosis.total.likelihood.instructions,
     late.diagnosis.by.strata.stage2.likelihood.instructions,
     #
-    proportion.tested.total.by.age.race.nested.likelihood.instructions,
-    proportion.tested.by.sex.nested.likelihood.instructions,
+    # proportion.tested.total.by.age.race.nested.likelihood.instructions,
+    # proportion.tested.by.sex.nested.likelihood.instructions,
+    proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
     #
     historical.diagnosis.likelihood.instructions,
     proportion_ps_male_among_msm_likelihood_instructions,
