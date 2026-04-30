@@ -51,6 +51,42 @@ data.manager$register.outcome(
     units = '%',
     description = "Proportion of People who have received an HIV test in the last year"), denominator.outcome = 'proportion.tested.for.hiv.n')
 
+data.manager$register.outcome(
+    'proportion.tested.for.hiv.high.risk.n',       
+    metadata = create.outcome.metadata(
+        scale = 'non.negative.number',
+        display.name = 'Denominator value for Proportion Tested for HIV in Past Year Among High Risk',
+        axis.name = 'Denominator value for Proportion Tested for HIV in Past Year Among High Risk',
+        units = '%',
+        description = "Denominator value for Proportion Tested for HIV in Past Year Among High Risk"))
+
+data.manager$register.outcome(
+    'proportion.tested.for.syphilis.high.risk.n',       
+    metadata = create.outcome.metadata(
+        scale = 'non.negative.number',
+        display.name = 'Denominator value for Proportion Tested for syphilis in Past Year Among High Risk',
+        axis.name = 'Denominator value for Proportion Tested for syphilis in Past Year Among High Risk',
+        units = '%',
+        description = "Denominator value for Proportion Tested for syphilis in Past Year Among High Risk"))
+
+data.manager$register.outcome(
+    'proportion.tested.for.hiv.high.risk', 
+    metadata = create.outcome.metadata(
+        scale = 'proportion',
+        display.name = 'Proportion Tested in Past Year Among High Risk',
+        axis.name = 'Proportion Tested in Past Year Among High Risk',
+        units = '%',
+        description = "Proportion of High Risk People who have received an HIV test in the last year"), denominator.outcome = 'proportion.tested.for.hiv.high.risk.n')
+
+data.manager$register.outcome(
+    'proportion.tested.for.syphilis.high.risk', 
+    metadata = create.outcome.metadata(
+        scale = 'proportion',
+        display.name = 'Proportion Tested in Past Year Among High Risk',
+        axis.name = 'Proportion Tested in Past Year Among High Risk',
+        units = '%',
+        description = "Proportion of High Risk People who have received an syphilis test in the last year"), denominator.outcome = 'proportion.tested.for.syphilis.high.risk.n')
+
 #Register Sources:
 data.manager$register.parent.source('BRFSS', full.name = 'Behavioral Risk Factor Surveillance System', short.name= "BRFSS") #parent
 data.manager$register.parent.source('ACS', full.name = 'American Community Survey', short.name= "ACS") #parent
