@@ -59,7 +59,7 @@ register.calibration.info('calib.4.29.stage2.pk',
 # # Attempting a top-to-bottom calibration. Here, uses 8x on future penalty likelihood.
 register.calibration.info('calib.4.24.stage2.az',
                           preceding.calibration.codes = 'calib.4.24.stage1.az',
-                          likelihood.instructions = lik.inst.stage2.wFC,
+                          likelihood.instructions = lik.inst.stage2,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
