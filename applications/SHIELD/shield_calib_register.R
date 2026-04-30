@@ -69,7 +69,6 @@ register.calibration.info('calib.4.24.stage2.az',
 )
 
 
-
 # ***** STAGE3 ***** ----
 
 # All outcomes and likelihoods, and sex-specific prop. tested, with 1/8th overall weight
@@ -78,23 +77,27 @@ register.calibration.info("calib.4.30.stage3.8th",
                           likelihood.instructions = lik.inst.stage3,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2035,
-                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
-                                              AGING.PARAMETERS.PRIOR@var.names,
-                                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
-                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
-                                              "global.transmission.rate"),
-                          n.iter = 10000, thin = 50, is.preliminary = F, max.run.time.seconds = 30, description = "NA"
-                          )
-
-# Attempting a top-to-bottom calibration. Here will use weight 1. Hope to end with 100 simulations.
-register.calibration.info('calib.4.24.stage3.az',
-                          preceding.calibration.codes = 'calib.4.24.stage2.az',
-                          likelihood.instructions = lik.inst.stage3,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2035,
-                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
-                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
-                          n.iter = 10000, thin = 50, is.preliminary = F, max.run.time.seconds = 30, description = "NA"
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names,
+                              "global.transmission.rate"
+                              ),
+                          n.iter = 10000, thin = 50,n.chains = 1, is.preliminary = F, max.run.time.seconds = 30, description = "NA"
 )
+
+# # Attempting a top-to-bottom calibration. Here will use weight 1. Hope to end with 100 simulations.
+# register.calibration.info('calib.4.24.stage3.az',
+#                           preceding.calibration.codes = 'calib.4.24.stage2.az',
+#                           likelihood.instructions = lik.inst.stage3,
+#                           data.manager = SURVEILLANCE.MANAGER,
+#                           end.year = 2035,
+#                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+#                                               STI.TESTING.PARAMETERS.PRIOR@var.names,
+#                                               TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+#                                               POPULATION.PARAMETERS.PRIOR@var.names,
+#                                               AGING.PARAMETERS.PRIOR@var.names),
+#                           n.iter = 10000, thin = 50, is.preliminary = F, max.run.time.seconds = 30, description = "NA"
+# )
