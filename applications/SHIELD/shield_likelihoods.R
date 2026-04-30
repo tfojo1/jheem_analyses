@@ -19,7 +19,7 @@ diagnosis_cv=PS_CV #we will use this error variance for all diagnosis categories
 STAGE.0.WEIGHT= 1/32 # lowered by half on 3/13/2026 
 STAGE.1.WEIGHT= 1/8
 STAGE.2.WEIGHT= 1/8
-STAGE.3.WEIGHT= 1
+STAGE.3.WEIGHT= 1/8
 
 FUTURE.CHANGE.LIKELIHOOD.WEIGHT = 8 # representing the eight points we would have post 2022 (eight times as many points)
 HIV.TESTING.BY.SEX.WEIGHT= 8 #increasing the weight for sex a specific HIV test testing rates because this is the only targets that's available among MSM
@@ -664,8 +664,6 @@ proportion.tested.total.by.race.nested.likelihood.instructions =
                                                      #
                                                      dimensions = c("race"),
                                                      levels.of.stratification = c(0,1),
-                                                     from.year = 2010,
-                                                     to.year = 2019,
                                                      #
                                                      p.bias.inside.location = 0,
                                                      p.bias.outside.location = proportion.tested.bias.estimates$out.mean,
@@ -695,8 +693,6 @@ proportion.tested.total.by.age.race.nested.likelihood.instructions =
                                                      #
                                                      dimensions = c("age", "race"),
                                                      levels.of.stratification = c(0,1),
-                                                     from.year = 2010,
-                                                     to.year = 2019,
                                                      #
                                                      p.bias.inside.location = 0,
                                                      p.bias.outside.location = proportion.tested.bias.estimates$out.mean,
@@ -726,8 +722,7 @@ proportion.tested.by.sex.nested.likelihood.instructions =
                                                      #
                                                      dimensions = c("sex"),
                                                      levels.of.stratification = c(1),
-                                                     from.year = 2010,
-                                                     to.year = 2019,
+                                                     location.overall.keep.threshold = 1, # in case there aren't enough extra years of data from the State... although then should we be using this?
                                                      #
                                                      p.bias.inside.location = 0,
                                                      p.bias.outside.location = proportion.tested.bias.estimates$out.mean,
@@ -760,8 +755,6 @@ proportion.tested.total.by.age.race.sex.nested.likelihood.instructions <-
                                                      #
                                                      dimensions = c("age", "race", "sex"),
                                                      levels.of.stratification = c(0,1),
-                                                     from.year = 2010,
-                                                     to.year = 2019,
                                                      #
                                                      p.bias.inside.location = 0,
                                                      p.bias.outside.location = proportion.tested.bias.estimates$out.mean,
@@ -869,9 +862,9 @@ lik.inst.stg3.nondemographics=join.likelihood.instructions(
     late.diagnosis.total.likelihood.instructions,
     late.diagnosis.by.strata.stage2.likelihood.instructions,
     #
-    # proportion.tested.total.by.age.race.nested.likelihood.instructions,
-    # proportion.tested.by.sex.nested.likelihood.instructions,
-    proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
+    proportion.tested.total.by.age.race.nested.likelihood.instructions,
+    proportion.tested.by.sex.nested.likelihood.instructions,
+    # proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
     #
     historical.diagnosis.likelihood.instructions,
     proportion_ps_male_among_msm_likelihood_instructions,
