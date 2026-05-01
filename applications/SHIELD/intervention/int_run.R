@@ -1,20 +1,25 @@
 # ============================================================================
 # DoxyPEP Intervention Analysis
 # ============================================================================
-source('../jheem_analyses/applications/SHIELD/shield_specification.R')
+# source('../jheem_analyses/applications/SHIELD/shield_specification.R')
 # source('../jheem_analyses/commoncode/locations_of_interest.R')
 source("../jheem_analyses/applications/SHIELD/intervention/intervention_definitions.R")
+source("../jheem_analyses/applications/SHIELD/intervention/intervention_plots.R")
+
+source("../jheem_analyses/applications/SHIELD/calibration/shield_calibration_plots.R")
+
+
 # --- Settings ---
 # LOCATIONS <- SHIELD.TEN.MSAS  # or your DOXY.LOCATIONS vector
-LOCATIONS <- "C.12580"
+LOCATIONS <- SHIELD.TEN.MSAS
 CALIBRATION.CODE <- "calib.4.24.stage2.az"  # Replace with your calibration code
 N.SIM <- 300  # or your desired number of simulations
 FORCE.OVERWRITE <- TRUE
 VERBOSE <- TRUE
-DOXY.ANCHOR.YEAR <- 2026  # Year DoxyPEP implementation begins
+DOXY.ANCHOR.YEAR <- DOXY.START  # Year DoxyPEP implementation begins
 
 # Intervention codes for DoxyPEP scenarios
-INTERVENTION.CODES <- c('noint', 'doxypep.10', 'doxypep.20') 
+INTERVENTION.CODES <- c('noint', 'doxypep.10', 'doxypep.25','doxypep.50') 
 
 print(paste0("Doing locations: ", paste0(LOCATIONS, collapse = ', ')))
 
@@ -28,13 +33,40 @@ sim.collection <- create.simset.collection(
 )
 
 sim.collection$run(
-    2026, 
-    2030, 
+    2020, 
+    2035, 
     verbose = TRUE, 
     stop.for.errors = FALSE, 
-    # overwrite.prior = FORCE.OVERWRITE, 
-    keep.from.year = 2024
+    overwrite.prior = FORCE.OVERWRITE,
+    keep.from.year = 2020
 )
+
+#  
+# # Get simsets using the shield_calibration_plots code ----
+# simset_data <- prepare_simsets_for_plots(CALIBRATION.CODE, LOCATIONS)
+# 
+# int_sims <- get_intervention_simsets(simset_data, INTERVENTION.CODES)
+simset0<-load.simulation.set("~/../../Volumes/jheem$/simulations/shield/calib.4.24.stage2.az-300/C.12580/shield_calib.4.24.stage2.az-300_C.12580_noint.Rdata")
+simset10<-load.simulation.set("~/../../Volumes/jheem$/simulations/shield/calib.4.24.stage2.az-300/C.12580/shield_calib.4.24.stage2.az-300_C.12580_doxypep.10.Rdata")
+simset20<-load.simulation.set("~/../../Volumes/jheem$/simulations/shield/calib.4.24.stage2.az-300/C.12580/shield_calib.4.24.stage2.az-300_C.12580_doxypep.20.Rdata")
+
+
+`No Doxy-PEP Intervention` = simset0
+`10% Doxy-PEP Coverage` = simset10
+`20% Doxy-PEP Coverage`= simset20
+intervention.style.manager = create.style.manager(color.sim.by = "simset")
+library(ggplot2)
+simplot(
+    `No Doxy-PEP Intervention`,
+    `10% Doxy-PEP Coverage`,
+    outcomes = c("diagnosis.ps","doxy.uptake"), split.by="sex",
+    dimension.values = list(year = 2020:2035),
+    style.manager = intervention.style.manager,
+    summary.type = "median.and.interval"
+) + theme_minimal() 
+
+
+
 
 # --- Define Primary Outcomes ---
 PRIMARY.OUTCOMES <- c(

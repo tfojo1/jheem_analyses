@@ -59,7 +59,7 @@ rownames(DOXY.PARAMS) <- c("doxy.effectiveness","doxy.discontinuationRate")
 
 # Intervention control uptake levels
 clear.interventions() 
-for (uptake in c(10,20)){
+for (uptake in c(10,25,50)){
     uptake.effect =  create.intervention.effect(
         quantity.name    = "doxy.uptake",
         start.time       = DOXY.START,
