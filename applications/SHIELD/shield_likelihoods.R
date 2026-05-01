@@ -840,16 +840,26 @@ lik.inst.stage2=join.likelihood.instructions(
 ## STAGE3 ----
 # STAGE 3 now has demographics split into a separate group
 # so that you can set different weights for them if you want.
-lik.inst.stg3.demographics=join.likelihood.instructions(
+lik.inst.stg3.population=join.likelihood.instructions(
+    population.likelihood.instructions
+)
+lik.inst.stg3.population.2x=join.likelihood.instructions(
     population.likelihood.instructions,
+    additional.weights = 1/2
+)
+lik.inst.stg3.population.4x=join.likelihood.instructions(
+    population.likelihood.instructions,
+    additional.weights = 1/4
+)
+lik.inst.stg3.population.8x=join.likelihood.instructions(
+    population.likelihood.instructions,
+    additional.weights = 1/8
+)
+lik.inst.stg3.except.population=join.likelihood.instructions(
     deaths.likelihood.instructions,
     fertility.likelihood.instructions,
     immigration.likelihood.instructions,
     emigration.likelihood.instructions,
-    #
-    additional.weights = STAGE.3.WEIGHT # consider lowering to balance out large datapoints for population
-)
-lik.inst.stg3.nondemographics=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
     total.diagnosis.by.strata.stage2.likelihood.instructions,
     #
@@ -868,11 +878,25 @@ lik.inst.stg3.nondemographics=join.likelihood.instructions(
     #
     historical.diagnosis.likelihood.instructions,
     proportion_ps_male_among_msm_likelihood_instructions,
-    future.change.likelihood.instructions,    # Future change penalty
-    #
-    additional.weights = STAGE.3.WEIGHT
+    future.change.likelihood.instructions    # Future change penalty
 )
 lik.inst.stage3 = join.likelihood.instructions(
-    lik.inst.stg3.demographics,
-    lik.inst.stg3.nondemographics
+    lik.inst.stg3.population,
+    lik.inst.stg3.except.population,
+    additional.weights = STAGE.3.WEIGHT
+)
+lik.inst.stage3.pop.2x = join.likelihood.instructions(
+    lik.inst.stg3.population.2x,
+    lik.inst.stg3.except.population,
+    additional.weights = STAGE.3.WEIGHT
+) 
+lik.inst.stage3.pop.4x = join.likelihood.instructions(
+    lik.inst.stg3.population.4x,
+    lik.inst.stg3.except.population,
+    additional.weights = STAGE.3.WEIGHT
+) 
+lik.inst.stage3.pop.8x = join.likelihood.instructions(
+    lik.inst.stg3.population.8x,
+    lik.inst.stg3.except.population,
+    additional.weights = STAGE.3.WEIGHT
 ) 
