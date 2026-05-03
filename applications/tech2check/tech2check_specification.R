@@ -99,10 +99,19 @@ register.transition(TECH2CHECK.SPECIFICATION,
 ##-----------------##
 #
 # Apply the trial OR to the inherited baseline suppression proportion on the
-# odds scale: p' = OR * p / (1 - p + OR * p), where p = suppression.of.diagnosed.
+# odds scale: p' = OR * p / (1 - p + OR * p), where p = super.suppression.of.diagnosed.
 # Three independent ORs so the design.md sensitivity scenarios (reduced OR in
 # Recently; residual OR in Distantly) are parameterizable without restructuring.
-# diagnosed_chronic (never intervened) inherits the EHE baseline unchanged.
+# diagnosed_chronic (never intervened) inherits the EHE baseline unchanged via
+# the dispatcher's neutral default (OR = 1).
+#
+# Subtle: we redefine `suppression.of.diagnosed` (not `suppression`) because the
+# inherited `suppression` tracked outcome reads `multiply.by = 'suppression.of.diagnosed'`,
+# and the framework rejects re-registering an inherited outcome. Anchoring the
+# OR effect on `suppression.of.diagnosed` lets the inherited outcome dispatch
+# per-compartment automatically; EHE's mortality/transmissibility consume
+# `suppression` (the dispatcher), which inherits the redefinition transparently.
+# See jheem_spec_notes.md ("Model quantities vs. tracked outcomes") for full context.
 
 register.model.element(TECH2CHECK.SPECIFICATION,
                        name = 'tech2check.on.suppression.OR',
@@ -120,49 +129,119 @@ register.model.element(TECH2CHECK.SPECIFICATION,
                        value = 1.0)
 
 
+# Per-compartment OR dispatcher: default 1 (neutral) everywhere; subsets override
+# for the three intervention compartments. Same shape as EHE's `suppression`
+# quantity — base value plus name-referencing subsets.
 register.model.quantity(TECH2CHECK.SPECIFICATION,
-                        name = 'suppression',
-                        value = 0)
+                        name = 'tech2check.suppression.OR',
+                        value = 1)
 
 register.model.quantity.subset(TECH2CHECK.SPECIFICATION,
-                               name = 'suppression',
-                               value = 'suppression.of.diagnosed',
-                               applies.to = list(continuum = 'diagnosed_chronic'))
-
-
-register.model.quantity(TECH2CHECK.SPECIFICATION,
-                        name = 'suppression.on.intervention',
-                        value = expression(tech2check.on.suppression.OR * suppression.of.diagnosed /
-                                           (1 - suppression.of.diagnosed + tech2check.on.suppression.OR * suppression.of.diagnosed)),
-                        scale = 'proportion')
-
-register.model.quantity(TECH2CHECK.SPECIFICATION,
-                        name = 'suppression.recently.intervened',
-                        value = expression(tech2check.recently.suppression.OR * suppression.of.diagnosed /
-                                           (1 - suppression.of.diagnosed + tech2check.recently.suppression.OR * suppression.of.diagnosed)),
-                        scale = 'proportion')
-
-register.model.quantity(TECH2CHECK.SPECIFICATION,
-                        name = 'suppression.distantly.intervened',
-                        value = expression(tech2check.distantly.suppression.OR * suppression.of.diagnosed /
-                                           (1 - suppression.of.diagnosed + tech2check.distantly.suppression.OR * suppression.of.diagnosed)),
-                        scale = 'proportion')
-
-
-register.model.quantity.subset(TECH2CHECK.SPECIFICATION,
-                               name = 'suppression',
-                               value = 'suppression.on.intervention',
+                               name = 'tech2check.suppression.OR',
+                               value = 'tech2check.on.suppression.OR',
                                applies.to = list(continuum = 'on_intervention'))
 
 register.model.quantity.subset(TECH2CHECK.SPECIFICATION,
-                               name = 'suppression',
-                               value = 'suppression.recently.intervened',
+                               name = 'tech2check.suppression.OR',
+                               value = 'tech2check.recently.suppression.OR',
                                applies.to = list(continuum = 'recently_intervened'))
 
 register.model.quantity.subset(TECH2CHECK.SPECIFICATION,
-                               name = 'suppression',
-                               value = 'suppression.distantly.intervened',
+                               name = 'tech2check.suppression.OR',
+                               value = 'tech2check.distantly.suppression.OR',
                                applies.to = list(continuum = 'distantly_intervened'))
+
+
+# Redefine the diagnosed-suppression baseline with the per-compartment OR.
+# diagnosed_chronic: dispatcher returns 1 -> expression collapses to
+#   super.suppression.of.diagnosed (EHE baseline preserved, COVID multiplier intact).
+# intervention compartments: dispatcher returns the compartment-specific OR ->
+#   p' = OR * baseline / (1 - baseline + OR * baseline).
+register.model.quantity(TECH2CHECK.SPECIFICATION,
+                        name = 'suppression.of.diagnosed',
+                        value = expression(tech2check.suppression.OR * super.suppression.of.diagnosed /
+                                           (1 - super.suppression.of.diagnosed +
+                                            tech2check.suppression.OR * super.suppression.of.diagnosed)))
+
+
+##----------------------##
+##-- TRACKED OUTCOMES --##
+##----------------------##
+#
+# EHE outcomes are inherited; these are Tech2Check-specific additions for
+# verification (simulation_verification.md) and downstream paper/cost analysis.
+
+# Annual program enrollments per stratum.
+track.transition(TECH2CHECK.SPECIFICATION,
+                 name = 'tech2check.enrollments',
+                 outcome.metadata = create.outcome.metadata(display.name = 'Tech2Check Enrollments',
+                                                            description = "Number of Individuals Enrolling in Tech2Check in the Past Year",
+                                                            scale = 'non.negative.number',
+                                                            axis.name = 'Enrollments',
+                                                            units = 'persons',
+                                                            singular.unit = 'person'),
+                 dimension = 'continuum',
+                 from.compartments = 'diagnosed_chronic',
+                 to.compartments = 'on_intervention',
+                 keep.dimensions = c('location','age','race','sex','risk'))
+
+# Population in each lifecycle compartment (continuum kept to break out by state).
+track.point.outcome(TECH2CHECK.SPECIFICATION,
+                    name = 'intervention.population',
+                    outcome.metadata = create.outcome.metadata(display.name = 'Intervention Population',
+                                                               description = "Number of Individuals in Each Intervention Lifecycle Compartment",
+                                                               scale = 'non.negative.number',
+                                                               axis.name = 'Persons',
+                                                               units = 'persons',
+                                                               singular.unit = 'person'),
+                    value = 'infected',
+                    subset.dimension.values = list(continuum = c('on_intervention',
+                                                                 'recently_intervened',
+                                                                 'distantly_intervened')),
+                    keep.dimensions = c('location','age','race','sex','risk','continuum'))
+
+# Person-years on active intervention -- direct cost-analysis input.
+track.integrated.outcome(TECH2CHECK.SPECIFICATION,
+                         name = 'person.years.on.intervention',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Person-Years on Intervention',
+                                                                    description = "Person-Years Spent in the Active Intervention Compartment",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Person-Years',
+                                                                    units = 'person-years',
+                                                                    singular.unit = 'person-year'),
+                         value.to.integrate = 'infected',
+                         subset.dimension.values = list(continuum = 'on_intervention'),
+                         keep.dimensions = c('location','age','race','sex','risk'))
+
+# Per-state diagnosed prevalence -- denominator for the per-state suppression outcome.
+track.integrated.outcome(TECH2CHECK.SPECIFICATION,
+                         name = 'diagnosed.prevalence.by.intervention.state',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Prevalence by Intervention State',
+                                                                    description = "The Number of Diagnosed PWH in Each Intervention Lifecycle State",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Prevalent Cases',
+                                                                    units = 'cases',
+                                                                    singular.unit = 'case'),
+                         value.to.integrate = 'infected',
+                         subset.dimension.values = list(continuum = 'diagnosed.states'),
+                         keep.dimensions = c('location','age','race','sex','risk','continuum'))
+
+# Suppression broken out by intervention state -- enables analytical verification
+# of OR application (Step 4 of simulation_verification.md) and the per-stage
+# suppression plot Melissa is anticipating.
+track.integrated.outcome(TECH2CHECK.SPECIFICATION,
+                         name = 'suppression.by.intervention.state',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Suppression by Intervention State',
+                                                                    description = "The Proportion of People with Diagnosed HIV who are Virally Suppressed, by Intervention Lifecycle State",
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'Proportion Suppressed',
+                                                                    units = '%'),
+                         value.to.integrate = 'infected',
+                         value.is.numerator = T,
+                         multiply.by = 'suppression.of.diagnosed',
+                         subset.dimension.values = list(continuum = 'diagnosed.states'),
+                         denominator.outcome = 'diagnosed.prevalence.by.intervention.state',
+                         keep.dimensions = c('location','age','race','sex','risk','continuum'))
 
 
 ##--------------##
