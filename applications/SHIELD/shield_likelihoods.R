@@ -787,33 +787,58 @@ lik.inst.stage0 =join.likelihood.instructions(
     additional.weights = STAGE.0.WEIGHT
 )
 
-## STAGE1 ----- 
-### without future trend -----
-# stage1 likelihoods without future trends
+## NEW STAGE 1 ----
+# same as stage 2 from before. Temporarily, these sub likelihoods will retain their original names (with "stage2")
 lik.inst.stage1=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
-    total.diagnosis.by.strata.stage1.likelihood.instructions,
+    total.diagnosis.by.strata.stage2.likelihood.instructions,
     #
     ps.diagnosis.total.likelihood.instructions,
-    ps.diagnosis.by.strata.stage1.likelihood.instructions,
+    ps.diagnosis.by.strata.stage2.likelihood.instructions,
     #
     early.diagnosis.total.likelihood.instructions,
-    early.diagnosis.by.strata.stage1.likelihood.instructions,
+    early.diagnosis.by.strata.stage2.likelihood.instructions,
     #
     late.diagnosis.total.likelihood.instructions,
-    late.diagnosis.by.strata.stage1.likelihood.instructions,
+    late.diagnosis.by.strata.stage2.likelihood.instructions,
     #
-    proportion.tested.total.by.race.nested.likelihood.instructions,
+    proportion.tested.total.by.age.race.nested.likelihood.instructions,
     proportion.tested.by.sex.nested.likelihood.instructions,
     #
     historical.diagnosis.likelihood.instructions,
-    proportion_ps_male_among_msm_likelihood_instructions,    # Future change penalty
-    future.change.likelihood.instructions,
+    proportion_ps_male_among_msm_likelihood_instructions,
+    future.change.likelihood.instructions,    # Future change penalty
     #
     additional.weights = STAGE.1.WEIGHT
 )
 
-## STAGE2 ----- 
+## OLD STAGE1 ----- 
+### without future trend -----
+# stage1 likelihoods without future trends
+# lik.inst.stage1=join.likelihood.instructions(
+#     total.diagnosis.likelihood.instructions,
+#     total.diagnosis.by.strata.stage1.likelihood.instructions,
+#     #
+#     ps.diagnosis.total.likelihood.instructions,
+#     ps.diagnosis.by.strata.stage1.likelihood.instructions,
+#     #
+#     early.diagnosis.total.likelihood.instructions,
+#     early.diagnosis.by.strata.stage1.likelihood.instructions,
+#     #
+#     late.diagnosis.total.likelihood.instructions,
+#     late.diagnosis.by.strata.stage1.likelihood.instructions,
+#     #
+#     proportion.tested.total.by.race.nested.likelihood.instructions,
+#     proportion.tested.by.sex.nested.likelihood.instructions,
+#     #
+#     historical.diagnosis.likelihood.instructions,
+#     proportion_ps_male_among_msm_likelihood_instructions,    # Future change penalty
+#     future.change.likelihood.instructions,
+#     #
+#     additional.weights = STAGE.1.WEIGHT
+# )
+
+## OLD STAGE2 ----- 
 #total syphilis +stage 2 stratas (by age, sex, race)### with future trend -----
 lik.inst.stage2=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
