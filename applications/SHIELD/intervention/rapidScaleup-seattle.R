@@ -1,5 +1,14 @@
 # Modeling a rapid scale up in Seattle according to DOXYPEP Trial 
 
+
+# ============================================================================
+# DoxyPEP Intervention Analysis
+# ============================================================================
+source('../jheem_analyses/applications/SHIELD/shield_specification.R')
+source('../jheem_analyses/commoncode/locations_of_interest.R')
+
+
+
 # enrolled in 2020–2022 across San Francisco (UCSF) and Seattle (UW).  
 # Enrollment occurred largely in 2020–2021 with 12 months of follow‑up per participant.
 # Enrollment start: August 19, 2020
@@ -88,17 +97,13 @@ for (uptake in c(30,45)){
         uptake.effect,
         parameters = DOXY.PARAMS,
         WHOLE.POPULATION, 
-        code = paste0("doxypep.",uptake)
+        code = paste0("doxypep.",uptake,".rapid")
     )
+    print(paste("registered: ",paste0("doxypep.",uptake,".rapid")))
 }
 
 noint = get.null.intervention()
 
-# ============================================================================
-# DoxyPEP Intervention Analysis
-# ============================================================================
-source('../jheem_analyses/applications/SHIELD/shield_specification.R')
-source('../jheem_analyses/commoncode/locations_of_interest.R')
 
 # =============================================================================
 # SECTION 1: Configuration
@@ -120,7 +125,7 @@ INTERVENTION.LABELS <- c(
 )
 INTERVENTION.CODES <- names(INTERVENTION.LABELS)
 
-if (1==1){
+if (1==2){
     sim.collection <- create.simset.collection(
         version = "shield",
         calibration.code = CALIBRATION.CODE,
@@ -140,3 +145,56 @@ if (1==1){
         keep.from.year = FIRST.YEAR
     )
 }
+
+# =============================================================================
+# SECTION 3: Load All Simsets
+# =============================================================================
+
+all.simsets <- load.all.simsets(
+    locations           = LOCATIONS,
+    intervention.codes  = INTERVENTION.CODES,
+    calibration.code    = CALIBRATION.CODE,
+    n.sim               = N.SIM,
+    base.path           = BASE.PATH,
+    intervention.labels = INTERVENTION.LABELS,
+    # cache               = all.simsets,   # explicit — takes priority Anything already in `all.simsets` is reused; only new keys are loaded from file
+    append=T
+    # force.reload        = FALSE # set TRUE to ignore cache and reload everything
+)
+# =============================================================================
+# SECTION 4: Plotting
+# =============================================================================
+
+intervention.style.manager <- create.style.manager(color.sim.by = "simset",alpha.line=1)
+
+# Plot output directories
+ROOT.DIR <- get.jheem.root.directory()
+PLOT.BASE.DIR <- file.path(ROOT.DIR, "shield", "interventionPlots", CALIBRATION.CODE)
+PLOT.COMPARISON.DIR <- file.path(PLOT.BASE.DIR, "comparisons")
+
+# --- Single city, display only ---
+plot_int_single_city(
+    all.simsets,
+    city     = "Seattle",
+    outcomes = c("diagnosis.ps", "doxy.uptake")
+    # save = T,create.dirs = T
+)
+plot_int_single_city(
+    all.simsets,
+    city     = "Seattle",
+    outcomes = c("diagnosis.ps"),
+    # facet.by = "sex",
+    # plot.which="sim.only",
+    # years=c(2000,2025),
+    style.manager = intervention.style.manager
+    # save = T,create.dirs = T
+)
+plot_int_single_city(
+    all.simsets,
+    city     = "Seattle",
+    outcomes = c("doxy.uptake"),
+    facet.by = "sex",
+    years=c(2020,2025),
+    style.manager = intervention.style.manager
+    # save = T,create.dirs = T
+)

@@ -336,7 +336,10 @@ plot_int_single_city <- function(all.simsets,
                                  city,
                                  interventions = NULL,
                                  outcomes = c("diagnosis.ps", "doxy.uptake"),
+                                 split.by=NULL,
+                                 facet.by=NULL,
                                  years = 2020:2035,
+                                 plot.which="sim.and.data",
                                  style.manager = NULL,
                                  save = FALSE,
                                  save.dir = NULL,
@@ -375,7 +378,10 @@ plot_int_single_city <- function(all.simsets,
             outcomes         = outcomes,
             dimension.values = list(year = years),
             style.manager    = style.manager,
-            summary.type     = "median.and.interval"
+            summary.type     = "median.and.interval",
+            split.by=split.by,
+            facet.by=facet.by,
+            plot.which=plot.which
         )
     ))
     
