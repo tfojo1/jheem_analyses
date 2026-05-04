@@ -90,9 +90,13 @@ data.manager$register.outcome(
 #Register Sources:
 data.manager$register.parent.source('BRFSS', full.name = 'Behavioral Risk Factor Surveillance System', short.name= "BRFSS") #parent
 data.manager$register.parent.source('ACS', full.name = 'American Community Survey', short.name= "ACS") #parent
+data.manager$register.parent.source('CDC', full.name = 'Centers for Disease Control and Prevention', short.name= "cdc") #parent
+
 
 data.manager$register.source('emory', parent.source= "ACS", full.name = "Emory University", short.name='emory') #child
 data.manager$register.source('brfss', parent.source= "BRFSS", full.name = "Behavioral Risk Factor Surveillance System", short.name='brfss') #child
+data.manager$register.source('nhbs', parent.source= "CDC", full.name = "National HIV Behavioral Surveillance", short.name='nhbs') #child
+
 
 #Register Ontologies:
 data.manager$register.ontology(
@@ -133,6 +137,17 @@ data.manager$register.ontology( #This ontology removes the risk category and reo
         age=c('18-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65+ years'),
         race=c('white', 'black', 'american indian/alaska native', 'asian', 'native hawaiian/other pacific islander', 'other race', 'hispanic'),
         sex=c('msm', 'male', 'female')
+    ))
+
+data.manager$register.ontology(
+    'nhbs',
+    ont = ontology(
+        year= NULL,
+        location= NULL,
+        age=c('18-24 years', '25-29 years', '30-39 years', '40-49 years', '50+ years'),
+        race=c('white', 'black', 'american indian/alaska native', 'asian/native hawaiian/other pacific islander', 'hispanic', 'other race'),
+        sex=c('male','female'),
+        risk=c('msm', 'heterosexual')
     ))
 
 #Codes:
