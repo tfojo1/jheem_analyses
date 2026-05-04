@@ -156,6 +156,7 @@ source('data_processing/syphilis.manager/brfss_national_weighted_tested.R') #Thi
 source('data_processing/syphilis.manager/proportion.tested.for.hiv_state_weighted.R') #This is used for state level proportion.tested.for.hiv
 source('data_processing/syphilis.manager/proportion.tested.for.hiv_msa_weighted.R') #This is used for msa level proportion.tested.for.hiv
 source('data_processing/syphilis.manager/brfss_national_weighted_msm.R') #This is used for national level proportion.msm
+source('data_processing/syphilis.manager/nhbs.testing.tables.R') #This is used for proportion.tested.for.hiv.high.risk (and syphilis)
 
 #Save:
 save(data.manager, file=Sys.getenv("SECTION_OUTPUT", file.path(Q_ROOT, "data_managers/data.manager.merge/syphilis.manager_section4.rdata")))
