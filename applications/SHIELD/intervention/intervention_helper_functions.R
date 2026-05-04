@@ -10,7 +10,7 @@
 #   - Visualization/plotting functions
 # ****************************************************************************************************
 
-
+# SIMSET LOADING FUNCTIONS ----
 # build.simset.path ----
 # 
 # Path Builder: Constructs the full .Rdata file path for one location × 
@@ -208,8 +208,6 @@ load.all.simsets <- function(locations,
 # Utility functions for extracting subsets of the combined simset list.
 # All return named sublists ready for do.call(simplot, ...).
 # ****************************************************************************************************
-
-
 # get.simsets.for.city ----
 #
 # Returns all interventions for a given city name.
@@ -313,47 +311,304 @@ get_intervention_simsets <- function(simset.data, intervention, just.last.twenty
 }
 
 
-# create_intervention_plots ----
-#
-# Generates and saves comparison plots for intervention vs null across cities.
-#
-# Arguments:
-#   int.sim.data - Output from get_intervention_simsets()
-#   create.dirs  - If TRUE, creates output directories if they don't exist
-#
-# Side Effects:
-#   Saves PNG plot files to:
-#     {jheem.root}/shield/interventionPlots/{CALIB}/{city}/diagnosis_ps.png
-#
-# Errors:
-#   Stops if directory doesn't exist and create.dirs = FALSE
-# ****************************************************************************************************
-create_intervention_plots <- function(int.sim.data, create.dirs = FALSE) {
+
+
+# PLOTTING FUNCTIONS ----
+# plot_int_single_city ----
+#' Plot multiple interventions for a single city
+#' Creates one plot with different panels for each outcome
+#'
+#' @param all.simsets Named list of all loaded simsets
+#' @param city City name to plot
+#' @param interventions Character vector of intervention labels to include (NULL = all)
+#' @param outcomes Character vector of outcomes (each becomes a panel)
+#' @param years Year range for x-axis
+#' @param style.manager Optional custom style manager
+#' @param save Logical, whether to save the plot
+#' @param save.dir Directory to save plot (default: PLOT.BASE.DIR/city/)
+#' @param filename Custom filename (default: auto-generated from city and outcomes)
+#' @param width Plot width in inches
+#' @param height Plot height in inches
+#' @param dpi Plot resolution
+#' @param create.dirs Create directories if they don't exist
+#' @return ggplot object (invisibly if saved)
+plot_int_single_city <- function(all.simsets,
+                                 city,
+                                 interventions = NULL,
+                                 outcomes = c("diagnosis.ps", "doxy.uptake"),
+                                 years = 2020:2035,
+                                 style.manager = NULL,
+                                 save = FALSE,
+                                 save.dir = NULL,
+                                 filename = NULL,
+                                 width = 12,
+                                 height = 7,
+                                 dpi = 300,
+                                 create.dirs = FALSE) {
     
-    for (city in names(int.sim.data)) {
-        
-        if (is.null(int.sim.data[[city]]$int_simset)) next
-        
-        plotting_path <- paste0(get.jheem.root.directory(), "/shield/interventionPlots/", CALIB, "/", city, "/")
-        
-        if (!dir.exists(plotting_path)) {
-            if (!create.dirs)
-                stop(paste0("Error: directory for '", city, "' and '", CALIB, 
-                            "' does not exist. Check that get.jheem.root.directory() ",
-                            "shows the right place, then try again with 'create.dirs' set to TRUE."))
-            dir.create(plotting_path, recursive = TRUE, showWarnings = FALSE)
-            print(paste0("Generating directories for '", city, "' and '", CALIB, "'"))
-        }
-        
-        plot <- simplot(int.sim.data[[city]]$int_simset,
-                        int.sim.data[[city]]$null_simset,
-                        "diagnosis.ps",
-                        summary.type = "median.and.interval",
-                        style.manager = create.style.manager(color.sim.by = "simset"))
-        
-        file_png <- file.path(paste0(plotting_path, "diagnosis_ps.png"))
-        ggsave(file_png, plot = plot, width = 12, height = 7, dpi = 300)
+    # Get simsets for this city
+    city.simsets <- get.simsets.for.city(all.simsets, city)
+    
+    if (length(city.simsets) == 0) {
+        stop(paste0("No simsets found for city: ", city))
     }
     
-    print("Done creating intervention plots")
+    # Filter to requested interventions
+    if (!is.null(interventions)) {
+        missing <- setdiff(interventions, names(city.simsets))
+        if (length(missing) > 0) {
+            warning(paste0("Interventions not found for ", city, ": ", 
+                           paste(missing, collapse = ", ")))
+        }
+        city.simsets <- city.simsets[intersect(interventions, names(city.simsets))]
+    }
+    
+    # Default style manager
+    if (is.null(style.manager)) {
+        style.manager <- create.style.manager(color.sim.by = "simset")
+    }
+    
+    # Create plot
+    p <- do.call(simplot, c(
+        city.simsets,
+        list(
+            outcomes         = outcomes,
+            dimension.values = list(year = years),
+            style.manager    = style.manager,
+            summary.type     = "median.and.interval"
+        )
+    ))
+    
+    # Add title
+    p <- p + ggtitle(city)
+    
+    # Save if requested
+    if (save) {
+        # Default save directory: ROOT.DIR/shield/interventionPlots/CALIBRATION.CODE/city/
+        if (is.null(save.dir)) {
+            save.dir <- file.path(PLOT.BASE.DIR, city)
+        }
+        
+        # Create directory if needed
+        if (!dir.exists(save.dir)) {
+            if (!create.dirs) {
+                stop(paste0("Directory does not exist: ", save.dir,
+                            "\nSet create.dirs = TRUE to create it."))
+            }
+            dir.create(save.dir, recursive = TRUE, showWarnings = FALSE)
+            message(paste0("Created directory: ", save.dir))
+        }
+        
+        # Default filename
+        if (is.null(filename)) {
+            outcomes.str <- paste(outcomes, collapse = "_")
+            filename <- paste0(city, "_", outcomes.str, ".png")
+        }
+        
+        # Ensure .png extension
+        if (!grepl("\\.png$", filename)) {
+            filename <- paste0(filename, ".png")
+        }
+        
+        filepath <- file.path(save.dir, filename)
+        ggsave(filepath, plot = p, width = width, height = height, dpi = dpi)
+        message(paste0("Saved: ", filepath))
+        
+        return(invisible(p))
+    }
+    
+    p
+}
+
+# plot_int_mult_cities ----
+#' Compare interventions across multiple cities (side-by-side)
+#' Creates a grid: rows = outcomes, columns = cities
+#'
+#' @param all.simsets Named list of all loaded simsets
+#' @param cities Character vector of city names to compare
+#' @param interventions Character vector of intervention labels to include (NULL = all)
+#' @param outcomes Character vector of outcomes
+#' @param years Year range for x-axis
+#' @param ncol Number of columns in grid (NULL = one per city)
+#' @param style.manager Optional custom style manager
+#' @param save Logical, whether to save the plot
+#' @param save.dir Directory to save plot (default: PLOT.BASE.DIR/comparisons/)
+#' @param filename Custom filename (default: auto-generated)
+#' @param width Plot width in inches (default: 4 per city)
+#' @param height Plot height in inches
+#' @param dpi Plot resolution
+#' @param create.dirs Create directories if they don't exist
+#' @return patchwork object (invisibly if saved)
+plot_int_mult_cities <- function(all.simsets,
+                                 cities,
+                                 interventions = NULL,
+                                 outcomes = c("diagnosis.ps", "doxy.uptake"),
+                                 years = 2020:2035,
+                                 ncol = NULL,
+                                 style.manager = NULL,
+                                 save = FALSE,
+                                 save.dir = NULL,
+                                 filename = NULL,
+                                 width = NULL,
+                                 height = 7,
+                                 dpi = 300,
+                                 create.dirs = FALSE) {
+    
+    # Default style manager
+    if (is.null(style.manager)) {
+        style.manager <- create.style.manager(color.sim.by = "simset")
+    }
+    
+    # Generate one plot per city
+    plots <- lapply(cities, function(city) {
+        
+        city.simsets <- get.simsets.for.city(all.simsets, city)
+        
+        if (length(city.simsets) == 0) {
+            warning(paste0("No simsets found for city: ", city))
+            return(NULL)
+        }
+        
+        # Filter to requested interventions
+        if (!is.null(interventions)) {
+            city.simsets <- city.simsets[intersect(interventions, names(city.simsets))]
+        }
+        
+        if (length(city.simsets) == 0) {
+            warning(paste0("No matching interventions for city: ", city))
+            return(NULL)
+        }
+        
+        # Create plot for this city
+        p <- do.call(simplot, c(
+            city.simsets,
+            list(
+                outcomes         = outcomes,
+                dimension.values = list(year = years),
+                style.manager    = style.manager,
+                summary.type     = "median.and.interval"
+            )
+        ))
+        
+        # Add city title
+        p + ggtitle(city)
+    })
+    
+    # Remove NULLs
+    valid.idx <- !sapply(plots, is.null)
+    plots <- plots[valid.idx]
+    valid.cities <- cities[valid.idx]
+    names(plots) <- valid.cities
+    
+    if (length(plots) == 0) {
+        stop("No valid plots generated for any city")
+    }
+    
+    # Combine into grid
+    if (is.null(ncol)) ncol <- length(plots)
+    
+    combined <- wrap_plots(plots, ncol = ncol) +
+        plot_layout(guides = "collect") &
+        theme(legend.position = "bottom")
+    
+    # Save if requested
+    if (save) {
+        # Default save directory: ROOT.DIR/shield/interventionPlots/CALIBRATION.CODE/comparisons/
+        if (is.null(save.dir)) {
+            save.dir <- PLOT.COMPARISON.DIR
+        }
+        
+        # Create directory if needed
+        if (!dir.exists(save.dir)) {
+            if (!create.dirs) {
+                stop(paste0("Directory does not exist: ", save.dir,
+                            "\nSet create.dirs = TRUE to create it."))
+            }
+            dir.create(save.dir, recursive = TRUE, showWarnings = FALSE)
+            message(paste0("Created directory: ", save.dir))
+        }
+        
+        # Default filename
+        if (is.null(filename)) {
+            cities.str <- paste(valid.cities, collapse = "_")
+            outcomes.str <- paste(outcomes, collapse = "_")
+            filename <- paste0("comparison_", cities.str, "_", outcomes.str, ".png")
+            
+            # Truncate if too long
+            if (nchar(filename) > 100) {
+                filename <- paste0("comparison_", length(valid.cities), 
+                                   "cities_", outcomes.str, ".png")
+            }
+        }
+        
+        # Ensure .png extension
+        if (!grepl("\\.png$", filename)) {
+            filename <- paste0(filename, ".png")
+        }
+        
+        # Default width based on number of cities
+        if (is.null(width)) {
+            width <- 4 * min(ncol, length(plots))
+        }
+        
+        filepath <- file.path(save.dir, filename)
+        ggsave(filepath, plot = combined, width = width, height = height, dpi = dpi)
+        message(paste0("Saved: ", filepath))
+        
+        return(invisible(combined))
+    }
+    
+    combined
+}
+
+# plot_int_all_cities ----
+#' Generate and save plots for all cities
+#'
+#' @param all.simsets Named list of all loaded simsets
+#' @param cities Character vector of city names (NULL = all available)
+#' @param interventions Character vector of intervention labels (NULL = all)
+#' @param outcomes Character vector of outcomes
+#' @param years Year range
+#' @param save.dir Base directory for saving (default: PLOT.BASE.DIR)
+#' @param create.dirs Create directories if they don't exist
+plot_int_all_cities <- function(all.simsets,
+                                cities = NULL,
+                                interventions = NULL,
+                                outcomes = c("diagnosis.ps", "doxy.uptake"),
+                                years = 2020:2035,
+                                save.dir = NULL,
+                                create.dirs = TRUE) {
+    
+    # Default save directory
+    if (is.null(save.dir)) {
+        save.dir <- PLOT.BASE.DIR
+    }
+    
+    # Get all cities if not specified
+    if (is.null(cities)) {
+        all.names <- names(all.simsets)
+        cities <- unique(sapply(strsplit(all.names, " – "), `[`, 1))
+    }
+    
+    message(paste0("Generating plots for ", length(cities), " cities..."))
+    message(paste0("Saving to: ", save.dir))
+    
+    for (city in cities) {
+        tryCatch({
+            plot_int_single_city(
+                all.simsets,
+                city          = city,
+                interventions = interventions,
+                outcomes      = outcomes,
+                years         = years,
+                save          = TRUE,
+                save.dir      = file.path(save.dir, city),
+                create.dirs   = create.dirs
+            )
+        }, error = function(e) {
+            warning(paste0("Failed to generate plot for ", city, ": ", e$message))
+        })
+    }
+    
+    message("Done generating all city plots")
 }
