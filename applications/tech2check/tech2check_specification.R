@@ -227,8 +227,7 @@ track.integrated.outcome(TECH2CHECK.SPECIFICATION,
                          keep.dimensions = c('location','age','race','sex','risk','continuum'))
 
 # Suppression broken out by intervention state -- enables analytical verification
-# of OR application (Step 4 of simulation_verification.md) and the per-stage
-# suppression plot Melissa is anticipating.
+# of OR application (Step 4 of simulation_verification.md)
 track.integrated.outcome(TECH2CHECK.SPECIFICATION,
                          name = 'suppression.by.intervention.state',
                          outcome.metadata = create.outcome.metadata(display.name = 'Suppression by Intervention State',
