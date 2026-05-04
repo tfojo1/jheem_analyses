@@ -183,9 +183,10 @@ plot_int_single_city(
     all.simsets,
     city     = "Seattle",
     outcomes = c("diagnosis.ps"),
-    # facet.by = "sex",
+    facet.by = "sex",
     # plot.which="sim.only",
-    # years=c(2000,2025),
+    # years=c(2023,2025),
+    years=c(2000,2025),
     style.manager = intervention.style.manager
     # save = T,create.dirs = T
 )
@@ -198,3 +199,6 @@ plot_int_single_city(
     style.manager = intervention.style.manager
     # save = T,create.dirs = T
 )
+
+# Across the study period, MSM comprised 69% of all syphilis cases among men 
+# (84% in 2017–2020 and 56% in 2021–2025). 
