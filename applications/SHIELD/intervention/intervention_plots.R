@@ -56,6 +56,18 @@ INTERVENTION.CODES <- names(INTERVENTION.LABELS)
 # The result is a flat named list. Each entry is one simset, keyed by
 # "{City} – {Intervention Label}" for unambiguous lookup and plotting.
 # =============================================================================
+LOCATIONS=SHIELD.TEN.MSAS[1] 
+all.simsets <- load.all.simsets(
+    locations           = LOCATIONS,
+    intervention.codes  = INTERVENTION.CODES,
+    calibration.code    = CALIBRATION.CODE,
+    n.sim               = N.SIM,
+    base.path           = BASE.PATH,
+    intervention.labels = INTERVENTION.LABELS,
+    # cache               = all.simsets,   # explicit — takes priority Anything already in `all.simsets` is reused; only new keys are loaded from file
+    append=T
+    # force.reload        = FALSE # set TRUE to ignore cache and reload everything
+)
 LOCATIONS=SHIELD.TEN.MSAS
 all.simsets <- load.all.simsets(
     locations           = LOCATIONS,
@@ -68,7 +80,6 @@ all.simsets <- load.all.simsets(
     append=T
     # force.reload        = FALSE # set TRUE to ignore cache and reload everything
 )
-
 # Quick inventory of what was loaded
 cat(paste0(names(all.simsets), "\n"))
 
