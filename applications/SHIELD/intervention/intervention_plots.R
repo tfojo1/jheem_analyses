@@ -1,53 +1,129 @@
+# ============================================================================
+# DoxyPEP Intervention Analysis
+# ============================================================================
+source('../jheem_analyses/applications/SHIELD/shield_specification.R')
+source('../jheem_analyses/commoncode/locations_of_interest.R')
+source("../jheem_analyses/applications/SHIELD/intervention/intervention_definitions.R")
+source("../jheem_analyses/applications/SHIELD/intervention/intervention_helper_functions.R")
 
-#' @param just.last.twenty If false, will do the whole simset, which takes longer.
-#' @value A list for which each element includes the intervention simset and null simset for a city.
-get_intervention_simsets <- function(simset.data, intervention, just.last.twenty=T) {
-    setNames(lapply(cities, function(city) {
-        browser()
-        if (is.null(simset.data[[city]])) {
-            print(paste0("No simset found for '", city, "': Skipping"))
-            return(NULL)
-        }
-        used_simset <- if (just.last.twenty) simset.data[[city]]$last20_sims else simset.data[[city]]$full_simset
-        
-        print(paste0("Running intervention for '", city, "'..."))
-        int_simset <- intervention$run(used_simset, start.year = 2020, end.year = 2035)
-        
-        print(paste0("Running null intervention for '", city, "'..."))
-        null_simset <- get.null.intervention()$run(used_simset, start.year = 2020, end.year = 2035)
-        print(paste0("Done with '", city, "'"))
-        list(int_simset=int_simset,
-             null_simset=null_simset)
-        
-    }), cities)}
+# =============================================================================
+# SECTION 1: Configuration
+# =============================================================================
+LOCATIONS        <- SHIELD.TEN.MSAS     # Named vector: names = city, values = codes
 
+CALIBRATION.CODE <- "calib.4.24.stage2.az"
+N.SIM <- 300
+FIRST.YEAR <- 2000
+LAST.YEAR <- 2040
 
-# Visualize results ----
-create_intervention_plots <- function(int.sim.data, create.dirs = F) {
-    
-    for (city in names(int.sim.data)) {
-        
-        if (is.null(int.sim.data[[city]]$int_simset)) next
-        
-        plotting_path <- paste0(get.jheem.root.directory(), "/shield/interventionPlots/", CALIB, "/", city, "/")
-        if (!dir.exists(plotting_path)) {
-            if (!create.dirs)
-                stop(paste0("Error: directory for '", city, "' and '", CALIB, "' does not exist. Check that get.jheem.root.directory() shows the right place, then try again with 'create.dirs' set to TRUE."))
-            dir.create(plotting_path, recursive = T,showWarnings = F)
-            print(paste0("Generating directories for '", city, "' and '", CALIB, "'"))
-        }
-        
-        # Early example
-        plot <- simplot(int.sim.data[[city]]$int_simset,
-                        int.sim.data[[city]]$null_simset,
-                        "diagnosis.ps",
-                        summary.type = "median.and.interval",
-                        style.manager = create.style.manager(color.sim.by = "simset"))
-        file_png  <- file.path(paste0(plotting_path ,"diagnosis_ps.png"))
-        ggsave(file_png, plot = plot, width = 12, height = 7, dpi = 300)
-        
-    }
-    print("Done creating intervention plots")
+BASE.PATH <- "~/../../Volumes/jheem$/simulations/shield"
+
+INTERVENTION.LABELS <- c(
+    noint        = "No Doxy-PEP Intervention",
+    doxypep.10   = "10% Doxy-PEP Coverage",
+    doxypep.25   = "25% Doxy-PEP Coverage",
+    doxypep.50   = "50% Doxy-PEP Coverage"
+)
+INTERVENTION.CODES <- names(INTERVENTION.LABELS)
+
+# =============================================================================
+# SECTION 2: Run Interventions
+# =============================================================================
+# --- Create and Run Simulation Collection ---
+if (1==2){
+    sim.collection <- create.simset.collection(
+        version = "shield",
+        calibration.code = CALIBRATION.CODE,
+        locations = LOCATIONS,
+        interventions = INTERVENTION.CODES,
+        n.sim = N.SIM
+    )
+    #
+    FORCE.OVERWRITE<- FALSE
+    #
+    sim.collection$run(
+        FIRST.YEAR,
+        LAST.YEAR,
+        verbose = T,
+        stop.for.errors = FALSE,
+        overwrite.prior = FORCE.OVERWRITE,
+        keep.from.year = FIRST.YEAR
+    )
 }
+# =============================================================================
+# SECTION 3: Load All Simsets
+# The result is a flat named list. Each entry is one simset, keyed by
+# "{City} – {Intervention Label}" for unambiguous lookup and plotting.
+# =============================================================================
+LOCATIONS=SHIELD.TEN.MSAS[10]
+all.simsets <- load.all.simsets(
+    locations           = LOCATIONS,
+    intervention.codes  = INTERVENTION.CODES,
+    calibration.code    = CALIBRATION.CODE,
+    n.sim               = N.SIM,
+    base.path           = BASE.PATH,
+    intervention.labels = INTERVENTION.LABELS,
+    # cache               = all.simsets,   # explicit — takes priority Anything already in `all.simsets` is reused; only new keys are loaded from file
+    append=T
+    # force.reload        = FALSE # set TRUE to ignore cache and reload everything
+)
+
+# Quick inventory of what was loaded
+cat(paste0(names(all.simsets), "\n"))
+
+
+
+# =============================================================================
+# SECTION 4: Plotting
+# simplot() takes simsets as named ... arguments, so use do.call() to
+# pass a named list. Swap in any subset from the helpers above.
+# =============================================================================
+intervention.style.manager <- create.style.manager(color.sim.by = "simset")
+
+# --- Example A: all interventions for one city ---
+Seattle.simsets <- get.simsets.for.city(all.simsets, "Seattle")
+
+do.call(simplot, c(
+    Seattle.simsets[c(1,4)],
+    list(
+        # outcomes    = c("diagnosis.ps"),
+        outcomes  = c( "doxy.uptake"),
+        dimension.values = list(year = 2018:2025),
+        style.manager    = intervention.style.manager,
+        summary.type     = "median.and.interval"
+    )
+))
+
+# --- Example B: one intervention across all cities ---
+no.int.simsets <- get.simsets.for.intervention(all.simsets, "No Doxy-PEP Intervention")
+
+do.call(simplot, c(
+    no.int.simsets,
+    list(
+        outcomes         = c("diagnosis.ps", "doxy.uptake"),
+        dimension.values = list(year = 2020:2030),
+        style.manager    = intervention.style.manager,
+        summary.type     = "median.and.interval"
+    )
+))
+
+# --- Example C: two specific simsets side by side ---
+comparison.simsets <- list(
+    get.simset(all.simsets, "Chicago", "No Doxy-PEP Intervention"),
+    get.simset(all.simsets, "Chicago", "50% Doxy-PEP Coverage")
+)
+names(comparison.simsets) <- c("Chicago – No Doxy-PEP Intervention",
+                               "Chicago – 50% Doxy-PEP Coverage")
+
+do.call(simplot, c(
+    comparison.simsets,
+    list(
+        outcomes         = c("diagnosis.ps", "doxy.uptake"),
+        dimension.values = list(year = 2020:2030),
+        style.manager    = intervention.style.manager,
+        summary.type     = "median.and.interval"
+    )
+))
+
 
 create_intervention_plots(int_sims, create.dirs = T)

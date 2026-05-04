@@ -134,6 +134,9 @@ do.call(simplot, c(
     )
 ))
 
+
+create_intervention_plots(int_sims, create.dirs = T)
+
 # #  
 # # Get simsets using the shield_calibration_plots code ----
 # simset_data <- prepare_simsets_for_plots(CALIBRATION.CODE, LOCATIONS)
