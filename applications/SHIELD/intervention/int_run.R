@@ -1,71 +1,180 @@
 # ============================================================================
 # DoxyPEP Intervention Analysis
 # ============================================================================
-# source('../jheem_analyses/applications/SHIELD/shield_specification.R')
-# source('../jheem_analyses/commoncode/locations_of_interest.R')
+source('../jheem_analyses/applications/SHIELD/shield_specification.R')
+source('../jheem_analyses/commoncode/locations_of_interest.R')
 source("../jheem_analyses/applications/SHIELD/intervention/intervention_definitions.R")
-source("../jheem_analyses/applications/SHIELD/intervention/intervention_plots.R")
+source("../jheem_analyses/applications/SHIELD/intervention/intervention_helper_functions.R")
+# source("../jheem_analyses/applications/SHIELD/intervention/intervention_plots.R")
+# source("../jheem_analyses/applications/SHIELD/calibration/shield_calibration_plots.R")
 
-source("../jheem_analyses/applications/SHIELD/calibration/shield_calibration_plots.R")
+# =============================================================================
+# SECTION 1: Configuration
+# =============================================================================
+# LOCATIONS        <- SHIELD.TEN.MSAS       # Named vector: names = city, values = codes
+
+LOCATIONS        <- SHIELD.TEN.MSAS     # Named vector: names = city, values = codes
+
+CALIBRATION.CODE <- "calib.4.24.stage2.az"
+N.SIM            <- 300
+FIRST.YEAR <- 2000
+LAST.YEAR <- 2040
+
+BASE.PATH <- "~/../../Volumes/jheem$/simulations/shield"
+
+INTERVENTION.CODES <- c("noint" 
+                        # "doxypep.10",
+                        # "doxypep.25",
+                        # "doxypep.50"
+                        )
+
+INTERVENTION.LABELS <- c(
+    "noint"      = "No Doxy-PEP Intervention"
+    # "doxypep.10" = "10% Doxy-PEP Coverage",
+    # "doxypep.25" = "25% Doxy-PEP Coverage",
+    # "doxypep.50" = "50% Doxy-PEP Coverage"
+)
 
 
-# --- Settings ---
-# LOCATIONS <- SHIELD.TEN.MSAS  # or your DOXY.LOCATIONS vector
-LOCATIONS <- SHIELD.TEN.MSAS
-CALIBRATION.CODE <- "calib.4.24.stage2.az"  # Replace with your calibration code
-N.SIM <- 300  # or your desired number of simulations
-FORCE.OVERWRITE <- TRUE
-VERBOSE <- TRUE
-DOXY.ANCHOR.YEAR <- DOXY.START  # Year DoxyPEP implementation begins
-
-# Intervention codes for DoxyPEP scenarios
-INTERVENTION.CODES <- c('noint', 'doxypep.10', 'doxypep.25','doxypep.50') 
-
-print(paste0("Doing locations: ", paste0(LOCATIONS, collapse = ', ')))
-
+# =============================================================================
+# SECTION 2: Run Interventions
+# =============================================================================
 # --- Create and Run Simulation Collection ---
-sim.collection <- create.simset.collection(
-    version = "shield", 
-    calibration.code = CALIBRATION.CODE, 
-    locations = LOCATIONS, 
-    interventions = INTERVENTION.CODES, 
-    n.sim = N.SIM
+# sim.collection <- create.simset.collection(
+#     version = "shield", 
+#     calibration.code = CALIBRATION.CODE, 
+#     locations = LOCATIONS, 
+#     interventions = INTERVENTION.CODES, 
+#     n.sim = N.SIM
+# )
+# VERBOSE<-T
+# FORCE.OVERWRITE<- F
+# sim.collection$run(
+#     FIRST.YEAR, 
+#     LAST.YEAR, 
+#     verbose = VERBOSE, 
+#     stop.for.errors = FALSE, 
+#     overwrite.prior = FORCE.OVERWRITE,
+#     keep.from.year = FIRST.YEAR
+# )
+# 
+# =============================================================================
+# SECTION 3: Load All Simsets
+# The result is a flat named list. Each entry is one simset, keyed by
+# "{City} – {Intervention Label}" for unambiguous lookup and plotting.
+# =============================================================================
+LOCATIONS=SHIELD.TEN.MSAS[6]
+all.simsets <- load.all.simsets(
+    locations           = LOCATIONS,
+    intervention.codes  = INTERVENTION.CODES,
+    calibration.code    = CALIBRATION.CODE,
+    n.sim               = N.SIM,
+    base.path           = BASE.PATH,
+    intervention.labels = INTERVENTION.LABELS,
+    # cache               = all.simsets,   # explicit — takes priority Anything already in `all.simsets` is reused; only new keys are loaded from file
+    append=T
+    # force.reload        = FALSE # set TRUE to ignore cache and reload everything
+
 )
 
-sim.collection$run(
-    2020, 
-    2035, 
-    verbose = TRUE, 
-    stop.for.errors = FALSE, 
-    overwrite.prior = FORCE.OVERWRITE,
-    keep.from.year = 2020
-)
+# Quick inventory of what was loaded
+cat(paste0(names(all.simsets), "\n"))
 
-#  
+
+
+# =============================================================================
+# SECTION 4: Plotting
+# simplot() takes simsets as named ... arguments, so use do.call() to
+# pass a named list. Swap in any subset from the helpers above.
+# =============================================================================
+intervention.style.manager <- create.style.manager(color.sim.by = "simset")
+
+# --- Example A: all interventions for one city ---
+Seattle.simsets <- get.simsets.for.city(all.simsets, "Seattle")
+
+do.call(simplot, c(
+    Seattle.simsets[c(1,4)],
+    list(
+        # outcomes    = c("diagnosis.ps"),
+        outcomes  = c( "doxy.uptake"),
+        dimension.values = list(year = 2018:2025),
+        style.manager    = intervention.style.manager,
+        summary.type     = "median.and.interval"
+    )
+))
+
+# --- Example B: one intervention across all cities ---
+no.int.simsets <- get.simsets.for.intervention(all.simsets, "No Doxy-PEP Intervention")
+
+do.call(simplot, c(
+    no.int.simsets,
+    list(
+        outcomes         = c("diagnosis.ps", "doxy.uptake"),
+        dimension.values = list(year = 2020:2030),
+        style.manager    = intervention.style.manager,
+        summary.type     = "median.and.interval"
+    )
+))
+
+# --- Example C: two specific simsets side by side ---
+comparison.simsets <- list(
+    get.simset(all.simsets, "Chicago", "No Doxy-PEP Intervention"),
+    get.simset(all.simsets, "Chicago", "50% Doxy-PEP Coverage")
+)
+names(comparison.simsets) <- c("Chicago – No Doxy-PEP Intervention",
+                               "Chicago – 50% Doxy-PEP Coverage")
+
+do.call(simplot, c(
+    comparison.simsets,
+    list(
+        outcomes         = c("diagnosis.ps", "doxy.uptake"),
+        dimension.values = list(year = 2020:2030),
+        style.manager    = intervention.style.manager,
+        summary.type     = "median.and.interval"
+    )
+))
+
+# #  
 # # Get simsets using the shield_calibration_plots code ----
 # simset_data <- prepare_simsets_for_plots(CALIBRATION.CODE, LOCATIONS)
 # 
 # int_sims <- get_intervention_simsets(simset_data, INTERVENTION.CODES)
-simset0<-load.simulation.set("~/../../Volumes/jheem$/simulations/shield/calib.4.24.stage2.az-300/C.12580/shield_calib.4.24.stage2.az-300_C.12580_noint.Rdata")
-simset10<-load.simulation.set("~/../../Volumes/jheem$/simulations/shield/calib.4.24.stage2.az-300/C.12580/shield_calib.4.24.stage2.az-300_C.12580_doxypep.10.Rdata")
-simset20<-load.simulation.set("~/../../Volumes/jheem$/simulations/shield/calib.4.24.stage2.az-300/C.12580/shield_calib.4.24.stage2.az-300_C.12580_doxypep.20.Rdata")
+simset0<-load.simulation.set(paste0("~/../../Volumes/jheem$/simulations/shield/calib.4.24.stage2.az-300/",LOCATIONS,"/shield_calib.4.24.stage2.az-300_",LOCATIONS,"_noint.Rdata"))
+simset10<-load.simulation.set(paste0("~/../../Volumes/jheem$/simulations/shield/calib.4.24.stage2.az-300/",LOCATIONS,"/shield_calib.4.24.stage2.az-300_",LOCATIONS,"_doxypep.10.Rdata"))
+simset25<-load.simulation.set(paste0("~/../../Volumes/jheem$/simulations/shield/calib.4.24.stage2.az-300/",LOCATIONS,"/shield_calib.4.24.stage2.az-300_",LOCATIONS,"_doxypep.25.Rdata"))
+simset50<-load.simulation.set(paste0("~/../../Volumes/jheem$/simulations/shield/calib.4.24.stage2.az-300/",LOCATIONS,"/shield_calib.4.24.stage2.az-300_",LOCATIONS,"_doxypep.50.Rdata"))
 
 
 `No Doxy-PEP Intervention` = simset0
 `10% Doxy-PEP Coverage` = simset10
-`20% Doxy-PEP Coverage`= simset20
+`25% Doxy-PEP Coverage`= simset25
+`50% Doxy-PEP Coverage`= simset50
 intervention.style.manager = create.style.manager(color.sim.by = "simset")
-library(ggplot2)
+# library(ggplot2)
 simplot(
-    `No Doxy-PEP Intervention`,
-    `10% Doxy-PEP Coverage`,
-    outcomes = c("diagnosis.ps","doxy.uptake"), split.by="sex",
-    dimension.values = list(year = 2020:2035),
+    `No Doxy-PEP Intervention`, 
+    # `10% Doxy-PEP Coverage`,
+    # `25% Doxy-PEP Coverage`,
+    `50% Doxy-PEP Coverage`,
+    outcomes = c("diagnosis.ps","doxy.uptake"), 
+    # split.by="sex",
+    dimension.values = list(year = 2020:2030),
     style.manager = intervention.style.manager,
     summary.type = "median.and.interval"
-) + theme_minimal() 
+) #+ theme_minimal() 
 
-
+simplot(
+    `No Doxy-PEP Intervention`, 
+    # `10% Doxy-PEP Coverage`,
+    # `25% Doxy-PEP Coverage`,
+    `50% Doxy-PEP Coverage`,
+    # outcomes = c("diagnosis.ps"),
+    outcomes = c("doxy.uptake"),
+    facet.by="sex",plot.which = "sim.only",
+    dimension.values = list(year = 2020:2030),
+    style.manager = intervention.style.manager,
+    summary.type = "median.and.interval"
+) #+ theme_minimal() 
 
 
 # --- Define Primary Outcomes ---

@@ -568,8 +568,9 @@ if (1==2) {
     )
     
     # Example 1: Create multi-panel plots for selected outputs
-    outcomes <- c("diagnosis.total", "diagnosis.ps", "diagnosis.el.misclassified", 
-                  "diagnosis.late.misclassified", "hiv.testing")
+    # outcomes <- c("diagnosis.total", "diagnosis.ps", "diagnosis.el.misclassified", 
+    #               "diagnosis.late.misclassified", "hiv.testing")
+    outcomes <- c("sti.screening")
     for( o in outcomes){
         create_multipanel_location_comparison(
             outcome = o,
@@ -586,13 +587,4 @@ if (1==2) {
         )
     }
     
-    
-    # Example 2: Create all multi-panel plots for a stage with custom summary type
-    create_multipanel_plots_for_stage(
-        stage = 2,
-        simset.data = simset_data,
-        calibration.code = calibname,
-        summary.type = "mean.and.interval",
-        create.dirs = TRUE
-    )
 }

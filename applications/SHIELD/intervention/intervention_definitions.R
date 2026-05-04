@@ -4,8 +4,8 @@
 WHOLE.POPULATION = create.target.population(name = 'Whole Population') #MSM?
 
 # Timing
-DOXY.START <- 2022 + 9/12       # Oct 1, 2022
-DOXY.END   <- 2030      #  Jan 1, 2030
+INTERVENTION.START <- 2022 + 9/12       # Oct 1, 2022
+INTERVENTION.END   <- 2030      #  Jan 1, 2030
 
 # DOXY-PEP EFFICATY (Studies report: RR: Rate Ratio of incident syphilis cases in doxy vs no-doxy arms per person-time)
 # we have pooled estiamtes from clinical trials to estimate the meanlog and sdlog
@@ -62,9 +62,9 @@ clear.interventions()
 for (uptake in c(10,25,50)){
     uptake.effect =  create.intervention.effect(
         quantity.name    = "doxy.uptake",
-        start.time       = DOXY.START,
         effect.values    = uptake/100,
-        times            = DOXY.END, # when scale up ends
+        start.time       = INTERVENTION.START,# when scale up begins
+        times            = INTERVENTION.END, # when scale up ends
         scale            = "proportion",
         apply.effects.as = "value",
         allow.values.less.than.otherwise  = FALSE,
