@@ -87,8 +87,10 @@ rownames(DOXY.PARAMS) <- c("doxy.effectiveness","doxy.discontinuationRate")
 
 if (1==1){
     clear.interventions() 
+    #
+    noint = get.null.intervention()
+    # Linear scale up from 2020 to 2024 (starting from DoxyPEP trial)
     for (uptake in c(30,45)){
-        # LINEAR scaleup
         uptake.effect =  create.intervention.effect(
             quantity.name    = "doxy.uptake",
             effect.values    = uptake/100,
@@ -105,36 +107,91 @@ if (1==1){
             WHOLE.POPULATION,
             code = paste0("doxypep.",uptake,".linear.2024")
         )
-        # STEPWISE Scaleup
-        uptake.effect =  create.intervention.effect(
-            quantity.name    = "doxy.uptake",
-            effect.values    = c(15,15,uptake)/100,
-            
-            start.time       = 2020 + 8/12 ,# when scale up begins
-            times            = c(2022 + 5/12 ,
-                                 2023 + 5/12 ,
-                                 2024 + 6/12),       
-            scale            = "proportion",
-            apply.effects.as = "value",
-            allow.values.less.than.otherwise  = FALSE,
-            allow.values.greater.than.otherwise = TRUE
-        );
-        uptake_intervention <- create.intervention(
-            uptake.effect,
-            parameters = DOXY.PARAMS,
-            WHOLE.POPULATION,
-            code = paste0("doxypep.",uptake,".stepwise.2024")
-        )
-        noint = get.null.intervention()
     }
+    # pushing hte starting time to May 2022 (after trial ends)
+    uptake.effect =  create.intervention.effect(
+        quantity.name    = "doxy.uptake",
+        start.time       = 2022 + 5/12 ,# May 2022: trial ended-
+        times            = c(2023+3/12,# march 2023 outside of trial
+                             2024 + 6/12), #
+        effect.values    = c(0.12,
+                             0.5),
+        scale            = "proportion",
+        apply.effects.as = "value",
+        allow.values.less.than.otherwise  = FALSE,
+        allow.values.greater.than.otherwise = TRUE
+    );
+    uptake_intervention <- create.intervention(
+        uptake.effect,
+        parameters = DOXY.PARAMS,
+        WHOLE.POPULATION,
+        code = paste0("doxypep.rollout.1")
+    )
+    # pushing hte starting time to May 2023 (the started offering outside of trial)
+    uptake.effect =  create.intervention.effect(
+        quantity.name    = "doxy.uptake",
+        start.time       = 2023 + 5/12 ,# May 2022: trial ended-
+        times            = c(2025), # a faster scale up between 2023-2025
+        effect.values    = c(0.5),
+        scale            = "proportion",
+        apply.effects.as = "value",
+        allow.values.less.than.otherwise  = FALSE,
+        allow.values.greater.than.otherwise = TRUE
+    );
+    uptake_intervention <- create.intervention(
+        uptake.effect,
+        parameters = DOXY.PARAMS,
+        WHOLE.POPULATION,
+        code = paste0("doxypep.rollout.2")
+    )
+    # pushing increasing coverage to 2026
+    uptake.effect =  create.intervention.effect(
+        quantity.name    = "doxy.uptake",
+        start.time       = 2023 + 5/12 ,# May 2022: trial ended-
+        times            = c(2025,
+                             2026), # a faster scale up between 2023-2025
+        effect.values    = c(0.5,
+                             0.6),
+        scale            = "proportion",
+        apply.effects.as = "value",
+        allow.values.less.than.otherwise  = FALSE,
+        allow.values.greater.than.otherwise = TRUE
+    );
+    uptake_intervention <- create.intervention(
+        uptake.effect,
+        parameters = DOXY.PARAMS,
+        WHOLE.POPULATION,
+        code = paste0("doxypep.rollout.3")
+    )
+    #
+    uptake.effect =  create.intervention.effect(
+        quantity.name    = "doxy.uptake",
+        start.time       = 2023 + 5/12 ,# May 2022: trial ended-
+        times            = c(2025,
+                             2026), # a faster scale up between 2023-2025
+        effect.values    = c(0.5,
+                             0.75),
+        scale            = "proportion",
+        apply.effects.as = "value",
+        allow.values.less.than.otherwise  = FALSE,
+        allow.values.greater.than.otherwise = TRUE
+    );
+    uptake_intervention <- create.intervention(
+        uptake.effect,
+        parameters = DOXY.PARAMS,
+        WHOLE.POPULATION,
+        code = paste0("doxypep.rollout.4")
+    )
 }
 
 INTERVENTION.LABELS <- c(
     noint        = "No Doxy-PEP Intervention",
     doxypep.30.linear.2024   = "30% Doxy-PEP linear Coverage 2020-2024",
     doxypep.45.linear.2024   = "45% Doxy-PEP linear Coverage 2020-2024",
-    doxypep.30.stepwise.2024 = "30% Doxy-PEP stepwise Coverage 2020-2024",
-    doxypep.45.stepwise.2024 = "45% Doxy-PEP stepwise Coverage 2020-2024"
+    doxypep.rollout.1 ="50% doxypep.rollout May 2022-June 2024",
+    doxypep.rollout.2="50% doxypep.rollout May 2023-Jan 2025",
+    doxypep.rollout.3="60% doxypep.rollout May 2023-Jan 2026",
+    doxypep.rollout.4="75% doxypep.rollout May 2023-Jan 2026"
 )
 INTERVENTION.CODES <- names(INTERVENTION.LABELS)
 
@@ -180,28 +237,32 @@ all.simsets <- load.all.simsets(
 intervention.style.manager <- create.style.manager(color.sim.by = "simset",alpha.line=1)
 
 # Plot output directories
-ROOT.DIR <- get.jheem.root.directory()
-PLOT.BASE.DIR <- file.path(ROOT.DIR, "shield", "interventionPlots", CALIBRATION.CODE)
-PLOT.COMPARISON.DIR <- file.path(PLOT.BASE.DIR, "comparisons")
+# ROOT.DIR <- get.jheem.root.directory()
+# PLOT.BASE.DIR <- file.path(ROOT.DIR, "shield", "interventionPlots", CALIBRATION.CODE)
+# PLOT.COMPARISON.DIR <- file.path(PLOT.BASE.DIR, "comparisons")
 
 # --- Single city, display only ---
 plot_int_single_city(
     all.simsets,
     city     = "Seattle",
-    outcomes = c("diagnosis.ps", "doxy.uptake")
-    # save = T,create.dirs = T
-)
-plot_int_single_city(
-    all.simsets,
-    city     = "Seattle",
-    outcomes = c("diagnosis.ps"),
-    facet.by = "sex",
-    # plot.which="sim.only",
-    years=c(2000:2025),
-    # years=c(2000,2025),
+    # outcomes = c("diagnosis.ps"),
+    outcomes =c("doxy.uptake"),
     style.manager = intervention.style.manager
     # save = T,create.dirs = T
 )
+plot_int_single_city(
+    all.simsets[c(1,5,6,7)],
+    city     = "Seattle",
+    outcomes = c("diagnosis.total"),
+    # outcomes =c("doxy.uptake"),
+    facet.by = "sex",
+    plot.which="sim.only",
+    # years=c(2000:2025),
+    years=c(2018:2025),
+    style.manager = intervention.style.manager
+    # save = T,create.dirs = T
+)
+points()
 plot_int_single_city(
     all.simsets,
     city     = "Seattle",
@@ -214,3 +275,12 @@ plot_int_single_city(
 
 # Across the study period, MSM comprised 69% of all syphilis cases among men 
 # (84% in 2017–2020 and 56% in 2021–2025). 
+
+#proportion of MSM diagnosis among male diagnosis
+prp.msm <- calc_proportion_over_dim(
+    data = all.simsets$`Seattle – No Doxy-PEP Intervention`$diagnosis.ps,
+    target_dim = 5,     # operate on 5th dimension sex
+    num_idx = 2,        # numerator is index 2 for msm
+    denom_idx = 1:2,    # sum indices 1-2 for denominator (het male+msm)
+    mean_dim = 1        # average over 1st dimension (year)
+)
