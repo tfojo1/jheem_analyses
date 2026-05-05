@@ -1,7 +1,7 @@
 {
   "metadata": {
     "generated_from": "syphilis.manager_section3",
-    "generated_at": "2026-04-22 18:20:27"
+    "generated_at": "2026-05-05 16:36:38"
   },
   "outcomes": {
     "population": {
@@ -6399,6 +6399,374 @@
                     "values": ["AK", "AL", "AR", "AZ", "C.10100", "C.10380", "C.10420", "C.10580", "C.10740", "C.10900", "C.11260", "C.12060", "C.12260", "C.12420", "C.12580", "C.12940", "C.13140", "C.13220", "C.13620", "C.13740", "C.13780", "C.13820", "C.13900", "C.14260", "C.15380", "C.15540", "C.16300", "C.16620", "C.16700", "C.16740", "C.16860", "C.16980", "C.17140", "C.17460", "C.17780", "C.17820", "C.17900", "C.18140", "C.18580", "C.18880", "C.19060", "C.19340", "C.19430", "C.19660", "C.19740", "C.19780", "C.20260", "C.21340", "C.21780", "C.22020", "C.22220", "C.22500", "C.23060", "C.23540", "C.24020", "C.24220", "C.24260", "C.24340", "C.24660", "C.24860", "C.25060", "C.25180", "C.25540", "C.25720", "C.25940", "C.26420", "C.26580", "C.26820", "C.26900", "C.27140", "C.27260", "C.27980", "C.28140", "C.28260", "C.28420", "C.28660", "C.28700", "C.28940", "C.29180", "C.29620", "C.30100", "C.30460", "C.30700", "C.30780", "C.30860", "C.31080", "C.31140", "C.31540", "C.31740", "C.32820", "C.33100", "C.33340", "C.33460", "C.33500", "C.33660", "C.33860", "C.34820", "C.34980", "C.35380", "C.35740", "C.35820", "C.35840", "C.36260", "C.36420", "C.36540", "C.36740", "C.37460", "C.37860", "C.38060", "C.38300", "C.38660", "C.38860", "C.38900", "C.38940", "C.39100", "C.39300", "C.39340", "C.39580", "C.39660", "C.39900", "C.40060", "C.40140", "C.40220", "C.40340", "C.40380", "C.40900", "C.41060", "C.41180", "C.41420", "C.41460", "C.41540", "C.41620", "C.41700", "C.41940", "C.41980", "C.42420", "C.43340", "C.43580", "C.43620", "C.43780", "C.43900", "C.44060", "C.44140", "C.45060", "C.45220", "C.45300", "C.45780", "C.45820", "C.46140", "C.46220", "C.46540", "C.47260", "C.47940", "C.47980", "C.48620", "C.48660", "C.49340", "C.49660", "CA", "CO", "CT", "DC", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "PR", "RI", "SC", "SD", "TN", "TX", "US", "UT", "VA", "VT", "WA", "WI", "WV", "WY"]
                   },
                   "sex": ["female", "male", "msm"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "proportion.tested.for.hiv.high.risk": {
+      "scale": "proportion",
+      "denominator_outcome": "proportion.tested.for.hiv.high.risk.n",
+      "sources": {
+        "nhbs": {
+          "ontologies": {
+            "nhbs": {
+              "stratifications": {
+                "year__location__sex__risk": {
+                  "dimensions": ["year", "location", "sex", "risk"],
+                  "year": {
+                    "n": 10,
+                    "min": "2008",
+                    "max": "2023",
+                    "values": ["2008", "2010", "2011", "2013", "2014", "2016", "2017", "2019", "2021", "2023"]
+                  },
+                  "location": {
+                    "n": 24,
+                    "min": "C.12060",
+                    "max": "US",
+                    "values": ["C.12060", "C.12580", "C.14460", "C.16980", "C.19100", "C.19740", "C.19820", "C.26420", "C.26900", "C.31080", "C.32820", "C.33100", "C.35380", "C.35620", "C.37980", "C.38900", "C.41180", "C.41740", "C.41860", "C.41980", "C.42660", "C.47260", "C.47900", "US"]
+                  },
+                  "sex": ["female", "male"],
+                  "risk": ["heterosexual", "msm"]
+                },
+                "year__location__age__sex__risk": {
+                  "dimensions": ["year", "location", "age", "sex", "risk"],
+                  "year": {
+                    "n": 8,
+                    "min": "2008",
+                    "max": "2023",
+                    "values": ["2008", "2010", "2011", "2013", "2014", "2017", "2021", "2023"]
+                  },
+                  "location": {
+                    "n": 1,
+                    "min": "US",
+                    "max": "US",
+                    "values": "US"
+                  },
+                  "age": ["18-24 years", "25-29 years", "30-39 years", "40-49 years", "50+ years"],
+                  "sex": ["female", "male"],
+                  "risk": ["heterosexual", "msm"]
+                },
+                "year__location__race__sex__risk": {
+                  "dimensions": ["year", "location", "race", "sex", "risk"],
+                  "year": {
+                    "n": 8,
+                    "min": "2008",
+                    "max": "2023",
+                    "values": ["2008", "2010", "2011", "2013", "2014", "2017", "2021", "2023"]
+                  },
+                  "location": {
+                    "n": 1,
+                    "min": "US",
+                    "max": "US",
+                    "values": "US"
+                  },
+                  "race": ["american indian/alaska native", "asian/native hawaiian/other pacific islander", "black", "hispanic", "other race", "white"],
+                  "sex": ["female", "male"],
+                  "risk": ["heterosexual", "msm"]
+                },
+                "year__location__risk": {
+                  "dimensions": ["year", "location", "risk"],
+                  "year": {
+                    "n": 3,
+                    "min": "2013",
+                    "max": "2019",
+                    "values": ["2013", "2016", "2019"]
+                  },
+                  "location": {
+                    "n": 22,
+                    "min": "C.12060",
+                    "max": "US",
+                    "values": ["C.12060", "C.12580", "C.14460", "C.16980", "C.19100", "C.19740", "C.19820", "C.26420", "C.31080", "C.32820", "C.33100", "C.35380", "C.35620", "C.37980", "C.38900", "C.41740", "C.41860", "C.41980", "C.42660", "C.47260", "C.47900", "US"]
+                  },
+                  "risk": ["heterosexual", "msm"]
+                },
+                "year__location__age__risk": {
+                  "dimensions": ["year", "location", "age", "risk"],
+                  "year": {
+                    "n": 3,
+                    "min": "2013",
+                    "max": "2019",
+                    "values": ["2013", "2016", "2019"]
+                  },
+                  "location": {
+                    "n": 1,
+                    "min": "US",
+                    "max": "US",
+                    "values": "US"
+                  },
+                  "age": ["18-24 years", "25-29 years", "30-39 years", "40-49 years", "50+ years"],
+                  "risk": ["heterosexual", "msm"]
+                },
+                "year__location__race__risk": {
+                  "dimensions": ["year", "location", "race", "risk"],
+                  "year": {
+                    "n": 3,
+                    "min": "2013",
+                    "max": "2019",
+                    "values": ["2013", "2016", "2019"]
+                  },
+                  "location": {
+                    "n": 1,
+                    "min": "US",
+                    "max": "US",
+                    "values": "US"
+                  },
+                  "race": ["american indian/alaska native", "asian/native hawaiian/other pacific islander", "black", "hispanic", "other race", "white"],
+                  "risk": ["heterosexual", "msm"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "proportion.tested.for.hiv.high.risk.n": {
+      "scale": "non.negative.number",
+      "denominator_outcome": {},
+      "sources": {
+        "nhbs": {
+          "ontologies": {
+            "nhbs": {
+              "stratifications": {
+                "year__location__sex__risk": {
+                  "dimensions": ["year", "location", "sex", "risk"],
+                  "year": {
+                    "n": 10,
+                    "min": "2008",
+                    "max": "2023",
+                    "values": ["2008", "2010", "2011", "2013", "2014", "2016", "2017", "2019", "2021", "2023"]
+                  },
+                  "location": {
+                    "n": 24,
+                    "min": "C.12060",
+                    "max": "US",
+                    "values": ["C.12060", "C.12580", "C.14460", "C.16980", "C.19100", "C.19740", "C.19820", "C.26420", "C.26900", "C.31080", "C.32820", "C.33100", "C.35380", "C.35620", "C.37980", "C.38900", "C.41180", "C.41740", "C.41860", "C.41980", "C.42660", "C.47260", "C.47900", "US"]
+                  },
+                  "sex": ["female", "male"],
+                  "risk": ["heterosexual", "msm"]
+                },
+                "year__location__age__sex__risk": {
+                  "dimensions": ["year", "location", "age", "sex", "risk"],
+                  "year": {
+                    "n": 8,
+                    "min": "2008",
+                    "max": "2023",
+                    "values": ["2008", "2010", "2011", "2013", "2014", "2017", "2021", "2023"]
+                  },
+                  "location": {
+                    "n": 1,
+                    "min": "US",
+                    "max": "US",
+                    "values": "US"
+                  },
+                  "age": ["18-24 years", "25-29 years", "30-39 years", "40-49 years", "50+ years"],
+                  "sex": ["female", "male"],
+                  "risk": ["heterosexual", "msm"]
+                },
+                "year__location__race__sex__risk": {
+                  "dimensions": ["year", "location", "race", "sex", "risk"],
+                  "year": {
+                    "n": 8,
+                    "min": "2008",
+                    "max": "2023",
+                    "values": ["2008", "2010", "2011", "2013", "2014", "2017", "2021", "2023"]
+                  },
+                  "location": {
+                    "n": 1,
+                    "min": "US",
+                    "max": "US",
+                    "values": "US"
+                  },
+                  "race": ["american indian/alaska native", "asian/native hawaiian/other pacific islander", "black", "hispanic", "other race", "white"],
+                  "sex": ["female", "male"],
+                  "risk": ["heterosexual", "msm"]
+                },
+                "year__location__risk": {
+                  "dimensions": ["year", "location", "risk"],
+                  "year": {
+                    "n": 3,
+                    "min": "2013",
+                    "max": "2019",
+                    "values": ["2013", "2016", "2019"]
+                  },
+                  "location": {
+                    "n": 22,
+                    "min": "C.12060",
+                    "max": "US",
+                    "values": ["C.12060", "C.12580", "C.14460", "C.16980", "C.19100", "C.19740", "C.19820", "C.26420", "C.31080", "C.32820", "C.33100", "C.35380", "C.35620", "C.37980", "C.38900", "C.41740", "C.41860", "C.41980", "C.42660", "C.47260", "C.47900", "US"]
+                  },
+                  "risk": ["heterosexual", "msm"]
+                },
+                "year__location__age__risk": {
+                  "dimensions": ["year", "location", "age", "risk"],
+                  "year": {
+                    "n": 3,
+                    "min": "2013",
+                    "max": "2019",
+                    "values": ["2013", "2016", "2019"]
+                  },
+                  "location": {
+                    "n": 1,
+                    "min": "US",
+                    "max": "US",
+                    "values": "US"
+                  },
+                  "age": ["18-24 years", "25-29 years", "30-39 years", "40-49 years", "50+ years"],
+                  "risk": ["heterosexual", "msm"]
+                },
+                "year__location__race__risk": {
+                  "dimensions": ["year", "location", "race", "risk"],
+                  "year": {
+                    "n": 3,
+                    "min": "2013",
+                    "max": "2019",
+                    "values": ["2013", "2016", "2019"]
+                  },
+                  "location": {
+                    "n": 1,
+                    "min": "US",
+                    "max": "US",
+                    "values": "US"
+                  },
+                  "race": ["american indian/alaska native", "asian/native hawaiian/other pacific islander", "black", "hispanic", "other race", "white"],
+                  "risk": ["heterosexual", "msm"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "proportion.tested.for.syphilis.high.risk": {
+      "scale": "proportion",
+      "denominator_outcome": "proportion.tested.for.syphilis.high.risk.n",
+      "sources": {
+        "nhbs": {
+          "ontologies": {
+            "nhbs": {
+              "stratifications": {
+                "year__location__sex__risk": {
+                  "dimensions": ["year", "location", "sex", "risk"],
+                  "year": {
+                    "n": 1,
+                    "min": "2011",
+                    "max": "2011",
+                    "values": "2011"
+                  },
+                  "location": {
+                    "n": 19,
+                    "min": "C.12060",
+                    "max": "US",
+                    "values": ["C.12060", "C.12580", "C.14460", "C.16980", "C.19100", "C.19740", "C.19820", "C.26420", "C.31080", "C.33100", "C.35380", "C.35620", "C.37980", "C.41740", "C.41860", "C.41980", "C.42660", "C.47900", "US"]
+                  },
+                  "sex": ["female", "male"],
+                  "risk": ["heterosexual", "msm"]
+                },
+                "year__location__race__sex__risk": {
+                  "dimensions": ["year", "location", "race", "sex", "risk"],
+                  "year": {
+                    "n": 1,
+                    "min": "2011",
+                    "max": "2011",
+                    "values": "2011"
+                  },
+                  "location": {
+                    "n": 1,
+                    "min": "US",
+                    "max": "US",
+                    "values": "US"
+                  },
+                  "race": ["american indian/alaska native", "asian/native hawaiian/other pacific islander", "black", "hispanic", "other race", "white"],
+                  "sex": ["female", "male"],
+                  "risk": ["heterosexual", "msm"]
+                },
+                "year__location__age__sex__risk": {
+                  "dimensions": ["year", "location", "age", "sex", "risk"],
+                  "year": {
+                    "n": 1,
+                    "min": "2011",
+                    "max": "2011",
+                    "values": "2011"
+                  },
+                  "location": {
+                    "n": 1,
+                    "min": "US",
+                    "max": "US",
+                    "values": "US"
+                  },
+                  "age": ["18-24 years", "25-29 years", "30-39 years", "40-49 years", "50+ years"],
+                  "sex": ["female", "male"],
+                  "risk": ["heterosexual", "msm"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "proportion.tested.for.syphilis.high.risk.n": {
+      "scale": "non.negative.number",
+      "denominator_outcome": {},
+      "sources": {
+        "nhbs": {
+          "ontologies": {
+            "nhbs": {
+              "stratifications": {
+                "year__location__sex__risk": {
+                  "dimensions": ["year", "location", "sex", "risk"],
+                  "year": {
+                    "n": 1,
+                    "min": "2011",
+                    "max": "2011",
+                    "values": "2011"
+                  },
+                  "location": {
+                    "n": 19,
+                    "min": "C.12060",
+                    "max": "US",
+                    "values": ["C.12060", "C.12580", "C.14460", "C.16980", "C.19100", "C.19740", "C.19820", "C.26420", "C.31080", "C.33100", "C.35380", "C.35620", "C.37980", "C.41740", "C.41860", "C.41980", "C.42660", "C.47900", "US"]
+                  },
+                  "sex": ["female", "male"],
+                  "risk": ["heterosexual", "msm"]
+                },
+                "year__location__race__sex__risk": {
+                  "dimensions": ["year", "location", "race", "sex", "risk"],
+                  "year": {
+                    "n": 1,
+                    "min": "2011",
+                    "max": "2011",
+                    "values": "2011"
+                  },
+                  "location": {
+                    "n": 1,
+                    "min": "US",
+                    "max": "US",
+                    "values": "US"
+                  },
+                  "race": ["american indian/alaska native", "asian/native hawaiian/other pacific islander", "black", "hispanic", "other race", "white"],
+                  "sex": ["female", "male"],
+                  "risk": ["heterosexual", "msm"]
+                },
+                "year__location__age__sex__risk": {
+                  "dimensions": ["year", "location", "age", "sex", "risk"],
+                  "year": {
+                    "n": 1,
+                    "min": "2011",
+                    "max": "2011",
+                    "values": "2011"
+                  },
+                  "location": {
+                    "n": 1,
+                    "min": "US",
+                    "max": "US",
+                    "values": "US"
+                  },
+                  "age": ["18-24 years", "25-29 years", "30-39 years", "40-49 years", "50+ years"],
+                  "sex": ["female", "male"],
+                  "risk": ["heterosexual", "msm"]
                 }
               }
             }
