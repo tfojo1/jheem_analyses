@@ -52,7 +52,17 @@ register.calibration.info('calib.5.4.stage1.az',
                                               TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-
+#changes specification to assume fraction.msm.pairings.with.female=30%
+register.calibration.info('calib.5.5.stage1.pk',
+                          preceding.calibration.codes = 'calib.4.24.stage0.az',
+                          likelihood.instructions = lik.inst.stage1,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
 # *** OLD (has to be kept here because the registration has to happen in order)----
 # # Attempting a top-to-bottom calibration. Here, uses 8x on future penalty likelihood.
 register.calibration.info('calib.4.24.stage2.az',
