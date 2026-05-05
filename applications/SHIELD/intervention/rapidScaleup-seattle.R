@@ -1,13 +1,9 @@
 # Modeling a rapid scale up in Seattle according to DOXYPEP Trial 
-
-
-# ============================================================================
 # DoxyPEP Intervention Analysis
 # ============================================================================
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
-
-
+source('../jheem_analyses/applications/SHIELD/intervention/intervention_helper_functions.R')
 
 # enrolled in 2020–2022 across San Francisco (UCSF) and Seattle (UW).  
 # Enrollment occurred largely in 2020–2021 with 12 months of follow‑up per participant.
@@ -23,13 +19,24 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 # self-reported doxy-PEP use in the prior month increased from 15% to 31% among MSM
 
 # Single target population for all MSM
+# SECTION 1: Configuration ----
+
+# Just for SEATTLE
+LOCATIONS        <- SHIELD.TEN.MSAS[10]     # Named vector: names = city, values = codes
+
+CALIBRATION.CODE <- "calib.4.24.stage2.az"
+N.SIM <- 300
+FIRST.YEAR <- 2000
+LAST.YEAR <- 2040
+BASE.PATH <- paste0(ROOT.DIR,"/simulations/shield")
+
 WHOLE.POPULATION = create.target.population(name = 'Whole Population') #MSM?
 
-# Timing
-INTERVENTION.START <- 2020 + 8/12       # August 19, 2020. DoxyPEP trial begins Uptake0
-# INTERVENTION.END   <- 2022 + 5/12      # May 13, 2022. DoxyPEP trial ends 
-# INTERVENTION.END   <- 2023 + 5/12      # May , 2023 guideline dropped Uptake 12-15%
-INTERVENTION.END   <- 2024 + 6/12      # June, 2024 last interview  Uptake 31-45%
+# Timeline:
+# August 2020. DoxyPEP trial begins Uptake0
+# May 2022. DoxyPEP trial ends 
+# May 2023 guideline dropped Uptake 12-15%
+# June 2024 last interview  Uptake 31-45%
 
 # DOXY-PEP EFFICATY (Studies report: RR: Rate Ratio of incident syphilis cases in doxy vs no-doxy arms per person-time)
 # we have pooled estiamtes from clinical trials to estimate the meanlog and sdlog
@@ -56,7 +63,7 @@ effectiveness_samples=1-rr_samples
 # effectiveness_samples=rr_samples
 
 
-# PERSISTANCE and DISCONTINUATION RATE #----
+# PERSISTANCE and DISCONTINUATION RATE  
 # P: proportion of population, taking Doxy at the end of the year
 # Discontinuation rate= -log(Peristance)
 
@@ -67,65 +74,73 @@ draw_persistance_uniform<-function(n){
 persistence_samples<-draw_persistance_uniform(10000)
 discont_rate_samples = -log(persistence_samples)
 
-# Putting them together ----
+# Putting them together  
 DOXY.PARAMS <- rbind(effectiveness_samples,discont_rate_samples)
 rownames(DOXY.PARAMS) <- c("doxy.effectiveness","doxy.discontinuationRate")
 
-
-# INTERVENTION ----
+####
 # intervnetion controls the uptake among eligible population >>> 10% from 2022-2030
 # we know C=U/(1+r) > in the model, we will calculate the coverage
 # r is discontinuation rate
 # U is the proportion of eligible population filling a prescription for doxy (regardless app having been on Doxy before)
 # C is the proportion of eligible population receiving doxyPep by the end of the year?
 
-# Intervention control uptake levels
-clear.interventions() 
-for (uptake in c(30,45)){
-    uptake.effect =  create.intervention.effect(
-        quantity.name    = "doxy.uptake",
-        effect.values    = uptake/100,
-        start.time       = INTERVENTION.START,# when scale up begins
-        times            = INTERVENTION.END, # when scale up ends
-        scale            = "proportion",
-        apply.effects.as = "value",
-        allow.values.less.than.otherwise  = FALSE,
-        allow.values.greater.than.otherwise = TRUE
-    )
-    
-    uptake_intervention <- create.intervention(
-        uptake.effect,
-        parameters = DOXY.PARAMS,
-        WHOLE.POPULATION, 
-        code = paste0("doxypep.",uptake,".rapid")
-    )
-    print(paste("registered: ",paste0("doxypep.",uptake,".rapid")))
+if (1==1){
+    clear.interventions() 
+    for (uptake in c(30,45)){
+        # LINEAR scaleup
+        uptake.effect =  create.intervention.effect(
+            quantity.name    = "doxy.uptake",
+            effect.values    = uptake/100,
+            start.time       = 2020 + 8/12 ,# when scale up begins in Aug 2020
+            times            = 2024 + 6/12, # when scale up ends - stays up at this level
+            scale            = "proportion",
+            apply.effects.as = "value",
+            allow.values.less.than.otherwise  = FALSE,
+            allow.values.greater.than.otherwise = TRUE
+        );
+        uptake_intervention <- create.intervention(
+            uptake.effect,
+            parameters = DOXY.PARAMS,
+            WHOLE.POPULATION,
+            code = paste0("doxypep.",uptake,".linear.2024")
+        )
+        # STEPWISE Scaleup
+        uptake.effect =  create.intervention.effect(
+            quantity.name    = "doxy.uptake",
+            effect.values    = c(15,15,uptake)/100,
+            
+            start.time       = 2020 + 8/12 ,# when scale up begins
+            times            = c(2022 + 5/12 ,
+                                 2023 + 5/12 ,
+                                 2024 + 6/12),       
+            scale            = "proportion",
+            apply.effects.as = "value",
+            allow.values.less.than.otherwise  = FALSE,
+            allow.values.greater.than.otherwise = TRUE
+        );
+        uptake_intervention <- create.intervention(
+            uptake.effect,
+            parameters = DOXY.PARAMS,
+            WHOLE.POPULATION,
+            code = paste0("doxypep.",uptake,".stepwise.2024")
+        )
+        noint = get.null.intervention()
+    }
 }
-
-noint = get.null.intervention()
-
-
-# =============================================================================
-# SECTION 1: Configuration
-# =============================================================================
-# Just for SEATTLE
-LOCATIONS        <- SHIELD.TEN.MSAS[10]     # Named vector: names = city, values = codes
-
-CALIBRATION.CODE <- "calib.4.24.stage2.az"
-N.SIM <- 300
-FIRST.YEAR <- 2000
-LAST.YEAR <- 2040
-
-BASE.PATH <- paste0(ROOT.DIR,"/simulations/shield")
 
 INTERVENTION.LABELS <- c(
     noint        = "No Doxy-PEP Intervention",
-    doxypep.30.rapid   = "30% Doxy-PEP Coverage (2020-2024)",
-    doxypep.45.rapid   = "45% Doxy-PEP Coverage (2020-2024)"
+    doxypep.30.linear.2024   = "30% Doxy-PEP linear Coverage 2020-2024",
+    doxypep.45.linear.2024   = "45% Doxy-PEP linear Coverage 2020-2024",
+    doxypep.30.stepwise.2024 = "30% Doxy-PEP stepwise Coverage 2020-2024",
+    doxypep.45.stepwise.2024 = "45% Doxy-PEP stepwise Coverage 2020-2024"
 )
 INTERVENTION.CODES <- names(INTERVENTION.LABELS)
 
-if (1==2){
+
+# SECTION 2: Run ----
+if (1==1){
     sim.collection <- create.simset.collection(
         version = "shield",
         calibration.code = CALIBRATION.CODE,
@@ -146,10 +161,8 @@ if (1==2){
     )
 }
 
-# =============================================================================
-# SECTION 3: Load All Simsets
-# =============================================================================
-
+# SECTION 3: Load All Simsets ----
+# rm(all.simsets)
 all.simsets <- load.all.simsets(
     locations           = LOCATIONS,
     intervention.codes  = INTERVENTION.CODES,
@@ -161,9 +174,8 @@ all.simsets <- load.all.simsets(
     append=T
     # force.reload        = FALSE # set TRUE to ignore cache and reload everything
 )
-# =============================================================================
-# SECTION 4: Plotting
-# =============================================================================
+
+# SECTION 4: Plotting ----
 
 intervention.style.manager <- create.style.manager(color.sim.by = "simset",alpha.line=1)
 
@@ -185,8 +197,8 @@ plot_int_single_city(
     outcomes = c("diagnosis.ps"),
     facet.by = "sex",
     # plot.which="sim.only",
-    # years=c(2023,2025),
-    years=c(2000,2025),
+    years=c(2000:2025),
+    # years=c(2000,2025),
     style.manager = intervention.style.manager
     # save = T,create.dirs = T
 )
