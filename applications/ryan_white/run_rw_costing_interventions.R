@@ -1,6 +1,5 @@
 
 ###### Needed to work on SHIELD server #########################################
-library(jheem2)
 
 print("Sourcing code prior to running interventions")
 
@@ -12,7 +11,7 @@ set.jheem.root.directory(ROOT.DIR)
 
 LOCATIONS =  'FL'  #RW.LOCATIONS # 'FL' 
 FORCE.OVERWRITE = T #FORCE.REDO
-INTERVENTION.CODES = c('adap.end.50.no.trate.26','noint.no.trate.26') 
+INTERVENTION.CODES =  c('adap.end.50.no.trate.26','noint.no.trate.26','adap.end.50.w.trate.26') 
 
 print(paste0("Doing locations: ",
              paste0(LOCATIONS, collapse=', ')))

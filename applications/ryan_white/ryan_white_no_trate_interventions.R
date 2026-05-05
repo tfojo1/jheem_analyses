@@ -54,5 +54,12 @@ adap.coverage.50.no.trate = create.intervention(no.transmission.effect,
                                                 WHOLE.POPULATION, 
                                                 code = paste0("adap.end.50.no.trate",rw.intervention.suffix))
 
+adap.coverage.50.w.trate = create.intervention(adap.coverage.50.exp.effect,
+                                               adap.coverage.50.nexp.effect,
+                                               parameters = rbind(
+                                                   RW.effect.values[c(1,4),],
+                                                   LOSE.ADAP.FRACTION),
+                                               WHOLE.POPULATION, 
+                                               code = paste0("adap.end.50.w.trate",rw.intervention.suffix))
 
 
