@@ -28,13 +28,36 @@ register.calibration.info("calib.4.24.stage0.az",
                           n.iter = 10000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
-
+# *** OLD (has to be kept here because the registration has to happen in order)----
+# Attempting a full top-to-bottom calibration
+register.calibration.info('calib.4.24.stage1.az',
+                          preceding.calibration.codes = 'calib.4.24.stage0.az',
+                          likelihood.instructions = lik.inst.stage1, # likelihood has different meaning now
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
 
 
 # ***** NEW STAGE1 ***** ----
 register.calibration.info('calib.5.4.stage1.az',
                           preceding.calibration.codes = 'calib.4.24.stage0.az',
                           likelihood.instructions = lik.inst.stage1,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+# *** OLD (has to be kept here because the registration has to happen in order)----
+# # Attempting a top-to-bottom calibration. Here, uses 8x on future penalty likelihood.
+register.calibration.info('calib.4.24.stage2.az',
+                          preceding.calibration.codes = 'calib.4.24.stage1.az',
+                          likelihood.instructions = lik.inst.stage1, # likelihood replaced so that this code still runs. Was stage 2
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
@@ -122,26 +145,5 @@ register.calibration.info("calib.4.30.stage3.8th",
 #                           n.iter = 10000, thin = 50, is.preliminary = F, max.run.time.seconds = 30, description = "NA"
 # )
 
-# ***** STAGE1 *****  ----
-# Attempting a full top-to-bottom calibration
-register.calibration.info('calib.4.24.stage1.az',
-                          preceding.calibration.codes = 'calib.4.24.stage0.az',
-                          likelihood.instructions = lik.inst.stage1, # likelihood has different meaning now
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                              STI.TESTING.PARAMETERS.PRIOR@var.names),
-                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
-)
 
-# # Attempting a top-to-bottom calibration. Here, uses 8x on future penalty likelihood.
-register.calibration.info('calib.4.24.stage2.az',
-                          preceding.calibration.codes = 'calib.4.24.stage1.az',
-                          likelihood.instructions = lik.inst.stage1, # likelihood replaced so that this code still runs. Was stage 2
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
-                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
-                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
-)
+
