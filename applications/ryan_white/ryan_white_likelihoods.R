@@ -58,7 +58,7 @@ rw.total.non.adap.likelihood.instructions = create.basic.likelihood.instructions
 rw.non.adap.sex.risk.proportion.likelihood.instructions = create.custom.likelihood.instructions(
     name = 'non.adap.sex.risk',
     
-    compute.function = function(sim, data, log=T)
+    compute.function = function(sim, data, log=T, weights)
     {
         sim.data = sim$optimized.get(data$optimized.instr)
         sim.vector = vapply(data$mapping.indices, function(ind){sum(sim.data[ind])}, FUN.VALUE = numeric(1))

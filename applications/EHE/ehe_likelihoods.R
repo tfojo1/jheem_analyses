@@ -2221,7 +2221,7 @@ future.new.incidence.change.likelihood.instructions = join.likelihood.instructio
 proportion.msm.likelihood.instructions = create.custom.likelihood.instructions(
     name = 'idu.active.prior.ratio',
     
-    compute.function = function(sim, data, log=T)
+    compute.function = function(sim, data, log=T, weights)
     {
         sim.total = sim$optimized.get(data$total.optimized.get.instr)
         total.d = dnorm(data$totals, sim.total, data$total.sd)
@@ -2388,7 +2388,7 @@ proportion.msm.likelihood.instructions = create.custom.likelihood.instructions(
 idu.active.prior.ratio.likelihood.instructions = create.custom.likelihood.instructions(
     name = 'idu.active.prior.ratio',
     
-    compute.function = function(sim, data, log=T)
+    compute.function = function(sim, data, log=T, weights)
     {
         pop = sim$optimized.get(data$optimized.get.instr)
         
