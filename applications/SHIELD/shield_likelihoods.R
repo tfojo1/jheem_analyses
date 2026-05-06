@@ -758,6 +758,14 @@ lik.inst.stg3.population.8x=join.likelihood.instructions(
     population.likelihood.instructions,
     additional.weights = 1/8
 )
+lik.inst.stg3.population.16x=join.likelihood.instructions(
+    population.likelihood.instructions,
+    additional.weights = 1/16
+)
+lik.inst.stg3.population.32x=join.likelihood.instructions(
+    population.likelihood.instructions,
+    additional.weights = 1/32
+)
 lik.inst.stg3.except.population=join.likelihood.instructions(
     deaths.likelihood.instructions,
     fertility.likelihood.instructions,
@@ -820,6 +828,32 @@ lik.inst.stage3.4x.pop.8x = join.likelihood.instructions(
 ) 
 lik.inst.stage3.8x.pop.2x = join.likelihood.instructions(
     lik.inst.stg3.population.2x,
+    lik.inst.stg3.except.population,
+    additional.weights = 1/8
+) 
+
+lik.inst.stage3.2x.pop.16x = join.likelihood.instructions(
+    lik.inst.stg3.population.16x,
+    lik.inst.stg3.except.population,
+    additional.weights = 1/2
+)
+lik.inst.stage3.2x.pop.32x = join.likelihood.instructions(
+    lik.inst.stg3.population.32x,
+    lik.inst.stg3.except.population,
+    additional.weights = 1/2
+)
+lik.inst.stage3.4x.pop.16x = join.likelihood.instructions(
+    lik.inst.stg3.population.16x,
+    lik.inst.stg3.except.population,
+    additional.weights = 1/4
+)
+lik.inst.stage3.4x.pop.32x = join.likelihood.instructions(
+    lik.inst.stg3.population.32x,
+    lik.inst.stg3.except.population,
+    additional.weights = 1/4
+)
+lik.inst.stage3.8x.pop.4x = join.likelihood.instructions(
+    lik.inst.stg3.population.4x,
     lik.inst.stg3.except.population,
     additional.weights = 1/8
 ) 

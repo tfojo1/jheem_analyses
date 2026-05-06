@@ -116,6 +116,38 @@ register.calibration.info("calib.5.6.stage3.2.p8",
                           ),
                           n.iter = 10000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
+# overall 1/2, pop 1/16
+register.calibration.info("calib.5.6.stage3.2.p16",
+                          preceding.calibration.codes = 'calib.5.4.stage1.az',
+                          likelihood.instructions = lik.inst.stage3.2x.pop.16x,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names,
+                              "global.transmission.rate"
+                          ),
+                          n.iter = 10000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+# overall 1/2, pop 1/32
+register.calibration.info("calib.5.6.stage3.2.p32",
+                          preceding.calibration.codes = 'calib.5.4.stage1.az',
+                          likelihood.instructions = lik.inst.stage3.2x.pop.32x,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names,
+                              "global.transmission.rate"
+                          ),
+                          n.iter = 10000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
 # overall 1/4, pop 1/2
 register.calibration.info("calib.5.6.stage3.4.p2",
                           preceding.calibration.codes = 'calib.5.4.stage1.az',
@@ -164,10 +196,58 @@ register.calibration.info("calib.5.6.stage3.4.p8",
                           ),
                           n.iter = 10000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
+# overall 1/4, pop 1/16
+register.calibration.info("calib.5.6.stage3.4.p16",
+                          preceding.calibration.codes = 'calib.5.4.stage1.az',
+                          likelihood.instructions = lik.inst.stage3.4x.pop.16x,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names,
+                              "global.transmission.rate"
+                          ),
+                          n.iter = 10000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+# overall 1/4, pop 1/32
+register.calibration.info("calib.5.6.stage3.4.p32",
+                          preceding.calibration.codes = 'calib.5.4.stage1.az',
+                          likelihood.instructions = lik.inst.stage3.2x.pop.32x,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names,
+                              "global.transmission.rate"
+                          ),
+                          n.iter = 10000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
 # overall 1/8, pop 1/2
 register.calibration.info("calib.5.6.stage3.8.p2",
                           preceding.calibration.codes = 'calib.5.4.stage1.az',
                           likelihood.instructions = lik.inst.stage3.8x.pop.2x,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names,
+                              "global.transmission.rate"
+                          ),
+                          n.iter = 10000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+# overall 1/8, pop 1/4
+register.calibration.info("calib.5.6.stage3.8.p4",
+                          preceding.calibration.codes = 'calib.5.4.stage1.az',
+                          likelihood.instructions = lik.inst.stage3.8x.pop.4x,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
                           parameter.names = c(
