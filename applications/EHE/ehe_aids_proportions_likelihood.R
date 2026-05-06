@@ -44,7 +44,7 @@ min.aids.diagnoses.penalty.instructions = create.custom.likelihood.instructions(
 state.aids.diagnoses.proportions.instructions = create.custom.likelihood.instructions(
     name = 'aids.diagnoses.stratified.proportions',
     
-    compute.function = function(sim, data, log=T)
+    compute.function = function(sim, data, log=T, weights)
     {
         # RISK
         
@@ -238,7 +238,7 @@ state.aids.diagnoses.proportions.instructions = create.custom.likelihood.instruc
 state.aids.diagnoses.ratio.instructions = create.custom.likelihood.instructions(
     name = 'aids.diagnoses.total.ratio',
     
-    compute.function = function(sim, data, log=T)
+    compute.function = function(sim, data, log=T, weights)
     {
         sim.aids = sim$get('aids.diagnoses', 
                                 year = c(data$rel.to.year, data$years),
@@ -317,7 +317,7 @@ state.aids.diagnoses.ratio.instructions = create.custom.likelihood.instructions(
 trate.peak.penalty.likelihood.instructions = create.custom.likelihood.instructions(
     name = 'aids.diagnoses.total.ratio',
     
-    compute.function = function(sim, data, log=T)
+    compute.function = function(sim, data, log=T, weights)
     {
         if (log)
         {
