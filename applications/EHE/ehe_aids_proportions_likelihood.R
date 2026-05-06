@@ -2,7 +2,7 @@
 min.aids.diagnoses.penalty.instructions = create.custom.likelihood.instructions(
     name = 'min.aids.diagnoses',
     
-    compute.function = function(sim, data, log=T)
+    compute.function = function(sim, data, log=T, weights)
     {
         if (log)
         {

@@ -382,7 +382,7 @@ create.future.change.likelihood.instructions <- function(outcomes,
         )
     }
     
-    compute.function = function(sim, data, log=T)
+    compute.function = function(sim, data, log=T, weights)
     {
         #-- Get the data and calculate fold change ratio --#
         sim.values = sim$optimized.get(data$optimized.get.instr)
@@ -499,7 +499,7 @@ create.future.change.pivot.likelihood.instructions <- function(outcomes,
         )
     }
     
-    compute.function = function(sim, data, log=T)
+    compute.function = function(sim, data, log=T, weights)
     {
         #-- Get the data and calculate fold change ratio --#
         sim.values = sim$optimized.get(data$optimized.get.instr)
