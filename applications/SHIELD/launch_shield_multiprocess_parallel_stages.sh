@@ -2,7 +2,7 @@
 #
 # USAGE
 #   Launch over SSH (survives logout):
-#       nohup bash applications/SHIELD/launch_shield_multiprocess.sh > applications/SHIELD/logs/launcher.out 2>&1 &
+#       nohup bash applications/SHIELD/launch_shield_multiprocess_parallel_stages.sh > applications/SHIELD/logs/launcher.out 2>&1 &
 #   Kill Runs: 
 #       pkill -u pkasaie1 -x R
 #       pkill -u pkasaie1 -f "Rscript"
@@ -71,58 +71,50 @@ all_except_ten_cities=(
 # Stages run sequentially per city — each is a separate Rscript process
 # so the OS fully reclaims memory between them
 stages=(
-    calib.5.1.stage3.p8
+    calib.5.6.stage3.2.p2
+    calib.5.6.stage3.2.p4
+    calib.5.6.stage3.2.p8
+    calib.5.6.stage3.4.p2
+    calib.5.6.stage3.4.p4
+    calib.5.6.stage3.4.p8
+    calib.5.6.stage3.8.p2
 )
 
 script="$SCRIPT_DIR/shield_calib_setup_and_run.R"
-MAX_JOBS=15
+MAX_JOBS=20
 
-
-# ── per-city pipeline ──────────────────────────────────────────────────────────
-# Arguments: $1 = city code, $2..$N = stage names
-# Runs all stages in sequence for one city.
-# If any stage fails, logs the error and skips remaining stages for that city.
-run_city() {
+run_stage() {
     local loc="$1"
-    shift                   # drop the city argument so "$@" contains only the stage names
-    
-    for stage in "$@"; do   # iterate over whatever stages were passed in — no dependency on a global array name
-    
+    local stage="$2"
     echo "[$(date '+%F %T')] START   $loc :: $stage"
-    
-    # Run this stage; redirect both stdout and stderr to the city+stage log file
     Rscript "$script" "$loc" "$stage" > "$LOG_DIR/${loc}_${stage}.out" 2>&1
-    local rc=$?          # capture exit code (0 = success, non-zero = failure)
-        
-        if (( rc != 0 )); then
-    # >&2 sends this message to stderr so it appears in launcher.out
-    # separately from the per-city log files
-    echo "[$(date '+%F %T')] FAILED  $loc :: $stage (exit $rc) — skipping remaining stages" >&2
-    return 1         # exit the function early; remaining stages for this city are skipped
+    local rc=$?
+    if (( rc != 0 )); then
+        echo "[$(date '+%F %T')] FAILED  $loc :: $stage (exit $rc)" >&2
+        return 1
     fi
-    
     echo "[$(date '+%F %T')] DONE    $loc :: $stage"
-    
-    done
-    
-    echo "[$(date '+%F %T')] COMPLETE $loc (all stages)"
 }
 
 # ── job-slot manager ───────────────────────────────────────────────────────────
 running=0
 for loc in "${five_cities[@]}"; do
-for stage in "${stages[@]}"; do
-while (( running >= MAX_JOBS )); do
-wait -n -p done_pid
-(( running-- ))
-echo "[$(date '+%F %T')] SLOT FREED (PID $done_pid, running=$running)"
+    for stage in "${stages[@]}"; do
+        while (( running >= MAX_JOBS )); do
+            wait -n -p done_pid
+            (( running-- ))
+            echo "[$(date '+%F %T')] SLOT FREED (PID $done_pid, running=$running)"
+        done
+
+        run_stage "$loc" "$stage" &
+        (( running++ ))
+        echo "[$(date '+%F %T')] LAUNCHED $loc :: $stage (PID $!, running=$running)"
+    done
 done
 
-run_stage "$loc" "$stage" &
-    (( running++ ))
-echo "[$(date '+%F %T')] LAUNCHED $loc :: $stage (PID $!, running=$running)"
-done
-done
+# Wait for all remaining background jobs to finish
+wait
+echo "[$(date '+%F %T')] ALL DONE"
 
 # The for-loop is exhausted (all cities launched) but up to MAX_JOBS
 # pipelines may still be running. Wait here until every last one finishes.
