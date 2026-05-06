@@ -3,10 +3,6 @@
 # Single target population for all MSM
 WHOLE.POPULATION = create.target.population(name = 'Whole Population') #MSM?
 
-# Timing
-INTERVENTION.START <- 2022 + 9/12       # Oct 1, 2022
-INTERVENTION.END   <- 2030      #  Jan 1, 2030
-
 # DOXY-PEP EFFICATY (Studies report: RR: Rate Ratio of incident syphilis cases in doxy vs no-doxy arms per person-time)
 # we have pooled estiamtes from clinical trials to estimate the meanlog and sdlog
 # Draw RR samples from the final lognormal distribution to use in the model
@@ -59,12 +55,12 @@ rownames(DOXY.PARAMS) <- c("doxy.effectiveness","doxy.discontinuationRate")
 
 # Intervention control uptake levels
 clear.interventions() 
-for (uptake in c(10,25,50)){
+for (uptake in c(25,50,75)){
     uptake.effect =  create.intervention.effect(
         quantity.name    = "doxy.uptake",
         effect.values    = uptake/100,
-        start.time       = INTERVENTION.START,# when scale up begins
-        times            = INTERVENTION.END, # when scale up ends
+        start.time       = 2020,# when scale up begins
+        times            = 2025, # when scale up ends
         scale            = "proportion",
         apply.effects.as = "value",
         allow.values.less.than.otherwise  = FALSE,
@@ -75,10 +71,28 @@ for (uptake in c(10,25,50)){
         uptake.effect,
         parameters = DOXY.PARAMS,
         WHOLE.POPULATION, 
-        code = paste0("doxypep.",uptake)
+        code = paste0("doxy.",uptake,".2020")
     )
 }
-
+for (uptake in c(25,50,75)){
+    uptake.effect =  create.intervention.effect(
+        quantity.name    = "doxy.uptake",
+        effect.values    = uptake/100,
+        start.time       = 2022,# when scale up begins
+        times            = 2025, # when scale up ends
+        scale            = "proportion",
+        apply.effects.as = "value",
+        allow.values.less.than.otherwise  = FALSE,
+        allow.values.greater.than.otherwise = TRUE
+    )
+    
+    uptake_intervention <- create.intervention(
+        uptake.effect,
+        parameters = DOXY.PARAMS,
+        WHOLE.POPULATION, 
+        code = paste0("doxy.",uptake,".2022")
+    )
+}
 noint = get.null.intervention()
 
 
