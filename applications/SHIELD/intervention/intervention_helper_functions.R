@@ -618,3 +618,45 @@ plot_int_all_cities <- function(all.simsets,
     
     message("Done generating all city plots")
 }
+
+# to summarize data: 
+calc_proportion_over_dim <- function(data, 
+                                     target_dim = 5,   # which dimension to calculate proportion over (sex)
+                                     num_idx = 2,      # index for numerator (e.g., MSM)
+                                     denom_idx = 1:2,  # indices to sum for denominator
+                                     mean_dim = 1) {   # which dimension to average over at end
+    
+    # Get original dimensions
+    d <- dim(data)
+    ndim <- length(d)
+    
+    # Build index expressions dynamically
+    # For numerator: data[,,,,num_idx,, drop=FALSE]
+    num_idx_list <- rep(list(quote(expr=)), ndim)
+    num_idx_list[[target_dim]] <- num_idx
+    num <- do.call(`[`, c(list(data), num_idx_list, list(drop = FALSE)))
+    
+    # For denominator subset: data[,,,,denom_idx,, drop=FALSE]
+    denom_idx_list <- rep(list(quote(expr=)), ndim)
+    denom_idx_list[[target_dim]] <- denom_idx
+    denom_subset <- do.call(`[`, c(list(data), denom_idx_list, list(drop = FALSE)))
+    
+    # Sum over target_dim using apply
+    margin <- setdiff(1:ndim, target_dim)
+    denom <- apply(denom_subset, margin, sum)
+    
+    # Restore the collapsed dimension
+    new_dims <- d
+    new_dims[target_dim] <- 1
+    denom_full <- array(denom, dim = new_dims)
+    
+    # Calculate proportion
+    prp <- num / denom_full
+    
+    # Get mean over specified dimension
+    y <- apply(prp, mean_dim, mean, na.rm = TRUE)
+    
+    # Return both proportion array and mean
+    list(mean_over_dim = y)
+}
+

@@ -254,11 +254,14 @@ plot_int_single_city(
     all.simsets[c(1,5,6,7)],
     city     = "Seattle",
     outcomes = c("diagnosis.total"),
+    # outcomes = c("diagnosis.ps"),
+    # outcomes = c("diagnosis.el.misclassified"),
+    
     # outcomes =c("doxy.uptake"),
     facet.by = "sex",
     plot.which="sim.only",
     # years=c(2000:2025),
-    years=c(2018:2025),
+    years=c(2018:2030),
     style.manager = intervention.style.manager
     # save = T,create.dirs = T
 )

@@ -11,7 +11,10 @@ source("../jheem_analyses/applications/SHIELD/intervention/intervention_helper_f
 # =============================================================================
 LOCATIONS        <- SHIELD.TEN.MSAS     # Named vector: names = city, values = codes
 
-CALIBRATION.CODE <- "calib.4.24.stage2.az"
+# CALIBRATION.CODE <- "calib.4.24.stage2.az"
+
+CALIBRATION.CODE <- "calib.5.4.stage1.az"
+
 N.SIM <- 300
 FIRST.YEAR <- 2000
 LAST.YEAR <- 2040
@@ -21,9 +24,12 @@ BASE.PATH <- paste0(ROOT.DIR,"/simulations/shield")
 
 INTERVENTION.LABELS <- c(
     noint        = "No Doxy-PEP Intervention",
-    doxypep.10   = "10% Doxy-PEP Coverage",
-    doxypep.25   = "25% Doxy-PEP Coverage",
-    doxypep.50   = "50% Doxy-PEP Coverage"
+    doxy.25.2020   = "25% Doxy-PEP Coverage 2020-2025",
+    doxy.50.2020   = "50% Doxy-PEP Coverage 2020-2025",
+    doxy.75.2020   = "75% Doxy-PEP Coverage 2020-2025",
+    doxy.25.2022   = "25% Doxy-PEP Coverage 2022-2025",
+    doxy.50.2022   = "50% Doxy-PEP Coverage 2022-2025",
+    doxy.75.2022   = "75% Doxy-PEP Coverage 2022-2025"
 )
 INTERVENTION.CODES <- names(INTERVENTION.LABELS)
 
