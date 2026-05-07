@@ -1,6 +1,14 @@
 
 # BRFSS & SHIELD ----
 
+# Needed for finding p bias estimates for SHIELD proportion tested
+register.ontology.mapping("brfss.shield.to.cdc.sex",
+                          from.dimensions = "sex",
+                          to.dimensions = "sex",
+                          mappings = rbind(c("male", "male"),
+                                           c("female", "female"),
+                                           c("msm", "male")))
+
 #This maps shield to BRFSS.SHIELD ontology
 register.ontology.mapping('shield.to.brfss.shield.sex',
                           from.dimensions = "sex",

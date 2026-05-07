@@ -21,6 +21,19 @@ proportion.tested.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
                                                         super.location.type = "STATE",
                                                         main.location.type = "CBSA",
                                                         main.location.type.n.source = "census.population") 
+get.p.bias.estimates(SURVEILLANCE.MANAGER,
+                     dimensions = c("age","race","sex"),
+                     levels.of.stratification = c(0),
+                     outcome.for.p = "proportion.tested",
+                     outcome.for.n = "adult.population",
+                     sub.location.type = NULL, 
+                     super.location.type = "STATE",
+                     main.location.type = "CBSA",
+                     # main.location.type.n.source = "census.population",
+                     main.location.type.n.source = "census.aggregated.adult.population") 
+# try with shield surveillance manager
+# try stage 1 again with revised 
+# for SHIELD, got out.mean -0.029 and out.sd 0.150 with n.out = 2323
 
 hiv.test.positivity.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
                                              dimensions = character(),

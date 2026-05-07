@@ -24,10 +24,6 @@ STAGE.3.WEIGHT= 1/8
 FUTURE.CHANGE.LIKELIHOOD.WEIGHT = 8 # representing the eight points we would have post 2022 (eight times as many points)
 HIV.TESTING.BY.SEX.WEIGHT= 8 #increasing the weight for sex a specific HIV test testing rates because this is the only targets that's available among MSM
 
-NEW.PROP.TESTED.P.BIAS.ESTIMATES <- list(out.mean = -0.0285,
-                                         out.sd = 0.1500,
-                                         n.out = 2323)
-
 #** POPULATION SIZES ** ---- 
 #'# Error variance for population data <From EHE model>
 population.error.sd.shield = function(data, details=attr(data, 'details'), version, location)
@@ -530,7 +526,7 @@ SHIELD.DUMMY.PARTITIONING.FUNCTION <- function(arr, version = 'shield', location
     return(arr)
 }
 proportion.tested.bias.estimates = get.cached.object.for.version(name = "proportion.tested.bias.estimates", 
-                                                                 version = 'ehe')
+                                                                 version = 'shield')
 SHIELD.PARTITIONING.FUNCTION <- function(arr, version, location)
 {
     # We only do anything if:
@@ -597,9 +593,9 @@ proportion.tested.total.by.race.nested.likelihood.instructions =
                                                      levels.of.stratification = c(0,1),
                                                      #
                                                      p.bias.inside.location = 0,
-                                                     p.bias.outside.location = NEW.PROP.TESTED.P.BIAS.ESTIMATES$out.mean,
-                                                     p.bias.sd.inside.location = NEW.PROP.TESTED.P.BIAS.ESTIMATES$out.sd,
-                                                     p.bias.sd.outside.location = NEW.PROP.TESTED.P.BIAS.ESTIMATES$out.sd,
+                                                     p.bias.outside.location = proportion.tested.bias.estimates$out.mean,
+                                                     p.bias.sd.inside.location = proportion.tested.bias.estimates$out.sd,
+                                                     p.bias.sd.outside.location = proportion.tested.bias.estimates$out.sd,
                                                      #
                                                      within.location.p.error.correlation = 0.5, #Default: correlation from one year to other in the bias in the city and outside the city
                                                      within.location.n.error.correlation = 0.5, #Default: ratio of tests outside MSA to those inside MSA (for MSA we usually dont have fully stratified numbers)
@@ -626,9 +622,9 @@ proportion.tested.total.by.age.race.nested.likelihood.instructions =
                                                      levels.of.stratification = c(0,1),
                                                      #
                                                      p.bias.inside.location = 0,
-                                                     p.bias.outside.location = NEW.PROP.TESTED.P.BIAS.ESTIMATES$out.mean,
-                                                     p.bias.sd.inside.location = NEW.PROP.TESTED.P.BIAS.ESTIMATES$out.sd,
-                                                     p.bias.sd.outside.location = NEW.PROP.TESTED.P.BIAS.ESTIMATES$out.sd,
+                                                     p.bias.outside.location = proportion.tested.bias.estimates$out.mean,
+                                                     p.bias.sd.inside.location = proportion.tested.bias.estimates$out.sd,
+                                                     p.bias.sd.outside.location = proportion.tested.bias.estimates$out.sd,
                                                      #
                                                      within.location.p.error.correlation = 0.5, #Default: correlation from one year to other in the bias in the city and outside the city
                                                      within.location.n.error.correlation = 0.5, #Default: ratio of tests outside MSA to those inside MSA (for MSA we usually dont have fully stratified numbers)
@@ -656,9 +652,9 @@ proportion.tested.by.sex.nested.likelihood.instructions =
                                                      location.overall.keep.threshold = 1, # in case there aren't enough extra years of data from the State... although then should we be using this?
                                                      #
                                                      p.bias.inside.location = 0,
-                                                     p.bias.outside.location = NEW.PROP.TESTED.P.BIAS.ESTIMATES$out.mean,
-                                                     p.bias.sd.inside.location = NEW.PROP.TESTED.P.BIAS.ESTIMATES$out.sd,
-                                                     p.bias.sd.outside.location = NEW.PROP.TESTED.P.BIAS.ESTIMATES$out.sd,
+                                                     p.bias.outside.location = proportion.tested.bias.estimates$out.mean,
+                                                     p.bias.sd.inside.location = proportion.tested.bias.estimates$out.sd,
+                                                     p.bias.sd.outside.location = proportion.tested.bias.estimates$out.sd,
                                                      #
                                                      within.location.p.error.correlation = 0.5, #Default: correlation from one year to other in the bias in the city and outside the city
                                                      within.location.n.error.correlation = 0.5, #Default: ratio of tests outside MSA to those inside MSA (for MSA we usually dont have fully stratified numbers)
@@ -688,9 +684,9 @@ proportion.tested.total.by.age.race.sex.nested.likelihood.instructions <-
                                                      levels.of.stratification = c(0,1),
                                                      #
                                                      p.bias.inside.location = 0,
-                                                     p.bias.outside.location = NEW.PROP.TESTED.P.BIAS.ESTIMATES$out.mean,
-                                                     p.bias.sd.inside.location = NEW.PROP.TESTED.P.BIAS.ESTIMATES$out.sd,
-                                                     p.bias.sd.outside.location = NEW.PROP.TESTED.P.BIAS.ESTIMATES$out.sd,
+                                                     p.bias.outside.location = proportion.tested.bias.estimates$out.mean,
+                                                     p.bias.sd.inside.location = proportion.tested.bias.estimates$out.sd,
+                                                     p.bias.sd.outside.location = proportion.tested.bias.estimates$out.sd,
                                                      #
                                                      within.location.p.error.correlation = 0.5, #Default: correlation from one year to other in the bias in the city and outside the city
                                                      within.location.n.error.correlation = 0.5, #Default: ratio of tests outside MSA to those inside MSA (for MSA we usually dont have fully stratified numbers)
