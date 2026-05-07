@@ -372,7 +372,8 @@ make_stage2_plots_for_location <- function(last20, lastsim, plotting.path, title
     make_facet_plot("hiv.testing", last20, lastsim, facet.vars = c("sex", "race", "age"), style.manager = source.style.manager, plotting.path = plotting.path, title.suffix = title.suffix)
 }
 
-# COMPARE by LOCATION ----#' @title Create Multi-Panel Location Comparison Plot
+# COMPARE by LOCATION ---- 
+#' @title Create Multi-Panel Location Comparison Plot
 create_multipanel_location_comparison <- function(outcome,
                                                   simset.data,
                                                   calibration.code,
@@ -554,27 +555,53 @@ if (1==2) {
 }
 
 # --- Multi-panel location comparison plots ---
-if (1==2) {
+if (1==1) {
     
-    calibname <- "calib.4.24.stage2.az"
-    # plot.which = c("sim.and.data", "sim.only")[1],
-    # summary.type = c("individual.simulation", "mean.and.interval",
-    #                  "median.and.interval")[1],
-    # Retrieve and/or assemble simsets (same as before)
-    simset_data <- prepare_simsets_for_plots(
+    calibname <- "calib.5.4.stage1.az"
+#
+    all.calibration.simsets <- prepare_simsets_for_plots(
         calibration.code = calibname, 
-        locations = names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N","S","PH")], 
+        locations = SHIELD.TEN.MSAS, 
         assemble.incomplete = F
     )
     
-    # Example 1: Create multi-panel plots for selected outputs
-    # outcomes <- c("diagnosis.total", "diagnosis.ps", "diagnosis.el.misclassified", 
-    #               "diagnosis.late.misclassified", "hiv.testing")
-    outcomes <- c("sti.screening")
+    # Create multi-panel plots for selected outputs
+    outcomes <- c("diagnosis.total", "diagnosis.ps", "diagnosis.el.misclassified",
+                  "diagnosis.late.misclassified", "hiv.testing")
     for( o in outcomes){
         create_multipanel_location_comparison(
             outcome = o,
-            simset.data = simset_data,
+            simset.data = all.calibration.simsets,
+            # split.by = "sex",
+            # plot.which="sim.only", #"sim.and.data"
+            calibration.code = calibname,
+            summary.type = "mean.and.interval",
+            # summary.type = "individual.simulation",
+            nrow = 2, ncol = 5,
+            # width = 36, height = 16,
+            
+            create.dirs = TRUE
+        )
+    }
+    for( o in outcomes){
+        create_multipanel_location_comparison(
+            outcome = o,
+            simset.data = all.calibration.simsets,
+            split.by = "sex",
+            # plot.which="sim.only", #"sim.and.data"
+            calibration.code = calibname,
+            summary.type = "mean.and.interval",
+            # summary.type = "individual.simulation",
+            nrow = 2, ncol = 5,
+            # width = 36, height = 16,
+            
+            create.dirs = TRUE
+        )
+    }
+    for( o in outcomes){
+        create_multipanel_location_comparison(
+            outcome = o,
+            simset.data = all.calibration.simsets,
             split.by = "sex",
             plot.which="sim.only", #"sim.and.data"
             calibration.code = calibname,
@@ -587,4 +614,4 @@ if (1==2) {
         )
     }
     
-}
+} 

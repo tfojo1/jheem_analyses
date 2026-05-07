@@ -11,26 +11,27 @@ stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 
 # READ STATUS of ongoing runs
 for(x in SHIELD.TEN.MSAS  ){
-    # status<-get.calibration.progress('shield', locations = x, calibration.code = "calib.5.4.stage1.az") #new stage1 
     status<-get.calibration.progress('shield', locations = x, calibration.code = "calib.5.5.stage1.pk") #new stage1+30% msm.female.partnership
     print(status)
 }
-
-# Reads completed runs
-assign_simset_vars(SHIELD.TEN.MSAS[10],calibration.codes = "calib.5.4.stage1.az",n.sim = 300,sim.id = 1)
-assign_simset_vars(SHIELD.TEN.MSAS[10],calibration.codes = "calib.5.5.stage1.pk",n.sim = 300,sim.id = 2)
-
-simsetX2<-assemble.simulations.from.calibration(
-    version = 'shield',
-    location = SHIELD.TEN.MSAS[9],
-    calibration.code = "calib.5.5.stage1.pk",
-    allow.incomplete = TRUE
-)
+# 
+# # Reads completed runs
+# assign_simset_vars(SHIELD.TEN.MSAS[10],calibration.codes = "calib.5.4.stage1.az",n.sim = 300,sim.id = 1)
+# assign_simset_vars(SHIELD.TEN.MSAS[10],calibration.codes = "calib.5.5.stage1.pk",n.sim = 300,sim.id = 2)
+# 
+# <<<<<<< HEAD
+# simsetX2<-assemble.simulations.from.calibration(
+#     version = 'shield',
+#     location = SHIELD.TEN.MSAS[9],
+#     calibration.code = "calib.5.5.stage1.pk",
+#     allow.incomplete = TRUE
+# )
 x<-simsetX2$last.sim()$get.params()
 x
 # *******************************************************************************
 simplot(
-    simsetS1$last.sim(),simsetS2$last.sim(),
+    simsetP1$last.sim(),simsetP2$last.sim(),
+# >>>>>>> 26b643e2421d6d91677cf1a69bd0c1ec7c53d9b4
     outcomes=c("population","diagnosis.ps")
     # outcomes = c("diagnosis.primary.symptomatic","diagnosis.secondary.symptomatic","diagnosis.primary.asymptomatic","diagnosis.secondary.asymptomatic")
     # outcomes = c("diagnosis.total", "diagnosis.ps", "diagnosis.el.misclassified","diagnosis.late.misclassified","hiv.testing")
