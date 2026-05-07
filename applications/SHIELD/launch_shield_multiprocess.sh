@@ -67,7 +67,8 @@ all_except_ten_cities=(
 # Stages run sequentially per city — each is a separate Rscript process
 # so the OS fully reclaims memory between them
 stages=(
-    calib.5.6.stage1.pk
+    calib.5.7.stage0.pk
+    calib.5.7.stage1.pk
 )
 
 script="$SCRIPT_DIR/shield_calib_setup_and_run.R"

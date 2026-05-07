@@ -28,6 +28,18 @@ register.calibration.info("calib.4.24.stage0.az",
                           n.iter = 10000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
+# Attempting a calibration after increasing msm.fraction.pairing.female to 30%
+register.calibration.info("calib.5.7.stage0.pk",
+                          likelihood.instructions = lik.inst.stage0,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          fixed.initial.parameter.values = c("global.transmission.rate"=2.3),  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          parameter.aliases = par.aliases.transmission,
+                          n.iter = 10000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
 # *** OLD (has to be kept here because the registration has to happen in order)----
 # Attempting a full top-to-bottom calibration
 register.calibration.info('calib.4.24.stage1.az',
@@ -52,8 +64,10 @@ register.calibration.info('calib.5.4.stage1.az',
                                               TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-register.calibration.info('calib.5.6.stage1.pk',
-                          preceding.calibration.codes = 'calib.4.24.stage0.az',
+
+# Attempting a calibration after increasing msm.fraction.pairing.female to 30%
+register.calibration.info('calib.5.7.stage1.pk',
+                          preceding.calibration.codes = 'calib.5.7.stage0.pk',
                           likelihood.instructions = lik.inst.stage1,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
