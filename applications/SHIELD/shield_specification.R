@@ -614,8 +614,7 @@ register.model.element(SHIELD.SPECIFICATION,
 
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'fraction.msm.pairings.with.female',
-                       # value = mean(PAIRING.INPUT.MANAGER$msm.sex.with.female.estimates),
-                       value=0.3,
+                       value = mean(PAIRING.INPUT.MANAGER$msm.sex.with.female.estimates),
                        scale = 'ratio')
 ###
 register.model.quantity(SHIELD.SPECIFICATION,

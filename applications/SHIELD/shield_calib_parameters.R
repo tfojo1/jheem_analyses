@@ -254,9 +254,8 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
   ## Sexual Mixing by Risk ----
   oe.female.pairings.with.msm = Lognormal.Distribution(meanlog = log(0.0895), sdlog = log(2)), #SD are chosen empirically '@Ryan: Mu?
   fraction.heterosexual_male.pairings.with.male = Logitnormal.Distribution(meanlogit = logit(0.004), sdlogit = log(2)),
-  # fraction.msm.pairings.with.female = Logitnormal.Distribution(meanlogit = logit(0.1187612), sdlogit = log(2)),
-  fraction.msm.pairings.with.female = Logitnormal.Distribution(meanlogit = logit(0.3), sdlogit = log(2)/2),
-  
+  fraction.msm.pairings.with.female = Logitnormal.Distribution(meanlogit = logit(0.1187612), sdlogit = log(2)),
+
   # Proportion MSM ----#'@:Ryan: where are these mu/sd coming from? 
   black.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog =0, sdlog = 0.125*log(2)),
   hispanic.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.125*log(2)),
