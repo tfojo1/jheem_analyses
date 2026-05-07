@@ -10,46 +10,32 @@ source.style.manager   = create.style.manager( shape.data.by = "source",color.da
 stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 
 # READ STATUS of ongoing runs
-# for(x in names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N")] ){
-    for(x in MSAS.OF.INTEREST  ){
-        
-    # print(MSAS.OF.INTEREST[MSAS.OF.INTEREST==x])
-    status<-get.calibration.progress('shield', locations = x, calibration.code = "calib.4.13.stage1.pk")
+for(x in SHIELD.TEN.MSAS  ){
+    # status<-get.calibration.progress('shield', locations = x, calibration.code = "calib.5.4.stage1.az") #new stage1 
+    status<-get.calibration.progress('shield', locations = x, calibration.code = "calib.5.5.stage1.pk") #new stage1+30% msm.female.partnership
     print(status)
 }
-#names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N")]
-#    
 
 # Reads completed runs
-assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("P","B","M","A","H","C","L","N")],calibration.codes = "calib.4.8.stage0.az",n.sim = 300,sim.id = 0)
-assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("B","M","A","H","C","L","N")],calibration.codes = "calib.4.8.stage1.az",n.sim = 300,sim.id = 1)
-assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("B","M","A","H","C","L","N")],calibration.codes = "calib.4.8.stage2.az",n.sim = 300,sim.id = 2)
+assign_simset_vars(SHIELD.TEN.MSAS[10],calibration.codes = "calib.5.4.stage1.az",n.sim = 300,sim.id = 1)
+assign_simset_vars(SHIELD.TEN.MSAS[10],calibration.codes = "calib.5.5.stage1.pk",n.sim = 300,sim.id = 2)
 
-#before change
-assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("B","M","A","H","C","L","N")],calibration.codes = "calib.4.3.stage1.pk",n.sim = 300,sim.id=10)
-assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("B","M","A","H","C","L","N")],calibration.codes = "calib.4.3.stage2.pk",n.sim = 300,sim.id=20)
-
-# for ( x in c("B","M","A","H","C","L","N")){
-#     location= names(msa_var_names)[msa_var_names %in% x]
-#     assign(
-#         paste0("simset",x,0),
-#         retrieve.simulation.set('shield',location = location,calibration.code = "calib.4.3.stage0.pk",n.sim = 300))
-#     paste("read ",x," ")
-# }
-
-
+simsetX2<-assemble.simulations.from.calibration(
+    version = 'shield',
+    location = SHIELD.TEN.MSAS[9],
+    calibration.code = "calib.5.5.stage1.pk",
+    allow.incomplete = TRUE
+)
+x<-simsetX2$last.sim()$get.params()
+x
+# *******************************************************************************
 simplot(
-    # simsetB1$last.sim(),  simsetB2$last.sim(),
-    # simsetH1$last.sim(),  simsetH2$last.sim(),
-    # simsetA1$last.sim(),  simsetA2$last.sim(),
-    # simsetL1$last.sim(),  simsetL2$last.sim(),
-    simsetP0$last.sim(),
-    # outcomes=c("immigration")# facet.by = "age",split.by = "race"
+    simsetS1$last.sim(),simsetS2$last.sim(),
     outcomes=c("population","diagnosis.ps")
     # outcomes = c("diagnosis.primary.symptomatic","diagnosis.secondary.symptomatic","diagnosis.primary.asymptomatic","diagnosis.secondary.asymptomatic")
     # outcomes = c("diagnosis.total", "diagnosis.ps", "diagnosis.el.misclassified","diagnosis.late.misclassified","hiv.testing")
     # ,split.by="sex",plot.which="sim.only"
-     # ,split.by="race"
+    # ,split.by="race"
     # 
     # outcomes = c("diagnosis.ps"),
     # outcomes = c("diagnosis.el.misclassified")
@@ -58,6 +44,7 @@ simplot(
     # ,split.by="sex"
     # dimension.values = list(year=c(1970:2025)),
 )    
+create_multipanel_location_comparison()
 
 lik1=lik.inst.stage1$instantiate.likelihood(VERSION,LOCATION)
 lik1$compare.sims( simsetL1$subset(142),simsetL1$subset(145) )
@@ -82,7 +69,6 @@ assign_simset_vars(names(msa_var_names)[msa_var_names %in% c("A")],calibration.c
 simplot(simsetA$subset(280:300),
         outcomes ="diagnosis.ps")
 
- make_total_plot("diagnosis.total", 
+make_total_plot("diagnosis.total", 
                 simsetA2$subset(280:300), lastA2, 
                 style.manager = source.style.manager)
-        
