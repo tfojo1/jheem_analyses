@@ -6,6 +6,11 @@ cost_low    <- 32560
 cost_median <- 40460
 cost_high   <- 76760
 
+# Off-ART cost: applies per person-year to anyone diagnosed but not
+# yet on ART. Single value (200-500 CD4 stratum from doc Table 2),
+# constant across the low/mid/high ART cost gradient.
+cost_off_art <- 3730
+
 # -------------------------------------------------
 # Re-engagement hazard: mixture model
 # F(t) = pi * (1 - exp(-lambda * t))
@@ -13,19 +18,24 @@ cost_high   <- 76760
 #   lambda  = annual hazard among the eventual starters
 # Derived from Helleberg 2012:
 #   F(1) = 0.60, F(5) = 0.86 (asymptote)
+# 14% never reengage and accrue off-ART cost through end of horizon.
 # -------------------------------------------------
 pi_reengage     <- 0.86
 lambda_reengage <- 1.2
-horizon_years   <- 10  # how many years to follow each non-starter cohort
+horizon_years   <- 10  # follow each non-starter cohort up to 10 years
 
 F_cum <- function(t) pi_reengage * (1 - exp(-lambda_reengage * t))
 
-# Year-by-year incremental return fraction:
-# incr_return[k] = F(k) - F(k-1) = fraction of original non-starter
-# cohort that starts ART during year_offset k.
+# Year-by-year incremental return fraction (cohort flow rate of
+# starting ART) AND survival fraction (still off ART at start of
+# each follow-up year). year_offset = 0 means "still in the year
+# of diagnosis, not yet started ART" -- this is when the not_starting_now
+# group begins accruing off-ART cost.
 reengage_schedule <- tibble(
-    year_offset = 1:horizon_years,
-    incr_return = F_cum(year_offset) - F_cum(year_offset - 1)
+    year_offset      = 0:horizon_years,
+    F_cum            = F_cum(year_offset),
+    incr_return      = F_cum - lag(F_cum, default = 0),
+    still_offart     = 1 - lag(F_cum, default = 0)   # at START of year
 )
 
 # -------------------------------------------------
@@ -72,7 +82,7 @@ new_excess <- df %>%
     filter(
         year >= 2026, year <= 2035,
         outcome == "new",
-        intervention %in% c("noint", "adap.100.end.26")
+        intervention %in% c("noint", "adap.100.end.26") #this needs to be updated depending on simset run
     ) %>%
     select(location, sim, year, intervention, value) %>%
     pivot_wider(names_from = intervention, values_from = value) %>%
@@ -87,22 +97,33 @@ new_excess <- df %>%
     arrange(location, sim, year)
 
 # -------------------------------------------------
-# 4. Delayed starts via mixture model.
-#    Each non-starter cohort (indexed by diagnosis year) is followed
-#    independently. In year `year + year_offset`, a fraction
-#    `incr_return[year_offset]` of that cohort starts ART.
+# 4. Expand each non-starter cohort across follow-up years.
+#    For each diagnosis-year cohort we track:
+#      - delayed_starts: number reengaging this calendar year
+#      - offart_pyears:  person-years off ART contributed this year
 # -------------------------------------------------
-lagged_starts <- new_excess %>%
-    select(location, sim, year, not_starting_now) %>%
+nonstarter_followup <- new_excess %>%
+    select(location, sim, index_year = year, not_starting_now) %>%
     crossing(reengage_schedule) %>%
     mutate(
+        year           = index_year + year_offset,
         delayed_starts = not_starting_now * incr_return,
-        year           = year + year_offset
+        offart_pyears  = not_starting_now * still_offart
     ) %>%
-    filter(year >= 2026, year <= 2035) %>%
+    filter(year >= 2026, year <= 2035)
+
+lagged_starts <- nonstarter_followup %>%
+    filter(year_offset >= 1) %>%   # year_offset 0 = diagnosis year, no reengagement yet
     group_by(location, sim, year) %>%
     summarise(
         delayed_starts = sum(delayed_starts, na.rm = TRUE),
+        .groups = "drop"
+    )
+
+offart_stock <- nonstarter_followup %>%
+    group_by(location, sim, year) %>%
+    summarise(
+        offart_pyears = sum(offart_pyears, na.rm = TRUE),
         .groups = "drop"
     )
 
@@ -112,14 +133,16 @@ lagged_starts <- new_excess %>%
 start_paths <- new_excess %>%
     select(location, sim, year, excess_new, immediate_starts, not_starting_now) %>%
     left_join(lagged_starts, by = c("location", "sim", "year")) %>%
+    left_join(offart_stock,  by = c("location", "sim", "year")) %>%
     mutate(
         delayed_starts = coalesce(delayed_starts, 0),
+        offart_pyears  = coalesce(offart_pyears, 0),
         total_starts   = immediate_starts + delayed_starts
     ) %>%
     arrange(location, sim, year)
 
 # -------------------------------------------------
-# 6. Deterministic cost gradient
+# 6. Deterministic cost gradient (ART tier varies; off-ART cost fixed)
 # -------------------------------------------------
 cost_grid <- tibble(
     cost_scenario = factor(
@@ -130,8 +153,9 @@ cost_grid <- tibble(
 )
 
 # -------------------------------------------------
-# 7. Expand across cost gradient and compute
-#    recurring annual costs from accumulated burden
+# 7. Expand across cost gradient and compute recurring annual costs.
+#    Annual cost = (people on ART) * ART tier
+#                + (person-years off ART) * off-ART cost
 # -------------------------------------------------
 inc_cost_grid <- start_paths %>%
     crossing(cost_grid) %>%
@@ -139,7 +163,9 @@ inc_cost_grid <- start_paths %>%
     group_by(location, sim, cost_scenario) %>%
     mutate(
         active_excess_on_art        = cumsum(total_starts),
-        annual_incremental_cost     = active_excess_on_art * annual_cost,
+        annual_on_art_cost          = active_excess_on_art * annual_cost,
+        annual_offart_cost          = offart_pyears * cost_off_art,
+        annual_incremental_cost     = annual_on_art_cost + annual_offart_cost,
         cumulative_incremental_cost = cumsum(annual_incremental_cost)
     ) %>%
     ungroup()
@@ -259,7 +285,7 @@ p_state <- ggplot(
     labs(
         x = NULL,
         y = "Net savings from Keeping ADAP, 
-        Only accounting for additional HIV infections,
+        Only accounting for additional Diagnosed HIV infections,
         cumulative through 2035 (millions USD)"
     ) +
     theme_bw() +
