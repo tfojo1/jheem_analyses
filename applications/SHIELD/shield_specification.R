@@ -602,22 +602,24 @@ register.model.element(SHIELD.SPECIFICATION,
 
 ##---- Sexual Contact: By SEX ----
 # Set up elements
+# prp of MSM who are MSMW (have sex with both men and women)
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'oe.female.pairings.with.msm',
-                       value = SHIELD_BASE_PARAMETER_VALUES['oe.female.pairings.with.msm'],
+                       value = PAIRING.INPUT.MANAGER$oe.female.pairings.with.msm,
                        scale = 'ratio')
 
+#prop of Het_male's sexual contacts that are with other men
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'fraction.heterosexual_male.pairings.with.male',
-                       value = SHIELD_BASE_PARAMETER_VALUES['fraction.heterosexual_male.pairings.with.male'],
+                       value = PAIRING.INPUT.MANAGER$fraction.heterosexual_male.pairings.with.male,
                        scale = 'ratio')
 
+#prop of msm's sexual contacts that are with women
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'fraction.msm.pairings.with.female',
-                       # value = mean(PAIRING.INPUT.MANAGER$msm.sex.with.female.estimates),
-                       value = 0.3, #@'PK: changing this for SA
+                       value = PAIRING.INPUT.MANAGER$fraction.msm.pairings.with.female,
                        scale = 'ratio')
-###
+# prp all male.male sexual contacts that are with msm?
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'fraction.male.male.that.are.with.msm',
                         value = expression(prp.msm.of.male /
@@ -628,23 +630,23 @@ register.model.quantity(SHIELD.SPECIFICATION,
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'sexual.contact.by.sex',
                         value = 0)
+# To female from HET_male or MSM
+# denom: # of total sexual contacts for females with het_male and msm: (#het_male)+(#MSMW) =(1-prp.msm.of.male +prp.msm.of.male * oe.female.pairings.with.msm)
 # To female from het
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sexual.contact.by.sex',
                                applies.to=list(sex.from='heterosexual_male',
                                                sex.to='female'),
                                value = expression((1-prp.msm.of.male)/
-                                                      (1-prp.msm.of.male +
-                                                           prp.msm.of.male * oe.female.pairings.with.msm))
-)
+                                                      (1-prp.msm.of.male + prp.msm.of.male * oe.female.pairings.with.msm))
+                               )
 # To female from msm
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sexual.contact.by.sex',
                                applies.to=list(sex.from='msm',
                                                sex.to='female'),
-                               value = expression(prp.msm.of.male * oe.female.pairings.with.msm/
-                                                      (1-prp.msm.of.male +
-                                                           prp.msm.of.male * oe.female.pairings.with.msm))
+                               value = expression((prp.msm.of.male * oe.female.pairings.with.msm)/
+                                                      (1-prp.msm.of.male + prp.msm.of.male * oe.female.pairings.with.msm))
 )
 # To MSM from female, msm, het male
 register.model.quantity.subset(SHIELD.SPECIFICATION,

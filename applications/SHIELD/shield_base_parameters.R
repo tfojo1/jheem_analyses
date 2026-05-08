@@ -65,16 +65,6 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'el.rel.secondary.tr
                                       .25,0,0)
 
 
-## ---- MIXING BY SEXUAL ORIENTATION ---- ## ----
-#observed to estimated ratio of contacts for females with male who are msm
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'oe.female.pairings.with.msm', 
-                                      0.0895,0,0,
-                                      citation='Pathela 2006')
-
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.heterosexual_male.pairings.with.male',
-                                      0.004,0,0,
-                                      citation='JHEEM assumption')
-
 ## ---- SEXUAL CONTACT BY RACE ---- ## ----
 #base sexual contact oes by race for the same race (black-black, hispanic-hispanic, other-other)
 #these are average values from 4 different studies that are included in the pairing_input_manager
