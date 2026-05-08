@@ -52,6 +52,10 @@ register.model.element(CDCP.SPECIFICATION, name = "fraction.tests.from.cdc",
 
 #-- Relating Testing to PrEP --#
 
+register.model.element(CDCP.SPECIFICATION, name = "proportion.prep.regardless",
+                       value = 0.25,
+                       scale = "proportion")
+
 register.model.element(CDCP.SPECIFICATION, name = "fraction.cdc.tests.unique",
                        value = 0.5, 
                        scale = "proportion")
@@ -138,6 +142,11 @@ register.model.element(CDCP.SPECIFICATION, name = "fraction.cdc.tested.prep.elig
 #     scale = 'proportion'
 # )
 
+
+register.model.element(CDCP.SPECIFICATION, name = "proportion.contact.tracing.regardless",
+                       value = 0.14,
+                       scale = "proportion")
+
 register.model.element(CDCP.SPECIFICATION, name = "fraction.diagnoses.from.contact.tracing",
                        get.functional.form.function = get.fraction.positive.contacts,
                        scale = "proportion",
@@ -145,6 +154,8 @@ register.model.element(CDCP.SPECIFICATION, name = "fraction.diagnoses.from.conta
 
 
 #-- CDC Effects --#
+
+
 
 register.model.element(CDCP.SPECIFICATION, name = "cdc.prep.effect",
                        value = 1,
@@ -176,11 +187,17 @@ register.model.quantity(CDCP.SPECIFICATION,
 
 register.model.quantity(CDCP.SPECIFICATION,
                         name = 'oral.prep.coverage',
-                        value = expression(super.oral.prep.coverage * (fraction.prep.not.from.cdc + fraction.prep.from.cdc * cdc.prep.effect)) )
+                        value = expression(super.oral.prep.coverage * 
+                                               (fraction.prep.not.from.cdc + 
+                                                    fraction.prep.from.cdc * cdc.prep.effect +
+                                                    fraction.prep.from.cdc * (1-cdc.prep.effect) * proportion.prep.regardless)))
 
 register.model.quantity(CDCP.SPECIFICATION,
                         name = 'lai.prep.coverage',
-                        value = expression(super.lai.prep.coverage * (fraction.prep.not.from.cdc + fraction.prep.from.cdc * cdc.prep.effect)) )
+                        value = expression(super.lai.prep.coverage * 
+                                               (fraction.prep.not.from.cdc + 
+                                                    fraction.prep.from.cdc * cdc.prep.effect +
+                                                    fraction.prep.from.cdc * (1-cdc.prep.effect) * proportion.prep.regardless)))
 
 ##-------------##
 ##-- Testing --##
@@ -201,10 +218,12 @@ register.model.quantity(CDCP.SPECIFICATION, name = "cdc.nonfunded.testing.of.und
                                                ( (1-fraction.diagnoses.from.cdc) +
                                                      fraction.diagnoses.from.cdc * (1-cdc.testing.effect) * proportion.tested.regardless) )
 )
-
 register.model.quantity(CDCP.SPECIFICATION, name = "testing.of.undiagnosed",
-                        value = expression( (cdc.funded.testing.of.undiagnosed + cdc.nonfunded.testing.of.undiagnosed) *
-                                                (1-fraction.diagnoses.from.contact.tracing + fraction.diagnoses.from.contact.tracing * cdc.contact.tracing.effect)) )
+                        value = expression(
+                            (cdc.funded.testing.of.undiagnosed + cdc.nonfunded.testing.of.undiagnosed) *
+                                (1 - fraction.diagnoses.from.contact.tracing + 
+                                     fraction.diagnoses.from.contact.tracing * cdc.contact.tracing.effect +
+                                     fraction.diagnoses.from.contact.tracing * (1-cdc.contact.tracing.effect) * proportion.contact.tracing.regardless)))
 
 
 #-- The Testing Rate --#
@@ -323,12 +342,17 @@ track.cumulative.outcome(CDCP.SPECIFICATION,
 
 track.integrated.outcome(CDCP.SPECIFICATION,
                          name = 'cumulative.fraction.diagnoses.from.contact.tracing',
-                         outcome.metadata = NULL,
-                         scale = 'proportion',
-                         value.to.integrate = 'fraction.diagnoses.from.contact.tracing',
-                         keep.dimensions = c('location','age','race','sex','risk'),
-                         denominator.outcome = 'new',
-                         save = F)
+                         outcome.metadata = create.outcome.metadata(display.name = 'Number of Partners Testing Positive',
+                                                                    description = "Number of Partners Testing Positive",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'People',
+                                                                    units = 'people',
+                                                                    singular.unit = 'person'),
+                         scale = 'non.negative.number',
+                         value.to.integrate = 'infected',
+                         multiply.by = 'fraction.diagnoses.from.contact.tracing',
+                         keep.dimensions = c('location'),
+                         save = T)
 
 track.cumulative.outcome(CDCP.SPECIFICATION,
                          name = 'number.partners.positive',
