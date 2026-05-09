@@ -14,6 +14,7 @@ par.aliases.transmission = list(
 )
 
 # ***** STAGE0 ***** ----
+# MAKE SURE FOR NEW STAGE 0 TO USE 15000 AND TO KEEP IT CONSISTENT ACROSS STAGES
 
 # Attempting a full top-to-bottom calibration
 register.calibration.info("calib.4.24.stage0.az",
@@ -102,7 +103,23 @@ register.calibration.info('calib.4.24.stage2.az',
                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
-# ***** STAGE3 ***** ----
+# ***** STAGE2 (formerly STAGE3) ***** ----
+# overall 1/2, pop 1/32
+register.calibration.info("calib.5.8.stg2.2.p32",
+                          preceding.calibration.codes = 'calib.5.4.stage1.az',
+                          likelihood.instructions = lik.inst.stage3.2x.pop.32x,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names,
+                              "global.transmission.rate"
+                          ),
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
 
 # overall 1/2, pop 1/2
 register.calibration.info("calib.5.6.stage3.2.p2",
@@ -295,6 +312,24 @@ register.calibration.info("calib.5.6.stage3.8.p4",
                               "global.transmission.rate"
                           ),
                           n.iter = 10000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+# STAGE 3 (formerly would have been STAGE 4) ----
+# overall 1/2, pop 1/32
+register.calibration.info("calib.5.8.stg3.2.p32",
+                          preceding.calibration.codes = 'calib.5.8.stg2.2.p32',
+                          likelihood.instructions = lik.inst.stage3.2x.pop.32x,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names,
+                              "global.transmission.rate"
+                          ),
+                          n.iter = 10000, thin = 50, is.preliminary = F, n.chains=4, max.run.time.seconds = 30, description = "NA"
 )
 
 # register.calibration.info("calib.5.1.stage3.p2",
