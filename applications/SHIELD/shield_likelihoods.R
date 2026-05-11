@@ -18,8 +18,9 @@ diagnosis_cv=PS_CV #we will use this error variance for all diagnosis categories
 #
 STAGE.0.WEIGHT= 1/32 # lowered by half on 3/13/2026 
 STAGE.1.WEIGHT= 1/8
-STAGE.2.WEIGHT= 1/8
-STAGE.3.WEIGHT= 1/8
+STAGE.23.WEIGHT= 1/2
+STAGE.23.POPULATION.WEIGHT = 1/32
+# STAGE.3.WEIGHT= 1/8
 
 FUTURE.CHANGE.LIKELIHOOD.WEIGHT = 8 # representing the eight points we would have post 2022 (eight times as many points)
 HIV.TESTING.BY.SEX.WEIGHT= 8 #increasing the weight for sex a specific HIV test testing rates because this is the only targets that's available among MSM
@@ -693,7 +694,7 @@ proportion.tested.total.by.age.race.sex.nested.likelihood.instructions <-
                                                      #
                                                      observation.correlation.form = 'compound.symmetry',
                                                      p.error.variance.term = NULL, # this was cv=50% until "calib.3.16.stage1.az"
-                                                     p.error.variance.type = "data.variance",
+                                                     p.error.variance.type = "data.variance", # We get variance data from the surveillance manager
                                                      minimum.error.sd = 0.01, # to fix two Houston points where variance data says 0
                                                      #
                                                      partitioning.function = SHIELD.PARTITIONING.FUNCTION,
@@ -729,8 +730,10 @@ lik.inst.stage1=join.likelihood.instructions(
     late.diagnosis.total.likelihood.instructions,
     late.diagnosis.by.strata.likelihood.instructions,
     #
-    proportion.tested.total.by.age.race.nested.likelihood.instructions,
-    proportion.tested.by.sex.nested.likelihood.instructions,
+    # proportion.tested.total.by.age.race.nested.likelihood.instructions,
+    # proportion.tested.by.sex.nested.likelihood.instructions,
+    proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
+    
     #
     historical.diagnosis.likelihood.instructions,
     proportion_ps_male_among_msm_likelihood_instructions,
@@ -739,33 +742,15 @@ lik.inst.stage1=join.likelihood.instructions(
     additional.weights = STAGE.1.WEIGHT
 )
 
-## STAGE3 ----
+## STAGE 2 & 3 ----
 # STAGE 3 now has demographics split into a separate group
 # so that you can set different weights for them if you want.
-lik.inst.stg3.population=join.likelihood.instructions(
-    population.likelihood.instructions
-)
-lik.inst.stg3.population.2x=join.likelihood.instructions(
+lik.inst.stg23.population=join.likelihood.instructions(
     population.likelihood.instructions,
-    additional.weights = 1/2
+    additional.weights = STAGE.23.POPULATION.WEIGHT
 )
-lik.inst.stg3.population.4x=join.likelihood.instructions(
-    population.likelihood.instructions,
-    additional.weights = 1/4
-)
-lik.inst.stg3.population.8x=join.likelihood.instructions(
-    population.likelihood.instructions,
-    additional.weights = 1/8
-)
-lik.inst.stg3.population.16x=join.likelihood.instructions(
-    population.likelihood.instructions,
-    additional.weights = 1/16
-)
-lik.inst.stg3.population.32x=join.likelihood.instructions(
-    population.likelihood.instructions,
-    additional.weights = 1/32
-)
-lik.inst.stg3.except.population=join.likelihood.instructions(
+
+lik.inst.stg23.except.population=join.likelihood.instructions(
     deaths.likelihood.instructions,
     fertility.likelihood.instructions,
     immigration.likelihood.instructions,
@@ -782,77 +767,99 @@ lik.inst.stg3.except.population=join.likelihood.instructions(
     late.diagnosis.total.likelihood.instructions,
     late.diagnosis.by.strata.likelihood.instructions,
     #
-    proportion.tested.total.by.age.race.nested.likelihood.instructions,
-    proportion.tested.by.sex.nested.likelihood.instructions,
-    # proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
+    # proportion.tested.total.by.age.race.nested.likelihood.instructions,
+    # proportion.tested.by.sex.nested.likelihood.instructions,
+    proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
     #
     historical.diagnosis.likelihood.instructions,
     proportion_ps_male_among_msm_likelihood_instructions,
     future.change.likelihood.instructions    # Future change penalty
 )
-lik.inst.stage3 = join.likelihood.instructions(
-    lik.inst.stg3.population,
-    lik.inst.stg3.except.population,
+
+# We use this one
+lik.inst.stage23 = join.likelihood.instructions(
+    lik.inst.stg23.population,
+    lik.inst.stg23.except.population,
     additional.weights = STAGE.3.WEIGHT
 )
-lik.inst.stage3.2x.pop.2x = join.likelihood.instructions(
-    lik.inst.stg3.population.2x,
-    lik.inst.stg3.except.population,
-    additional.weights = 1/2
-) 
-lik.inst.stage3.2x.pop.4x = join.likelihood.instructions(
-    lik.inst.stg3.population.4x,
-    lik.inst.stg3.except.population,
-    additional.weights = 1/2
-) 
-lik.inst.stage3.2x.pop.8x = join.likelihood.instructions(
-    lik.inst.stg3.population.8x,
-    lik.inst.stg3.except.population,
-    additional.weights = 1/2
-) 
-lik.inst.stage3.4x.pop.2x = join.likelihood.instructions(
-    lik.inst.stg3.population.2x,
-    lik.inst.stg3.except.population,
-    additional.weights = 1/4
-) 
-lik.inst.stage3.4x.pop.4x = join.likelihood.instructions(
-    lik.inst.stg3.population.4x,
-    lik.inst.stg3.except.population,
-    additional.weights = 1/4
-) 
-lik.inst.stage3.4x.pop.8x = join.likelihood.instructions(
-    lik.inst.stg3.population.8x,
-    lik.inst.stg3.except.population,
-    additional.weights = 1/4
-) 
-lik.inst.stage3.8x.pop.2x = join.likelihood.instructions(
-    lik.inst.stg3.population.2x,
-    lik.inst.stg3.except.population,
-    additional.weights = 1/8
-) 
 
-lik.inst.stage3.2x.pop.16x = join.likelihood.instructions(
-    lik.inst.stg3.population.16x,
-    lik.inst.stg3.except.population,
-    additional.weights = 1/2
-)
-lik.inst.stage3.2x.pop.32x = join.likelihood.instructions(
-    lik.inst.stg3.population.32x,
-    lik.inst.stg3.except.population,
-    additional.weights = 1/2
-)
-lik.inst.stage3.4x.pop.16x = join.likelihood.instructions(
-    lik.inst.stg3.population.16x,
-    lik.inst.stg3.except.population,
-    additional.weights = 1/4
-)
-lik.inst.stage3.4x.pop.32x = join.likelihood.instructions(
-    lik.inst.stg3.population.32x,
-    lik.inst.stg3.except.population,
-    additional.weights = 1/4
-)
-lik.inst.stage3.8x.pop.4x = join.likelihood.instructions(
-    lik.inst.stg3.population.4x,
-    lik.inst.stg3.except.population,
-    additional.weights = 1/8
-) 
+# Alternative weight versions ----
+# lik.inst.stg3.population.2x=join.likelihood.instructions(
+#     population.likelihood.instructions,
+#     additional.weights = 1/2
+# )
+# lik.inst.stg3.population.4x=join.likelihood.instructions(
+#     population.likelihood.instructions,
+#     additional.weights = 1/4
+# )
+# lik.inst.stg3.population.8x=join.likelihood.instructions(
+#     population.likelihood.instructions,
+#     additional.weights = 1/8
+# )
+# lik.inst.stg3.population.16x=join.likelihood.instructions(
+#     population.likelihood.instructions,
+#     additional.weights = 1/16
+# )
+# 
+# 
+# lik.inst.stage3.2x.pop.2x = join.likelihood.instructions(
+#     lik.inst.stg3.population.2x,
+#     lik.inst.stg3.except.population,
+#     additional.weights = 1/2
+# ) 
+# lik.inst.stage3.2x.pop.4x = join.likelihood.instructions(
+#     lik.inst.stg3.population.4x,
+#     lik.inst.stg3.except.population,
+#     additional.weights = 1/2
+# ) 
+# lik.inst.stage3.2x.pop.8x = join.likelihood.instructions(
+#     lik.inst.stg3.population.8x,
+#     lik.inst.stg3.except.population,
+#     additional.weights = 1/2
+# ) 
+# lik.inst.stage3.4x.pop.2x = join.likelihood.instructions(
+#     lik.inst.stg3.population.2x,
+#     lik.inst.stg3.except.population,
+#     additional.weights = 1/4
+# ) 
+# lik.inst.stage3.4x.pop.4x = join.likelihood.instructions(
+#     lik.inst.stg3.population.4x,
+#     lik.inst.stg3.except.population,
+#     additional.weights = 1/4
+# ) 
+# lik.inst.stage3.4x.pop.8x = join.likelihood.instructions(
+#     lik.inst.stg3.population.8x,
+#     lik.inst.stg3.except.population,
+#     additional.weights = 1/4
+# ) 
+# lik.inst.stage3.8x.pop.2x = join.likelihood.instructions(
+#     lik.inst.stg3.population.2x,
+#     lik.inst.stg3.except.population,
+#     additional.weights = 1/8
+# ) 
+# 
+# lik.inst.stage3.2x.pop.16x = join.likelihood.instructions(
+#     lik.inst.stg3.population.16x,
+#     lik.inst.stg3.except.population,
+#     additional.weights = 1/2
+# )
+# lik.inst.stage3.2x.pop.32x = join.likelihood.instructions(
+#     lik.inst.stg3.population.32x,
+#     lik.inst.stg3.except.population,
+#     additional.weights = 1/2
+# )
+# lik.inst.stage3.4x.pop.16x = join.likelihood.instructions(
+#     lik.inst.stg3.population.16x,
+#     lik.inst.stg3.except.population,
+#     additional.weights = 1/4
+# )
+# lik.inst.stage3.4x.pop.32x = join.likelihood.instructions(
+#     lik.inst.stg3.population.32x,
+#     lik.inst.stg3.except.population,
+#     additional.weights = 1/4
+# )
+# lik.inst.stage3.8x.pop.4x = join.likelihood.instructions(
+#     lik.inst.stg3.population.4x,
+#     lik.inst.stg3.except.population,
+#     additional.weights = 1/8
+# ) 
