@@ -780,7 +780,7 @@ lik.inst.stg23.except.population=join.likelihood.instructions(
 lik.inst.stage23 = join.likelihood.instructions(
     lik.inst.stg23.population,
     lik.inst.stg23.except.population,
-    additional.weights = STAGE.3.WEIGHT
+    additional.weights = STAGE.23.WEIGHT
 )
 
 # Alternative weight versions ----
