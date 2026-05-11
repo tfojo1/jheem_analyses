@@ -7,6 +7,17 @@
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
 
 
+##---------------##
+##-- CONSTANTS --##
+##---------------##
+
+# Trial-aligned eligible age range. JHEEM's first age band ("13-24 years")
+# corresponds almost exactly to the Tech2Check trial's enrollment range
+# (ages 12-25). 12-year-olds are not modeled by JHEEM (start age 13);
+# 25-year-olds fall in band 2 — both edges are small modeling approximations.
+TECH2CHECK.ELIGIBLE.AGES <- '13-24 years'
+
+
 ##-------------------##
 ##-- SPECIFICATION --##
 ##-------------------##
@@ -47,7 +58,8 @@ register.transition(TECH2CHECK.SPECIFICATION,
                     groups = 'infected',
                     from.compartments = 'diagnosed_chronic',
                     to.compartments = 'on_intervention',
-                    value = 'tech2check.recruitment.rate')
+                    value = 'tech2check.recruitment.rate',
+                    applies.to = list(age = TECH2CHECK.ELIGIBLE.AGES))
 
 
 #-- On intervention -> Recently intervened (program completion) --#
