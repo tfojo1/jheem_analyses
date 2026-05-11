@@ -109,7 +109,7 @@ register.calibration.info('calib.4.24.stage1.az',
                           end.year = 2030,
                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
                                               STI.TESTING.PARAMETERS.PRIOR@var.names),
-                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
 
@@ -124,7 +124,7 @@ register.calibration.info('calib.5.7.stage1.test',
                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
                                               STI.TESTING.PARAMETERS.PRIOR@var.names,
                                               TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
-                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
 register.calibration.info('calib.5.4.stage1.az',
@@ -135,7 +135,7 @@ register.calibration.info('calib.5.4.stage1.az',
                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
                                               STI.TESTING.PARAMETERS.PRIOR@var.names,
                                               TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
-                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
 # Attempting a calibration after increasing msm.fraction.pairing.female to 30%
@@ -147,7 +147,7 @@ register.calibration.info('calib.5.7.stage1.pk',
                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
                                               STI.TESTING.PARAMETERS.PRIOR@var.names,
                                               TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
-                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 # *** OLD (has to be kept here because the registration has to happen in order)----
 # # Attempting a top-to-bottom calibration. Here, uses 8x on future penalty likelihood.
@@ -159,7 +159,7 @@ register.calibration.info('calib.4.24.stage2.az',
                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
                                               STI.TESTING.PARAMETERS.PRIOR@var.names,
                                               TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
-                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
 # ***** STAGE2 (formerly STAGE3) ***** ----
