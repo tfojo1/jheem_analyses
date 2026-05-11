@@ -145,10 +145,21 @@ data.manager$register.ontology(
         risk=c('msm','idu','msm_idu','heterosexual','other')
     ))
 
+data.manager$register.ontology(
+    'cdc.new.2',
+    ont = ontology(
+        year= NULL,
+        location= NULL,
+        age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years','55-59 years', '60-64 years', '65-69 years', '70-74 years', '75-79 years', '80-84 years', "85+ years"),
+        race=c('american indian/alaska native', 'asian', 'black/african american', 'hispanic/latino', 'native hawaiian/other pacific islander', 'white'),
+        sex=c('male','female'),
+        risk=c('msm','idu','msm_idu','heterosexual','other')
+    ))
+
 #Codes:
 source('data_processing/hiv.surveillance.manager/aids_data_1981_2001.R') #CDC Wonder AIDS data from 1981-2001
 source('data_processing/hiv.surveillance.manager/msa_reports_processing.R') #Source in CDC MSA PDF Reports data and cleaning
-source('data_processing/hiv.surveillance.manager/aids.diagnoses.atlas.plus.00.07.R')
+source('data_processing/hiv.surveillance.manager/aids.diagnoses.and.classifications.R') #Atlas Plus data on aids diagnoses and deaths
 
 #Aggregate Outcomes:#None
 
