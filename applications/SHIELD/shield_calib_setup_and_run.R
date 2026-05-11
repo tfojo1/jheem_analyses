@@ -19,7 +19,7 @@ set.seed(00000)
 CACHE.FREQ= 500 # how often should write the results to disk (Default: 100)
 UPDATE.FREQ= 50 # how often to print messages (Default: 50)
 
-################
+#SECTION1: SETUP
 if (START_FROM_SCRATCH) {
     print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
     #
@@ -37,7 +37,7 @@ if (START_FROM_SCRATCH) {
     print(paste0("Calibration is set up for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 }
 
-# Run calibration ----
+#SECTION2: RUN
 start.time <- Sys.time()
 print(paste0("STARTING MCMC RUN OF ", LOCATION, " (", locations::get.location.name(LOCATION), ") AT ", Sys.time()))
 
@@ -66,7 +66,7 @@ while (attempts < 100) {
 end.time <- Sys.time()
 run.time <- as.numeric(end.time) - as.numeric(start.time)
 
-# Print run time ----
+#SECTION3: ASSEMBLE
 print(paste0("DONE RUNNING MCMC: Took ",
              round(run.time/60, 0), " minutes to run ",
              format(N_ITER, big.mark = ","),
@@ -76,9 +76,9 @@ print(paste0("DONE RUNNING MCMC: Took ",
 
 # Save simset
 simset <- assemble.simulations.from.calibration(version = VERSION,
-                                               location = LOCATION,
-                                               calibration.code = CALIBRATION.NAME,
-                                               allow.incomplete = T)
+                                                location = LOCATION,
+                                                calibration.code = CALIBRATION.NAME,
+                                                allow.incomplete = T)
 save.simulation.set(simset)
 
 
