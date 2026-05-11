@@ -43,8 +43,10 @@ aids.class.data.clean = lapply(aids.class.data, function(file){
     data=file[["data"]]
     filename = file[["filename"]]
     
+    data$Geography <- trimws(gsub("[^A-Za-z ]", "", data$Geography))
+    
     data <- data%>%
-        mutate(Geography = gsub("[[:punct:]]", "", Geography))%>%
+        #mutate(Geography = gsub("[[:punct:]]", "", Geography))%>%
         mutate(location = state.abb[match(data$Geography, state.name)])%>%
         mutate(location = ifelse(Geography  == "District of Columbia", "DC", location))%>%
         mutate(year = as.character(Year))%>%
@@ -136,12 +138,17 @@ aids.class.data.clean.age2 = lapply(aids.class.data.age2, function(file){
     data=file[["data"]]
     filename = file[["filename"]]
     
-    data <- data%>%
-        mutate(Geography = gsub("[[:punct:]]", "", Geography))%>%
-        mutate(location = state.abb[match(data$Geography, state.name)])%>%
-        mutate(location = ifelse(Geography  == "District of Columbia", "DC", location))%>%
-        mutate(year = as.character(Year))%>%
-        mutate(value = as.numeric(gsub(",", "", Cases)))
+    data$Geography <- trimws(gsub("[^A-Za-z ]", "", data$Geography))
+    
+    data <- data %>%
+        mutate(
+            #Geography = gsub("[[:punct:]]", "", Geography),
+            location = state.abb[match(Geography, state.name)],
+            location = ifelse(Geography == "District of Columbia", "DC", location),
+            year = as.character(Year),
+            Cases = ifelse(Cases %in% c("Data suppressed", "Data not available"), NA, Cases),
+            value = readr::parse_number(as.character(Cases))
+        )
     
     
     if(grepl("classification", filename)) {
