@@ -14,18 +14,59 @@ par.aliases.transmission = list(
 )
 
 # ***** STAGE0 ***** ----
-for (rate in seq(1.6, 2.6, by=0.2)) {
-    print(paste0("calib.5.7.stg0.gtr.", round(rate*10,0)))
-    register.calibration.info(paste0("calib.5.7.stg0.gtr.", round(rate*10,0)),
+for (rate in c(20,22)) {
+    print(paste0("calib.5.11.stg0.gtr.", rate))
+    register.calibration.info(paste0("calib.5.11.stg0.gtr.", rate),
                               likelihood.instructions = lik.inst.stage0,
                               data.manager = SURVEILLANCE.MANAGER,
                               end.year = 2030,
-                              fixed.initial.parameter.values = c("global.transmission.rate"=rate),  
+                              fixed.initial.parameter.values = c("global.transmission.rate"=rate/10),  
                               parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
                                                   AGING.PARAMETERS.PRIOR@var.names,
                                                   "global.transmission.rate"),
                               parameter.aliases = par.aliases.transmission,
-                              n.iter = 5000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+                              n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
     )
 }
- 
+# for (rate in seq(1.6, 2.6, by=0.2)) {
+#     print(paste0("calib.5.7.stg0.gtr.", round(rate*10,0)))
+#     register.calibration.info(paste0("calib.5.7.stg0.gtr.", round(rate*10,0)),
+#                               likelihood.instructions = lik.inst.stage0,
+#                               data.manager = SURVEILLANCE.MANAGER,
+#                               end.year = 2030,
+#                               fixed.initial.parameter.values = c("global.transmission.rate"=rate),  
+#                               parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+#                                                   AGING.PARAMETERS.PRIOR@var.names,
+#                                                   "global.transmission.rate"),
+#                               parameter.aliases = par.aliases.transmission,
+#                               n.iter = 5000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+#     )
+# }
+#  
+# STAGE 1
+register.calibration.info('calib.5.12.stage1.pk',
+                          preceding.calibration.codes = 'calib.5.11.stg0.gtr.20',
+                          likelihood.instructions = lik.inst.stage1,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+# STAGE 2
+register.calibration.info("calib.5.12.stage2.pk",
+                          preceding.calibration.codes = 'calib.5.12.stage1.pk',
+                          likelihood.instructions = lik.inst.stage23,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names,
+                              "global.transmission.rate"
+                          ),
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)

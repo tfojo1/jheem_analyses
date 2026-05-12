@@ -32,7 +32,7 @@ create.pairing.manager <- function(dir)
     
     # REVISED!
     # From https://pmc.ncbi.nlm.nih.gov/articles/PMC7836745/ Risk Behaviors Among MSMO and MSMW, NHBS, 2011 and 2014
-    msm.sex.with.female.pk= 1- ((0.88*3+0.12*3)/(0.88*3 + 0.12 *6)) 
+    msm.sex.with.female.pk= 0.1 #1- ((0.88*3+0.12*3)/(0.88*3 + 0.12 *6)) 
     rv$fraction.msm.pairings.with.female= msm.sex.with.female.pk
     
     #-- SEXUAL PAIRINGS by RACE --## ----

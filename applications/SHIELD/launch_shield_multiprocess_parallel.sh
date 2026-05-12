@@ -63,12 +63,8 @@ all_except_ten_cities=(
 # Each calibname is run independently across all cities in parallel.
 # Add or remove entries here to control which calibrations are dispatched.
 calibnames=(
-    calib.5.7.stg0.gtr.16
-    calib.5.7.stg0.gtr.18
-    calib.5.7.stg0.gtr.20
-    calib.5.7.stg0.gtr.22
-    calib.5.7.stg0.gtr.24
-    calib.5.7.stg0.gtr.26
+  calib.5.11.stg0.gtr.20
+  calib.5.11.stg0.gtr.22
 )
 
 script="$SCRIPT_DIR/shield_calib_setup_and_run.R"

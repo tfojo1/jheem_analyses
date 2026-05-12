@@ -202,7 +202,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
   
   
   ## Global transmission ----
-  global.transmission.rate = Lognormal.Distribution(meanlog = log(2.2), sdlog = log(10)/2), #'@Ryan: why are we using these mu/sd?
+  global.transmission.rate = Lognormal.Distribution(meanlog = log(2), sdlog = log(10)/2), #'@Ryan: why are we using these mu/sd?
   
   #12 independant params
   ## msm multipliers by time ----
