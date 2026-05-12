@@ -14,10 +14,11 @@ create.pairing.manager <- function(dir)
   #-- SEXUAL PAIRINGS by SEX --# ---
   # -
   #1- proportion of msm who are msmw (have sex with men and women) ----
-  rv$oe.female.pairings.with.msm= 0.0895 #citation='Pathela 2006' #https://www.acpjournals.org/doi/epdf/10.7326/0003-4819-145-6-200609190-00005
+  # rv$oe.female.pairings.with.msm= 0.0895 #citation='Pathela 2006' #https://www.acpjournals.org/doi/epdf/10.7326/0003-4819-145-6-200609190-00005
   
   # >> NHBS estimates is higher at 12% https://pmc.ncbi.nlm.nih.gov/articles/PMC7836745/
-  # PK REVISION:   rv$oe.female.pairings.with.msm = 0.3
+  # PK REVISION:   
+    rv$oe.female.pairings.with.msm = 0.3
   
   
   #2- fraction of heterosexual_men's sexual contacts that are with MSM partners 
@@ -25,16 +26,16 @@ create.pairing.manager <- function(dir)
   
   #3- fraction of msm's sexual contacts that are with female partners 
   #from CDC NHBS: https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-22.pdf
-  msm.sex.with.female.1 = (885+353)/(885+353+6422)
-  #From https://link.springer.com/article/10.1007%2Fs10461-014-0955-0
-  msm.sex.with.female.2 = (39+5+3+16) / (39+5+3+16 + 394+190+112+71)
-  rv$msm.sex.with.female.estimates = c(msm.sex.with.female.1, msm.sex.with.female.2)
-  rv$fraction.msm.pairings.with.female= mean(msm.sex.with.female.1, msm.sex.with.female.2)
+  # msm.sex.with.female.1 = (885+353)/(885+353+6422)
+  # #From https://link.springer.com/article/10.1007%2Fs10461-014-0955-0
+  # msm.sex.with.female.2 = (39+5+3+16) / (39+5+3+16 + 394+190+112+71)
+  # rv$msm.sex.with.female.estimates = c(msm.sex.with.female.1, msm.sex.with.female.2)
+  # rv$fraction.msm.pairings.with.female= mean(msm.sex.with.female.1, msm.sex.with.female.2)
 
   # PK REVISION:
   # From https://pmc.ncbi.nlm.nih.gov/articles/PMC7836745/ Risk Behaviors Among MSMO and MSMW, NHBS, 2011 and 2014
-  # msm.sex.with.female.pk= 0.1 #1- ((0.88*3+0.12*3)/(0.88*3 + 0.12 *6)) 
-  # rv$fraction.msm.pairings.with.female= msm.sex.with.female.pk
+  msm.sex.with.female.pk= 0.1 #1- ((0.88*3+0.12*3)/(0.88*3 + 0.12 *6))
+  rv$fraction.msm.pairings.with.female= msm.sex.with.female.pk
   
   ## ---- SEXUAL CONTACT BY RACE ---- ## ----
   #base sexual contact oes by race for the same race (black-black, hispanic-hispanic, other-other)
