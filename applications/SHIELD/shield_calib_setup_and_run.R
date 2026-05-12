@@ -14,12 +14,12 @@ source('../jheem_analyses/applications/SHIELD/shield_calib_register.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases for locations C.12580=Blatimore MSA
 
 VERSION<- 'shield'
-START_FROM_SCRATCH <- TRUE
-set.seed(00000)
 CACHE.FREQ= 500 # how often should write the results to disk (Default: 100)
 UPDATE.FREQ= 50 # how often to print messages (Default: 50)
 
-#SECTION1: SETUP
+START_FROM_SCRATCH <- TRUE
+set.seed(00000)
+#SECTION1: SETUP ----
 if (START_FROM_SCRATCH) {
     print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
     #
@@ -37,7 +37,7 @@ if (START_FROM_SCRATCH) {
     print(paste0("Calibration is set up for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 }
 
-#SECTION2: RUN
+#SECTION2: RUN ----
 start.time <- Sys.time()
 print(paste0("STARTING MCMC RUN OF ", LOCATION, " (", locations::get.location.name(LOCATION), ") AT ", Sys.time()))
 
@@ -66,15 +66,12 @@ while (attempts < 100) {
 end.time <- Sys.time()
 run.time <- as.numeric(end.time) - as.numeric(start.time)
 
-#SECTION3: ASSEMBLE
+
 print(paste0("DONE RUNNING MCMC: Took ",
-             round(run.time/60, 0), " minutes to run ",
-             format(N_ITER, big.mark = ","),
-             " simulations (",
-             round(run.time / N_ITER, 1), " seconds per simulation on average)"))
+             round(run.time/60, 0), " minutes to run"))
 
 
-# Save simset
+#SECTION3: ASSEMBLE ----
 simset <- assemble.simulations.from.calibration(version = VERSION,
                                                 location = LOCATION,
                                                 calibration.code = CALIBRATION.NAME,
