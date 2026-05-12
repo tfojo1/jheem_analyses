@@ -68,10 +68,7 @@ run.time <- as.numeric(end.time) - as.numeric(start.time)
 
 #SECTION3: ASSEMBLE
 print(paste0("DONE RUNNING MCMC: Took ",
-             round(run.time/60, 0), " minutes to run ",
-             format(N_ITER, big.mark = ","),
-             " simulations (",
-             round(run.time / N_ITER, 1), " seconds per simulation on average)"))
+             round(run.time/60, 0), " minutes to run "))
 
 
 # Save simset
