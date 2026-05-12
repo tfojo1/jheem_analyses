@@ -602,19 +602,22 @@ register.model.element(SHIELD.SPECIFICATION,
 
 ##---- Sexual Contact: By SEX ----
 # Set up elements
+# prp of MSM who are MSMW (have sex with both men and women)
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'oe.female.pairings.with.msm',
-                       value = SHIELD_BASE_PARAMETER_VALUES['oe.female.pairings.with.msm'],
+                       value = PAIRING.INPUT.MANAGER$oe.female.pairings.with.msm,
                        scale = 'ratio')
 
+#prop of Het_male's sexual contacts that are with other men
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'fraction.heterosexual_male.pairings.with.male',
-                       value = SHIELD_BASE_PARAMETER_VALUES['fraction.heterosexual_male.pairings.with.male'],
+                       value = PAIRING.INPUT.MANAGER$fraction.heterosexual_male.pairings.with.male,
                        scale = 'ratio')
 
+#prop of msm's sexual contacts that are with women
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'fraction.msm.pairings.with.female',
-                       value = mean(PAIRING.INPUT.MANAGER$msm.sex.with.female.estimates),
+                       value = PAIRING.INPUT.MANAGER$fraction.msm.pairings.with.female,
                        scale = 'ratio')
 ###
 register.model.quantity(SHIELD.SPECIFICATION,
@@ -627,6 +630,8 @@ register.model.quantity(SHIELD.SPECIFICATION,
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'sexual.contact.by.sex',
                         value = 0)
+# To female from HET_male or MSM
+# denom: # of total sexual contacts for females with het_male and msm: (#het_male)+(#MSMW) =(1-prp.msm.of.male +prp.msm.of.male * oe.female.pairings.with.msm)
 # To female from het
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sexual.contact.by.sex',
@@ -689,9 +694,9 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 # Susceptibility of uninfected persons
 ##---- Sexual Contact: By RACE ----
 # oes for racial mixing with the same sex are estiamted from 4 studies. we assume equally likely mixing with other groups
-baseline.sexual.oes = array(c(SHIELD_BASE_PARAMETER_VALUES['oe.sexual.byrace.bb'],1,1,
-                              1,SHIELD_BASE_PARAMETER_VALUES['oe.sexual.byrace.hh'],1,
-                              1,1,SHIELD_BASE_PARAMETER_VALUES['oe.sexual.byrace.oo']),
+baseline.sexual.oes = array(c(PAIRING.INPUT.MANAGER$oe.sexual.byrace.bb,1,1,
+                              1,PAIRING.INPUT.MANAGER$oe.sexual.byrace.hh,1,
+                              1,1,PAIRING.INPUT.MANAGER$oe.sexual.byrace.oo),
                             dim = c(race.to=3, race.from=3),
                             dimnames = list(race.to=c('black','hispanic','other'),
                                             race.from=c('black','hispanic','other')))
