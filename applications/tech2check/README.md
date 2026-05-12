@@ -8,7 +8,6 @@ JHEEM extension assessing the population-level impact of scaling up the Tech2Che
 |---|---|
 | `tech2check_specification.R` | Canonical Tech2Check spec. Run via `source('applications/tech2check/tech2check_specification.R')` from jheem_analyses root. |
 | `tech2check_engine_test.R` | Engine test: confirms spec sources, engine builds, sim produces output at Baltimore. Exits 0/1; CI/testthat-promotable. |
-| `tech2check_specification_guided.r` | Earlier sketch variant. Not the production spec. |
 | `design.md` | Model design reference: compartment structure, parameters, rationale. |
 
 ## Quick start
