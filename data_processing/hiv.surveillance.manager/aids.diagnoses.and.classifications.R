@@ -178,7 +178,7 @@ aids.class.data.clean.age2 = lapply(aids.class.data.age2, function(file){
         data$age = paste(data$Age.Group, "years")
     }
     if(grepl("age2", filename)) {
-        data = subset(data, data$Age.Group != "50-54")
+        data = subset(data, data$Age.Group != "50–54")
         
         data$age = paste(data$Age.Group, "years")
     }
