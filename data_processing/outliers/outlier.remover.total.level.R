@@ -333,6 +333,7 @@ aids.diagnoses.source.two<- run.outlier.process(outcome= 'aids.diagnoses',
                                                 data.manager= surveillance.manager,
                                                 phi = 0.9, 
                                                 theta = 0.3,
+                                                max.year = 2019,
                                                 locations= c(surveillance.manager$get.locations.with.data(outcome="aids.diagnoses")))%>%
                           filter(source == "cdc.surveillance.reports")
 
@@ -344,6 +345,7 @@ run.outlier.process(outcome= 'aids.diagnoses',
                     data.manager= surveillance.manager,
                     phi = 0.9,
                     theta = 0.3,
+                    max.year = 2019,
                     locations= c(surveillance.manager$get.locations.with.data(outcome="aids.diagnoses")),
                     adjudication.data.frame = aids.diagnoses.source.two)
 
@@ -357,8 +359,9 @@ aids.diagnoses.source.one <- run.outlier.process(outcome= 'aids.diagnoses',
                                                   data.manager= surveillance.manager,
                                                   phi = 0.9,
                                                   theta = 0.5,
+                                                  max.year = 2019,
                                                   locations= c(surveillance.manager$get.locations.with.data(outcome="aids.diagnoses")))%>%
-                              filter(source == "cdc.aids")
+                              dplyr::filter(source == "cdc.aids")
 
 aids.diagnoses.source.one$adjudication <- c(F, F, F, F, F, F, T)
 
@@ -367,6 +370,7 @@ run.outlier.process(outcome= 'aids.diagnoses',
                     data.manager= surveillance.manager,
                     phi = 0.9,
                     theta = 0.5,
+                    max.year = 2019,
                     locations= c(surveillance.manager$get.locations.with.data(outcome="aids.diagnoses")),
                     adjudication.data.frame = aids.diagnoses.source.one)
 
