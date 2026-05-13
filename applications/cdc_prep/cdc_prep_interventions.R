@@ -85,17 +85,17 @@ cdc.cessation.testing = create.intervention(WHOLE.POPULATION,
                                             cdc.testing.cessation.effect,
                                             proportion.tested.regardless.effect,
                                             code = paste0("cdcp.end.testing", CDC.PREP.INTERVENTION.SUFFIX),
-                                            parameters = proportion.tested.regardless.values)
+                                            parameters = c(proportion.tested.regardless.values,proportion.prep.regardless.values,proportion.contact.tracing.regardless.values) )
 
 cdc.cessation.tracing = create.intervention(WHOLE.POPULATION,
                                             cdc.contact.tracing.cesation.effect,
                                             code = paste0("cdcp.end.tracing", CDC.PREP.INTERVENTION.SUFFIX),
-                                            parameters = proportion.tested.regardless.values)
+                                            parameters = c(proportion.tested.regardless.values,proportion.prep.regardless.values,proportion.contact.tracing.regardless.values) )
 
 cdc.cessation.prep = create.intervention(WHOLE.POPULATION,
                                          cdc.prep.cessation.effect,
                                          code = paste0("cdcp.end.prep", CDC.PREP.INTERVENTION.SUFFIX),
-                                         parameters = proportion.tested.regardless.values)
+                                         parameters = c(proportion.tested.regardless.values,proportion.prep.regardless.values,proportion.contact.tracing.regardless.values) )
 
 cdc.cessation = create.intervention(WHOLE.POPULATION,
                                     cdc.testing.cessation.effect,
@@ -103,4 +103,4 @@ cdc.cessation = create.intervention(WHOLE.POPULATION,
                                     cdc.contact.tracing.cesation.effect,
                                     cdc.prep.cessation.effect,
                                     code = paste0("cdcp.end", CDC.PREP.INTERVENTION.SUFFIX),
-                                    parameters = proportion.tested.regardless.values)
+                                    parameters =  c(proportion.tested.regardless.values,proportion.prep.regardless.values,proportion.contact.tracing.regardless.values) )
