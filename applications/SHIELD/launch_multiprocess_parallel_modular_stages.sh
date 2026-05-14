@@ -68,9 +68,10 @@ export MKL_NUM_THREADS=1
 # at the locations here
 CITIES=(
     C.12060 C.12580 C.16980 C.26420 C.31080
+    C.33100 C.35620 C.37980 C.38060 C.42660
 )
 CALIBRATION_CODES=(
-    calib.5.11.stage3.az
+    calib.5.12.stage3.pk
 )
 N_CHAINS=4
 SCRIPT="$SCRIPT_DIR/shield_calib_setup_and_run_modular.R"
