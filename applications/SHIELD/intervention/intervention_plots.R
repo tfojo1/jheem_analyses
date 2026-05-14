@@ -9,11 +9,10 @@ source("../jheem_analyses/applications/SHIELD/intervention/intervention_helper_f
 # =============================================================================
 # SECTION 1: Configuration
 # =============================================================================
-LOCATIONS        <- SHIELD.TEN.MSAS     # Named vector: names = city, values = codes
+LOCATIONS        <- SHIELD.TEN.MSAS    # Named vector: names = city, values = codes
 
-# CALIBRATION.CODE <- "calib.4.24.stage2.az"
-
-CALIBRATION.CODE <- "calib.5.4.stage1.az"
+# CALIBRATION.CODE <- "calib.5.12.stage2.pk" # SA models with oe.msm.female.partnership=30%
+CALIBRATION.CODE <- "calib.5.11.stage2.az" # SA models with oe.msm.female.partnership=8%
 
 N.SIM <- 300
 FIRST.YEAR <- 2000
@@ -24,12 +23,10 @@ BASE.PATH <- paste0(ROOT.DIR,"/simulations/shield")
 
 INTERVENTION.LABELS <- c(
     noint        = "No Doxy-PEP Intervention",
-    doxy.25.2020   = "25% Doxy-PEP Coverage 2020-2025",
-    doxy.50.2020   = "50% Doxy-PEP Coverage 2020-2025",
-    doxy.75.2020   = "75% Doxy-PEP Coverage 2020-2025",
-    doxy.25.2022   = "25% Doxy-PEP Coverage 2022-2025",
-    doxy.50.2022   = "50% Doxy-PEP Coverage 2022-2025",
-    doxy.75.2022   = "75% Doxy-PEP Coverage 2022-2025"
+    doxy.u.60.p.50   = "Uptake 60% Persistence 50%",
+    doxy.u.60.p.100   = "Uptake 60% Persistence 100%",
+    doxy.u.100.p.50   = "Uptake 100% Persistence 50%",
+    doxy.u.100.p.100   = "Uptake 100% Persistence 100%"
 )
 INTERVENTION.CODES <- names(INTERVENTION.LABELS)
 
@@ -37,26 +34,26 @@ INTERVENTION.CODES <- names(INTERVENTION.LABELS)
 # SECTION 2: Run Interventions
 # =============================================================================
 # --- Create and Run Simulation Collection ---
-# if (1==2){
-#     sim.collection <- create.simset.collection(
-#         version = "shield",
-#         calibration.code = CALIBRATION.CODE,
-#         locations = LOCATIONS,
-#         interventions = INTERVENTION.CODES,
-#         n.sim = N.SIM
-#     )
-#     #
-#     FORCE.OVERWRITE<- FALSE
-#     #
-#     sim.collection$run(
-#         FIRST.YEAR,
-#         LAST.YEAR,
-#         verbose = T,
-#         stop.for.errors = FALSE,
-#         overwrite.prior = FORCE.OVERWRITE,
-#         keep.from.year = FIRST.YEAR
-#     )
-# }
+if (1==1){
+    sim.collection <- create.simset.collection(
+        version = "shield",
+        calibration.code = CALIBRATION.CODE,
+        locations = LOCATIONS,
+        interventions = INTERVENTION.CODES,
+        n.sim = N.SIM
+    )
+    #
+    FORCE.OVERWRITE<- FALSE
+    #
+    sim.collection$run(
+        FIRST.YEAR,
+        LAST.YEAR,
+        verbose = T,
+        stop.for.errors = FALSE,
+        overwrite.prior = FORCE.OVERWRITE,
+        keep.from.year = FIRST.YEAR
+    )
+}
 # =============================================================================
 # SECTION 3: Load All Simsets
 # The result is a flat named list. Each entry is one simset, keyed by
