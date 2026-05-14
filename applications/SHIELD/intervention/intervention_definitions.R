@@ -20,30 +20,24 @@ draw_rr_lnorm <- function(n,
 rr_samples <- draw_rr_lnorm(n = 1000, rr_meanlog = -1.540424,rr_sdlog =0.2510223,cap_at_one = T )
 effectiveness_samples=1-rr_samples
 
-# draw_effectiveness_uniform<-function(n){
-#     persistence_samples = runif(n,1,1)
-#     persistence_samples
-# }
-# rr_samples<-draw_effectiveness_uniform(1000)
-# effectiveness_samples=rr_samples
-
 
 # PERSISTANCE and DISCONTINUATION RATE #----
 # P: proportion of population, taking Doxy at the end of the year
 # Discontinuation rate= -log(Peristance)
 
-draw_persistance_uniform<-function(n){
-    persistence_samples = runif(n,1,1)
-    persistence_samples
-}
-persistence_samples<-draw_persistance_uniform(10000)
-discont_rate_samples = -log(persistence_samples)
+# draw_persistance_uniform<-function(n){
+#     persistence_samples = runif(n,1,1)
+#     persistence_samples
+# }
+# persistence_samples<-draw_persistance_uniform(10000)
+# discont_rate_samples = -log(persistence_samples)
 
 # Putting them together ----
-DOXY.PARAMS <- rbind(effectiveness_samples,discont_rate_samples)
-rownames(DOXY.PARAMS) <- c("doxy.effectiveness","doxy.discontinuationRate")
-
-
+# DOXY.PARAMS <- rbind(effectiveness_samples,discont_rate_samples)
+# rownames(DOXY.PARAMS) <- c("doxy.effectiveness","doxy.discontinuationRate")
+DOXY.PARAMS <- matrix(effectiveness_samples,
+                      nrow = 1,
+                      dimnames = list("doxy.effectiveness", NULL))
 
 
 # INTERVENTION ----
@@ -55,44 +49,43 @@ rownames(DOXY.PARAMS) <- c("doxy.effectiveness","doxy.discontinuationRate")
 
 # Intervention control uptake levels
 clear.interventions() 
-for (uptake in c(25,50,75)){
-    uptake.effect =  create.intervention.effect(
-        quantity.name    = "doxy.uptake",
-        effect.values    = uptake/100,
-        start.time       = 2020,# when scale up begins
-        times            = 2025, # when scale up ends
-        scale            = "proportion",
-        apply.effects.as = "value",
-        allow.values.less.than.otherwise  = FALSE,
-        allow.values.greater.than.otherwise = TRUE
-    )
-    
-    uptake_intervention <- create.intervention(
-        uptake.effect,
-        parameters = DOXY.PARAMS,
-        WHOLE.POPULATION, 
-        code = paste0("doxy.",uptake,".2020")
-    )
+
+for (uptake in c(60,100)){ # change to full range later on [20-100]
+    for (persistence in c(50,100)){ # change to full range later on [20-100]
+        
+        # uptake is scaled up linearly
+        uptake.effect =  create.intervention.effect(
+            quantity.name    = "doxy.uptake",
+            effect.values    = uptake/100,
+            start.time       = 2022,# when scale up begins
+            times            = 2030, # when scale up ends
+            scale            = "proportion",
+            apply.effects.as = "value",
+            allow.values.less.than.otherwise  = FALSE,
+            allow.values.greater.than.otherwise = TRUE
+        )
+        # persistence takes affect immediately and remain constant
+        persistence.effect   = create.intervention.effect(
+            quantity.name    = "doxy.discontinuationRate",
+            effect.values    = -log(persistence/100),
+            start.time       = 2022,# when scale up begins  
+            times            = 2022, # when scale up ends  
+            scale            = "rate",
+            apply.effects.as = "value",
+            allow.values.less.than.otherwise  = FALSE,
+            allow.values.greater.than.otherwise = TRUE
+        )
+        doxy_int <- create.intervention(
+            c(uptake.effect,
+            persistence.effect),
+            parameters = DOXY.PARAMS,
+            WHOLE.POPULATION, 
+            code = paste0("doxy.u.",uptake,".p.",persistence)
+        )
+        print(paste0("created: ", "doxy.u.",uptake,".p.",persistence))
+    }
 }
-for (uptake in c(25,50,75)){
-    uptake.effect =  create.intervention.effect(
-        quantity.name    = "doxy.uptake",
-        effect.values    = uptake/100,
-        start.time       = 2022,# when scale up begins
-        times            = 2025, # when scale up ends
-        scale            = "proportion",
-        apply.effects.as = "value",
-        allow.values.less.than.otherwise  = FALSE,
-        allow.values.greater.than.otherwise = TRUE
-    )
-    
-    uptake_intervention <- create.intervention(
-        uptake.effect,
-        parameters = DOXY.PARAMS,
-        WHOLE.POPULATION, 
-        code = paste0("doxy.",uptake,".2022")
-    )
-}
+
 noint = get.null.intervention()
 
 
