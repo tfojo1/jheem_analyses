@@ -1,3 +1,22 @@
+# Steps to manage a bad fit:
+# 1- check the fit using simplot()
+# 2- check mixing 
+# >>Mixing issue? downweighting the likelihoods 
+# >>are we using correct variance correlation:  "autoregressive.1" vs "compound symmetry"
+# 3- look at the likelihood.compute(debug=T):
+# >>  are we looking at the correct values in the plot? data points and simulated points align? 
+# 4- look for a manual sim that looks better
+# >> does the likelihood also look better? likelihood.compare()
+# >> how are the parameter values generating this fit compared to prior?
+# >> do we need to revise the prior?
+# 5- check the variable values inside the engine q=engine$extract.quantity.values()        
+# 
+# 6- Simultanous fit is not achieved:can we simplify the model more? 
+#     
+# >>>run a demographic calibration first model    
+# >>>use it as a starting point for the next calibration focusing on total diagnosis (relax the demographic parameters)
+# >>>strip away unrelated model dynamics to simplify the model (e.g., relapse=0)
+# 
 # Load Required Libraries and Commoncode----
 library(plotly)
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
@@ -161,3 +180,22 @@ if (1==2){
 dnorm(0, mean = 0, sd = 1)
 dnorm(1, 0, 1) / dnorm(0, 0, 1)  # ~60% of peak
 dnorm(2, 0, 1) / dnorm(0, 0, 1)  # ~13% of peak
+
+
+# CHECK over 10X change ----
+# Function to take in simset and check the number of the last X sims that
+# have a ratio of 2030 PS diagnoses to 2022 that is over 10.
+
+# What you get from prepare_simsets_for_plots of the calibration plot code
+# prepared_simset_list
+find_prp_over_10 <- function(simset, last_n) {
+    sim_subset <- simset$subset((1 + simset$n.sim - last_n) : simset$n.sim)
+    vals <- sim_subset$get("diagnosis.ps", dimension.values = list(year=c(2020, 2030)), keep.dimensions = "year")
+    ratio <- apply(vals, "sim", function(x) {x["2030"]/x["2020"]})
+}
+
+lapply(prepared_simset_list, function(x) {
+    if (is.null(x)) return(NULL)
+    y <- find_prp_over_10(x$full_simset, 10)
+    mean(y > 10)
+})
