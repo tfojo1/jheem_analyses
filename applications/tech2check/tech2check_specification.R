@@ -225,6 +225,27 @@ track.integrated.outcome(TECH2CHECK.SPECIFICATION,
                          subset.dimension.values = list(continuum = 'on_intervention'),
                          keep.dimensions = c('location','age','race','sex','risk'))
 
+# Person-years in active OR recently-completed intervention -- the "active
+# intervention" aggregate for headline policy claims. Distinct from
+# person.years.on.intervention (on_intervention only, the program-delivery
+# denominator for cost analysis) and from intervention.population (which
+# includes distantly_intervened, where OR = 1.0 in the base case and so
+# doesn't represent ongoing behavioral effect). Per-recruit dwell math gives
+# ~93% of cumulative intervention.population person-years in distantly, so
+# reaching for that aggregate overstates active program impact by roughly
+# an order of magnitude.
+track.integrated.outcome(TECH2CHECK.SPECIFICATION,
+                         name = 'person.years.on.or.recently.intervened',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Person-Years On or Recently Intervened',
+                                                                    description = "Person-Years Spent in the Active or Recently-Completed Intervention Compartments",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Person-Years',
+                                                                    units = 'person-years',
+                                                                    singular.unit = 'person-year'),
+                         value.to.integrate = 'infected',
+                         subset.dimension.values = list(continuum = c('on_intervention', 'recently_intervened')),
+                         keep.dimensions = c('location','age','race','sex','risk'))
+
 # Per-state diagnosed prevalence -- denominator for the per-state suppression outcome.
 track.integrated.outcome(TECH2CHECK.SPECIFICATION,
                          name = 'diagnosed.prevalence.by.intervention.state',

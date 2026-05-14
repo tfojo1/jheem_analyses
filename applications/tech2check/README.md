@@ -32,8 +32,9 @@ Expected output: `OK: sim produced (class=jheem.simulation.set/...)`, exit code 
 | Outcome | Type | Use |
 |---|---|---|
 | `tech2check.enrollments` | transition | Annual program enrollments per stratum |
-| `intervention.population` | point | Stock in each intervention lifecycle compartment |
-| `person.years.on.intervention` | integrated | Person-time in active intervention (cost-analysis input) |
+| `intervention.population` | point | Stock in each intervention lifecycle compartment (all three) |
+| `person.years.on.intervention` | integrated | Person-time in `on_intervention` only (cost-analysis denominator) |
+| `person.years.on.or.recently.intervened` | integrated | "Active intervention" aggregate (`on_intervention + recently_intervened`); correct denominator for headline policy claims, excludes `distantly_intervened` where OR = 1.0 in base case |
 | `diagnosed.prevalence.by.intervention.state` | integrated | Per-state denominator for the suppression breakout |
 | `suppression.by.intervention.state` | integrated | Per-state proportion suppressed; load-bearing for verifying OR dispatch |
 
