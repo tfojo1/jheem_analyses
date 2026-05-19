@@ -12,9 +12,10 @@ par.aliases.transmission = list(
     trate.5 = c("transmission.rate.multiplier.msm2017", "transmission.rate.multiplier.heterosexual2017")
 )
 # ***** STAGE0 ***** ----
+# These all had "5.11" or "5.12" versions that I (AZ) changed to "5.19" when I fixed the parameter priors
 for (rate in c(20,22)) {
-    print(paste0("calib.5.11.stg0.gtr.", rate))
-    register.calibration.info(paste0("calib.5.11.stg0.gtr.", rate),
+    print(paste0("calib.5.19.stg0.gtr.", rate))
+    register.calibration.info(paste0("calib.5.19.stg0.gtr.", rate),
                               likelihood.instructions = lik.inst.stage0,
                               data.manager = SURVEILLANCE.MANAGER,
                               end.year = 2030,
@@ -27,8 +28,8 @@ for (rate in c(20,22)) {
     )
 }
 # STAGE 1
-register.calibration.info('calib.5.12.stage1.pk',
-                          preceding.calibration.codes = 'calib.5.11.stg0.gtr.20',
+register.calibration.info('calib.5.19.stage1.pk',
+                          preceding.calibration.codes = 'calib.5.19.stg0.gtr.20',
                           likelihood.instructions = lik.inst.stage1,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
@@ -38,8 +39,8 @@ register.calibration.info('calib.5.12.stage1.pk',
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 # STAGE 2
-register.calibration.info("calib.5.12.stage2.pk",
-                          preceding.calibration.codes = 'calib.5.12.stage1.pk',
+register.calibration.info("calib.5.19.stage2.pk",
+                          preceding.calibration.codes = 'calib.5.19.stage1.pk',
                           likelihood.instructions = lik.inst.stage23,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
@@ -54,8 +55,8 @@ register.calibration.info("calib.5.12.stage2.pk",
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 # STAGE 3
-register.calibration.info("calib.5.12.stage3.pk",
-                          preceding.calibration.codes = 'calib.5.12.stage2.pk',
+register.calibration.info("calib.5.19.stage3.pk",
+                          preceding.calibration.codes = 'calib.5.19.stage2.pk',
                           likelihood.instructions = lik.inst.stage23,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
