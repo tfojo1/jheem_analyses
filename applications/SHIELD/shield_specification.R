@@ -603,6 +603,9 @@ register.model.element(SHIELD.SPECIFICATION,
 ##---- Sexual Contact: By SEX ----
 # Set up elements
 # prp of MSM who are MSMW (have sex with both men and women)
+# For example, if 10% of male are MSM, then expect 10% of female partnerships with male to be MSM
+# IF no preferential mixing
+# If actually observe 5% of female partnership with male are MSM, then "observed/expected" ratio is 0.05/0.1 = 0.5
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'oe.female.pairings.with.msm',
                        value = PAIRING.INPUT.MANAGER$oe.female.pairings.with.msm,

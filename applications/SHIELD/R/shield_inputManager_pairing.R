@@ -17,8 +17,9 @@ create.pairing.manager <- function(dir)
   # rv$oe.female.pairings.with.msm= 0.0895 #citation='Pathela 2006' #https://www.acpjournals.org/doi/epdf/10.7326/0003-4819-145-6-200609190-00005
   
   # >> NHBS estimates is higher at 12% https://pmc.ncbi.nlm.nih.gov/articles/PMC7836745/
-  # PK REVISION:   
-    rv$oe.female.pairings.with.msm = 0.3
+  # PK REVISION: 0.3
+  # AZ REVISION with Todd and Parastu:
+    rv$oe.female.pairings.with.msm = 0.2
   
   
   #2- fraction of heterosexual_men's sexual contacts that are with MSM partners 

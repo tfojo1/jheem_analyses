@@ -252,9 +252,12 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
   other.other.sexual.multi = Lognormal.Distribution(meanlog =  log(4), sdlog = log(2)),
   
   ## Sexual Mixing by Risk ----
-  oe.female.pairings.with.msm = Lognormal.Distribution(meanlog = log(0.0895), sdlog = log(2)), #SD are chosen empirically '@Ryan: Mu?
-  fraction.heterosexual_male.pairings.with.male = Logitnormal.Distribution(meanlogit = logit(0.004), sdlogit = log(2)),
-  fraction.msm.pairings.with.female = Logitnormal.Distribution(meanlogit = logit(0.1187612), sdlogit = log(2)),
+  # oe.female.pairings.with.msm = Lognormal.Distribution(meanlog = log(0.0895), sdlog = log(2)), #SD are chosen empirically '@Ryan: Mu?
+  oe.female.pairings.with.msm = Lognormal.Distribution(meanlog = log(PAIRING.INPUT.MANAGER$oe.female.pairings.with.msm), sdlog = log(2)), #SD are chosen empirically '@Ryan: Mu?
+  # fraction.heterosexual_male.pairings.with.male = Logitnormal.Distribution(meanlogit = logit(0.004), sdlogit = log(2)),
+  fraction.heterosexual_male.pairings.with.male = Logitnormal.Distribution(meanlogit = logit(PAIRING.INPUT.MANAGER$fraction.heterosexual_male.pairings.with.male), sdlogit = log(2)),
+  # fraction.msm.pairings.with.female = Logitnormal.Distribution(meanlogit = logit(0.1187612), sdlogit = log(2)),
+  fraction.msm.pairings.with.female = Logitnormal.Distribution(meanlogit = logit(PAIRING.INPUT.MANAGER$fraction.msm.pairings.with.female), sdlogit = log(2)),
 
   # Proportion MSM ----#'@:Ryan: where are these mu/sd coming from? 
   black.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog =0, sdlog = 0.125*log(2)),
