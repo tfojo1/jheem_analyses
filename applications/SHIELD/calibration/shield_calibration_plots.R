@@ -555,9 +555,9 @@ if (1==2) {
 }
 
 # --- Multi-panel location comparison plots ---
-if (1==1) {
+if (1==2) {
     
-    calibname <- "calib.5.4.stage1.az"
+    calibname <- "calib.5.19.stg0.gtr.20"
 #
     all.calibration.simsets <- prepare_simsets_for_plots(
         calibration.code = calibname, 
