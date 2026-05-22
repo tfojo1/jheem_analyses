@@ -33,12 +33,15 @@ stratum.style.manager  <- create.style.manager(color.data.by = "stratum")
 # USAGE EXAMPLES ----
 # ****************************************************************************************************
 # read the data
-calibname <- "calib.5.12.stage2.pk"
-calibration.simsets <- load.calibration.simsets(
-    locations           = SHIELD.TEN.MSAS,
-    calibration.codes   = calibname,
-    assemble.incomplete = FALSE
-)
+if (1==2)
+{
+    calibname <- "calib.5.19.stage2.pk"
+    calibration.simsets <- load.calibration.simsets(
+        locations           = SHIELD.TEN.MSAS,
+        calibration.codes   = calibname,
+        assemble.incomplete = FALSE
+    )
+}
 # --- Per-city stage plots (all loaded locations) ---
 if (1 == 2) {
     stage     <- 2
