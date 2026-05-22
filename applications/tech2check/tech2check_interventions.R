@@ -24,15 +24,26 @@ TECH2CHECK.START.YEAR <- 2026
 TECH2CHECK.END.YEAR   <- 2030
 
 
-# Recruitment activation: set tech2check.recruitment.rate to a non-zero
-# value at the start year. 0.5/yr is a placeholder; sweep parameter for
-# the scale-up scenarios is recruitment rate (separate from the OR sweep).
+# Recruitment activation: jump tech2check.recruitment.rate to 0.5/yr at the
+# start year and SUSTAIN it. 0.5/yr is a placeholder; recruitment rate is a
+# sweep parameter for the scale-up scenarios (separate from the OR sweep).
+#
+# IMPORTANT (2026-05-22): do NOT set end.time here. In jheem2, end.time is the
+# time by which the quantity RETURNS to baseline -- the value trajectory is built
+# over union(start.time, times, end.time) with baseline at start.time/end.time
+# and effect.values at times (INTERVENTIONS_intervention_effects.R ~L421). With a
+# single control point at start.time PLUS an end.time, the rate ramps linearly
+# DOWN from 0.5 to 0 over [start, end] -- it is NOT held constant. That was the
+# original bug: enrollments decayed to ~0 by end.time instead of sustaining,
+# faster than the eligible pool depleted. Omitting end.time (default Inf) holds
+# the rate at 0.5 indefinitely (the SHIELD doxy idiom). A time-limited variant
+# (recruit then stop) is a sweep option: times = c(start, stop),
+# effect.values = c(0.5, 0.5), end.time = stop.
 tech2check.recruitment.activation <- create.intervention.effect(
     quantity.name = 'tech2check.recruitment.rate',
     start.time    = TECH2CHECK.START.YEAR,
-    end.time      = TECH2CHECK.END.YEAR,
     effect.values = 0.5,
-    times         = TECH2CHECK.START.YEAR,        # immediate; no ramp
+    times         = TECH2CHECK.START.YEAR,        # jump to 0.5 at start, then hold (no end.time)
     scale         = 'rate',
     apply.effects.as = 'value',
     allow.values.less.than.otherwise = F,
