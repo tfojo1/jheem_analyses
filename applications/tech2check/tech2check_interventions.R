@@ -24,38 +24,86 @@ TECH2CHECK.START.YEAR <- 2026
 TECH2CHECK.END.YEAR   <- 2030
 
 
-# Recruitment activation: jump tech2check.recruitment.rate to 0.5/yr at the
-# start year and SUSTAIN it. 0.5/yr is a placeholder; recruitment rate is a
-# sweep parameter for the scale-up scenarios (separate from the OR sweep).
+# Factory: build a Tech2Check intervention for a given recruitment rate and
+# (optionally) overridden suppression ORs. Defaults reproduce the base scenario
+# (recruitment 0.5/yr sustained, spec-default ORs 2.0 / 2.0 / 1.0). Used for
+# scenario sweeps -- vary recruitment.rate (scale-up intensity) and/or the ORs
+# (effect-size sensitivity) -- following the cdc_testing_interventions pattern of
+# parallel intervention objects built from a constructor.
 #
-# IMPORTANT (2026-05-22): do NOT set end.time here. In jheem2, end.time is the
-# time by which the quantity RETURNS to baseline -- the value trajectory is built
-# over union(start.time, times, end.time) with baseline at start.time/end.time
-# and effect.values at times (INTERVENTIONS_intervention_effects.R ~L421). With a
-# single control point at start.time PLUS an end.time, the rate ramps linearly
-# DOWN from 0.5 to 0 over [start, end] -- it is NOT held constant. That was the
-# original bug: enrollments decayed to ~0 by end.time instead of sustaining,
-# faster than the eligible pool depleted. Omitting end.time (default Inf) holds
-# the rate at 0.5 indefinitely (the SHIELD doxy idiom). A time-limited variant
-# (recruit then stop) is a sweep option: times = c(start, stop),
-# effect.values = c(0.5, 0.5), end.time = stop.
-tech2check.recruitment.activation <- create.intervention.effect(
-    quantity.name = 'tech2check.recruitment.rate',
-    start.time    = TECH2CHECK.START.YEAR,
-    effect.values = 0.5,
-    times         = TECH2CHECK.START.YEAR,        # jump to 0.5 at start, then hold (no end.time)
-    scale         = 'rate',
-    apply.effects.as = 'value',
-    allow.values.less.than.otherwise = F,
-    allow.values.greater.than.otherwise = T
-)
+# recruitment.rate : sustained rate applied from start.year.
+# stop.year        : NULL = sustained (default); a year = time-limited (recruit
+#                    at the rate from start.year to stop.year, then stop).
+# on/recently/distantly.or : NULL = leave the spec default in place; a number
+#                    overrides that compartment's OR.
+#
+# IMPORTANT (end.time gotcha, 2026-05-22): for SUSTAINED recruitment do NOT pass
+# end.time. In jheem2, end.time is the time by which the quantity RETURNS to
+# baseline -- the trajectory is built over union(start.time, times, end.time)
+# with baseline at start.time/end.time and effect.values at times
+# (INTERVENTIONS_intervention_effects.R ~L421). A single control point at
+# start.time PLUS an end.time ramps the rate linearly DOWN to 0 over the window
+# (the original bug). Omitting end.time (default Inf) holds it constant. The
+# time-limited branch below pins both endpoints (times = c(start, stop),
+# effect.values = c(r, r), end.time = stop) so the rate is held flat then stops.
+make.tech2check.intervention <- function(recruitment.rate = 0.5,
+                                         on.or        = NULL,
+                                         recently.or  = NULL,
+                                         distantly.or = NULL,
+                                         start.year   = TECH2CHECK.START.YEAR,
+                                         stop.year    = NULL,
+                                         code         = NULL) {
+    if (is.null(stop.year))
+        recruitment.effect <- create.intervention.effect(
+            quantity.name = 'tech2check.recruitment.rate',
+            start.time    = start.year,
+            times         = start.year,
+            effect.values = recruitment.rate,
+            scale         = 'rate',
+            apply.effects.as = 'value',
+            allow.values.less.than.otherwise = F,
+            allow.values.greater.than.otherwise = T)
+    else
+        recruitment.effect <- create.intervention.effect(
+            quantity.name = 'tech2check.recruitment.rate',
+            start.time    = start.year,
+            times         = c(start.year, stop.year),
+            effect.values = c(recruitment.rate, recruitment.rate),
+            end.time      = stop.year,
+            scale         = 'rate',
+            apply.effects.as = 'value',
+            allow.values.less.than.otherwise = F,
+            allow.values.greater.than.otherwise = T)
 
+    effects <- list(recruitment.effect)
 
-# Base intervention -- spec-default ORs (2.0 / 2.0 / 1.0) plus recruitment
-# activation. No parameter sweep at this stage.
-tech2check.base.intervention <- create.intervention(
-    WHOLE.POPULATION,
-    tech2check.recruitment.activation,
-    code = 't2c.base',
-    parameters = NULL
-)
+    # Optional OR overrides. scale = 'ratio' matches the OR model elements.
+    # NOTE: the OR-override path is not yet exercised in a verified run -- before
+    # relying on it in an OR sweep, confirm suppression.by.intervention.state
+    # responds to these effects (the recruitment path IS verified).
+    or.targets <- list('tech2check.on.suppression.OR'       = on.or,
+                       'tech2check.recently.suppression.OR'  = recently.or,
+                       'tech2check.distantly.suppression.OR' = distantly.or)
+    for (qname in names(or.targets)) {
+        v <- or.targets[[qname]]
+        if (!is.null(v))
+            effects <- c(effects, list(create.intervention.effect(
+                quantity.name = qname,
+                start.time    = start.year,
+                times         = start.year,
+                effect.values = v,
+                scale         = 'ratio',
+                apply.effects.as = 'value',
+                allow.values.less.than.otherwise = T,
+                allow.values.greater.than.otherwise = T)))
+    }
+
+    if (is.null(code))
+        code <- sprintf('t2c.r%g', recruitment.rate)
+
+    do.call(create.intervention,
+            c(list(WHOLE.POPULATION), effects, list(code = code, parameters = NULL)))
+}
+
+# Base intervention: factory defaults (recruitment 0.5/yr sustained, spec ORs).
+tech2check.base.intervention <- make.tech2check.intervention(code = 't2c.base')
