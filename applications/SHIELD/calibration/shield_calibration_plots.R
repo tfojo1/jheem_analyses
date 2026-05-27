@@ -87,7 +87,7 @@ if (1 == 2) {
 }
 
 # --- Compare two calibration codes ---
-if (1 == 2) {
+if (1 == 1) {
     calibname1 <- "calib.5.12.stage2.pk"
     calibname2 <- "calib.4.24.stage2.az"
     
