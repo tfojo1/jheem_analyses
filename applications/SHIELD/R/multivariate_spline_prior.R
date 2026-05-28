@@ -3,15 +3,15 @@
 #' @description This make can a multivariate joint distribution for any number of parameters and spline points.
 #' @param parameters Parameters for which spline point values will be correlated
 #' @param logmean.baseline,logsd.baseline A vector of log means and sds for the baseline year, each with one value per parameter.
-#' @param logsd.deltas.past,logsd.deltas.future A vector of log sd's, one per spline point before, or after, the baseline year
-#' @param spline.times A character vector of years indicating, in order, the past spline point years, the baseline year, and the future years
+#' @param logsd.deltas.past,logsd.deltas.future A named vector of log sd's, one per spline point either before or after the baseline, called past or future points. Names are years, matching spline times.
+#' @param spline.times A character vector of years indicating, in order, the past spline point years, the baseline year, and the future years. Whichever year isn't referred to in the names of the deltas future and past sd vectors is taken to be the baseline year.
 #' @param correlation The correlation between parameter values for the same spline point year
-make.joint.mv.spline.prior <- function(parameters = c("A", "B"),
-                                       logmean.baseline = log(2),
-                                       logsd.baseline = 0.01,
-                                       logsd.deltas.past = 1:2,
-                                       logsd.deltas.future = 5:6,
-                                       spline.times = c("1970", "1995", "2000", "2010", "2020"),
+make.joint.mv.spline.prior <- function(parameters,
+                                       logmean.baseline,
+                                       logsd.baseline,
+                                       logsd.deltas.past,
+                                       logsd.deltas.future,
+                                       spline.times = c("1970", "1990", "1995", "2000", "2010", "2017"),
                                        correlation = 0.5,
                                        debug = F) {
     
@@ -20,10 +20,10 @@ make.joint.mv.spline.prior <- function(parameters = c("A", "B"),
     error.prefix = "error making joint multivariate spline prior: "
     if (!is.character(parameters) || length(parameters)==0 || any(is.na(parameters)))
         stop(paste0(error.prefix, "'parameters' must be a character vector with no missing values"))
-    if (!is.numeric(logmean.baseline) || length(logmean.baseline) != 1 || any(is.na(logmean.baseline)))
-        stop(paste0(error.prefix, "'logmean.baseline' must be a single numeric value"))
-    if (!is.numeric(logsd.baseline) || length(logsd.baseline) != 1 || any(is.na(logsd.baseline)) || logsd.baseline<=0)
-        stop(paste0(error.prefix, "'logsd.baseline' must be a single, positive numeric value"))
+    if (!is.numeric(logmean.baseline) || length(logmean.baseline) != length(parameters) || any(is.na(logmean.baseline)))
+        stop(paste0(error.prefix, "'logmean.baseline' must be a numeric vector with one non-missing value per parameter"))
+    if (!is.numeric(logsd.baseline) || length(logsd.baseline) != length(parameters) || any(is.na(logsd.baseline)) || any(logsd.baseline<=0))
+        stop(paste0(error.prefix, "'logsd.baseline' must be a numeric vector with one positive, non-missing value per parameter"))
     if (!is.numeric(logsd.deltas.past) || any(is.na(logsd.deltas.past)) || any(logsd.deltas.past<=0))
         stop(paste0(error.prefix, "'logsd.deltas.past' must be a vector containing only positive numeric values. Can have length 0."))
     if (!is.numeric(logsd.deltas.future) || any(is.na(logsd.deltas.future)) || any(logsd.deltas.future<=0))
@@ -33,15 +33,40 @@ make.joint.mv.spline.prior <- function(parameters = c("A", "B"),
     if (!is.numeric(correlation) || length(correlation)!=1 || is.na(correlation) || correlation < -1 || correlation > 1)
         stop(paste0(error.prefix, "'correlation' must be a single numeric value between 1 and -1 inclusive"))
     
+    # Check vector names
+    if (length(logsd.deltas.past)>0 &
+        (!is.character(names(logsd.deltas.past)) ||
+         any(is.na(names(logsd.deltas.past))) ||
+         !all(names(logsd.deltas.past) %in% spline.times)))
+        stop(paste0(error.prefix, "the names of 'logsd.deltas.past' must all be character values found in 'spline.times'"))
+    if (length(logsd.deltas.future)>0 &
+        (!is.character(names(logsd.deltas.future)) ||
+         any(is.na(names(logsd.deltas.future))) ||
+         !all(names(logsd.deltas.future) %in% spline.times)))
+        stop(paste0(error.prefix, "the names of 'logsd.deltas.future' must all be character values found in 'spline.times'"))
+    if (length(intersect(names(logsd.deltas.past), names(logsd.deltas.future)))!=0)
+        stop(paste0(error.prefix, "'logsd.deltas.past' and 'logsd.deltas.future' can not share any names"))
+    baseline_year <- setdiff(spline.times, union(names(logsd.deltas.past), names(logsd.deltas.future)))
+    if (length(baseline_year)!=1)
+        stop(paste0(error.prefix, "'spline.times' must contain all the names of 'logsd.deltas.past' and 'logsd.deltas.future' with exactly one additonal baseline year"))
+    if (any(names(logsd.deltas.past)>=baseline_year) || any(names(logsd.deltas.future)<=baseline_year))
+        stop(paste0(error.prefix, "the baseline year must be later than all past years and earlier than all future years"))
+    
+    # Create the untransformed mu and sigma ----
+    
     num_past_years <- length(logsd.deltas.past)
     num_future_years <- length(logsd.deltas.future)
     num_spline_points <- num_past_years + 1 + num_future_years
     num_parameters <- length(parameters)
     
+    # We want to re-order the sd vectors from oldest to newest,
+    # since we assume this order when making the mapping matrix.
+    logsd.deltas.past <- logsd.deltas.past[sort(names(logsd.deltas.past))]
+    logsd.deltas.future <- logsd.deltas.future[sort(names(logsd.deltas.future))]
     
-    # Create the untransformed mu and sigma ----
     # The untransformed mu has zero for all the log deltas, since we expect no change between years.
-    untransformed_mu <- rep(c(logmean.baseline, rep(0, num_spline_points - 1)), each=num_parameters)
+    untransformed_mu <- c(logmean.baseline,
+                          rep(0, (num_spline_points - 1) * num_parameters))
     
     # Since the parameters are correlated, the untransformed sigma is no longer diagonal,
     # but rather block-diagonal by spline point.
@@ -52,7 +77,7 @@ make.joint.mv.spline.prior <- function(parameters = c("A", "B"),
     # The following code produces this sigma matrix in stages.
     n_col <- num_parameters * num_spline_points
     block_size <- num_parameters
-    
+
     # Start fresh
     untransformed_sigma <- diag(n_col)
     
@@ -62,15 +87,15 @@ make.joint.mv.spline.prior <- function(parameters = c("A", "B"),
         rep(1:(n_col / block_size) * block_size - block_size, each = block_size^2)
     
     untransformed_sigma[diagonal_block_idx] <- rep(c(
-        logsd.baseline,
+        0,
         logsd.deltas.past,
         logsd.deltas.future
     )^2, each = block_size^2) * correlation
-    
+
     # Divide the diagonals by correlation so only the off-diagonals have it
     diag(untransformed_sigma) <- diag(untransformed_sigma) / correlation
     
-    # Reset the baseline block, which is first, to be diagonal with its own variance
+    # Reset the baseline block, which is first, to be diagonal with its own variances
     untransformed_sigma[1:block_size, 1:block_size] <- diag(logsd.baseline^2, nrow = block_size, ncol = block_size)
     
     # Create the mapping matrix M ----
@@ -85,7 +110,7 @@ make.joint.mv.spline.prior <- function(parameters = c("A", "B"),
     # The only complexity that having multiple parameters adds is that
     # each 1 in the mapping matrix for spline points described above
     # becomes an identity matrix. This is because cells corresponding to certain
-    # parameters will never map to cells corresponding to a different parameter.
+    # one parameter will never map to cells corresponding to a different parameter.
     
     # M might look like this before considering multiple parameters:
     
@@ -106,7 +131,7 @@ make.joint.mv.spline.prior <- function(parameters = c("A", "B"),
     #       c(0,1,0,0,0,1,0,1))
     
     M_per_parameter <- matrix(0, nrow = num_spline_points, ncol = num_spline_points)
-
+    
     # The entire first column will be 1s because every value uses the baseline trate.
     M_per_parameter[,1] <- 1
     
@@ -141,12 +166,15 @@ make.joint.mv.spline.prior <- function(parameters = c("A", "B"),
     
 }
 
-# make.mv.spline.prior(parameter = "transmission.rate.multiplier.msm", #relative to heterosexuals
-#                      logmean00 = log(3),logsd00 = log(2), #reference year 2000 # 3X transmission assumption based on https://pmc.ncbi.nlm.nih.gov/articles/PMC11307151
-#                      #
-#                      logsd.delta95 = log(sqrt(1.5))/2, #'@Ryan: why are we using these values?
-#                      logsd.delta90 = log(sqrt(1.5))/2, 
-#                      logsd.delta70 = log(1.5^2)/2,
-#                      logsd.delta10 = log(1.5)/2, 
-#                      logsd.delta17 = log(1.5)/2 # change this to 2017
-# ),
+xx=make.joint.mv.spline.prior(
+    parameters = paste0("transmission.rate.multiplier.", c("msm", "heterosexual")),
+    # parameters = c("A", "B"), # shorter names are easier for debugging the output array
+    logmean.baseline = c(log(3), 0),
+    logsd.baseline = c(log(2), log(2)),
+    logsd.deltas.past = c("1970" = log(1.5^2)/2,
+                          "1990" = log(sqrt(1.5))/2,
+                          "1995" = log(sqrt(1.5))/2),
+    logsd.deltas.future = c("2010" = log(1.5)/2,
+                            "2017" = log(1.5)/2),
+    spline.times = c("1970", "1990", "1995", "2000", "2010", "2017"),
+    correlation = 0.5)
