@@ -77,7 +77,7 @@ make.joint.mv.spline.prior <- function(parameters,
     # The following code produces this sigma matrix in stages.
     n_col <- num_parameters * num_spline_points
     block_size <- num_parameters
-
+    
     # Start fresh
     untransformed_sigma <- diag(n_col)
     
@@ -91,7 +91,7 @@ make.joint.mv.spline.prior <- function(parameters,
         logsd.deltas.past,
         logsd.deltas.future
     )^2, each = block_size^2) * correlation
-
+    
     # Divide the diagonals by correlation so only the off-diagonals have it
     diag(untransformed_sigma) <- diag(untransformed_sigma) / correlation
     
@@ -109,8 +109,8 @@ make.joint.mv.spline.prior <- function(parameters,
     
     # The only complexity that having multiple parameters adds is that
     # each 1 in the mapping matrix for spline points described above
-    # becomes an identity matrix. This is because cells corresponding to certain
-    # one parameter will never map to cells corresponding to a different parameter.
+    # becomes an identity matrix. This is because cells corresponding to one
+    # parameter will never map to cells corresponding to a different parameter.
     
     # M might look like this before considering multiple parameters:
     
@@ -136,14 +136,14 @@ make.joint.mv.spline.prior <- function(parameters,
     M_per_parameter[,1] <- 1
     
     # Each past year has 1s in the columns for itself and later years
-    # E.g. 1970 might have 1s for 1970 and 1995 (along with the 2000 baseline)
+    # E.g. 1990 might have 1s for 1990 and 1995 (along with the 2000 baseline)
     for (i in seq_len(num_past_years)) {
         M_per_parameter[i,
                         2 + 0 : (num_past_years - i)] <- 1
     }
     
     # Each future year has 1s in the columns for itself and earlier years
-    # E.g. 2020 might have 1s for 2020 and 2010 (along with the 2000 baseline)
+    # E.g. 2017 might have 1s for 2017 and 2010 (along with the 2000 baseline)
     for (i in seq_len(num_future_years)) {
         M_per_parameter[i + 1 + num_past_years,
                         1 + num_past_years + 1:i] <- 1
@@ -166,15 +166,17 @@ make.joint.mv.spline.prior <- function(parameters,
     
 }
 
-xx=make.joint.mv.spline.prior(
-    parameters = paste0("transmission.rate.multiplier.", c("msm", "heterosexual")),
-    # parameters = c("A", "B"), # shorter names are easier for debugging the output array
-    logmean.baseline = c(log(3), 0),
-    logsd.baseline = c(log(2), log(2)),
-    logsd.deltas.past = c("1970" = log(1.5^2)/2,
-                          "1990" = log(sqrt(1.5))/2,
-                          "1995" = log(sqrt(1.5))/2),
-    logsd.deltas.future = c("2010" = log(1.5)/2,
-                            "2017" = log(1.5)/2),
-    spline.times = c("1970", "1990", "1995", "2000", "2010", "2017"),
-    correlation = 0.5)
+if (1==2) {
+    xx=make.joint.mv.spline.prior(
+        parameters = paste0("transmission.rate.multiplier.", c("msm", "heterosexual")),
+        # parameters = c("A", "B"), # shorter names are easier for debugging the output array
+        logmean.baseline = c(log(3), 0),
+        logsd.baseline = c(log(2), log(2)),
+        logsd.deltas.past = c("1970" = log(1.5^2)/2,
+                              "1990" = log(sqrt(1.5))/2,
+                              "1995" = log(sqrt(1.5))/2),
+        logsd.deltas.future = c("2010" = log(1.5)/2,
+                                "2017" = log(1.5)/2),
+        spline.times = c("1970", "1990", "1995", "2000", "2010", "2017"),
+        correlation = 0.5)
+}
