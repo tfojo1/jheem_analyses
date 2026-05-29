@@ -118,7 +118,7 @@ make.mv.spline.prior.five.points <- function(parameter,
 }
 
 if (1==2){
-    # make.mv.spline.prior(parameter = "transmission.rate.multiplier.heterosexual", 
+    # make.mv.spline.prior.five.points(parameter = "transmission.rate.multiplier.heterosexual", 
     #                      logmean00 = 0,
     #                      logsd00 = log(2),  
     #                      logsd.delta95 = log(sqrt(1.5))/2, 
