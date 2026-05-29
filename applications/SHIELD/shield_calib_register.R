@@ -12,7 +12,6 @@ par.aliases.transmission = list(
     trate.5 = c("transmission.rate.multiplier.msm2017", "transmission.rate.multiplier.heterosexual2017")
 )
 
-
 # MAIN CALIBRATION -----
 # STAGE 0
 register.calibration.info("calib.5.11.stage0.az",
@@ -95,6 +94,62 @@ register.calibration.info('calib.5.28.stage1.az',
 
 
 
+
+# CALIBRATION AFTER SPECIFICATION REVISIONS ----
+register.calibration.info("calib.5.29.stage0.az",
+                          likelihood.instructions = lik.inst.stage0,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          fixed.initial.parameter.values = c("global.transmission.rate"=2.3),  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          parameter.aliases = par.aliases.transmission,
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+# STAGE 1
+register.calibration.info('calib.5.29.stage1.az',
+                          preceding.calibration.codes = 'calib.5.29.stage0.az',
+                          likelihood.instructions = lik.inst.stage1,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+# STAGE 2
+register.calibration.info("calib.5.29.stage2.az",
+                          preceding.calibration.codes = 'calib.5.29.stage1.az',
+                          likelihood.instructions = lik.inst.stage23,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names,
+                              "global.transmission.rate"
+                          ),
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+# STAGE 3
+register.calibration.info("calib.5.29.stage3.az",
+                          preceding.calibration.codes = 'calib.5.29.stage2.az',
+                          likelihood.instructions = lik.inst.stage23,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names,
+                              "global.transmission.rate"
+                          ),
+                          n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
+)
 
 # SA Model: 30% msm partnership with females -----
 # Global transmission was found at 2 in stage 0 and was used in other stages too (inc_msm_female_partnerships2 baranch )
