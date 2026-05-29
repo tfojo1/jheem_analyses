@@ -15,63 +15,8 @@ source("applications/SHIELD/R/multivariate_spline_prior.R")
 # ************************************************************************************************************************
 # Helpul command: #get.intervals(variable name): Get intervals (confidence/credible intervals) for the variables in a distribution
 # HELPER FUNCTIONS ----
-
 logit = function(p){
     log(p) - log(1-p)
-}
-
-# helper function to build multivariate normal distribution
-make.mv.spline.prior = function(parameter, 
-                                logmean00, logsd00, #mean and standard deviation for the parameter corresponding to the year 2000
-                                logsd.delta95, logsd.delta90, logsd.delta70, #SD for past changes (delta) in the param values between knots to 2000
-                                logsd.delta10, logsd.delta17 #SD for future changes (delta) in the param values between knots to 2000
-){
-    
-    untransformed.mu = c(logmean00,0,0,0,0,0) #the initial expectation is that the change between years is zero
-    #diagonal covariance matrix for the initial parameters. Initial parameters are assumed to be independent.
-    #The variances for the changes (logsd.delta...) determine the expected magnitude of the annual changes.
-    untransformed.sigma = diag(c(logsd00,
-                                 logsd.delta95, 
-                                 logsd.delta90, 
-                                 logsd.delta70, 
-                                 logsd.delta10, 
-                                 logsd.delta17))
-    
-    #trasformation matrix: transforming the initial, independent parameters (baseline value + deltas) to the 
-    # final, correlated parameters (the value of the parameter at each of the six years)
-    # This structure allows to model knot values by accumulating changes (deltas) from baseline year
-    # P2000=baseline
-    # P1995=P2000+deltas???  #'@Ryan: can you review notes to see how the knots depend on each other. 
-    # Each delta is a log-change between successive knots.
-    # We use an accumulation matrix M as a shortcut to find covariances
-    M = rbind(
-        c(1,1,1,1,0,0), # 1970 # log P_1970 = logsd00 + logsd.delta95 + logsd.delta90 + logsd.delta70
-        c(1,1,1,0,0,0), # 1990 # log P_1990 = logsd00 + logsd.delta95 + logsd.delta90 
-        c(1,1,0,0,0,0), # 1995 # log P_1995 = logsd00 + logsd.delta95 
-        c(1,0,0,0,0,0), # 2000 # log P_2000 = logsd00 
-        c(1,0,0,0,1,0), # 2010 # log P_2010 = logsd00 + logsd.delta10 
-        c(1,0,0,0,1,1) # 2017 # log P_2020 = logsd00 + logsd.delta10 + logsd.delta20 
-    ) # 2000, 1970, 1995, 1990, 2010, 2020
-    
-    mu = M %*% untransformed.mu # E[y] = M E[x]
-    sigma = M  %*% untransformed.sigma %*% t(M) # Σ_y = M Σ_x Mᵀ 
-    
-    # Let:
-    #   y_i = sum_k M[i,k] * x_k
-    #   y_j = sum_l M[j,l] * x_l
-    #
-    # Then the covariance between y_i and y_j is:
-    #   Cov(y_i, y_j) = sum_{k,l} M[i,k] * M[j,l] * Cov(x_k, x_l)
-    #
-    # Since Σ_x is diagonal (the x_k are independent),
-    # all Cov(x_k, x_l) = 0 unless k = l. Therefore:
-    #
-    #   Cov(y_i, y_j) = sum_{k shared by i and j} M[i,k] * M[j,k] * σ_k^2
-    
-    #
-    dist = Multivariate.Lognormal.Distribution(mu = mu, sigma = sigma, 
-                                               var.names = paste0(parameter,c(1970,1990,1995,2000,2010,2017)))
-    return(dist)
 }
 
 create.auto.regressive.covariance.matrix = function(correlation.coefficient,n,sd){
@@ -80,7 +25,6 @@ create.auto.regressive.covariance.matrix = function(correlation.coefficient,n,sd
     corr.matrix*(sd^2)
 }
 
-#my best guess for this parameter is different in different locations, so we formulate prior as a multiply of the best guess
 # Defining the calibration parameters and prior distributions
 
 #***** PARAMETER PRIORS *****----
@@ -205,29 +149,13 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     ## Global transmission ----
     global.transmission.rate = Lognormal.Distribution(meanlog = log(2.2), sdlog = log(10)/2), #'@Ryan: why are we using these mu/sd?
     
-    # #12 independant params
-    # ## msm multipliers by time ----
-    # make.mv.spline.prior(parameter = "transmission.rate.multiplier.msm", #relative to heterosexuals
-    #                      logmean00 = log(3),logsd00 = log(2), #reference year 2000 # 3X transmission assumption based on https://pmc.ncbi.nlm.nih.gov/articles/PMC11307151
-    #                      #
-    #                      logsd.delta95 = log(sqrt(1.5))/2, #'@Ryan: why are we using these values?
-    #                      logsd.delta90 = log(sqrt(1.5))/2, 
-    #                      logsd.delta70 = log(1.5^2)/2,
-    #                      logsd.delta10 = log(1.5)/2, 
-    #                      logsd.delta17 = log(1.5)/2 # change this to 2017
-    # ),
-    # 
-    # ## heterosexual multipliers by time ----
-    # make.mv.spline.prior(parameter = "transmission.rate.multiplier.heterosexual", 
-    #                      logmean00 = 0,logsd00 = log(2), ##'@Ryan: why are we using this SD?
-    #                      logsd.delta95 = log(sqrt(1.5))/2, 
-    #                      logsd.delta90 = log(sqrt(1.5))/2, 
-    #                      logsd.delta70 = log(1.5^2)/2,
-    #                      logsd.delta10 = log(1.5)/2, 
-    #                      logsd.delta17 = log(1.5)/2 # change this to 2017
-    # ),
+    # Transmission multipliers 
+    # we built a joint prior for: transmission.rate.multiplier.msm & transmission.rate.multiplier.heterosexual
+    # each one has a baseline value in year 2000, and changes over spline years:    1970, 1990, 1995, 2000, 2010, 2017
+    # The baseline transmission rates at year 2000 are specified separately for MSM and heterosexuals (independant)
+    # The spline-point values within each group are linked through shared latent baseline/delta structure.
+    # The two groups are correlated at the same spline points through the correlation parameter.
     
-    # MSM and heterosexual trates are now correlated
     make.joint.mv.spline.prior(
         parameters = paste0("transmission.rate.multiplier.", c("msm", "heterosexual")),
         logmean.baseline = c(log(3), 0),
@@ -238,7 +166,8 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
         logsd.deltas.future = c("2010" = log(1.5)/2,
                                 "2017" = log(1.5)/2),
         spline.times = c("1970", "1990", "1995", "2000", "2010", "2017"),
-        correlation = 0.5),
+        correlation = 0.5
+        ),
     
     ## race multipliers (msm and het seperatly) ----
     #'@Ryan: we have used sdlog= log(2)/2 everywhere else.why increasing here?
