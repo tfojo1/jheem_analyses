@@ -479,3 +479,8 @@ xx=make.joint.mv.spline.prior(
     spline.times = c("1970", "1990", "1995", "2000", "2010", "2017"),
     correlation = 0.5)
 }
+
+
+
+
+# *****

@@ -113,27 +113,15 @@ register.model.element(SHIELD.SPECIFICATION,
                        value = SHIELD_BASE_PARAMETER_VALUES['popProp.lu.diag.1970'])
 
 # Calibration multipliers
-# Finally, we add 6 parameters to tune infected population size in calibration (multipliers for (ps, el, lu) for (msm vs het))
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'ps.diagnoses.msm.multiplier.1970', scale = 'non.negative.number',
+                       name = 'prp.diagnoses.are.msm.1970', 
+                       scale = 'proportion',
                        value = 1)
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'ps.diagnoses.heterosexual.multiplier.1970', scale = 'non.negative.number',
-                       value = 1)
-
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'el.diagnoses.msm.multiplier.1970', scale = 'non.negative.number',
-                       value = 1)
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'el.diagnoses.heterosexual.multiplier.1970', scale = 'non.negative.number',
+                       name = 'ratio.of.infected.to.diagnosed.1970', 
+                       scale = 'ratio',
                        value = 1)
  
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'lu.diagnoses.msm.multiplier.1970', scale = 'non.negative.number',
-                       value = 1)
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'lu.diagnoses.heterosexual.multiplier.1970', scale = 'non.negative.number',
-                       value = 1)
 
 # proportion of PS diagnoses that are in the primary stage in 1970
 register.model.element(SHIELD.SPECIFICATION,
@@ -141,7 +129,8 @@ register.model.element(SHIELD.SPECIFICATION,
                        value = SHIELD_BASE_PARAMETER_VALUES['prp.ps.in.primary.stage.1970'])
 
 ### **** Populating the infected stages *****
-
+# prp.diagnoses.are.msm.1970 # prop of all diagnoses that are msm [0-1]
+# ratio.of.infected.to.diagnosed.1970 # 
 # Estimating size of infected population
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'prop.initial.population.infected',
@@ -150,54 +139,38 @@ register.model.quantity(SHIELD.SPECIFICATION,
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
                                applies.to=list(continuum='undiagnosed', stage='primary', sex='msm' ),
-                               value=expression(popProp.ps.diag.1970 * ps.diagnoses.msm.multiplier.1970 * prp.ps.in.primary.stage.1970))
+                               value=expression(popProp.ps.diag.1970 * ratio.of.infected.to.diagnosed.1970 * prp.diagnoses.are.msm.1970 * prp.ps.in.primary.stage.1970))
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
-                               applies.to=list(continuum='undiagnosed', stage='primary', sex='heterosexual_male' ),
-                               value=expression(popProp.ps.diag.1970 * ps.diagnoses.heterosexual.multiplier.1970* prp.ps.in.primary.stage.1970))
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name='prop.initial.population.infected',
-                               applies.to=list(continuum='undiagnosed', stage='primary', sex='female' ),
-                               value=expression(popProp.ps.diag.1970 * ps.diagnoses.heterosexual.multiplier.1970 * prp.ps.in.primary.stage.1970))
+                               applies.to=list(continuum='undiagnosed', stage='primary', sex=c('heterosexual_male','female')),
+                               value=expression(popProp.ps.diag.1970 * ratio.of.infected.to.diagnosed.1970 * (1-prp.diagnoses.are.msm.1970)*0.5 * prp.ps.in.primary.stage.1970))
 # Secondary 
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
                                applies.to=list(continuum='undiagnosed', stage='secondary', sex='msm' ),
-                               value=expression(popProp.ps.diag.1970 * ps.diagnoses.msm.multiplier.1970 * (1-prp.ps.in.primary.stage.1970)))
+                               value=expression(popProp.ps.diag.1970 * ratio.of.infected.to.diagnosed.1970 * prp.diagnoses.are.msm.1970 * (1-prp.ps.in.primary.stage.1970)))
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
-                               applies.to=list(continuum='undiagnosed', stage='secondary', sex='heterosexual_male' ),
-                               value=expression(popProp.ps.diag.1970 * ps.diagnoses.heterosexual.multiplier.1970* (1-prp.ps.in.primary.stage.1970)))
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name='prop.initial.population.infected',
-                               applies.to=list(continuum='undiagnosed', stage='secondary', sex='female' ),
-                               value=expression(popProp.ps.diag.1970 * ps.diagnoses.heterosexual.multiplier.1970 * (1-prp.ps.in.primary.stage.1970)))
+                               applies.to=list(continuum='undiagnosed', stage='secondary', sex=c('heterosexual_male','female')),
+                               value=expression(popProp.ps.diag.1970 * ratio.of.infected.to.diagnosed.1970 * (1-prp.diagnoses.are.msm.1970)* 0.5 * (1-prp.ps.in.primary.stage.1970)))
 # Early latent
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
                                applies.to=list(continuum='undiagnosed', stage='early.latent', sex='msm'),
-                               value=expression(popProp.el.diag.1970 * el.diagnoses.msm.multiplier.1970))
+                               value=expression(popProp.el.diag.1970 * ratio.of.infected.to.diagnosed.1970 *  prp.diagnoses.are.msm.1970))
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
-                               applies.to=list(continuum='undiagnosed', stage='early.latent', sex='heterosexual_male'),
-                               value=expression(popProp.el.diag.1970 * el.diagnoses.heterosexual.multiplier.1970 ))
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name='prop.initial.population.infected',
-                               applies.to=list(continuum='undiagnosed', stage='early.latent', sex='female'),
-                               value=expression(popProp.el.diag.1970 * el.diagnoses.heterosexual.multiplier.1970 ))
+                               applies.to=list(continuum='undiagnosed', stage='early.latent', sex=c('heterosexual_male','female')),
+                               value=expression(popProp.el.diag.1970 * ratio.of.infected.to.diagnosed.1970 * (1-prp.diagnoses.are.msm.1970)* 0.5 ))
 # Late Latent / Unknown
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
                                applies.to=list(continuum='undiagnosed', stage='late.latent', sex='msm' ),
-                               value=expression(popProp.lu.diag.1970 * lu.diagnoses.msm.multiplier.1970 ))
+                               value=expression(popProp.lu.diag.1970 * ratio.of.infected.to.diagnosed.1970 *  prp.diagnoses.are.msm.1970 ))
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
-                               applies.to=list(continuum='undiagnosed', stage='late.latent', sex='heterosexual_male' ),
-                               value=expression(popProp.lu.diag.1970 * lu.diagnoses.heterosexual.multiplier.1970 ))
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name='prop.initial.population.infected',
-                               applies.to=list(continuum='undiagnosed', stage='late.latent', sex='female' ),
-                               value=expression(popProp.lu.diag.1970 * lu.diagnoses.heterosexual.multiplier.1970))
+                               applies.to=list(continuum='undiagnosed', stage='late.latent', sex=c('heterosexual_male','female')),
+                               value=expression(popProp.lu.diag.1970 * ratio.of.infected.to.diagnosed.1970 * (1-prp.diagnoses.are.msm.1970)* 0.5 ))
 
 ### **** Register the infected population *****
 register.model.quantity(SHIELD.SPECIFICATION,
@@ -211,24 +184,31 @@ register.initial.population(SHIELD.SPECIFICATION,
 #-----------------------------#
 ## Uninfected ---- 
 #-----------------------------#
-# we need to calculate the size of infected population without the infected dimensions (stage, continuum)
+# we need to calculate the size of infected population without the infected dimensions (stage, continuum) that exist in n.initial.population.infected
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'n.initial.population.infected.all.stages',
                         value = 0)
+
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='n.initial.population.infected.all.stages',
                                applies.to=list(sex='msm'),
                                value=expression(
-                                   (popProp.ps.diag.1970 * ps.diagnoses.msm.multiplier.1970 +
-                                        popProp.el.diag.1970 * el.diagnoses.msm.multiplier.1970 +
-                                        popProp.lu.diag.1970 * lu.diagnoses.msm.multiplier.1970) * n.initial.population))
+                                   (popProp.ps.diag.1970 +popProp.el.diag.1970+popProp.lu.diag.1970 )*
+                                       ratio.of.infected.to.diagnosed.1970 *
+                                       prp.diagnoses.are.msm.1970*
+                                       n.initial.population))
+
+ 
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='n.initial.population.infected.all.stages',
                                applies.to=list(sex=c('female','heterosexual_male')),
                                value=expression(
-                                   (popProp.ps.diag.1970 * ps.diagnoses.heterosexual.multiplier.1970 +
-                                        popProp.el.diag.1970 * el.diagnoses.heterosexual.multiplier.1970 +
-                                        popProp.lu.diag.1970 * lu.diagnoses.heterosexual.multiplier.1970) * n.initial.population))
+                                   (popProp.ps.diag.1970 +popProp.el.diag.1970+popProp.lu.diag.1970 )*
+                                       ratio.of.infected.to.diagnosed.1970 *
+                                       (1-prp.diagnoses.are.msm.1970) *
+                                       0.5 * #assuming half of het infections are among men vs women
+                                       n.initial.population)
+                               )
 
 ## **** Register Uninfected Population ****
 register.model.quantity(SHIELD.SPECIFICATION,

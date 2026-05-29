@@ -5,7 +5,7 @@ source("applications/SHIELD/R/multivariate_spline_prior.R")
 #Notes:
 # We use this distribution to model uncertainty in changes to event odds.
 # We assume the odds ratio is most likely between half and double the prior odds.
-# Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2), # 95% CI= (0.5, 1.9) 
+# Lognormal.Distribution(meanlog = log(1), sdlog = 0.5*log(2)), # 95% CI= (0.5, 1.9) 
 
 # When using a log-linear or logit-linear model, we can express changes in terms of odds ratios
 # for both the intercept and the slope.
@@ -34,16 +34,16 @@ POPULATION.PARAMETERS.PRIOR=join.distributions(
     # (6 agegroups, 3 race, 2 knots)-> max 36 params
     # we start with 6 age, and 3 race, parameters applied to both knots -> 9 total
     # Race-level fertility rate multipliers
-    black.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    hispanic.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    other.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
+    black.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    hispanic.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    other.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     # Age-level fertility rate multipliers
-    age15.19.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    age20.24.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    age25.29.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    age30.34.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    age35.39.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    age40.44.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
+    age15.19.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age20.24.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age25.29.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age30.34.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age35.39.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age40.44.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     
     # Mortality rates ----
     # By Race:
@@ -134,20 +134,15 @@ AGING.PARAMETERS.PRIOR=join.distributions(
 
 ## TRANSMISSION.PARAMETERS.PRIOR ----
 TRANSMISSION.PARAMETERS.PRIOR=join.distributions( 
-    ## Initial diagnosis 1970 by sex/risk group ----
-    ps.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),#'@Ryan: why are we using these mu?
-    ps.diagnoses.heterosexual.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    
-    el.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),#'@Ryan: why are we using these mu
-    el.diagnoses.heterosexual.multiplier.1970 = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
-    
-    #'@PKASAIE
-    lu.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),#'@Ryan: why are we using these mu
-    lu.diagnoses.heterosexual.multiplier.1970 = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
-    
+    ## Initial infections in 1970 ----
+    # because we don't have true infection counts, we estimate estimated from reported diagnosis in 1970
+    # we assume a certain ratio of infected to diagnosed cases in 1970 that is theoritically >=1
+    # we also assume a certain proportion of diagnosis were made among MSM, and the rest are divided among heterosexual men and women
+    prp.diagnoses.are.msm.1970 = Logitnormal.Distribution(meanlogit = log(.5), sdlogit = log(2)), #CI=[0.13 0.66] larger SD because of uncertainty
+    ratio.of.infected.to.diagnosed.1970 = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)), #CI=[1.5, 5.9]
     
     ## Global transmission ----
-    global.transmission.rate = Lognormal.Distribution(meanlog = log(2.2), sdlog = log(10)/2), #'@Ryan: why are we using these mu/sd?
+    global.transmission.rate = Lognormal.Distribution(meanlog = log(2.2), sdlog = 0.5*log(10)), # large SD to allow more mixing
     
     # Transmission multipliers 
     # we built a joint prior for: transmission.rate.multiplier.msm & transmission.rate.multiplier.heterosexual
@@ -155,38 +150,40 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     # The baseline transmission rates at year 2000 are specified separately for MSM and heterosexuals (independant)
     # The spline-point values within each group are linked through shared latent baseline/delta structure.
     # The two groups are correlated at the same spline points through the correlation parameter.
-    
+    # we assume that trate can change by 1.5 over 10 years :logsd(Delta10)=log(1.5)
+    # this means that over 5 years, trate can change by sqrt(1.5) and by 20 years, it can change by 1.5^2
     make.joint.mv.spline.prior(
         parameters = paste0("transmission.rate.multiplier.", c("msm", "heterosexual")),
-        logmean.baseline = c(log(3), 0),
-        logsd.baseline = c(log(2), log(2)),
-        logsd.deltas.past = c("1970" = log(1.5^2)/2,
-                              "1990" = log(sqrt(1.5))/2,
-                              "1995" = log(sqrt(1.5))/2),
-        logsd.deltas.future = c("2010" = log(1.5)/2,
-                                "2017" = log(1.5)/2),
+        logmean.baseline = c(log(3), #msm
+                             0), #het
+        logsd.baseline = c(log(2), #msm
+                           log(2)), #het
+        logsd.deltas.past = c("1970" = 0.5*log(1.5^2), #20-year delta
+                              "1990" = 0.5*log(sqrt(1.5)), #5-year delta
+                              "1995" = 0.5*log(sqrt(1.5))), #5-year delta
+        logsd.deltas.future = c("2010" = 0.5*log(1.5), #10-year delta
+                                "2017" = 0.5*log(1.5)),#10-year delta
         spline.times = c("1970", "1990", "1995", "2000", "2010", "2017"),
         correlation = 0.5
-        ),
+    ),
     
     ## race multipliers (msm and het seperatly) ----
-    #'@Ryan: we have used sdlog= log(2)/2 everywhere else.why increasing here?
+    # increased SD to allow more variation CI= [0.25 - 3.9] 
     transmission.rate.multiplier.black.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
     transmission.rate.multiplier.black.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    
+    #
     transmission.rate.multiplier.hispanic.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
     transmission.rate.multiplier.hispanic.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    
+    #
     transmission.rate.multiplier.other.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
     transmission.rate.multiplier.other.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
     
     ## future change ----
-    transmission.rate.future.change.mult = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0), #@Ryan: please cite these numbers 
+    transmission.rate.future.change.mult = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0), #CI=(0.25 - 1.25) #assumption
     
     ## Sexual Mixing by Age ----
+    #directly used in specification helper function to control the standard deviation of the contact matrix by age
     age.mixing.sd.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #the model is sensitive to this parameter-we reduce the sdlog=1/4*log(2)
-    #directly used in specification helper function
-    #to control the standard deviation of the contact matrix by age
     
     ## Sexual Mixing by Race ----
     #this is multiplied in the race mixing matrix
@@ -195,18 +192,19 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     other.other.sexual.multi = Lognormal.Distribution(meanlog =  log(4), sdlog = log(2)),
     
     ## Sexual Mixing by Risk ----
-    oe.female.pairings.with.msm = Lognormal.Distribution(meanlog = log(0.0895), sdlog = log(2)), #SD are chosen empirically '@Ryan: Mu?
-    fraction.heterosexual_male.pairings.with.male = Logitnormal.Distribution(meanlogit = logit(0.004), sdlogit = log(2)),
+    # see shield_inputManager_pairing.R
+    oe.female.pairings.with.msm = Lognormal.Distribution(meanlog = log(0.0895), sdlog = log(2)), 
+    fraction.heterosexual_male.pairings.with.male = Logitnormal.Distribution(meanlogit = logit(0.004), sdlogit = log(2)), 
     fraction.msm.pairings.with.female = Logitnormal.Distribution(meanlogit = logit(0.1187612), sdlogit = log(2)),
     
-    # Proportion MSM ----#'@:Ryan: where are these mu/sd coming from? 
-    black.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog =0, sdlog = 0.125*log(2)),
+    # Proportion MSM ----
+    black.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.125*log(2)), #reduced SD to limit deviation from mean (since we are not formally calibrating this)
     hispanic.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.125*log(2)),
     other.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog =0, sdlog = 0.125*log(2)),
     
-    # relapse & infectiousness for EL ---- '@:Ryan: where are these mu/sd coming from? 
-    prop.early.latent.to.secondary=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) ),# get.intervals(prop.early.latent.to.secondary)
-    el.rel.secondary.transmissibility=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) )
+    # relapse & infectiousness for EL ----  
+    prop.early.latent.to.secondary=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2)),# CI= [0.079 0.56] larger SD to reflect lack of confidence in both parameters
+    el.rel.secondary.transmissibility=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2))
 ) 
 
 ## STI.TESTING.PARAMETERS.PRIOR ----
@@ -216,58 +214,56 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
     # >> we use this to inform the prior for MSM and het_male
     # >> for female, we compute the ratio_group = (primary diagnoses) / (primary + secondary diagnoses) as a proxy for proportion of 
     # primary disease that is symptomatic and use ratio_female/ratio_male to compute females relative to MSM (see input_prop_symp_primary.R ~ 0.66)
-    ### Primary Stage by Sex ----
-    prp.symptomatic.primary.msm=Logitnormal.Distribution(meanlogit = logit(0.25),sdlogit = log(2)/2), #
+    ## Primary Stage by Sex 
+    prp.symptomatic.primary.msm=Logitnormal.Distribution(meanlogit = logit(0.25),sdlogit = 0.5*log(2)), 
     #relative ratio of female & het_male to MSM
-    rr.prp.symptomatic.primary.female=Logitnormal.Distribution(meanlogit = logit( 0.66), sdlogit = (log(2)/2)),# data range is from .57-0.81, which is close to this interval (0.49-.79)
-    rr.prp.symptomatic.primary.heterosexual_male=Lognormal.Distribution(meanlog = log(1),sdlog = log(1.2)/2), #we manually set the sd so that the interval ranges from 0.8-1.2
+    rr.prp.symptomatic.primary.female=Logitnormal.Distribution(meanlogit = logit( 0.66), sdlogit = 0.5*log(2)),# data range is from .57-0.81, which is close to this interval (0.49-.79)
+    rr.prp.symptomatic.primary.heterosexual_male=Lognormal.Distribution(meanlog = log(1),sdlog = 0.5*log(1.2)), #we manually set the sd so that the interval ranges from 0.8-1.2
     
-    ### Secondary stage (total) ---- #assuming a single parameter accross all groups
-    prp.symptomatic.secondary=Logitnormal.Distribution(meanlogit = logit(0.16),sdlogit = log(2)/2), 
+    ## Secondary stage (total) assuming a single parameter accross all groups
+    prp.symptomatic.secondary=Logitnormal.Distribution(meanlogit = logit(0.16),sdlogit = 0.5*log(2)), 
     
     ## Careseeking among Symptomatic cases (by sex and race) ---- #a Logistic Linear function (Intercept by race and sex, Slope)
-    or.careseeking.symptomatic.ps.msm = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
-    or.careseeking.symptomatic.ps.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
-    or.careseeking.symptomatic.ps.female = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
+    or.careseeking.symptomatic.ps.msm = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2) ) ,
+    or.careseeking.symptomatic.ps.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2) ) ,
+    or.careseeking.symptomatic.ps.female = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2) ) ,
     #
-    or.careseeking.symptomatic.ps.black = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
-    or.careseeking.symptomatic.ps.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
-    or.careseeking.symptomatic.ps.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
+    or.careseeking.symptomatic.ps.black = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2) ) ,
+    or.careseeking.symptomatic.ps.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2) ) ,
+    or.careseeking.symptomatic.ps.other = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2) ) ,
     # Changing the slope for everyone (We avoid sampling slopes across many dimensions at once, because small changes in the slope
     # can lead to very large increases in the odds ratio)
-    or.slope.careseeking.symptomatic.ps = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/10), #smaller sd for slopes 
+    or.slope.careseeking.symptomatic.ps = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10), #smaller sd for slopes 
     
     ## STI Screening ----
     # Stratify intercept by race and sex
-    or.sti.screening.msm = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    or.sti.screening.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    or.sti.screening.female = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    or.sti.screening.msm = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    or.sti.screening.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    or.sti.screening.female = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     #
-    or.sti.screening.black = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    or.sti.screening.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    or.sti.screening.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    or.sti.screening.black = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    or.sti.screening.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    or.sti.screening.other = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     # Changing the slope for everyone
-    or.slope.sti.screening = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/10),
-    
+    or.slope.sti.screening = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10),
     
     ## Syphilis to HIV Testing Ratio ----
     # Stratify intercept by race and sex
-    or.syphilis.to.hiv.testing.msm = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    or.syphilis.to.hiv.testing.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    or.syphilis.to.hiv.testing.female = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    or.syphilis.to.hiv.testing.msm = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    or.syphilis.to.hiv.testing.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    or.syphilis.to.hiv.testing.female = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     #
-    or.syphilis.to.hiv.testing.black = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    or.syphilis.to.hiv.testing.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    or.syphilis.to.hiv.testing.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    or.syphilis.to.hiv.testing.black = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    or.syphilis.to.hiv.testing.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    or.syphilis.to.hiv.testing.other = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     #
-    or.slope.syphilis.to.hiv.testing = Lognormal.Distribution(meanlog = 0, sdlog = (log(1.25)/2)/10), # changed from 2 to make change slower
+    or.slope.syphilis.to.hiv.testing = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10), # changed from 2 to make change slower
     
     ## Misclassification Error ----
-    fraction.el.misclassified.ll =Logitnormal.Distribution(meanlogit = logit(0.096), sdlog =  log(2)) , #IQR: 0.025 0.27
-    fraction.ll.misclassified.el =Logitnormal.Distribution(meanlogit = logit(0.27), sdlog =  log(2)) #IQR: 0.064 0.51
+    fraction.el.misclassified.ll =Logitnormal.Distribution(meanlogit = logit(0.096), sdlog =  log(2)) , #CI=[0.025 0.27]
+    fraction.ll.misclassified.el =Logitnormal.Distribution(meanlogit = logit(0.27), sdlog =  log(2)) #CI=[0.064 0.51]
 )
 
-###--------------------------------------------------------------------------###
 ## TRANS.BY.AGE.SAMPLING.PRIOR ----
 # changing transmission function by age
 # we assume an auto regressive (AR) structure between agegroups 
@@ -280,11 +276,11 @@ n_ages <- length(age_labels)
 # MSM_sexualActivity (male values in the survey)
 # msm_sexualActivity_means <- ESTIAMTED IN input_estimate_sexual_activity_by_age.R 
 msm_sexualActivity_meanlog <- log(msm_sexualActivity_means)
-msm_sexualActivity_sdlog <- 0.5 * log(2)     
+msm_sexualActivity_sdlog <- 0.5*log(2)     
 # Heterosexual_sexualActivity (these are female values)
 # het_sexualActivity_means <- ESTIAMTED IN input_estimate_sexual_activity_by_age.R 
 het_sexualActivity_meanlog <- log(het_sexualActivity_means)
-het_sexualActivity_sdlog <- 0.5 * log(2)     
+het_sexualActivity_sdlog <- 0.5*log(2)     
 # AR parameters 
 rho_age <- 0.7  # p: correlation between adjacent ages
 # Covariance matrices
@@ -306,7 +302,7 @@ TRANS.BY.AGE.SAMPLING.PRIOR=join.distributions(
     ## MSM Sexual activity ----
     #Transmission multiplier for age 0-14: we have a seperate parameter for this agegroup 
     transmission.rate.multiplier.age14.msm = Lognormal.Distribution(meanlog = log(0.01), #pure assumption: sexual activity relative to 20-24 (peak)
-                                                                    sdlog = 0.5 * log(8)), #widened the prior to allow a wider search (emperically)
+                                                                    sdlog = 0.5*log(10)), #widened the prior to allow a wider search (emperically) CI=[0.001 - 0.1]
     
     # The other agegroups are tied together through a MVN distribution 
     TRANSMISSION.AGE.MSM.PRIOR <- Multivariate.Lognormal.Distribution( 
@@ -316,136 +312,89 @@ TRANS.BY.AGE.SAMPLING.PRIOR=join.distributions(
     ),
     
     ## HET Sexual activity ----
-    transmission.rate.multiplier.age14.heterosexual = Lognormal.Distribution(meanlog = log(1e-2), sdlog = 0.5 * log(8)),
+    transmission.rate.multiplier.age14.heterosexual = Lognormal.Distribution(meanlog = log(0.01), 
+                                                                             sdlog = 0.5*log(10)),
     TRANSMISSION.AGE.HET.PRIOR <- Multivariate.Lognormal.Distribution(
         mu = het_sexualActivity_meanlog,
         sigma = het_sexualActivity_sigma,
         var.names = het_varnames
     )
 )
-###--------------------------------------------------------------------------###
-## //TESTING.BY.AGE.PARAMETERS.PRIOR ----
-# A similar framework to model changes in STI screening by age #'Andrew: should we model this for sympomatic testing too?
-
-# 1- Define the params
-# testing_meanlog <- c(0, 0, 0, 0,0, 0, 0, 0, 0, 0)
-# testing_sdlog <- 0.5 * log(2)
-# testing_sigma <- create.auto.regressive.covariance.matrix(
-#   correlation.coefficient = rho_age,
-#   n = n_ages,
-#   sd = testing_sdlog
-# )
-# 2-variable names
-# screening_varnames <- paste0("sti.screening.multiplier.age", age_labels)
-# symptomatic_varnames <- paste0("or.symptomatic.age", age_labels)
-# 3-make the prior
-# TESTING.BY.AGE.PARAMETERS.PRIOR=join.distributions( 
-## STI.Screening 
-# sti.screening.multiplier.age14 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-# SCREENING.AGE.PRIOR <- Multivariate.Lognormal.Distribution(
-#   mu = testing_meanlog,
-#   sigma = testing_sigma,
-#   var.names = screening_varnames
-# ),
-
-## Symptomatic Testing 
-# or.symptomatic.age14 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-# SYMPTOMATIC.PRIOR <- Multivariate.Lognormal.Distribution(
-#   mu = testing_meanlog,
-#   sigma = testing_sigma,
-#   var.names = symptomatic_varnames
-# )
 
 ## PRENATAL.PARAMETER.PRIOR ----
 PRENATAL.PARAMETERS.PRIOR=join.distributions(
     # First‑trimester 
-    first.trimester.intercept.mult      = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    first.trimester.slope.mult          = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5), 
+    first.trimester.intercept.mult      = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    first.trimester.slope.mult          = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10), 
     
-    # black.first.trimester.odds.mult     = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # hispanic.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # other.first.trimester.odds.mult     = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    # black.first.trimester.odds.mult     = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # hispanic.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # other.first.trimester.odds.mult     = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     # 
-    # age15.19.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age20.24.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age25.29.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age30.34.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age35.39.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age40.44.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    # age15.19.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age20.24.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age25.29.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age30.34.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age35.39.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age40.44.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     
     # Second‑trimester 
-    second.trimester.intercept.mult     = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2), 
-    second.trimester.slope.mult         = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5),
+    second.trimester.intercept.mult     = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
+    second.trimester.slope.mult         = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10),
     
-    # black.second.trimester.odds.mult    = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # hispanic.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # other.second.trimester.odds.mult    = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    # black.second.trimester.odds.mult    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # hispanic.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # other.second.trimester.odds.mult    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     # 
-    # age15.19.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age20.24.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age25.29.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age30.34.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age35.39.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age40.44.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    # age15.19.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age20.24.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age25.29.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age30.34.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age35.39.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age40.44.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     # 
     # Third‑trimester 
-    third.trimester.intercept.mult      = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    third.trimester.slope.mult          = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5)
+    third.trimester.intercept.mult      = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    third.trimester.slope.mult          = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10)
     
-    # black.third.trimester.odds.mult     = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # hispanic.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # other.third.trimester.odds.mult     = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    # black.third.trimester.odds.mult     = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # hispanic.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # other.third.trimester.odds.mult     = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     # 
-    # age15.19.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age20.24.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age25.29.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age30.34.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age35.39.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age40.44.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    # age15.19.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age20.24.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age25.29.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age30.34.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age35.39.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age40.44.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     
     # ## non fertile ages ##
     # # First‑trimester
-    # age0.14.first.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age45.49.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age50.54.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age55.64.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age65.plus.first.trimester.odds.mult= Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    # age0.14.first.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age45.49.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age50.54.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age55.64.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age65.plus.first.trimester.odds.mult= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     # 
     # # Second‑trimester
-    # age0.14.second.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age45.49.second.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age50.54.second.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age55.64.second.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age65.plus.second.trimester.odds.mult= Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    # age0.14.second.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age45.49.second.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age50.54.second.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age55.64.second.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age65.plus.second.trimester.odds.mult= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     # 
     # # Third‑trimester
-    # age0.14.third.trimester.odds.mult    = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age45.49.third.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age50.54.third.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age55.64.third.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age65.plus.third.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2)
+    # age0.14.third.trimester.odds.mult    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age45.49.third.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age50.54.third.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age55.64.third.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # age65.plus.third.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
     
 )
 
-## DOXY-PEP.PARAMETERS.PRIOR ----
-# 
-# DOXYPEP.PARAMETERS.PRIOR = join.distributions(
-#   
-#   # Logistic slope for doxy coverage after 2022
-#   # logit(coverage(t)) = doxy.coverage.slope * (t - 2022), t >= 2022
-#   doxy.coverage.slope = Lognormal.Distribution(
-#     meanlog = log(1), sdlog  = 0.5*log(2)),
-#   
-#   # Luetkemeyer et al. 2025 https://pubmed.ncbi.nlm.nih.gov/40147465/
-#   # Relative risk under doxy-PEP (multiplicative reduction in acquisition)
-#   doxy.rr = Lognormal.Distribution(
-#     meanlog = log(0.20),   # prior mean RR ~0.20 (80% reduction)
-#     sdlog  = 0.4570899     # chosen to match 95% CI [0.08 - 0.48]
-#   )
-# )
-
-#### ----
+# *********************************************************************************************************************************************************************
 #***** LINKING PARAMETERS TO FUNCTIONAL FORMS *****  -----
+# *********************************************************************************************************************************************************************
 SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){ 
     ages=model.settings$specification.metadata$dim.names$age
     sexes=model.settings$specification.metadata$dim.names$sex
@@ -562,7 +511,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
     
     ## Transmission ----
     #multipliers for msm rates in each knot:
-    for(time in c("1970","1990","1995","2000","2010","2017")){   # change this to 2017 
+    for(time in c("1970","1990","1995","2000","2010","2017")){   
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "transmission.rate.msm",
                                                        alpha.name = time,
@@ -576,7 +525,6 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                        values = parameters[paste0("transmission.rate.multiplier.heterosexual",time)],
                                                        dimension = 'all',
                                                        applies.to.dimension.values = 'all')
-        
         
         #race multipliers, shared for msm and heterosexuals: 
         set.element.functional.form.main.effect.alphas(model.settings,
@@ -596,7 +544,6 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                        dimension = "race.to", #recipient
                                                        applies.to.dimension.values = c("black","hispanic", "other"))
         
-        
         #age multipliers:
         agegroups = c("14", "19","24", "29", "34", "39", "44", "49", "54", "64", "65")
         paramName.msm =paste0("transmission.rate.multiplier.age",agegroups, ".msm")
@@ -614,7 +561,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                        dimension = "age.to", #recipient
                                                        applies.to.dimension.values = ages)
     }
-    
+    # Future change multiplier ----
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "transmission.rate.heterosexual",
                                                    alpha.name = "after.modifier",
@@ -630,8 +577,8 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    dimension = "all"
     )
     
-    
-    ## Symptomatic Testing ---- Logit Linear function 
+    ## Symptomatic Testing ---- 
+    # Logit Linear function 
     # changes in intercept by sex
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "prob.careseek.if.symptomatic.ps",
@@ -724,26 +671,15 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
             values = parameters[paste0(pre, ".slope.mult")],
             dimension = "all",
             applies.to.dimension.values = "all")
-        
+            }
+    
     }
-    
-    ## Doxy-PEP Coverage
-    # set.element.functional.form.main.effect.alphas(
-    #   model.settings,
-    #   element.name = "doxy.coverage",
-    #   alpha.name   = "slope",
-    #   values       = parameters["doxy.coverage.slope"],
-    #   dimension    = "all",
-    #   applies.to.dimension.values = "all"
-    # )
-    
-    
-}
 
 
 
-#### ----
+# *********************************************************************************************************************************************************************
 #***** SAMPLING BLOCKS ***** ----
+#### *********************************************************************************************************************************************************************
 # classic mcmc samples one param at a time, adaptive mcms samples multiple params (1-5 per block)
 
 ## POPULATION.SAMPLING.BLOCKS ----
@@ -925,16 +861,9 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
     #
     infectiousness=c("el.rel.secondary.transmissibility"),
     #
-    initial.infections.msm=c(
-        'ps.diagnoses.msm.multiplier.1970',
-        'el.diagnoses.msm.multiplier.1970',
-        'lu.diagnoses.msm.multiplier.1970'
-    ),
-    initial.infections.Heterosexual=c(
-        'ps.diagnoses.heterosexual.multiplier.1970',
-        'el.diagnoses.heterosexual.multiplier.1970',
-        'lu.diagnoses.heterosexual.multiplier.1970'
-    ),
+    prp.inf.msm.1970=c("prp.diagnoses.are.msm.1970"),
+    #
+    inf.to.diag.1970=c("ratio.of.infected.to.diagnosed.1970"),
     #
     msm.transmission.block1 = c(
         "transmission.rate.multiplier.msm1970",
@@ -983,7 +912,6 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
         'black.proportion.msm.of.male.mult',
         'hispanic.proportion.msm.of.male.mult',
         'other.proportion.msm.of.male.mult')
-    
 )
 
 ## STI.TESTING.SAMPLING.BLOCKS ----
@@ -994,6 +922,7 @@ STI.TESTING.SAMPLING.BLOCKS = list(
         "rr.prp.symptomatic.primary.heterosexual_male",
         "prp.symptomatic.secondary"
     ),
+    #
     or.careseeking.sym.sex=c(
         "or.careseeking.symptomatic.ps.msm",
         "or.careseeking.symptomatic.ps.heterosexual_male",
@@ -1005,7 +934,7 @@ STI.TESTING.SAMPLING.BLOCKS = list(
         "or.careseeking.symptomatic.ps.other",
         "or.slope.careseeking.symptomatic.ps"
     ),
-    #######
+    #
     or.sti.screening.sex<-c(
         'or.sti.screening.msm',  
         'or.sti.screening.heterosexual_male',
@@ -1014,22 +943,21 @@ STI.TESTING.SAMPLING.BLOCKS = list(
         'or.sti.screening.black',  
         'or.sti.screening.hispanic',
         'or.sti.screening.other',
-        'or.slope.sti.screening'),
-    
-    #######
+        'or.slope.sti.screening'
+        ),
+    #
     syphilis.to.hiv.testing.ratio.sex.slope<-c(
         "or.syphilis.to.hiv.testing.msm",
         "or.syphilis.to.hiv.testing.heterosexual_male",
         "or.syphilis.to.hiv.testing.female",
         "or.slope.syphilis.to.hiv.testing"
     ),
-    #
     syphilis.to.hiv.testing.ratio.race<-c(
         "or.syphilis.to.hiv.testing.black",
         "or.syphilis.to.hiv.testing.hispanic",
         "or.syphilis.to.hiv.testing.other"
     ),
-    #######
+    #
     misclas.error<-c(
         "fraction.el.misclassified.ll",
         "fraction.ll.misclassified.el"
@@ -1040,7 +968,8 @@ STI.TESTING.SAMPLING.BLOCKS = list(
 TRANS.BY.AGE.SAMPLING.BLOCKS = list(
     age.transmission.young<-c(
         "transmission.rate.multiplier.age14.msm",
-        "transmission.rate.multiplier.age14.heterosexual"),
+        "transmission.rate.multiplier.age14.heterosexual"
+        ),
     #
     age.transmission.msm.1 = c(
         "transmission.rate.multiplier.age19.msm",
@@ -1146,41 +1075,26 @@ PRENATAL.SAMPLING.BLOCKS=list(
 )
 
 
-## DOXY-PEP.SAMPLING.BLOCKS ----
-# DOXYPEP.SAMPLING.BLOCKS = list(
-#   doxy.block = c(
-#     "doxy.coverage.slope",
-#     "doxy.rr"
-#   )
-# )
-
-#### ----
+# ****************************************************************************************************************************************************************
 # SUMMARIZE ---- 
+# ****************************************************************************************************************************************************************
 #these will be registered in the specification 
 SHIELD.FULL.PARAMETERS.PRIOR = distributions::join.distributions(
-    #stage0
     POPULATION.PARAMETERS.PRIOR,
     AGING.PARAMETERS.PRIOR,
-    
-    #stage1
     TRANSMISSION.PARAMETERS.PRIOR,
     STI.TESTING.PARAMETERS.PRIOR,
-    TRANS.BY.AGE.SAMPLING.PRIOR, #stage2
-    
+    TRANS.BY.AGE.SAMPLING.PRIOR, 
     PRENATAL.PARAMETERS.PRIOR
 )
 
 SHIELD.FULL.PARAMETERS.SAMPLING.BLOCKS=c(
     POPULATION.SAMPLING.BLOCKS,
     AGING.SAMPLING.BLOCKS ,
-    
     TRANSMISSION.SAMPLING.BLOCKS,
     STI.TESTING.SAMPLING.BLOCKS,
     TRANS.BY.AGE.SAMPLING.BLOCKS,
-    
     PRENATAL.SAMPLING.BLOCKS
-    
-    
 )
 
 
