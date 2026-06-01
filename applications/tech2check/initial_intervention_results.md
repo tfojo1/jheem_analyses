@@ -28,9 +28,10 @@ identical ~8 pp boost in viral suppression. `distantly_intervened` (OR =
 people who were previously suppressed in the boosted states. This is the
 OR design playing out exactly where the spec puts it. The rest of the
 framework’s standard checks pass too: the two scenarios are identical
-before 2026, HIV mortality moves in the expected direction given OR \>
-1, and the per-stratum suppression numbers match the analytical OR
-formula to within ~0.3% across ~136K stratum-cells.
+before 2026 (a clean comparison baseline), and within every population
+stratum (age × race × sex × risk), the simulated post-OR suppression
+rate matches what the OR-on-odds formula predicts to within ~0.3% —
+worst case across ~136K stratum/year/sim cells.
 
 ## Population-level effects (2030)
 
