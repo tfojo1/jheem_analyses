@@ -19,7 +19,7 @@ posterior at year 2030.
 
 ## Per-compartment OR effect
 
-![](initial_intervention_results_files/figure-commonmark/per-compartment-or-1.svg)
+![](figures/initial_intervention_results-per-compartment-or-1.svg)
 
 The two compartments where the design applies OR = 2.0 —
 `on_intervention` and `recently_intervened` — pick up an essentially
@@ -46,7 +46,7 @@ vs no-intervention at year 2030.
 
 ## The context — why the effect is small
 
-![](initial_intervention_results_files/figure-commonmark/age-share-1.svg)
+![](figures/initial_intervention_results-age-share-1.svg)
 
 A youth-only intervention is acting on roughly **1% of the diagnosed
 prevalence** — even a strong per-person effect, applied to a group
@@ -56,7 +56,7 @@ population-share story, not a recruitment-volume story.
 
 ## The eligible pool depletes under the intervention
 
-![](initial_intervention_results_files/figure-commonmark/pool-drain-1.svg)
+![](figures/initial_intervention_results-pool-drain-1.svg)
 
 Cumulative reach over the 4-year window is **~310 enrollees** (median;
 95% CI 208–388). The intervention is mechanically doing its job —
