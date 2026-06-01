@@ -5,12 +5,20 @@
 
 Initial result from running the calibrated **Tech2Check intervention on
 Maryland state-level baselines** (1000-sim posterior, sustained
-recruitment over 2026–2030). Pipeline runs end-to-end; structural and
-directional checks pass. Maryland state is the modeled geography because
-current-spec MSA calibration is not yet available. Calibration fits ~82%
-of CDC surveillance for 13–24 at 2023 with some recent-year drift — fine
-for the relative effects reported here; worth noting for absolute
-counts.
+recruitment over 2026–2030). Maryland state is the modeled geography
+because current-spec MSA calibration is not yet available.
+
+Pipeline runs end-to-end. Structural invariants (pre-intervention
+bit-identity between scenarios, compartment non-negativity, closed-form
+verification of the OR-modified suppression, no-intervention re-run
+fidelity) and directional regime checks (mortality direction under OR \>
+1, adult-cohort spillover bounded) all pass. As concrete examples:
+pre-intervention trajectories match between scenarios with max abs diff
+= 0 across EHE outcomes for years before 2026 (a clean comparison
+baseline); the OR-modified suppression matches the closed form OR·p / (1
+− p + OR·p) per stratum to within 3.2 × 10⁻³ relative deviation (against
+a 5 × 10⁻³ tolerance, checked across ~136K stratum-cells
+post-activation).
 
 The simulated scenario is sustained recruitment of diagnosed-chronic
 youth (13–24) into the four-state lifecycle
@@ -67,10 +75,3 @@ triples cumulative reach and drains the eligible pool to ~6 by 2030, but
 the median effects at 2030 barely move. The reach→impact curve is
 effectively flat from the base case onward — the conclusion is bounded
 by the size of the eligible pool, not by recruitment intensity.
-
-## Initial read
-
-Looks like a structurally bounded result — the per-person effect is
-real, but the population it acts on is small. Curious how you’d want to
-frame this, whether the natural framing is still scale-up impact or
-whether the small denominator wants a rethink.
