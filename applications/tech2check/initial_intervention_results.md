@@ -49,9 +49,10 @@ vs no-intervention at year 2030.
 ![](initial_intervention_results_files/figure-commonmark/age-share-1.svg)
 
 A youth-only intervention is acting on roughly **1% of the diagnosed
-prevalence** — even a strong per-person effect can only do so much
-against that denominator. The smallness is a population-share story, not
-a recruitment-volume story.
+prevalence** — even a strong per-person effect, applied to a group
+that’s that small a share of the total, can only move the
+population-level numbers a fraction of a percent. The smallness is a
+population-share story, not a recruitment-volume story.
 
 ## The eligible pool depletes under the intervention
 
