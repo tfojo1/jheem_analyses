@@ -512,10 +512,21 @@ extract.calib.simsets <- function(calib.simsets,
     
     if (stage == 0) {
         for (out in c("population", "deaths", "immigration", "emigration")) {
+            
+            # Unstratified
             make_one(out)
-            make_one(out, fb = c("sex", "race", "age"))
-            if (out %in% c("population", "deaths"))
-                make_one(out, fb = c("age","age","sex"), sb = c("sex","race","race"))
+            
+            # Faceted by one variable
+            for (var in c("sex", "race", "age"))
+                make_one(out, fb=var)
+            
+            # Faceted by one variable and split by one variable
+            if (out %in% c("population", "deaths")) {
+                for (pair in list(c("age", "sex"),
+                                  c("age", "race"),
+                                  c("sex", "race")))
+                    make_one(out, fb=pair[1], sb=pair[2])
+            }
         }
         make_one("fertility.rate", fb = "age", sb = "race")
         make_one("diagnosis.ps")
@@ -525,11 +536,20 @@ extract.calib.simsets <- function(calib.simsets,
         stage.outcomes <- c("diagnosis.total", "diagnosis.ps", "diagnosis.el.misclassified",
                             "diagnosis.late.misclassified", "hiv.testing")
         for (out in stage.outcomes) {
+            
+            # Unstratified
             make_one(out)
-            make_one(out, fb = if (stage == 1) c("sex","race") else c("sex","race","age"))
+            
+            # Faceted by one variable
+            for (var in if (stage == 1) c("sex", "race") else c("sex", "race", "age"))
+                make_one(out, fb = var)
+            
+            # Faceted by one variable and split by one variable
             if (out != "hiv.testing") {
-                if (stage == 1) make_one(out, fb = "race", sb = "sex")
-                if (stage == 2) make_one(out, fb = c("age","age","sex"), sb = c("sex","race","race"))
+                for (pair in if (stage == 1) list(c("race", "sex")) else list(c("age", "sex"),
+                                                                              c("age", "race"),
+                                                                              c("sex", "race")))
+                    make_one(out, fb=pair[1], sb=pair[2])
             }
         }
     }
@@ -548,9 +568,15 @@ plot.calib.stages <- function(calib.simsets,
     if (is.null(style.manager))
         style.manager <- create.style.manager(shape.data.by = "source", color.data.by = "stratum")
     
-    available <- unique(sapply(
-        extract.calib.simsets(calib.simsets, calibration.code = calibration.code),
-        function(e) setNames(e$location.code, e$location.name)))
+    # This new version makes sure the end result is a named vector.
+    # We can't use "unique" without losing the names, hence the approach with "!duplicated".
+    available <- setNames(
+        sapply(extract.calib.simsets(calib.simsets, calibration.code = calibration.code),
+               function(e) e$location.code),
+        sapply(extract.calib.simsets(calib.simsets, calibration.code = calibration.code),
+               function(e) e$location.name)
+    )
+    available <- available[!duplicated(available)]
     if (length(available) == 0) { warning("No simsets for '", calibration.code, "'"); return(invisible(character(0))) }
     
     target      <- .filter.to.requested.locations(locations, available, "plot.calib.stages")
@@ -646,6 +672,9 @@ plot.calib.comparison <- function(calib.simsets,
                                   create.dirs       = TRUE,
                                   verbose           = TRUE) {
     
+    if (!is.null(locations) && is.null(names(locations)))
+        stop("Error: 'locations' must be a NAMED vector")
+    
     separate.by <- match.arg(separate.by)
     if (is.null(style.manager)) style.manager <- .auto.style.manager(split.by, facet.by)
     suffix      <- .build.file.suffix(plot.which, split.by, facet.by)
@@ -653,9 +682,9 @@ plot.calib.comparison <- function(calib.simsets,
     all.calibs <- if (!is.null(calibration.codes)) calibration.codes else
         unique(sapply(calib.simsets, `[[`, "calib.code"))
     all.loc.names <- if (!is.null(locations)) {
-        names(.filter.to.requested.locations(locations,
+        unique(names(.filter.to.requested.locations(locations,
                                              setNames(sapply(calib.simsets, `[[`, "location.code"),
-                                                      sapply(calib.simsets, `[[`, "location.name")), "plot.calib.comparison"))
+                                                      sapply(calib.simsets, `[[`, "location.name")), "plot.calib.comparison")))
     } else unique(sapply(calib.simsets, `[[`, "location.name"))
     
     if (is.null(save.dir)) save.dir <- file.path(SHIELD.PLOT.PATH, "calibrationPlots",
