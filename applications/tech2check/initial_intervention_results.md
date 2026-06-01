@@ -8,26 +8,29 @@ Maryland state-level baselines** (1000-sim posterior, sustained
 recruitment over 2026–2030). Maryland state is the modeled geography
 because current-spec MSA calibration is not yet available.
 
-Pipeline runs end-to-end. Structural invariants (pre-intervention
-bit-identity between scenarios, compartment non-negativity, closed-form
-verification of the OR-modified suppression, no-intervention re-run
-fidelity) and directional regime checks (mortality direction under OR \>
-1, adult-cohort spillover bounded) all pass. As concrete examples:
-pre-intervention trajectories match between scenarios with max abs diff
-= 0 across EHE outcomes for years before 2026 (a clean comparison
-baseline); the OR-modified suppression matches the closed form OR·p / (1
-− p + OR·p) per stratum to within 3.2 × 10⁻³ relative deviation (against
-a 5 × 10⁻³ tolerance, checked across ~136K stratum-cells
-post-activation).
-
 The simulated scenario is sustained recruitment of diagnosed-chronic
 youth (13–24) into the four-state lifecycle
 (`on_intervention → recently_intervened → distantly_intervened`), with
 the trial OR (default 2.0) applied to suppression in `on_intervention`
 and `recently_intervened` and OR = 1 in `distantly_intervened`.
-Recruitment is held at 0.5/yr — a placeholder for `recruitment.rate`,
-not a trial-derived value. Effects below are compared against a
-no-intervention re-run of the same posterior at year 2030.
+Recruitment is held at 0.5/yr as a placeholder — not trial-derived.
+Effects below are compared against a no-intervention re-run of the same
+posterior at year 2030.
+
+## Per-compartment OR effect
+
+![](initial_intervention_results_files/figure-commonmark/per-compartment-or-1.svg)
+
+The two compartments where the design applies OR = 2.0 —
+`on_intervention` and `recently_intervened` — pick up an essentially
+identical ~8 pp boost in viral suppression. `distantly_intervened` (OR =
+1, no active boost) shows the much smaller residual carry-over from
+people who were previously suppressed in the boosted states. This is the
+OR design playing out exactly where the spec puts it. The rest of the
+framework’s standard checks pass too: the two scenarios are identical
+before 2026, HIV mortality moves in the expected direction given OR \>
+1, and the per-stratum suppression numbers match the analytical OR
+formula to within ~0.3% across ~136K stratum-cells.
 
 ## Population-level effects (2030)
 
