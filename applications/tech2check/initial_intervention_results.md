@@ -34,7 +34,7 @@ vs no-intervention at year 2030.
 
 ## The context — why the effect is small
 
-![](initial_intervention_results_files/figure-commonmark/age-share-1.png)
+![](initial_intervention_results_files/figure-commonmark/age-share-1.svg)
 
 A youth-only intervention is acting on roughly **1% of the diagnosed
 prevalence** — even a strong per-person effect can only do so much
@@ -43,7 +43,7 @@ a recruitment-volume story.
 
 ## The eligible pool depletes under the intervention
 
-![](initial_intervention_results_files/figure-commonmark/pool-drain-1.png)
+![](initial_intervention_results_files/figure-commonmark/pool-drain-1.svg)
 
 Cumulative reach over the 4-year window is **~310 enrollees** (median;
 95% CI 208–388). The intervention is mechanically doing its job —
