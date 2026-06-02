@@ -13,17 +13,22 @@ youth (13–24) into the four-state lifecycle
 (`on_intervention → recently_intervened → distantly_intervened`), with
 the trial OR (default 2.0) applied to suppression in `on_intervention`
 and `recently_intervened` and OR = 1 in `distantly_intervened`.
-Recruitment is held at 0.5/yr as a placeholder — not trial-derived.
-Effects below are compared against a no-intervention re-run of the same
-posterior at year 2030.
+Recruitment is held at 0.5/yr as a placeholder — not trial-derived. This
+is a **universal-offer scenario** applied to all diagnosed-chronic youth
+13–24 — broader than the trial’s actual enrollment, which targeted a
+more viremic / adherence-challenged subgroup. Effects below are compared
+against a no-intervention re-run of the same posterior at year 2030.
+Standard structural and directional checks pass, including a per-stratum
+implementation check confirming the suppression dispatcher matches the
+intended OR transform within the reporting-level test tolerance.
 
 ## Population-level effects (2030)
 
-| Outcome       | Δ at 2030 (median) | CI low (2.5%) | CI high (97.5%) | % of base |
-|:--------------|-------------------:|--------------:|----------------:|----------:|
-| incidence     |              -0.56 |         -1.36 |           -0.08 |    -0.158 |
-| new           |              -0.58 |         -1.91 |           -0.03 |    -0.147 |
-| hiv.mortality |              -0.09 |         -0.13 |           -0.02 |    -0.013 |
+| Outcome | Δ at 2030 (median) | CI low (2.5%) | CI high (97.5%) | % change vs no-intervention |
+|:---|---:|---:|---:|---:|
+| incidence | -0.56 | -1.36 | -0.08 | -0.133 |
+| new | -0.58 | -1.91 | -0.03 | -0.276 |
+| hiv.mortality | -0.09 | -0.13 | -0.02 | -0.017 |
 
 Maryland, 1000-sim posterior, sustained 0.5/yr recruitment. Intervention
 vs no-intervention at year 2030.
@@ -33,9 +38,9 @@ vs no-intervention at year 2030.
 ![](figures/initial_intervention_results-age-share-1.svg)
 
 A youth-only intervention is acting on roughly **1% of the diagnosed
-prevalence** — even a strong per-person effect, applied to a group
-that’s that small a share of the total, can only move the
-population-level numbers a fraction of a percent. The smallness is a
+prevalence**. In this calibrated MD model, the small youth pool combined
+with the modeled suppression-to-transmission pathway bounds the
+population-level effect to a fraction of a percent. The smallness is a
 population-share story, not a recruitment-volume story.
 
 ## The eligible pool depletes under the intervention
@@ -63,7 +68,10 @@ Pushing recruitment from 0.5/yr toward saturation (10/yr) roughly
 triples cumulative reach and drains the eligible pool to ~6 by 2030, but
 the median effects at 2030 barely move. The reach→impact curve is
 effectively flat from the base case onward — the conclusion is bounded
-by the size of the eligible pool, not by recruitment intensity.
+by the size of the eligible pool, not by recruitment intensity. Per-sim
+CIs widen at higher reach (mortality at rate 10 straddles zero around
+the same median), so the ceiling is a median-trajectory claim, not a
+per-sim-significant one at maximum reach.
 
 ## Trajectories: intervention vs no-intervention
 
@@ -84,28 +92,15 @@ enrollment for the two scenarios.
 
 ![](figures/initial_intervention_results-traj-enrollment-age-1.svg)
 
-## Suppression by lifecycle compartment
-
-![](figures/initial_intervention_results-per-compartment-or-1.svg)
-
-Population-weighted viral suppression rate at year 2030 by lifecycle
-compartment, within the intervention run. The two compartments where the
-design applies OR = 2.0 — `on_intervention` and `recently_intervened` —
-sit several percentage points above the `diagnosed_chronic` baseline,
-consistent with the OR mechanism doing its work. `distantly_intervened`
-(OR = 1) tracks close to `diagnosed_chronic`; the per-stratum
-analytical-OR check confirms OR = 1 cancellation to within ~0.3% across
-~136K stratum/year/sim cells.
-
 ## Where this could go
 
 **Near-term, regardless of direction.**
 
 - *Cross-state pool fractions and ceiling effects.* We have ~30
-  state-level baselines available; running the same intervention
-  scenarios across them and comparing pool fractions, age composition,
-  and ceiling effects state-by-state would test whether the youth ≈ 1%
-  finding is Maryland-specific or roughly universal. Either strengthens
+  state-level baselines available. Near-term: a descriptive pass on pool
+  fractions and age composition state-by-state, testing whether the
+  youth ≈ 1% finding is Maryland-specific or roughly universal.
+  Follow-on: full multi-state intervention runs. Either tier strengthens
   the bounded-impact framing or opens a richer geographic story (e.g.,
   the same intervention having more leverage in states with different
   youth demographics).
