@@ -80,3 +80,32 @@ triples cumulative reach and drains the eligible pool to ~6 by 2030, but
 the median effects at 2030 barely move. The reach→impact curve is
 effectively flat from the base case onward — the conclusion is bounded
 by the size of the eligible pool, not by recruitment intensity.
+
+## Where this could go
+
+A few possible directions — open to any of these or to ideas you have in
+mind.
+
+**Near-term, regardless of direction.** A cheap cross-state pass to see
+whether the youth ≈ 1% finding is Maryland-specific or roughly
+universal. We have ~30 state-level baselines available; pool-share and
+age-composition summaries are descriptive (no new intervention runs
+needed for a first cut) and would either strengthen the bounded-impact
+framing or open a richer geographic story.
+
+**Possible directions for the paper itself.**
+
+- *Cost-effectiveness layer.* Even a small population effect can be
+  cost-effective if the intervention is cheap. Pricing it as cost per
+  active-suppression person-year gained converts the bounded-impact
+  result into a sharper policy claim — “small but defensibly
+  cost-effective” or “not worth it at this scale.” Needs Tech2Check
+  program-cost inputs to exist; we haven’t checked.
+
+- *Quantifying the structural ceiling as the contribution itself.* Frame
+  what we already have — youth-only suppression interventions are
+  structurally bounded to a small fraction of a percent at the state
+  level by the pool size — as the paper’s main result. Lowest
+  additional-work path; the measurement is in hand.
+
+Other directions welcome.
