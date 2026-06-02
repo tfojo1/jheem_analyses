@@ -81,6 +81,29 @@ the median effects at 2030 barely move. The reach→impact curve is
 effectively flat from the base case onward — the conclusion is bounded
 by the size of the eligible pool, not by recruitment intensity.
 
+## Trajectories: intervention vs no-intervention
+
+Time-series overlays of viral suppression, new diagnoses, and program
+enrollment for the two scenarios. Both simsets are bit-identical
+pre-2026 (the structural invariant); any divergence after that reflects
+intervention effects.
+
+![](figures/initial_intervention_results-traj-suppression-1.svg)
+
+![](figures/initial_intervention_results-traj-new-1.svg)
+
+![](figures/initial_intervention_results-traj-enrollment-1.svg)
+
+**By age.** The intervention is age-restricted to 13–24 at recruitment,
+so direct effects concentrate there; older bands show negligible
+divergence at this horizon.
+
+![](figures/initial_intervention_results-traj-suppression-age-1.svg)
+
+![](figures/initial_intervention_results-traj-new-age-1.svg)
+
+![](figures/initial_intervention_results-traj-enrollment-age-1.svg)
+
 ## Where this could go
 
 **Near-term, regardless of direction.**
