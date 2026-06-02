@@ -86,14 +86,25 @@ by the size of the eligible pool, not by recruitment intensity.
 A few possible directions — open to any of these or to ideas you have in
 mind.
 
-**Near-term, regardless of direction.** We have ~30 state-level
-baselines available; running the same intervention scenarios across them
-and comparing pool fractions, age composition, and ceiling effects
-state-by-state would test whether the youth ≈ 1% finding is
-Maryland-specific or roughly universal. Either strengthens the
-bounded-impact framing or opens a richer geographic story (e.g., the
-same intervention having more leverage in states with different youth
-demographics).
+**Near-term, regardless of direction.**
+
+- *Cross-state pool fractions and ceiling effects.* We have ~30
+  state-level baselines available; running the same intervention
+  scenarios across them and comparing pool fractions, age composition,
+  and ceiling effects state-by-state would test whether the youth ≈ 1%
+  finding is Maryland-specific or roughly universal. Either strengthens
+  the bounded-impact framing or opens a richer geographic story (e.g.,
+  the same intervention having more leverage in states with different
+  youth demographics).
+
+- *Broadening the modeled population beyond youth, as a sensitivity.*
+  Pure OR transport across ages isn’t defensible (the digital-health +
+  peer-support modality plausibly attenuates with life-stage), but a
+  family of scenarios varying the attenuation profile — from no
+  transport, through partial transport, to full transport — bounds what
+  happens to the pool-bound result when the eligible pool isn’t
+  restricted to youth. A reviewer will probably ask for this regardless
+  of the chosen contribution framing, so it’s worth doing proactively.
 
 **Possible directions for the paper itself.**
 
@@ -103,15 +114,6 @@ demographics).
   result into a sharper policy claim — “small but defensibly
   cost-effective” or “not worth it at this scale.” Needs Tech2Check
   program-cost inputs to exist; we haven’t checked.
-
-- *Broadening the eligible population.* Youth-only is what the trial
-  supports, but the intervention modality (digital health + peer
-  support) isn’t strictly youth-specific in mechanism. Extending to
-  broader age ranges expands the pool, directly addressing the
-  constraint that bounds the current result. Transporting the per-person
-  OR beyond the trial’s age band is a real assumption to flag, but if
-  the OR is the thing we’re already conditioning on, it’s a reasonable
-  question what changes when the pool is bigger.
 
 - *Quantifying the structural ceiling as the contribution itself.* Frame
   what we already have — youth-only suppression interventions are
