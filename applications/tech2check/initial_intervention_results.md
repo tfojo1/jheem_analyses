@@ -83,9 +83,6 @@ by the size of the eligible pool, not by recruitment intensity.
 
 ## Where this could go
 
-A few possible directions — open to any of these or to ideas you have in
-mind.
-
 **Near-term, regardless of direction.**
 
 - *Cross-state pool fractions and ceiling effects.* We have ~30
@@ -120,5 +117,3 @@ mind.
   structurally bounded to a small fraction of a percent at the state
   level by the pool size — as the paper’s main result. Lowest
   additional-work path; the measurement is in hand.
-
-Other directions welcome.
