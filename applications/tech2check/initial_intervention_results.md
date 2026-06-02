@@ -54,8 +54,6 @@ vs no-intervention at year 2030.
 
 Absolute deltas are median per-sim differences (intervention −
 no-intervention); percent changes are the ratio of median trajectories.
-They’re slightly different aggregations, so the arithmetic doesn’t line
-up exactly.
 
 ## The context — why the effect is small
 
