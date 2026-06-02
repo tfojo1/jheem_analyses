@@ -17,21 +17,25 @@ Recruitment is held at 0.5/yr as a placeholder — not trial-derived.
 Effects below are compared against a no-intervention re-run of the same
 posterior at year 2030.
 
-## Per-compartment OR effect
+## Suppression by lifecycle compartment
 
 ![](figures/initial_intervention_results-per-compartment-or-1.svg)
 
-The two compartments where the design applies OR = 2.0 —
-`on_intervention` and `recently_intervened` — pick up an essentially
-identical ~8 pp boost in viral suppression. `distantly_intervened` (OR =
-1, no active boost) shows the much smaller residual carry-over from
-people who were previously suppressed in the boosted states. This is the
-OR design playing out exactly where the spec puts it. The rest of the
-framework’s standard checks pass too: the two scenarios are identical
-before 2026 (a clean comparison baseline), and within every population
-stratum (age × race × sex × risk), the simulated post-OR suppression
-rate matches what the OR-on-odds formula predicts to within ~0.3% —
-worst case across ~136K stratum/year/sim cells.
+Each bar is the gap between that lifecycle compartment’s
+population-weighted suppression rate and `diagnosed_chronic`’s, both
+taken from the intervention run at year 2030. The two OR = 2.0
+compartments — `on_intervention` and `recently_intervened` — sit about 8
+pp above `diagnosed_chronic`, consistent with the OR design playing out
+where the spec puts it. The `distantly_intervened` bar (OR = 1) is *not*
+an OR effect — at OR = 1 the closed form returns the baseline per
+stratum exactly, verified to within ~0.3% by the per-stratum
+analytical-OR check across ~136K stratum/year/sim cells. The small ~2 pp
+residual at the aggregate is a between-stratum composition artifact:
+`distantly_intervened` is populated only by people who started in 13–24
+and aged through, so its stratum mix (age × race × sex × risk) differs
+from `diagnosed_chronic`’s (which includes the predominantly-adult
+never-recruited population), and population-weighted aggregates can
+differ even when per-stratum probabilities are identical.
 
 ## Population-level effects (2030)
 
@@ -84,9 +88,7 @@ by the size of the eligible pool, not by recruitment intensity.
 ## Trajectories: intervention vs no-intervention
 
 Time-series overlays of viral suppression, new diagnoses, and program
-enrollment for the two scenarios. Both simsets are bit-identical
-pre-2026 (the structural invariant); any divergence after that reflects
-intervention effects.
+enrollment for the two scenarios.
 
 ![](figures/initial_intervention_results-traj-suppression-1.svg)
 
@@ -94,9 +96,7 @@ intervention effects.
 
 ![](figures/initial_intervention_results-traj-enrollment-1.svg)
 
-**By age.** The intervention is age-restricted to 13–24 at recruitment,
-so direct effects concentrate there; older bands show negligible
-divergence at this horizon.
+**By age.**
 
 ![](figures/initial_intervention_results-traj-suppression-age-1.svg)
 
