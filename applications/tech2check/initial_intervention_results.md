@@ -18,9 +18,28 @@ is a **universal-offer scenario** applied to all diagnosed-chronic youth
 13–24 — broader than the trial’s actual enrollment, which targeted a
 more viremic / adherence-challenged subgroup. Effects below are compared
 against a no-intervention re-run of the same posterior at year 2030.
-Standard structural and directional checks pass, including a per-stratum
-implementation check confirming the suppression dispatcher matches the
-intended OR transform within the reporting-level test tolerance.
+Standard structural and directional checks pass; the per-stratum OR
+check (comparing the simulated suppression rate to what the OR formula
+predicts at each stratum/year/sim cell) comes back within tolerance.
+
+## Trajectories: intervention vs no-intervention
+
+Time-series overlays of viral suppression, new diagnoses, and program
+enrollment for the two scenarios.
+
+![](figures/initial_intervention_results-traj-suppression-1.svg)
+
+![](figures/initial_intervention_results-traj-new-1.svg)
+
+![](figures/initial_intervention_results-traj-enrollment-1.svg)
+
+**By age.**
+
+![](figures/initial_intervention_results-traj-suppression-age-1.svg)
+
+![](figures/initial_intervention_results-traj-new-age-1.svg)
+
+![](figures/initial_intervention_results-traj-enrollment-age-1.svg)
 
 ## Population-level effects (2030)
 
@@ -32,6 +51,11 @@ intended OR transform within the reporting-level test tolerance.
 
 Maryland, 1000-sim posterior, sustained 0.5/yr recruitment. Intervention
 vs no-intervention at year 2030.
+
+Absolute deltas are median per-sim differences (intervention −
+no-intervention); percent changes are the ratio of median trajectories.
+They’re slightly different aggregations, so the arithmetic doesn’t line
+up exactly.
 
 ## The context — why the effect is small
 
@@ -68,29 +92,11 @@ Pushing recruitment from 0.5/yr toward saturation (10/yr) roughly
 triples cumulative reach and drains the eligible pool to ~6 by 2030, but
 the median effects at 2030 barely move. The reach→impact curve is
 effectively flat from the base case onward — the conclusion is bounded
-by the size of the eligible pool, not by recruitment intensity. Per-sim
-CIs widen at higher reach (mortality at rate 10 straddles zero around
-the same median), so the ceiling is a median-trajectory claim, not a
-per-sim-significant one at maximum reach.
-
-## Trajectories: intervention vs no-intervention
-
-Time-series overlays of viral suppression, new diagnoses, and program
-enrollment for the two scenarios.
-
-![](figures/initial_intervention_results-traj-suppression-1.svg)
-
-![](figures/initial_intervention_results-traj-new-1.svg)
-
-![](figures/initial_intervention_results-traj-enrollment-1.svg)
-
-**By age.**
-
-![](figures/initial_intervention_results-traj-suppression-age-1.svg)
-
-![](figures/initial_intervention_results-traj-new-age-1.svg)
-
-![](figures/initial_intervention_results-traj-enrollment-age-1.svg)
+by the size of the eligible pool, not by recruitment intensity. At
+higher recruitment, the medians barely move but the spread across sims
+widens — mortality at rate 10 has a CI that includes zero. So the “flat
+ceiling” claim describes the median; per-sim uncertainty grows as
+recruitment pushes higher.
 
 ## Where this could go
 
