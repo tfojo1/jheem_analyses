@@ -17,26 +17,6 @@ Recruitment is held at 0.5/yr as a placeholder — not trial-derived.
 Effects below are compared against a no-intervention re-run of the same
 posterior at year 2030.
 
-## Suppression by lifecycle compartment
-
-![](figures/initial_intervention_results-per-compartment-or-1.svg)
-
-Each bar is the gap between that lifecycle compartment’s
-population-weighted suppression rate and `diagnosed_chronic`’s, both
-taken from the intervention run at year 2030. The two OR = 2.0
-compartments — `on_intervention` and `recently_intervened` — sit about 8
-pp above `diagnosed_chronic`, consistent with the OR design playing out
-where the spec puts it. The `distantly_intervened` bar (OR = 1) is *not*
-an OR effect — at OR = 1 the closed form returns the baseline per
-stratum exactly, verified to within ~0.3% by the per-stratum
-analytical-OR check across ~136K stratum/year/sim cells. The small ~2 pp
-residual at the aggregate is a between-stratum composition artifact:
-`distantly_intervened` is populated only by people who started in 13–24
-and aged through, so its stratum mix (age × race × sex × risk) differs
-from `diagnosed_chronic`’s (which includes the predominantly-adult
-never-recruited population), and population-weighted aggregates can
-differ even when per-stratum probabilities are identical.
-
 ## Population-level effects (2030)
 
 | Outcome       | Δ at 2030 (median) | CI low (2.5%) | CI high (97.5%) | % of base |
@@ -103,6 +83,26 @@ enrollment for the two scenarios.
 ![](figures/initial_intervention_results-traj-new-age-1.svg)
 
 ![](figures/initial_intervention_results-traj-enrollment-age-1.svg)
+
+## Suppression by lifecycle compartment
+
+![](figures/initial_intervention_results-per-compartment-or-1.svg)
+
+Each bar is the gap between that lifecycle compartment’s
+population-weighted suppression rate and `diagnosed_chronic`’s, both
+taken from the intervention run at year 2030. The two OR = 2.0
+compartments — `on_intervention` and `recently_intervened` — sit about 8
+pp above `diagnosed_chronic`, consistent with the OR design playing out
+where the spec puts it. The `distantly_intervened` bar (OR = 1) is *not*
+an OR effect — at OR = 1 the closed form returns the baseline per
+stratum exactly, verified to within ~0.3% by the per-stratum
+analytical-OR check across ~136K stratum/year/sim cells. The small ~2 pp
+residual at the aggregate is a between-stratum composition artifact:
+`distantly_intervened` is populated only by people who started in 13–24
+and aged through, so its stratum mix (age × race × sex × risk) differs
+from `diagnosed_chronic`’s (which includes the predominantly-adult
+never-recruited population), and population-weighted aggregates can
+differ even when per-stratum probabilities are identical.
 
 ## Where this could go
 
