@@ -464,7 +464,7 @@ make.joint.mv.spline.prior <- function(parameters,
     return(dist)
     
 }
-
+# example ----
 if(1==2){
 xx=make.joint.mv.spline.prior(
     parameters = paste0("transmission.rate.multiplier.", c("msm", "heterosexual")),
@@ -480,7 +480,47 @@ xx=make.joint.mv.spline.prior(
     correlation = 0.5)
 }
 
-
-
+# finding a good p ----
+if (1==2){
+    # bivariate normal (both parameters marginally normal, with a defined covariance/correlation)
+    # Conditional mean: E[Y | X = x] = mu_y + rho*(sigma_y/sigma_x)*(x - mu_x)
+    # Shifts mu_y by the regression of Y on X, scaled by correlation and SD ratio
+    
+    conditional_bivariate_normal <- function(x_obs, mu_x, mu_y, sigma_x, sigma_y, rho) {
+        
+        # Conditional mean: E[Y | X = x] = mu_y + rho*(sigma_y/sigma_x)*(x - mu_x)
+        # Shifts mu_y by the regression of Y on X, scaled by correlation and SD ratio
+        cond_mean <- mu_y + rho * (sigma_y / sigma_x) * (x_obs - mu_x)
+        
+        # Conditional SD: sigma_y * sqrt(1 - rho^2)
+        # Residual uncertainty in Y after observing X; independent of x_obs
+        # Approaches 0 as |rho| -> 1 (perfect correlation), equals sigma_y when rho = 0 (independence)
+        cond_sd   <- sigma_y * sqrt(1 - rho^2)
+        
+        # 95% CI: conditional mean +/- 1.96 * conditional SD
+        # Assumes Y | X = x is normally distributed
+        ci_lower  <- cond_mean - 1.96 * cond_sd
+        ci_upper  <- cond_mean + 1.96 * cond_sd
+        
+        list(
+            conditional_mean = cond_mean,
+            conditional_sd   = cond_sd,
+            ci_95_lower      = ci_lower,
+            ci_95_upper      = ci_upper
+        )
+    }
+    # in a given period (2000-2010); if het transmission changes by .25, how much should the MSM should be able to change?
+    conditional_bivariate_normal(0.30, 0,0,0.5*log(1.5),0.5*log(1.5), 0.8)
+    
+    # if you wanted to impose an assumption; when heterosexual transmission changes by 25%; MSM transmission cannot decrease;
+    # we can find the p value that works:
+    conditional_bivariate_normal(0.250, 0,0,0.5*log(1.5),0.5*log(1.5), 0.5) #$ci_95_lower -0.2191202
+    conditional_bivariate_normal(0.250, 0,0,0.5*log(1.5),0.5*log(1.5), 0.8) #$ci_95_lower -0.03841348
+    conditional_bivariate_normal(0.250, 0,0,0.5*log(1.5),0.5*log(1.5), 0.85) #$ci_95_lower 0.003179841 >> this works.
+    
+    # But the problem with this approach is that the bivariate normal distribution here is symmetric
+    # so instead of increasing p, we will add a penalty function to avoid increase increases in Het male values and reductions among MSM
+    
+}
 
 # *****
