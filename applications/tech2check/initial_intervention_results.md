@@ -55,6 +55,24 @@ vs no-intervention at year 2030.
 Absolute deltas are median per-sim differences (intervention −
 no-intervention); percent changes are the ratio of median trajectories.
 
+## Cumulative infections averted (2026–2030)
+
+Cumulative new HIV infections summed over the intervention window,
+comparing the two scenarios. The final two rows show the relative
+reduction at the total-population level and within the 13–24 age band
+specifically.
+
+| Metric                                      | Value                     |
+|:--------------------------------------------|:--------------------------|
+| Cumulative new infections — no intervention | 2087 \[1735, 2603\]       |
+| Cumulative new infections — intervention    | 2084 \[1732, 2602\]       |
+| Cumulative averted                          | 2.6 \[0.7, 3.9\]          |
+| % averted (total population)                | 0.122% \[0.029%, 0.189%\] |
+| % averted (13–24 only)                      | 0.28% \[0.11%, 0.44%\]    |
+
+Maryland, 1000-sim posterior. Median \[95% CI\] of per-sim cumulative
+new HIV infections summed over 2026–2030.
+
 ## The context — why the effect is small
 
 ![](figures/initial_intervention_results-age-share-1.svg)
