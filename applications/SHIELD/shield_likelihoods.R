@@ -450,6 +450,77 @@ proportion_ps_male_among_msm_likelihood_instructions <-
         },
         weights = 1
     )
+#---- Penalizing when Heterosexual Male PS Diagnosis growth rates are much higher than MSM ----
+diagnosis_trajectory_penalty_likelihood_instructions <-
+    create.custom.likelihood.instructions(
+        name = "diagnosis.trajectory.penalty.likelihood",
+        compute.function = function(sim, data, weights, log = TRUE, debug = F) {
+            if (debug) browser()
+            
+            get_instr <- data$get_instr
+            years <- data$years
+            window_length <- data$window_length
+            meanlog <- data$meanlog
+            sdlog <- data$sdlog
+            
+            num_years <- length(years)
+            
+            # An array with dimensions "year" and "sex"
+            vals <- sim$optimized.get(get_instr)
+            
+            ratio_het <-
+                vals[(1 + window_length):num_years, "heterosexual_male"] /
+                vals[1:(num_years - window_length), "heterosexual_male"]
+            
+            ratio_msm <-
+                vals[(1 + window_length):num_years, "msm"] /
+                vals[1:(num_years - window_length), "msm"]
+            
+            # ror: "Ratio of ratios"
+            ror <- ratio_het / ratio_msm
+            
+            # What if there are zero diagnoses? Ideally, we'd want to penalize
+            # these cases. But we can't just turn NaN ror's into Infinity.
+            # Or can we?
+            ror[is.na(ror)] <- Inf
+            
+            upper_penalty_cutoff <- exp(meanlog + 2 * sdlog)
+            
+            # If an ror falls below the cutoff, it is treated as though it is
+            # equal to the cutoff, even if it is far into the lower tail of the
+            # distribution. This is because we only care about cases where the
+            # ror is greater than 1 (het growing faster than msm)
+            lik <- sum(dlnorm(pmax(ror, upper_penalty_cutoff),
+                              meanlog, sdlog/sqrt(weights), log=T))
+            
+            if (log) lik else exp(lik)
+        },
+        get.data.function = function(version, location) {
+            sim_metadata <- get.simulation.metadata(version = version, location = location)
+            #
+            start_year <- 2015L
+            end_year <- 2030L
+            years <- seq(start_year, end_year)
+            window_length <- 5L
+            meanlog <- 0
+            sdlog <- log(2)/2 # TO BE DETERMINED
+            #
+            get_instr <- sim_metadata$prepare.optimized.get.instructions(
+                outcome = "diagnosis.ps",
+                dimension.values = list(year = years, sex = c("msm", "heterosexual_male")),
+                keep.dimensions = c("year", "sex"),
+                drop.single.sim.dimension = TRUE
+            )
+            #
+            list(
+                get_instr = get_instr,
+                years = years,
+                window_length = window_length,
+                meanlog = meanlog,
+                sdlog = sdlog
+            )
+        }
+    )
 ## EARLY Diagnosis ----
 # data from 1941-2022 (cdc.pdf.report) for national model Only (total)
 # data from 2000-2023 (cdc.sti) for county; state; national level (total; sex; race; age group; age group+sex; age group + race; race+sex)
@@ -757,6 +828,7 @@ lik.inst.stage1=join.likelihood.instructions(
     #
     historical.diagnosis.likelihood.instructions,
     proportion_ps_male_among_msm_likelihood_instructions,
+    diagnosis_trajectory_penalty_likelihood_instructions,
     future.change.penalty.likelihood.instructions,    # Future change penalty
     #
     additional.weights = STAGE.1.WEIGHT
@@ -793,6 +865,7 @@ lik.inst.stg23.non.demog=join.likelihood.instructions(
     #
     historical.diagnosis.likelihood.instructions,
     proportion_ps_male_among_msm_likelihood_instructions,
+    diagnosis_trajectory_penalty_likelihood_instructions,
     future.change.penalty.likelihood.instructions    # Future change penalty
 )
 
