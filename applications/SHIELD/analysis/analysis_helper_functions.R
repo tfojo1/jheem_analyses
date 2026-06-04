@@ -697,9 +697,11 @@ plot.calib.comparison <- function(calib.simsets,
                                                       sapply(calib.simsets, `[[`, "location.name")), "plot.calib.comparison")))
     } else unique(sapply(calib.simsets, `[[`, "location.name"))
     
-    if (is.null(save.dir)) save.dir <- file.path(SHIELD.PLOT.PATH, "calibrationPlots",
-                                                 "comparison", if (!is.null(folder.name)) folder.name else NULL,
-                                                 paste0("by_", separate.by))
+    if (is.null(save.dir)) {
+        save.dir <- file.path(SHIELD.PLOT.PATH, "calibrationPlots","comparison")
+        if (!is.null(folder.name)) save.dir <- file.path(save.dir, folder.name)
+        save.dir <- file.path(save.dir, paste0("by_", separate.by))
+    }
     
     loc.panel <- function(loc, outs) {
         entries <- extract.calib.simsets(calib.simsets, location.name = loc, exact = TRUE)
