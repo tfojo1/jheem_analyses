@@ -149,7 +149,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     
     # Transmission multipliers 
     # we built a joint prior for: transmission.rate.multiplier.msm & transmission.rate.multiplier.heterosexual
-    # each one has a baseline value in year 2000, and changes over spline years:    1970, 1990, 1995, 2000, 2010, 2017
+    # each one has a baseline value in year 2000, and changes over spline years:    1970, 1990, 1995, 2000, 2010, 2022
     # The baseline transmission rates at year 2000 are specified separately for MSM and heterosexuals (independant)
     # The spline-point values within each group are linked through shared latent baseline/delta structure.
     # The two groups are correlated at the same spline points through the correlation parameter.
@@ -165,8 +165,8 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
                               "1990" = 0.5*log(sqrt(1.5)), #5-year delta
                               "1995" = 0.5*log(sqrt(1.5))), #5-year delta
         logsd.deltas.future = c("2010" = 0.5*log(1.5), #10-year delta
-                                "2017" = 0.5*log(1.5)),#10-year delta
-        spline.times = c("1970", "1990", "1995", "2000", "2010", "2017"),
+                                "2022" = 0.5*log(1.5)),#10-year delta
+        spline.times = c("1970", "1990", "1995", "2000", "2010", "2022"),
         correlation = 0.5
     ),
     
@@ -516,7 +516,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
     
     ## Transmission ----
     #multipliers for msm rates in each knot:
-    for(time in c("1970","1990","1995","2000","2010","2017")){   
+    for(time in c("1970","1990","1995","2000","2010","2022")){   
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "transmission.rate.msm",
                                                        alpha.name = time,
@@ -877,7 +877,7 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
     msm.transmission.block2=c(
         "transmission.rate.multiplier.msm2000",
         "transmission.rate.multiplier.msm2010",
-        "transmission.rate.multiplier.msm2017"#, # rename this and others to 2017
+        "transmission.rate.multiplier.msm2022"  
         #"transmission.rate.multiplier.msm2030"
     ),
     #
@@ -888,7 +888,7 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
     het.transmission.block2=c(
         "transmission.rate.multiplier.heterosexual2000",
         "transmission.rate.multiplier.heterosexual2010",
-        "transmission.rate.multiplier.heterosexual2017"#,
+        "transmission.rate.multiplier.heterosexual2022"
         #"transmission.rate.multiplier.heterosexual2030"
     ),
     #
