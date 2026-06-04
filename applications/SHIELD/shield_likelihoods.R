@@ -352,6 +352,13 @@ future.change.penalty.likelihood.instructions =
                 sex_vals[as.character(end_year),] / sex_vals[as.character(start_year),]
             )
             
+            # If we considered correlation... but I don't think there's an easily available lognormal form of mvtnorm::dmvnorm
+            # correlation_different_strata <- 0.5
+            # 
+            # sigma <- matrix(correlation_different_strata * sdlog^2,
+            #                 nrow=length(ratio), ncol=length(ratio))
+            # diag(sigma) <- sdlog^2
+            
             # I guess we're assuming zero correlation between ratios of different strata.
             # So the total likelihood just becomes the sum of each individual log likelihood
             lik <- sum(dlnorm(pmax(ratio, penalty_cutoff),
