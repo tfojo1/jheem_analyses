@@ -341,13 +341,23 @@ future.change.penalty.likelihood.instructions =
             
             vals <- sim$optimized.get(get.instr)
             
+            sex_vals <- apply(vals, c("year", "sex"), sum)
+            race_vals <- apply(vals, c("year", "race"), sum)
+            total_vals <- apply(vals, c("year"), sum)
+            
             # 10-year ratio
-            ratio <- vals[as.character(end_year)] / vals[as.character(start_year)]
-            # browser()
-            lik <- dlnorm(max(ratio, penalty_cutoff),
-                          meanlog = meanlog,
-                          sdlog = sdlog/sqrt(weights),
-                          log=T)
+            ratio <- c(
+                total_vals[as.character(end_year)] / total_vals[as.character(start_year)],
+                race_vals[as.character(end_year),] / race_vals[as.character(start_year),],
+                sex_vals[as.character(end_year),] / sex_vals[as.character(start_year),]
+            )
+            
+            # I guess we're assuming zero correlation between ratios of different strata.
+            # So the total likelihood just becomes the sum of each individual log likelihood
+            lik <- sum(dlnorm(pmax(ratio, penalty_cutoff),
+                              meanlog = meanlog,
+                              sdlog = sdlog/sqrt(weights),
+                              log=T))
             
             if (log) lik else exp(lik)
         },
