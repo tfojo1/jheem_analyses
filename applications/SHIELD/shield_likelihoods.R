@@ -746,16 +746,16 @@ lik.inst.stage1=join.likelihood.instructions(
 ## STAGE 2 & 3 ----
 # STAGE 3 now has demographics split into a separate group
 # so that you can set different weights for them if you want.
-lik.inst.stg23.population=join.likelihood.instructions(
+lik.inst.stg23.demog=join.likelihood.instructions(
     population.likelihood.instructions,
-    additional.weights = STAGE.23.POPULATION.WEIGHT
-)
-
-lik.inst.stg23.except.population=join.likelihood.instructions(
     deaths.likelihood.instructions,
     fertility.likelihood.instructions,
     immigration.likelihood.instructions,
     emigration.likelihood.instructions,
+    additional.weights = STAGE.23.POPULATION.WEIGHT
+)
+
+lik.inst.stg23.non.demog=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
     total.diagnosis.by.strata.likelihood.instructions,
     #
@@ -779,8 +779,8 @@ lik.inst.stg23.except.population=join.likelihood.instructions(
 
 # We use this one
 lik.inst.stage23 = join.likelihood.instructions(
-    lik.inst.stg23.population,
-    lik.inst.stg23.except.population,
+    lik.inst.stg23.demog,
+    lik.inst.stg23.non.demog,
     additional.weights = STAGE.23.WEIGHT
 )
 
