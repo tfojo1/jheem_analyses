@@ -328,7 +328,7 @@ ps.diagnosis.by.strata.likelihood.instructions =
 # We used the mean and standard deviation of log(x) to characterize this distribution. The observed values ranged from 0.3 to 9.4, 
 # so we assumed an upper threshold corresponding to a 10-fold increase. Simulations producing values outside this range were penalized accordingly.
 # To avoid redundant calculations, this ratio computed only once by comparing simulations in 2030 to 2020 and penalizing sims that fall outside of the 10X increase
-future.change.likelihood.instructions =
+future.change.penalty.likelihood.instructions =
     create.custom.likelihood.instructions(
         name = "future.change.likelihood",
         compute.function = function(sim, data, weights, log = T) {
@@ -359,8 +359,10 @@ future.change.likelihood.instructions =
             
             get.instr <- sim.meta$prepare.optimized.get.instructions(
                 outcome                   = "diagnosis.ps",
-                dimension.values          = list(year = c(start_year, end_year)),
-                keep.dimensions           = "year",
+                dimension.values          = list(year = c(start_year, end_year),
+                                                 race=c('black','hispanic','other'),
+                                                 sex= c('heterosexual_male', 'msm', 'female')),
+                keep.dimensions           = c("year","sex","race"),
                 drop.single.sim.dimension = TRUE
             )
             
@@ -738,7 +740,7 @@ lik.inst.stage1=join.likelihood.instructions(
     #
     historical.diagnosis.likelihood.instructions,
     proportion_ps_male_among_msm_likelihood_instructions,
-    future.change.likelihood.instructions,    # Future change penalty
+    future.change.penalty.likelihood.instructions,    # Future change penalty
     #
     additional.weights = STAGE.1.WEIGHT
 )
@@ -774,7 +776,7 @@ lik.inst.stg23.non.demog=join.likelihood.instructions(
     #
     historical.diagnosis.likelihood.instructions,
     proportion_ps_male_among_msm_likelihood_instructions,
-    future.change.likelihood.instructions    # Future change penalty
+    future.change.penalty.likelihood.instructions    # Future change penalty
 )
 
 # We use this one
