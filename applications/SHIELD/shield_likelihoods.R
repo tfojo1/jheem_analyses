@@ -5,9 +5,10 @@
 # in the surveillance manager, we only need to have MSA level and national level data
 # we should bound agegroups at 85+
 source("applications/SHIELD/inputs/input_historical_likelihood_penalty_helper.R")
+# source("applications/SHIELD/inputs/input_future_change_ten_year_ratio_likelihood_penalty.R")
 
 #estiamting cv for ps diagnosis from 2 available sources:
-source("applications/SHIELD/inputs/input_estimate_error_variances.R") #calculates PS_CV
+source("applications/SHIELD/R/shield_calculating_error_terms_for_likelihoods.R") #calculates PS_CV
 
 diagnosis_cv=PS_CV #we will use this error variance for all diagnosis categories
 

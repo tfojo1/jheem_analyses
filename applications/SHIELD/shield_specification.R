@@ -15,7 +15,7 @@ source('applications/SHIELD/R/shield_locations_of_interest.R')
 # Caching required objects: 
 # HIV testing priors from BRFSS
 # source("applications/SHIELD/inputs/input_cache_hiv_testing_prior_brfss.R")
-# PRENATAL care coverage estiamtes from Wonder 
+# PRENATAL care coverage estimates from Wonder 
 # source("applications/SHIELD/inputs/input_cache_prenatal_prior_from_wonder.R")
 
 shield.solver= create.solver.metadata(rtol = 0.001, atol=0.03) #rtol,atol

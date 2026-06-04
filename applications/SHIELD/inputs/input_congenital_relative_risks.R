@@ -1,11 +1,9 @@
-#'@Andrew: please explain what is being done and where the data is coming from
-# Source: See Syphilis Natural History document
 
 #see this example:
 ### Estimating xxx
 ### Data: xxx
 ### Returning xxxx
-
+### called by SHIELD/shield_base_parameters.R
 
 calculate_cs_relative_risks <- function() {
     risk_congenital_syphilis_prenatal_care_first_trimester <- 0.104

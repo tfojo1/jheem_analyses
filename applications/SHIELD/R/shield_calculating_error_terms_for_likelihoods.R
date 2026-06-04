@@ -1,79 +1,7 @@
-library(ggplot2)
-if (1==2)
-{
-    # POPULATION: 0.1561269 (ethnicity); 0.1939618 (age-ethnicity)
-    calculate.error.terms.pop(stratification = "ethnicity",
-                              output = 'cv')
-    
-    calculate.error.terms.pop(stratification = "age-ethnicity",
-                              output = 'cv')
-    # other estimates: 0.3023304 (all); 0.1031615 (race); 0.2771433 (age-race)
-    
-    
-    # SUPPRESSION: 0.04560282 
-    calculate.error.terms(data.type = "suppression",
-                          data.source.1 = "cdc.aggregated.proportion",
-                          data.source.2 = "lhd",
-                          output = 'sd')
-    
-    # DIAGNOSES:  0.05368198 (should be 0.04514847)
-    calculate.lhd.error.terms("diagnoses")
-    calculate.lhd.error.terms("diagnoses", output='exponent.of.variance')
-    calculate.lhd.error.terms("diagnoses", output='cv.and.exponent.of.variance')
-    # OLD VALUE: 0.04621778
-    calculate.error.terms(data.type = "diagnoses",
-                          data.source.1 = "cdc.surveillance.reports",
-                          data.source.2 = "cdc.aggregated.county",
-                          output = 'cv')
-    
-    
-    # PREVALENCE: 0.08384422
-    calculate.lhd.error.terms("diagnosed.prevalence")
-    calculate.lhd.error.terms("diagnosed.prevalence", output='cv.and.exponent.of.variance.eq.1')
-    calculate.lhd.error.terms("diagnosed.prevalence", output='cv.and.exponent.of.variance')
-    calculate.lhd.error.terms("diagnosed.prevalence", output='exponent.of.variance')
-    calculate.lhd.error.terms("diagnosed.prevalence", output='cv.sqrt')
-    calculate.lhd.error.terms("diagnosed.prevalence", output='cv.and.cv.sqrt')
-    calculate.lhd.error.terms("diagnosed.prevalence", output='cv.and.fixed.exponent.of.variance',PREVALENCE.EXP.OF.VAR)
-    # OLD VALUE: 0.04711922 --> NO LONGER GETTING THIS, NOW GETTING 0.03623443??
-    calculate.error.terms(data.type = "diagnosed.prevalence",
-                          data.source.1 = "cdc.surveillance.reports",
-                          data.source.2 = "cdc.aggregated.county",
-                          output = 'cv')
-    calculate.error.terms(data.type = "diagnosed.prevalence",
-                          data.source.1 = "cdc.surveillance.reports",
-                          data.source.2 = "cdc.aggregated.county",
-                          output = 'cv.sqrt')
-    calculate.error.terms(data.type = "diagnosed.prevalence",
-                          data.source.1 = "cdc.surveillance.reports",
-                          data.source.2 = "cdc.aggregated.county",
-                          output = 'c.of.v.and.sqrt')
-    calculate.error.terms(data.type = "diagnosed.prevalence",
-                          data.source.1 = "cdc.surveillance.reports",
-                          data.source.2 = "cdc.aggregated.county",
-                          output = 'cv.and.exponent.of.variance')
-    calculate.error.terms(data.type = "diagnosed.prevalence",
-                          data.source.1 = "cdc.surveillance.reports",
-                          data.source.2 = "cdc.aggregated.county",
-                          output = 'cv.and.exponent.of.variance.eq.1')
-    calculate.error.terms(data.type = "diagnosed.prevalence",
-                          data.source.1 = "cdc.surveillance.reports",
-                          data.source.2 = "cdc.aggregated.county",
-                          output = 'cv.and.cv.sqrt')
-    
-    # AIDS DIAGNOSES: 0.2277531 - from 1993-1997 only; one source only has totals so no stratifications anyway 
-    calculate.error.terms(data.type = "aids.diagnoses",
-                          data.source.1 = "cdc.surveillance.reports",
-                          data.source.2 = "cdc.aids",
-                          years = c(1993:1997),
-                          output = 'cv')
-    # PREP UPTAKE: 0.01239159
-    calculate.error.terms(data.type = "prep",
-                          data.source.1 = "aidsvu",
-                          data.source.2 = "cdc.prep",
-                          output = 'cv')
-}
-
+# functions copied entirely from JHEEM
+# ***************************************************************************************************
+# HELPER FUNCTIONS ----
+# ***************************************************************************************************
 calculate.lhd.error.terms = function(data.type, 
                                      output=c('cv',
                                               'exponent.of.variance',
@@ -493,4 +421,41 @@ calculate.error.terms.pop = function(stratification,
     rv
     
 }
+
+# ***************************************************************************************************
+# Estimates for SHIELD ----
+# ***************************************************************************************************
+#Estimate used for all syphilis stages (too few data points in other stages)
+PS_CV <- calculate.error.terms(
+    data.type    = "ps.syphilis.diagnoses",
+    data.source.1 = "cdc.aggregated.county",
+    data.source.2 = "lhd",
+    output       = "cv",
+    verbose = F
+) # gives 0.0764791209420945, log L = -2005.39939971725
+print(paste("The CV for ps.syphilis.diagnoses is = ",PS_CV))
+
+# I dont think that we have enough data point for these
+# cv_EL_2 <- calculate.error.terms(
+#     data.type    = "early.syphilis.diagnoses",
+#     data.source.1 = "cdc.aggregated.county",
+#     data.source.2 = "lhd",
+#     output       = "cv"
+# )  
+# print(paste("The CV for early.syphilis.diagnoses is = ",cv_EL_2))
+# 
+# cv_LL_2 <- calculate.error.terms(
+#     data.type    = "unknown.duration.or.late.syphilis.diagnoses",
+#     data.source.1 = "cdc.aggregated.county",
+#     data.source.2 = "lhd",
+#     output       = "cv"
+# )  
+# print(paste("The CV for unknown.duration.or.late.syphilis.diagnoses is = ",cv_LL_2))
+
+# cv_Total <- calculate.error.terms(
+#     data.type    = "total.syphilis.diagnoses",
+#     data.source.1 = "cdc.sti.surveillance",
+#     data.source.2 = "lhd",
+#     output       = "cv"
+# ) # no overlap, think of other 
 

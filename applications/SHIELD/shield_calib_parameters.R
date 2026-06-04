@@ -1,6 +1,9 @@
-source("applications/SHIELD/shield_base_parameters.R")
-source("applications/SHIELD/inputs/input_estimate_sexual_activity_by_age.R")
-source("applications/SHIELD/R/multivariate_spline_prior.R")
+source("../jheem_analyses/applications/SHIELD/shield_base_parameters.R")
+source("../jheem_analyses/applications/SHIELD/inputs/input_estimate_sexual_activity_by_age.R")
+source("../jheem_analyses/applications/SHIELD/R/multivariate_spline_prior.R")
+
+# source("../jheem_analyses/applications/SHIELD/inputs/input_syphilis_misclassification_error.R")
+# source("../jheem_analyses/applications/SHIELD/inputs/input_prop_symp_primary.R")
 
 #Notes:
 # We use this distribution to model uncertainty in changes to event odds.
@@ -210,6 +213,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
 ## STI.TESTING.PARAMETERS.PRIOR ----
 STI.TESTING.PARAMETERS.PRIOR=join.distributions( 
     ## Fraction Symptomatic ----
+    #  inputs/input_prop_symp_primary.R
     ## Data source: Study of MSM followed at PrEP clinics: Proportion of incident syphilis presenting with symptomatic primary 25% or secondary at 16% disease
     # >> we use this to inform the prior for MSM and het_male
     # >> for female, we compute the ratio_group = (primary diagnoses) / (primary + secondary diagnoses) as a proxy for proportion of 
@@ -260,6 +264,7 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
     or.slope.syphilis.to.hiv.testing = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10), # changed from 2 to make change slower
     
     ## Misclassification Error ----
+    # see inputs/input_syphilis_misclassification_error.R
     fraction.el.misclassified.ll =Logitnormal.Distribution(meanlogit = logit(0.096), sdlog =  log(2)) , #CI=[0.025 0.27]
     fraction.ll.misclassified.el =Logitnormal.Distribution(meanlogit = logit(0.27), sdlog =  log(2)) #CI=[0.064 0.51]
 )

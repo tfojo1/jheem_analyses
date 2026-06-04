@@ -12,9 +12,10 @@ source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions
 
 # ---- SETUP ----
 calibration.codes <- c(
-    "calib.5.11.stage2.az"   # master branch
+    # "calib.5.11.stage2.az"   # master branch
     # "calib.5.19.stage2.pk"    # sa with higher msm-female partnership (oe.female)
     # "calib.5.12.stage2.pk"
+    "calib.5.29.stage2.az"
 )
  
 # read simulations into the simset
@@ -22,6 +23,23 @@ calib.simsets <- load.calib.simsets(
     locations         = SHIELD.TEN.MSAS, #seattle
     calibration.codes = calibration.codes
 )
+
+plot.calib.stages(calib.simsets = calib.simsets,stage = 2,locations = SHIELD.TEN.MSAS,calibration.code =calibration.codes )
+
+calib.simsets$`LA – calib.5.29.stage2.az`$full_simset$traceplot(c("transmission.*19","transmission.*20"))
+calib.simsets$`LA – calib.5.29.stage2.az`$last_sim$get.params(c("transmission.*20"))
+calib.simsets$`LA – calib.5.29.stage2.az`$last_sim$get.params(c("future"))
+
+calib.simsets$`B – calib.5.29.stage2.az`$full_simset$traceplot(c("transmission.*19","transmission.*20"))
+calib.simsets$`Baltimore – calib.5.29.stage2.az`$last_sim$get.params(c("transmission.*20"))
+calib.simsets$`LA – calib.5.29.stage2.az`$last_sim$get.params(c("future"))
+
+
+calib.simsets$`NYC – calib.5.29.stage2.az`$full_simset$traceplot(c("transmission.*19","transmission.*20"))
+calib.simsets$`NYC – calib.5.29.stage2.az`$full_simset$traceplot("future")
+calib.simsets$`NYC – calib.5.29.stage2.az`$last_sim$get.params("transmission.*20")
+calib.simsets$`NYC – calib.5.29.stage2.az`$last_sim$get.params("screening")
+calib.simsets$`NYC – calib.5.29.stage2.az`$last_sim$get.params("future")
 
 
 # Outcome sets used across examples below

@@ -1,6 +1,6 @@
 cat("*** Running Shield_source_code.R ***\n")
 # detach("package:jheem2", character.only = TRUE, unload = TRUE)
-
+library(ggplot2)
 # rm(list = ls())
 source("../jheem_analyses/use_jheem2_package_setting.R") #this file creates a variable USE.JHEEM2.PACKAGE
 # USE.JHEEM2.PACKAGE=F

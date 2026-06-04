@@ -1,5 +1,10 @@
 
-source("../jheem_analyses/applications/SHIELD/inputs/input_congenital_relative_risks.R")
+
+
+# uses estiamtes from:
+# source("../jheem_analyses/applications/SHIELD/inputs/x-input_untreated_syphilis_progression_rates.R)
+# source("../jheem_analyses/applications/SHIELD/inputs/input_congenital_relative_risks.R")
+# source(../jheem_analyses/applications/SHIELD/inputs/input_fraction_hiv_test_by_age.R)
 
 # what are the citation numbers?
 add.parameter <- function(params, param.name,
@@ -95,18 +100,18 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.tran
 
 
 ## ---- Risk Ratios Based on Prenatal Cares timing  ----
+# inputs/input_congenital_relative_risks.R
+# cs_relative_risks 
+# first    second     third      none 
+# 0.3061055 0.5160727 0.8182090 1.000000
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.no.prenatal.care',
-                                      cs_relative_risks["none"],0.28,0.449, 
-                                      citation = "syphilis_natural_history.docx") 
+                                      1.0, 0,0)
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.care.first.trimester',
-                                      cs_relative_risks["first"], 0.077, 0.14,
-                                      citation = "syphilis_natural_history.docx") 
+                                      0.3061055, 0,0)
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.care.second.trimester',
-                                      cs_relative_risks["second"], 0.118, 0.254,
-                                      citation = "syphilis_natural_history.docx") 
+                                      0.5160727, 0,0)
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.care.third.trimester',
-                                      cs_relative_risks["third"], 0.313, 0.507,
-                                      citation = "syphilis_natural_history.docx") 
+                                      0.8182090, 0,0)
 
 # *** NEW BIRTHS ---- ##----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'ratio.birth.male.to.female',
@@ -141,27 +146,24 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.cns',
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.early.latent.to.secondary',
                                       0.25,0,0)
 
-# Late Latent to Tertiary:
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.tertiary.male',
-                                      0.01049095 ,0,0, #0.00946867 ,0.01151324,  
-                                      citation = "untreated_syphilis_progression_rates.R")
-
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.tertiary.female',
-                                      0.010286933, 0,0, #0.008440789, 0.012133077,
-                                      citation = "untreated_syphilis_progression_rates.R")
-
 # Early stages to CNS: #used for primary, secondary and EL
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.early.stage.to.cns',
                                       0.085 ,0,0,# 0.05, 0.12,
                                       citation = "syphilis_natural_history.docx")
 
+# Late Latent to Tertiary:
+# see  inputs/untreated_syphilis_progression_rates.R
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.tertiary.male',
+                                      0.010771530, 0.009749247, 0.011793814)
+
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.tertiary.female',
+                                      0.010346077, 0.008499934, 0.012192221)
+
 # Late Latent to CNS (by sex):
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.cns.male',
-                                      0.004465265,0,0,
-                                      citation = "untreated_syphilis_progression_rates.R")
+                                      0.004538942,0,0)
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.cns.female',
-                                      0.002227628,0,0,
-                                      citation = "untreated_syphilis_progression_rates.R")
+                                      0.002246082,0,0)
 
 ## ---- SYMPTOMATIC INFECTIONS ----                        
 ## Fraction with symptomatic disesase: changed as calib params
@@ -175,6 +177,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.se
                                       0.16, 0,0)                                      
 
 # *** HIV TESTING ---- ##-----
+# inputs/input_fraction_hiv_test_by_age.R
 # what fraction of tests reported in 15-19 agegroup are carried among 18-19 year olds
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.hiv.tests.18.19.among.15.19',
                                       0.62, 0,0,

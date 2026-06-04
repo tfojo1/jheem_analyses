@@ -1,3 +1,10 @@
+
+#see this example:
+### Estimating xxx
+### Data: xxx
+### Returning xxxx
+### called by shield_calib_parameters.R
+
 # Proportion symptomatic in primary 
 # to inform the prior for this parameter among woman compared to MSM, 
 # we use the ratio of diagnosis in the primary stage relative to primary plus secondary stage as a proxy

@@ -1,7 +1,7 @@
-### Estiamting sexual activity levels by age
+### Estimating sexual activity levels by age
 ### Data: GSS survey (https://gss.norc.org/)
 ### Returning het_sexualActivity_means and msm_sexualActivity_means
-
+### called by  shield_calib_parameters.R
 if (1==2){
     
     library(ggplot2)

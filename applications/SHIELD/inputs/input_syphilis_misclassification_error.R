@@ -1,3 +1,10 @@
+
+#see this example:
+### Estimating xxx
+### Data: xxx
+### Returning xxxx
+### called by  shield_calib_parameters.R
+
 ### Estimating the % of EL cases that are misclassified as LL/Unknown and LL/U cases misclassified as EL
 ### Data from a manuscript (see below)
 

@@ -1,6 +1,7 @@
 ### Estimating the proportion of population who report receiving HIV testing in the past year 
 ### Data: BRFSS
 ### Returning the final function informing the hiv.testing.prior in the model 
+### called by shield_specification.R (called only once on each machine, the cached object will be saved for future)
 
 library(dplyr) 
 library(reshape2)

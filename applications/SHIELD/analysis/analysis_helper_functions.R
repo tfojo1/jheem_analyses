@@ -500,12 +500,14 @@ extract.calib.simsets <- function(calib.simsets,
     last_sim <- entry$last_sim
     suffix   <- entry$title.suffix
     
-    make_one <- function(outcome, fb = NULL, sb = NULL) {
+    make_one <- function(outcome, fb = NULL, sb = NULL,plot.which="sim.and.data") {
         p <- simplot(last20, last_sim, outcomes = outcome, facet.by = fb, split.by = sb,
                      style.manager = style.manager, title.suffix = suffix,
-                     dimension.values = list(year = 2000:2030))
+                     dimension.values = list(year = 2000:2030),plot.which=plot.which)
+        
         strat <- paste(c(sb, fb), collapse = "_")
         strat <- if (nchar(strat) > 0) paste0("_", strat) else ""
+        if(plot.which == "sim.only") strat<-paste0(strat,"_sim.only")
         ggsave(file.path(plotting.path, paste0(.sanitize(outcome), strat, ".png")),
                plot = p, width = 12, height = 7, dpi = 300)
     }
@@ -536,14 +538,14 @@ extract.calib.simsets <- function(calib.simsets,
         stage.outcomes <- c("diagnosis.total", "diagnosis.ps", "diagnosis.el.misclassified",
                             "diagnosis.late.misclassified", "hiv.testing")
         for (out in stage.outcomes) {
-            
+
             # Unstratified
             make_one(out)
-            
+
             # Faceted by one variable
             for (var in if (stage == 1) c("sex", "race") else c("sex", "race", "age"))
                 make_one(out, fb = var)
-            
+
             # Faceted by one variable and split by one variable
             if (out != "hiv.testing") {
                 for (pair in if (stage == 1) list(c("race", "sex")) else list(c("age", "sex"),
@@ -551,6 +553,14 @@ extract.calib.simsets <- function(calib.simsets,
                                                                               c("sex", "race")))
                     make_one(out, fb=pair[1], sb=pair[2])
             }
+        }
+    }
+    
+    if (stage %in% c(1, 2)) {
+        stage.outcomes <- c("diagnosis.total", "diagnosis.ps")
+        for (out in stage.outcomes) {
+                make_one(out, fb = 'sex',plot.which="sim.only")
+            
         }
     }
 }
