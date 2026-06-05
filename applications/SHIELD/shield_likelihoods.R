@@ -484,14 +484,10 @@ diagnosis_trajectory_penalty_likelihood_instructions <-
             # Or can we?
             ror[is.na(ror)] <- Inf
             
-            upper_penalty_cutoff <- exp(meanlog + 2 * sdlog)
-            
-            # If an ror falls below the cutoff, it is treated as though it is
-            # equal to the cutoff, even if it is far into the lower tail of the
-            # distribution. This is because we only care about cases where the
-            # ror is greater than 1 (het growing faster than msm)
-            lik <- sum(dlnorm(pmax(ror, upper_penalty_cutoff),
-                              meanlog, sdlog/sqrt(weights), log=T))
+            cutoff <- meanlog + 2*sdlog # replace
+            lik <- sum(dnorm(pmin(dnorm(log(ror), meanlog, sdlog, log=T),
+                                  dnorm(log(cutoff), meanlog, sdlog, log=T))) -
+                           log(ror))
             
             if (log) lik else exp(lik)
         },
@@ -828,7 +824,6 @@ lik.inst.stage1=join.likelihood.instructions(
     #
     historical.diagnosis.likelihood.instructions,
     proportion_ps_male_among_msm_likelihood_instructions,
-    diagnosis_trajectory_penalty_likelihood_instructions,
     future.change.penalty.likelihood.instructions,    # Future change penalty
     #
     additional.weights = STAGE.1.WEIGHT
@@ -865,7 +860,6 @@ lik.inst.stg23.non.demog=join.likelihood.instructions(
     #
     historical.diagnosis.likelihood.instructions,
     proportion_ps_male_among_msm_likelihood_instructions,
-    diagnosis_trajectory_penalty_likelihood_instructions,
     future.change.penalty.likelihood.instructions    # Future change penalty
 )
 
