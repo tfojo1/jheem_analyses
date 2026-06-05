@@ -1,6 +1,6 @@
 source("../jheem_analyses/applications/SHIELD/shield_base_parameters.R")
 source("../jheem_analyses/applications/SHIELD/inputs/input_estimate_sexual_activity_by_age.R")
-source("../jheem_analyses/applications/SHIELD/R/shield_multivariate_spline_prior")
+source("../jheem_analyses/applications/SHIELD/R/shield_multivariate_spline_prior.R")
 
 # source("../jheem_analyses/applications/SHIELD/inputs/input_syphilis_misclassification_error.R")
 # source("../jheem_analyses/applications/SHIELD/inputs/input_prop_symp_primary.R")
