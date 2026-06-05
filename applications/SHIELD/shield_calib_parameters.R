@@ -167,7 +167,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
         logsd.deltas.future = c("2010" = 0.5*log(1.5), #10-year delta
                                 "2022" = 0.5*log(1.5)),#10-year delta
         spline.times = c("1970", "1990", "1995", "2000", "2010", "2022"),
-        correlation = 0.5
+        correlation = 0.7
     ),
     
     ## race multipliers (msm and het seperatly) ----
