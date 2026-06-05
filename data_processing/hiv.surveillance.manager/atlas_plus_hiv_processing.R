@@ -421,8 +421,6 @@ data.list.clean.sle = lapply(data.list.sle, function(file){
   if(grepl("allcounty", filename)) {
     data$location = as.character(data$FIPS)
     data$location = str_pad(data$location, width = 5, side = "left", pad = "0")
-    data <- data%>%
-        filter(State != "Marshall Islands") # Fixing a data issue from Atlas Plus
   }  
   
   if(grepl("_age", filename)) {
@@ -467,6 +465,12 @@ data.list.clean.sle = lapply(data.list.sle, function(file){
       #     dplyr::group_by(dplyr::across(all_of(group_cols))) %>%
       #     dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop")
   }
+  
+  
+  if(grepl("link_allcounty", filename)) {
+      data <- data%>%
+          filter(State != "Marshall Islands") # Fixing a data issue from Atlas Plus
+  } 
   
   list(filename, data) 
   
