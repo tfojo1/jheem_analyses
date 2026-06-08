@@ -121,6 +121,123 @@ cv.female.all.years = log((params.female.all.years$sd/params.female.all.years$me
 
 
 
+#### MMP data #### 
+MMP.CAP = 400 # 5000
+
+## Total, MMP ## - Table 1
+total.mmp.2021.counts = c('0-99%' = 1373,
+                          '100-138%' = 383,
+                          '139-399%' = 1279,
+                          '>399%' = 0) # 543
+total.mmp.2022.counts = c('0-99%' = 1106,
+                          '100-138%' = 449,
+                          '139-399%' = 1200,
+                          '>399%' = 0) #
+total.mmp.2021 = total.mmp.2021.counts/sum(total.mmp.2021.counts)
+total.mmp.2022 = total.mmp.2022.counts/sum(total.mmp.2022.counts)
+
+params.total.mmp = fit.tobit.normal.distribution.with.ssi.to.quantiles(p = c(total.mmp.2021,total.mmp.2022),upper.limit = MMP.CAP)
+
+## Cis male ## - Table 3a
+cis.male.mmp.2021.counts = c('0-99%' = 857,
+                             '100-138%' = 273,
+                             '139-399%' = 1031,
+                             '>399%' = 0) # 491
+cis.male.mmp.2022.counts = c('0-99%' = 680,
+                             '100-138%' = 329,
+                             '139-399%' = 966,
+                             '>399%' = 0) # 533
+cis.male.mmp.2021 = cis.male.mmp.2021.counts/sum(cis.male.mmp.2021.counts)
+cis.male.mmp.2022 = cis.male.mmp.2022.counts/sum(cis.male.mmp.2022.counts)
+params.cis.male.all.years = fit.tobit.normal.distribution.with.ssi.to.quantiles(p = c(cis.male.mmp.2021,cis.male.mmp.2022),upper.limit = MMP.CAP)
+beta.cis.male.all.years = log(params.cis.male.all.years$mean/params.total.mmp$mean)
+cv.cis.male.all.years = log((params.cis.male.all.years$sd/params.cis.male.all.years$mean) / (params.total.mmp$sd/params.total.mmp$mean))
+
+
+## MSM ## - Table 6 
+msm.mmp.2021.counts = c('0-99%' = 465,
+                        '100-138%' = 173,
+                        '139-399%' = 785,
+                        '>399%' = 0) # 443
+msm.mmp.2022.counts = c('0-99%' = 354,
+                        '100-138%' = 212,
+                        '139-399%' = 743,
+                        '>399%' = 0) # 479
+
+msm.mmp.2021 = msm.mmp.2021.counts/sum(msm.mmp.2021.counts)
+msm.mmp.2022 = msm.mmp.2022.counts/sum(msm.mmp.2022.counts)
+params.msm.all.years = fit.tobit.normal.distribution.with.ssi.to.quantiles(p = c(msm.mmp.2021,msm.mmp.2022),upper.limit = MMP.CAP)
+
+# DIVIDED BY ALL MALE
+beta.msm.all.years = log(params.msm.all.years$mean/params.cis.male.all.years$mean)
+cv.msm.all.years = log((params.msm.all.years$sd/params.msm.all.years$mean) / (params.cis.male.all.years$sd/params.cis.male.all.years$mean))
+
+
+## Het male ## 
+# Get this from subtracting MSM numbers from cisgender male numbers 
+het.male.mmp.2021.counts = cis.male.mmp.2021.counts - msm.mmp.2021.counts
+het.male.mmp.2022.counts = cis.male.mmp.2022.counts - msm.mmp.2022.counts
+het.male.mmp.2021 = het.male.mmp.2021.counts/sum(het.male.mmp.2021.counts)
+het.male.mmp.2022 = het.male.mmp.2022.counts/sum(het.male.mmp.2022.counts)
+params.het.male.all.years = fit.tobit.normal.distribution.with.ssi.to.quantiles(p = c(het.male.mmp.2021,het.male.mmp.2022),upper.limit = MMP.CAP)
+
+# DIVIDED BY ALL MALE
+beta.het.male.all.years = log(params.het.male.all.years$mean/params.cis.male.all.years$mean)
+cv.het.male.all.years = log((params.het.male.all.years$sd/params.het.male.all.years$mean) / (params.cis.male.all.years$sd/params.cis.male.all.years$mean))
+
+## Cis female ##
+# cis.female.mmp.2021.counts = c('0-99%' = 471,
+#                                '100-138%' = 101,
+#                                '139-399%' = 228,
+#                                '>399%' = 0) # 46
+# cis.female.mmp.2022.counts = c('0-99%' = 389,
+#                                '100-138%' = 109,
+#                                '139-399%' = 210,
+#                                '>399%' = 0) # 36
+# cis.female.mmp.2021 = cis.female.mmp.2021.counts/sum(cis.female.mmp.2021.counts)
+# cis.female.mmp.2022 = cis.female.mmp.2022.counts/sum(cis.female.mmp.2022.counts)
+# params.cis.female.all.years = fit.tobit.normal.distribution.with.ssi.to.quantiles(p = c(cis.female.mmp.2021,cis.female.mmp.2022),upper.limit = MMP.CAP)
+# beta.cis.female.all.years = log(params.cis.female.all.years$mean/params.total.mmp$mean)
+# cv.cis.female.all.years = log((params.cis.female.all.years$sd/params.cis.female.all.years$mean) / (params.total.mmp$sd/params.total.mmp$mean))
+
+
+## IDU ## 
+pwid.mmp.2021.counts = c('0-99%' = 46,
+                 '100-138%' = 10,
+                 '139-399%' = 30,
+                 '>399%' = 0) # NA 
+pwid.mmp.2022.counts = c('0-99%' = 52,
+                 '100-138%' = 0, # DON'T USE THIS YEAR BC OF THIS MISSING DATA
+                 '139-399%' = 31, 
+                 '>399%' = 0) # NA 
+pwid.mmp.2021 = pwid.mmp.2021.counts/sum(pwid.mmp.2021.counts)
+pwid.mmp.2022 = pwid.mmp.2022.counts/sum(pwid.mmp.2022.counts)
+
+params.pwid.all.years = fit.tobit.normal.distribution.with.ssi.to.quantiles(p = c(pwid.mmp.2021),upper.limit = MMP.CAP) # took out 2022 dist
+beta.pwid.all.years = log(params.pwid.all.years$mean/params.total.mmp$mean)
+cv.pwid.all.years = log((params.pwid.all.years$sd/params.pwid.all.years$mean) / (params.total.mmp$sd/params.total.mmp$mean))
+
+
+## Heterosexual ## - Table 4a
+# don't need this
+# het.mmp.2021.counts = c('0-99%' = 792,
+#                  '100-138%' = 179,
+#                  '139-399%' = 462,
+#                  '>399%' = 0) # 93
+# 
+# het.mmp.2022.counts = c('0-99%' = 672,
+#                  '100-138%' = 210,
+#                  '139-399%' = 415,
+#                  '>399%' = 0) # 92
+# het.mmp.2021 = het.mmp.2021.counts/sum(het.mmp.2021.counts)
+# het.mmp.2022 = het.mmp.2022.counts/sum(het.mmp.2022.counts)
+# 
+# params.het.all.years = fit.tobit.normal.distribution.with.ssi.to.quantiles(p = c(het.mmp.2021,het.mmp.2022),upper.limit = MMP.CAP)
+# beta.het.all.years = log(params.het.all.years$mean/params.total.mmp$mean)
+# cv.het.all.years = log((params.het.all.years$sd/params.het.all.years$mean) / (params.total.mmp$sd/params.total.mmp$mean))
+# 
+
+
 #### FOR INDIVIDUAL YEARS ####
 if(1==2){
     params.total.by.year = list()
