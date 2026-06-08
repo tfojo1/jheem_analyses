@@ -3,18 +3,21 @@ source("applications/adap_cuts/fitting_income_distributions.R")
 source("applications/ryan_white/process_rw_data_for_priors.R")
 ROOT.DIR = "../jheem_analyses/applications/ryan_white/ryan_white_data/adap_clients"
 
-income.race = read.adap.income.data(ROOT.DIR,dimension = "race")
+income.race = read.adap.income.data(ROOT.DIR,dimension = "race") # pulls income distribution by RACE from RW ADAP reports (Table 2)
 
-income.age = read.adap.income.data(ROOT.DIR,dimension = "age")
+income.age = read.adap.income.data(ROOT.DIR,dimension = "age") # pulls income distribution by AGE from RW ADAP reports (Table 4)
 
-income.sex.1 = read.adap.income.data(ROOT.DIR,dimension = "sex",years=2020:2022)
+income.sex.1 = read.adap.income.data(ROOT.DIR,dimension = "sex",years=2020:2022) # pulls income distribution by SEX from RW ADAP reports (Table 3) - M/F/trans M/trans F/other
 
-income.sex.2 = read.adap.income.data(ROOT.DIR,dimension = "sex",years=2023)
+income.sex.2 = read.adap.income.data(ROOT.DIR,dimension = "sex",years=2023) # pulls income distribution by SEX from RW ADAP reports (Table 3) - M/F only 
 
-income.service = read.adap.income.data(ROOT.DIR,dimension = "service")
+income.service = read.adap.income.data(ROOT.DIR,dimension = "service") # pulls income distribution by SERVICE from RW ADAP reports (2020-22: Table 7; 2023: Table 6)
+# service options: full pay, premium, copay, multiple
 
-income.total = read.adap.income.data(ROOT.DIR,dimension = "total")
+income.total = read.adap.income.data(ROOT.DIR,dimension = "total") # pulls totals from the age table 
 
+
+#### Further risk disaggregation (MSM, het, IDU) from MMP reports below ####
 
 
 #### FOR ALL YEARS COMBINED ####
