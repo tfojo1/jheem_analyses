@@ -249,7 +249,9 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
     or.sti.screening.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     or.sti.screening.other = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     # Changing the slope for everyone
-    or.slope.sti.screening = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10),
+    # or.slope.sti.screening = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10),
+    or.slope.sti.screening.msm = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10),
+    or.slope.sti.screening.heterosexual = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10),
     
     ## Syphilis to HIV Testing Ratio ----
     # Stratify intercept by race and sex
@@ -620,12 +622,24 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    values = parameters[paste0("or.sti.screening.", sexes)],
                                                    dimension = "sex", #recipient
                                                    applies.to.dimension.values = sexes)
+    # set.element.functional.form.main.effect.alphas(model.settings,
+    #                                                element.name = "rate.sti.screening.over.14",
+    #                                                alpha.name = "slope",
+    #                                                values = parameters["or.slope.sti.screening"],
+    #                                                dimension = "all", #recipient
+    #                                                applies.to.dimension.values = "all")
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "rate.sti.screening.over.14",
                                                    alpha.name = "slope",
-                                                   values = parameters["or.slope.sti.screening"],
-                                                   dimension = "all", #recipient
-                                                   applies.to.dimension.values = "all")
+                                                   values = parameters["or.slope.sti.screening.msm"],
+                                                   dimension = "sex", #recipient
+                                                   applies.to.dimension.values = c("msm"))
+    set.element.functional.form.main.effect.alphas(model.settings,
+                                                   element.name = "rate.sti.screening.over.14",
+                                                   alpha.name = "slope",
+                                                   values = parameters["or.slope.sti.screening.heterosexual"],
+                                                   dimension = "sex", #recipient
+                                                   applies.to.dimension.values = c("heterosexual_male", "female"))
     
     ## Syphilis to HIV tests Ratio ----
     # Change intercept and slope
@@ -948,7 +962,9 @@ STI.TESTING.SAMPLING.BLOCKS = list(
         'or.sti.screening.black',  
         'or.sti.screening.hispanic',
         'or.sti.screening.other',
-        'or.slope.sti.screening'
+        # 'or.slope.sti.screening',
+        'or.slope.sti.screening.msm',
+        'or.slope.sti.screening.heterosexual'
         ),
     #
     syphilis.to.hiv.testing.ratio.sex.slope<-c(
