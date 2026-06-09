@@ -869,6 +869,11 @@ lik.inst.stage23 = join.likelihood.instructions(
     lik.inst.stg23.non.demog,
     additional.weights = STAGE.23.WEIGHT
 )
+lik.inst.stage23.fourth = join.likelihood.instructions(
+    lik.inst.stg23.demog,
+    lik.inst.stg23.non.demog,
+    additional.weights = STAGE.23.WEIGHT * 1/2 # 1/4
+)
 
 # Alternative weight versions ----
 # lik.inst.stg3.population.2x=join.likelihood.instructions(

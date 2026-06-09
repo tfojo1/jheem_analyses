@@ -105,6 +105,23 @@ register.calibration.info("calib.6.8.stage2.az",
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
+# with overall weight for 2-3 likelihood lowered to 1/4 from 1/2
+register.calibration.info("calib.6.9.stage2.az",
+                          preceding.calibration.codes = 'calib.6.8.stage1.az',
+                          likelihood.instructions = lik.inst.stage23.fourth,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names,
+                              "global.transmission.rate"
+                          ),
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
 # MAIN CALIBRATION -----
 # STAGE 0
 register.calibration.info("calib.5.11.stage0.az",
