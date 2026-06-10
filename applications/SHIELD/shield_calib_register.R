@@ -125,7 +125,17 @@ register.calibration.info("calib.6.9.stage2.az",
 
 
 # With new priors on transmission baseline ----
-
+register.calibration.info("calib.6.10.stage0.az",
+                          likelihood.instructions = lik.inst.stage0,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          fixed.initial.parameter.values = c("global.transmission.rate"=2.3),  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          parameter.aliases = par.aliases.transmission,
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
 register.calibration.info('calib.6.10.stage1.az',
                           preceding.calibration.codes = 'calib.6.5.stage0.az',
                           likelihood.instructions = lik.inst.stage1,
@@ -154,7 +164,7 @@ register.calibration.info("calib.6.10.stage2.az",
 
 # Same as above but with the new penalty likelihood ----
 register.calibration.info('calib.6.10.stg1.penalty',
-                          preceding.calibration.codes = 'calib.6.5.stage0.az',
+                          preceding.calibration.codes = 'calib.6.10.stage0.az',
                           likelihood.instructions = lik.inst.stage1.plus.penalty,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
