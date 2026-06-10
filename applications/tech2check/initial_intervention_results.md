@@ -114,6 +114,40 @@ widens — mortality at rate 10 has a CI that includes zero. So the “flat
 ceiling” claim describes the median; per-sim uncertainty grows as
 recruitment pushes higher.
 
+## OR magnitude sensitivity
+
+A complementary stress test: rather than varying the recruitment rate,
+hold recruitment at 0.5/yr and vary the suppression OR over a 50× range.
+If the bound is *magnitude-based* (small because OR = 2 isn’t strong
+enough), the cumulative-averted curve should lift sharply at high OR. If
+the bound is *pool-based* (small because youth are 1% of the epidemic),
+the curve should flatten quickly as per-stratum suppression saturates.
+
+| OR (on / recently) | Cumulative averted, 2026–2030 (median \[95% CI\]) | % change vs no-intervention @ 2030 |
+|:---|:---|:---|
+| 2 (trial estimate) | 2.60 \[0.70, 3.90\] | -0.133% |
+| 5 | 4.45 \[2.27, 6.52\] | -0.259% |
+| 20 | 5.43 \[3.11, 7.89\] | -0.311% |
+| 100 | 5.70 \[3.36, 8.29\] | -0.325% |
+
+Maryland, 1000-sim posterior, sustained 0.5/yr recruitment.
+distantly_intervened OR = 1 throughout. Cumulative averted is computed
+per-simulation (sum of annual incidence 2026–2030), then summarized
+across sims — matching the Cumulative infections averted section above.
+Per-stratum analytical-OR check passes within tolerance at each OR.
+
+The median averted rises substantially from OR = 2 to OR = 5 (roughly
+1.7× lift), then flattens: a 5× magnitude increase from OR = 20 to OR =
+100 adds only ~0.3 averted at the median. The pattern is consistent with
+the OR-on-odds transform saturating against the suppression-rate cap —
+at OR = 100, baseline ~85% suppression closes to ~99.8%, so the
+per-stratum boost approaches the cap of (1 − baseline) ≈ 15 pp and
+further magnitude can’t help. **Magnitude does real work until
+saturation; the eligible-pool size caps how much the per-person boost
+can translate to statewide impact regardless of magnitude.** Both
+factors matter, and both are visible here: OR drives the lift, the pool
+keeps the absolute numbers small.
+
 ## Where this could go
 
 **Near-term, regardless of direction.**
