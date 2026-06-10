@@ -828,6 +828,31 @@ lik.inst.stage1=join.likelihood.instructions(
     #
     additional.weights = STAGE.1.WEIGHT
 )
+lik.inst.stage1.plus.penalty=join.likelihood.instructions(
+    total.diagnosis.likelihood.instructions,
+    total.diagnosis.by.strata.likelihood.instructions,
+    #
+    ps.diagnosis.total.likelihood.instructions,
+    ps.diagnosis.by.strata.likelihood.instructions,
+    #
+    early.diagnosis.total.likelihood.instructions,
+    early.diagnosis.by.strata.likelihood.instructions,
+    #
+    late.diagnosis.total.likelihood.instructions,
+    late.diagnosis.by.strata.likelihood.instructions,
+    #
+    # proportion.tested.total.by.age.race.nested.likelihood.instructions,
+    # proportion.tested.by.sex.nested.likelihood.instructions,
+    proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
+    
+    #
+    historical.diagnosis.likelihood.instructions,
+    proportion_ps_male_among_msm_likelihood_instructions,
+    diagnosis_trajectory_penalty_likelihood_instructions,
+    future.change.penalty.likelihood.instructions,    # Future change penalty
+    #
+    additional.weights = STAGE.1.WEIGHT
+)
 
 ## STAGE 2 & 3 ----
 # STAGE 3 now has demographics split into a separate group
@@ -872,6 +897,34 @@ lik.inst.stage23 = join.likelihood.instructions(
 lik.inst.stage23.fourth = join.likelihood.instructions(
     lik.inst.stg23.demog,
     lik.inst.stg23.non.demog,
+    additional.weights = STAGE.23.WEIGHT * 1/2 # 1/4
+)
+
+lik.inst.stg23.non.demog.plus.penalty=join.likelihood.instructions(
+    total.diagnosis.likelihood.instructions,
+    total.diagnosis.by.strata.likelihood.instructions,
+    #
+    ps.diagnosis.total.likelihood.instructions,
+    ps.diagnosis.by.strata.likelihood.instructions,
+    #
+    early.diagnosis.total.likelihood.instructions,
+    early.diagnosis.by.strata.likelihood.instructions,
+    #
+    late.diagnosis.total.likelihood.instructions,
+    late.diagnosis.by.strata.likelihood.instructions,
+    #
+    # proportion.tested.total.by.age.race.nested.likelihood.instructions,
+    # proportion.tested.by.sex.nested.likelihood.instructions,
+    proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
+    #
+    historical.diagnosis.likelihood.instructions,
+    proportion_ps_male_among_msm_likelihood_instructions,
+    diagnosis_trajectory_penalty_likelihood_instructions,
+    future.change.penalty.likelihood.instructions    # Future change penalty
+)
+lik.inst.stage23.plus.penalty = join.likelihood.instructions(
+    lik.inst.stg23.demog,
+    lik.inst.stg23.non.demog.plus.penalty,
     additional.weights = STAGE.23.WEIGHT * 1/2 # 1/4
 )
 
