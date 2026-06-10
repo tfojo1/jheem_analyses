@@ -9,10 +9,10 @@ source("../jheem_analyses/applications/SHIELD/intervention/intervention_helper_f
 # =============================================================================
 # SECTION 1: Configuration
 # =============================================================================
-LOCATIONS        <- SHIELD.TEN.MSAS    # Named vector: names = city, values = codes
+LOCATIONS        <- SHIELD.TEN.MSAS[10]    # Named vector: names = city, values = codes
 
-# CALIBRATION.CODE <- "calib.5.12.stage2.pk" # SA models with oe.msm.female.partnership=30%
-CALIBRATION.CODE <- "calib.5.11.stage2.az" # SA models with oe.msm.female.partnership=8%
+# CALIBRATION.CODE <- "calib.5.19.stage2.pk" # SA models with oe.msm.female.partnership=30%
+CALIBRATION.CODE <- "calib.6.9.stage2.az" # SA models with oe.msm.female.partnership=8%
 
 N.SIM <- 300
 FIRST.YEAR <- 2000
@@ -23,10 +23,11 @@ BASE.PATH <- paste0(ROOT.DIR,"/simulations/shield")
 
 INTERVENTION.LABELS <- c(
     noint        = "No Doxy-PEP Intervention",
-    doxy.u.60.p.50   = "Uptake 60% Persistence 50%",
-    doxy.u.60.p.100   = "Uptake 60% Persistence 100%",
-    doxy.u.100.p.50   = "Uptake 100% Persistence 50%",
-    doxy.u.100.p.100   = "Uptake 100% Persistence 100%"
+    # doxy.u.60.p.50   = "Uptake 60% Persistence 50%",
+    # doxy.u.60.p.100   = "Uptake 60% Persistence 100%",
+    # doxy.u.100.p.50   = "Uptake 100% Persistence 50%",
+    doxy.u.100.p.100   = "Uptake 100% Persistence 100%",
+    doxy.rapid.uptake="Uptake 15%, 40% and then 100%"
 )
 INTERVENTION.CODES <- names(INTERVENTION.LABELS)
 

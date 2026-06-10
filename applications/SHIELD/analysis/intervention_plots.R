@@ -12,9 +12,7 @@ source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions
 
 # ---- SETUP ----
 calibration.codes <- c(
-    "calib.5.11.stage2.az",   # master branch
-    "calib.5.19.stage2.pk"    # sa with higher msm-female partnership (oe.female)
-    # "calib.5.12.stage2.pk"
+    "calib.6.9.stage2.az"
 )
 
 intervention.codes <-c(
@@ -22,7 +20,8 @@ intervention.codes <-c(
     # "doxy.u.60.p.50",
     # "doxy.u.60.p.100",
     # "doxy.u.100.p.50",
-    "doxy.u.100.p.100"
+    "doxy.u.100.p.100",
+    "doxy.rapid.uptake"
 )
 # read simulations into the simset
 int.simsets <- load.int.simsets(
@@ -38,6 +37,18 @@ int.simsets <- load.int.simsets(
 #                   "diagnosis.el.misclassified", "diagnosis.late.misclassified","hiv.testing")
 outcomes.all <- c("diagnosis.ps","doxy.uptake")
                   
+
+plot.int.location(int.simsets = int.simsets,
+                  location = "Seattle",
+                  calib.code ="calib.6.9.stage2.az",
+                  interventions =intervention.codes,
+                  outcomes = "diagnosis.total",
+                  facet.by = "sex",
+                  # plot.which = "sim.only",
+                  years = c(2018:2025),save = T,create.dirs = T )
+
+
+
 # ****************************************************************************************************
 # 1. COMPARE BOTH CALIBRATIONS ACROSS ALL CITIES — SEPARATE BY OUTCOME ----
 # ****************************************************************************************************

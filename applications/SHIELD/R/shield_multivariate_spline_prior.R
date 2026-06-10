@@ -510,7 +510,8 @@ if (1==2){
         )
     }
     # in a given period (2000-2010); if het transmission changes by .25, how much should the MSM should be able to change?
-    conditional_bivariate_normal(0.30, 0,0,0.5*log(1.5),0.5*log(1.5), 0.8)
+    conditional_bivariate_normal(1.5, 0,0,0.5*log(1.5),0.5*log(1.5), 0.5)
+    conditional_bivariate_normal(1.5, 0,0,0.5*log(1.5),0.5*log(1.5), 0.5)
     
     # if you wanted to impose an assumption; when heterosexual transmission changes by 25%; MSM transmission cannot decrease;
     # we can find the p value that works:
