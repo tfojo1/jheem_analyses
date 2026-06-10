@@ -157,10 +157,11 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     # this means that over 5 years, trate can change by sqrt(1.5) and by 20 years, it can change by 1.5^2
     make.joint.mv.spline.prior(
         parameters = paste0("transmission.rate.multiplier.", c("msm", "heterosexual")),
-        logmean.baseline = c(log(3), #msm
-                             0), #het
-        logsd.baseline = c(log(2), #msm
-                           log(2)), #het
+        logmean.baseline = c(log(1), #msm
+                             log(1)), #het
+        logsd.baseline = c(log(2)*2, #msm
+                           log(2)*2
+                           ), #het
         logsd.deltas.past = c("1970" = 0.5*log(1.5^2), #20-year delta
                               "1990" = 0.5*log(sqrt(1.5)), #5-year delta
                               "1995" = 0.5*log(sqrt(1.5))), #5-year delta
