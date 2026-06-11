@@ -137,7 +137,7 @@ register.calibration.info("calib.6.10.stage0.az",
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 register.calibration.info('calib.6.10.stage1.az',
-                          preceding.calibration.codes = 'calib.6.5.stage0.az',
+                          preceding.calibration.codes = 'calib.6.10.stage0.az',
                           likelihood.instructions = lik.inst.stage1,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
@@ -188,6 +188,21 @@ register.calibration.info("calib.6.10.stg2.penalty",
                           ),
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
+
+# Trying out global trates ----
+for (gtr in c(2.5, 2.7, 2.9, 3.1)) {
+    register.calibration.info(paste0("calib.6.11.stg0.", gtr),
+                              likelihood.instructions = lik.inst.stage0,
+                              data.manager = SURVEILLANCE.MANAGER,
+                              end.year = 2030,
+                              fixed.initial.parameter.values = c("global.transmission.rate"=gtr),  
+                              parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                                  AGING.PARAMETERS.PRIOR@var.names,
+                                                  "global.transmission.rate"),
+                              parameter.aliases = par.aliases.transmission,
+                              n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+    )
+}
 
 # MAIN CALIBRATION -----
 # STAGE 0
