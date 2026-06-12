@@ -138,7 +138,7 @@ register.calibration.info("calib.6.12.stage0.az",
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 register.calibration.info('calib.6.12.stage1.az',
-                          preceding.calibration.codes = 'calib.6.10.stage0.az',
+                          preceding.calibration.codes = 'calib.6.12.stage0.az',
                           likelihood.instructions = lik.inst.stage1,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
@@ -148,7 +148,7 @@ register.calibration.info('calib.6.12.stage1.az',
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 register.calibration.info("calib.6.12.stage2.az",
-                          preceding.calibration.codes = 'calib.6.10.stage1.az',
+                          preceding.calibration.codes = 'calib.6.12.stage1.az',
                           likelihood.instructions = lik.inst.stage23.fourth,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
