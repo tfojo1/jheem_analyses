@@ -117,44 +117,11 @@ for (uptake in c(100)){ # change to full range later on [20-100]
         code = paste0("doxy.rapid.uptake")
     )
     print(paste0("created: ", "doxy.rapid.uptake"))
-    
-    noint = get.null.intervention()
 }
+    noint = get.null.intervention()
 
-{
-    # uptake is scaled up fast similar to kingcounty
-    uptake.effect =  create.intervention.effect(
-        quantity.name    = "doxy.uptake",
-        effect.values    = c(0.15,0.6,1),
-        start.time       = 2021,# when scale up begins
-        times            = c(2023,2024,2030), # when scale up ends
-        scale            = "proportion",
-        apply.effects.as = "value",
-        allow.values.less.than.otherwise  = FALSE,
-        allow.values.greater.than.otherwise = TRUE
-    )
-    # persistence takes affect immediately and remain constant
-    persistence.effect   = create.intervention.effect(
-        quantity.name    = "doxy.discontinuationRate",
-        effect.values    = -log(1),
-        start.time       = 2022,# when scale up begins  
-        times            = 2022, # when scale up ends  
-        scale            = "rate",
-        apply.effects.as = "value",
-        allow.values.less.than.otherwise  = FALSE,
-        allow.values.greater.than.otherwise = TRUE
-    )
-    doxy_int <- create.intervention(
-        c(uptake.effect,
-          persistence.effect),
-        parameters = DOXY.PARAMS,
-        WHOLE.POPULATION, 
-        code = paste0("doxy.rapid.uptake2")
-    )
-    print(paste0("created: ", "doxy.rapid.uptake2"))
-    
-    noint = get.null.intervention()
-}
+    print(paste0("created: ", "noint"))
+
 # # NEW ----
 # if (1==2)
 # {

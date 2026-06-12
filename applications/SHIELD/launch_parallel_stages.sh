@@ -23,6 +23,7 @@
 #   When a city finishes (or fails early), its slot is freed and the
 #   next city launches. Memory is fully released between calibration codes
 #   because each is a separate Rscript process.
+#   the order of calibration code is not guaranteed: if CALIBRATION_CODES had >1 entry, multiple codes for the same city could run concurrently
 #
 # ON FAILURE
 #   The failed city prints to stderr and releases its slot.
