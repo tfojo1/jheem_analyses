@@ -21,6 +21,54 @@ par.aliases.transmission = list(
 )
 
 
+
+register.calibration.info("calib.7.12.stage0.test",
+                          likelihood.instructions = lik.inst.stage0,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          fixed.initial.parameter.values = c("global.transmission.rate"=3.3),  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          parameter.aliases = par.aliases.transmission,
+                          n.iter = 1000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info("calib.7.12.stage1.test",
+                          likelihood.instructions = lik.inst.stage1,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = 1000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info("calib.7.12.stage2.test",
+                          likelihood.instructions = lik.inst.stage23,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names
+                          ),
+                          n.iter = 1000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info("calib.7.12.stage3.test",
+                          likelihood.instructions = lik.inst.stage23,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names
+                          ),
+                          n.iter = 1000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
+)
+
 # NEW CALIBRATION WITH VARIOUS CHANGES ----
 register.calibration.info("calib.6.5.stage0.az",
                           likelihood.instructions = lik.inst.stage0,
@@ -30,7 +78,6 @@ register.calibration.info("calib.6.5.stage0.az",
                           parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
                                               AGING.PARAMETERS.PRIOR@var.names,
                                               "global.transmission.rate"),
-                          parameter.aliases = par.aliases.transmission,
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 # STAGE 1
