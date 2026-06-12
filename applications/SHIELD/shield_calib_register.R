@@ -190,8 +190,8 @@ register.calibration.info("calib.6.10.stg2.penalty",
 )
 
 # Trying out global trates ----
-for (gtr in c(2.5, 2.7, 2.9, 3.1)) {
-    register.calibration.info(paste0("calib.6.11.stg0.", gtr),
+for (gtr in c(3.6, 3.7, 3.8, 3.9)) {
+    register.calibration.info(paste0("calib.6.12.stg0.", gtr),
                               likelihood.instructions = lik.inst.stage0,
                               data.manager = SURVEILLANCE.MANAGER,
                               end.year = 2030,
@@ -200,7 +200,7 @@ for (gtr in c(2.5, 2.7, 2.9, 3.1)) {
                                                   AGING.PARAMETERS.PRIOR@var.names,
                                                   "global.transmission.rate"),
                               parameter.aliases = par.aliases.transmission,
-                              n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+                              n.iter = 1000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
     )
 }
 
