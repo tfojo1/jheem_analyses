@@ -157,10 +157,23 @@ register.calibration.info("calib.6.12.stage2.az",
                               STI.TESTING.PARAMETERS.PRIOR@var.names,
                               TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
                               POPULATION.PARAMETERS.PRIOR@var.names,
-                              AGING.PARAMETERS.PRIOR@var.names,
-                              "global.transmission.rate"
+                              AGING.PARAMETERS.PRIOR@var.names
                           ),
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info("calib.6.12.stage3.az",
+                          preceding.calibration.codes = 'calib.6.12.stage2.az',
+                          likelihood.instructions = lik.inst.stage23.fourth,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names
+                          ),
+                          n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
 )
 
 # Same as above but with the new penalty likelihood ----
@@ -201,6 +214,20 @@ register.calibration.info("calib.6.12.stg2.penalty",
                               AGING.PARAMETERS.PRIOR@var.names
                           ),
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info("calib.6.12.stg3.penalty",
+                          preceding.calibration.codes = 'calib.6.12.stg2.penalty',
+                          likelihood.instructions = lik.inst.stage23.plus.penalty,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names
+                          ),
+                          n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
 )
 
 # Trying out global trates ----
