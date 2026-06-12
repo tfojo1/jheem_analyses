@@ -2,7 +2,7 @@
 #
 # USAGE
 #   Launch over SSH (survives logout):
-#       nohup bash applications/SHIELD/launch_full_pipeline.sh > applications/SHIELD/logs/launcher.out 2>&1 &
+#       nohup bash applications/SHIELD/launch_pipeline_stages_0_to_3.sh > applications/SHIELD/logs/launcher.out 2>&1 &
 #   Kill Runs:
 #       pkill -u pkasaie1 -x R
 #       pkill -u pkasaie1 -f "Rscript"
@@ -75,9 +75,7 @@ all_except_ten_cities=(
 )
 
 # ── set active cities and calibration codes here ───────────────────────────────
-CITIES=(
-    C.12060 C.12580
-)
+CITIES=("${ten_cities[@]}")
 
 # Phase 1: sequential, single-chain stages (one Rscript process per stage,
 # so the OS fully reclaims memory between them).

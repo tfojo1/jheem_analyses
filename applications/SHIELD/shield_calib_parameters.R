@@ -145,7 +145,8 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     ratio.of.infected.to.diagnosed.1970 = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)), #CI=[1.5, 5.9]
     
     ## Global transmission ----
-    global.transmission.rate = Lognormal.Distribution(meanlog = log(2.2), sdlog = 0.5*log(10)), # large SD to allow more mixing
+    global.transmission.rate.msm = Lognormal.Distribution(meanlog = log(3.9), sdlog = 0.5*log(10)), # large SD to allow more mixing
+    global.transmission.rate.het = Lognormal.Distribution(meanlog = log(3.9), sdlog = 0.5*log(10)), # large SD to allow more mixing
     
     # Transmission multipliers 
     # we built a joint prior for: transmission.rate.multiplier.msm & transmission.rate.multiplier.heterosexual
@@ -873,7 +874,8 @@ AGING.SAMPLING.BLOCKS = list(
 
 ## TRANSMISSION.SAMPLING.BLOCKS ----
 TRANSMISSION.SAMPLING.BLOCKS = list(
-    global.transmission.rate=c("global.transmission.rate"),
+    global.transmission.rate=c("global.transmission.rate.msm",
+                               "global.transmission.rate.het"),
     #
     age.mixing.sd.mult=("age.mixing.sd.mult"),
     #

@@ -401,16 +401,29 @@ register.transmission(SHIELD.SPECIFICATION,
                       new.infections.applies.to = list(continuum='undiagnosed',stage='primary'))
 ##---- Sexual Contact ----
 register.model.element(SHIELD.SPECIFICATION,
-                       name='global.transmission.rate',
+                       name='global.transmission.rate.msm',
+                       scale = 'rate',
+                       value = 1 ) #tuned in calib_parameters
+register.model.element(SHIELD.SPECIFICATION,
+                       name='global.transmission.rate.het',
                        scale = 'rate',
                        value = 1 ) #tuned in calib_parameters
 
 # rate of contact between infected and uninfected
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'sexual.contact',
-                        value = expression(global.transmission.rate *
+                        expression(global.transmission.rate.het *
+                                       rate.sexual.transmission *
+                                       sexual.contact.matrix)
+                        )
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                        name = 'sexual.contact',
+                        applies.to = list(sex="msm"),
+                        value = expression(global.transmission.rate.msm *
                                                rate.sexual.transmission *
-                                               sexual.contact.matrix))
+                                               sexual.contact.matrix)
+                        )
+ 
 
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'sexual.contact.matrix',

@@ -10,11 +10,11 @@ source("../jheem_analyses/applications/SHIELD/shield_calib_register.R")
 source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions.R')
 
 # ---- SETUP ----
-for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.9.stage2.az"))}
+for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.12.stage0.test"))}
 
 
 calibration.codes <- c(
-    "calib.6.9.stage2.az" #new run after lowering the weights
+    "calib.7.12.stage0.test" #new run after lowering the weights
 )
  
 # read simulations into the simset
@@ -23,6 +23,22 @@ calib.simsets <- load.calib.simsets(
     calibration.codes = calibration.codes
         
 )
+
+head(calib.simsets$`Atlanta – calib.7.12.stage0.test`$full_simset$get.mcmc.mixing.statistic())
+simplot(calib.simsets$`Atlanta – calib.7.12.stage0.test`$full_simset,"diagnosis.ps")
+simplot(calib.simsets$`Atlanta – calib.7.12.stage0.test`$last_sim,"diagnosis.ps")
+
+# head(calib.simsets$`Baltimore – calib.7.12.stage0.test`$full_simset$get.mcmc.mixing.statistic())
+# simplot(calib.simsets$`Baltimore – calib.7.12.stage0.test`$full_simset,"diagnosis.ps")
+
+engine=create.jheem.engine('shield',"C.12060",end.year = 2030)
+lik=instantiate.likelihood(lik.inst.stage1,version = 'shield',location = "C.12060")
+lik$compute(calib.simsets$`Atlanta – calib.7.12.stage0.test`$last_sim)
+
+
+
+
+
 plot.calib.stages(calib.simsets = calib.simsets,stage = 2,locations = SHIELD.TEN.MSAS,calibration.code =calibration.codes )
 
 lapply(calib.simsets,function(x){
