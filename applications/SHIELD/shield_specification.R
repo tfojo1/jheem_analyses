@@ -418,7 +418,7 @@ register.model.quantity(SHIELD.SPECIFICATION,
                         )
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                         name = 'sexual.contact',
-                        applies.to = list(sex="msm"),
+                        applies.to = list(sex.from="msm"),
                         value = expression(global.transmission.rate.msm *
                                                rate.sexual.transmission *
                                                sexual.contact.matrix)
