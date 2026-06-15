@@ -1,12 +1,14 @@
-# JHEEM/SHIELD Servers (`pearl1`, `shield1`, `shield2`) - User Guide
+# JHEEM/SHIELD Servers (`pearl1`, `shield1`, `shield2`, `shield3`) - User Guide
 
-This guide provides instructions for accessing and using the JHEEM/SHIELD modeling servers: `pearl1.jhsph.edu`, `shield1.jhsph.edu`, and `shield2.jhsph.edu`.
+This guide provides instructions for accessing and using the JHEEM/SHIELD modeling servers: `pearl1`, `shield1`, `shield2`, and `shield3`.
 
 **Note:** You must be connected to the JHU VPN to access any of these servers.
 
-> **Important: DNS Not Yet Updated (January 2026)**
+> **Important: DNS state varies by server**
 >
-> The `shield1` and `shield2` servers were recently moved and assigned new IP addresses. The DNS records have **not yet been updated**, so connecting via hostname (e.g., `shield1.jhsph.edu`) will fail. **Use the IP addresses directly** until DNS is updated.
+> - `pearl1.jhsph.edu` resolves correctly.
+> - `shield3.acasmart.jh.edu` resolves correctly (note the different domain — `acasmart.jh.edu`, not `jhsph.edu`).
+> - `shield1.jhsph.edu` and `shield2.jhsph.edu` were moved and assigned new IPs, and the DNS records have **not yet been updated** for the new IPs. **Use the IP addresses directly** for these two until DNS is fixed.
 
 ## Getting Started & Account Management
 
@@ -29,13 +31,12 @@ Multiple users can be logged in and working on the servers simultaneously. Be mi
 
 ### Server Addresses
 
-| Server | Hostname | IP Address |
-|--------|----------|------------|
-| pearl1 | `pearl1.jhsph.edu` | `10.253.171.246` |
-| shield1 | `shield1.jhsph.edu` | `10.253.170.91` |
-| shield2 | `shield2.jhsph.edu` | `10.253.170.89` |
-
-> **Reminder:** Until DNS is updated, use IP addresses for `shield1` and `shield2`.
+| Server | Hostname | IP Address | DNS works? |
+|--------|----------|------------|------------|
+| pearl1 | `pearl1.jhsph.edu` | `10.253.171.246` | yes |
+| shield1 | `shield1.jhsph.edu` | `10.253.170.91` | no — use IP |
+| shield2 | `shield2.jhsph.edu` | `10.253.170.89` | no — use IP |
+| shield3 | `shield3.acasmart.jh.edu` | `10.253.170.193` | yes |
 
 ### Method 1: Terminal (macOS/Linux) using SSH
 
@@ -43,9 +44,10 @@ Use the following command, replacing `YOUR_USERNAME` with your assigned username
 
 Type this in your local terminal:
 ```bash
-ssh YOUR_USERNAME@10.253.170.91   # For shield1
-ssh YOUR_USERNAME@10.253.170.89   # For shield2
-ssh YOUR_USERNAME@pearl1.jhsph.edu   # For pearl1
+ssh YOUR_USERNAME@10.253.170.91             # For shield1
+ssh YOUR_USERNAME@10.253.170.89             # For shield2
+ssh YOUR_USERNAME@shield3.acasmart.jh.edu   # For shield3 (or use 10.253.170.193)
+ssh YOUR_USERNAME@pearl1.jhsph.edu          # For pearl1
 ```
 
 ### Method 2: VS Code with Remote - SSH Extension
@@ -74,10 +76,14 @@ This provides a rich editing environment directly on the server.
    Host jhu-shield2
        HostName 10.253.170.89
        User YOUR_USERNAME
+
+   Host jhu-shield3
+       HostName shield3.acasmart.jh.edu
+       User YOUR_USERNAME
    ```
    Replace `YOUR_USERNAME` with your assigned username on the servers.
 
-   > **Note:** Once DNS is updated, you can change the `HostName` for shield1/shield2 back to `shield1.jhsph.edu` and `shield2.jhsph.edu`.
+   > **Note:** Once DNS is updated for shield1/shield2, you can change their `HostName` entries back to `shield1.jhsph.edu` and `shield2.jhsph.edu`.
 
 3. In VS Code, open the Command Palette (`Cmd+Shift+P` on macOS, `Ctrl+Shift+P` on Windows/Linux), type "Remote-SSH: Connect to Host...", and select the alias you configured (e.g., `jhu-shield1`).
 
@@ -89,9 +95,10 @@ RStudio Server provides a familiar R IDE accessible via your web browser.
    - For `pearl1`: `http://pearl1.jhsph.edu:8787`
    - For `shield1`: `http://10.253.170.91:8787`
    - For `shield2`: `http://10.253.170.89:8787`
+   - For `shield3`: `http://shield3.acasmart.jh.edu:8787` (or `http://10.253.170.193:8787`)
 2. Log in with your Linux username and password for that specific server.
 
-> **Note:** Once DNS is updated, you can use the hostnames (e.g., `http://shield1.jhsph.edu:8787`).
+> **Note:** Once DNS is updated for shield1/shield2, you can use their hostnames (e.g., `http://shield1.jhsph.edu:8787`).
 
 ### Recommended: SSH Key-Based Authentication (Passwordless Login)
 
@@ -113,7 +120,7 @@ In a terminal on your *local* machine:
 
 #### B. Copy Your Public Key to EACH Server
 
-For *each server* (`pearl1`, `shield1`, `shield2`) you want passwordless access to, run this command from your *local* machine:
+For *each server* (`pearl1`, `shield1`, `shield2`, `shield3`) you want passwordless access to, run this command from your *local* machine:
 
 ```bash
 # For pearl1:
@@ -124,6 +131,9 @@ ssh-copy-id -i ~/.ssh/id_ed25519.pub YOUR_USERNAME@10.253.170.91
 
 # For shield2 (use IP until DNS is fixed):
 ssh-copy-id -i ~/.ssh/id_ed25519.pub YOUR_USERNAME@10.253.170.89
+
+# For shield3:
+ssh-copy-id -i ~/.ssh/id_ed25519.pub YOUR_USERNAME@shield3.acasmart.jh.edu
 ```
 
 You will be prompted for your password for that server one last time to authorize the key.
@@ -398,3 +408,20 @@ You have been added to the `jheem` group on the servers to facilitate shared acc
 ```bash
 groups
 ```
+
+## Server Specifications
+
+| Server | CPU | Cores | RAM | Local Storage |
+|--------|-----|-------|-----|---------------|
+| pearl1 | (TBD) | (TBD) | (TBD) | (TBD) |
+| shield1 | AMD Threadripper PRO 7965WX | 24 cores (48 threads) | 250 GB | ~400 GB |
+| shield2 | AMD Threadripper PRO 7965WX | 24 cores (48 threads) | 502 GB | ~880 GB |
+| shield3 | AMD Threadripper PRO 7975WX | 32 cores (64 threads) | 250 GB | ~950 GB |
+
+All servers run RHEL 9.x with RStudio Server. shield1, shield2, and pearl1 are on R 4.5.2; shield3 is currently on R 4.6.0 (a planned fleet-wide upgrade will bring shield1/shield2 to 4.6 at a later maintenance window).
+
+**Choosing a server for a workload:**
+
+- shield3 has the most CPU (32 cores), so it's the best fit for jobs that parallelize well across many cores or many independent simulations.
+- shield2 has the most RAM (502 GB), best for memory-heavy jobs (large MCMC chains, large simset assembly).
+- shield1 is a peer of shield3 on RAM (250 GB) but has fewer cores (24).
