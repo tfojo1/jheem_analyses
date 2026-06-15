@@ -326,7 +326,7 @@ load.calib.simsets <- function(locations,
         
         if (!is.null(calib.info)) {
             if (calib.info$n.burn != 0) warning("Calibration '", cc, "' has n.burn != 0")
-            n.sim.reg <- calib.info$n.iter / calib.info$thin
+            
             
             calib.progress <- tryCatch(
                 get.calibration.progress(version = version, locations = locs.for.code, calibration.code = cc),
@@ -362,7 +362,7 @@ load.calib.simsets <- function(locations,
                 } else {
                     tryCatch(retrieve.simulation.set(
                         version = version, location = loc.code,
-                        calibration.code = cc, n.sim = n.sim.reg),
+                        calibration.code = cc, n.sim ),
                         error = function(e) { warning("Error retrieving '", simset.key, "': ", e$message); NULL })
                 }
                 if (is.null(full.simset)) { n.skipped <- n.skipped + 1; next }

@@ -10,36 +10,41 @@ source("../jheem_analyses/applications/SHIELD/shield_calib_register.R")
 source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions.R')
 
 # ---- SETUP ----
-for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.12.stage0.test"))}
+# for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.12.stage3.az"))}
 
 
 calibration.codes <- c(
-    "calib.7.12.stage0.test" #new run after lowering the weights
+    "calib.6.12.stage3.az", 
+    "calib.6.12.stg3.penalty"
 )
  
 # read simulations into the simset
 calib.simsets <- load.calib.simsets(
-    locations         = SHIELD.TEN.MSAS, #seattle
-    calibration.codes = calibration.codes
+    locations         = SHIELD.TEN.MSAS,
+    calibration.codes = calibration.codes,
+    n.sim = 400
         
 )
 
-head(calib.simsets$`Atlanta – calib.7.12.stage0.test`$full_simset$get.mcmc.mixing.statistic())
-simplot(calib.simsets$`Atlanta – calib.7.12.stage0.test`$full_simset,"diagnosis.ps")
-simplot(calib.simsets$`Atlanta – calib.7.12.stage0.test`$last_sim,"diagnosis.ps")
-
-# head(calib.simsets$`Baltimore – calib.7.12.stage0.test`$full_simset$get.mcmc.mixing.statistic())
-# simplot(calib.simsets$`Baltimore – calib.7.12.stage0.test`$full_simset,"diagnosis.ps")
-
-engine=create.jheem.engine('shield',"C.12060",end.year = 2030)
-lik=instantiate.likelihood(lik.inst.stage1,version = 'shield',location = "C.12060")
-lik$compute(calib.simsets$`Atlanta – calib.7.12.stage0.test`$last_sim)
-
-
-
-
-
 plot.calib.stages(calib.simsets = calib.simsets,stage = 2,locations = SHIELD.TEN.MSAS,calibration.code =calibration.codes )
+
+calib.simsets$
+
+    # head(calib.simsets$`Atlanta – calib.7.12.stage0.test`$full_simset$get.mcmc.mixing.statistic())
+# simplot(calib.simsets$`Atlanta – calib.7.12.stage0.test`$full_simset,"diagnosis.ps")
+# simplot(calib.simsets$`Atlanta – calib.7.12.stage0.test`$last_sim,"diagnosis.ps")
+# 
+# # head(calib.simsets$`Baltimore – calib.7.12.stage0.test`$full_simset$get.mcmc.mixing.statistic())
+# # simplot(calib.simsets$`Baltimore – calib.7.12.stage0.test`$full_simset,"diagnosis.ps")
+# 
+# engine=create.jheem.engine('shield',"C.12060",end.year = 2030)
+# lik=instantiate.likelihood(lik.inst.stage1,version = 'shield',location = "C.12060")
+# lik$compute(calib.simsets$`Atlanta – calib.7.12.stage0.test`$last_sim)
+
+
+
+
+
 
 lapply(calib.simsets,function(x){
     head(x$full_simset$get.mcmc.mixing.statistic())
