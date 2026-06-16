@@ -777,118 +777,225 @@ register.model.element(ADAP.SPECIFICATION,
 ##-- INPUTS: FRACTION OF TIME SPENT if A CLIENT --##
 ##------------------------------------------------##
 
-#@todo - let's come up with data-based estimates of these - inferring from enrollments/disenrollments
+# Individual categories: 
+# F: full pay only 
+# P: premium only 
+# Cs: cost-sharing only 
 
-# Among Full-Pay Only
+# At any given time: 
+# F, P, Cs, or PCs
+    # Cannot have full-pay at the same time as either premium or cost-sharing, but can have premium and cost-sharing at the same time 
+
+# Over the course of a year, can have: 
+    # Only one category during that year (3): 
+        # F, P, or Cs
+    # Two categories during that year (3): 
+        # FP: full pay and premium
+        # FCs: full pay and cost-sharing
+        # PCs: premium and cost-sharing 
+    # All three categories during that year (1)
+        # FPCs: full pay, premium, and cost-sharing 
+
+# Later on, cost-sharing split into: deductible and/or co-pay assistance
+# D: deductible
+# Cp: co-pay assistance 
+
+
+### ONLY ONE CATEGORY DURING THAT YEAR (3): F, P, or Cs ###
+# Among those who had only one service during a year, what fraction of the year were they covered (assumes not the whole year)
+    # We will use the same value for all categories, but keep them separate for now for max flexibility 
+    # maybe replace with 0.84 based on 2023 NASTAD report, but look at other years too
+
+# FULL PAY ONLY (F)
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'fraction.time.on.adap.full.pay.among.full.pay.only',
+                       name = 'fraction.time.covered.among.F',  
+                       value = 0.875, 
+                       scale = 'proportion')
+
+# PREMIUM ONLY (P)
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'fraction.time.covered.among.P',  
+                       value = 0.875, 
+                       scale = 'proportion')
+
+# COST-SHARE ONLY (Cs) 
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'fraction.time.covered.among.Cs', 
+                       value = 0.875, 
+                       scale = 'proportion')
+
+
+### TWO CATEGORIES DURING THAT YEAR (3): FP, FCs, PCs ###
+    # People in this category could have spent their time in one of three states: (a) no ADAP, (b) category 1, (c) category 2
+    # which are (usually) mutually exclusive and must always add to one
+
+# FULL PAY AND PREMIUM (FP)
+    # Mutually exclusive 
+# First, what time covered at all (for now, same as above among full-pay only)
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'fraction.time.covered.among.FP', 
                        value = 0.875,
                        scale = 'proportion')
-    # Assumes that not everyone who was counted as having full-pay support in a given year had full pay support for the whole year
 
-
-# Among Full-Pay AND Premium Assistane (without cost sharing)
-#   People in this category could have spent their time in one of three states: (a) no ADAP, (b) full-pay, (c) premium assistance
-#   which are mutually exclusive and must add to one
-
-
-#@ Melissa insert here depending on how we think it should be layed out
-
+# Next, what time spent on full-pay out of that coverage time 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'fraction.time.on.any.adap.among.full.pay.and.premium.without.cost.sharing',
-                       value = 0.875,
+                       name = 'fraction.time.F.of.time.covered.among.FP',  
+                       value = 0.25/0.875, # setting this so that it is ~ 3 months of the year on full-pay
                        scale = 'proportion')
 
-
-
-
-register.model.element(ADAP.SPECIFICATION,
-                       name = 'fraction.time.on.adap.full.pay.among.full.pay.and.premium.without.cost.sharing',
-                       value = 0.25,
-                       scale = 'proportion')
-
+# Finally, multiply these two to get fraction time spent on full-pay out of the full calendar year 
 register.model.quantity(ADAP.SPECIFICATION,
-                       name = 'fraction.time.on.adap.premium.without.cost.sharing.among.full.pay.and.premium.without.cost.sharing',
-                       value = expression( (1-fraction.time.on.adap.full.pay.among.full.pay.and.premium.without.cost.sharing) * 
-                                               x),
-                       scale = 'proportion')
-    # Formulated so that the sum of this + fraction.time.on.adap.full.pay.among.full.pay.and.premium.without.cost.sharing never add to more than 1
-    # The sum of the two could be less than one (a person was not on any ADAP for part of the year), but never more than one
-
-
-
-
-
-
-
-register.model.element(ADAP.SPECIFICATION,
-                       name = 'fraction.time.on.adap.full.pay.among.full.pay.and.premium.without.cost.sharing',
-                       value = 0.25,
+                       name = 'fraction.time.F.among.FP', 
+                       value = expression(fraction.time.covered.among.FP*fraction.time.F.of.time.covered.among.FP),
                        scale = 'proportion')
 
-
-
-register.model.element(ADAP.SPECIFICATION,
-                       name = 'fraction.non.full.pay.time.on.adap.premium.without.cost.sharing.from.with.full.pay',
-                       value = 0.875,
-                       scale = 'proportion')
-
-
-
-
-register.model.element(ADAP.SPECIFICATION,
-                       name = 'fraction.time.on.adap.full.pay.from.full.pay.and.premium.and.cost.sharing',
-                       value = 0.25,
-                       scale = 'proportion')
-
-register.model.element(ADAP.SPECIFICATION,
-                       name = 'fraction.time.on.adap.full.pay.from.full.pay.and.cost.sharing.without.premium',
-                       value = 0.25,
-                       scale = 'proportion')
-
-# Time on premium and/or cost-sharing from no full-pay
-register.model.element(ADAP.SPECIFICATION,
-                       name = 'fraction.time.on.adap.premium.without.cost.sharing.from.without.full.pay',
-                       value = 0.875,
-                       scale = 'proportion')
-
-register.model.element(ADAP.SPECIFICATION,
-                       name = 'fraction.time.on.adap.premium.and.cost.sharing.from.without.full.pay',
-                       value = 0.875,
-                       scale = 'proportion')
-
-register.model.element(ADAP.SPECIFICATION,
-                       name = 'fraction.time.on.adap.premium.without.cost.sharing.from.without.full.pay',
-                       value = 0.875,
-                       scale = 'proportion')
-
-# Time on premium and/or cost-sharing as fraction of time not on full-pay when both
-
-register.model.element(ADAP.SPECIFICATION,
-                       name = 'fraction.non.full.pay.time.on.adap.premium.and.cost.sharing.from.with.full.pay',
-                       value = 0.875,
-                       scale = 'proportion')
-
-register.model.element(ADAP.SPECIFICATION,
-                       name = 'fraction.non.full.pay.time.on.adap.cost.sharing.without.premium.from.with.full.pay',
-                       value = 0.875,
-                       scale = 'proportion')
-
-# Quick calculation for the non-full pay services when combined with full-pay
+# and the same thing for premium (1-full pay)
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'fraction.time.on.adap.premium.without.cost.sharing.from.with.full.pay',
-                        value = expression( (1 - fraction.time.on.adap.premium.without.cost.sharing.from.without.full.pay) *
-                                                fraction.non.full.pay.time.on.adap.premium.without.cost.sharing.from.with.full.pay))
+                       name = 'fraction.time.P.among.FP', 
+                       value = expression(fraction.time.covered.among.FP*(1-fraction.time.F.of.time.covered.among.FP)),
+                       scale = 'proportion')
 
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'fraction.time.on.adap.premium.and.cost.sharing.from.with.full.pay',
-                        value = expression( (1 - fraction.time.on.adap.premium.and.cost.sharing.from.without.full.pay) *
-                                                fraction.non.full.pay.time.on.adap.premium.and.cost.sharing.from.with.full.pay))
+# FULL PAY AND COST-SHARING (FCs)
+    # Mutually exclusive; same steps as above 
+# First, what time covered at all 
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'fraction.time.covered.among.FCs', 
+                       value = 0.875,
+                       scale = 'proportion')
 
+# Next, what time spent on full-pay out of that coverage time 
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'fraction.time.F.of.time.covered.among.FCs',  
+                       value = 0.25/0.875, 
+                       scale = 'proportion')
+
+# Finally, multiply these two to get fraction time spent on full-pay out of the full calendar year 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'fraction.time.on.adap.cost.sharing.without.premium.from.with.full.pay',
-                        value = expression( (1 - fraction.time.on.adap.cost.sharing.without.premium.from.without.full.pay) *
-                                                fraction.non.full.pay.time.on.adap.cost.sharing.without.premium.from.with.full.pay))
+                        name = 'fraction.time.F.among.FCs', 
+                        value = expression(fraction.time.covered.among.FCs*fraction.time.F.of.time.covered.among.FCs),
+                        scale = 'proportion')
+
+# and the same thing for cost-sharing (1-full pay)
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'fraction.time.Cs.among.FCs', 
+                        value = expression(fraction.time.covered.among.FCs*(1-fraction.time.F.of.time.covered.among.FCs)),
+                        scale = 'proportion')
+
+# PREMIUM AND COST-SHARING (PCs)
+    # NOT mutually exclusive: could in theory spend time in: neither, each individually, or both
+    # For simplicity, assume full coverage period was both (not either individually)
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'fraction.time.covered.among.PCs', 
+                       value = 0.875,
+                       scale = 'proportion')
+
+
+### ALL THREE CATEGORIES DURING THAT YEAR (1): FPCs ###
+    # Again, PCs is not mutually exclusive: could spend time in P, Cs, or both 
+    # For simplicity, assume people were either in F or PCs combined (not P or Cs individually)
+# First, what time covered at all 
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'fraction.time.covered.among.FPCs', 
+                       value = 0.875,
+                       scale = 'proportion')
+
+# Next, what time spent on full-pay out of that coverage time 
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'fraction.time.F.of.time.covered.among.FPCs',  
+                       value = 0.25/0.875, 
+                       scale = 'proportion')
+
+# Finally, multiply these two to get fraction time spent on full-pay out of the full calendar year 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'fraction.time.F.among.FPCs', 
+                        value = expression(fraction.time.covered.among.FPCs*fraction.time.F.of.time.covered.among.FPCs),
+                        scale = 'proportion')
+
+# and the same thing for premium + cost-sharing (1-full pay)
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'fraction.time.PCs.among.FPCs', 
+                        value = expression(fraction.time.covered.among.FPCs*(1-fraction.time.F.of.time.covered.among.FPCs)),
+                        scale = 'proportion')
+
+## Todd's old code, with some comments from me to compare
+if(1==2){
+    # F among FP
+    register.model.element(ADAP.SPECIFICATION,
+                           name = 'fraction.time.on.adap.full.pay.among.full.pay.and.premium.without.cost.sharing',
+                           value = 0.25,
+                           scale = 'proportion')
+    
+    
+    # quantity used to calculate P among FP (below)
+    register.model.element(ADAP.SPECIFICATION,
+                           name = 'fraction.non.full.pay.time.on.adap.premium.without.cost.sharing.from.with.full.pay',
+                           value = 0.875,
+                           scale = 'proportion')
+    
+    
+    
+    # F among FPCs
+    register.model.element(ADAP.SPECIFICATION,
+                           name = 'fraction.time.on.adap.full.pay.from.full.pay.and.premium.and.cost.sharing',
+                           value = 0.25,
+                           scale = 'proportion')
+    
+    # F among FCs
+    register.model.element(ADAP.SPECIFICATION,
+                           name = 'fraction.time.on.adap.full.pay.from.full.pay.and.cost.sharing.without.premium',
+                           value = 0.25,
+                           scale = 'proportion')
+    
+    # Time on premium and/or cost-sharing from no full-pay
+    # # P alone 
+    register.model.element(ADAP.SPECIFICATION,
+                           name = 'fraction.time.on.adap.premium.without.cost.sharing.from.without.full.pay',
+                           value = 0.875,
+                           scale = 'proportion')
+    
+    # PCs alone
+    register.model.element(ADAP.SPECIFICATION,
+                           name = 'fraction.time.on.adap.premium.and.cost.sharing.from.without.full.pay',
+                           value = 0.875,
+                           scale = 'proportion')
+    
+    # P alone - SAME AS ABOVE, I think he meant to do Cs alone 
+    register.model.element(ADAP.SPECIFICATION,
+                           name = 'fraction.time.on.adap.premium.without.cost.sharing.from.without.full.pay',
+                           value = 0.875,
+                           scale = 'proportion')
+    
+    # Time on premium and/or cost-sharing as fraction of time not on full-pay when both
+    # quantity used to calculate PCs among FPCs (below)
+    register.model.element(ADAP.SPECIFICATION,
+                           name = 'fraction.non.full.pay.time.on.adap.premium.and.cost.sharing.from.with.full.pay',
+                           value = 0.875,
+                           scale = 'proportion')
+    
+    # quantity used to calculate Cs among FCs (below)
+    register.model.element(ADAP.SPECIFICATION,
+                           name = 'fraction.non.full.pay.time.on.adap.cost.sharing.without.premium.from.with.full.pay',
+                           value = 0.875,
+                           scale = 'proportion')
+    
+    # Quick calculation for the non-full pay services when combined with full-pay
+    # P among FP
+    register.model.quantity(ADAP.SPECIFICATION,
+                            name = 'fraction.time.on.adap.premium.without.cost.sharing.from.with.full.pay',
+                            value = expression( (1 - fraction.time.on.adap.premium.without.cost.sharing.from.without.full.pay) *
+                                                    fraction.non.full.pay.time.on.adap.premium.without.cost.sharing.from.with.full.pay))
+    # PCs among FPCs
+    register.model.quantity(ADAP.SPECIFICATION,
+                            name = 'fraction.time.on.adap.premium.and.cost.sharing.from.with.full.pay',
+                            value = expression( (1 - fraction.time.on.adap.premium.and.cost.sharing.from.without.full.pay) *
+                                                    fraction.non.full.pay.time.on.adap.premium.and.cost.sharing.from.with.full.pay))
+    # Cs among FCs
+    register.model.quantity(ADAP.SPECIFICATION,
+                            name = 'fraction.time.on.adap.cost.sharing.without.premium.from.with.full.pay',
+                            value = expression( (1 - fraction.time.on.adap.cost.sharing.without.premium.from.without.full.pay) *
+                                                    fraction.non.full.pay.time.on.adap.cost.sharing.without.premium.from.with.full.pay))
+    
+}
 
 
 ##---------------------------------------------------------------------------##
