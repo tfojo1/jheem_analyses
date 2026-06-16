@@ -50,9 +50,15 @@ TECH2CHECK.END.YEAR   <- 2030
 make.tech2check.intervention <- function(recruitment.rate       = 0.5,   # legacy: YOUTH rate (adult defaults to 0)
                                          recruitment.rate.youth = NULL,
                                          recruitment.rate.adult = NULL,
-                                         on.or        = NULL,
+                                         on.or        = NULL,   # legacy: sets BOTH youth + adult
                                          recently.or  = NULL,
                                          distantly.or = NULL,
+                                         on.or.youth        = NULL,
+                                         on.or.adult        = NULL,
+                                         recently.or.youth  = NULL,
+                                         recently.or.adult  = NULL,
+                                         distantly.or.youth = NULL,
+                                         distantly.or.adult = NULL,
                                          start.year   = TECH2CHECK.START.YEAR,
                                          stop.year    = NULL,
                                          code         = NULL) {
@@ -75,8 +81,25 @@ make.tech2check.intervention <- function(recruitment.rate       = 0.5,   # legac
     }
     require.scalar(youth.rate, 'recruitment.rate.youth')
     require.scalar(adult.rate, 'recruitment.rate.adult')
-    for (nm in c('on.or', 'recently.or', 'distantly.or')) {
-        v <- get(nm)
+
+    # Resolve youth/adult ORs (#35). Legacy `on.or` etc. set BOTH bands (harmless:
+    # in the youth-only base no adult carries an OR, since adult recruitment is 0);
+    # explicit `.youth`/`.adult` override per band. NULL leaves the spec default.
+    on.youth.or        <- if (!is.null(on.or.youth))        on.or.youth        else on.or
+    on.adult.or        <- if (!is.null(on.or.adult))        on.or.adult        else on.or
+    recently.youth.or  <- if (!is.null(recently.or.youth))  recently.or.youth  else recently.or
+    recently.adult.or  <- if (!is.null(recently.or.adult))  recently.or.adult  else recently.or
+    distantly.youth.or <- if (!is.null(distantly.or.youth)) distantly.or.youth else distantly.or
+    distantly.adult.or <- if (!is.null(distantly.or.adult)) distantly.or.adult else distantly.or
+
+    or.targets <- list('tech2check.on.suppression.OR.youth'        = on.youth.or,
+                       'tech2check.on.suppression.OR.adult'        = on.adult.or,
+                       'tech2check.recently.suppression.OR.youth'  = recently.youth.or,
+                       'tech2check.recently.suppression.OR.adult'  = recently.adult.or,
+                       'tech2check.distantly.suppression.OR.youth' = distantly.youth.or,
+                       'tech2check.distantly.suppression.OR.adult' = distantly.adult.or)
+    for (nm in names(or.targets)) {
+        v <- or.targets[[nm]]
         if (!is.null(v)) require.scalar(v, nm, allow.zero = FALSE)
     }
 
@@ -104,13 +127,11 @@ make.tech2check.intervention <- function(recruitment.rate       = 0.5,   # legac
     if (adult.rate > 0)
         effects <- c(effects, list(rate.effect('tech2check.recruitment.rate.adult', adult.rate)))
 
-    # Optional OR overrides. scale = 'ratio' matches the OR model elements.
-    # NOTE: the OR-override path is not yet exercised in a verified run -- before
-    # relying on it in an OR sweep, confirm suppression.by.intervention.state
-    # responds to these effects (the recruitment path IS verified).
-    or.targets <- list('tech2check.on.suppression.OR'       = on.or,
-                       'tech2check.recently.suppression.OR'  = recently.or,
-                       'tech2check.distantly.suppression.OR' = distantly.or)
+    # Optional OR overrides on the six youth/adult x {on,recently,distantly}
+    # quantities (resolved + validated above). scale = 'ratio' matches the OR
+    # model elements. The youth-band override path is verified (verify_or_override.R,
+    # #38); the multi-dimensional age x continuum path is verified by the
+    # adult-positive OR gate (verify_broaden_or.R, #35).
     for (qname in names(or.targets)) {
         v <- or.targets[[qname]]
         if (!is.null(v))

@@ -22,6 +22,17 @@ TECH2CHECK.RECRUIT.YOUTH.AGES <- '13-24 years'
 # original single-band model. See docs/plan_broaden_pool.md.
 TECH2CHECK.RECRUIT.ADULT.AGES <- '25-34 years'
 
+# Effect-adult age set for the suppression OR (#35): 25+ (all bands at/above 25),
+# NOT just the 25-34 recruitment band. Under current-age semantics individuals
+# age across bands while enrolled (confirmed in verify_broaden_recruitment.R), so
+# a recruit who ages past 34 would otherwise revert to OR=1 at age 35 -- an
+# arbitrary, unspoken discontinuity. Keying the adult OR to 25+ means youth
+# recruits who age up pick up the adult OR and keep it. effect-youth is the youth
+# recruitment band (13-24 = TECH2CHECK.RECRUIT.YOUTH.AGES); together the two
+# effect sets partition all modeled ages (13+), so the OR dispatcher subsets are
+# non-overlapping and exhaustive over the intervention compartments.
+TECH2CHECK.EFFECT.ADULT.AGES <- c('25-34 years', '35-44 years', '45-54 years', '55+ years')
+
 
 ##-------------------##
 ##-- SPECIFICATION --##
@@ -154,8 +165,12 @@ register.transition(TECH2CHECK.SPECIFICATION,
 #
 # Apply the trial OR to the inherited baseline suppression proportion on the
 # odds scale: p' = OR * p / (1 - p + OR * p), where p = super.suppression.of.diagnosed.
-# Three independent ORs so the design.md sensitivity scenarios (reduced OR in
-# Recently; residual OR in Distantly) are parameterizable without restructuring.
+# ORs are split youth/adult x {on, recently, distantly} for the broaden-the-pool
+# OR-transport sensitivity (#35) -- six independent quantities. Adult MIRRORS
+# youth by default (identical values), so the youth-only base is unchanged and
+# adult OR-transport is an explicit override (full = adult OR = youth OR; none =
+# adult OR = 1). The {on, recently, distantly} split also parameterizes the
+# design.md waning scenarios (reduced OR in Recently; residual OR in Distantly).
 # diagnosed_chronic (never intervened) inherits the EHE baseline unchanged via
 # the dispatcher's neutral default (OR = 1).
 #
@@ -168,42 +183,81 @@ register.transition(TECH2CHECK.SPECIFICATION,
 # See jheem_spec_notes.md ("Model quantities vs. tracked outcomes") for full context.
 
 register.model.element(TECH2CHECK.SPECIFICATION,
-                       name = 'tech2check.on.suppression.OR',
+                       name = 'tech2check.on.suppression.OR.youth',
                        scale = 'ratio',
                        value = 2.0)
 
 register.model.element(TECH2CHECK.SPECIFICATION,
-                       name = 'tech2check.recently.suppression.OR',
+                       name = 'tech2check.on.suppression.OR.adult',
                        scale = 'ratio',
                        value = 2.0)
 
 register.model.element(TECH2CHECK.SPECIFICATION,
-                       name = 'tech2check.distantly.suppression.OR',
+                       name = 'tech2check.recently.suppression.OR.youth',
+                       scale = 'ratio',
+                       value = 2.0)
+
+register.model.element(TECH2CHECK.SPECIFICATION,
+                       name = 'tech2check.recently.suppression.OR.adult',
+                       scale = 'ratio',
+                       value = 2.0)
+
+register.model.element(TECH2CHECK.SPECIFICATION,
+                       name = 'tech2check.distantly.suppression.OR.youth',
+                       scale = 'ratio',
+                       value = 1.0)
+
+register.model.element(TECH2CHECK.SPECIFICATION,
+                       name = 'tech2check.distantly.suppression.OR.adult',
                        scale = 'ratio',
                        value = 1.0)
 
 
-# Per-compartment OR dispatcher: default 1 (neutral) everywhere; subsets override
-# for the three intervention compartments. Same shape as EHE's `suppression`
-# quantity — base value plus name-referencing subsets.
+# Per-compartment x age OR dispatcher: default 1 (neutral) everywhere; six
+# non-overlapping subsets override for {on, recently, distantly} x {youth, adult}.
+# Non-overlapping by construction -- distinct continuum compartments, and within a
+# compartment youth (13-24) vs adult (25+) are disjoint age sets -- so precedence
+# is a non-question (overlapping-subset precedence is unverified in jheem2;
+# jheem_spec_notes.md). Same dispatch shape as before, now keyed on age too.
 register.model.quantity(TECH2CHECK.SPECIFICATION,
                         name = 'tech2check.suppression.OR',
                         value = 1)
 
 register.model.quantity.subset(TECH2CHECK.SPECIFICATION,
                                name = 'tech2check.suppression.OR',
-                               value = 'tech2check.on.suppression.OR',
-                               applies.to = list(continuum = 'on_intervention'))
+                               value = 'tech2check.on.suppression.OR.youth',
+                               applies.to = list(continuum = 'on_intervention',
+                                                 age = TECH2CHECK.RECRUIT.YOUTH.AGES))
 
 register.model.quantity.subset(TECH2CHECK.SPECIFICATION,
                                name = 'tech2check.suppression.OR',
-                               value = 'tech2check.recently.suppression.OR',
-                               applies.to = list(continuum = 'recently_intervened'))
+                               value = 'tech2check.on.suppression.OR.adult',
+                               applies.to = list(continuum = 'on_intervention',
+                                                 age = TECH2CHECK.EFFECT.ADULT.AGES))
 
 register.model.quantity.subset(TECH2CHECK.SPECIFICATION,
                                name = 'tech2check.suppression.OR',
-                               value = 'tech2check.distantly.suppression.OR',
-                               applies.to = list(continuum = 'distantly_intervened'))
+                               value = 'tech2check.recently.suppression.OR.youth',
+                               applies.to = list(continuum = 'recently_intervened',
+                                                 age = TECH2CHECK.RECRUIT.YOUTH.AGES))
+
+register.model.quantity.subset(TECH2CHECK.SPECIFICATION,
+                               name = 'tech2check.suppression.OR',
+                               value = 'tech2check.recently.suppression.OR.adult',
+                               applies.to = list(continuum = 'recently_intervened',
+                                                 age = TECH2CHECK.EFFECT.ADULT.AGES))
+
+register.model.quantity.subset(TECH2CHECK.SPECIFICATION,
+                               name = 'tech2check.suppression.OR',
+                               value = 'tech2check.distantly.suppression.OR.youth',
+                               applies.to = list(continuum = 'distantly_intervened',
+                                                 age = TECH2CHECK.RECRUIT.YOUTH.AGES))
+
+register.model.quantity.subset(TECH2CHECK.SPECIFICATION,
+                               name = 'tech2check.suppression.OR',
+                               value = 'tech2check.distantly.suppression.OR.adult',
+                               applies.to = list(continuum = 'distantly_intervened',
+                                                 age = TECH2CHECK.EFFECT.ADULT.AGES))
 
 
 # Redefine the diagnosed-suppression baseline with the per-compartment OR.
