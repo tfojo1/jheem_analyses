@@ -597,21 +597,44 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
     )
     
     ## COVID multipliers ----
+    # # Sex/risk 
+    # set.element.functional.form.interaction.alphas(model.settings,
+    #                                                element.name = "max.covid.effect.sti.screening.reduction",
+    #                                                alpha.name = "value",
+    #                                                value = parameters['heterosexual.sti.screening.covid.multiplier'],
+    #                                                applies.to.dimension.values=list(sex = c("female","heterosexual_male"))
+    # )
+    # set.element.functional.form.interaction.alphas(model.settings,
+    #                                                element.name = "max.covid.effect.sti.screening.reduction",
+    #                                                alpha.name = "value",
+    #                                                value = parameters['msm.sti.screening.covid.multiplier'],
+    #                                                applies.to.dimension.values=list(sex = c("msm"))
+    # )
+    # # race
+    # set.element.functional.form.interaction.alphas(model.settings,
+    #                                                element.name = "max.covid.effect.sti.screening.reduction",
+    #                                                alpha.name = "value",
+    #                                                values = parameters[paste0(races,'.sti.screening.covid.multiplier')],
+    #                                                dimension = 'race',
+    #                                                applies.to.dimension.values = races
+    # )
     # Sex/risk 
-    set.element.functional.form.interaction.alphas(model.settings,
+    set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "max.covid.effect.sti.screening.reduction",
                                                    alpha.name = "value",
                                                    value = parameters['heterosexual.sti.screening.covid.multiplier'],
-                                                   applies.to.dimension.values=list(sex = c("female","heterosexual_male"))
+                                                   dimension = "sex",
+                                                   applies.to.dimension.values= c("female","heterosexual_male")
     )
-    set.element.functional.form.interaction.alphas(model.settings,
+    set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "max.covid.effect.sti.screening.reduction",
                                                    alpha.name = "value",
                                                    value = parameters['msm.sti.screening.covid.multiplier'],
-                                                   applies.to.dimension.values=list(sex = c("msm"))
+                                                   dimension = "sex",
+                                                   applies.to.dimension.values="msm"
     )
     # race
-    set.element.functional.form.interaction.alphas(model.settings,
+    set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "max.covid.effect.sti.screening.reduction",
                                                    alpha.name = "value",
                                                    values = parameters[paste0(races,'.sti.screening.covid.multiplier')],
@@ -646,13 +669,15 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
     ## STI Screening  ----
     # Change intercept and slope 
     set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "rate.sti.screening.over.14",
+                                                   # element.name = "rate.sti.screening.over.14",
+                                                   element.name = "rate.sti.screening.over.14.without.covid",
                                                    alpha.name = "intercept",
                                                    values = parameters[paste0("or.sti.screening.", races)],
                                                    dimension = "race", #recipient
                                                    applies.to.dimension.values = races) 
     set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "rate.sti.screening.over.14",
+                                                   # element.name = "rate.sti.screening.over.14",
+                                                   element.name = "rate.sti.screening.over.14.without.covid",
                                                    alpha.name = "intercept",
                                                    values = parameters[paste0("or.sti.screening.", sexes)],
                                                    dimension = "sex", #recipient
@@ -664,13 +689,15 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
     #                                                dimension = "all", #recipient
     #                                                applies.to.dimension.values = "all")
     set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "rate.sti.screening.over.14",
+                                                   # element.name = "rate.sti.screening.over.14",
+                                                   element.name = "rate.sti.screening.over.14.without.covid",
                                                    alpha.name = "slope",
                                                    values = parameters["or.slope.sti.screening.msm"],
                                                    dimension = "sex", #recipient
                                                    applies.to.dimension.values = c("msm"))
     set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "rate.sti.screening.over.14",
+                                                   # element.name = "rate.sti.screening.over.14",
+                                                   element.name = "rate.sti.screening.over.14.without.covid",
                                                    alpha.name = "slope",
                                                    values = parameters["or.slope.sti.screening.heterosexual"],
                                                    dimension = "sex", #recipient
