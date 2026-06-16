@@ -14,21 +14,43 @@ source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions
 
 
 calibration.codes <- c(
-    "calib.6.12.stage3.az", 
-    "calib.6.12.stg3.penalty"
+    "calib.6.12.stage2.az", 
+    "calib.6.12.stg2.penalty"
 )
  
 # read simulations into the simset
 calib.simsets <- load.calib.simsets(
     locations         = SHIELD.TEN.MSAS,
     calibration.codes = calibration.codes,
-    n.sim = 400
-        
+    n.sim = 300
 )
 
-plot.calib.stages(calib.simsets = calib.simsets,stage = 2,locations = SHIELD.TEN.MSAS,calibration.code =calibration.codes )
+# CREATE ALL STAGE CALIBRATION PLOTS
+plot.calib.stages(calib.simsets = calib.simsets,
+                  calibration.code =calibration.codes[2],
+                  stage = 2,
+                  locations = 'Baltimore')
 
-calib.simsets$
+# SINGLE CALIB SINGLE LOCATION
+plot.single.calib.single.location(calib.simsets = calib.simsets,
+                    calibration.code = calibration.codes[2],
+                    location ="C.12580",
+                    outcomes = "diagnosis.ps",facet.by = "sex",plot.which = "sim.only")
+
+# COMPARING CALIBRATION 
+plot.calib.comparison(calib.simsets = calib.simsets,
+                      # calibration.codes = "calib.6.12.stage2.az",
+                      calibration.codes = calibration.codes,
+                      
+                      locations = SHIELD.TEN.MSAS,
+                      separate.by = "outcome",
+                      outcomes = "diagnosis.ps",
+                      # ncol = 1
+                      facet.by = "sex" ,
+                      plot.which = "sim.only",ncol = 2
+                      )
+
+
 
     # head(calib.simsets$`Atlanta – calib.7.12.stage0.test`$full_simset$get.mcmc.mixing.statistic())
 # simplot(calib.simsets$`Atlanta – calib.7.12.stage0.test`$full_simset,"diagnosis.ps")
