@@ -23,7 +23,7 @@ Expected output: `OK: sim produced (class=jheem.simulation.set/...)`, exit code 
 
 - **Parent spec:** EHE (`parent.version = 'ehe'`).
 - **Compartment extension:** `continuum` dimension gains three intervention-lifecycle states beyond `diagnosed_chronic`. `diagnosed_chronic` is retained as "never intervened."
-- **Recruitment:** `diagnosed_chronic → on_intervention` transition, age-restricted to `'13-24 years'` via `applies.to = list(age = TECH2CHECK.ELIGIBLE.AGES)`. Rate is the primary policy lever (`tech2check.recruitment.rate`).
+- **Recruitment:** one `diagnosed_chronic → on_intervention` transition whose rate is an age dispatcher (`tech2check.recruitment.rate`): youth (`13-24`) and adult (`25-34`) bands route to band-specific underlying rate elements (`tech2check.recruitment.rate.youth/.adult`), default 0 elsewhere. A single transition with a dispatched rate is required — jheem2 rejects two transitions on the same compartments regardless of `applies.to`. Youth-only base (adult rate 0) reproduces the original single-band model; the adult band is the broaden-the-pool sensitivity (#35). Rate is the primary policy lever.
 - **Other lifecycle flows:** completion (`on → recently`, 6-month default), dropout (`on → distantly`), waning (`recently → distantly`).
 - **Suppression effect:** OR-on-odds applied per intervention compartment via a per-compartment OR dispatcher (`tech2check.suppression.OR`) and a single-expression redefinition of `suppression.of.diagnosed` referencing `super.suppression.of.diagnosed`. Inherited tracked outcomes (notably `suppression`) pick up the per-compartment values automatically.
 

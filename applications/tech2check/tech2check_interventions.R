@@ -3,7 +3,7 @@
 # Encodes the policy scenario: Tech2Check recruitment activates at the
 # defined start year and runs through the end year (e.g., 2026-2030 for a
 # 4-year scale-up window). Pre-start-year: no intervention -- baseline
-# counterfactual is the spec default of tech2check.recruitment.rate = 0,
+# counterfactual is the spec default of tech2check.recruitment.rate.youth/.adult = 0,
 # so lifecycle compartments remain empty. Post-start-year: recruitment
 # fires at the specified rate; spec-default ORs (on = 2.0, recently = 2.0,
 # distantly = 1.0) drive the suppression effect through the dispatcher.
@@ -31,7 +31,8 @@ TECH2CHECK.END.YEAR   <- 2030
 # (effect-size sensitivity) -- following the cdc_testing_interventions pattern of
 # parallel intervention objects built from a constructor.
 #
-# recruitment.rate : sustained rate applied from start.year.
+# recruitment.rate : legacy alias = YOUTH rate (adult defaults to 0). Use
+#                    recruitment.rate.youth / .adult for explicit broadened scenarios.
 # stop.year        : NULL = sustained (default); a year = time-limited (recruit
 #                    at the rate from start.year to stop.year, then stop).
 # on/recently/distantly.or : NULL = leave the spec default in place; a number
@@ -46,36 +47,44 @@ TECH2CHECK.END.YEAR   <- 2030
 # (the original bug). Omitting end.time (default Inf) holds it constant. The
 # time-limited branch below pins both endpoints (times = c(start, stop),
 # effect.values = c(r, r), end.time = stop) so the rate is held flat then stops.
-make.tech2check.intervention <- function(recruitment.rate = 0.5,
+make.tech2check.intervention <- function(recruitment.rate       = 0.5,   # legacy: YOUTH rate (adult defaults to 0)
+                                         recruitment.rate.youth = NULL,
+                                         recruitment.rate.adult = NULL,
                                          on.or        = NULL,
                                          recently.or  = NULL,
                                          distantly.or = NULL,
                                          start.year   = TECH2CHECK.START.YEAR,
                                          stop.year    = NULL,
                                          code         = NULL) {
-    if (is.null(stop.year))
-        recruitment.effect <- create.intervention.effect(
-            quantity.name = 'tech2check.recruitment.rate',
-            start.time    = start.year,
-            times         = start.year,
-            effect.values = recruitment.rate,
-            scale         = 'rate',
-            apply.effects.as = 'value',
-            allow.values.less.than.otherwise = F,
-            allow.values.greater.than.otherwise = T)
-    else
-        recruitment.effect <- create.intervention.effect(
-            quantity.name = 'tech2check.recruitment.rate',
-            start.time    = start.year,
-            times         = c(start.year, stop.year),
-            effect.values = c(recruitment.rate, recruitment.rate),
-            end.time      = stop.year,
-            scale         = 'rate',
-            apply.effects.as = 'value',
-            allow.values.less.than.otherwise = F,
-            allow.values.greater.than.otherwise = T)
+    # Resolve youth/adult recruitment (#35). Legacy `recruitment.rate` means the
+    # YOUTH rate with adult defaulting to 0 -- so the base scenario stays youth-only
+    # and is NOT silently broadened. Explicit `recruitment.rate.youth/.adult` override.
+    youth.rate <- if (!is.null(recruitment.rate.youth)) recruitment.rate.youth else recruitment.rate
+    adult.rate <- if (!is.null(recruitment.rate.adult)) recruitment.rate.adult else 0
 
-    effects <- list(recruitment.effect)
+    # Sustained (stop.year = NULL) or time-limited rate effect on one quantity.
+    # (See the end.time-gotcha note above: for SUSTAINED recruitment do NOT pass
+    # end.time, or jheem2 ramps the rate linearly down to 0 over the window.)
+    rate.effect <- function(qname, rate) {
+        if (is.null(stop.year))
+            create.intervention.effect(
+                quantity.name = qname, start.time = start.year, times = start.year,
+                effect.values = rate, scale = 'rate', apply.effects.as = 'value',
+                allow.values.less.than.otherwise = F, allow.values.greater.than.otherwise = T)
+        else
+            create.intervention.effect(
+                quantity.name = qname, start.time = start.year, times = c(start.year, stop.year),
+                effect.values = c(rate, rate), end.time = stop.year, scale = 'rate',
+                apply.effects.as = 'value', allow.values.less.than.otherwise = F,
+                allow.values.greater.than.otherwise = T)
+    }
+
+    # Youth recruitment effect always; adult only when > 0 (0 = spec default, a
+    # no-op -- omitting it keeps the youth-only base/neutrality scenario exactly
+    # the original single-band model).
+    effects <- list(rate.effect('tech2check.recruitment.rate.youth', youth.rate))
+    if (adult.rate > 0)
+        effects <- c(effects, list(rate.effect('tech2check.recruitment.rate.adult', adult.rate)))
 
     # Optional OR overrides. scale = 'ratio' matches the OR model elements.
     # NOTE: the OR-override path is not yet exercised in a verified run -- before
@@ -99,7 +108,7 @@ make.tech2check.intervention <- function(recruitment.rate = 0.5,
     }
 
     if (is.null(code))
-        code <- sprintf('t2c.r%g', recruitment.rate)
+        code <- sprintf('t2c.ry%g.ra%g', youth.rate, adult.rate)
 
     do.call(create.intervention,
             c(list(WHOLE.POPULATION), effects, list(code = code, parameters = NULL)))

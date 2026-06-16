@@ -11,11 +11,16 @@ source('../jheem_analyses/applications/EHE/ehe_specification.R')
 ##-- CONSTANTS --##
 ##---------------##
 
-# Trial-aligned eligible age range. JHEEM's first age band ("13-24 years")
+# Trial-aligned youth eligible age range. JHEEM's first age band ("13-24 years")
 # corresponds almost exactly to the Tech2Check trial's enrollment range
 # (ages 12-25). 12-year-olds are not modeled by JHEEM (start age 13);
 # 25-year-olds fall in band 2 — both edges are small modeling approximations.
-TECH2CHECK.ELIGIBLE.AGES <- '13-24 years'
+TECH2CHECK.RECRUIT.YOUTH.AGES <- '13-24 years'
+
+# Adult recruitment band for the broaden-the-pool sensitivity (#35). Adult
+# recruitment defaults to 0 (youth-only base case), so the base reproduces the
+# original single-band model. See docs/plan_broaden_pool.md.
+TECH2CHECK.RECRUIT.ADULT.AGES <- '25-34 years'
 
 
 ##-------------------##
@@ -48,18 +53,55 @@ TECH2CHECK.SPECIFICATION = create.jheem.specification(
 ##-----------------##
 
 #-- Never intervened -> On intervention (recruitment; primary policy lever) --#
+# Split youth/adult for the broaden-the-pool sensitivity (#35) via an AGE
+# DISPATCHER on one transition -- NOT two transitions. jheem2 keys transitions
+# by dimension/from/to/group/tag and REJECTS a second transition on the same
+# compartments regardless of `applies.to` (components.clash,
+# SPECIFICATION_model_specification.R:7429 + parent :6661 -- applies.to is not
+# part of the clash key). So one transition reads an age-subset dispatcher rate
+# quantity: youth ages pick up the youth rate, adult ages the adult rate, all
+# other ages 0 (the dispatcher default). Pattern A (separate underlying rate
+# quantities) is still REQUIRED so the intervention can set youth/adult rates
+# independently -- a single create.intervention rejects two effects on one
+# quantity (INTERVENTIONS_main.R:60; jheem_spec_notes.md). Base case is
+# youth-only (adult rate defaults to 0), so the base reproduces the original
+# single-rate model (verified by the neutrality + base-preservation gates).
 register.model.element(TECH2CHECK.SPECIFICATION,
-                       name = 'tech2check.recruitment.rate',
+                       name = 'tech2check.recruitment.rate.youth',
                        scale = 'rate',
                        value = 0)
+
+register.model.element(TECH2CHECK.SPECIFICATION,
+                       name = 'tech2check.recruitment.rate.adult',
+                       scale = 'rate',
+                       value = 0)
+
+# Age dispatcher: default 0 (no recruitment); the youth/adult age bands override
+# to their band-specific underlying rate element. Non-overlapping subsets
+# (13-24 vs 25-34) -- overlapping-subset precedence is unverified in jheem2
+# (jheem_spec_notes.md). Same dispatch shape as tech2check.suppression.OR, here
+# consumed as a transition rate rather than inside an expression.
+register.model.quantity(TECH2CHECK.SPECIFICATION,
+                        name = 'tech2check.recruitment.rate',
+                        scale = 'rate',
+                        value = 0)
+
+register.model.quantity.subset(TECH2CHECK.SPECIFICATION,
+                               name = 'tech2check.recruitment.rate',
+                               value = 'tech2check.recruitment.rate.youth',
+                               applies.to = list(age = TECH2CHECK.RECRUIT.YOUTH.AGES))
+
+register.model.quantity.subset(TECH2CHECK.SPECIFICATION,
+                               name = 'tech2check.recruitment.rate',
+                               value = 'tech2check.recruitment.rate.adult',
+                               applies.to = list(age = TECH2CHECK.RECRUIT.ADULT.AGES))
 
 register.transition(TECH2CHECK.SPECIFICATION,
                     dimension = 'continuum',
                     groups = 'infected',
                     from.compartments = 'diagnosed_chronic',
                     to.compartments = 'on_intervention',
-                    value = 'tech2check.recruitment.rate',
-                    applies.to = list(age = TECH2CHECK.ELIGIBLE.AGES))
+                    value = 'tech2check.recruitment.rate')
 
 
 #-- On intervention -> Recently intervened (program completion) --#
@@ -183,34 +225,50 @@ register.model.quantity(TECH2CHECK.SPECIFICATION,
 # EHE outcomes are inherited; these are Tech2Check-specific additions for
 # verification (simulation_verification.md) and downstream paper/cost analysis.
 
-# Annual program enrollments per stratum.
+# Annual program enrollments per stratum, split youth/adult (#35). Each is the
+# integral over the year of (recruitment.rate.<band> * infected population)
+# restricted to diagnosed_chronic in that recruitment band -- the same
+# expression the ODE evaluates at the recruitment transition, integrated
+# post-hoc. Split is required because the two bands carry different recruitment
+# rates: a single broadened outcome can't multiply two source populations by
+# two different rates. Each multiplies by its band's underlying rate ELEMENT
+# (tech2check.recruitment.rate.youth/.adult), NOT the age dispatcher quantity
+# tech2check.recruitment.rate (which the transition reads) -- the outcome's own
+# age subset already restricts the source population, so the flat element is the
+# right per-band rate. Sum the two in analysis for a total.
 #
-# Mathematically: integral over the year of (recruitment.rate * infected
-# population) restricted to diagnosed_chronic in the eligible age range --
-# the same expression the ODE evaluates at the recruitment transition, just
-# integrated post-hoc rather than tracked dynamically.
-#
-# Implementation note: track.integrated.outcome (static) is used here rather
-# than track.transition (dynamic) so the spec remains transmutable from EHE.
+# Implementation note: track.integrated.outcome (static) is used rather than
+# track.transition (dynamic) so the spec remains transmutable from EHE.
 # do.evaluate.can.transmute rejects new dynamic outcomes in the to-spec
 # (JHEEM_transmutation.R::do.evaluate.can.transmute line ~123); the team's
 # Ryan White spec follows the same pattern -- zero track.transition calls.
-# The integrated form is documented as "an approximation of the outcome that
-# would be generated by using track.dynamic.outcome" (rectangle rule per
-# integration window); for a constant within-year rate as used here, the
-# approximation is exact in the limit and very close in practice.
+# For a constant within-year rate the integrated form is exact in the limit.
 track.integrated.outcome(TECH2CHECK.SPECIFICATION,
-                         name = 'tech2check.enrollments',
-                         outcome.metadata = create.outcome.metadata(display.name = 'Tech2Check Enrollments',
-                                                                    description = "Number of Individuals Enrolling in Tech2Check in the Past Year",
+                         name = 'tech2check.enrollments.youth',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Tech2Check Enrollments (Youth 13-24)',
+                                                                    description = "Number of Youth (13-24) Enrolling in Tech2Check in the Past Year",
                                                                     scale = 'non.negative.number',
                                                                     axis.name = 'Enrollments',
                                                                     units = 'persons',
                                                                     singular.unit = 'person'),
                          value.to.integrate = 'infected',
-                         multiply.by = 'tech2check.recruitment.rate',
+                         multiply.by = 'tech2check.recruitment.rate.youth',
                          subset.dimension.values = list(continuum = 'diagnosed_chronic',
-                                                        age = TECH2CHECK.ELIGIBLE.AGES),
+                                                        age = TECH2CHECK.RECRUIT.YOUTH.AGES),
+                         keep.dimensions = c('location','age','race','sex','risk'))
+
+track.integrated.outcome(TECH2CHECK.SPECIFICATION,
+                         name = 'tech2check.enrollments.adult',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Tech2Check Enrollments (Adult 25-34)',
+                                                                    description = "Number of Adults (25-34) Enrolling in Tech2Check in the Past Year",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Enrollments',
+                                                                    units = 'persons',
+                                                                    singular.unit = 'person'),
+                         value.to.integrate = 'infected',
+                         multiply.by = 'tech2check.recruitment.rate.adult',
+                         subset.dimension.values = list(continuum = 'diagnosed_chronic',
+                                                        age = TECH2CHECK.RECRUIT.ADULT.AGES),
                          keep.dimensions = c('location','age','race','sex','risk'))
 
 # Population in each lifecycle compartment (continuum kept to break out by state).
