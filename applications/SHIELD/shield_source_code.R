@@ -91,6 +91,7 @@ source('applications/SHIELD/R/shield_ontology_mappings.R') ; print("shield_ontol
 source('applications/SHIELD/R/shield_specification_helpers.R'); print("shield_specification_helpers.R sourced")
 source('applications/SHIELD/R/shield_inputManager_pairing.R') ; print("shield_inputManager_pairing.R sourced")
 source('applications/SHIELD/R/shield_inputManager_helpers.R') ; print("shield_inputManager_helpers.R sourced")
+source('applications/SHIELD/R/shield_inputManager_covid.R') ; print("shield_inputManager_covid.R sourced")
 
 ##-- CREATE and STORE --## ----
 PAIRING.INPUT.MANAGER = create.pairing.manager(dir=paste0("applications/SHIELD/data_files/pairing"))

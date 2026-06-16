@@ -1143,8 +1143,8 @@ register.model.element(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'max.covid.effect.sti.screening.reduction',
                        scale = 'ratio',
-                       # get.functional.form.function = get.covid.max.testing.effect)
-                       value = 1)
+                       get.functional.form.function = get.covid.max.testing.effect)
+           
 
 
 # register.model.element(SHIELD.SPECIFICATION,

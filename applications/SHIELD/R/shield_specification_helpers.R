@@ -1048,10 +1048,19 @@ get_prob_careseek_symptomatic_ps_functional_form<-function(specification.metadat
 
  
 ##-- COVID --# ----
-get.covid.max.testing.effect = function(specification.metadata){
+# Wraps the fully stratified Q2 2020 testing reduction array into a static
+# functional form object on the logit scale, ready for use as a model parameter.
+# The array from contains values in probability space (0, 1), representing the proportion of baseline
+# testing retained at the Q2 2020 nadir for each [age × race × sex] stratum.
+
+# The resulting object represents the maximum COVID suppression of testing
+# (the Q2 2020 nadir). It is passed into the model's time-varying testing rate parameter alongside a separate functional form
+# that governs how the effect ramps in and out across the full 2020–2022 COVID period (covid on).
+max.covid.effect.sti.screening.reduction = function(specification.metadata){
     create.static.functional.form(value = get.q2.full.stratified.covid.reduction.in.testing(specification.metadata),
                                   link = 'logit',
-                                  value.is.on.transformed.scale = F)
+                                  value.is.on.transformed.scale = F #inputs are raw probabilities (not yet logit-transformed)
+                                  )
 }
 
  

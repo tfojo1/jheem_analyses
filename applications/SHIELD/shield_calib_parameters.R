@@ -162,7 +162,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
                              log(1)), #het
         logsd.baseline = c(log(2)*2, #msm
                            log(2)*2
-                           ), #het
+        ), #het
         logsd.deltas.past = c("1970" = 0.5*log(1.5^2), #20-year delta
                               "1990" = 0.5*log(sqrt(1.5)), #5-year delta
                               "1995" = 0.5*log(sqrt(1.5))), #5-year delta
@@ -214,10 +214,17 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
 
 ## STI.TESTING.PARAMETERS.PRIOR ----
 STI.TESTING.PARAMETERS.PRIOR=join.distributions( 
-## COVID ----
-max.covid.effect.sti.screening.reduction= Logitnormal.Distribution(meanlogit = logit(0.5),sdlogit = log(2)),
-
-        ## Fraction Symptomatic ----
+    ## COVID ----
+    # sti.screening: 5 alphas (leaving out age for now) #'@Melissa: why log? not logit?
+    # parameter: max.covid.effect.sti.screening.reduction
+    black.sti.screening.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    hispanic.sti.screening.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    other.sti.screening.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    
+    heterosexual.sti.screening.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    msm.sti.screening.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    
+    ## Fraction Symptomatic ----
     #  inputs/input_prop_symp_primary.R
     ## Data source: Study of MSM followed at PrEP clinics: Proportion of incident syphilis presenting with symptomatic primary 25% or secondary at 16% disease
     # >> we use this to inform the prior for MSM and het_male
@@ -589,6 +596,29 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    dimension = "all"
     )
     
+    ## COVID multipliers ----
+    # Sex/risk 
+    set.element.functional.form.interaction.alphas(model.settings,
+                                                   element.name = "max.covid.effect.sti.screening.reduction",
+                                                   alpha.name = "value",
+                                                   value = parameters['heterosexual.sti.screening.covid.multiplier'],
+                                                   applies.to.dimension.values=list(sex = c("female","heterosexual_male"))
+    )
+    set.element.functional.form.interaction.alphas(model.settings,
+                                                   element.name = "max.covid.effect.sti.screening.reduction",
+                                                   alpha.name = "value",
+                                                   value = parameters['msm.sti.screening.covid.multiplier'],
+                                                   applies.to.dimension.values=list(sex = c("msm"))
+    )
+    # race
+    set.element.functional.form.interaction.alphas(model.settings,
+                                                   element.name = "max.covid.effect.sti.screening.reduction",
+                                                   alpha.name = "value",
+                                                   values = parameters[paste0(races,'.sti.screening.covid.multiplier')],
+                                                   dimension = 'race',
+                                                   applies.to.dimension.values = races
+    )
+    
     ## Symptomatic Testing ---- 
     # Logit Linear function 
     # changes in intercept by sex
@@ -695,9 +725,9 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
             values = parameters[paste0(pre, ".slope.mult")],
             dimension = "all",
             applies.to.dimension.values = "all")
-            }
-    
     }
+    
+}
 
 
 
@@ -941,9 +971,13 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
 
 ## STI.TESTING.SAMPLING.BLOCKS ----
 STI.TESTING.SAMPLING.BLOCKS = list(
-    covid.screening=c(
-        "max.covid.effect.sti.screening.reduction"
-    ),
+    covid.screening.red.sex=c(
+        "heterosexual.sti.screening.covid.multiplier",
+        "msm.sti.screening.covid.multiplier"),
+    covid.screening.red.race=c("black.sti.screening.covid.multiplier",
+                               "hispanic.sti.screening.covid.multiplier",
+                               "other.sti.screening.covid.multiplier"),
+    #
     prp.sym.ps=c(
         "prp.symptomatic.primary.msm",
         "rr.prp.symptomatic.primary.female",
@@ -974,7 +1008,7 @@ STI.TESTING.SAMPLING.BLOCKS = list(
         # 'or.slope.sti.screening',
         'or.slope.sti.screening.msm',
         'or.slope.sti.screening.heterosexual'
-        ),
+    ),
     #
     syphilis.to.hiv.testing.ratio.sex.slope<-c(
         "or.syphilis.to.hiv.testing.msm",
@@ -999,7 +1033,7 @@ TRANS.BY.AGE.SAMPLING.BLOCKS = list(
     age.transmission.young<-c(
         "transmission.rate.multiplier.age14.msm",
         "transmission.rate.multiplier.age14.heterosexual"
-        ),
+    ),
     #
     age.transmission.msm.1 = c(
         "transmission.rate.multiplier.age19.msm",
