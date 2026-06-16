@@ -1143,29 +1143,13 @@ register.model.element(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'max.covid.effect.sti.screening.reduction',
                        scale = 'ratio',
-                       get.functional.form.function = get.covid.max.testing.effect)
-           
-
-
-# register.model.element(SHIELD.SPECIFICATION,
-#                        name = 'testing.mobility.correlation',
-#                        scale = 'proportion',
-#                        value = 1)
-# 
-# register.model.element(SHIELD.SPECIFICATION,
-#                        name = 'covid.mobility.change',
-#                        scale = 'proportion',
-#                        get.functional.form.function = get.covid.mobility.for.location,
-#                        functional.form.from.time = 2020)
+                       get.functional.form.function = get.max.covid.effect.sti.screening.reduction)
 
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.sti.screening',
                         scale = 'rate',
                         value = expression(
                             rate.sti.screening.without.covid *  (1-(1-max.covid.effect.sti.screening.reduction) * covid.on )))
-                                # (1-(1-max.covid.effect.sti.screening.reduction) * covid.on *
-                                #      (1-testing.mobility.correlation+(testing.mobility.correlation*covid.mobility.change))))
-
 
 # Model the ratio of STI screening to HIV tests as a smooth function 
 #'@Andrew: to review with Todd: I think that we should define this as a proportion (wont expect to go over 1?)

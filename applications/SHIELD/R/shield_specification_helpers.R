@@ -1053,10 +1053,10 @@ get_prob_careseek_symptomatic_ps_functional_form<-function(specification.metadat
 # The array from contains values in probability space (0, 1), representing the proportion of baseline
 # testing retained at the Q2 2020 nadir for each [age × race × sex] stratum.
 
-# The resulting object represents the maximum COVID suppression of testing
+# The resulting object represents the maximum COVID reduction of testing
 # (the Q2 2020 nadir). It is passed into the model's time-varying testing rate parameter alongside a separate functional form
 # that governs how the effect ramps in and out across the full 2020–2022 COVID period (covid on).
-max.covid.effect.sti.screening.reduction = function(specification.metadata){
+get.max.covid.effect.sti.screening.reduction = function(specification.metadata){
     create.static.functional.form(value = get.q2.full.stratified.covid.reduction.in.testing(specification.metadata),
                                   link = 'logit',
                                   value.is.on.transformed.scale = F #inputs are raw probabilities (not yet logit-transformed)
@@ -1082,6 +1082,7 @@ get_sti_screening_functional_form <- function(specification.metadata) {
                                                                           anchor.year = 2010,
                                                                           max = 1,
                                                                           parameters.are.on.logit.scale = T)
+  
   
   sti_screening_functional_form
 }

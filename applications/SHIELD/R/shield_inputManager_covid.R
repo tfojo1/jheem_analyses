@@ -65,59 +65,6 @@ get.covid.reduction.in.testing.by.sex.race = function(specification.metadata){
     rv
 }
 
-# get.q2.covid.reduction() ----
-# Returns a scalar that represents how much deeper the Q2 2020 testing nadir
-# was relative to the full-year 2020 average reduction.
-#
-# Data source: Hoover et al. 2022 (DOI 10.15585/mmwr.mm7148a1), Table 1.
-# Quarterly HIV diagnosis counts from NHSS (LabCorp + Quest Diagnostics):
-#
-#   2019: Q1=9,488  Q2=9,431  Q3=9,164  Q4=8,392  → Total=36,475
-#   2020: Q1=8,438  Q2=6,228  Q3=7,905  Q4=7,758  → Total=30,329
-#
-# Full-year ratio:  30,329 / 36,475 = 0.831  (i.e., ~83% of 2019 diagnoses)
-# Q2 ratio:          6,228 /  9,431 = 0.660  (i.e., ~66% of 2019 Q2 diagnoses)
-#
-# The function returns: Q2 ratio / full-year ratio = 0.660 / 0.831 ≈ 0.794
-#
-# Interpretation: Q2 2020 was ~79.4% as severe as the full-year average,
-# meaning Q2 had about 20.6 percentage points more reduction relative to
-# the annual mean. This scalar is used as a multiplier in
-# get.q2.full.stratified.covid.reduction.in.testing() to scale the annual
-# testing reduction down to its Q2 nadir.
-#
-# NOTE: The code comments show equivalent calculations using raw test counts
-# rather than diagnoses; the diagnosis-based version is what is implemented.
-# Both approaches yield similar results (0.734 vs 0.794).
-get.q2.covid.reduction = function(){
-    # the reductions in HIV test and diagnosis are similar; we used the diagnosis below 
-    # Using number of tests (Table1)
-    # tests.2019 = sum(2101633,2523317,2572963,2451303)
-    # tests.2020 = sum(2471614,1682578,2325554,2274593)
-    # 
-    # overall.reducton.tests = tests.2020/tests.2019 #0.9
-    # 
-    # q2.2019.tests = 2523317
-    # q2.2020.tests = 1682578
-    # 
-    # q2.reduction.tests = q2.2020.tests/q2.2019.tests #0.66
-    # q2.to.full.year.tests = q2.reduction.tests/overall.reducton.tests # 0.734 (reductions in HIV test in Q2 relative to full year)
-    # 
-    # Using diagnosed HIV 
-    diagnosed.2019 = sum(9488,9431,9164,8392)
-    diagnosed.2020 = sum(8438,6228,7905,7758)
-    
-    overall.reduction.diagnosed = diagnosed.2020/diagnosed.2019 #.83
-    
-    q2.2019.diagnosed = 9431
-    q2.2020.diagnosed = 6228
-    
-    q2.reduction.diagnosed = q2.2020.diagnosed/q2.2019.diagnosed #0.66
-    
-    q2.to.full.year.diagnosed = q2.reduction.diagnosed/overall.reduction.diagnosed # 0.794 (reductions in HIV diagnosis in Q2 relative to full year)
-    
-    q2.to.full.year.diagnosed # multiply this by overall reduction in previous function to get max reduction in q2
-}
 
 # get.covid.reduction.in.testing.by.age() ----
 # Data source: Patel et al. 2022 (PMID 36094476), JAIDS. Uses CDC-funded health
@@ -171,6 +118,61 @@ get.covid.reduction.in.testing.by.age = function(specification.metadata){
     
     
     age.to.all.ages.reduction.mapped
+}
+
+
+# get.q2.covid.reduction() ----
+# Returns a scalar that represents how much deeper the Q2 2020 testing nadir
+# was relative to the full-year 2020 average reduction.
+#
+# Data source: Hoover et al. 2022 (DOI 10.15585/mmwr.mm7148a1), Table 1.
+# Quarterly HIV diagnosis counts from NHSS (LabCorp + Quest Diagnostics):
+#
+#   2019: Q1=9,488  Q2=9,431  Q3=9,164  Q4=8,392  → Total=36,475
+#   2020: Q1=8,438  Q2=6,228  Q3=7,905  Q4=7,758  → Total=30,329
+#
+# Full-year ratio:  30,329 / 36,475 = 0.831  (i.e., ~83% of 2019 diagnoses)
+# Q2 ratio:          6,228 /  9,431 = 0.660  (i.e., ~66% of 2019 Q2 diagnoses)
+#
+# The function returns: Q2 ratio / full-year ratio = 0.660 / 0.831 ≈ 0.794
+#
+# Interpretation: Q2 2020 was ~79.4% as severe as the full-year average,
+# meaning Q2 had about 20.6 percentage points more reduction relative to
+# the annual mean. This scalar is used as a multiplier in
+# get.q2.full.stratified.covid.reduction.in.testing() to scale the annual
+# testing reduction down to its Q2 nadir.
+#
+# NOTE: The code comments show equivalent calculations using raw test counts
+# rather than diagnoses; the diagnosis-based version is what is implemented.
+# Both approaches yield similar results (0.734 vs 0.794).
+get.q2.covid.reduction = function(){
+    # the reductions in HIV test and diagnosis are similar; we used the diagnosis below 
+    # Using number of tests (Table1)
+    # tests.2019 = sum(2101633,2523317,2572963,2451303)
+    # tests.2020 = sum(2471614,1682578,2325554,2274593)
+    # 
+    # overall.reducton.tests = tests.2020/tests.2019 #0.9
+    # 
+    # q2.2019.tests = 2523317
+    # q2.2020.tests = 1682578
+    # 
+    # q2.reduction.tests = q2.2020.tests/q2.2019.tests #0.66
+    # q2.to.full.year.tests = q2.reduction.tests/overall.reducton.tests # 0.734 (reductions in HIV test in Q2 relative to full year)
+    # 
+    # Using diagnosed HIV 
+    diagnosed.2019 = sum(9488,9431,9164,8392)
+    diagnosed.2020 = sum(8438,6228,7905,7758)
+    
+    overall.reduction.diagnosed = diagnosed.2020/diagnosed.2019 #.83
+    
+    q2.2019.diagnosed = 9431
+    q2.2020.diagnosed = 6228
+    
+    q2.reduction.diagnosed = q2.2020.diagnosed/q2.2019.diagnosed #0.66
+    
+    q2.to.full.year.diagnosed = q2.reduction.diagnosed/overall.reduction.diagnosed # 0.794 (reductions in HIV diagnosis in Q2 relative to full year)
+    
+    q2.to.full.year.diagnosed # multiply this by overall reduction in previous function to get max reduction in q2
 }
 
 
