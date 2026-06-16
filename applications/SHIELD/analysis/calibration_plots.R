@@ -29,27 +29,40 @@ calib.simsets <- load.calib.simsets(
 plot.calib.stages(calib.simsets = calib.simsets,
                   calibration.code =calibration.codes[2],
                   stage = 2,
-                  locations = 'Baltimore')
+                  locations = SHIELD.TEN.MSAS)
 
 # SINGLE CALIB SINGLE LOCATION
 plot.single.calib.single.location(calib.simsets = calib.simsets,
                     calibration.code = calibration.codes[2],
                     location ="C.12580",
-                    outcomes = "diagnosis.ps",facet.by = "sex",plot.which = "sim.only")
+                    outcomes = "hiv.testing",facet.by = "age",split.by = "sex")
+
+simplot(calib.simsets$`Baltimore – calib.6.12.stg2.penalty`$last_sim,
+        outcomes = "hiv.testing",facet.by = "age",split.by = "sex")
 
 # COMPARING CALIBRATION 
 plot.calib.comparison(calib.simsets = calib.simsets,
-                      # calibration.codes = "calib.6.12.stage2.az",
-                      calibration.codes = calibration.codes,
-                      
+                      calibration.codes = c("calib.6.12.stage2.az","calib.6.12.stg2.penalty"),
+                      sim.subset = "last20",
                       locations = SHIELD.TEN.MSAS,
                       separate.by = "outcome",
-                      outcomes = "diagnosis.ps",
+                      outcomes = c("diagnosis.ps","hiv.testing"),
                       # ncol = 1
                       facet.by = "sex" ,
-                      plot.which = "sim.only",ncol = 2
+                      # plot.which = "sim.only",
+                      ncol = 2
                       )
-
+plot.calib.comparison(calib.simsets = calib.simsets,
+                      calibration.codes = c("calib.6.12.stage2.az","calib.6.12.stg2.penalty"),
+                      sim.subset = "last20",
+                      locations = SHIELD.TEN.MSAS,
+                      separate.by = "outcome",
+                      outcomes =  c("diagnosis.total", "diagnosis.ps", "diagnosis.el.misclassified",
+                                    "diagnosis.late.misclassified", "hiv.testing")
+                      # ncol = 1
+                      # facet.by = "sex" ,
+                      # plot.which = "sim.only",ncol = 2
+)
 
 
     # head(calib.simsets$`Atlanta – calib.7.12.stage0.test`$full_simset$get.mcmc.mixing.statistic())

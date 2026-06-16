@@ -1047,6 +1047,14 @@ get_prob_careseek_symptomatic_ps_functional_form<-function(specification.metadat
 }
 
  
+##-- COVID --# ----
+get.covid.max.testing.effect = function(specification.metadata){
+    create.static.functional.form(value = get.q2.full.stratified.covid.reduction.in.testing(specification.metadata),
+                                  link = 'logit',
+                                  value.is.on.transformed.scale = F)
+}
+
+ 
 
 #-- STI SCREENING --# ----
 get_sti_screening_functional_form <- function(specification.metadata) {

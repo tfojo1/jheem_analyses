@@ -1092,30 +1092,80 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                value =expression(1/duration.cns))
 
 
+
+
 ##---- 2-STI SCREENING ----
-# In absence of direct data on STI screening rate, we estiamte the initial function using the HIV testing data from BRFSS.
+# In absence of direct data on STI screening rate, we estimate the initial function using the HIV testing data from BRFSS.
 # We then implement multiple parameters to fine tune STI testing in our model (by sex, race, etc) to fit STI diagnosis
 # We also calculate the projected HIV testing pattern from simulated STI screening in the model, and fit that against observed data to make sure that we stay true to it
+
+# Make quantities to cover all ages.
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'rate.sti.screening.without.covid',
+                        scale = 'rate',
+                        value=0)
 
 # HIV testing data (BRFFS) starts from age 18. We assume those age 15-17 have similar testing proportions as those in 18-19 agegroup
 # we assume 0 testing in the youngest age-group [0-14].
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'rate.sti.screening.over.14',
+                       name = 'rate.sti.screening.over.14.without.covid',
                        scale = 'rate',
                        get.functional.form.function = get_sti_screening_functional_form,
                        functional.form.from.time = 2010,
                        functional.form.scale = 'proportion')
 
-# Make quantities to cover all ages.
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = "rate.sti.screening.without.covid", 
+                               applies.to = list(age=c("15-19 years" ,"20-24 years" ,"25-29 years" ,"30-34 years", "35-39 years", "40-44 years", "45-49 years" ,"50-54 years", "55-64 years" ,"65+ years")),
+                               value = "rate.sti.screening.over.14.without.covid")
+
+##---- COVID
+N.COVID.MONTHS = 24
+N.COVID.MONTHS.FULL.EFFECT = 12
+# binary variable that is on from March 15,2020-2022, marking the covid period
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'covid.on',
+                       scale = 'proportion',
+                       functional.form = create.linear.spline.functional.form(
+                           knot.times = c(pre = (2020 + (2.5/12)), # March 15, 2020
+                                          start = (2020 + (3/12)), # March 30, 2020
+                                          end = (2020 + (3/12) + N.COVID.MONTHS.FULL.EFFECT/12), # starts tapering 
+                                          post = (2020 + (3/12) + N.COVID.MONTHS/12) # back to normal 
+                           ),
+                           knot.values = list(pre = 0,
+                                              start = 1,
+                                              end = 1,
+                                              post = 0)
+                       ),
+                       functional.form.from.time = 2020)
+
+#Reduced value due to covid: e.g. 1>> no change; 0.8>> 20% reduction during covid
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'max.covid.effect.sti.screening.reduction',
+                       scale = 'ratio',
+                       # get.functional.form.function = get.covid.max.testing.effect)
+                       value = 1)
+
+
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = 'testing.mobility.correlation',
+#                        scale = 'proportion',
+#                        value = 1)
+# 
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = 'covid.mobility.change',
+#                        scale = 'proportion',
+#                        get.functional.form.function = get.covid.mobility.for.location,
+#                        functional.form.from.time = 2020)
+
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.sti.screening',
                         scale = 'rate',
-                        value=0)
+                        value = expression(
+                            rate.sti.screening.without.covid *  (1-(1-max.covid.effect.sti.screening.reduction) * covid.on )))
+                                # (1-(1-max.covid.effect.sti.screening.reduction) * covid.on *
+                                #      (1-testing.mobility.correlation+(testing.mobility.correlation*covid.mobility.change))))
 
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = "rate.sti.screening",
-                               applies.to = list(age=c("15-19 years" ,"20-24 years" ,"25-29 years" ,"30-34 years", "35-39 years", "40-44 years", "45-49 years" ,"50-54 years", "55-64 years" ,"65+ years")),
-                               value = "rate.sti.screening.over.14")
 
 # Model the ratio of STI screening to HIV tests as a smooth function 
 #'@Andrew: to review with Todd: I think that we should define this as a proportion (wont expect to go over 1?)

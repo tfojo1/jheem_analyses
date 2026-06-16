@@ -214,7 +214,10 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
 
 ## STI.TESTING.PARAMETERS.PRIOR ----
 STI.TESTING.PARAMETERS.PRIOR=join.distributions( 
-    ## Fraction Symptomatic ----
+## COVID ----
+max.covid.effect.sti.screening.reduction= Logitnormal.Distribution(meanlogit = logit(0.5),sdlogit = log(2)),
+
+        ## Fraction Symptomatic ----
     #  inputs/input_prop_symp_primary.R
     ## Data source: Study of MSM followed at PrEP clinics: Proportion of incident syphilis presenting with symptomatic primary 25% or secondary at 16% disease
     # >> we use this to inform the prior for MSM and het_male
@@ -938,6 +941,9 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
 
 ## STI.TESTING.SAMPLING.BLOCKS ----
 STI.TESTING.SAMPLING.BLOCKS = list(
+    covid.screening=c(
+        "max.covid.effect.sti.screening.reduction"
+    ),
     prp.sym.ps=c(
         "prp.symptomatic.primary.msm",
         "rr.prp.symptomatic.primary.female",
