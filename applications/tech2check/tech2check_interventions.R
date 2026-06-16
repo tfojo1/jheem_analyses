@@ -62,6 +62,24 @@ make.tech2check.intervention <- function(recruitment.rate       = 0.5,   # legac
     youth.rate <- if (!is.null(recruitment.rate.youth)) recruitment.rate.youth else recruitment.rate
     adult.rate <- if (!is.null(recruitment.rate.adult)) recruitment.rate.adult else 0
 
+    # Validate inputs up front (before scenario configs start passing these around):
+    # a malformed rate should error loudly, not silently fall through the
+    # `adult.rate > 0` guard (which would swallow a negative as "no adult arm" or
+    # error opaquely on NA). Rates are non-negative; ORs (when given) are positive.
+    require.scalar <- function(x, nm, allow.zero = TRUE) {
+        if (!is.numeric(x) || length(x) != 1L || !is.finite(x) ||
+            (allow.zero && x < 0) || (!allow.zero && x <= 0))
+            stop(sprintf(paste0("make.tech2check.intervention: '%s' must be a single finite ",
+                                "%s number (got: %s)"),
+                         nm, if (allow.zero) "non-negative" else "positive", deparse(x)))
+    }
+    require.scalar(youth.rate, 'recruitment.rate.youth')
+    require.scalar(adult.rate, 'recruitment.rate.adult')
+    for (nm in c('on.or', 'recently.or', 'distantly.or')) {
+        v <- get(nm)
+        if (!is.null(v)) require.scalar(v, nm, allow.zero = FALSE)
+    }
+
     # Sustained (stop.year = NULL) or time-limited rate effect on one quantity.
     # (See the end.time-gotcha note above: for SUSTAINED recruitment do NOT pass
     # end.time, or jheem2 ramps the rate linearly down to 0 over the window.)

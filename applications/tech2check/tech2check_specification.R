@@ -225,17 +225,23 @@ register.model.quantity(TECH2CHECK.SPECIFICATION,
 # EHE outcomes are inherited; these are Tech2Check-specific additions for
 # verification (simulation_verification.md) and downstream paper/cost analysis.
 
-# Annual program enrollments per stratum, split youth/adult (#35). Each is the
-# integral over the year of (recruitment.rate.<band> * infected population)
-# restricted to diagnosed_chronic in that recruitment band -- the same
-# expression the ODE evaluates at the recruitment transition, integrated
-# post-hoc. Split is required because the two bands carry different recruitment
-# rates: a single broadened outcome can't multiply two source populations by
-# two different rates. Each multiplies by its band's underlying rate ELEMENT
-# (tech2check.recruitment.rate.youth/.adult), NOT the age dispatcher quantity
-# tech2check.recruitment.rate (which the transition reads) -- the outcome's own
-# age subset already restricts the source population, so the flat element is the
-# right per-band rate. Sum the two in analysis for a total.
+# Annual program enrollments -- a total plus a youth/adult split (#35). Each is
+# the integral over the year of (recruitment.rate * infected population)
+# restricted to diagnosed_chronic in the relevant recruitment band(s) -- the same
+# expression the ODE evaluates at the recruitment transition, integrated post-hoc.
+#
+# tech2check.enrollments (TOTAL) multiplies by the age DISPATCHER quantity
+# (tech2check.recruitment.rate) over the full 13-34 recruitment range: the
+# dispatcher returns the youth rate at 13-24 and the adult rate at 25-34, so the
+# integral is youth-rate*youth-pop + adult-rate*adult-pop = the per-band split
+# summed. Retained under its original name for backward compatibility (older
+# consumers read `tech2check.enrollments`); in the youth-only base it equals the
+# youth value exactly (adult rate 0). Verified total == youth + adult in
+# verify_broaden_recruitment.R. The .youth / .adult splits each multiply by their
+# band's underlying rate ELEMENT (tech2check.recruitment.rate.youth/.adult) -- the
+# outcome's own age subset already restricts the source population, so the flat
+# element is the right per-band rate; a single split outcome can't multiply two
+# source populations by two different rates, hence the explicit pair.
 #
 # Implementation note: track.integrated.outcome (static) is used rather than
 # track.transition (dynamic) so the spec remains transmutable from EHE.
@@ -243,6 +249,21 @@ register.model.quantity(TECH2CHECK.SPECIFICATION,
 # (JHEEM_transmutation.R::do.evaluate.can.transmute line ~123); the team's
 # Ryan White spec follows the same pattern -- zero track.transition calls.
 # For a constant within-year rate the integrated form is exact in the limit.
+track.integrated.outcome(TECH2CHECK.SPECIFICATION,
+                         name = 'tech2check.enrollments',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Tech2Check Enrollments (Total)',
+                                                                    description = "Number of Individuals Enrolling in Tech2Check in the Past Year (all recruited ages)",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Enrollments',
+                                                                    units = 'persons',
+                                                                    singular.unit = 'person'),
+                         value.to.integrate = 'infected',
+                         multiply.by = 'tech2check.recruitment.rate',
+                         subset.dimension.values = list(continuum = 'diagnosed_chronic',
+                                                        age = c(TECH2CHECK.RECRUIT.YOUTH.AGES,
+                                                                TECH2CHECK.RECRUIT.ADULT.AGES)),
+                         keep.dimensions = c('location','age','race','sex','risk'))
+
 track.integrated.outcome(TECH2CHECK.SPECIFICATION,
                          name = 'tech2check.enrollments.youth',
                          outcome.metadata = create.outcome.metadata(display.name = 'Tech2Check Enrollments (Youth 13-24)',

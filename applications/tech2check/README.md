@@ -31,7 +31,8 @@ Expected output: `OK: sim produced (class=jheem.simulation.set/...)`, exit code 
 
 | Outcome | Type | Use |
 |---|---|---|
-| `tech2check.enrollments` | transition | Annual program enrollments per stratum |
+| `tech2check.enrollments` | integrated | Annual program enrollments, total (dispatcher-multiplied over 13-34) |
+| `tech2check.enrollments.youth` / `.adult` | integrated | Annual enrollments split by recruitment band (13-24 / 25-34); sum to the total |
 | `intervention.population` | point | Stock in each intervention lifecycle compartment (all three) |
 | `person.years.on.intervention` | integrated | Person-time in `on_intervention` only (cost-analysis denominator) |
 | `person.years.on.or.recently.intervened` | integrated | "Active intervention" aggregate (`on_intervention + recently_intervened`); correct denominator for headline policy claims, excludes `distantly_intervened` where OR = 1.0 in base case |
