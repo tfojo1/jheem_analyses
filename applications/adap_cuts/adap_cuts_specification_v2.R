@@ -303,7 +303,7 @@ register.model.element(ADAP.SPECIFICATION,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "proportion.adap.change.to.full.pay.clients.with.formulary.change", ## @todo WHAT DOES THIS MEAN? 
+                       name = "proportion.adap.change.to.full.pay.clients.with.formulary.change", ## melissa question: WHAT DOES THIS MEAN? 
                        value = 0.5,
                        scale = 'proportion')
 
@@ -1008,19 +1008,20 @@ if(1==2){
 ##---------------------------------------------------------------------------##
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "p.adap.premium.and.cost.sharing.clients.with.copay.if.allowed",
+                       name = "proportion.Cs.clients.with.Cp.if.allowed", # p.adap.cost.sharing.without.premium.clients.with.copay.if.allowed
+                       functional.form = proportion.adap.cost.sharing.without.premium.clients.with.copay(), # melissa question: should this be a functional form?
+                       scale = 'proportion')
+
+register.model.element(ADAP.SPECIFICATION,
+                       name = "proportion.PCs.clients.with.Cp.if.allowed", # p.adap.premium.and.cost.sharing.clients.with.copay.if.allowed
                        functional.form = get.p.adap.cost.sharing.clients.with.copay.functional.form(),
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "p.adap.full.pay.premium.and.cost.sharing.clients.with.copay.if.allowed",
-                       functional.form = proportion.adap.full.pay.premium.and.cost.sharing.clients.with.copay(),
+                       name = "proportion.FPCs.clients.with.Cp.if.allowed", # p.adap.full.pay.premium.and.cost.sharing.clients.with.copay.if.allowed
+                       functional.form = proportion.adap.full.pay.premium.and.cost.sharing.clients.with.copay(), # melissa question: should this be a functional form?
                        scale = 'proportion')
 
-register.model.element(ADAP.SPECIFICATION,
-                       name = "p.adap.cost.sharing.without.premium.clients.with.copay.if.allowed",
-                       functional.form = proportion.adap.cost.sharing.without.premium.clients.with.copay(),
-                       scale = 'proportion')
 
 #-- Quickly, put these together with the state-level inputs --#
 #   The three quantities below evaluate to:
@@ -1028,18 +1029,18 @@ register.model.element(ADAP.SPECIFICATION,
 #   - 0                                         IF  state ADAP does not cover copays
 #   - 1                                         IF  state ADAP does not cover deductibles
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = "proportion.adap.premium.and.cost.sharing.clients.with.copay",
-                        value = expression(adap.covers.copay * adap.covers.deductible * p.adap.premium.and.cost.sharing.clients.with.copay.if.allowed + 
+                        name = "proportion.PCs.clients.with.Cp", # proportion.adap.premium.and.cost.sharing.clients.with.copay
+                        value = expression(adap.covers.copay * adap.covers.deductible * proportion.PCs.clients.with.Cp.if.allowed + 
                                                (1-adap.covers.deductible)*adap.covers.copay))
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = "proportion.adap.full.pay.premium.and.cost.sharing.clients.with.copay",
-                        value = expression(adap.covers.copay * adap.covers.deductible * p.adap.full.pay.premium.and.cost.sharing.clients.with.copay.if.allowed + 
+                        name = "proportion.FPCs.clients.with.Cp", # proportion.adap.full.pay.premium.and.cost.sharing.clients.with.copay
+                        value = expression(adap.covers.copay * adap.covers.deductible * proportion.FPCs.clients.with.Cp.if.allowed + 
                                                (1-adap.covers.deductible)*adap.covers.copay))
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = "proportion.adap.cost.sharing.without.premium.clients.with.copay",
-                        value = expression(adap.covers.copay * adap.covers.deductible * p.adap.cost.sharing.without.premium.clients.with.copay.if.allowed + 
+                        name = "proportion.Cs.clients.with.Cp", # proportion.adap.cost.sharing.without.premium.clients.with.copay
+                        value = expression(adap.covers.copay * adap.covers.deductible * proportion.Cs.clients.with.Cp.if.allowed + 
                                                (1-adap.covers.deductible)*adap.covers.copay))
 
 
@@ -2375,13 +2376,13 @@ register.model.quantity(ADAP.SPECIFICATION,
                                                     (1 - proportion.adap.premium.and.cost.sharing.who.lose.eligibility -
                                                          proportion.adap.premium.and.cost.sharing.who.change.eligibility.to.full.pay -
                                                          proportion.adap.premium.and.cost.sharing.who.change.eligibility.to.premium.without.cost.sharing) *
-                                                    proportion.adap.premium.and.cost.sharing.clients.with.copay *
+                                                    proportion.PCs.clients.with.Cp *
                                                     proportion.PCp.clients.with.formulary.change +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.with.full.pay *
                                                     (1 - proportion.adap.full.pay.and.premium.and.cost.sharing.who.lose.premium.and.cost.sharing.eligibility -
                                                          proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.full.pay -
                                                          proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.premium.without.cost.sharing) *
-                                                    proportion.adap.full.pay.premium.and.cost.sharing.clients.with.copay *
+                                                    proportion.FPCs.clients.with.Cp *
                                                     proportion.PCp.clients.with.formulary.change
                                                ))
 )
@@ -2393,12 +2394,12 @@ register.model.quantity(ADAP.SPECIFICATION,
                                                     (1 - proportion.adap.full.pay.and.premium.and.cost.sharing.who.lose.eligibility -
                                                          proportion.adap.premium.and.cost.sharing.who.change.eligibility.to.full.pay -
                                                          proportion.adap.premium.and.cost.sharing.who.change.eligibility.to.premium.without.cost.sharing) *
-                                                    (1 - proportion.adap.premium.and.cost.sharing.clients.with.copay * proportion.PCp.clients.with.formulary.change) +
+                                                    (1 - proportion.PCs.clients.with.Cp * proportion.PCp.clients.with.formulary.change) +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.with.full.pay *
                                                     (1 - proportion.adap.full.pay.and.premium.and.cost.sharing.who.lose.premium.and.cost.sharing.eligibility -
                                                          proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.full.pay -
                                                          proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.premium.without.cost.sharing) *
-                                                    (1 - proportion.adap.full.pay.premium.and.cost.sharing.clients.with.copay * proportion.PCp.clients.with.formulary.change)
+                                                    (1 - proportion.FPCs.clients.with.Cp * proportion.PCp.clients.with.formulary.change)
                                                ))
 )
 
@@ -2440,11 +2441,11 @@ register.model.quantity(ADAP.SPECIFICATION,
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.cost.sharing.without.premium.from.without.full.pay *
                                                     (1-proportion.adap.cost.sharing.without.premium.who.lose.eligibility) *
-                                                    proportion.adap.cost.sharing.without.premium.clients.with.copay *
+                                                    proportion.Cs.clients.with.Cp *
                                                     proportion.Cp.clients.with.formulary.change +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.cost.sharing.without.premium.from.with.full.pay *
                                                     (1-proportion.adap.full.pay.and.cost.sharing.without.premium.who.lose.cost.sharing.eligibility) *
-                                                    proportion.adap.full.pay.premium.and.cost.sharing.clients.with.copay *
+                                                    proportion.FPCs.clients.with.Cp *
                                                     proportion.adap.copay.and.premium.clients.with.formulary.change
                                                ))
 )
@@ -2454,10 +2455,10 @@ register.model.quantity(ADAP.SPECIFICATION,
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.cost.sharing.without.premium.from.without.full.pay *
                                                     (1-proportion.adap.cost.sharing.without.premium.who.lose.eligibility) *
-                                                    (1 - proportion.adap.cost.sharing.without.premium.clients.with.copay * proportion.Cp.clients.with.formulary.change) +
+                                                    (1 - proportion.Cs.clients.with.Cp * proportion.Cp.clients.with.formulary.change) +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.cost.sharing.without.premium.from.with.full.pay *
                                                     (1-proportion.adap.full.pay.and.cost.sharing.without.premium.who.lose.cost.sharing.eligibility) *
-                                                    (1 - proportion.adap.full.pay.premium.and.cost.sharing.clients.with.copay * proportion.adap.copay.and.premium.clients.with.formulary.change)
+                                                    (1 - proportion.FPCs.clients.with.Cp * proportion.adap.copay.and.premium.clients.with.formulary.change)
                                                ))
 )
 
