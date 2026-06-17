@@ -1042,7 +1042,7 @@ register.model.quantity(ADAP.SPECIFICATION,
                         name = "proportion.Cs.clients.with.Cp", # proportion.adap.cost.sharing.without.premium.clients.with.copay
                         value = expression(adap.covers.copay * adap.covers.deductible * proportion.Cs.clients.with.Cp.if.allowed + 
                                                (1-adap.covers.deductible)*adap.covers.copay))
-
+# melissa stopped here 6/17
 
 ##----------------------------------------------##
 ##-- INPUTS: P ADAP SERVICE TYPE GIVEN INCOME --##
