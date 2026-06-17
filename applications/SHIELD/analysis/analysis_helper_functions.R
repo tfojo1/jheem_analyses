@@ -824,7 +824,7 @@ load.int.simsets <- function(locations,
                              force.reload        = FALSE,
                              append              = TRUE,
                              verbose             = TRUE) {
-    
+    # browser()
     city.names     <- if (!is.null(names(locations))) names(locations) else unname(locations)
     location.codes <- unname(locations)
     
@@ -864,6 +864,7 @@ load.int.simsets <- function(locations,
         if (verbose) message("[Append] Mode OFF — returning requested keys only")
         resolved.cache[cached.keys]
     } else { list() }
+    
     
     n.loaded <- n.skipped <- 0
     

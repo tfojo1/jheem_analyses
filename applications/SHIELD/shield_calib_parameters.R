@@ -265,6 +265,17 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
     or.slope.sti.screening.msm = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10),
     or.slope.sti.screening.heterosexual = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10),
     
+    # knot1.multiplier.msm
+    # knot1.multiplier.het_male
+    # knot1.multiplier.het_female
+    # 
+    # knot2.multiplier.msm
+    # knot2.multiplier.het_male
+    # knot2.multiplier.het_female
+    # 
+    # 2 sep
+    
+    
     ## Syphilis to HIV Testing Ratio ----
     # Stratify intercept by race and sex
     or.syphilis.to.hiv.testing.msm = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
