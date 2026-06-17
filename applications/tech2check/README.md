@@ -1,6 +1,6 @@
 # Tech2Check
 
-JHEEM extension assessing the population-level impact of scaling up the Tech2Check intervention for viral suppression in youth with HIV. Inherits from EHE; adds a 4-state intervention lifecycle (`diagnosed_chronic` → `on_intervention` → `recently_intervened` → `distantly_intervened`) on the `continuum` dimension. Recruitment is age-restricted to JHEEM's youth band (13-24 years); the suppression OR is applied per intervention compartment via dispatcher composition on `suppression.of.diagnosed`.
+JHEEM extension assessing the population-level impact of scaling up the Tech2Check intervention for viral suppression in youth with HIV. Inherits from EHE; adds a 4-state intervention lifecycle (`diagnosed_chronic` → `on_intervention` → `recently_intervened` → `distantly_intervened`) on the `continuum` dimension. Recruitment defaults to JHEEM's youth band (13-24 years) and can be broadened to adults (25-34) via an age dispatcher (#35); the suppression OR is applied per intervention compartment × age band via dispatcher composition on `suppression.of.diagnosed`.
 
 ## Files
 
