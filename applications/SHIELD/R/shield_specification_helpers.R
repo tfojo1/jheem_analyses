@@ -1086,6 +1086,29 @@ get_sti_screening_functional_form <- function(specification.metadata) {
   
   sti_screening_functional_form
 }
+
+
+get_sti_screening_functional_form2 <- function(specification.metadata) {
+    sti_screening_functional_form <- create.linear.spline.functional.form(knot.times = c("2010"=2010,"2022"=2022),
+                                                                          knot.values = list("2010"= hiv_testing_prior$intercepts,
+                                                                                             "2022"=hiv_testing_prior$intercepts+ hiv_testing_prior$slopes* (2022-2010)),
+                                                                          link = "logit",
+                                                                          knot.link="logit",
+                                                                          knots.are.on.transformed.scale = T,
+                                                                          after.time = 2030,
+                                                                          after.modifier = .5,
+                                                                          after.modifier.increasing.change.link = 'logit',
+                                                                          after.modifier.decreasing.change.link = 'logit', 
+                                                                          min=0,
+                                                                          max=0.9
+                                                                            )
+    #logit(2030)=logit(2020)+ logit(2020)/logit(2010) * after_modifier
+    
+}
+ 
+
+
+
 #-- STI TO HIV TESTS RATIO --# ----
 get_sti_to_hiv_testing_ratio_functional_form <- function(specification.metadata) {
   # we use this to calculate hiv tests and fit them against BRFSS data
