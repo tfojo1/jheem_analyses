@@ -10,12 +10,12 @@ source("../jheem_analyses/applications/SHIELD/shield_calib_register.R")
 source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions.R')
  
 # ---- SETUP ----
-for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.16.stage2.az"))}
+# for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.16.stage2.az"))}
  
 
 calibration.codes <- c(
-    "calib.6.12.stage2.az", 
-    "calib.6.12.stg2.penalty"
+    "calib.6.16.stage2.az", 
+    "calib.6.16.stg2.penalty"
 )
  
 # read simulations into the simset

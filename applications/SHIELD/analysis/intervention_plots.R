@@ -5,27 +5,26 @@
 # across all 10 cities using plot.calib.comparison() and plot.calib.location()
 # ****************************************************************************************************
 source('../jheem_analyses/commoncode/locations_of_interest.R')
-source("../jheem_analyses/applications/SHIELD/shield_specification.R")
+source('../jheem_analyses/applications/SHIELD/shield_specification.R')
+source("../jheem_analyses/applications/SHIELD/shield_source_code.R")
 source("../jheem_analyses/applications/SHIELD/shield_calib_register.R")
 source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions.R')
 
 
 # ---- SETUP ----
 calibration.codes <- c(
-    "calib.6.9.stage2.az"
+    "calib.6.12.stage2.az",
+    "calib.6.12.stg2.penalty"
 )
 
 intervention.codes <-c(
     "noint",
-    # "doxy.u.60.p.50",
-    # "doxy.u.60.p.100",
-    # "doxy.u.100.p.50",
     "doxy.u.100.p.100",
     "doxy.rapid.uptake"
 )
 # read simulations into the simset
 int.simsets <- load.int.simsets(
-    locations         = SHIELD.TEN.MSAS, #seattle
+    locations         = SHIELD.TEN.MSAS[10],
     n.sim = 300,
     intervention.codes = intervention.codes,
     calibration.codes = calibration.codes
@@ -35,17 +34,30 @@ int.simsets <- load.int.simsets(
 # Outcome sets used across examples below
 # outcomes.all <- c("diagnosis.total", "diagnosis.ps",
 #                   "diagnosis.el.misclassified", "diagnosis.late.misclassified","hiv.testing")
-outcomes.all <- c("diagnosis.ps","doxy.uptake")
-                  
+# outcomes.all <- c("diagnosis.ps","doxy.uptake")
+
 
 plot.int.location(int.simsets = int.simsets,
                   location = "Seattle",
-                  calib.code ="calib.6.9.stage2.az",
+                  # calib.code ="calib.6.12.stage2.az",
+                  calib.code ="calib.6.12.stg2.penalty",
                   interventions =intervention.codes,
-                  outcomes = "diagnosis.total",
-                  facet.by = "sex",
+                  outcomes = c("diagnosis.total", "diagnosis.ps", "diagnosis.el.misclassified", "diagnosis.late.misclassified","hiv.testing","doxy.uptake"),
+                  # facet.by = "sex",
                   # plot.which = "sim.only",
-                  years = c(2018:2025),save = T,create.dirs = T )
+                  years = c(2018:2025),
+                  save = T,create.dirs = T )
+
+plot.int.location(int.simsets = int.simsets,
+                  location = "Seattle",
+                  # calib.code ="calib.6.12.stage2.az",
+                  calib.code ="calib.6.12.stg2.penalty",
+                  interventions =intervention.codes,
+                  outcomes = c("diagnosis.total"),
+                  facet.by = "sex",
+                  plot.which = "sim.only",
+                  years = c(2018:2025),
+                  save = T,create.dirs = T )
 
 
 
@@ -57,13 +69,15 @@ plot.int.location(int.simsets = int.simsets,
 plot.int.comparison(
     int.simsets = int.simsets,
     calibration.codes = calibration.codes,
-    interventions = intervention.codes, 
-    outcomes          = c("diagnosis.total","diagnosis.ps"),
+    interventions = intervention.codes[c(1,2)], 
+    locations = "Seattle",
+    outcomes          = c("diagnosis.total"),
     
     separate.by       = "outcome",
     years = 2018:2030,
-    nrow=2,
-    folder.name       = "5.11.vs.5.19.stage2", 
+    # nrow=2,
+    folder.name       = "6.12.stage2.vs.penalty", 
+    facet.by = "sex",
     save              = TRUE,
     create.dirs       = TRUE,
     style.manager     = int.style.manager(

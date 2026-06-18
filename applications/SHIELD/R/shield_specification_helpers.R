@@ -1095,11 +1095,11 @@ get_sti_screening_functional_form_OPTION2 <- function(specification.metadata) {
   #
   
     sti_screening_functional_form <- create.linear.spline.functional.form(knot.times = c("2010"=2010,"2020"=2020),
-                                                                          knot.values = list("2010"= hiv_testing_prior$intercepts,
-                                                                                             "2020"=hiv_testing_prior$intercepts+ hiv_testing_prior$slopes* (2020-2010)),
+                                                                          knot.values = list("2010"= expit(hiv_testing_prior$intercepts +log(.5)),
+                                                                                             "2020"=expit(hiv_testing_prior$intercepts +log(.5)+ hiv_testing_prior$slopes* (2020-2010))),
                                                                           link = "logit",
                                                                           knot.link="logit",
-                                                                          knots.are.on.transformed.scale = T,
+                                                                          knots.are.on.transformed.scale = F,
                                                                           after.time = 2030,
                                                                           after.modifier = .5,
                                                                           after.modifier.increasing.change.link = 'logit',
