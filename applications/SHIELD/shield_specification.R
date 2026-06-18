@@ -489,12 +489,18 @@ register.model.element(SHIELD.SPECIFICATION,
                            #
                            after.time = 2030, #values between 2020-2030 are scaled down to change up to 50% of modeled change between 2010-2020
                            after.modifier = 0.5, # 2030 = 2020 + delta(2020 vs 2010) * after.modifier IF delta is positive. This gets overwritten by the ~N(0.75, 0.25) fut change multiplier
-                           after.modifier.increasing.change.link = 'identity',
-                           after.modifier.decreasing.change.link = 'log', # log(2030) = log(2020) + log(delta(2020 vs 2010)) * after.modifier IF delta is negative
+                           after.modifier.increasing.change.link = 'identity', #if the delta is >1 (values increasing), we let the changes to grow linearly over time without rescaling them
+                           after.modifier.decreasing.change.link = 'log', # if delta is <1 (values decreasing), we risk hiting zero fast, so we model these reductions in the log-scale which will 
+                           #slow down the reductions when we transform the value back (assomptotic reductions)
+                           # log(2030) = log(2020) + log(delta(2020 vs 2010)) * after.modifier IF delta is negative
                            modifiers.apply.to.change = T, # means it multiplies the delta
                            min=0 #even after using log for knots, value can be negative so we need to truncate
                        )
 ) 
+
+# log(T2030)= log(T2020) + delta( log(T2020)/log(T2010)) *after_mod
+
+
 #if we wanted to use a natural spline without log transformation:
 # knot.values = list(time0=1,time1=1,time2=1) , knots.are.on.transformed.scale = F, #on the identity scale
 #use a log(y) transformation, so that all returned values are positive
@@ -1092,30 +1098,64 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                value =expression(1/duration.cns))
 
 
+
+
 ##---- 2-STI SCREENING ----
-# In absence of direct data on STI screening rate, we estiamte the initial function using the HIV testing data from BRFSS.
+# In absence of direct data on STI screening rate, we estimate the initial function using the HIV testing data from BRFSS.
 # We then implement multiple parameters to fine tune STI testing in our model (by sex, race, etc) to fit STI diagnosis
 # We also calculate the projected HIV testing pattern from simulated STI screening in the model, and fit that against observed data to make sure that we stay true to it
+
+# Make quantities to cover all ages.
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'rate.sti.screening.without.covid',
+                        scale = 'rate',
+                        value=0)
 
 # HIV testing data (BRFFS) starts from age 18. We assume those age 15-17 have similar testing proportions as those in 18-19 agegroup
 # we assume 0 testing in the youngest age-group [0-14].
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'rate.sti.screening.over.14',
+                       name = 'rate.sti.screening.over.14.without.covid',
                        scale = 'rate',
-                       get.functional.form.function = get_sti_screening_functional_form,
+                       get.functional.form.function = get_sti_screening_functional_form_OPTION2,
                        functional.form.from.time = 2010,
                        functional.form.scale = 'proportion')
 
-# Make quantities to cover all ages.
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = "rate.sti.screening.without.covid", 
+                               applies.to = list(age=c("15-19 years" ,"20-24 years" ,"25-29 years" ,"30-34 years", "35-39 years", "40-44 years", "45-49 years" ,"50-54 years", "55-64 years" ,"65+ years")),
+                               value = "rate.sti.screening.over.14.without.covid")
+
+##---- COVID
+N.COVID.MONTHS = 24
+N.COVID.MONTHS.FULL.EFFECT = 12
+# binary variable that is on from March 15,2020-2022, marking the covid period
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'covid.on',
+                       scale = 'proportion',
+                       functional.form = create.linear.spline.functional.form(
+                           knot.times = c(pre = (2020 + (2.5/12)), # March 15, 2020
+                                          start = (2020 + (3/12)), # March 30, 2020
+                                          end = (2020 + (3/12) + N.COVID.MONTHS.FULL.EFFECT/12), # starts tapering 
+                                          post = (2020 + (3/12) + N.COVID.MONTHS/12) # back to normal 
+                           ),
+                           knot.values = list(pre = 0,
+                                              start = 1,
+                                              end = 1,
+                                              post = 0)
+                       ),
+                       functional.form.from.time = 2020)
+
+#Reduced value due to covid: e.g. 1>> no change; 0.8>> 20% reduction during covid
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'max.covid.effect.sti.screening.reduction',
+                       scale = 'ratio',
+                       get.functional.form.function = get.max.covid.effect.sti.screening.reduction)
+
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.sti.screening',
                         scale = 'rate',
-                        value=0)
-
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = "rate.sti.screening",
-                               applies.to = list(age=c("15-19 years" ,"20-24 years" ,"25-29 years" ,"30-34 years", "35-39 years", "40-44 years", "45-49 years" ,"50-54 years", "55-64 years" ,"65+ years")),
-                               value = "rate.sti.screening.over.14")
+                        value = expression(
+                            rate.sti.screening.without.covid *  (1-(1-max.covid.effect.sti.screening.reduction) * covid.on )))
 
 # Model the ratio of STI screening to HIV tests as a smooth function 
 #'@Andrew: to review with Todd: I think that we should define this as a proportion (wont expect to go over 1?)

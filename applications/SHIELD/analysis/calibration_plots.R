@@ -9,26 +9,63 @@ source("../jheem_analyses/applications/SHIELD/shield_specification.R")
 source("../jheem_analyses/applications/SHIELD/shield_calib_register.R")
 source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions.R')
 
+?create.logistic.spline.functional.form()
+?create.linear.spline.functional.form
 # ---- SETUP ----
-# for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.12.stage3.az"))}
+for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.12.stage2.az"))}
 
 
 calibration.codes <- c(
-    "calib.6.12.stage3.az", 
-    "calib.6.12.stg3.penalty"
+    "calib.6.12.stage2.az", 
+    "calib.6.12.stg2.penalty"
 )
  
 # read simulations into the simset
 calib.simsets <- load.calib.simsets(
     locations         = SHIELD.TEN.MSAS,
     calibration.codes = calibration.codes,
-    n.sim = 400
-        
+    n.sim = 300
 )
 
-plot.calib.stages(calib.simsets = calib.simsets,stage = 2,locations = SHIELD.TEN.MSAS,calibration.code =calibration.codes )
+# CREATE ALL STAGE CALIBRATION PLOTS
+plot.calib.stages(calib.simsets = calib.simsets,
+                  calibration.code =calibration.codes[2],
+                  stage = 2,
+                  locations = SHIELD.TEN.MSAS)
 
-calib.simsets$
+# SINGLE CALIB SINGLE LOCATION
+plot.single.calib.single.location(calib.simsets = calib.simsets,
+                    calibration.code = calibration.codes[2],
+                    location ="C.12580",
+                    outcomes = "hiv.testing",facet.by = "age",split.by = "sex")
+
+simplot(calib.simsets$`Baltimore – calib.6.12.stg2.penalty`$last_sim,
+        outcomes = "hiv.testing",facet.by = "age",split.by = "sex")
+
+# COMPARING CALIBRATION 
+plot.calib.comparison(calib.simsets = calib.simsets,
+                      calibration.codes = c("calib.6.12.stage2.az","calib.6.12.stg2.penalty"),
+                      sim.subset = "last20",
+                      locations = SHIELD.TEN.MSAS,
+                      separate.by = "outcome",
+                      outcomes = c("diagnosis.ps","hiv.testing"),
+                      # ncol = 1
+                      facet.by = "sex" ,
+                      # plot.which = "sim.only",
+                      ncol = 2
+                      )
+plot.calib.comparison(calib.simsets = calib.simsets,
+                      calibration.codes = c("calib.6.12.stage2.az","calib.6.12.stg2.penalty"),
+                      sim.subset = "last20",
+                      locations = SHIELD.TEN.MSAS,
+                      separate.by = "outcome",
+                      outcomes =  c("diagnosis.total", "diagnosis.ps", "diagnosis.el.misclassified",
+                                    "diagnosis.late.misclassified", "hiv.testing")
+                      # ncol = 1
+                      # facet.by = "sex" ,
+                      # plot.which = "sim.only",ncol = 2
+)
+
 
     # head(calib.simsets$`Atlanta – calib.7.12.stage0.test`$full_simset$get.mcmc.mixing.statistic())
 # simplot(calib.simsets$`Atlanta – calib.7.12.stage0.test`$full_simset,"diagnosis.ps")

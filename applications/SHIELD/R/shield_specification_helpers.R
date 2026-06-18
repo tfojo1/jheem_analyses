@@ -1047,16 +1047,34 @@ get_prob_careseek_symptomatic_ps_functional_form<-function(specification.metadat
 }
 
  
+##-- COVID --# ----
+# Wraps the fully stratified Q2 2020 testing reduction array into a static
+# functional form object on the logit scale, ready for use as a model parameter.
+# The array from contains values in probability space (0, 1), representing the proportion of baseline
+# testing retained at the Q2 2020 nadir for each [age × race × sex] stratum.
+
+# The resulting object represents the maximum COVID reduction of testing
+# (the Q2 2020 nadir). It is passed into the model's time-varying testing rate parameter alongside a separate functional form
+# that governs how the effect ramps in and out across the full 2020–2022 COVID period (covid on).
+get.max.covid.effect.sti.screening.reduction = function(specification.metadata){
+    create.static.functional.form(value = get.q2.full.stratified.covid.reduction.in.testing(specification.metadata),
+                                  link = 'logit',
+                                  value.is.on.transformed.scale = F #inputs are raw probabilities (not yet logit-transformed)
+                                  )
+}
+
+ 
 
 #-- STI SCREENING --# ----
-get_sti_screening_functional_form <- function(specification.metadata) {
+# OPTION1: Using logistic linear function
+get_sti_screening_functional_form_OPTION1 <- function(specification.metadata) {
   # Get a cached object
   # We read the HIV testing prior from BRFSS in, then shift it to serve as our STI screening functional form's priors
   # (After implementation in the model, we will calculate HIV tests based on simulated sti screenings again and fit it against BRFSS)
   #
   hiv_testing_prior <- get.cached.object.for.version(name = "hiv.testing.prior",
                                                      version = specification.metadata$version)
-  
+
   # Use HIV testing prior slope and intercept and shift to find STI screening functional form slope and intercept
   # We will add log(0.5) assuming half the odds of an syphilis screen compared to the odds of an HIV test in the last year.
   # The 0.9 that was in here was to say we never think we screen more than 90% of people in a stratum, and must subtract log(0.9) to compensate mathematically.
@@ -1065,9 +1083,39 @@ get_sti_screening_functional_form <- function(specification.metadata) {
                                                                           anchor.year = 2010,
                                                                           max = 1,
                                                                           parameters.are.on.logit.scale = T)
-  
+
+
   sti_screening_functional_form
 }
+
+# OPTION2: Using linear spline function (provides the flexibility to change after modifier)
+get_sti_screening_functional_form_OPTION2 <- function(specification.metadata) {
+  hiv_testing_prior <- get.cached.object.for.version(name = "hiv.testing.prior",
+                                                     version = specification.metadata$version)
+  #
+  
+    sti_screening_functional_form <- create.linear.spline.functional.form(knot.times = c("2010"=2010,"2020"=2020),
+                                                                          knot.values = list("2010"= hiv_testing_prior$intercepts,
+                                                                                             "2020"=hiv_testing_prior$intercepts+ hiv_testing_prior$slopes* (2020-2010)),
+                                                                          link = "logit",
+                                                                          knot.link="logit",
+                                                                          knots.are.on.transformed.scale = T,
+                                                                          after.time = 2030,
+                                                                          after.modifier = .5,
+                                                                          after.modifier.increasing.change.link = 'logit',
+                                                                          after.modifier.decreasing.change.link = 'logit', 
+                                                                          min=0,
+                                                                          max=0.9
+                                                                            )
+    #logit(2030)=logit(2020)+ logit(2020)/logit(2010) * after_modifier
+    # after modifier is unique for everyone
+    sti_screening_functional_form
+    
+}
+ 
+
+
+
 #-- STI TO HIV TESTS RATIO --# ----
 get_sti_to_hiv_testing_ratio_functional_form <- function(specification.metadata) {
   # we use this to calculate hiv tests and fit them against BRFSS data

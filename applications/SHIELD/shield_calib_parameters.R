@@ -162,7 +162,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
                              log(1)), #het
         logsd.baseline = c(log(2)*2, #msm
                            log(2)*2
-                           ), #het
+        ), #het
         logsd.deltas.past = c("1970" = 0.5*log(1.5^2), #20-year delta
                               "1990" = 0.5*log(sqrt(1.5)), #5-year delta
                               "1995" = 0.5*log(sqrt(1.5))), #5-year delta
@@ -214,6 +214,16 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
 
 ## STI.TESTING.PARAMETERS.PRIOR ----
 STI.TESTING.PARAMETERS.PRIOR=join.distributions( 
+    ## COVID ----
+    # sti.screening: 5 alphas (leaving out age for now) #'@Melissa: why log? not logit?
+    # parameter: max.covid.effect.sti.screening.reduction
+    black.sti.screening.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    hispanic.sti.screening.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    other.sti.screening.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    
+    heterosexual.sti.screening.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    msm.sti.screening.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    
     ## Fraction Symptomatic ----
     #  inputs/input_prop_symp_primary.R
     ## Data source: Study of MSM followed at PrEP clinics: Proportion of incident syphilis presenting with symptomatic primary 25% or secondary at 16% disease
@@ -242,7 +252,8 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
     or.slope.careseeking.symptomatic.ps = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10), #smaller sd for slopes 
     
     ## STI Screening ----
-    # Stratify intercept by race and sex
+    
+    #OPTION1: using logistic linear function with an intercept and slope
     or.sti.screening.msm = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     or.sti.screening.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     or.sti.screening.female = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -250,10 +261,28 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
     or.sti.screening.black = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     or.sti.screening.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     or.sti.screening.other = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    # Changing the slope for everyone
-    # or.slope.sti.screening = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10),
+    #
     or.slope.sti.screening.msm = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10),
     or.slope.sti.screening.heterosexual = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10),
+    
+    #OPTION2: using a linear spline function (knots 2010,2020) 
+    #by sex, by race in each knot
+    screening.rate.multiplier.msm.2010 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    screening.rate.multiplier.het.2010 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    #
+    screening.rate.multiplier.msm.2020 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    screening.rate.multiplier.het.2020 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    #
+    screening.rate.multiplier.black.2010 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    screening.rate.multiplier.hispanic.2010 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    screening.rate.multiplier.other.2010 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    #
+    screening.rate.multiplier.black.2020 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    screening.rate.multiplier.hispanic.2020 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    screening.rate.multiplier.other.2020 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # future change multiplier
+    screening.rate.future.change.mult  = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0), #CI=(0.25 - 1.25) #assumption
+    
     
     ## Syphilis to HIV Testing Ratio ----
     # Stratify intercept by race and sex
@@ -586,6 +615,52 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    dimension = "all"
     )
     
+    ## COVID multipliers ----
+    # # Sex/risk 
+    # set.element.functional.form.interaction.alphas(model.settings,
+    #                                                element.name = "max.covid.effect.sti.screening.reduction",
+    #                                                alpha.name = "value",
+    #                                                value = parameters['heterosexual.sti.screening.covid.multiplier'],
+    #                                                applies.to.dimension.values=list(sex = c("female","heterosexual_male"))
+    # )
+    # set.element.functional.form.interaction.alphas(model.settings,
+    #                                                element.name = "max.covid.effect.sti.screening.reduction",
+    #                                                alpha.name = "value",
+    #                                                value = parameters['msm.sti.screening.covid.multiplier'],
+    #                                                applies.to.dimension.values=list(sex = c("msm"))
+    # )
+    # # race
+    # set.element.functional.form.interaction.alphas(model.settings,
+    #                                                element.name = "max.covid.effect.sti.screening.reduction",
+    #                                                alpha.name = "value",
+    #                                                values = parameters[paste0(races,'.sti.screening.covid.multiplier')],
+    #                                                dimension = 'race',
+    #                                                applies.to.dimension.values = races
+    # )
+    # Sex/risk 
+    set.element.functional.form.main.effect.alphas(model.settings,
+                                                   element.name = "max.covid.effect.sti.screening.reduction",
+                                                   alpha.name = "value",
+                                                   value = parameters['heterosexual.sti.screening.covid.multiplier'],
+                                                   dimension = "sex",
+                                                   applies.to.dimension.values= c("female","heterosexual_male")
+    )
+    set.element.functional.form.main.effect.alphas(model.settings,
+                                                   element.name = "max.covid.effect.sti.screening.reduction",
+                                                   alpha.name = "value",
+                                                   value = parameters['msm.sti.screening.covid.multiplier'],
+                                                   dimension = "sex",
+                                                   applies.to.dimension.values="msm"
+    )
+    # race
+    set.element.functional.form.main.effect.alphas(model.settings,
+                                                   element.name = "max.covid.effect.sti.screening.reduction",
+                                                   alpha.name = "value",
+                                                   values = parameters[paste0(races,'.sti.screening.covid.multiplier')],
+                                                   dimension = 'race',
+                                                   applies.to.dimension.values = races
+    )
+    
     ## Symptomatic Testing ---- 
     # Logit Linear function 
     # changes in intercept by sex
@@ -611,37 +686,64 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    applies.to.dimension.values = "all") 
     
     ## STI Screening  ----
-    # Change intercept and slope 
+    # OPTION1: Change intercept and slope 
     set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "rate.sti.screening.over.14",
+                                                   element.name = "rate.sti.screening.over.14.without.covid",
                                                    alpha.name = "intercept",
                                                    values = parameters[paste0("or.sti.screening.", races)],
                                                    dimension = "race", #recipient
-                                                   applies.to.dimension.values = races) 
+                                                   applies.to.dimension.values = races)
     set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "rate.sti.screening.over.14",
+                                                   element.name = "rate.sti.screening.over.14.without.covid",
                                                    alpha.name = "intercept",
                                                    values = parameters[paste0("or.sti.screening.", sexes)],
                                                    dimension = "sex", #recipient
                                                    applies.to.dimension.values = sexes)
-    # set.element.functional.form.main.effect.alphas(model.settings,
-    #                                                element.name = "rate.sti.screening.over.14",
-    #                                                alpha.name = "slope",
-    #                                                values = parameters["or.slope.sti.screening"],
-    #                                                dimension = "all", #recipient
-    #                                                applies.to.dimension.values = "all")
     set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "rate.sti.screening.over.14",
+                                                   element.name = "rate.sti.screening.over.14.without.covid",
                                                    alpha.name = "slope",
                                                    values = parameters["or.slope.sti.screening.msm"],
                                                    dimension = "sex", #recipient
                                                    applies.to.dimension.values = c("msm"))
     set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "rate.sti.screening.over.14",
+                                                   # element.name = "rate.sti.screening.over.14",
+                                                   element.name = "rate.sti.screening.over.14.without.covid",
                                                    alpha.name = "slope",
                                                    values = parameters["or.slope.sti.screening.heterosexual"],
                                                    dimension = "sex", #recipient
                                                    applies.to.dimension.values = c("heterosexual_male", "female"))
+    #OPTION2:
+    for(time in c("2010","2020")){   
+        set.element.functional.form.main.effect.alphas(model.settings,
+                                                       element.name = "rate.sti.screening.over.14.without.covid",
+                                                       alpha.name = time,
+                                                       values = parameters[paste0("screening.rate.multiplier.msm.",time)],
+                                                       dimension = 'sex',
+                                                       applies.to.dimension.values = c('msm'))
+        set.element.functional.form.main.effect.alphas(model.settings,
+                                                       element.name = "rate.sti.screening.over.14.without.covid",
+                                                       alpha.name = time,
+                                                       values = parameters[paste0("screening.rate.multiplier.het.",time)],
+                                                       dimension = 'sex',
+                                                       applies.to.dimension.values = c("heterosexual_male", "female"))
+        for(race in races){  
+            set.element.functional.form.main.effect.alphas(model.settings,
+                                                       element.name = "rate.sti.screening.over.14.without.covid",
+                                                       alpha.name = time,
+                                                       values = parameters[paste0("screening.rate.multiplier.",race,".",time)],
+                                                       dimension = 'race',
+                                                       applies.to.dimension.values = race)
+        }
+        
+    }
+    # Future change multiplier ----
+    set.element.functional.form.main.effect.alphas(model.settings,
+                                                   element.name = "rate.sti.screening.over.14.without.covid",
+                                                   alpha.name = "after.modifier",
+                                                   values = parameters["screening.rate.future.change.mult"],
+                                                   applies.to.dimension.values = "all",
+                                                   dimension = "all"
+    )
     
     ## Syphilis to HIV tests Ratio ----
     # Change intercept and slope
@@ -692,9 +794,9 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
             values = parameters[paste0(pre, ".slope.mult")],
             dimension = "all",
             applies.to.dimension.values = "all")
-            }
-    
     }
+    
+}
 
 
 
@@ -920,7 +1022,7 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
         "transmission.rate.multiplier.other.heterosexual"
     ),
     #
-    future.change.trate=c("transmission.rate.future.change.mult"),
+    trans.rate.future.change=c("transmission.rate.future.change.mult"),
     #
     race.mixing.transmission= c("black.black.sexual.multi",
                                 "hispanic.hispanic.sexual.multi", 
@@ -938,6 +1040,13 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
 
 ## STI.TESTING.SAMPLING.BLOCKS ----
 STI.TESTING.SAMPLING.BLOCKS = list(
+    covid.screening.red.sex=c(
+        "heterosexual.sti.screening.covid.multiplier",
+        "msm.sti.screening.covid.multiplier"),
+    covid.screening.red.race=c("black.sti.screening.covid.multiplier",
+                               "hispanic.sti.screening.covid.multiplier",
+                               "other.sti.screening.covid.multiplier"),
+    #
     prp.sym.ps=c(
         "prp.symptomatic.primary.msm",
         "rr.prp.symptomatic.primary.female",
@@ -956,19 +1065,40 @@ STI.TESTING.SAMPLING.BLOCKS = list(
         "or.careseeking.symptomatic.ps.other",
         "or.slope.careseeking.symptomatic.ps"
     ),
-    #
+    #OPTION1
     or.sti.screening.sex<-c(
-        'or.sti.screening.msm',  
+        'or.sti.screening.msm',
         'or.sti.screening.heterosexual_male',
         'or.sti.screening.female'),
     or.sti.screening.race.slope<-c(
-        'or.sti.screening.black',  
+        'or.sti.screening.black',
         'or.sti.screening.hispanic',
         'or.sti.screening.other',
         # 'or.slope.sti.screening',
         'or.slope.sti.screening.msm',
         'or.slope.sti.screening.heterosexual'
+    ),
+    #OPTION2
+    sti.screening.sex<- c(
+        "screening.rate.multiplier.msm.2010",
+        "screening.rate.multiplier.het.2010",
+        "screening.rate.multiplier.msm.2020",
+        "screening.rate.multiplier.het.2020"
         ),
+    sti.screening.race1<-c(
+        "screening.rate.multiplier.black.2010" ,
+        "screening.rate.multiplier.hispanic.2010",
+        "screening.rate.multiplier.other.2010"
+        ),
+    sti.screening.race2<-c(
+        "screening.rate.multiplier.black.2020" ,
+        "screening.rate.multiplier.hispanic.2020",
+        "screening.rate.multiplier.other.2020"
+        ),
+    sti.screening.future.change<-c(
+        "screening.rate.future.change.mult"
+        ),
+    
     #
     syphilis.to.hiv.testing.ratio.sex.slope<-c(
         "or.syphilis.to.hiv.testing.msm",
@@ -993,7 +1123,7 @@ TRANS.BY.AGE.SAMPLING.BLOCKS = list(
     age.transmission.young<-c(
         "transmission.rate.multiplier.age14.msm",
         "transmission.rate.multiplier.age14.heterosexual"
-        ),
+    ),
     #
     age.transmission.msm.1 = c(
         "transmission.rate.multiplier.age19.msm",
