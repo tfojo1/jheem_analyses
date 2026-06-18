@@ -282,7 +282,7 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
     screening.rate.multiplier.other.2020 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     # future change multiplier
     screening.rate.future.change.mult  = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0), #CI=(0.25 - 1.25) #assumption
-    
+
     
     ## Syphilis to HIV Testing Ratio ----
     # Stratify intercept by race and sex
@@ -713,7 +713,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    dimension = "sex", #recipient
                                                    applies.to.dimension.values = c("heterosexual_male", "female"))
     #OPTION2:
-    for(time in c("2010","2020")){   
+    for(time in c("2010","2020")){
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "rate.sti.screening.over.14.without.covid",
                                                        alpha.name = time,
@@ -726,7 +726,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                        values = parameters[paste0("screening.rate.multiplier.het.",time)],
                                                        dimension = 'sex',
                                                        applies.to.dimension.values = c("heterosexual_male", "female"))
-        for(race in races){  
+        for(race in races){
             set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "rate.sti.screening.over.14.without.covid",
                                                        alpha.name = time,
@@ -734,16 +734,16 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                        dimension = 'race',
                                                        applies.to.dimension.values = race)
         }
-        
+
     }
-    # Future change multiplier ----
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "rate.sti.screening.over.14.without.covid",
-                                                   alpha.name = "after.modifier",
-                                                   values = parameters["screening.rate.future.change.mult"],
-                                                   applies.to.dimension.values = "all",
-                                                   dimension = "all"
-    )
+    # # Future change multiplier ----
+    # set.element.functional.form.main.effect.alphas(model.settings,
+    #                                                element.name = "rate.sti.screening.over.14.without.covid",
+    #                                                alpha.name = "after.modifier",
+    #                                                values = parameters["screening.rate.future.change.mult"],
+    #                                                applies.to.dimension.values = "all",
+    #                                                dimension = "all"
+    # )
     
     ## Syphilis to HIV tests Ratio ----
     # Change intercept and slope
@@ -1098,7 +1098,7 @@ STI.TESTING.SAMPLING.BLOCKS = list(
     sti.screening.future.change<-c(
         "screening.rate.future.change.mult"
         ),
-    
+
     #
     syphilis.to.hiv.testing.ratio.sex.slope<-c(
         "or.syphilis.to.hiv.testing.msm",

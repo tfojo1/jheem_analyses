@@ -86,9 +86,9 @@ cbind(simset$get.params("transmission"))
 #Run Manual Simulation ----
 VERSION='shield'
 LOCATION="C.12580"
-engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
-param.manual=get.means(SHIELD.FULL.PARAMETERS.PRIOR)
-sim.manual <- engine$run(param.manual)
+engine1 <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
+param.manual1=get.means(SHIELD.FULL.PARAMETERS.PRIOR)
+sim.manual1 <- engine$run(param.manual)
 simplot(sim.manual,c("diagnosis.ps","hiv.testing"))
 
 
