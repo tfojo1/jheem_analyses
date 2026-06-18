@@ -89,7 +89,8 @@ LOCATION="C.12580"
 engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
 param.manual=get.means(SHIELD.FULL.PARAMETERS.PRIOR)
 sim.manual <- engine$run(param.manual)
-simplot(sim.manual,"diagnosis.ps")
+simplot(sim.manual,c("diagnosis.ps","hiv.testing"))
+
 
 params.manual <- params.last
 params.manual["hiv.testing.or"] <- 1.004

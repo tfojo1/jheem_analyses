@@ -1090,6 +1090,10 @@ get_sti_screening_functional_form_OPTION1 <- function(specification.metadata) {
 
 # OPTION2: Using linear spline function (provides the flexibility to change after modifier)
 get_sti_screening_functional_form_OPTION2 <- function(specification.metadata) {
+  hiv_testing_prior <- get.cached.object.for.version(name = "hiv.testing.prior",
+                                                     version = specification.metadata$version)
+  #
+  
     sti_screening_functional_form <- create.linear.spline.functional.form(knot.times = c("2010"=2010,"2020"=2020),
                                                                           knot.values = list("2010"= hiv_testing_prior$intercepts,
                                                                                              "2020"=hiv_testing_prior$intercepts+ hiv_testing_prior$slopes* (2020-2010)),
