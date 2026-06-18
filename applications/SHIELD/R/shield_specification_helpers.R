@@ -1093,7 +1093,7 @@ get_sti_screening_functional_form_OPTION2 <- function(specification.metadata) {
   hiv_testing_prior <- get.cached.object.for.version(name = "hiv.testing.prior",
                                                      version = specification.metadata$version)
   #
-  
+  expit = function(x){return(1/(1+exp(-x)))}
     sti_screening_functional_form <- create.linear.spline.functional.form(knot.times = c("2010"=2010,"2020"=2020),
                                                                           knot.values = list("2010"= expit(hiv_testing_prior$intercepts +log(.5)),
                                                                                              "2020"=expit(hiv_testing_prior$intercepts +log(.5)+ hiv_testing_prior$slopes* (2020-2010))),

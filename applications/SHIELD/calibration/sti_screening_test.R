@@ -1,4 +1,19 @@
 source("../jheem_analyses/applications/SHIELD/shield_specification.R")
+# correct values that we are looking for:
+
+specification.metadata=get.specification.metadata('shield',"C.12580")
+hiv_testing_prior <- get.cached.object.for.version(name = "hiv.testing.prior",
+                                                   version = specification.metadata$version)
+logodd=(hiv_testing_prior$intercepts+log(.5))[["15-19 years",'black','msm']]
+expit = function(x){return(1/(1+exp(-x)))}
+rate.from.prob= function(p){return (-log(1 - p))}
+
+p=expit(logodd); 
+r=rate.from.prob(p)
+print(paste0("prob ",p, "; rate is ",r))
+
+#### now we test with both models
+
 VERSION='shield'
 LOCATION="C.12580"
 if (1==2) {
@@ -49,8 +64,8 @@ if (1==1){
     
 }
 
-# simplot(sim.manual1,sim.manual2,
-# c("diagnosis.ps","hiv.testing","sti.screening"))
+simplot(sim.manual1,sim.manual2,
+c("diagnosis.ps","hiv.testing","sti.screening"))
 
 q1=engine1$extract.quantity.values() #returns the input values to the model
 q1$rate.sti.screening.over.14.without.covid$"2010"["15-19 years",'black','msm']
@@ -60,14 +75,3 @@ q2=engine2$extract.quantity.values() #returns the input values to the model
 q2$rate.sti.screening.over.14.without.covid$"2010"["15-19 years",'black','msm']
 
 
-
-specification.metadata=get.specification.metadata('shield',"C.12580")
-hiv_testing_prior <- get.cached.object.for.version(name = "hiv.testing.prior",
-                                                   version = specification.metadata$version)
-logodd=(hiv_testing_prior$intercepts+log(.5))[["15-19 years",'black','msm']]
-expit = function(x){return(1/(1+exp(-x)))}
-rate.from.prob= function(p){return (-log(1 - p))}
-
-p=expit(logodd); 
-r=rate.from.prob(p)
-print(paste0("prob ",p, "; rate is ",r))
