@@ -1066,7 +1066,8 @@ get.max.covid.effect.sti.screening.reduction = function(specification.metadata){
  
 
 #-- STI SCREENING --# ----
-get_sti_screening_functional_form <- function(specification.metadata) {
+# OPTION1: Using logistic linear function
+get_sti_screening_functional_form_OPTION1 <- function(specification.metadata) {
   # Get a cached object
   # We read the HIV testing prior from BRFSS in, then shift it to serve as our STI screening functional form's priors
   # (After implementation in the model, we will calculate HIV tests based on simulated sti screenings again and fit it against BRFSS)
@@ -1087,11 +1088,11 @@ get_sti_screening_functional_form <- function(specification.metadata) {
   sti_screening_functional_form
 }
 
-
-get_sti_screening_functional_form2 <- function(specification.metadata) {
-    sti_screening_functional_form <- create.linear.spline.functional.form(knot.times = c("2010"=2010,"2022"=2022),
+# OPTION2: Using linear spline function (provides the flexibility to change after modifier)
+get_sti_screening_functional_form_OPTION2 <- function(specification.metadata) {
+    sti_screening_functional_form <- create.linear.spline.functional.form(knot.times = c("2010"=2010,"2020"=2020),
                                                                           knot.values = list("2010"= hiv_testing_prior$intercepts,
-                                                                                             "2022"=hiv_testing_prior$intercepts+ hiv_testing_prior$slopes* (2022-2010)),
+                                                                                             "2020"=hiv_testing_prior$intercepts+ hiv_testing_prior$slopes* (2020-2010)),
                                                                           link = "logit",
                                                                           knot.link="logit",
                                                                           knots.are.on.transformed.scale = T,
