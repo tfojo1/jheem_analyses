@@ -84,7 +84,13 @@ simset$traceplot("transmission")
 cbind(simset$get.params("transmission"))
 
 #Run Manual Simulation ----
+VERSION='shield'
+LOCATION="C.12580"
 engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
+param.manual=get.means(SHIELD.FULL.PARAMETERS.PRIOR)
+sim.manual <- engine$run(param.manual)
+simplot(sim.manual,"diagnosis.ps")
+
 params.manual <- params.last
 params.manual["hiv.testing.or"] <- 1.004
 sim.manual <- engine$run(params.manual)

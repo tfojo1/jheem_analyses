@@ -717,13 +717,13 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "rate.sti.screening.over.14.without.covid",
                                                        alpha.name = time,
-                                                       values = parameters[paste0("screening.rate.multiplier.msm",time)],
+                                                       values = parameters[paste0("screening.rate.multiplier.msm.",time)],
                                                        dimension = 'sex',
                                                        applies.to.dimension.values = c('msm'))
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "rate.sti.screening.over.14.without.covid",
                                                        alpha.name = time,
-                                                       values = parameters[paste0("screening.rate.multiplier.het",time)],
+                                                       values = parameters[paste0("screening.rate.multiplier.het.",time)],
                                                        dimension = 'sex',
                                                        applies.to.dimension.values = c("heterosexual_male", "female"))
         for(race in races){  
