@@ -692,7 +692,7 @@ plot.calib.comparison <- function(calib.simsets,
                                   locations         = NULL,
                                   outcomes,
                                   separate.by       = c("outcome", "location", "calibration"),
-                                  folder.name       = NULL,
+                                 
                                   sim.subset        = "full",
                                   split.by          = NULL,
                                   facet.by          = NULL,
@@ -704,6 +704,7 @@ plot.calib.comparison <- function(calib.simsets,
                                   summary.type      = "median.and.interval",
                                   save              = TRUE,
                                   save.dir          = NULL,
+                                  folder.name       = NULL,
                                   width             = 20,
                                   height            = NULL,
                                   dpi               = 300,
@@ -725,14 +726,13 @@ plot.calib.comparison <- function(calib.simsets,
                                                       sapply(calib.simsets, `[[`, "location.name")), "plot.calib.comparison")))
     } else unique(sapply(calib.simsets, `[[`, "location.name"))
  
-    .calib.suffix <- all.calibs[1]
-    if (length(all.calibs)>1) {.calib.suffix<-paste0(all.calibs[1],"_vs_",all.calibs[1])} 
-    if (length(all.calibs)>2) {.calib.suffix<-paste0(all.calibs[1],"_vs_others")} 
+   if (is.null(folder.name)){ folder.name <- all.calibs[1]
+    if (length(all.calibs)>1) {folder.name<-paste0(all.calibs[1],"_vs_",all.calibs[1])} 
+    if (length(all.calibs)>2) {folder.name<-paste0(all.calibs[1],"_vs_others")} }
     
     if (is.null(save.dir)) {
-        save.dir <- file.path(SHIELD.PLOT.PATH, "calibrationPlots","comparison",.calib.suffix,paste0("by_",separate.by))
-        if (!is.null(folder.name)) save.dir <- file.path(save.dir, folder.name)
-    }
+        save.dir <- file.path(SHIELD.PLOT.PATH, "calibrationPlots","comparison",folder.name,paste0("by_",separate.by))
+     }
     
     loc.panel <- function(loc, outs) {
         entries <- extract.calib.simsets(calib.simsets, location = loc)
@@ -1045,8 +1045,9 @@ plot.int.comparison <- function(int.simsets,
         if (separate.by == "calibration")  "intervention" else
             if (length(all.calibs) > 1)        "both" else "intervention"
     
+    if (is.null(folder.name)) folder.name<-paste0(calibration.codes[1],".vs.others")
     if (is.null(save.dir)) save.dir <- file.path(SHIELD.PLOT.PATH, "interventionPlots",
-                                                 "comparison", if (!is.null(folder.name)) folder.name else NULL,
+                                                 "comparison",folder.name,
                                                  paste0("by_", separate.by))
     
     make.entries.panel <- function(entries, cur.outcomes = outcomes) {
