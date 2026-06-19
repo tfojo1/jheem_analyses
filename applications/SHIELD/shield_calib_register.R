@@ -203,7 +203,7 @@ register.calibration.info('calib.6.12.stg1.penalty',
 )
 register.calibration.info("calib.6.12.stg2.penalty",
                           preceding.calibration.codes = 'calib.6.12.stg1.penalty',
-                          likelihood.instructions = lik.inst.stage23.plus.penalty,
+                          likelihood.instructions = lik.inst.stage23.plus.penalty.fourth,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
                           parameter.names = c(
@@ -217,7 +217,7 @@ register.calibration.info("calib.6.12.stg2.penalty",
 )
 register.calibration.info("calib.6.12.stg3.penalty",
                           preceding.calibration.codes = 'calib.6.12.stg2.penalty',
-                          likelihood.instructions = lik.inst.stage23.plus.penalty,
+                          likelihood.instructions = lik.inst.stage23.plus.penalty.fourth,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
                           parameter.names = c(
@@ -301,7 +301,7 @@ register.calibration.info("calib.6.16.stg0.penalty",
 )
 register.calibration.info('calib.6.16.stg1.penalty',
                           preceding.calibration.codes = 'calib.6.16.stg0.penalty',
-                          likelihood.instructions = lik.inst.stage1.plus.penalty,
+                          likelihood.instructions = lik.inst.stage23.plus.penalty.fourth,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
@@ -311,7 +311,7 @@ register.calibration.info('calib.6.16.stg1.penalty',
 )
 register.calibration.info("calib.6.16.stg2.penalty",
                           preceding.calibration.codes = 'calib.6.16.stg1.penalty',
-                          likelihood.instructions = lik.inst.stage23.plus.penalty,
+                          likelihood.instructions = lik.inst.stage23.plus.penalty.fourth,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
                           parameter.names = c(
@@ -325,7 +325,7 @@ register.calibration.info("calib.6.16.stg2.penalty",
 )
 register.calibration.info("calib.6.16.stg3.penalty",
                           preceding.calibration.codes = 'calib.6.16.stg2.penalty',
-                          likelihood.instructions = lik.inst.stage23.plus.penalty,
+                          likelihood.instructions = lik.inst.stage23.plus.penalty.fourth,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
                           parameter.names = c(
@@ -380,7 +380,7 @@ register.calibration.info("calib.6.19.stage2.az",
 )
 register.calibration.info("calib.6.19.stage3.az",
                           preceding.calibration.codes = 'calib.6.19.stage2.az',
-                          likelihood.instructions = lik.inst.stage23.fourth,
+                          likelihood.instructions = lik.inst.stage23.eight,#w=1/8
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
                           parameter.names = c(

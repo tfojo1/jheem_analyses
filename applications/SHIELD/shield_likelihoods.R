@@ -897,9 +897,13 @@ lik.inst.stage23 = join.likelihood.instructions(
 lik.inst.stage23.fourth = join.likelihood.instructions(
     lik.inst.stg23.demog,
     lik.inst.stg23.non.demog,
-    additional.weights = STAGE.23.WEIGHT * 1/2 # 1/4
+    additional.weights = STAGE.23.WEIGHT * 1/2 # w=1/4
 )
-
+lik.inst.stage23.eight = join.likelihood.instructions(
+    lik.inst.stg23.demog,
+    lik.inst.stg23.non.demog,
+    additional.weights = STAGE.23.WEIGHT * 1/4 # w=1/8
+)
 lik.inst.stg23.non.demog.plus.penalty=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
     total.diagnosis.by.strata.likelihood.instructions,
@@ -925,9 +929,18 @@ lik.inst.stg23.non.demog.plus.penalty=join.likelihood.instructions(
 lik.inst.stage23.plus.penalty = join.likelihood.instructions(
     lik.inst.stg23.demog,
     lik.inst.stg23.non.demog.plus.penalty,
-    additional.weights = STAGE.23.WEIGHT * 1/2 # 1/4
+    additional.weights = STAGE.23.WEIGHT 
 )
-
+lik.inst.stage23.plus.penalty.fourth = join.likelihood.instructions(
+    lik.inst.stg23.demog,
+    lik.inst.stg23.non.demog.plus.penalty,
+    additional.weights = STAGE.23.WEIGHT * 1/2 # w=1/4
+)
+lik.inst.stage23.plus.penalty.eight = join.likelihood.instructions(
+    lik.inst.stg23.demog,
+    lik.inst.stg23.non.demog.plus.penalty,
+    additional.weights = STAGE.23.WEIGHT * 1/4 # w=1/8
+)
 # Alternative weight versions ----
 # lik.inst.stg3.population.2x=join.likelihood.instructions(
 #     population.likelihood.instructions,
