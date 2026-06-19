@@ -254,16 +254,16 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
     ## STI Screening ----
     
     #OPTION1: using logistic linear function with an intercept and slope
-    or.sti.screening.msm = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    or.sti.screening.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    or.sti.screening.female = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    #
-    or.sti.screening.black = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    or.sti.screening.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    or.sti.screening.other = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    #
-    or.slope.sti.screening.msm = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10),
-    or.slope.sti.screening.heterosexual = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10),
+    # or.sti.screening.msm = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # or.sti.screening.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # or.sti.screening.female = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # #
+    # or.sti.screening.black = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # or.sti.screening.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # or.sti.screening.other = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # #
+    # or.slope.sti.screening.msm = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10),
+    # or.slope.sti.screening.heterosexual = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10),
     
     #OPTION2: using a linear spline function (knots 2010,2020) 
     #by sex, by race in each knot
@@ -686,32 +686,32 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    applies.to.dimension.values = "all") 
     
     ## STI Screening  ----
-    # OPTION1: Change intercept and slope 
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "rate.sti.screening.over.14.without.covid",
-                                                   alpha.name = "intercept",
-                                                   values = parameters[paste0("or.sti.screening.", races)],
-                                                   dimension = "race", #recipient
-                                                   applies.to.dimension.values = races)
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "rate.sti.screening.over.14.without.covid",
-                                                   alpha.name = "intercept",
-                                                   values = parameters[paste0("or.sti.screening.", sexes)],
-                                                   dimension = "sex", #recipient
-                                                   applies.to.dimension.values = sexes)
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "rate.sti.screening.over.14.without.covid",
-                                                   alpha.name = "slope",
-                                                   values = parameters["or.slope.sti.screening.msm"],
-                                                   dimension = "sex", #recipient
-                                                   applies.to.dimension.values = c("msm"))
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   # element.name = "rate.sti.screening.over.14",
-                                                   element.name = "rate.sti.screening.over.14.without.covid",
-                                                   alpha.name = "slope",
-                                                   values = parameters["or.slope.sti.screening.heterosexual"],
-                                                   dimension = "sex", #recipient
-                                                   applies.to.dimension.values = c("heterosexual_male", "female"))
+    # # OPTION1: Change intercept and slope 
+    # set.element.functional.form.main.effect.alphas(model.settings,
+    #                                                element.name = "rate.sti.screening.over.14.without.covid",
+    #                                                alpha.name = "intercept",
+    #                                                values = parameters[paste0("or.sti.screening.", races)],
+    #                                                dimension = "race", #recipient
+    #                                                applies.to.dimension.values = races)
+    # set.element.functional.form.main.effect.alphas(model.settings,
+    #                                                element.name = "rate.sti.screening.over.14.without.covid",
+    #                                                alpha.name = "intercept",
+    #                                                values = parameters[paste0("or.sti.screening.", sexes)],
+    #                                                dimension = "sex", #recipient
+    #                                                applies.to.dimension.values = sexes)
+    # set.element.functional.form.main.effect.alphas(model.settings,
+    #                                                element.name = "rate.sti.screening.over.14.without.covid",
+    #                                                alpha.name = "slope",
+    #                                                values = parameters["or.slope.sti.screening.msm"],
+    #                                                dimension = "sex", #recipient
+    #                                                applies.to.dimension.values = c("msm"))
+    # set.element.functional.form.main.effect.alphas(model.settings,
+    #                                                # element.name = "rate.sti.screening.over.14",
+    #                                                element.name = "rate.sti.screening.over.14.without.covid",
+    #                                                alpha.name = "slope",
+    #                                                values = parameters["or.slope.sti.screening.heterosexual"],
+    #                                                dimension = "sex", #recipient
+    #                                                applies.to.dimension.values = c("heterosexual_male", "female"))
     #OPTION2:
     for(time in c("2010","2020")){
         set.element.functional.form.main.effect.alphas(model.settings,
@@ -736,14 +736,14 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
         }
 
     }
-    # # Future change multiplier ----
-    # set.element.functional.form.main.effect.alphas(model.settings,
-    #                                                element.name = "rate.sti.screening.over.14.without.covid",
-    #                                                alpha.name = "after.modifier",
-    #                                                values = parameters["screening.rate.future.change.mult"],
-    #                                                applies.to.dimension.values = "all",
-    #                                                dimension = "all"
-    # )
+    # Future change multiplier ----
+    set.element.functional.form.main.effect.alphas(model.settings,
+                                                   element.name = "rate.sti.screening.over.14.without.covid",
+                                                   alpha.name = "after.modifier",
+                                                   values = parameters["screening.rate.future.change.mult"],
+                                                   applies.to.dimension.values = "all",
+                                                   dimension = "all"
+    )
     
     ## Syphilis to HIV tests Ratio ----
     # Change intercept and slope
@@ -1066,18 +1066,18 @@ STI.TESTING.SAMPLING.BLOCKS = list(
         "or.slope.careseeking.symptomatic.ps"
     ),
     #OPTION1
-    or.sti.screening.sex<-c(
-        'or.sti.screening.msm',
-        'or.sti.screening.heterosexual_male',
-        'or.sti.screening.female'),
-    or.sti.screening.race.slope<-c(
-        'or.sti.screening.black',
-        'or.sti.screening.hispanic',
-        'or.sti.screening.other',
-        # 'or.slope.sti.screening',
-        'or.slope.sti.screening.msm',
-        'or.slope.sti.screening.heterosexual'
-    ),
+    # or.sti.screening.sex<-c(
+    #     'or.sti.screening.msm',
+    #     'or.sti.screening.heterosexual_male',
+    #     'or.sti.screening.female'),
+    # or.sti.screening.race.slope<-c(
+    #     'or.sti.screening.black',
+    #     'or.sti.screening.hispanic',
+    #     'or.sti.screening.other',
+    #     # 'or.slope.sti.screening',
+    #     'or.slope.sti.screening.msm',
+    #     'or.slope.sti.screening.heterosexual'
+    # ),
     #OPTION2
     sti.screening.sex<- c(
         "screening.rate.multiplier.msm.2010",

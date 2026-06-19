@@ -21,7 +21,7 @@ par.aliases.transmission = list(
 )
  
 
-# NEW CALIBRATION WITH VARIOUS CHANGES ----
+# 6.5 (several changes) ----
 register.calibration.info("calib.6.5.stage0.az",
                           likelihood.instructions = lik.inst.stage0,
                           data.manager = SURVEILLANCE.MANAGER,
@@ -32,7 +32,7 @@ register.calibration.info("calib.6.5.stage0.az",
                                               "global.transmission.rate"),
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-# STAGE 1
+# stage1
 register.calibration.info('calib.6.5.stage1.az',
                           preceding.calibration.codes = 'calib.6.5.stage0.az',
                           likelihood.instructions = lik.inst.stage1,
@@ -43,7 +43,7 @@ register.calibration.info('calib.6.5.stage1.az',
                                               TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-# STAGE 2
+# stage2
 register.calibration.info("calib.6.5.stage2.az",
                           preceding.calibration.codes = 'calib.6.5.stage1.az',
                           likelihood.instructions = lik.inst.stage23,
@@ -59,7 +59,7 @@ register.calibration.info("calib.6.5.stage2.az",
                           ),
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-# STAGE 3
+# stage3
 register.calibration.info("calib.6.5.stage3.az",
                           preceding.calibration.codes = 'calib.6.5.stage2.az',
                           likelihood.instructions = lik.inst.stage23,
@@ -76,8 +76,8 @@ register.calibration.info("calib.6.5.stage3.az",
                           n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
 )
 
-# with screening slope split in twain ----
-# STAGE 1
+# 6.8: seperating sti.screening slope for msm/het ----
+# STAGE0
 register.calibration.info('calib.6.8.stage1.az',
                           preceding.calibration.codes = 'calib.6.5.stage0.az',
                           likelihood.instructions = lik.inst.stage1,
@@ -88,7 +88,7 @@ register.calibration.info('calib.6.8.stage1.az',
                                               TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-# STAGE 2
+# STAGE1
 register.calibration.info("calib.6.8.stage2.az",
                           preceding.calibration.codes = 'calib.6.8.stage1.az',
                           likelihood.instructions = lik.inst.stage23,
@@ -105,7 +105,7 @@ register.calibration.info("calib.6.8.stage2.az",
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
-# with overall weight for 2-3 likelihood lowered to 1/4 from 1/2
+# 6.9: lowering overall weight for stage2-3 likelihood lowered to 1/4 from 1/2 ----
 register.calibration.info("calib.6.9.stage2.az",
                           preceding.calibration.codes = 'calib.6.8.stage1.az',
                           likelihood.instructions = lik.inst.stage23.fourth,
@@ -122,114 +122,7 @@ register.calibration.info("calib.6.9.stage2.az",
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
-# After adding COVID
-register.calibration.info("calib.6.16.stage0.az",
-                          likelihood.instructions = lik.inst.stage0,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          fixed.initial.parameter.values = c("global.transmission.rate.msm"=3.9,
-                                                             "global.transmission.rate.het"=3.9),  
-                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
-                                              AGING.PARAMETERS.PRIOR@var.names,
-                                              "global.transmission.rate.msm",
-                                              "global.transmission.rate.het"),
-                          parameter.aliases = par.aliases.transmission,
-                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
-)
-register.calibration.info('calib.6.16.stage1.az',
-                          preceding.calibration.codes = 'calib.6.16.stage0.az',
-                          likelihood.instructions = lik.inst.stage1,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
-                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
-                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
-)
-register.calibration.info("calib.6.16.stage2.az",
-                          preceding.calibration.codes = 'calib.6.16.stage1.az',
-                          likelihood.instructions = lik.inst.stage23.fourth,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          parameter.names = c(
-                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                              STI.TESTING.PARAMETERS.PRIOR@var.names,
-                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
-                              POPULATION.PARAMETERS.PRIOR@var.names,
-                              AGING.PARAMETERS.PRIOR@var.names
-                          ),
-                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
-)
-register.calibration.info("calib.6.16.stage3.az",
-                          preceding.calibration.codes = 'calib.6.16.stage2.az',
-                          likelihood.instructions = lik.inst.stage23.fourth,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          parameter.names = c(
-                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                              STI.TESTING.PARAMETERS.PRIOR@var.names,
-                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
-                              POPULATION.PARAMETERS.PRIOR@var.names,
-                              AGING.PARAMETERS.PRIOR@var.names
-                          ),
-                          n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
-)
-
-# Same as above but with the new penalty likelihood ----
-# This STAGE 0 is exactly identical to "calib.6.16.stage0.az"
-register.calibration.info("calib.6.16.stg0.penalty",
-                          likelihood.instructions = lik.inst.stage0,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          fixed.initial.parameter.values = c("global.transmission.rate.msm"=3.9,
-                                                             "global.transmission.rate.het"=3.9),  
-                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
-                                              AGING.PARAMETERS.PRIOR@var.names,
-                                              "global.transmission.rate.msm",
-                                              "global.transmission.rate.het"),
-                          parameter.aliases = par.aliases.transmission,
-                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
-)
-register.calibration.info('calib.6.16.stg1.penalty',
-                          preceding.calibration.codes = 'calib.6.16.stg0.penalty',
-                          likelihood.instructions = lik.inst.stage1.plus.penalty,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
-                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
-                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
-)
-register.calibration.info("calib.6.16.stg2.penalty",
-                          preceding.calibration.codes = 'calib.6.16.stg1.penalty',
-                          likelihood.instructions = lik.inst.stage23.plus.penalty,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          parameter.names = c(
-                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                              STI.TESTING.PARAMETERS.PRIOR@var.names,
-                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
-                              POPULATION.PARAMETERS.PRIOR@var.names,
-                              AGING.PARAMETERS.PRIOR@var.names
-                          ),
-                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
-)
-register.calibration.info("calib.6.16.stg3.penalty",
-                          preceding.calibration.codes = 'calib.6.16.stg2.penalty',
-                          likelihood.instructions = lik.inst.stage23.plus.penalty,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          parameter.names = c(
-                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                              STI.TESTING.PARAMETERS.PRIOR@var.names,
-                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
-                              POPULATION.PARAMETERS.PRIOR@var.names,
-                              AGING.PARAMETERS.PRIOR@var.names
-                          ),
-                          n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
-)
-
-# With new priors on transmission baseline ----
+# 6.12: setting msm trans prior in 2000 to log(1) same as het ----
 register.calibration.info("calib.6.12.stage0.az",
                           likelihood.instructions = lik.inst.stage0,
                           data.manager = SURVEILLANCE.MANAGER,
@@ -282,7 +175,8 @@ register.calibration.info("calib.6.12.stage3.az",
                           n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
 )
 
-# Same as above but with the new penalty likelihood ----
+# 6.12: with penalty---- 
+# Same as above but with the new penalty likelihood
 # This STAGE 0 is exactly identical to "calib.6.12.stage0.az"
 register.calibration.info("calib.6.12.stg0.penalty",
                           likelihood.instructions = lik.inst.stage0,
@@ -336,6 +230,169 @@ register.calibration.info("calib.6.12.stg3.penalty",
                           n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
 )
 
+# 6.16: adding covid reductions to sti.screenings ----
+register.calibration.info("calib.6.16.stage0.az",
+                          likelihood.instructions = lik.inst.stage0,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          fixed.initial.parameter.values = c("global.transmission.rate.msm"=3.9,
+                                                             "global.transmission.rate.het"=3.9),  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate.msm",
+                                              "global.transmission.rate.het"),
+                          parameter.aliases = par.aliases.transmission,
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info('calib.6.16.stage1.az',
+                          preceding.calibration.codes = 'calib.6.16.stage0.az',
+                          likelihood.instructions = lik.inst.stage1,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info("calib.6.16.stage2.az",
+                          preceding.calibration.codes = 'calib.6.16.stage1.az',
+                          likelihood.instructions = lik.inst.stage23.fourth,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names
+                          ),
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info("calib.6.16.stage3.az",
+                          preceding.calibration.codes = 'calib.6.16.stage2.az',
+                          likelihood.instructions = lik.inst.stage23.fourth,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names
+                          ),
+                          n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
+)
+
+# 6.16 with penalty ----
+# Same as above but with the new penalty likelihood
+# This STAGE 0 is exactly identical to "calib.6.16.stage0.az"
+register.calibration.info("calib.6.16.stg0.penalty",
+                          likelihood.instructions = lik.inst.stage0,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          fixed.initial.parameter.values = c("global.transmission.rate.msm"=3.9,
+                                                             "global.transmission.rate.het"=3.9),  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate.msm",
+                                              "global.transmission.rate.het"),
+                          parameter.aliases = par.aliases.transmission,
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info('calib.6.16.stg1.penalty',
+                          preceding.calibration.codes = 'calib.6.16.stg0.penalty',
+                          likelihood.instructions = lik.inst.stage1.plus.penalty,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info("calib.6.16.stg2.penalty",
+                          preceding.calibration.codes = 'calib.6.16.stg1.penalty',
+                          likelihood.instructions = lik.inst.stage23.plus.penalty,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names
+                          ),
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info("calib.6.16.stg3.penalty",
+                          preceding.calibration.codes = 'calib.6.16.stg2.penalty',
+                          likelihood.instructions = lik.inst.stage23.plus.penalty,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names
+                          ),
+                          n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
+)
+
+
+
+# 6.19: changing sti.screening.rate to linear spline function ----
+register.calibration.info("calib.6.19.stage0.az",
+                          likelihood.instructions = lik.inst.stage0,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          fixed.initial.parameter.values = c("global.transmission.rate.msm"=3.9,
+                                                             "global.transmission.rate.het"=3.9),  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate.msm",
+                                              "global.transmission.rate.het"),
+                          parameter.aliases = par.aliases.transmission,
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info('calib.6.19.stage1.az',
+                          preceding.calibration.codes = 'calib.6.19.stage0.az',
+                          likelihood.instructions = lik.inst.stage1,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info("calib.6.19.stage2.az",
+                          preceding.calibration.codes = 'calib.6.19.stage1.az',
+                          likelihood.instructions = lik.inst.stage23.fourth, #w=1/4
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names
+                          ),
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info("calib.6.19.stage3.az",
+                          preceding.calibration.codes = 'calib.6.19.stage2.az',
+                          likelihood.instructions = lik.inst.stage23.fourth,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names
+                          ),
+                          n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
+)
+# ************************************----
 # Trying out global trates ----
 for (gtr in c(3.6, 3.7, 3.8, 3.9)) {
     register.calibration.info(paste0("calib.6.12.stg0.", gtr),
@@ -351,7 +408,7 @@ for (gtr in c(3.6, 3.7, 3.8, 3.9)) {
     )
 }
 
-# MAIN CALIBRATION -----
+# old CALIBRATION -----
 # STAGE 0
 register.calibration.info("calib.5.11.stage0.az",
                           likelihood.instructions = lik.inst.stage0,
@@ -408,7 +465,7 @@ register.calibration.info("calib.5.11.stage3.az",
                           n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
 )
 
-# Testing the new joint het-msm transmission rate multiplier prior
+# 5.28: Testing the new joint het-msm transmission rate multiplier prior ----
 register.calibration.info("calib.5.28.stage0.az",
                           likelihood.instructions = lik.inst.stage0,
                           data.manager = SURVEILLANCE.MANAGER,
@@ -490,7 +547,7 @@ register.calibration.info("calib.5.29.stage3.az",
                           n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
 )
 
-# SA Model: 30% msm partnership with females -----
+# 5.11: SA Model: 30% msm partnership with females -----
 # Global transmission was found at 2 in stage 0 and was used in other stages too (inc_msm_female_partnerships2 baranch )
 # STAGE 1
     register.calibration.info(paste0("calib.5.11.stg0.gtr.20"),
@@ -550,7 +607,7 @@ register.calibration.info("calib.5.12.stage2.pk",
 
 # OLDER ----
 
-# ***** STAGE0 ***** ----
+#4.24 ----
 # MAKE SURE FOR NEW STAGE 0 TO USE 15000 AND TO KEEP IT CONSISTENT ACROSS STAGES
 
 # Attempting a full top-to-bottom calibration
@@ -566,7 +623,7 @@ register.calibration.info("calib.4.24.stage0.az",
                           n.iter = 10000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
-# Attempting a calibration after increasing msm.fraction.pairing.female to 30%
+# 5.7: Attempting a calibration after increasing msm.fraction.pairing.female to 30% ---
 register.calibration.info("calib.5.7.stage0.pk",
                           likelihood.instructions = lik.inst.stage0,
                           data.manager = SURVEILLANCE.MANAGER,

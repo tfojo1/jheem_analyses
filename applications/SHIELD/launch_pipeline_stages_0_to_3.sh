@@ -81,16 +81,16 @@ CITIES=("${ten_cities[@]}")
 # so the OS fully reclaims memory between them).
 SEQ_SCRIPT="$SCRIPT_DIR/shield_calib_setup_and_run.R"
 SEQ_CALIBRATION_CODES=(
-    calib.7.12.stage0.test
-    calib.7.12.stage1.test
-    calib.7.12.stage2.test
+    calib.6.19.stage0.az
+    calib.6.19.stage1.az
+    calib.6.19.stage2.az
 )
 SEQ_MAX_CITIES=20
 
 # Phase 2: parallel, multi-chain stage3.
 PAR_SCRIPT="$SCRIPT_DIR/shield_calib_setup_and_run_modular.R"
 PAR_CALIBRATION_CODES=(
-    calib.7.12.stage3.test
+    calib.6.19.stage3.az
 )
 N_CHAINS=4
 # Peak core usage = PAR_MAX_CITIES x N_CHAINS (e.g. 5 x 4 = 20)
