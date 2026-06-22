@@ -10,28 +10,29 @@ source("../jheem_analyses/applications/SHIELD/shield_calib_register.R")
 source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions.R')
 
 # ---- SETUP ----
-<<<<<<< HEAD
+
 for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.29.stage0.az"))}
  
 
 calibration.codes <- c(
     "calib.6.29.stage0.az"
     )
-=======
+
 # for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.16.stage2.az"))}
-
-
+ 
 calibration.codes <- c(
-    "calib.6.9.stage2.az" #prior run ater making a lot of revisions
-    #         "calib.6.12.stage2.az", #
+    "calib.6.9.stage2.az" ,#prior run after making a lot of revisions
+    "calib.6.12.stage2.az", # prior trate_2000 for msm set to log(1)
     #     # "calib.6.12.stg2.penalty"
-    #     
-    #     "calib.6.16.stage2.az", #with Covid reductions for sti screening
+    
+         "calib.6.16.stage2.az", #with Covid reductions for sti screening
     #      # "calib.6.16.stg2.penalty"
+    
+        "calib.6.19.stage2.az" #changed screening to spline
     
     
 )
->>>>>>> 4f22c0da (x)
+ 
 
 # read simulations into the simset
 calib.simsets <- load.calib.simsets(
@@ -94,6 +95,38 @@ apply(sim.manual$diagnosis.total,1,sum)==
 
 
 
+plot.calib.comparison(calib.simsets = calib.simsets,
+                      calibration.codes = c("calib.6.16.stage2.az"),
+                      sim.subset = "last20",
+                      locations = SHIELD.TEN.MSAS,
+                      separate.by = "outcome",
+                      folder.name = "calib.6.16.stage2.summary",
+                      outcomes = c("diagnosis.ps","hiv.testing","diagnosis.total"),
+                      years = c(1970:2030),
+                      # ncol=5
+                      facet.by = "sex" ,
+                      plot.which = "sim.only",
+                      ncol = 2
+)
+
+ 
+# simplot(calib.simsets$`Seattle – calib.6.12.stage2.az`$last20_sims$diagnosis.ps, outcomes = "diagnosis.ps",facet.by = "sex")
+# x=calib.simsets$`Seattle – calib.6.12.stage2.az`$last20_sims$diagnosis.ps
+# x[,,1,1,,1]
+
+plot.calib.comparison(calib.simsets = calib.simsets,
+                      calibration.codes = c("calib.6.19.stage2.az","calib.6.16.stage2.az"),
+                      sim.subset = "last20",
+                      locations = SHIELD.TEN.MSAS,
+                      separate.by = "outcome",
+                      folder.name = "calib.6.19.stage.vs.6.16",
+                      outcomes = c("diagnosis.ps","hiv.testing"),
+                      years = c(1970:2030),
+                      # ncol=5
+                      # facet.by = "sex" ,
+                      # plot.which = "sim.only",
+                      ncol = 2
+)
 # CREATE ALL STAGE CALIBRATION PLOTS
 plot.calib.stages(calib.simsets = calib.simsets,
                   calibration.code =calibration.codes,
