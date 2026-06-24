@@ -942,6 +942,58 @@ lik.inst.stage23.plus.penalty.eight = join.likelihood.instructions(
     additional.weights = STAGE.23.WEIGHT * 1/4 # w=1/8
 )
 # Alternative weight versions ----
+
+lik.inst.stg23.demog.2x=join.likelihood.instructions(
+    population.likelihood.instructions,
+    deaths.likelihood.instructions,
+    fertility.likelihood.instructions,
+    immigration.likelihood.instructions,
+    emigration.likelihood.instructions,
+    additional.weights = 1/2
+)
+lik.inst.stg23.demog.4x=join.likelihood.instructions(
+    population.likelihood.instructions,
+    deaths.likelihood.instructions,
+    fertility.likelihood.instructions,
+    immigration.likelihood.instructions,
+    emigration.likelihood.instructions,
+    additional.weights = 1/4
+)
+lik.inst.stg23.demog.8x=join.likelihood.instructions(
+    population.likelihood.instructions,
+    deaths.likelihood.instructions,
+    fertility.likelihood.instructions,
+    immigration.likelihood.instructions,
+    emigration.likelihood.instructions,
+    additional.weights = 1/8
+)
+
+lik.inst.stage23.8x.pop.4x = join.likelihood.instructions(
+    lik.inst.stg23.demog.4x,
+    lik.inst.stg23.non.demog.plus.penalty,
+    additional.weights = 1/8
+)
+lik.inst.stage23.8x.pop.8x = join.likelihood.instructions(
+    lik.inst.stg23.demog.8x,
+    lik.inst.stg23.non.demog.plus.penalty,
+    additional.weights = 1/8
+)
+lik.inst.stage23.16x.pop.2x = join.likelihood.instructions(
+    lik.inst.stg23.demog.2x,
+    lik.inst.stg23.non.demog.plus.penalty,
+    additional.weights = 1/16
+)
+lik.inst.stage23.16x.pop.4x = join.likelihood.instructions(
+    lik.inst.stg23.demog.4x,
+    lik.inst.stg23.non.demog.plus.penalty,
+    additional.weights = 1/16
+)
+lik.inst.stage23.32x.pop.2x = join.likelihood.instructions(
+    lik.inst.stg23.demog.2x,
+    lik.inst.stg23.non.demog.plus.penalty,
+    additional.weights = 1/32
+)
+
 # lik.inst.stg3.population.2x=join.likelihood.instructions(
 #     population.likelihood.instructions,
 #     additional.weights = 1/2
