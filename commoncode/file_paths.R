@@ -5,9 +5,9 @@ MAC.ROOT.DIR = "/Volumes/jheem$"
 JHU_SERVER_NAS_MOUNT_PATH = "/mnt/jheem_nas_share"
 
 JHU_SERVER_HOSTNAMES = c(
-    "pearl1.jhsph.edu", "pearl1",
-    "shield1.jhsph.edu", "shield1",
-    "shield2.jhsph.edu", "shield2"
+    "shield1",
+    "shield2",
+    "shield3"
 )
 
 LAPTOP.ROOT.DIR = '../../files'
