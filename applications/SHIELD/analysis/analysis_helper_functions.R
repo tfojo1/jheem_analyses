@@ -502,8 +502,15 @@ extract.calib.simsets <- function(calib.simsets,
         location.name=names(location.info)
         location.code=unname(location.info)[1]
         
-        if (exact) calib.simsets[startsWith(names(calib.simsets), paste0(location.name, " \u2013 "))]
-        else       calib.simsets[grepl(location.name, names(calib.simsets), fixed = TRUE)]
+        if (!is.null(calibration.code)) {
+            if (exact) calib.simsets[paste0(location.name, " \u2013 ", calibration.code)]
+            else       calib.simsets[grepl(location.name, names(calib.simsets), fixed = TRUE) &
+                                         grepl(calibration.code, names(calib.simsets), fixed = TRUE)]
+        } else {
+            if (exact) calib.simsets[startsWith(names(calib.simsets), paste0(location.name, " \u2013 "))]
+            else       calib.simsets[grepl(location.name, names(calib.simsets), fixed = TRUE)]
+        }
+        
     } else {
         if (exact) calib.simsets[endsWith(names(calib.simsets), paste0(" \u2013 ", calibration.code))]
         else       calib.simsets[grepl(calibration.code, names(calib.simsets), fixed = TRUE)]
@@ -594,7 +601,7 @@ plot.calib.stages <- function(calib.simsets,
                               style.manager = NULL,
                               create.dirs   = TRUE,
                               verbose       = TRUE) {
-      if (is.null(style.manager))
+    if (is.null(style.manager))
         style.manager <- create.style.manager(shape.data.by = "source", color.data.by = "stratum")
      
     # This new version makes sure the end result is a named vector.
@@ -722,8 +729,9 @@ plot.calib.comparison <- function(calib.simsets,
         unique(sapply(calib.simsets, `[[`, "calib.code"))
     all.loc.names <- if (!is.null(locations)) {
         unique(names(.filter.to.requested.locations(locations,
-                                             setNames(sapply(calib.simsets, `[[`, "location.code"),
-                                                      sapply(calib.simsets, `[[`, "location.name")), "plot.calib.comparison")))
+                                                    setNames(sapply(calib.simsets, `[[`, "location.code"),
+                                                             sapply(calib.simsets, `[[`, "location.name")),
+                                                    "plot.calib.comparison")))
     } else unique(sapply(calib.simsets, `[[`, "location.name"))
  
    if (is.null(folder.name)){ folder.name <- all.calibs[1]
@@ -1139,4 +1147,58 @@ plot.int.comparison <- function(int.simsets,
     
     if (verbose && save) message("\nDone. Saved ", length(output), " file(s) to: ", save.dir)
     if (save) invisible(output) else output
+}
+
+# **** SECTION 8: CALIBRATION VERIFICATION **** ----
+# ****************************************************************************************************
+verify_calibration <- function(calib.simsets,
+                               calibration.codes,
+                               generate.plots = TRUE,
+                               locations     = NULL,
+                               style.manager = NULL,
+                               verbose = TRUE,
+                               mixing.threshold = 100000,
+                               unmixed.allowable = 2) {
+    
+    all.loc.names <- if (!is.null(locations)) {
+        unique(names(.filter.to.requested.locations(locations,
+                                                    setNames(sapply(calib.simsets, `[[`, "location.code"),
+                                                             sapply(calib.simsets, `[[`, "location.name")),
+                                                    "verify_calibration")))
+    } else unique(sapply(calib.simsets, `[[`, "location.name"))
+    
+    setNames(lapply(calibration.codes, function(calib_code) {
+        if (generate.plots) {
+            plot.calib.comparison(
+                calib.simsets,
+                calibration.codes = calib_code,
+                locations = locations,
+                outcomes = c("population", "deaths", "diagnosis.ps"),
+                separate.by = "location",
+                sim.subset = "last1",
+                style.manager = style.manager,
+                save.dir = file.path(SHIELD.PLOT.PATH, "verificationPlots", calib_code)
+            )
+        }
+        
+        # Check if 2 or more parameters have a mixing statistic over 100,000
+        rv <- !sapply(all.loc.names, function(loc) {
+            tryCatch(
+                {
+                    simset <- extract.calib.simsets(calib.simsets, location = loc, calibration.code = calib_code, exact = T)[[1]]$full_simset
+                    sum(simset$get.mcmc.mixing.statistic() > mixing.threshold) >= unmixed.allowable
+                },
+                error=function(e) {
+                    print(paste0("Couldn't extract simset for ", loc, " in '", calib_code, "': returning FALSE"))
+                    F
+                })
+        }, USE.NAMES = T)
+        
+        if (verbose && any(!rv)) {
+            print(paste0("The following locations didn't mix in '", calib_code, "': ", paste0(all.loc.names[!rv], collapse = ", ")))
+        }
+        
+        rv
+        
+    }), calibration.codes)
 }
