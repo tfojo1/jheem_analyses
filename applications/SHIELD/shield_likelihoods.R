@@ -23,7 +23,7 @@ STAGE.23.WEIGHT= 1/2
 STAGE.23.POPULATION.WEIGHT = 1/32
 # STAGE.3.WEIGHT= 1/8
 
-FUTURE.CHANGE.LIKELIHOOD.WEIGHT = 8 # representing the eight points we would have post 2022 (eight times as many points)
+FUTURE.PENALTY.PS.DIAG.GROWTH.LIKELIHOOD.WEIGHT = 8 # representing the eight points we would have post 2022 (eight times as many points)
 HIV.TESTING.BY.SEX.WEIGHT= 8 #increasing the weight for sex a specific HIV test testing rates because this is the only targets that's available among MSM
 
 #** POPULATION SIZES ** ---- 
@@ -323,14 +323,14 @@ ps.diagnosis.by.strata.likelihood.instructions =
                                          minimum.error.sd = 1
     )
 
-##---- New Future Penalty ----
+##---- Future Penalty for ps.diagnosis growth ----
 # We estimated the 10-year ratio of ps.diagnosis across all MSAs. The log of this ratio was well approximated by a lognormal distribution. 
 # We used the mean and standard deviation of log(x) to characterize this distribution. The observed values ranged from 0.3 to 9.4, 
 # so we assumed an upper threshold corresponding to a 10-fold increase. Simulations producing values outside this range were penalized accordingly.
 # To avoid redundant calculations, this ratio computed only once by comparing simulations in 2030 to 2020 and penalizing sims that fall outside of the 10X increase
-future.change.penalty.likelihood.instructions =
+future.penalty.ps.diag.growth.likelihood.instructions =
     create.custom.likelihood.instructions(
-        name = "future.change.likelihood",
+        name = "future.penalty.ps.diag.growth.likelihood",
         compute.function = function(sim, data, weights, log = T) {
             get.instr = data$get.instr
             start_year = data$start_year #2020
@@ -392,7 +392,7 @@ future.change.penalty.likelihood.instructions =
                 penalty_cutoff=10 # penalizing sims falling outside of 10X increase
             )
         },
-        weights = FUTURE.CHANGE.LIKELIHOOD.WEIGHT
+        weights = FUTURE.PENALTY.PS.DIAG.GROWTH.LIKELIHOOD.WEIGHT
     )
 
 ##---- Proportion of Male Diagnosis among MSM ----
@@ -824,7 +824,7 @@ lik.inst.stage1=join.likelihood.instructions(
     #
     historical.diagnosis.likelihood.instructions,
     proportion_ps_male_among_msm_likelihood_instructions,
-    future.change.penalty.likelihood.instructions,    # Future change penalty
+    future.penalty.ps.diag.growth.likelihood.instructions,    # Future change penalty
     #
     additional.weights = STAGE.1.WEIGHT
 )
@@ -849,7 +849,7 @@ lik.inst.stage1.plus.penalty=join.likelihood.instructions(
     historical.diagnosis.likelihood.instructions,
     proportion_ps_male_among_msm_likelihood_instructions,
     diagnosis_trajectory_penalty_likelihood_instructions,
-    future.change.penalty.likelihood.instructions,    # Future change penalty
+    future.penalty.ps.diag.growth.likelihood.instructions,    # Future change penalty
     #
     additional.weights = STAGE.1.WEIGHT
 )
@@ -885,7 +885,7 @@ lik.inst.stg23.non.demog=join.likelihood.instructions(
     #
     historical.diagnosis.likelihood.instructions,
     proportion_ps_male_among_msm_likelihood_instructions,
-    future.change.penalty.likelihood.instructions    # Future change penalty
+    future.penalty.ps.diag.growth.likelihood.instructions    # Future change penalty
 )
 
 # We use this one
@@ -924,7 +924,7 @@ lik.inst.stg23.non.demog.plus.penalty=join.likelihood.instructions(
     historical.diagnosis.likelihood.instructions,
     proportion_ps_male_among_msm_likelihood_instructions,
     diagnosis_trajectory_penalty_likelihood_instructions,
-    future.change.penalty.likelihood.instructions    # Future change penalty
+    future.penalty.ps.diag.growth.likelihood.instructions    # Future change penalty
 )
 lik.inst.stage23.plus.penalty = join.likelihood.instructions(
     lik.inst.stg23.demog,

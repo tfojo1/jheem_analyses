@@ -90,7 +90,8 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 #-----------------------------#
 ##---- Infected ---- 
 #-----------------------------#
-# Because the true size of infected compartments are unknown, we approximate them based on number of new diagnosis (and will add multipliers to tune the true compartment sizes in the model). 
+# Because the true size of infected compartments are unknown, we approximate them based on number of new diagnosis
+# (and will add multipliers to tune the true compartment sizes in the model). 
 # First, we need to estimate the POPULATION PROPORTION (RATE) of diagnosis in year 1970 as = "n diag/population size" 
 # Since diagnoses data is unavailable in 1970, we need to use another (later year) to approximate 1970
 # We will use the first year that data is reported in each city 

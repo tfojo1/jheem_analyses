@@ -10,7 +10,7 @@
 
 ESTIMATES = list()
 
-#-- BENIGN LATE SYPHILIS --#
+#-- TERTIARY:  BENIGN LATE SYPHILIS --# ----
 
 # From Table 7: cumulative percent developing benign late syphilis by the end of the 15th, 30th, and 35th years
 male.p.benign.late = c('15'=10.9, '30'=15.7, '35'=16.4)/100
@@ -21,42 +21,57 @@ times.p.benign.late = as.numeric(names(male.p.benign.late))
 # -log(1-male.p.benign.late)/times.p.benign.late
 fit.male.p.benign.late = lm(-log(1-male.p.benign.late)~ times.p.benign.late + 0) # using a linear regression model (lm) (The + 0 in the formula means you're not including an intercept term in the model (you want the regression to pass through the origin).)
 ESTIMATES$rate.male.benign.late.est = as.numeric(fit.male.p.benign.late$coefficients[1]) #extracting the coefficient (slope) from the model fit, which represents the rate
-ESTIMATES$rate.male.benign.late.sd = sqrt(as.numeric(vcov(fit.male.p.benign.late))) #extracting the variance-covariance matrix of the model and taking the square root to get the standard deviation.
+ESTIMATES$rate.male.benign.late.se = sqrt(as.numeric(vcov(fit.male.p.benign.late))) #extracting the variance-covariance matrix of the model and taking the square root to get the standard error
 # women for women:
 -log(1-female.p.benign.late)/times.p.benign.late
 fit.female.p.benign.late = lm(-log(1-female.p.benign.late)~times.p.benign.late + 0)
 ESTIMATES$rate.female.benign.late.est = as.numeric(fit.female.p.benign.late$coefficients[1])
-ESTIMATES$rate.female.benign.late.sd = sqrt(as.numeric(vcov(fit.female.p.benign.late)))
+ESTIMATES$rate.female.benign.late.se = sqrt(as.numeric(vcov(fit.female.p.benign.late)))
 
 print(ESTIMATES)
 
-#-- CARDIOVASCULAR SYPHILIS --# ----
+#-- TERTIARY: CARDIOVASCULAR SYPHILIS --# ----
 
-# from Fig9: proportion of each agegroup developled some type of cardiovascular involvement
-# cardiovascular.male.15older=0.15
-# cardiovascular.female.15older=0.08
-# average.time=35 #years Fig10
-# ESTIMATES$rate.male.cardiovascular.15older.est.PK = -log(1-cardiovascular.male.15older)/average.time #MALE
-# ESTIMATES$rate.female.cardiovascular.15older.est.PK = -log(1-cardiovascular.female.15older)/average.time #FEMALE
+# from Fig9/Table10: proportion of each agegroup developled some type of cardiovascular involvement
+# the limitation here is the average time of 35 years is not representative of all the events 
+cardiovascular.male.15older=0.149
+cardiovascular.female.15older=0.08
+n.male=303
+n.female=584
+average.time=35 #years Fig10
 
+# point estimate: lambda = -log(1-p)/t
+ESTIMATES$rate.male.cardiovascular.15older.est = -log(1-cardiovascular.male.15older)/average.time #MALE
+ESTIMATES$rate.female.cardiovascular.15older.est = -log(1-cardiovascular.female.15older)/average.time #FEMALE
+
+# Delta method SE for lambda = -log(1-p)/t
+# d(lambda)/dp = 1/((1-p)*t)
+# SE_lambda = SE_p * |d(lambda)/dp| = sqrt(p(1-p)/n) / ((1-p)*t)
+ESTIMATES$rate.male.cardiovascular.15older.se   <- sqrt(cardiovascular.male.15older   *
+                                                            (1 - cardiovascular.male.15older)   / n.male)   / ((1 - cardiovascular.male.15older)   * average.time)
+ESTIMATES$rate.female.cardiovascular.15older.se <- sqrt(cardiovascular.female.15older * 
+                                                            (1 - cardiovascular.female.15older) / n.female) / ((1 - cardiovascular.female.15older) * average.time)
+
+print(ESTIMATES)
+# we also tried to break down uncomplicated versus complicated cardiovascular and approximate the mean year duration to its development from figure 10 the final results were very similar
 # MALE
-cardiovascular.male.outcomes = data.frame(
-    # from table 8: PROPORTION OF "KNOWNS" OBSERVED TO HAVE DEVELOPED CARDIOVASCULAR SYPHILIS  
-    p = c(uncomplicated.aortitis=2.6/100,
-          # aortic.insufficiency=7.3/100, #uncomplicated 
-          # saccular.aneurym=3.6/100,#uncomplicated 
-          # ostial.stenosis=0.7/100,#uncomplicated 
-          # aortitis.at.death=0.7/100,#uncomplicated 
-          total.complicated=12.3/100),
-    
-    # from figure 10 (digitized): Duration of infection at discovery, in mean years
-    mean.time = c(uncomplicated.aortitis=28.9,
-                  # aortic.insufficiency=31.5,
-                  # saccular.aneurym=31.4,
-                  # ostial.stenosis=NA,
-                  # aortitis.at.death=NA,
-                  total.complicated=30.7)
-)
+# cardiovascular.male.outcomes = data.frame(
+#     # from table 8: PROPORTION OF "KNOWNS" OBSERVED TO HAVE DEVELOPED CARDIOVASCULAR SYPHILIS  
+#     p = c(uncomplicated.aortitis=2.6/100,
+#           total.complicated=12.3/100),
+#     # from figure 10 (digitized): Duration of infection at discovery, in mean years
+#     mean.time = c(uncomplicated.aortitis=28.9,
+#                   total.complicated=30.7)
+# )
+# # FEMALE
+# cardiovascular.female.outcomes = data.frame(
+#     # from table 8
+#     p = c(uncomplicated.aortitis=2.9/100,
+#           total.complicated=5.1/100),
+#     # from figure 10 (digitized)
+#     mean.time = c(uncomplicated.aortitis=23.7,
+#                   total.complicated=32.8)
+# )
 #approach1-: rate of transition is 1/duration, then weighted based on probabiliry of event occuring (effective rate)
 # assuming that the risk of event is uniform over time:
 # cardiovascular.male.rates.among.those.with.outcome = 1/cardiovascular.male.outcomes$mean.time
@@ -64,104 +79,115 @@ cardiovascular.male.outcomes = data.frame(
 
 #appraoch2: using -log(1-p)/time to get the rate 
 # assuming that the rate of event is fix over time (but the risk of event is not): the time to event follows a logistic or exponential distribution, where the event’s likelihood increases over time in a non-linear way.
-cardiovascular.male.rates = -log(1- cardiovascular.male.outcomes$p)/cardiovascular.male.outcomes$mean.time
+# cardiovascular.male.rates = -log(1- cardiovascular.male.outcomes$p)/cardiovascular.male.outcomes$mean.time
+# names(cardiovascular.male.rates) = dimnames(cardiovascular.male.outcomes)[[1]]
+# ESTIMATES$rate.male.cardiovascular.est = as.numeric(cardiovascular.male.rates['uncomplicated.aortitis'] + cardiovascular.male.rates['total.complicated'])
+# 
+# cardiovascular.female.rates = -log(1- cardiovascular.female.outcomes$p)/cardiovascular.female.outcomes$mean.time
+# names(cardiovascular.female.rates) = dimnames(cardiovascular.female.outcomes)[[1]]
+# ESTIMATES$rate.female.cardiovascular.est = as.numeric(cardiovascular.female.rates['uncomplicated.aortitis'] + 
+#                                                           cardiovascular.female.rates['total.complicated'])
 
-names(cardiovascular.male.rates) = dimnames(cardiovascular.male.outcomes)[[1]]
-ESTIMATES$rate.male.cardiovascular.est = as.numeric(cardiovascular.male.rates['uncomplicated.aortitis'] + cardiovascular.male.rates['total.complicated'])
-
-# FEMALE
-cardiovascular.female.outcomes = data.frame(
-    # from table 8
-    p = c(uncomplicated.aortitis=2.9/100,
-          # aortic.insufficiency=3.3/100,
-          # saccular.aneurym=1.5/100,
-          # ostial.stenosis=0.3/100,
-          # aortitis.at.death=0.0/100,
-          total.complicated=5.1/100),
-    
-    # from figure 10 (digitized)
-    mean.time = c(uncomplicated.aortitis=23.7,
-                  # aortic.insufficiency=32.8,
-                  # saccular.aneurym=36.8,
-                  # ostial.stenosis=NA,
-                  # aortitis.at.death=NA,
-                  total.complicated=32.8)
-)
-cardiovascular.female.rates = -log(1- cardiovascular.female.outcomes$p)/cardiovascular.female.outcomes$mean.time
-names(cardiovascular.female.rates) = dimnames(cardiovascular.female.outcomes)[[1]]
-ESTIMATES$rate.female.cardiovascular.est = as.numeric(cardiovascular.female.rates['uncomplicated.aortitis'] + 
-                                                          cardiovascular.female.rates['total.complicated'])
-
-
-#-- Tertiary Syphilis --#
+#-- TERTIARY: COMBINED --# -----
 # assuming that the rates are independant, we can sum the means and variances 
-# sicne we dont have the sd for cardiovasculare, we apply the one from late.benign 
-# to estiamte the range, we estiamte the 95% halfwidth from normal (1.96*sd)
-rate.male.tertiary.late.est = ESTIMATES$rate.male.benign.late.est+ESTIMATES$rate.male.cardiovascular.est
-rate.male.tertiary.late.95hw=1.96* ESTIMATES$rate.male.benign.late.sd
-ESTIMATES$rate.male.tertiary.late.range= c(rate.male.tertiary.late.est, rate.male.tertiary.late.est-rate.male.tertiary.late.95hw,rate.male.tertiary.late.est+rate.male.tertiary.late.95hw)
+# --- 95% CI range for teriary rates (normal approximation) # Half-width = 1.96 * SE ---
+rate.male.tertiary.late.est <- ESTIMATES$rate.male.benign.late.est + ESTIMATES$rate.male.cardiovascular.15older.est
+rate.male.tertiary.late.95hw <- 1.96 * sqrt(ESTIMATES$rate.male.benign.late.se^2 + ESTIMATES$rate.male.cardiovascular.15older.se^2)
+ESTIMATES$rate.male.tertiary.late.range <- c(
+    est   = rate.male.tertiary.late.est,
+    lower = rate.male.tertiary.late.est - rate.male.tertiary.late.95hw,
+    upper = rate.male.tertiary.late.est + rate.male.tertiary.late.95hw
+)
 
-rate.female.tertiary.late.est = ESTIMATES$rate.female.benign.late.est+ESTIMATES$rate.female.cardiovascular.est
-rate.female.tertiary.late.95hw=1.96* ESTIMATES$rate.female.benign.late.sd
-ESTIMATES$rate.female.tertiary.late.range= c(rate.female.tertiary.late.est, rate.female.tertiary.late.est-rate.female.tertiary.late.95hw,rate.female.tertiary.late.est+rate.female.tertiary.late.95hw)
+rate.female.tertiary.late.est <- ESTIMATES$rate.female.benign.late.est + ESTIMATES$rate.female.cardiovascular.15older.est
+rate.female.tertiary.late.95hw <- 1.96 * sqrt(ESTIMATES$rate.female.benign.late.se^2 + ESTIMATES$rate.female.cardiovascular.15older.se^2)
+ESTIMATES$rate.female.tertiary.late.range <- c(
+    est   = rate.female.tertiary.late.est,
+    lower = rate.female.tertiary.late.est - rate.female.tertiary.late.95hw,
+    upper = rate.female.tertiary.late.est + rate.female.tertiary.late.95hw
+)
+
+print(ESTIMATES)
+sapply(ESTIMATES,round,4)
 
 #-- NEUROSYPHILIS ----
 
-# Fig11. proportion of each age and sex group developed neurosyphilis 
-# neurosyphilis.male.by.age=c("0-14"=0.12, "15-39"=0.1, "40+"=0)
-# neurosyphilis.female.by.age=c("0-14"=0.03, "15-39"=0.05, "40+"=0.04)
-# average.time=c(30,15) # fig12
-# 
-# ESTIMATES$neurosyphilis.male.by.age = 
-#     c("0-14"=list(-log(1-neurosyphilis.male.by.age[1])/average.time),
-#        "15-39"=list(-log(1-neurosyphilis.male.by.age[2])/average.time),
-#        "40+"=list(-log(1-neurosyphilis.male.by.age[3])/average.time))
-# ESTIMATES$neurosyphilis.female.by.age = 
-#     c("0-14"=list(-log(1-neurosyphilis.female.by.age[1])/average.time),
-#       "15-39"=list(-log(1-neurosyphilis.female.by.age[2])/average.time),
-#       "40+"=list(-log(1-neurosyphilis.female.by.age[3])/average.time))
+# Neurosyphilis progression rates from Oslo cohort 
+# Sub-outcomes treated as mutually exclusive by design (Table 9: sub-outcome proportions sum exactly to Oslo totals: men 9.4%, women 5.0%)
+# n = 331 males, n = 622 females (full followed cohort, Table 9 denominators)
+# Mean times to diagnosis digitized from Figure 12
 
-# MALE
-neurosyphilis.male.outcomes = data.frame(
-    # from table 9: proportion of cases developing neurosyphilis by type and sex
+# --- MALE ---
+n.male.neuro <- 331
+neurosyphilis.male.outcomes <- data.frame(
     p = c(diffuse.meningovascular = 3.6/100,
-          general.paresis = 3.0/100,
-          tabes.dorsalis = 2.5/100,
-          gumma.of.brain = 0.3/100),
-    # from figure 12:Duration of infection at discovery, in years, by type and sex
+          general.paresis         = 3.0/100,
+          tabes.dorsalis          = 2.5/100),
     mean.time = c(diffuse.meningovascular = 14.9,
-                  general.paresis = 25.4,
-                  tabes.dorsalis = 28.8,
-                  gumma.of.brain = NA)
+                  general.paresis         = 25.4,
+                  tabes.dorsalis          = 28.8)
 )
 
-# neurosyphilis.male.rates.among.those.with.outcome = 1/neurosyphilis.male.outcomes$mean.time
-# neurosyphilis.male.rates = neurosyphilis.male.rates.among.those.with.outcome * neurosyphilis.male.outcomes$p
-neurosyphilis.male.rates= - log(1-neurosyphilis.male.outcomes$p)/neurosyphilis.male.outcomes$mean.time
-names(neurosyphilis.male.rates) = dimnames(neurosyphilis.male.outcomes)[[1]]
-ESTIMATES$rate.male.neurosyphilis.est = as.numeric(neurosyphilis.male.rates['diffuse.meningovascular'] + neurosyphilis.male.rates['general.paresis'] + neurosyphilis.male.rates['tabes.dorsalis'])
+# Point estimates: lambda = -log(1-p) / t
+neurosyphilis.male.rates <- -log(1 - neurosyphilis.male.outcomes$p) / 
+    neurosyphilis.male.outcomes$mean.time
+names(neurosyphilis.male.rates) <- rownames(neurosyphilis.male.outcomes)
 
-# FEMALE
-neurosyphilis.female.outcomes = data.frame(
-    # from table 9
+# Delta method SE per sub-outcome: SE_lambda = sqrt(p(1-p)/n) / ((1-p) * t)
+neurosyphilis.male.se <- sqrt(neurosyphilis.male.outcomes$p * 
+                                  (1 - neurosyphilis.male.outcomes$p) / n.male.neuro) /
+    ((1 - neurosyphilis.male.outcomes$p) * 
+         neurosyphilis.male.outcomes$mean.time)
+names(neurosyphilis.male.se) <- rownames(neurosyphilis.male.outcomes)
+
+# Total: sum rates, combine SEs under independence (sqrt of sum of squares)
+ESTIMATES$rate.male.neurosyphilis.est <- sum(neurosyphilis.male.rates)
+ESTIMATES$rate.male.neurosyphilis.se  <- sqrt(sum(neurosyphilis.male.se^2))
+
+# --- FEMALE ---
+n.female.neuro <- 622
+neurosyphilis.female.outcomes <- data.frame(
     p = c(diffuse.meningovascular = 1.7/100,
-          general.paresis = 1.7/100,
-          tabes.dorsalis = 1.4/100,
-          gumma.of.brain = 0.2/100),
-    # from figure 12
+          general.paresis         = 1.7/100,
+          tabes.dorsalis          = 1.4/100),
     mean.time = c(diffuse.meningovascular = 18.8,
-                  general.paresis = 19.6,
-                  tabes.dorsalis = 30.7,
-                  gumma.of.brain = NA)
+                  general.paresis         = 19.6,
+                  tabes.dorsalis          = 30.7)
 )
 
-# neurosyphilis.female.rates.among.those.with.outcome = 1/neurosyphilis.female.outcomes$mean.time
-# neurosyphilis.female.rates = neurosyphilis.female.rates.among.those.with.outcome * neurosyphilis.female.outcomes$p
-neurosyphilis.female.rates= - log(1-neurosyphilis.female.outcomes$p)/neurosyphilis.female.outcomes$mean.time
-names(neurosyphilis.female.rates) = dimnames(neurosyphilis.female.outcomes)[[1]]
-ESTIMATES$rate.female.neurosyphilis.est = as.numeric(neurosyphilis.female.rates['diffuse.meningovascular'] + neurosyphilis.female.rates['general.paresis'] + neurosyphilis.female.rates['tabes.dorsalis'])
+# Point estimates
+neurosyphilis.female.rates <- -log(1 - neurosyphilis.female.outcomes$p) / 
+    neurosyphilis.female.outcomes$mean.time
+names(neurosyphilis.female.rates) <- rownames(neurosyphilis.female.outcomes)
+
+# Delta method SE per sub-outcome
+neurosyphilis.female.se <- sqrt(neurosyphilis.female.outcomes$p * 
+                                    (1 - neurosyphilis.female.outcomes$p) / n.female.neuro) /
+    ((1 - neurosyphilis.female.outcomes$p) * 
+         neurosyphilis.female.outcomes$mean.time)
+names(neurosyphilis.female.se) <- rownames(neurosyphilis.female.outcomes)
+
+# Total
+ESTIMATES$rate.female.neurosyphilis.est <- sum(neurosyphilis.female.rates)
+ESTIMATES$rate.female.neurosyphilis.se  <- sqrt(sum(neurosyphilis.female.se^2))
 
 
+# --- 95% CI range for neurosyphilis rates (normal approximation) ---
+# Half-width = 1.96 * SE, consistent with tertiary rate block
+
+ESTIMATES$rate.male.neurosyphilis.range <- c(
+    est   = ESTIMATES$rate.male.neurosyphilis.est,
+    lower = ESTIMATES$rate.male.neurosyphilis.est - 1.96 * ESTIMATES$rate.male.neurosyphilis.se,
+    upper = ESTIMATES$rate.male.neurosyphilis.est + 1.96 * ESTIMATES$rate.male.neurosyphilis.se
+)
+
+ESTIMATES$rate.female.neurosyphilis.range <- c(
+    est   = ESTIMATES$rate.female.neurosyphilis.est,
+    lower = ESTIMATES$rate.female.neurosyphilis.est - 1.96 * ESTIMATES$rate.female.neurosyphilis.se,
+    upper = ESTIMATES$rate.female.neurosyphilis.est + 1.96 * ESTIMATES$rate.female.neurosyphilis.se
+)
+print(ESTIMATES)
+sapply(ESTIMATES,round,4)
 
 #-- CHECK --#
 
