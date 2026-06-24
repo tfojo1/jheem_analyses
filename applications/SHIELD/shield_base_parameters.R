@@ -90,14 +90,12 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'el.rel.secondary.tr
 # Because the true size of infected compartments are unknown, we approximate them based on number of new diagnosis (and will add multipliers to tune the true compartment sizes in the model). 
 # First, we need to estimate the POPULATION PROPORTION (RATE) of diagnosis in year 1970 as = "n diag/population size" 
 # Since diagnoses data is unavailable in 1970, we need to use another (later year) to approximate 1970
-# We will use the first year that data is reported in each city 
+# We will use the first year that data is reported in each city (1993)
 # Population Proportion (Rate)= #diagnosesin stage X / population size 
 
 # Finding the first year of reporting:
-#'@Andrew: this is based on C.12580 now. How can we generalize to other locations?
-# x=SURVEILLANCE.MANAGER$data$total.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location[,'C.33100']
-# y0=names(x)[!is.na(x)][1] #1993 in baltimore
 y0="1993"
+#'@Andrew: this is based on C.12580 now. How can we generalize to other locations?
 # Estimating the population proportion of diagnoses in each stage in the max year (num: # of diag / denom: population)
 popProp.ps.diag.1970= SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location[y0,'C.12580']/
     SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location[y0,'C.12580']
