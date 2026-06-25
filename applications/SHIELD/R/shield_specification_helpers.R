@@ -1312,3 +1312,35 @@ get_doxy_coverage_functional_form<-function(specification.metadata) {
 # par(mfrow = c(1,2))
 # plot(t, logit_x, type = "l", main = "logit(x) — linear")
 # plot(t, x,       type = "l", main = "x — S-shaped logistic")
+
+## Initial population proportion of syphilis diagnosis 1970 -----
+# First, we need to estimate the POPULATION PROPORTION (RATE) of diagnosis in year 1970 as = "n diag/population size" 
+# Since diagnoses data is unavailable in 1970, we need to use another (later year) to approximate 1970
+# We will use the first year that data is reported in each city (1993)
+# Population Proportion (Rate)= #diagnosesin stage X / population size 
+# 1993 is the earliest year of data
+# proportion of PS diagnoses that are in the primary stage in 1970:
+# we estimate this as 25% based on duration of primary (4 weeks relative to PS duration of 12 months)
+get_popProp_primary_diag_1970<-function(location){
+  popProp.ps.diag.1970= 0.25 * 
+    SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location["1993",location]/
+    SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location["1993",location]
+  popProp.ps.diag.1970
+}
+get_popProp_secondary_diag_1970<-function(location){
+  popProp.ps.diag.1970= 0.75 * 
+    SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location["1993",location]/
+    SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location["1993",location]
+  popProp.ps.diag.1970
+}
+get_popProp_el_diag_1970<-function(location){
+  popProp.el.diag.1970= SURVEILLANCE.MANAGER$data$early.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location["1993",location]/
+    SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location["1993",location]
+  popProp.el.diag.1970
+}
+get_popProp_lu_diag_1970<-function(location){
+  popProp.lu.diag.1970= SURVEILLANCE.MANAGER$data$unknown.duration.or.late.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location["1993",location]/
+    SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location["1993",location]
+  popProp.lu.diag.1970
+}
+ 

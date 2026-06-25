@@ -138,11 +138,11 @@ AGING.PARAMETERS.PRIOR=join.distributions(
 ## TRANSMISSION.PARAMETERS.PRIOR ----
 TRANSMISSION.PARAMETERS.PRIOR=join.distributions( 
     ## Initial infections in 1970 ----
-    # because we don't have true infection counts, we estimate estimated from reported diagnosis in 1970
-    # we assume a certain ratio of infected to diagnosed cases in 1970 that is theoritically >=1
-    # we also assume a certain proportion of diagnosis were made among MSM, and the rest are divided among heterosexual men and women
-    prp.diagnoses.are.msm.1970 = Logitnormal.Distribution(meanlogit = log(.5), sdlogit = log(2)), #CI=[0.13 0.66] larger SD because of uncertainty
-    ratio.of.infected.to.diagnosed.1970 = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)), #CI=[1.5, 5.9]
+    # because we don't have true infection counts, we estimated from reported diagnosis in 1970
+    # we assume a certain ratio of undiagnosed to diagnosed cases in 1970
+    # we also assume a certain proportion of infections were made among MSM, and the rest are divided among heterosexual men and women
+    ratio.of.undiagnosed.to.diagnosed.1970 = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)), #CI=[1.5, 5.9]
+    prp.infections.among.msm.1970 = Logitnormal.Distribution(meanlogit = log(.5), sdlogit = log(2)), #CI=[0.13 0.66] larger SD because of uncertainty
     
     ## Global transmission ----
     global.transmission.rate.msm = Lognormal.Distribution(meanlog = log(3.9), sdlog = 0.5*log(10)), # large SD to allow more mixing
@@ -985,9 +985,9 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
     #
     infectiousness=c("el.rel.secondary.transmissibility"),
     #
-    prp.inf.msm.1970=c("prp.diagnoses.are.msm.1970"),
+    prp.inf.msm.1970=c("prp.infections.among.msm.1970"),
     #
-    inf.to.diag.1970=c("ratio.of.infected.to.diagnosed.1970"),
+    inf.to.diag.1970=c("ratio.of.undiagnosed.to.diagnosed.1970"),
     #
     msm.transmission.block1 = c(
         "transmission.rate.multiplier.msm1970",

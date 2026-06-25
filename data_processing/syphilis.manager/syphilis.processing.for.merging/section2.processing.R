@@ -3,6 +3,9 @@ library(locations)
 library(tidyverse)
 library(readxl)
 library(haven)
+library(readxl)
+library(purrr)
+library(tools)
 
 Q_ROOT <- Sys.getenv("Q_ROOT", "Q:")
 
@@ -160,6 +163,7 @@ source('data_processing/syphilis.manager/cdc.pdf.reports.1997.2003.R') #This pul
 source('data_processing/syphilis.manager/cdc.pdf.reports.1941.2022.R') #These replace the US totals for certain years above, they are more recent. This pulls one table from a 2022 report that reports cases back to 1941
 source('data_processing/syphilis.manager/syphilis.deaths.R')
 source('data_processing/syphilis.manager/local.health.department.syphilis.data.R')
+source('data_processing/syphilis.manager/sti.pdf.reports.by.sex.msm.R') #This pulls additional ps.syphilis data from cdc pdf reports by sex and msm
 
 # Aggregate Outcomes to MSA 
 syphilis.manager = data.manager
