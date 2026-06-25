@@ -1166,13 +1166,13 @@ register.model.quantity(SHIELD.SPECIFICATION,
 # gonorrhea.year.on.year.change.likelihood.instructions
 
 
-# Model the ratio of STI screening to HIV tests as a smooth function 
-#'@Andrew: to review with Todd: I think that we should define this as a proportion (wont expect to go over 1?)
+# Model the ratio of syphilis screening to HIV tests as a smooth function 
+# we have called is a ratio, but it does not go over 1.
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'ratio.syphilis.screening.to.hiv.tests', #'@Andrew: we should call this a proportion
+                       name = 'ratio.syphilis.screening.to.hiv.tests',  
                        scale = "ratio", #can go over 1 but we would expect it  not to
-                       get.functional.form.function = get_sti_to_hiv_testing_ratio_functional_form,
-                       functional.form.from.time = 2014,
+                       get.functional.form.function = get_syphilis_to_hiv_testing_ratio_functional_form,
+                       functional.form.from.time = 2010,
                        functional.form.scale = "ratio") 
                        
                        

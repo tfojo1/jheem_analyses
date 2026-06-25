@@ -1117,7 +1117,7 @@ get_sti_screening_functional_form_OPTION2 <- function(specification.metadata) {
 
 
 #-- STI TO HIV TESTS RATIO --# ----
-get_sti_to_hiv_testing_ratio_functional_form <- function(specification.metadata) {
+get_syphilis_to_hiv_testing_ratio_functional_form <- function(specification.metadata) {
   # we use this to calculate hiv tests and fit them against BRFSS data
   # since BRFSS is available seince 2014, we can anchor at that year 
   #'@Andrew: to review with todd (should we keep logistic or use log.linear (allow values>1))
