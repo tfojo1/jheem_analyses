@@ -12,7 +12,7 @@
 
 
 # Data: Proportion of births receiving prenatal care ine ach trimester (p1,p2,p3) and those not receiving any prenatal care(p0)
-# Zoe has pulled this data from CDC Wonderby year, age and race of moms
+# Zoe has pulled this data from CDC Wonder by year, age and race of moms
 # (p0,p1,p2,p3) form a multinomial distribution in each year and category 
 # to simplify, I model p1, and restructure p2 to represent the proportion of births receiving prenatal care in 
 # the second trimester out of those not receiving it in the first trimester (0-1), and similarly for p3
@@ -115,7 +115,7 @@ check.model.performance<-function(df,
   #
   df$P[df$P>0.99]<-0.99 #to avoid infinite values in the logit
   # Filter to pre-covid?
-  if (filter.covid) df<-df%>%filter(year<=2020) 
+  if (filter.covid) df<-df%>%filter(year<2020) 
   # set the anchor year
   anchor.year = 2016
   df$year = df$year-anchor.year

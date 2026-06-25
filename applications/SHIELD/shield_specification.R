@@ -1128,7 +1128,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                applies.to = list(age=c("15-19 years" ,"20-24 years" ,"25-29 years" ,"30-34 years", "35-39 years", "40-44 years", "45-49 years" ,"50-54 years", "55-64 years" ,"65+ years")),
                                value = "rate.sti.screening.over.14.without.covid")
 
-##---- COVID
+##---- ## COVID impact on screening ----
 N.COVID.MONTHS = 24
 N.COVID.MONTHS.FULL.EFFECT = 12
 # binary variable that is on from March 15,2020-2022, marking the covid period
@@ -1160,12 +1160,11 @@ register.model.quantity(SHIELD.SPECIFICATION,
                         value = expression(
                             rate.sti.screening.without.covid *  (1-(1-max.covid.effect.sti.screening.reduction) * covid.on ))) #add mobility
 # max.covid.effect.sti.screening.reduction: reduced.value.post.max.reduction.covid
+# **** add CDC. reported HIV tests : ratio of test
+# **** add number.of.tests.year.on.year.change.nested.likelihood.instructions
+# **** add gonorrhea.year.on.year.change.likelihood.instructions
 
-# CDC. reported HIV tests : ratio of test
-# number.of.tests.year.on.year.change.nested.likelihood.instructions
-# gonorrhea.year.on.year.change.likelihood.instructions
-
-
+##---- ## Rate of HIV testing from Syphilis Screening ----
 # Model the ratio of syphilis screening to HIV tests as a smooth function 
 # we have called is a ratio, but it does not go over 1.
 register.model.element(SHIELD.SPECIFICATION,
@@ -1175,9 +1174,6 @@ register.model.element(SHIELD.SPECIFICATION,
                        functional.form.from.time = 2010,
                        functional.form.scale = "ratio") 
                        
-                       
-# @Parastu, Todd insisted on dividing, not multiplying, in this expression, but if the multiplier is >1 (such as 2), then it should be multiplying, yes? HIV rate > STI screening rate.
-#' @Andrew: it's OK to divide. we can limit this to remain below 1 through the prior (logitnormal)  
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.testing.hiv',
                         scale = "rate",
