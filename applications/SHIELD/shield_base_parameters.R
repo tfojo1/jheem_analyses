@@ -86,36 +86,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'primary.rel.seconda
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'el.rel.secondary.transmissibility',  
                                       .25,0,0)
 
-# *** INITIAL POPULATION INFECTED in 1970 ---- ## ----
-# Because the true size of infected compartments are unknown, we approximate them based on number of new diagnosis (and will add multipliers to tune the true compartment sizes in the model). 
-# First, we need to estimate the POPULATION PROPORTION (RATE) of diagnosis in year 1970 as = "n diag/population size" 
-# Since diagnoses data is unavailable in 1970, we need to use another (later year) to approximate 1970
-# We will use the first year that data is reported in each city (1993)
-# Population Proportion (Rate)= #diagnosesin stage X / population size 
-
-# Finding the first year of reporting:
-y0="1993"
-#'@Andrew: this is based on C.12580 now. How can we generalize to other locations?
-# Estimating the population proportion of diagnoses in each stage in the max year (num: # of diag / denom: population)
-popProp.ps.diag.1970= SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location[y0,'C.12580']/
-    SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location[y0,'C.12580']
-popProp.el.diag.1970= SURVEILLANCE.MANAGER$data$early.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location[y0,'C.12580']/
-    SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location[y0,'C.12580']
-popProp.lu.diag.1970= SURVEILLANCE.MANAGER$data$unknown.duration.or.late.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location[y0,'C.12580']/
-    SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location[y0,'C.12580']
-
-# save these to use in the model (populationProportion of diagnosis in each stage in 1970)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'popProp.ps.diag.1970',
-                                      popProp.ps.diag.1970,0,0)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'popProp.el.diag.1970',
-                                      popProp.el.diag.1970,0,0)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'popProp.lu.diag.1970',
-                                      popProp.lu.diag.1970,0,0)
-
-# proportion of PS diagnoses that are in the primary stage in 1970
-# we estimate this as 25% based on duration of primary (4 weeks relative to PS duration of 12 months)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.ps.in.primary.stage.1970',
-                                      0.25,0,0)
+ 
 
 
 
