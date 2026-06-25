@@ -310,7 +310,7 @@ ps.diagnosis.by.strata.likelihood.instructions =
                                          outcome.for.data = "ps.syphilis.diagnoses",  
                                          dimensions = c("sex","race","age"),
                                          levels.of.stratification = c(1,2),
-                                         from.year = 2019,
+                                         from.year = 1993,
                                          to.year = 2022,
                                          #
                                          error.variance.type = c('cv'),
@@ -970,7 +970,7 @@ lik.inst.stg23.demog.8x=join.likelihood.instructions(
 
 lik.inst.stage23.8x.pop.4x = join.likelihood.instructions(
     lik.inst.stg23.demog.4x,
-    lik.inst.stg23.non.demog.plus.penalty,
+    lik.inst.stg23.non.demog,
     additional.weights = 1/8
 )
 lik.inst.stage23.8x.pop.8x = join.likelihood.instructions(
