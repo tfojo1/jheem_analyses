@@ -14,12 +14,12 @@ INSURANCE.CATEGORIES = c('medicaid.only',
                          'dual.medicare.medicaid.and.medicare'
                          )
 ADAP.SERVICE.CATEGORIES = c('full.pay.only', # F 
-                            'premium.only', # P renamed from: premium.without.cost.sharing
+                            'premium.only', # P 
                             'premium.and.cost.sharing', # PCs 
-                            'cost.sharing.only', # Cs # renamed from: cost.sharing.without.premium
-                            'full.pay.and.premium', # FP # renamed from: full.pay.and.premium.without.cost.sharing
+                            'cost.sharing.only', # Cs  
+                            'full.pay.and.premium', # FP 
                             'full.pay.and.premium.and.cost.sharing', # FPCs
-                            'full.pay.and.cost.sharing' # FCs # renamed from: full.pay.and.cost.sharing.without.premium
+                            'full.pay.and.cost.sharing' # FCs 
 )
 
 # Cost-sharing subcategories: 
@@ -234,76 +234,77 @@ register.model.quantity(ADAP.SPECIFICATION,
 ##-- INPUTS: EFFECTS of ELIGIBILITY RESTRICTIONS --##
 # Loss: 4 effects
 register.model.element(ADAP.SPECIFICATION,
-                       name = "lose.F.suppression.rr", # lose.adap.full.pay.suppression.rr
+                       name = "lose.F.suppression.rr", 
                        value = 0.5,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "lose.P.suppression.rr", # lose.adap.premium.without.cost.sharing.suppression.rr
+                       name = "lose.P.suppression.rr", 
                        value = 0.5,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "lose.PCs.suppression.rr", # lose.adap.premium.and.cost.sharing.suppression.rr
+                       name = "lose.PCs.suppression.rr", 
                        value = 0.5,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "lose.Cs.suppression.rr", # lose.adap.cost.sharing.without.premium.suppression.rr
+                       name = "lose.Cs.suppression.rr", 
                        value = 0.5,
                        scale = 'proportion')
 
 # Change: 3 effects
 register.model.element(ADAP.SPECIFICATION,
-                       name = "change.P.to.F.suppression.rr",# change.adap.premium.without.cost.sharing.to.full.pay.suppression.rr
+                       name = "change.P.to.F.suppression.rr",
                        value = 1,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "change.PCs.to.F.suppression.rr", # change.adap.premium.and.cost.sharing.to.full.pay.suppression.rr
+                       name = "change.PCs.to.F.suppression.rr", 
                        value = 1,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "change.PCs.to.P.suppression.rr", # change.adap.premium.and.cost.sharing.to.premium.without.cost.sharing.suppression.rr
+                       name = "change.PCs.to.P.suppression.rr",
                        value = 0.5,
                        scale = 'proportion')
 
 
 ##-- INPUTS: EFFECTS of FORMULARY RESTRICTIONS --##
 register.model.element(ADAP.SPECIFICATION,
-                       name = "change.F.formulary.suppression.rr", # change.adap.full.pay.formulary.suppression.rr
+                       name = "change.F.formulary.suppression.rr", 
                        value = 0.5,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "change.PCp.formulary.suppression.rr", # change.adap.copay.and.premium.formulary.suppression.rr - swapped order
+                       name = "change.PCp.formulary.suppression.rr", 
                        value = 0.5,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "change.Cp.formulary.suppression.rr", #change.adap.copay.without.premium.formulary.suppression.rr
+                       name = "change.Cp.formulary.suppression.rr", 
                        value = 0.5,
                        scale = 'proportion')
 
 ##-- INPUTS: HOW MANY EXPERIENCE FORMULARY RESTRICTIONS --##
 register.model.element(ADAP.SPECIFICATION,
-                       name = "proportion.F.clients.with.formulary.change", #proportion.adap.full.pay.clients.with.formulary.change
+                       name = "proportion.F.clients.with.formulary.change", 
                        value = 0.5,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "proportion.PCp.clients.with.formulary.change", #proportion.adap.premium.and.copay.clients.with.formulary.change
+                       name = "proportion.PCp.clients.with.formulary.change", 
                        value = 0.5,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "proportion.Cp.clients.with.formulary.change", # proportion.adap.copay.without.premium.clients.with.formulary.change
+                       name = "proportion.Cp.clients.with.formulary.change", 
                        value = 0.5,
                        scale = 'proportion')
 
+## among those who change from anything to full pay, what proportion have a formulary change (proportion who change will be dependent on income eligibility)
 register.model.element(ADAP.SPECIFICATION,
-                       name = "proportion.adap.change.to.full.pay.clients.with.formulary.change", ## melissa question: WHAT DOES THIS MEAN? 
+                       name = "proportion.change.to.F.with.formulary.change", 
                        value = 0.5,
                        scale = 'proportion')
 
@@ -734,45 +735,45 @@ register.model.element(ADAP.SPECIFICATION,
 
 # Full-pay only
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'proportion.F.only.suppressed', # proportion.adap.full.pay.only.suppressed
+                       name = 'proportion.F.only.suppressed', 
                        scale = 'proportion',
                        functional.form = get.adap.full.pay.only.suppression.functional.form(),
                        functional.form.from.time = 2010)
 
 # Insurance assistance only
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'proportion.P.only.suppressed', # proportion.adap.premium.without.cost.sharing.suppressed
+                       name = 'proportion.P.only.suppressed', 
                        scale = 'proportion',
                        functional.form = get.adap.insurance.assistance.only.functional.form(),
                        functional.form.from.time = 2010)
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'proportion.Cs.only.suppressed', # proportion.adap.cost.sharing.without.premium.suppressed
+                       name = 'proportion.Cs.only.suppressed', 
                        scale = 'proportion',
                        functional.form = get.adap.insurance.assistance.only.functional.form(),
                        functional.form.from.time = 2010)
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'proportion.PCs.suppressed', # proportion.adap.premium.and.cost.sharing.suppressed
+                       name = 'proportion.PCs.suppressed', 
                        scale = 'proportion',
                        functional.form = get.adap.insurance.assistance.only.functional.form(),
                        functional.form.from.time = 2010)
 
 # Full-pay PLUS Insurance assistance
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'proportion.FP.suppressed', # proportion.adap.full.pay.and.premium.without.cost.sharing.suppressed
+                       name = 'proportion.FP.suppressed', 
                        scale = 'proportion',
                        functional.form = get.adap.full.pay.and.insurance.assistance.functional.form(),
                        functional.form.from.time = 2010)
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'proportion.FCs.suppressed', # proportion.adap.full.pay.and.cost.sharing.without.premium.suppressed
+                       name = 'proportion.FCs.suppressed', 
                        scale = 'proportion',
                        functional.form = get.adap.full.pay.and.insurance.assistance.functional.form(),
                        functional.form.from.time = 2010)
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'proportion.FPCs.suppressed', # proportion.adap.full.pay.and.premium.and.cost.sharing.suppressed
+                       name = 'proportion.FPCs.suppressed', 
                        scale = 'proportion',
                        functional.form = get.adap.full.pay.and.insurance.assistance.functional.form(),
                        functional.form.from.time = 2010)
@@ -850,13 +851,13 @@ register.model.element(ADAP.SPECIFICATION,
 
 # Finally, multiply these two to get fraction time spent on full-pay out of the full calendar year 
 register.model.quantity(ADAP.SPECIFICATION,
-                       name = 'fraction.time.F.among.FP', 
+                       name = 'fraction.time.F.among.FP', # fraction.time.on.adap.full.pay.from.full.pay.and.premium.without.cost.sharing
                        value = expression(fraction.time.covered.among.FP*fraction.time.F.of.time.covered.among.FP),
                        scale = 'proportion')
 
 # and the same thing for premium (1-full pay)
 register.model.quantity(ADAP.SPECIFICATION,
-                       name = 'fraction.time.P.among.FP', 
+                       name = 'fraction.time.P.among.FP', # fraction.time.on.adap.premium.without.cost.sharing.from.with.full.pay
                        value = expression(fraction.time.covered.among.FP*(1-fraction.time.F.of.time.covered.among.FP)),
                        scale = 'proportion')
 
@@ -876,13 +877,13 @@ register.model.element(ADAP.SPECIFICATION,
 
 # Finally, multiply these two to get fraction time spent on full-pay out of the full calendar year 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'fraction.time.F.among.FCs', 
+                        name = 'fraction.time.F.among.FCs', # fraction.time.on.adap.full.pay.from.full.pay.and.cost.sharing.without.premium
                         value = expression(fraction.time.covered.among.FCs*fraction.time.F.of.time.covered.among.FCs),
                         scale = 'proportion')
 
 # and the same thing for cost-sharing (1-full pay)
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'fraction.time.Cs.among.FCs', 
+                        name = 'fraction.time.Cs.among.FCs', # fraction.time.on.adap.cost.sharing.without.premium.from.with.full.pay
                         value = expression(fraction.time.covered.among.FCs*(1-fraction.time.F.of.time.covered.among.FCs)),
                         scale = 'proportion')
 
@@ -890,7 +891,7 @@ register.model.quantity(ADAP.SPECIFICATION,
     # NOT mutually exclusive: could in theory spend time in: neither, each individually, or both
     # For simplicity, assume full coverage period was both (not either individually)
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'fraction.time.covered.among.PCs', 
+                       name = 'fraction.time.covered.among.PCs', # fraction.time.on.adap.premium.and.cost.sharing.from.without.full.pay
                        value = 0.875,
                        scale = 'proportion')
 
@@ -912,93 +913,91 @@ register.model.element(ADAP.SPECIFICATION,
 
 # Finally, multiply these two to get fraction time spent on full-pay out of the full calendar year 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'fraction.time.F.among.FPCs', 
+                        name = 'fraction.time.F.among.FPCs', # fraction.time.on.adap.full.pay.from.full.pay.and.premium.and.cost.sharing
                         value = expression(fraction.time.covered.among.FPCs*fraction.time.F.of.time.covered.among.FPCs),
                         scale = 'proportion')
 
 # and the same thing for premium + cost-sharing (1-full pay)
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'fraction.time.PCs.among.FPCs', 
+                        name = 'fraction.time.PCs.among.FPCs', # fraction.time.on.adap.premium.and.cost.sharing.from.with.full.pay
                         value = expression(fraction.time.covered.among.FPCs*(1-fraction.time.F.of.time.covered.among.FPCs)),
                         scale = 'proportion')
 
-## Todd's old code, with some comments from me to compare
+## Todd's old code, with some comments from me to compare - Melissa need to find and replace these later 
 if(1==2){
-    # F among FP
-    register.model.element(ADAP.SPECIFICATION,
-                           name = 'fraction.time.on.adap.full.pay.among.full.pay.and.premium.without.cost.sharing',
-                           value = 0.25,
-                           scale = 'proportion')
+    # F among FP 
+    # register.model.element(ADAP.SPECIFICATION,
+    #                        name = 'fraction.time.on.adap.full.pay.from.full.pay.and.premium.without.cost.sharing', # fraction.time.F.among.FP
+    #                        value = 0.25,
+    #                        scale = 'proportion')
     
     
-    # quantity used to calculate P among FP (below)
-    register.model.element(ADAP.SPECIFICATION,
-                           name = 'fraction.non.full.pay.time.on.adap.premium.without.cost.sharing.from.with.full.pay',
-                           value = 0.875,
-                           scale = 'proportion')
-    
-    
+    # quantity used to calculate P among FP (below); not used anywhere else 
+    # register.model.element(ADAP.SPECIFICATION,
+    #                        name = 'fraction.non.full.pay.time.on.adap.premium.without.cost.sharing.from.with.full.pay',
+    #                        value = 0.875,
+    #                        scale = 'proportion')
     
     # F among FPCs
-    register.model.element(ADAP.SPECIFICATION,
-                           name = 'fraction.time.on.adap.full.pay.from.full.pay.and.premium.and.cost.sharing',
-                           value = 0.25,
-                           scale = 'proportion')
+    # register.model.element(ADAP.SPECIFICATION,
+    #                        name = 'fraction.time.on.adap.full.pay.from.full.pay.and.premium.and.cost.sharing', # fraction.time.F.among.FPCs
+    #                        value = 0.25,
+    #                        scale = 'proportion')
     
     # F among FCs
-    register.model.element(ADAP.SPECIFICATION,
-                           name = 'fraction.time.on.adap.full.pay.from.full.pay.and.cost.sharing.without.premium',
-                           value = 0.25,
-                           scale = 'proportion')
+    # register.model.element(ADAP.SPECIFICATION,
+    #                        name = 'fraction.time.on.adap.full.pay.from.full.pay.and.cost.sharing.without.premium', # fraction.time.F.among.FCs
+    #                        value = 0.25,
+    #                        scale = 'proportion')
     
     # Time on premium and/or cost-sharing from no full-pay
     # # P alone 
-    register.model.element(ADAP.SPECIFICATION,
-                           name = 'fraction.time.on.adap.premium.without.cost.sharing.from.without.full.pay',
-                           value = 0.875,
-                           scale = 'proportion')
+    # register.model.element(ADAP.SPECIFICATION,
+    #                        name = 'fraction.time.on.adap.premium.without.cost.sharing.from.without.full.pay', # fraction.time.covered.among.P
+    #                        value = 0.875,
+    #                        scale = 'proportion')
     
     # PCs alone
-    register.model.element(ADAP.SPECIFICATION,
-                           name = 'fraction.time.on.adap.premium.and.cost.sharing.from.without.full.pay',
-                           value = 0.875,
-                           scale = 'proportion')
+    # register.model.element(ADAP.SPECIFICATION,
+    #                        name = 'fraction.time.on.adap.premium.and.cost.sharing.from.without.full.pay', # fraction.time.covered.among.PCs
+    #                        value = 0.875,
+    #                        scale = 'proportion')
     
-    # P alone - SAME AS ABOVE, I think he meant to do Cs alone 
-    register.model.element(ADAP.SPECIFICATION,
-                           name = 'fraction.time.on.adap.premium.without.cost.sharing.from.without.full.pay',
-                           value = 0.875,
-                           scale = 'proportion')
+    # # P alone - SAME AS ABOVE, I think he meant to do Cs alone: fraction.time.on.adap.cost.sharing.without.premium.from.without.full.pay
+    # register.model.element(ADAP.SPECIFICATION,
+    #                        name = 'fraction.time.on.adap.premium.without.cost.sharing.from.without.full.pay', # fraction.time.covered.among.Cs
+    #                        value = 0.875,
+    #                        scale = 'proportion')
     
     # Time on premium and/or cost-sharing as fraction of time not on full-pay when both
-    # quantity used to calculate PCs among FPCs (below)
-    register.model.element(ADAP.SPECIFICATION,
-                           name = 'fraction.non.full.pay.time.on.adap.premium.and.cost.sharing.from.with.full.pay',
-                           value = 0.875,
-                           scale = 'proportion')
+    # quantity used to calculate PCs among FPCs (below); not used anywhere else 
+    # register.model.element(ADAP.SPECIFICATION,
+    #                        name = 'fraction.non.full.pay.time.on.adap.premium.and.cost.sharing.from.with.full.pay',
+    #                        value = 0.875,
+    #                        scale = 'proportion')
     
-    # quantity used to calculate Cs among FCs (below)
-    register.model.element(ADAP.SPECIFICATION,
-                           name = 'fraction.non.full.pay.time.on.adap.cost.sharing.without.premium.from.with.full.pay',
-                           value = 0.875,
-                           scale = 'proportion')
+    # quantity used to calculate Cs among FCs (below); not used anywhere else 
+    # register.model.element(ADAP.SPECIFICATION,
+    #                        name = 'fraction.non.full.pay.time.on.adap.cost.sharing.without.premium.from.with.full.pay',
+    #                        value = 0.875,
+    #                        scale = 'proportion')
     
     # Quick calculation for the non-full pay services when combined with full-pay
     # P among FP
-    register.model.quantity(ADAP.SPECIFICATION,
-                            name = 'fraction.time.on.adap.premium.without.cost.sharing.from.with.full.pay',
-                            value = expression( (1 - fraction.time.on.adap.premium.without.cost.sharing.from.without.full.pay) *
-                                                    fraction.non.full.pay.time.on.adap.premium.without.cost.sharing.from.with.full.pay))
+    # register.model.quantity(ADAP.SPECIFICATION,
+    #                         name = 'fraction.time.on.adap.premium.without.cost.sharing.from.with.full.pay', # fraction.time.P.among.FP
+    #                         value = expression( (1 - fraction.time.covered.among.P) *
+    #                                                 fraction.non.full.pay.time.on.adap.premium.without.cost.sharing.from.with.full.pay))
     # PCs among FPCs
-    register.model.quantity(ADAP.SPECIFICATION,
-                            name = 'fraction.time.on.adap.premium.and.cost.sharing.from.with.full.pay',
-                            value = expression( (1 - fraction.time.on.adap.premium.and.cost.sharing.from.without.full.pay) *
-                                                    fraction.non.full.pay.time.on.adap.premium.and.cost.sharing.from.with.full.pay))
+    # register.model.quantity(ADAP.SPECIFICATION,
+    #                         name = 'fraction.time.on.adap.premium.and.cost.sharing.from.with.full.pay', # fraction.time.PCs.among.FPCs
+    #                         value = expression( (1 - fraction.time.covered.among.PCs) *
+    #                                                 fraction.non.full.pay.time.on.adap.premium.and.cost.sharing.from.with.full.pay))
     # Cs among FCs
-    register.model.quantity(ADAP.SPECIFICATION,
-                            name = 'fraction.time.on.adap.cost.sharing.without.premium.from.with.full.pay',
-                            value = expression( (1 - fraction.time.on.adap.cost.sharing.without.premium.from.without.full.pay) *
-                                                    fraction.non.full.pay.time.on.adap.cost.sharing.without.premium.from.with.full.pay))
+    # register.model.quantity(ADAP.SPECIFICATION,
+    #                         name = 'fraction.time.on.adap.cost.sharing.without.premium.from.with.full.pay', # fraction.time.Cs.among.FCs
+    #                         value = expression( (1 - fraction.time.covered.among.Cs) *
+    #                                                 fraction.non.full.pay.time.on.adap.cost.sharing.without.premium.from.with.full.pay))
     
 }
 
@@ -1008,18 +1007,18 @@ if(1==2){
 ##---------------------------------------------------------------------------##
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "proportion.Cs.clients.with.Cp.if.allowed", # p.adap.cost.sharing.without.premium.clients.with.copay.if.allowed
-                       functional.form = proportion.adap.cost.sharing.without.premium.clients.with.copay(), # melissa question: should this be a functional form?
+                       name = "proportion.Cs.clients.with.Cp.if.allowed", 
+                       functional.form = get.proportion.Cs.clients.with.Cp.functional.form(), 
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "proportion.PCs.clients.with.Cp.if.allowed", # p.adap.premium.and.cost.sharing.clients.with.copay.if.allowed
-                       functional.form = get.p.adap.cost.sharing.clients.with.copay.functional.form(),
+                       name = "proportion.PCs.clients.with.Cp.if.allowed", 
+                       functional.form = get.proportion.PCs.clients.with.Cp.functional.form(), 
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "proportion.FPCs.clients.with.Cp.if.allowed", # p.adap.full.pay.premium.and.cost.sharing.clients.with.copay.if.allowed
-                       functional.form = proportion.adap.full.pay.premium.and.cost.sharing.clients.with.copay(), # melissa question: should this be a functional form?
+                       name = "proportion.FPCs.clients.with.Cp.if.allowed", 
+                       functional.form = get.proportion.FPCs.clients.with.Cp.functional.form(), 
                        scale = 'proportion')
 
 
@@ -1029,21 +1028,21 @@ register.model.element(ADAP.SPECIFICATION,
 #   - 0                                         IF  state ADAP does not cover copays
 #   - 1                                         IF  state ADAP does not cover deductibles
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = "proportion.PCs.clients.with.Cp", # proportion.adap.premium.and.cost.sharing.clients.with.copay
+                        name = "proportion.PCs.clients.with.Cp", 
                         value = expression(adap.covers.copay * adap.covers.deductible * proportion.PCs.clients.with.Cp.if.allowed + 
                                                (1-adap.covers.deductible)*adap.covers.copay))
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = "proportion.FPCs.clients.with.Cp", # proportion.adap.full.pay.premium.and.cost.sharing.clients.with.copay
+                        name = "proportion.FPCs.clients.with.Cp", 
                         value = expression(adap.covers.copay * adap.covers.deductible * proportion.FPCs.clients.with.Cp.if.allowed + 
                                                (1-adap.covers.deductible)*adap.covers.copay))
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = "proportion.Cs.clients.with.Cp", # proportion.adap.cost.sharing.without.premium.clients.with.copay
+                        name = "proportion.Cs.clients.with.Cp", 
                         value = expression(adap.covers.copay * adap.covers.deductible * proportion.Cs.clients.with.Cp.if.allowed + 
                                                (1-adap.covers.deductible)*adap.covers.copay))
-# melissa stopped here 6/17
 
+# melissa and todd circle back to this section: 
 ##----------------------------------------------##
 ##-- INPUTS: P ADAP SERVICE TYPE GIVEN INCOME --##
 ##----------------------------------------------##
@@ -1054,6 +1053,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 
 # @redo - these are all just placeholder parameters
 
+# Given ADAP, there is a probability of having full-pay; defined by these 4 parameters 
 #-- Probability of having ONLY full-pay services if on ADAP --#
 register.model.element(ADAP.SPECIFICATION,
                        name = 'p.full.pay.only.if.adap.midpoint',
@@ -1490,18 +1490,18 @@ calculate.logistic.p <- function(logistic.midpoint,
 ##-- CALCULATED: INCOME DISTRIBUTION of ADAP CLIENTS --##
 ##-----------------------------------------------------##
 
-
+# Max ADAP income threshold - just defined by the state - gives us the upper bound for how high we need to break up the % FPL 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'max.adap.baseline.income',
                         value = calculate.max.baseline.adap.income)
 
-# Calculate income distribution, stratified by SSI, for all ADAP clients
+# Calculate income distribution, stratified by SSI, for all ADAP clients # Melissa rename: this is among ADAP, probability of being in a certain income bracket AND having SSI (or not having SSI, below)
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.by.income.with.ssi',
-                        value = calculate.baseline.p.of.adap.by.income.with.ssi)
+                        name = 'baseline.p.of.adap.by.income.with.ssi', # numerator: have ADAP, have SSI, in a certain income bracket; denominator: everyone with ADAP
+                        value = calculate.baseline.p.of.adap.by.income.with.ssi) #  bounded by 75% FPL (SSI max benefit), and SSI breakeven (~150%; benefit is 0 because no longer qualifying for it)
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.by.income.without.ssi',
+                        name = 'baseline.p.of.adap.by.income.without.ssi', # numerator: have ADAP, no SSI, in a certain income bracket; denominator: everyone with ADAP 
                         value = calculate.baseline.p.of.adap.by.income.without.ssi)
 
 # Fold in Medicare
@@ -2182,12 +2182,12 @@ register.model.quantity(ADAP.SPECIFICATION,
                                 proportion.pwh.who.are.suppressed.and.keep.adap.premium.and.copay.but.change.formulary * change.PCp.formulary.suppression.rr +
                                 proportion.pwh.who.are.suppressed.and.keep.adap.copay.without.premium.but.change.formulary * change.Cp.formulary.suppression.rr +
                                 
-                                proportion.pwh.who.are.suppressed.and.change.adap.premium.without.copay.to.full.pay.and.change.formulary * change.adap.full.pay.formulary.suppression.rr + #change.F.formulary.suppression.rr? I think this was a copy paste error
-                                proportion.pwh.who.are.suppressed.and.change.adap.premium.and.cost.sharing.to.full.pay.and.change.formulary * change.adap.full.pay.formulary.suppression.rr #change.F.formulary.suppression.rr? I think this was a copy paste error
+                                proportion.pwh.who.are.suppressed.and.change.adap.premium.without.copay.to.full.pay.and.change.formulary * change.F.formulary.suppression.rr + 
+                                proportion.pwh.who.are.suppressed.and.change.adap.premium.and.cost.sharing.to.full.pay.and.change.formulary * change.F.formulary.suppression.rr 
                                 )
 )
 
-#-- Suppression Among Full Pay --#
+#-- Suppression Among Full Pay (F) --#
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.and.lose.adap.full.pay',
                         value = expression(baseline.proportion.pwh.with.adap * 
@@ -2229,37 +2229,38 @@ register.model.quantity(ADAP.SPECIFICATION,
 )
 
 
-# Full-pay suppression components
+# Full-pay (F) suppression components
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.only',
                         value = expression(baseline.p.of.adap.with.full.pay.only * 
-                                               fraction.time.on.adap.full.pay.from.full.pay.only * 
+                                               fraction.time.covered.among.F * 
                                                proportion.F.only.suppressed
                         ))
 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.and.premium.without.cost.sharing',
                         value = expression(baseline.p.of.adap.with.full.pay.and.premium.without.cost.sharing *
-                                               fraction.time.on.adap.full.pay.from.full.pay.and.premium.without.cost.sharing *
+                                               fraction.time.F.among.FP *
                                                proportion.FP.suppressed
                         ))
 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.and.premium.and.cost.sharing',
                         value = expression(baseline.p.of.adap.with.full.pay.and.premium.and.cost.sharing *
-                                               fraction.time.on.adap.full.pay.from.full.pay.and.premium.and.cost.sharing *
+                                               fraction.time.F.among.FPCs *
                                                proportion.FPCs.suppressed
                         ))
 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.and.cost.sharing.without.premium',
                         value = expression(baseline.p.of.adap.with.full.pay.and.cost.sharing.without.premium *
-                                               fraction.time.on.adap.full.pay.from.full.pay.and.cost.sharing.without.premium *
-                                               proportion.adap.full.pay.and.cost.sharing.without.premium.suppressed
+                                               fraction.time.F.among.FCs *
+                                               proportion.FCs.suppressed
                         ))
 
-#-- Suppression Among Premium WithOUT Cost-Sharing --#
 
+
+#-- Suppression Among Premium (P) --#
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.and.lose.adap.premium.without.cost.sharing',
                         value = expression(baseline.proportion.pwh.with.adap * 
@@ -2276,10 +2277,10 @@ register.model.quantity(ADAP.SPECIFICATION,
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.without.full.pay *
                                                     proportion.adap.premium.without.cost.sharing.who.change.eligibility.to.full.pay *
-                                                    (1-proportion.adap.change.to.full.pay.clients.with.formulary.change) +
+                                                    (1-proportion.change.to.F.with.formulary.change) +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.with.full.pay *
                                                     proportion.adap.full.pay.and.premium.without.cost.sharing.who.change.eligibility.to.full.pay *
-                                                    (1-proportion.adap.change.to.full.pay.clients.with.formulary.change)
+                                                    (1-proportion.change.to.F.with.formulary.change)
                                                ))
 )
 
@@ -2288,10 +2289,10 @@ register.model.quantity(ADAP.SPECIFICATION,
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.without.full.pay *
                                                     proportion.adap.premium.without.cost.sharing.who.change.eligibility.to.full.pay *
-                                                    proportion.adap.change.to.full.pay.clients.with.formulary.change +
+                                                    proportion.change.to.F.with.formulary.change +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.with.full.pay *
                                                     proportion.adap.full.pay.and.premium.without.cost.sharing.who.change.eligibility.to.full.pay *
-                                                    proportion.adap.change.to.full.pay.clients.with.formulary.change
+                                                    proportion.change.to.F.with.formulary.change
                                                ))
 )
 
@@ -2307,24 +2308,24 @@ register.model.quantity(ADAP.SPECIFICATION,
 
 
 
-# Premium without cost-sharing suppression components
+# Premium (P) suppression components
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.without.full.pay',
                         value = expression(baseline.p.of.adap.with.premium.without.cost.sharing *
-                                               fraction.time.on.adap.premium.without.cost.sharing.from.without.full.pay *
+                                               fraction.time.covered.among.P *
                                                proportion.P.only.suppressed
                         ))
 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.with.full.pay',
                         value = expression(baseline.p.of.adap.with.full.pay.and.premium.without.cost.sharing *
-                                               fraction.time.on.adap.premium.without.cost.sharing.from.with.full.pay *
+                                               fraction.time.P.among.FP *
                                                proportion.FP.suppressed
                         ))
 
 
-#-- Suppression Among Premium AND Cost-Sharing --#
 
+#-- Suppression Among Premium AND Cost-Sharing (PCs) --#
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.and.lose.adap.premium.and.cost.sharing',
                         value = expression(baseline.proportion.pwh.with.adap * 
@@ -2340,10 +2341,10 @@ register.model.quantity(ADAP.SPECIFICATION,
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.without.full.pay *
                                                     proportion.adap.premium.and.cost.sharing.who.change.eligibility.to.full.pay *
-                                                    proportion.adap.change.to.full.pay.clients.with.formulary.change +
+                                                    proportion.change.to.F.with.formulary.change +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.with.full.pay *
                                                     proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.full.pay *
-                                                    proportion.adap.change.to.full.pay.clients.with.formulary.change
+                                                    proportion.change.to.F.with.formulary.change
                                                ))
 )
 
@@ -2352,10 +2353,10 @@ register.model.quantity(ADAP.SPECIFICATION,
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.without.full.pay *
                                                     proportion.adap.premium.and.cost.sharing.who.change.eligibility.to.full.pay *
-                                                    (1 - proportion.adap.change.to.full.pay.clients.with.formulary.change) +
+                                                    (1 - proportion.change.to.F.with.formulary.change) +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.with.full.pay *
                                                     proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.full.pay *
-                                                    (1 - proportion.adap.change.to.full.pay.clients.with.formulary.change)
+                                                    (1 - proportion.change.to.F.with.formulary.change)
                                                ))
 )
 
@@ -2408,24 +2409,24 @@ register.model.quantity(ADAP.SPECIFICATION,
  
 
 
-# Premium and cost-sharing suppression components
+# Premium and cost-sharing (PCs) suppression components
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.without.full.pay',
                         value = expression(baseline.p.of.adap.with.premium.and.cost.sharing *
-                                               fraction.time.on.adap.premium.and.cost.sharing.from.without.full.pay *
+                                               fraction.time.covered.among.PCs *
                                                proportion.PCs.suppressed
                         ))
 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.with.full.pay',
                         value = expression(baseline.p.of.adap.with.full.pay.and.premium.and.cost.sharing *
-                                               fraction.time.on.adap.premium.and.cost.sharing.from.with.full.pay *
+                                               fraction.time.PCs.among.FPCs *
                                                proportion.FPCs.suppressed
                         ))
 
 
-#-- Suppression Among Cost-Sharing withOUT Premium --#
 
+#-- Suppression Among Cost-Sharing (Cs) --#
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.and.lose.adap.cost.sharing.without.premium',
                         value = expression(baseline.proportion.pwh.with.adap * 
@@ -2463,19 +2464,19 @@ register.model.quantity(ADAP.SPECIFICATION,
 )
 
 
-# Cost-sharing without premium suppression components
+# Cost-sharing (Cs) suppression components
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.cost.sharing.without.premium.from.without.full.pay',
                         value = expression(baseline.p.of.adap.with.cost.sharing.without.premium *
-                                               fraction.time.on.adap.cost.sharing.without.premium.from.without.full.pay *
+                                               fraction.time.covered.among.Cs *
                                                proportion.Cs.only.suppressed
                         ))
 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.cost.sharing.without.premium.from.with.full.pay',
                         value = expression(baseline.p.of.adap.with.full.pay.and.cost.sharing.without.premium *
-                                               fraction.time.on.adap.cost.sharing.without.premium.from.with.full.pay *
-                                               proportion.adap.full.pay.and.cost.sharing.without.premium.suppressed
+                                               fraction.time.Cs.among.FCs *
+                                               proportion.FCs.suppressed
                         ))
 
 
