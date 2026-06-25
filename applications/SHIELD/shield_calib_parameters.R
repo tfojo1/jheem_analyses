@@ -721,7 +721,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
     #                                                applies.to.dimension.values = c("heterosexual_male", "female"))
     #OPTION2:
     for(time in c("2010","2020")){
-        for(sex in races){
+        for(sex in sexes){
             set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "rate.sti.screening.over.14.without.covid",
                                                        alpha.name = time,
