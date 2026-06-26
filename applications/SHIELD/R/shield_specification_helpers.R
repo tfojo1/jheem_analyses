@@ -1131,36 +1131,26 @@ get_syphilis_to_hiv_testing_ratio_functional_form <- function(specification.meta
 #-- PRENTAL CARE BY TRIMESTER FUNCTIONAL FORM --# -----
 get.prp.prenatal.care.functional.form = function(specification.metadata,trimester){
   # cashed object from input_prenatal_prior_wonder
-  prenatal.care.prior = get.cached.object.for.version(name = paste0("prenatal.care.initiation.",trimester,".trimester.prior"),
+  prenatal.care.prior = get.cached.object.for.version(name = paste0("prenatal.care.initiation.",trimester,".prior"),
                                                       version = specification.metadata$version)
-  #' #'@Todd: this is fix for now but we should find the issue with these additional ages in the specifications
-  # browser()
-  # new_ages <- c('0-14 years',"45-49 years", "50-54 years", "55-64 years","65+ years")
-  # new_data=matrix(rep(0,15),nrow=5, dimnames = list(age=new_ages, race=c('black','hispanic','other')))
-  # dim(new_data)
-  # 
-  # prenatal.care.prior$intercepts <- rbind(prenatal.care.prior$intercepts, new_data)
-  # names( dimnames(prenatal.care.prior$intercepts ))=c('age','race')
-  # 
-  # prenatal.care.prior$slopes <- rbind(prenatal.care.prior$slopes,new_data)
-  # names( dimnames(prenatal.care.prior$slopes ))=c('age','race')
-  # 
-  prenatal.care.functional.form = create.logistic.linear.functional.form(intercept = prenatal.care.prior$intercepts - log(0.9), #helps counteract max value below a bit
+  # we use a max 90% but this is really capping the first-trimester care 
+  # if we want to ensure a structural floor on late/no care (~7%) we need to add lower cap to each trimester
+  prenatal.care.functional.form = create.logistic.linear.functional.form(intercept = prenatal.care.prior$intercepts - log(0.9), #The GLM gives you an intercept on the standard logit scale assuming max = 1.0. When you set max = 0.9, the function output at the same intercept value is scaled down by 0.9, so you need to inflate the intercept to recover the same probability. The code subtracts log(0.9) ≈ −(−0.105) = adds 0.105 to the logit-scale intercept
                                                                          slope = prenatal.care.prior$slopes,
-                                                                         anchor.year = 2010,
-                                                                         max = 0.9,
+                                                                         anchor.year = prenatal.care.prior$anchor.year,
+                                                                         max = 0.9, #The function becomes: P(t) = 0.9 / (1 + exp(−(α + β · t))) instead of 1.0 in the denominator. This is a structural assumption that at least ~10% of births will never receive prenatal care in this trimester, regardless of trends.
                                                                          parameters.are.on.logit.scale = T)
   prenatal.care.functional.form
 }
 
 get.prp.prenatal.care.functional.form.first.trimester<-function(specification.metadata){
-  get.prp.prenatal.care.functional.form(specification.metadata,"first")
+  get.prp.prenatal.care.functional.form(specification.metadata,trimester = "first.trimester")
 }
 get.prp.prenatal.care.functional.form.second.trimester.of.those.not.screened.first<-function(specification.metadata){
-  get.prp.prenatal.care.functional.form(specification.metadata,"second")
+  get.prp.prenatal.care.functional.form(specification.metadata,trimester = "second.trimester")
 }
 get.prp.prenatal.care.functional.form.third.trimester.of.those.not.screened.first.second<-function(specification.metadata){
-  get.prp.prenatal.care.functional.form(specification.metadata,"third")
+  get.prp.prenatal.care.functional.form(specification.metadata,trimester = "third.trimester")
 }
 
 #'@:Todd: need to add an option for the national model ----

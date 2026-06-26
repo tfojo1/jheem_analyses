@@ -124,9 +124,9 @@ clean.brfss.data <- function(specification.metadata) {
   # it is multiplied by a large year value. To mitigate this issue, we use an anchor year, which effectively reduces the 
   # scale of the year variable by starting it from 1. 
   # This approach helps to stabilize the estimates and improve model convergence
-  testing_anchor_year <- 2010 
+  anchor_year <- 2010 
   df <- df %>% 
-    mutate(year = year - testing_anchor_year) # year range: 4-9
+    mutate(year = year - anchor_year) # year range: 4-9
   
   # table(df$age): no data for 0-14 and 15-19 age groups. 
   # drop unused factor levels
@@ -136,12 +136,12 @@ clean.brfss.data <- function(specification.metadata) {
 }
 
 # MODEL FITTING ----
-# get.testing.intercepts.and.slopes(...) function fits a logistic regression model to the data and returns 
+# get.testing.cache(...) function fits a logistic regression model to the data and returns 
 # a list containing two items: a multidimensional array of intercepts (the predicted log-odds when year = 0) 
 # and slopes (the change in log-odds per one unit change in year) for each combination of demographic strata.
-get.testing.intercepts.and.slopes <- function(df, 
-                                              specification.metadata,
-                                              selected.model ) {
+get.testing.cache <- function(df, 
+                              specification.metadata,
+                              selected.model ) {
   
   if (selected.model == "two.way") {
     fit <- glm(tested.past.year ~ age + sex + race + year + 
@@ -196,7 +196,8 @@ get.testing.intercepts.and.slopes <- function(df,
   #'Log-odds of -1.27 means the odds of testing in the past year are about 0.280 to 1, or the event is about 28% as likely to happen as it is to not happen.
   # The probability of testing in the past year for this baseline group (before adjusting for other predictors) is about 21.9%.
   list(intercepts = intercepts,
-       slopes = slopes )
+       slopes = slopes,
+       anchor.year=2010)
 }
 
 
@@ -215,9 +216,9 @@ checking.model.performance<- function(df, specification.metadata, selected.model
                     race = race_levels_model,
                     sex = sex_levels_model)
   
-  testing.prior <- get.testing.intercepts.and.slopes(df = df,
-                                                     specification.metadata = specification.metadata,
-                                                     selected.model)
+  testing.prior <- get.testing.cache(df = df,
+                                     specification.metadata = specification.metadata,
+                                     selected.model)
   print("Model is fitted")
   testing.functional.form <- create.logistic.linear.functional.form(
     intercept = testing.prior$intercepts,
@@ -313,16 +314,17 @@ specification.metadata <- get.specification.metadata(version = 'shield', locatio
 df <- clean.brfss.data(specification.metadata)
 
 ## Checking performances: fitting each model takes a long time
+if (1==2){
 checking.model.performance(df,specification.metadata,selected.model = "two.way")
 checking.model.performance(df,specification.metadata,"three.way.interacted")
 checking.model.performance(df,specification.metadata,"fully.interacted")
-
+}
 #fitting the final model 
 selected.model="three.way.interacted"
 print("final model is selected as three.way.interacted ....")
-testing.prior <- get.testing.intercepts.and.slopes(df = df,
-                                                   specification.metadata = specification.metadata,
-                                                   selected.model = selected.model)
+testing.prior <- get.testing.cache(df = df,
+                                   specification.metadata = specification.metadata,
+                                   selected.model = selected.model)
 cache.object.for.version(object = testing.prior,
                          name = "hiv.testing.prior",
                          version = 'shield',

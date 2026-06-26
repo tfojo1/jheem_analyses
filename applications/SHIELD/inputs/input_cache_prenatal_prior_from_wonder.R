@@ -43,7 +43,7 @@ reshapeData<-function(q1,q2,q3,q0,denom){
 }
 
 #Fitting alternative models and returning intercepts/slopes -----
-get.intercepts.and.slopes = function(df,  model ){
+get.prenatal.cache = function(df,  model ){
   library(splines)
   
   if(model=="fully.interacted"){
@@ -79,7 +79,8 @@ get.intercepts.and.slopes = function(df,  model ){
   dim(intercepts) = dim(slopes) = sapply(dim.names, length)
   dimnames(intercepts) = dimnames(slopes) = dim.names
   rv = list(intercepts=intercepts,
-            slopes=slopes)
+            slopes=slopes,
+            anchor.year=2016)
   rv
 }
 
@@ -122,7 +123,7 @@ check.model.performance<-function(df,
   ###
   print(paste("Checking performance for ",selected.model, " fitted to prenatal data from ",trimester))
   ###
-  prior= get.intercepts.and.slopes(df, model=selected.model)
+  prior= get.prenatal.cache(df, model=selected.model)
   
   functional.form = create.logistic.linear.functional.form(intercept = prior$intercepts,
                                                            slope = prior$slopes,
@@ -201,6 +202,7 @@ check.model.performance<-function(df,
 }
 
 # CHECKS/PLOTS:
+if(1==2){
 # A fully interacted model captures age-race values the best
 check.model.performance(df,trimester = "first.trimester", selected.model = "fully.interacted",filter.covid = T)
 check.model.performance(df,trimester = "first.trimester", selected.model = "two.way",filter.covid = T)
@@ -208,7 +210,7 @@ check.model.performance(df,trimester = "second.trimester", selected.model = "ful
 check.model.performance(df,trimester = "second.trimester", selected.model = "two.way",filter.covid = T)
 check.model.performance(df,trimester = "third.trimester", selected.model = "fully.interacted",filter.covid = T)
 check.model.performance(df,trimester = "third.trimester", selected.model = "two.way",filter.covid = T)
-
+}
 
 # CACHING THE FINAL PRIOR -----
 cache.final.prior<-function(df,
@@ -229,7 +231,7 @@ cache.final.prior<-function(df,
   ###
   print(paste("Cacching prior for a ",selected.model, " fitted to prenatal data from ",trimester))
   #
-  prior= get.intercepts.and.slopes(df, model=selected.model)
+  prior= get.prenatal.cache(df, model=selected.model)
   #
   cache.object.for.version(object = prior,
                            name = paste0("prenatal.care.initiation.",trimester,".prior"),
