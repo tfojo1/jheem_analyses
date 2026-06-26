@@ -301,6 +301,7 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
     # or.syphilis.to.hiv.testing.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     # or.syphilis.to.hiv.testing.other = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     #
+    or.syphilis.to.hiv.testing = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     or.slope.syphilis.to.hiv.testing = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10), # changed from 2 to make change slower
     
     ## Misclassification Error ----
@@ -762,7 +763,14 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
     #                                                values = parameters[paste0("or.syphilis.to.hiv.testing.", races)],
     #                                                dimension = "race", #recipient
     #                                                applies.to.dimension.values = races)
-    
+
+    set.element.functional.form.main.effect.alphas(model.settings,
+                                                   element.name = "ratio.syphilis.screening.to.hiv.tests",
+                                                   alpha.name = "intercept",
+                                                   values = parameters["or.syphilis.to.hiv.testing"],
+                                                   dimension = "all", #recipient
+                                                   applies.to.dimension.values = "all")
+
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "ratio.syphilis.screening.to.hiv.tests",
                                                    alpha.name = "slope",
@@ -1119,6 +1127,7 @@ STI.TESTING.SAMPLING.BLOCKS = list(
     # ),
     #
     syphilis.to.hiv.testing.ratio.sex.slope<-c(
+        "or.syphilis.to.hiv.testing",
         "or.slope.syphilis.to.hiv.testing"
     ),
     misclas.error<-c(
