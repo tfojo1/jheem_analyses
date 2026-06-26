@@ -392,7 +392,7 @@ register.calibration.info("calib.6.19.stage3.az",
                           ),
                           n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
 )
-# 6.23: trying different weights for a stage 2 off of 6.19.stage1
+# 6.23: trying different weights for a stage 2 off of 6.19.stage1 ----
 register.calibration.info("calib.6.23.stg2.8.pop.4",
                           preceding.calibration.codes = 'calib.6.19.stage1.az',
                           likelihood.instructions = lik.inst.stage23.8x.pop.4x, #w=1/4
@@ -463,7 +463,7 @@ register.calibration.info("calib.6.23.stg2.32.pop.2",
                           ),
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-# 6.26 built on 6.19 again, but with 8 & 4 weights and new data
+# 6.26 built on 6.19 again, but with 8 & 4 weights and new data ----
 register.calibration.info("calib.6.25.stage2.az",
                           preceding.calibration.codes = 'calib.6.19.stage1.az',
                           likelihood.instructions = lik.inst.stage23.8x.pop.4x,

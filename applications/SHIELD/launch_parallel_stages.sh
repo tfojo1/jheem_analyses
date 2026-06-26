@@ -66,7 +66,7 @@ all_except_ten_cities=(
 CITIES=("${ten_cities[@]}")
 
 CALIBRATION_CODES=(
-    calib.5.6.stage3.2.p2
+    calib.6.25.stage2.az
 )
 
 SCRIPT="$SCRIPT_DIR/shield_calib_setup_and_run.R"
