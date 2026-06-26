@@ -1,7 +1,7 @@
 {
   "metadata": {
     "generated_from": "syphilis.manager_section3",
-    "generated_at": "2026-06-24 21:16:05"
+    "generated_at": "2026-06-26 16:27:12"
   },
   "outcomes": {
     "population": {
@@ -4842,7 +4842,7 @@
                     "max": "WY",
                     "values": ["AK", "AL", "AR", "AZ", "C.10420", "C.10740", "C.12060", "C.12420", "C.12580", "C.13820", "C.14460", "C.15380", "C.16740", "C.16980", "C.17140", "C.17460", "C.18140", "C.18580", "C.19100", "C.19430", "C.19740", "C.19780", "C.19820", "C.21340", "C.25540", "C.26420", "C.26900", "C.27260", "C.28140", "C.29820", "C.31080", "C.31140", "C.32820", "C.33100", "C.33340", "C.33460", "C.34980", "C.35380", "C.35620", "C.36420", "C.36540", "C.36740", "C.37980", "C.38060", "C.38300", "C.38900", "C.39300", "C.39580", "C.40060", "C.40140", "C.40380", "C.40900", "C.41180", "C.41620", "C.41700", "C.41740", "C.41860", "C.41940", "C.41980", "C.42660", "C.45300", "C.45780", "C.46060", "C.46140", "C.46520", "C.47260", "C.47900", "C.48620", "CA", "CO", "CT", "DC", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "US", "UT", "VA", "VT", "WA", "WI", "WV", "WY"]
                   },
-                  "sex": ["female", "male"]
+                  "sex": ["female", "male", "msm"]
                 },
                 "year__location__age": {
                   "dimensions": ["year", "location", "age"],
@@ -4892,24 +4892,7 @@
                   },
                   "age": ["0-14 years", "15-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-54 years", "55-64 years", "65+ years"],
                   "race": ["american indian alaska native", "asian pacific islander", "black, non hispanic", "hispanic", "white, non hispanic"],
-                  "sex": ["female", "male"]
-                },
-                "year__location__sex__risk": {
-                  "dimensions": ["year", "location", "sex", "risk"],
-                  "year": {
-                    "n": 8,
-                    "min": "2016",
-                    "max": "2023",
-                    "values": ["2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023"]
-                  },
-                  "location": {
-                    "n": 51,
-                    "min": "AK",
-                    "max": "WY",
-                    "values": ["AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DC", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VA", "VT", "WA", "WI", "WV", "WY"]
-                  },
-                  "sex": ["female", "male"],
-                  "risk": ["heterosexual", "idu", "msm", "msm_idu", "other"]
+                  "sex": ["female", "male", "msm"]
                 }
               }
             }
