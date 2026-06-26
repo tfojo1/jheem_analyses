@@ -1123,10 +1123,7 @@ get_syphilis_to_hiv_testing_ratio_functional_form <- function(specification.meta
                                                                                         slope = 0.0987, # on the logit scale: (logit(0.69) − logit(0.6)) / 4 = (0.8001 − 0.4055) / 4 = 0.0987
                                                                                         anchor.year = 2010,
                                                                                         max = 1,
-                                                                                        parameters.are.on.logit.scale = T
-                                                                                          
-                                                                                        )
-  
+                                                                                        parameters.are.on.logit.scale = T)
   syphilis_to_hiv_testing_ratio_functional_form
 }
 

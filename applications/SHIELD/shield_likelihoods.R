@@ -450,6 +450,16 @@ penalty.msm.prop.of.ps.male.likelihood.instructions <-
         },
         weights = 1
     )
+
+
+##NEW---- Nestd proportion likelihood: prop of male ps diagnosis among MSM ----
+
+# prop.male.ps.diag.among.msm.likelihood.instructions
+
+# new outcomes:
+#         prop.male.ps.among.msm; ps.diag.among.male
+#p.bias=0; sd=0.05 #5% estimate both inside and outside
+
 #---- Penalizing when Heterosexual Male PS Diagnosis growth rates are much higher than MSM ----
 penalty.diag.traject.msm.vs.het.male.likelihood.instructions <-
     create.custom.likelihood.instructions(
@@ -697,6 +707,10 @@ proportion.tested.total.by.race.nested.likelihood.instructions =
                                                      #
                                                      equalize.weight.by.year = T
     )
+
+
+
+
 ##---- Total and by Age & Race ----
 proportion.tested.total.by.age.race.nested.likelihood.instructions =
     create.nested.proportion.likelihood.instructions(outcome.for.data = "proportion.tested.for.hiv",
