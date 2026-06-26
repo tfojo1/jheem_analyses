@@ -1128,7 +1128,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                applies.to = list(age=c("15-19 years" ,"20-24 years" ,"25-29 years" ,"30-34 years", "35-39 years", "40-44 years", "45-49 years" ,"50-54 years", "55-64 years" ,"65+ years")),
                                value = "rate.sti.screening.over.14.without.covid")
 
-##---- COVID
+##---- ## COVID impact on screening ----
 N.COVID.MONTHS = 24
 N.COVID.MONTHS.FULL.EFFECT = 12
 # binary variable that is on from March 15,2020-2022, marking the covid period
@@ -1160,24 +1160,20 @@ register.model.quantity(SHIELD.SPECIFICATION,
                         value = expression(
                             rate.sti.screening.without.covid *  (1-(1-max.covid.effect.sti.screening.reduction) * covid.on ))) #add mobility
 # max.covid.effect.sti.screening.reduction: reduced.value.post.max.reduction.covid
+# **** add CDC. reported HIV tests : ratio of test
+# **** add number.of.tests.year.on.year.change.nested.likelihood.instructions
+# **** add gonorrhea.year.on.year.change.likelihood.instructions
 
-# CDC. reported HIV tests : ratio of test
-# number.of.tests.year.on.year.change.nested.likelihood.instructions
-# gonorrhea.year.on.year.change.likelihood.instructions
-
-
-# Model the ratio of STI screening to HIV tests as a smooth function 
-#'@Andrew: to review with Todd: I think that we should define this as a proportion (wont expect to go over 1?)
+##---- ## Rate of HIV testing from Syphilis Screening ----
+# Model the ratio of syphilis screening to HIV tests as a smooth function 
+# we have called is a ratio, but it does not go over 1.
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'ratio.syphilis.screening.to.hiv.tests', #'@Andrew: we should call this a proportion
+                       name = 'ratio.syphilis.screening.to.hiv.tests',  
                        scale = "ratio", #can go over 1 but we would expect it  not to
-                       get.functional.form.function = get_sti_to_hiv_testing_ratio_functional_form,
-                       functional.form.from.time = 2014,
+                       get.functional.form.function = get_syphilis_to_hiv_testing_ratio_functional_form,
+                       functional.form.from.time = 2010,
                        functional.form.scale = "ratio") 
                        
-                       
-# @Parastu, Todd insisted on dividing, not multiplying, in this expression, but if the multiplier is >1 (such as 2), then it should be multiplying, yes? HIV rate > STI screening rate.
-#' @Andrew: it's OK to divide. we can limit this to remain below 1 through the prior (logitnormal)  
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.testing.hiv',
                         scale = "rate",
@@ -1187,14 +1183,14 @@ register.model.quantity(SHIELD.SPECIFICATION,
 # prop of pregnant women receiving 'successful' prenatal screening 
 #'@PK:TBD: How to model treatment failures that still result in congenital syphilis? 
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'b.model.prenatal.care',
+                       name = 'b.model.prenatal.and.cs',
                        scale = 'non.negative.number',
-                       value = SHIELD_BASE_PARAMETER_VALUES['b.model.prenatal.care']) #Boolean switch to turn on/off prenatal care
+                       value = SHIELD_BASE_PARAMETER_VALUES['b.model.prenatal.and.cs']) #Boolean switch to turn on/off prenatal care
 
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'prp.received.prenatal.care',
                         scale = 'proportion',
-                        value = expression(b.model.prenatal.care*(prp.prenatal.care.first.trimester+prp.prenatal.care.second.trimester+prp.prenatal.care.third.trimester)))
+                        value = expression(b.model.prenatal.and.cs*(prp.prenatal.care.first.trimester+prp.prenatal.care.second.trimester+prp.prenatal.care.third.trimester)))
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'prp.births.multi.born',
                        scale = 'proportion',
@@ -1402,26 +1398,13 @@ register.remission(SHIELD.SPECIFICATION,
                    tag = 'remission.treated.after.delay' )
 
 
-#*** CONGENITAL SYPHILIS *** ----
-##---- Vertical transmission By Stage ----
-register.model.element(SHIELD.SPECIFICATION,
-                       name='prob.vertical.transmission.mothers.early.syphilis',
-                       scale='proportion',
-                       value=SHIELD_BASE_PARAMETER_VALUES['prob.vertical.transmission.mothers.early.syphilis']) 
-register.model.element(SHIELD.SPECIFICATION,
-                       name='prob.vertical.transmission.mothers.late.syphilis',
-                       scale='proportion',
-                       value=SHIELD_BASE_PARAMETER_VALUES['prob.vertical.transmission.mothers.late.syphilis'])  
-register.model.quantity(SHIELD.SPECIFICATION,
-                        name='prob.vertical.transmission.by.stage',
-                        scale='proportion',
-                        value='prob.vertical.transmission.mothers.late.syphilis')
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name='prob.vertical.transmission.by.stage',
-                               applies.to = list(stage=c('primary','secondary','early.latent')),
-                               value='prob.vertical.transmission.mothers.early.syphilis')
-
-##---- Prenatal Care Coverage ----
+#*** CONGENITAL SYPHILIS (CS) *** ----
+# P(CS | pregnancy) = P(vertical transmission | stage) × RR(prenatal care timing)
+# There are 3 main components:
+# 1- prenatal care:  what proportion of births receive prenatal care and at what trimester?
+# 2- what is the risk ratio for congenital outcome among mothers receiving prenatal care in each trimester (relative to no prenatal care)
+# 3- what is the probability of vertical transmission based on this stage of infection for an untreated mom?
+##---- 1-Prenatal Care Coverage ----
 register.model.element(SHIELD.SPECIFICATION,
                        name='prp.prenatal.care.first.trimester',
                        scale='proportion', 
@@ -1454,7 +1437,7 @@ register.model.quantity(SHIELD.SPECIFICATION,
                         name='prp.no.prenatal.care',
                         scale='proportion',
                         value=expression(1- prp.prenatal.care.first.trimester -prp.prenatal.care.second.trimester -prp.prenatal.care.third.trimester))
-##---- Risk Ratios for Congenital Syphilis Based on Prenatal Care ----
+##---- 2-Risk Ratios for CS after receipt of prenatal care (relative to no care) ----
 register.model.element(SHIELD.SPECIFICATION,
                        name='rr.congenital.syphilis.no.prenatal.care', 
                        scale='ratio',
@@ -1472,6 +1455,25 @@ register.model.element(SHIELD.SPECIFICATION,
                        scale='ratio',
                        value=SHIELD_BASE_PARAMETER_VALUES['rr.congenital.syphilis.prenatal.care.third.trimester'])
 # assuming rr.congenital.syphilis.no.prenatal.care =1
+
+
+##---- 3-Vertical transmission By Stage of infection for untreated moms ----
+register.model.element(SHIELD.SPECIFICATION,
+                       name='prob.vertical.transmission.mothers.early.syphilis',
+                       scale='proportion',
+                       value=SHIELD_BASE_PARAMETER_VALUES['prob.vertical.transmission.mothers.early.syphilis']) 
+register.model.element(SHIELD.SPECIFICATION,
+                       name='prob.vertical.transmission.mothers.late.syphilis',
+                       scale='proportion',
+                       value=SHIELD_BASE_PARAMETER_VALUES['prob.vertical.transmission.mothers.late.syphilis'])  
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name='prob.vertical.transmission.by.stage',
+                        scale='proportion',
+                        value='prob.vertical.transmission.mothers.late.syphilis')
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name='prob.vertical.transmission.by.stage',
+                               applies.to = list(stage=c('primary','secondary','early.latent')),
+                               value='prob.vertical.transmission.mothers.early.syphilis')
 
 
 ##-----------------#######----------------#######-----------------##----
@@ -2051,7 +2053,9 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                                                                  units = 'persons',
                                                                  singular.unit = 'person'),
                       scale='non.negative.number',
-                      multiply.by = expression(prob.vertical.transmission.by.stage * (
+                      multiply.by = expression(
+                          prob.vertical.transmission.by.stage * 
+                              b.model.prenatal.and.cs * (
                           #prp of infected pregnant women whp pass on congenital syphilis to newborn
                           prp.prenatal.care.first.trimester * rr.congenital.syphilis.prenatal.care.first.trimester +
                               prp.prenatal.care.second.trimester * rr.congenital.syphilis.prenatal.care.second.trimester  +
@@ -2082,6 +2086,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
 track.integrated.outcome(SHIELD.SPECIFICATION,
                          name = 'prp.prenatal.care.first.trimester',
                          value.to.integrate = "prp.prenatal.care.first.trimester", #the number of births are also time varying but here we are approximating
+                         multiply.by = "b.model.prenatal.and.cs",
                          denominator.outcome = "births.from", #or we can define pregnancies= births /births
                          subset.dimension.values = list(sex='female',age=FERTILE.AGES),
                          outcome.metadata = create.outcome.metadata(display.name = 'Proportion of Births Starting Prenatal Care in the First Trimester',
@@ -2096,6 +2101,7 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
 track.integrated.outcome(SHIELD.SPECIFICATION,
                          name = 'prp.prenatal.care.second.trimester',
                          value.to.integrate = "prp.prenatal.care.second.trimester",
+                         multiply.by = "b.model.prenatal.and.cs",
                          denominator.outcome = "births.from",  
                          subset.dimension.values = list(sex='female',age=FERTILE.AGES),
                          outcome.metadata = create.outcome.metadata(display.name = 'Proportion of Births Starting Prenatal Care in the Second Trimester',
@@ -2110,6 +2116,7 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
 track.integrated.outcome(SHIELD.SPECIFICATION,
                          name = 'prp.prenatal.care.third.trimester',
                          value.to.integrate = "prp.prenatal.care.third.trimester",
+                         multiply.by = "b.model.prenatal.and.cs",
                          denominator.outcome = "births.from",  
                          subset.dimension.values = list(sex='female',age=FERTILE.AGES),
                          outcome.metadata = create.outcome.metadata(display.name = 'Proportion of Births Starting Prenatal Care in the Third Trimester',
@@ -2123,6 +2130,7 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
 track.integrated.outcome(SHIELD.SPECIFICATION,
                          name = 'prp.no.prenatal.care',
                          value.to.integrate = "prp.no.prenatal.care",
+                         multiply.by = "b.model.prenatal.and.cs",
                          denominator.outcome = "births.from",  
                          subset.dimension.values = list(sex='female',age=FERTILE.AGES),
                          outcome.metadata = create.outcome.metadata(display.name = 'Proportion of Births with No Prenatal Care',

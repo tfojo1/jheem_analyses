@@ -6,11 +6,12 @@
 ### called by SHIELD/shield_base_parameters.R
 
 calculate_cs_relative_risks <- function() {
-    risk_congenital_syphilis_prenatal_care_first_trimester <- 0.104
+  # data from paper:  
+  risk_congenital_syphilis_prenatal_care_first_trimester <- 0.104
     risk_congenital_syphilis_prenatal_care_second_trimester <- 0.176
     risk_congenital_syphilis_prenatal_care_third_trimester <- 0.406
     risk_congenital_syphilis_no_prenatal_care <- 0.36
-    
+    # build a dataset for risk of vertical trans by trimester 
     df <- data.frame(trimester = c(0.5, 1.5, 2.5, 3),
                      risk = c(risk_congenital_syphilis_prenatal_care_first_trimester,
                               risk_congenital_syphilis_prenatal_care_second_trimester,

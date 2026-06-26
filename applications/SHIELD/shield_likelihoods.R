@@ -310,7 +310,7 @@ ps.diagnosis.by.strata.likelihood.instructions =
                                          outcome.for.data = "ps.syphilis.diagnoses",  
                                          dimensions = c("sex","race","age"),
                                          levels.of.stratification = c(1,2),
-                                         from.year = 2019,
+                                         from.year = 1993,
                                          to.year = 2022,
                                          #
                                          error.variance.type = c('cv'),
@@ -328,7 +328,7 @@ ps.diagnosis.by.strata.likelihood.instructions =
 # We used the mean and standard deviation of log(x) to characterize this distribution. The observed values ranged from 0.3 to 9.4, 
 # so we assumed an upper threshold corresponding to a 10-fold increase. Simulations producing values outside this range were penalized accordingly.
 # To avoid redundant calculations, this ratio computed only once by comparing simulations in 2030 to 2020 and penalizing sims that fall outside of the 10X increase
-future.penalty.ps.diag.growth.likelihood.instructions =
+penalty.ps.diag.growth.likelihood.instructions =
     create.custom.likelihood.instructions(
         name = "future.penalty.ps.diag.growth.likelihood",
         compute.function = function(sim, data, weights, log = T) {
@@ -399,7 +399,7 @@ future.penalty.ps.diag.growth.likelihood.instructions =
 # Penalizing simulations where the proportion of Male diagnosis among MSM falls below a certain threshold  (2018-2022):last 5 years
 # We estimated the prop of msm/male at 0.6 from the national data 
 # assume a normal distribution centered at 0.6 with sd= 0.05. Penalize sims that fall below 2sd threshold (0.6-2*.05=0.5) according to the normal likelihood
-proportion_ps_male_among_msm_likelihood_instructions <-
+penalty.msm.prop.of.ps.male.likelihood.instructions <- 
     create.custom.likelihood.instructions(
         name = "proportion_msm_likelihood",
         compute.function = function(sim, data, weights, log = TRUE, debug = F) {
@@ -450,8 +450,18 @@ proportion_ps_male_among_msm_likelihood_instructions <-
         },
         weights = 1
     )
+
+
+##NEW---- Nestd proportion likelihood: prop of male ps diagnosis among MSM ----
+
+# prop.male.ps.diag.among.msm.likelihood.instructions
+
+# new outcomes:
+#         prop.male.ps.among.msm; ps.diag.among.male
+#p.bias=0; sd=0.05 #5% estimate both inside and outside
+
 #---- Penalizing when Heterosexual Male PS Diagnosis growth rates are much higher than MSM ----
-diagnosis_trajectory_penalty_likelihood_instructions <-
+penalty.diag.traject.msm.vs.het.male.likelihood.instructions <-
     create.custom.likelihood.instructions(
         name = "diagnosis.trajectory.penalty.likelihood",
         compute.function = function(sim, data, weights, log = TRUE, debug = F) {
@@ -697,6 +707,10 @@ proportion.tested.total.by.race.nested.likelihood.instructions =
                                                      #
                                                      equalize.weight.by.year = T
     )
+
+
+
+
 ##---- Total and by Age & Race ----
 proportion.tested.total.by.age.race.nested.likelihood.instructions =
     create.nested.proportion.likelihood.instructions(outcome.for.data = "proportion.tested.for.hiv",
@@ -823,8 +837,8 @@ lik.inst.stage1=join.likelihood.instructions(
     
     #
     historical.diagnosis.likelihood.instructions,
-    proportion_ps_male_among_msm_likelihood_instructions,
-    future.penalty.ps.diag.growth.likelihood.instructions,    # Future change penalty
+    penalty.msm.prop.of.ps.male.likelihood.instructions,
+    penalty.ps.diag.growth.likelihood.instructions,    # Future change penalty
     #
     additional.weights = STAGE.1.WEIGHT
 )
@@ -847,9 +861,9 @@ lik.inst.stage1.plus.penalty=join.likelihood.instructions(
     
     #
     historical.diagnosis.likelihood.instructions,
-    proportion_ps_male_among_msm_likelihood_instructions,
-    diagnosis_trajectory_penalty_likelihood_instructions,
-    future.penalty.ps.diag.growth.likelihood.instructions,    # Future change penalty
+    penalty.msm.prop.of.ps.male.likelihood.instructions,
+    penalty.diag.traject.msm.vs.het.male.likelihood.instructions,
+    penalty.ps.diag.growth.likelihood.instructions,    # Future change penalty
     #
     additional.weights = STAGE.1.WEIGHT
 )
@@ -884,8 +898,8 @@ lik.inst.stg23.non.demog=join.likelihood.instructions(
     proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
     #
     historical.diagnosis.likelihood.instructions,
-    proportion_ps_male_among_msm_likelihood_instructions,
-    future.penalty.ps.diag.growth.likelihood.instructions    # Future change penalty
+    penalty.msm.prop.of.ps.male.likelihood.instructions,
+    penalty.ps.diag.growth.likelihood.instructions    
 )
 
 # We use this one
@@ -904,6 +918,8 @@ lik.inst.stage23.eight = join.likelihood.instructions(
     lik.inst.stg23.non.demog,
     additional.weights = STAGE.23.WEIGHT * 1/4 # w=1/8
 )
+
+## penalty
 lik.inst.stg23.non.demog.plus.penalty=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
     total.diagnosis.by.strata.likelihood.instructions,
@@ -922,9 +938,10 @@ lik.inst.stg23.non.demog.plus.penalty=join.likelihood.instructions(
     proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
     #
     historical.diagnosis.likelihood.instructions,
-    proportion_ps_male_among_msm_likelihood_instructions,
-    diagnosis_trajectory_penalty_likelihood_instructions,
-    future.penalty.ps.diag.growth.likelihood.instructions    # Future change penalty
+    penalty.msm.prop.of.ps.male.likelihood.instructions,
+    penalty.ps.diag.growth.likelihood.instructions,    
+    ##
+    penalty.diag.traject.msm.vs.het.male.likelihood.instructions
 )
 lik.inst.stage23.plus.penalty = join.likelihood.instructions(
     lik.inst.stg23.demog,
@@ -942,7 +959,6 @@ lik.inst.stage23.plus.penalty.eight = join.likelihood.instructions(
     additional.weights = STAGE.23.WEIGHT * 1/4 # w=1/8
 )
 # Alternative weight versions ----
-
 lik.inst.stg23.demog.2x=join.likelihood.instructions(
     population.likelihood.instructions,
     deaths.likelihood.instructions,
@@ -967,12 +983,7 @@ lik.inst.stg23.demog.8x=join.likelihood.instructions(
     emigration.likelihood.instructions,
     additional.weights = 1/8
 )
-
-lik.inst.stage23.8x.pop.4x = join.likelihood.instructions(
-    lik.inst.stg23.demog.4x,
-    lik.inst.stg23.non.demog.plus.penalty,
-    additional.weights = 1/8
-)
+# testing various weight combinations -----
 lik.inst.stage23.8x.pop.8x = join.likelihood.instructions(
     lik.inst.stg23.demog.8x,
     lik.inst.stg23.non.demog.plus.penalty,
@@ -994,82 +1005,9 @@ lik.inst.stage23.32x.pop.2x = join.likelihood.instructions(
     additional.weights = 1/32
 )
 
-# lik.inst.stg3.population.2x=join.likelihood.instructions(
-#     population.likelihood.instructions,
-#     additional.weights = 1/2
-# )
-# lik.inst.stg3.population.4x=join.likelihood.instructions(
-#     population.likelihood.instructions,
-#     additional.weights = 1/4
-# )
-# lik.inst.stg3.population.8x=join.likelihood.instructions(
-#     population.likelihood.instructions,
-#     additional.weights = 1/8
-# )
-# lik.inst.stg3.population.16x=join.likelihood.instructions(
-#     population.likelihood.instructions,
-#     additional.weights = 1/16
-# )
-# 
-# 
-# lik.inst.stage3.2x.pop.2x = join.likelihood.instructions(
-#     lik.inst.stg3.population.2x,
-#     lik.inst.stg3.except.population,
-#     additional.weights = 1/2
-# ) 
-# lik.inst.stage3.2x.pop.4x = join.likelihood.instructions(
-#     lik.inst.stg3.population.4x,
-#     lik.inst.stg3.except.population,
-#     additional.weights = 1/2
-# ) 
-# lik.inst.stage3.2x.pop.8x = join.likelihood.instructions(
-#     lik.inst.stg3.population.8x,
-#     lik.inst.stg3.except.population,
-#     additional.weights = 1/2
-# ) 
-# lik.inst.stage3.4x.pop.2x = join.likelihood.instructions(
-#     lik.inst.stg3.population.2x,
-#     lik.inst.stg3.except.population,
-#     additional.weights = 1/4
-# ) 
-# lik.inst.stage3.4x.pop.4x = join.likelihood.instructions(
-#     lik.inst.stg3.population.4x,
-#     lik.inst.stg3.except.population,
-#     additional.weights = 1/4
-# ) 
-# lik.inst.stage3.4x.pop.8x = join.likelihood.instructions(
-#     lik.inst.stg3.population.8x,
-#     lik.inst.stg3.except.population,
-#     additional.weights = 1/4
-# ) 
-# lik.inst.stage3.8x.pop.2x = join.likelihood.instructions(
-#     lik.inst.stg3.population.2x,
-#     lik.inst.stg3.except.population,
-#     additional.weights = 1/8
-# ) 
-# 
-# lik.inst.stage3.2x.pop.16x = join.likelihood.instructions(
-#     lik.inst.stg3.population.16x,
-#     lik.inst.stg3.except.population,
-#     additional.weights = 1/2
-# )
-# lik.inst.stage3.2x.pop.32x = join.likelihood.instructions(
-#     lik.inst.stg3.population.32x,
-#     lik.inst.stg3.except.population,
-#     additional.weights = 1/2
-# )
-# lik.inst.stage3.4x.pop.16x = join.likelihood.instructions(
-#     lik.inst.stg3.population.16x,
-#     lik.inst.stg3.except.population,
-#     additional.weights = 1/4
-# )
-# lik.inst.stage3.4x.pop.32x = join.likelihood.instructions(
-#     lik.inst.stg3.population.32x,
-#     lik.inst.stg3.except.population,
-#     additional.weights = 1/4
-# )
-# lik.inst.stage3.8x.pop.4x = join.likelihood.instructions(
-#     lik.inst.stg3.population.4x,
-#     lik.inst.stg3.except.population,
-#     additional.weights = 1/8
-# ) 
+# 6.26: 
+lik.inst.stage23.8x.pop.4x = join.likelihood.instructions(
+    lik.inst.stg23.demog.4x,
+    lik.inst.stg23.non.demog,
+    additional.weights = 1/8
+)

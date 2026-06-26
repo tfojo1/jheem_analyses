@@ -88,8 +88,8 @@ VERSION='shield'
 LOCATION="C.12580"
 engine1 <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
 param.manual1=get.means(SHIELD.FULL.PARAMETERS.PRIOR)
-sim.manual1 <- engine$run(param.manual)
-simplot(sim.manual,c("diagnosis.ps","hiv.testing"))
+sim.manual1 <- engine1$run(param.manual1)
+simplot(sim.manual1,c("diagnosis.ps","hiv.testing","sti.screening"))
 
 
 params.manual <- params.last
@@ -178,6 +178,8 @@ if (1==2){
 {
     q=engine$extract.quantity.values() #returns the input values to the model
     q$rate.sti.screening
+    plot(unlist(q$ratio.syphilis.screening.to.hiv.tests))
+    q$rate.testing.hiv
     apply(q$rate.sti.screening[[1]],c("stage","age"),mean)
     
     sapply(q$rate.sti.screening[[1]],mean)

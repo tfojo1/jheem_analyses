@@ -106,19 +106,16 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.msm.sex.with.f
                                       citation=9525438) 
 
 # *** CONGENITAL SYPHILIS ---- ##----
-# Boolean variable to control prenatal care as a switch
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'b.model.prenatal.care',
-                                      1,0,0)
+# Boolean variable to control prenatal care and congenital syphilis as a switch
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'b.model.prenatal.and.cs',
+                                      0,0,0)
 
 
 ## ---- Prob of Vertical Transmission Based on Disease Stage -----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.early.syphilis',
-                                      0.5,0.3,0.6,
-                                      citation = "syphilis_natural_history.docx") 
+                                      0.5,0,0) #0.3 - 0.70 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.late.syphilis',
-                                      0.1,0.05,0.15,
-                                      citation = "syphilis_natural_history.docx") 
-
+                                      0.1,0,0)# 0.02 - 0.2
 
 ## ---- Risk Ratios Based on Prenatal Cares timing  ----
 # inputs/input_congenital_relative_risks.R

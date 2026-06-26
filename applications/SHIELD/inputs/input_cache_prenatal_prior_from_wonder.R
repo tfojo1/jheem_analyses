@@ -12,7 +12,7 @@
 
 
 # Data: Proportion of births receiving prenatal care ine ach trimester (p1,p2,p3) and those not receiving any prenatal care(p0)
-# Zoe has pulled this data from CDC Wonderby year, age and race of moms
+# Zoe has pulled this data from CDC Wonder by year, age and race of moms
 # (p0,p1,p2,p3) form a multinomial distribution in each year and category 
 # to simplify, I model p1, and restructure p2 to represent the proportion of births receiving prenatal care in 
 # the second trimester out of those not receiving it in the first trimester (0-1), and similarly for p3
@@ -43,7 +43,7 @@ reshapeData<-function(q1,q2,q3,q0,denom){
 }
 
 #Fitting alternative models and returning intercepts/slopes -----
-get.intercepts.and.slopes = function(df,  model ){
+get.prenatal.cache = function(df,  model ){
   library(splines)
   
   if(model=="fully.interacted"){
@@ -79,7 +79,8 @@ get.intercepts.and.slopes = function(df,  model ){
   dim(intercepts) = dim(slopes) = sapply(dim.names, length)
   dimnames(intercepts) = dimnames(slopes) = dim.names
   rv = list(intercepts=intercepts,
-            slopes=slopes)
+            slopes=slopes,
+            anchor.year=2016)
   rv
 }
 
@@ -115,14 +116,14 @@ check.model.performance<-function(df,
   #
   df$P[df$P>0.99]<-0.99 #to avoid infinite values in the logit
   # Filter to pre-covid?
-  if (filter.covid) df<-df%>%filter(year<=2020) 
+  if (filter.covid) df<-df%>%filter(year<2020) 
   # set the anchor year
   anchor.year = 2016
   df$year = df$year-anchor.year
   ###
   print(paste("Checking performance for ",selected.model, " fitted to prenatal data from ",trimester))
   ###
-  prior= get.intercepts.and.slopes(df, model=selected.model)
+  prior= get.prenatal.cache(df, model=selected.model)
   
   functional.form = create.logistic.linear.functional.form(intercept = prior$intercepts,
                                                            slope = prior$slopes,
@@ -201,6 +202,7 @@ check.model.performance<-function(df,
 }
 
 # CHECKS/PLOTS:
+if(1==2){
 # A fully interacted model captures age-race values the best
 check.model.performance(df,trimester = "first.trimester", selected.model = "fully.interacted",filter.covid = T)
 check.model.performance(df,trimester = "first.trimester", selected.model = "two.way",filter.covid = T)
@@ -208,7 +210,7 @@ check.model.performance(df,trimester = "second.trimester", selected.model = "ful
 check.model.performance(df,trimester = "second.trimester", selected.model = "two.way",filter.covid = T)
 check.model.performance(df,trimester = "third.trimester", selected.model = "fully.interacted",filter.covid = T)
 check.model.performance(df,trimester = "third.trimester", selected.model = "two.way",filter.covid = T)
-
+}
 
 # CACHING THE FINAL PRIOR -----
 cache.final.prior<-function(df,
@@ -229,7 +231,7 @@ cache.final.prior<-function(df,
   ###
   print(paste("Cacching prior for a ",selected.model, " fitted to prenatal data from ",trimester))
   #
-  prior= get.intercepts.and.slopes(df, model=selected.model)
+  prior= get.prenatal.cache(df, model=selected.model)
   #
   cache.object.for.version(object = prior,
                            name = paste0("prenatal.care.initiation.",trimester,".prior"),
