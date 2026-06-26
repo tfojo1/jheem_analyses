@@ -1119,11 +1119,13 @@ get_sti_screening_functional_form_OPTION2 <- function(specification.metadata) {
 #-- STI TO HIV TESTS RATIO --# ----
 get_syphilis_to_hiv_testing_ratio_functional_form <- function(specification.metadata) {
   # we use this to calculate hiv tests and fit them against BRFSS data
-  syphilis_to_hiv_testing_ratio_functional_form <-  create.logistic.linear.functional.form(intercept = 0.6, # reported ratio of syphilis to HIV testing in MSM NHBS: PMID: 28604440
-                                                                                        slope = 0.0225, # (0.69 - 0.6)/(2014-2010)
+  syphilis_to_hiv_testing_ratio_functional_form <-  create.logistic.linear.functional.form(intercept = logit(0.6), # reported ratio of syphilis to HIV testing in MSM NHBS: PMID: 28604440
+                                                                                        slope = 0.0987, # on the logit scale: (logit(0.69) − logit(0.6)) / 4 = (0.8001 − 0.4055) / 4 = 0.0987
                                                                                         anchor.year = 2010,
                                                                                         max = 1,
-                                                                                        parameters.are.on.logit.scale = F)
+                                                                                        parameters.are.on.logit.scale = T
+                                                                                          
+                                                                                        )
   
   syphilis_to_hiv_testing_ratio_functional_form
 }
