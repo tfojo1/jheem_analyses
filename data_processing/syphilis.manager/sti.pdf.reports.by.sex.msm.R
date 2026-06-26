@@ -141,8 +141,22 @@ pdf.reports.by.sex.clean = lapply(pdf.reports.by.sex.raw, function(file){
             )
         )
     
-    # Pull the most recent report of each year of data
-    if (report_year != 2023) {
+    # 2023 report and 2019 MSA report both contain multiple years
+    if (report_year == 2023 ||
+        (report_year == 2019 && grepl("msa", filename))) {
+        
+        data <- data %>%
+            pivot_longer(
+                cols = starts_with("Cases "),
+                names_to = "year",
+                names_prefix = "Cases ",
+                values_to = "value"
+            ) %>%
+            mutate(
+                year = as.numeric(year)
+            )
+        
+    } else {
         
         case_year <- report_year - 4
         
@@ -154,25 +168,11 @@ pdf.reports.by.sex.clean = lapply(pdf.reports.by.sex.raw, function(file){
             select(-starts_with("Cases "))
     }
     
-    # Pivot 2023 to select multiple years of data - will need to change this if we get more recent data
-    if (report_year == 2023) {
-        
-        data <- data %>%
-            pivot_longer(
-                cols = starts_with("Cases "),
-                names_to = "year",
-                names_prefix = "Cases ",
-                values_to = "value"
-            ) %>%
-            mutate(
-                year = as.numeric(year)
-            )}
-
     
-    #Sum together (Oakland + SF), (Newark + Jersey City + NYC), (Dallas + Forth Worth)
+    #####Sum together (Oakland + SF), (Newark + Jersey City + NYC), (Dallas + Forth Worth)#####
     if(grepl("msa", filename)) {
     data <- data %>%
-        group_by(location)%>%
+        group_by(location, year)%>%
         mutate(value.new = sum(value))
     }
         
