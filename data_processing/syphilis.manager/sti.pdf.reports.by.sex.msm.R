@@ -124,8 +124,8 @@ pdf.reports.by.sex.clean = lapply(pdf.reports.by.sex.raw, function(file){
         data$sex = "male"
     }
     if(grepl("_msm", filename)) {
-        data$sex = "male"
-        data$risk = "msm"
+        data$sex = "msm"
+    
     }
     
   #Pull most recent report of each year:
