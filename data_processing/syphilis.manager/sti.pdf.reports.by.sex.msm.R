@@ -5,6 +5,10 @@
 #This data was extracted from AI and not tabula- this is why this
 #code is separate from other PDF processing codes
 
+#This code also creates the proportion of MSM that have ps syphilis diag among men with ps syphilis diagnoses
+
+options(scipen = 999)
+
 #==================================================================
 #Read in Data Tables
 #==================================================================
@@ -175,9 +179,6 @@ pdf.reports.by.sex.clean = lapply(pdf.reports.by.sex.raw, function(file){
         group_by(location, year)%>%
         mutate(value.new = sum(value))
     }
-        
-    
-    
     
     data$outcome = "ps.syphilis.diagnoses"
     data$year = as.character(data$year)
@@ -200,3 +201,64 @@ for (data in pdf.reports.by.sex.clean.put) {
         url = 'https://www.cdc.gov/sti-statistics/media/pdfs/2024/07/1997-Surveillance-Report.pdf',
         details = 'CDC STI Surveillance Reports')
 }
+
+
+#==================================================================
+#Calculate Proportion of MSM PS Syphilis Cases
+#This is by State from 2016-2023
+#==================================================================
+
+years.with.msm<- c("2016":"2023")
+states.only <- c(state.abb)
+men.only <- c("msm", "male")
+
+all.data <- as.data.frame.table(data.manager$data$ps.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location__sex)
+
+msm.data <- all.data%>%
+    filter(year %in% years.with.msm)%>%
+    mutate(year = as.character(year))%>%
+    filter(location %in% states.only)%>%
+    mutate(location = as.character(location))%>%
+    filter(sex %in% men.only)%>%
+    rename(count = Freq)%>%
+    pivot_wider(
+        names_from = sex,
+        values_from = count
+    )%>%
+    rename(male.only = male)%>%
+    rename(msm.only = msm)%>%
+    
+    group_by(location, year)%>%
+    mutate(denominator.for.prop.male.ps.diag.among.msm = male.only + msm.only)%>%
+    mutate(prop.male.ps.diag.among.msm = msm.only/denominator.for.prop.male.ps.diag.among.msm)%>%
+    
+    select(-male.only, - msm.only)%>%
+    
+ 
+    pivot_longer(
+        cols = c(
+            denominator.for.prop.male.ps.diag.among.msm,
+            prop.male.ps.diag.among.msm
+        ),
+        names_to = "outcome",
+        values_to = "value"
+    ) %>%
+    mutate(
+        value = as.numeric(value),
+        value = case_when(
+            outcome == "denominator.for.prop.male.ps.diag.among.msm" ~ round(value),
+            TRUE ~ value
+        )
+    )
+    
+#==================================================================
+#Put
+#==================================================================
+msm.data = as.data.frame(msm.data)
+data.manager$put.long.form(
+    data = msm.data,
+    ontology.name = 'cdc.pdf.report',
+    source = 'cdc.sti.surveillance.reports',
+    url = 'https://www.cdc.gov/sti-statistics/media/pdfs/2024/07/1997-Surveillance-Report.pdf',
+    details = 'CDC STI Surveillance Reports')
+

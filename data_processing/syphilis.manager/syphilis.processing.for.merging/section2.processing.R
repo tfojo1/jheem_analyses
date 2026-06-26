@@ -108,6 +108,24 @@ data.manager$register.outcome(
     units = 'cases',
     description = "Congenital Syphilis Deaths"))
 
+data.manager$register.outcome(
+    'denominator.for.prop.male.ps.diag.among.msm',
+    metadata = create.outcome.metadata(
+        scale = 'non.negative.number',
+        display.name = 'Denominator Value for Proportion of Male PS Syphilis Diagnoses Among MSM',
+        axis.name = 'Denominator Value for Proportion of Male PS Syphilis Diagnoses Among MSM',
+        units = 'cases',
+        description = "Denominator Value for Proportion of Male PS Syphilis Diagnoses Among MSM"))
+
+data.manager$register.outcome(
+    'prop.male.ps.diag.among.msm',
+    metadata = create.outcome.metadata(
+        scale = 'proportion',
+        display.name = 'Proportion Male PS Syphilis Diagnoses Among MSM',
+        axis.name = 'Proportion Male PS Syphilis Diagnoses Among MSM',
+        units = '%',
+        description = "Proportion Male PS Syphilis Diagnoses Among MSM"), denominator.outcome = 'denominator.for.prop.male.ps.diag.among.msm')
+
 
 #Register Sources:
 data.manager$register.parent.source('NHSS', full.name = 'National HIV Surveillance System', short.name= "NHSS") #parent
