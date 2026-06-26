@@ -1566,8 +1566,8 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          keep.dimensions =  c('location','age','race','sex'),
                          subset.dimension.values = list(sex='female'),
                          corresponding.data.outcome = 'fertility.rate',
-                         outcome.metadata = create.outcome.metadata(display.name = 'Fetility Rate',
-                                                                    description = 'Fetility Rate',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Fertility Rate',
+                                                                    description = 'Fertility Rate',
                                                                     scale = 'rate',
                                                                     axis.name = 'Rate',
                                                                     units = 'rate',
@@ -2019,20 +2019,51 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          corresponding.data.outcome = 'ps.syphilis.diagnoses',
                          keep.dimensions = c('location','age','race','sex')
 )
+# PS diagnosis among male, unstratified
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'diagnosis.ps.among.male',
                          value = expression(diagnosis.primary.symptomatic + diagnosis.secondary.symptomatic),
-                         subset.dimension.values = list(sex=c("heterosexual_male", "msm")),  
-                         
-                         outcome.metadata = create.outcome.metadata(display.name = 'Primary & Secondary Diagnosis (Symptomatic Disease)',
-                                                                    description = 'Number of Individuals with a Diagnosis of Primary and Secondary (Symptomatic) Syphilis in the Past Year',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Primary & Secondary Diagnosis (Symptomatic Disease) Among Male',
+                                                                    description = 'Number of Male Individuals with a Diagnosis of Primary and Secondary (Symptomatic) Syphilis in the Past Year',
                                                                     scale = 'non.negative.number',
                                                                     axis.name = 'Cases',
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
-                         # corresponding.data.outcome = 'ps.syphilis.diagnoses', 
-                         keep.dimensions = c('location')
+                         corresponding.data.outcome = 'ps.syphilis.diagnoses.among.male', # check if changed
+                         subset.dimension.values = list(sex=c("heterosexual_male", "msm")),
+                         keep.dimensions = 'location'
+)
+
+# PS diagnosis among MSM, unstratified
+track.cumulative.outcome(SHIELD.SPECIFICATION,
+                         name = 'diagnosis.ps.among.msm',
+                         value = expression(diagnosis.primary.symptomatic + diagnosis.secondary.symptomatic),
+                         outcome.metadata = create.outcome.metadata(display.name = 'Primary & Secondary Diagnosis (Symptomatic Disease) Among MSM',
+                                                                    description = 'Number of MSM with a Diagnosis of Primary and Secondary (Symptomatic) Syphilis in the Past Year',
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Cases',
+                                                                    units = 'cases',
+                                                                    singular.unit = 'case'),
+                         scale='non.negative.number',
+                         corresponding.data.outcome = 'ps.syphilis.diagnoses.among.msm', # check if changed
+                         subset.dimension.values = list(sex="msm"),
+                         keep.dimensions = 'location'
+)
+
+# Proportion diagnosis for male among MSM, unstratified
+track.cumulative.outcome(SHIELD.SPECIFICATION,
+                         name='prop.male.ps.diag.among.msm',
+                         value=expression(diagnosis.ps.among.msm/diagnosis.ps.among.male),
+                         denominator.outcome = 'diagnosis.ps.among.male',
+                         keep.dimensions =  "location",
+                         corresponding.data.outcome = 'prop.male.ps.diag.among.msm',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion Male Primary and Secondary (Symptomatic Disease) Among MSM',
+                                                                    description = 'Proportion of Male Diagnosis of Primary and Secondary (Symptomatic Disease) That is Among MSM',
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'Proportion',
+                                                                    units = 'percent',
+                                                                    singular.unit = 'percent')
 )
 ### Early Latent Syphilis: True Estimate ----
 # Just counting those in early stage 
