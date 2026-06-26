@@ -106,9 +106,9 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.msm.sex.with.f
                                       citation=9525438) 
 
 # *** CONGENITAL SYPHILIS ---- ##----
-# Boolean variable to control prenatal care as a switch
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'b.model.prenatal.care',
-                                      1,0,0)
+# Boolean variable to control prenatal care and congenital syphilis as a switch
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'b.model.prenatal.and.cs',
+                                      0,0,0)
 
 
 ## ---- Prob of Vertical Transmission Based on Disease Stage -----
