@@ -105,43 +105,6 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.msm.sex.with.f
                                       0.18, 0.18*5, 0.18*2,
                                       citation=9525438) 
 
-# *** CONGENITAL SYPHILIS ---- ##----
-# Boolean variable to control prenatal care and congenital syphilis as a switch
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'b.model.prenatal.and.cs',
-                                      0,0,0)
-
-
-## ---- Prob of Vertical Transmission Based on Disease Stage -----
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.early.syphilis',
-                                      0.5,0,0) #0.3 - 0.70 
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.late.syphilis',
-                                      0.1,0,0)# 0.02 - 0.2
-
-## ---- Risk Ratios Based on Prenatal Cares timing  ----
-# inputs/input_congenital_relative_risks.R
-# cs_relative_risks 
-# first    second     third      none 
-# 0.3061055 0.5160727 0.8182090 1.000000
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.no.prenatal.care',
-                                      1.0, 0,0)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.care.first.trimester',
-                                      0.3061055, 0,0)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.care.second.trimester',
-                                      0.5160727, 0,0)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.care.third.trimester',
-                                      0.8182090, 0,0)
-
-# *** NEW BIRTHS ---- ##----
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'ratio.birth.male.to.female',
-                                      1.048,0,0) # 1.04, 1.06
-## Prop Multibirths
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.births.multi.born', #proportion of births that are multibirth
-                                      0.031,0,0) #we are not including the trend here
-
-
-
-
-
 # *** HIV TESTING ---- ##-----
 # inputs/input_fraction_hiv_test_by_age.R
 # what fraction of tests reported in 15-19 agegroup are carried among 18-19 year olds
@@ -149,19 +112,14 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.hiv.tests
                                       0.62, 0,0,
                                       citation = "input_fraction_hiv_test_by_age.R")
 
-# *** CONTACT TRACING ---- ## ----
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.index.cases.reached.for.contact.tracing',
-                                      0.8,0,0)   #0.3, 0.98
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'contacts.diagnosed.treated.per.index.case',
-                                      0.1, 0,0) #.05, 0.2,
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'contacts.empirically.treated.infected.per.index.case',
-                                      0.1, 0,0) #0.04, 0.19,
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.primary',
-                                      0.1425, 0,0)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.secondary',
-                                      0.4275, 0,0)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.early.latent',
-                                      0.215, 0,0)
+
+
+# *** NEW BIRTHS ---- ##----
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'ratio.birth.male.to.female',
+                                      1.048,0,0) # 1.04, 1.06
+## Prop Multibirths
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.births.multi.born', #proportion of births that are multibirth
+                                      0.031,0,0) #we are not including the trend here
 
 
 #*** MISCLASSIFICATION ERROR **** ## -----
@@ -187,6 +145,48 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immedi
 #'@Todd: should we separate this based on symptoms? or for pregnant women? 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.treatment.after.delay', 
                                       1.91,0,0) 
+
+# *** CONTACT TRACING ---- ## ----
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'B.MODEL.CONTACT.TRACING',
+                                      0,0,0)   # SWITCH TOO TURN ON/OFF CONTACT TRACING
+
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.index.cases.reached.for.contact.tracing',
+                                      0.8,0,0)   #0.3, 0.98
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'contacts.diagnosed.treated.per.index.case',
+                                      0.1, 0,0) #.05, 0.2,
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'contacts.empirically.treated.infected.per.index.case',
+                                      0.1, 0,0) #0.04, 0.19,
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.primary',
+                                      0.1425, 0,0)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.secondary',
+                                      0.4275, 0,0)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.early.latent',
+                                      0.215, 0,0)
+
+# *** CONGENITAL SYPHILIS ---- ##----
+# Boolean variable to control prenatal care and congenital syphilis as a switch
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'B.MODEL.PRENATAL.AND.CS',
+                                      0,0,0) # SWITCH TOO TURN ON/OFF PRENATAL CARE ADN CONGENITAL SYPHILIS
+
+## ---- Prob of Vertical Transmission Based on Disease Stage -----
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.early.syphilis',
+                                      0.5,0,0) #0.3 - 0.70 
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.late.syphilis',
+                                      0.1,0,0)# 0.02 - 0.2
+
+## ---- Risk Ratios Based on Prenatal Cares timing  ----
+# inputs/input_congenital_relative_risks.R
+# cs_relative_risks 
+# first    second     third      none 
+# 0.3061055 0.5160727 0.8182090 1.000000
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.no.prenatal.care',
+                                      1.0, 0,0)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.care.first.trimester',
+                                      0.3061055, 0,0)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.care.second.trimester',
+                                      0.5160727, 0,0)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.care.third.trimester',
+                                      0.8182090, 0,0)
 
 ## ********** -----
 SHIELD_BASE_PARAMETER_VALUES = SHIELD_BASE_PARAMETER$values
