@@ -229,7 +229,7 @@ msm.data <- all.data%>%
     rename(msm.only = msm)%>%
     
     group_by(location, year)%>%
-    mutate(denominator.for.prop.male.ps.diag.among.msm = male.only + msm.only)%>%
+    mutate(denominator.for.prop.male.ps.diag.among.msm = male.only)%>%
     mutate(prop.male.ps.diag.among.msm = msm.only/denominator.for.prop.male.ps.diag.among.msm)%>%
     
     select(-male.only, - msm.only)%>%
