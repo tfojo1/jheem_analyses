@@ -1309,7 +1309,8 @@ register.model.quantity(SHIELD.SPECIFICATION,
 #*** DIAGNOSIS/TREATMENT *** --#----
 # Diagnosis is followed by immediate or delayed treatment
 # we will track each one separately
-# We further breakdown each one into those that were diagnosed by symptomatic testing, or other means
+# We assume no differences by stage (symptomatic tertiary or CNS are also subject to delayed treatment)
+
 ##---- Immediate Treatments ----
 # modeling all immediate treatments via #1-testing, 2-sti.screeing, 3-contact tracing
 # (prenatal is screening and treatment is separately modeled below)
@@ -1321,37 +1322,26 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = 'prp.treated.immediately.following.symptomatic.testing',
                        scale = 'proportion',
                        value = SHIELD_BASE_PARAMETER_VALUES['prp.treated.immediately.following.symptomatic.testing']) 
-# 
+# 1-symptomatic.testing
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.diagnosis.immediate.treatment.via.symptomatic.testing',
-                        value = expression(rate.symptomatic.testing * prp.treated.immediately.following.symptomatic.testing
-                        ))
-# register.model.quantity(SHIELD.SPECIFICATION,
-#                         name = 'rate.diagnosis.immediate.treatment.other',
-#                         value = expression(    rate.sti.screening * prp.treated.immediately.following.screening + 
-#                                                rate.infected.contacts.diagnosed.treated 
-#                         ))
+                        value = expression(rate.symptomatic.testing * prp.treated.immediately.following.symptomatic.testing)
+                        )
+# 2-sti.screening
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.diagnosis.immediate.treatment.sti.screening',
                         value = expression(    rate.sti.screening * prp.treated.immediately.following.screening)
 )
+# 3-contact.tracing
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.diagnosis.immediate.treatment.contact.tracing',
                         value ='rate.infected.contacts.diagnosed.treated'
-)
+                        )
 
-# # adding prenatal:
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name = 'rate.diagnosis.immediate.treatment.other',
-#                                apply.function = 'add',
-#                                applies.to = list(sex='female',age=FERTILE.AGES),
-#                                value= expression(rate.prenatal.care )
-# )
-# saving prenatal:
+# 4-prenatal:
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.diagnosis.immediate.treatment.prenatal',
                         value=0)
-
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'rate.diagnosis.immediate.treatment.prenatal',
                                applies.to = list(sex='female',age=FERTILE.AGES),

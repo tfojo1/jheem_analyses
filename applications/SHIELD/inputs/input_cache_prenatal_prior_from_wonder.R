@@ -1,11 +1,8 @@
-
-
-
 ### Estimating the proportion of women initiating prenatal care in each trimester
 ### Data: CDC Wonder
 ### Returning the final functions informing the 
 ### called by shield_specification.R (called only once on each machine, the cached object will be saved for future)
-
+## ******************************* ******************************* ******************************* ******************************* ##
 # prenatal.care.initiation.first.trimester.prior
 # prenatal.care.initiation.second.trimester.prior
 # prenatal.care.initiation.third.trimester.prior in the model ###

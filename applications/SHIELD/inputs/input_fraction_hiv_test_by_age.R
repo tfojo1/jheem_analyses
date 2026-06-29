@@ -1,7 +1,9 @@
-### Estimating XXX
-### Data XXX
-### Returning XXX
+### Estimating Fraction of tests reported for 15-19 agegroup that were among 18-19 years olds
+### Data CDC
+### Returning Fraction of tests reported for 15-19 agegroup that were among 18-19 years olds
 ### called by SHIELD/shield_base_parameters.R
+## ******************************* ******************************* ******************************* ******************************* ##
+
 # From Todd: 
 
 # 2021 data

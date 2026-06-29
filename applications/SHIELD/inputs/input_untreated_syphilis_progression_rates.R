@@ -1,8 +1,8 @@
-### Estimating XXX
-### Data XXX
-### Returning XXX
+### Estimating progression rate from untreated syphilis to CNS or tertiary
+### Data OSLO study
+### Returning victor of estimates used in the base perameter
 ### called by  shield_base_parameters.R
-
+## ******************************* ******************************* ******************************* ******************************* ##
 # From
 # https://www.sciencedirect.com/science/article/pii/0021968155901399
 # the pdf:

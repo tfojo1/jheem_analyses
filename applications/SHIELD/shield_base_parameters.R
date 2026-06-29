@@ -5,6 +5,7 @@
 # source("../jheem_analyses/applications/SHIELD/inputs/x-input_untreated_syphilis_progression_rates.R)
 # source("../jheem_analyses/applications/SHIELD/inputs/input_congenital_relative_risks.R")
 # source(../jheem_analyses/applications/SHIELD/inputs/input_fraction_hiv_test_by_age.R)
+# source(../jheem_analyses/applications/SHIELD/inputs/input_syphilis_misclassification_error.R)
 
 # what are the citation numbers?
 add.parameter <- function(params, param.name,
@@ -30,9 +31,8 @@ SHIELD_BASE_PARAMETER = list(values=numeric(),
 # ci's are not used
 # citation numbers are pubmed ID, they're for our own records'
 
-# *** SYPHILIS NATURAL HISTORY ---- ##-----
-
-## ---- STATE DURATIONS ---- assuming as fixed 
+# *** SYPHILIS NATURAL HISTORY *** ##-----
+## STATE DURATIONS ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.primary',
                                       4/52, 0,0) #2-6weeks 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.secondary',
@@ -46,7 +46,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.tertiary'
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.cns',
                                       1/12,0,0) #average of 1 month
 
-## ---- TRANSITION RATES ----
+## TRANSITION RATES ----
 # RELAPSE: 25% of persons leaving EL go to secondary, the rest go to LL
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.early.latent.to.secondary',
                                       0.25,0,0)
@@ -65,8 +65,8 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.t
                                       0.0102,0,0) #0.0085 - 0.0119
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.tertiary.female',
                                       0.0099 ,0,0) #0.0079 – 0.0119
-
-## ---- SYMPTOMATIC INFECTIONS ----                        
+## *** CARE CASCADE *** ----
+## SYMPTOMATIC INFECTIONS ----                        
 ## Fraction with symptomatic disesase: changed as calib params
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.msm',
                                       0.25, 0,0)
@@ -76,8 +76,35 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.prp.symptomatic
                                       1, 0,0)
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.secondary',
                                       0.16, 0,0)                                      
+## HIV TESTING ##-----
+# inputs/input_fraction_hiv_test_by_age.R
+# what fraction of tests reported in 15-19 agegroup are carried among 18-19 year olds
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.hiv.tests.18.19.among.15.19',
+                                      0.62, 0,0,
+                                      citation = "input_fraction_hiv_test_by_age.R")
+## MISCLASSIFICATION ERROR -----
+# source("applications/SHIELD/inputs/input_syphilis_misclassification_error.R")
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.el.misclassified.ll',
+                                      0.096, 0,0)
 
-# *** INFECTIOUSNESS ---- ## ----
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.ll.misclassified.el',
+                                      0.272, 0,0)
+
+#*** TREATMENTS INITIATION  **** ## ---- 
+#*#'@PK:double check
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.screening', 
+                                      0.89,0,0)
+
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.symptomatic.testing', 
+                                      0.89,0,0)
+#differences by stage of infection (early vs late) was too small to include 
+
+#if someone is diagnosed and doesn't receive immediate treatment, what is the rate of treatment
+#'@Todd: should we separate this based on symptoms? or for pregnant women? 
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.treatment.after.delay', 
+                                      1.91,0,0) 
+
+# *** TRANSMISSION ****  ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'secondary.transmissibility',  
                                       1,0,0)  # Max value
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'primary.rel.secondary.transmissibility',  
@@ -86,11 +113,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'primary.rel.seconda
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'el.rel.secondary.transmissibility',  
                                       .25,0,0)
 
- 
-
-
-
-## ---- SEXUAL TRANSMISSION RATES ---- ##----
+## SEXUAL TRANSMISSION RATES ---- ##----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'male.to.female.sexual.transmission',
                                       4.75, 2.4, 7.1,
                                       citation=26362321) 
@@ -105,14 +128,6 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.msm.sex.with.f
                                       0.18, 0.18*5, 0.18*2,
                                       citation=9525438) 
 
-# *** HIV TESTING ---- ##-----
-# inputs/input_fraction_hiv_test_by_age.R
-# what fraction of tests reported in 15-19 agegroup are carried among 18-19 year olds
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.hiv.tests.18.19.among.15.19',
-                                      0.62, 0,0,
-                                      citation = "input_fraction_hiv_test_by_age.R")
-
-
 
 # *** NEW BIRTHS ---- ##----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'ratio.birth.male.to.female',
@@ -122,29 +137,6 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.births.multi.b
                                       0.031,0,0) #we are not including the trend here
 
 
-#*** MISCLASSIFICATION ERROR **** ## -----
-# source("applications/SHIELD/inputs/input_syphilis_misclassification_error.R")
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.el.misclassified.ll',
-                                      0.096, 0,0)
-
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.ll.misclassified.el',
-                                      0.272, 0,0)
-
-
-#*** TREATMENTS INITIATION  **** ## ---- 
-#*#'@PK:double check
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.screening', 
-                                      0.89,0,0)
-
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.symptomatic.testing', 
-                                      0.89,0,0,
-                                      citation = "syphilis_natural_history.docx")
-#differences by stage of infection (early vs late) was too small to include 
-
-#if someone is diagnosed and doesn't receive immediate treatment, what is the rate of treatment
-#'@Todd: should we separate this based on symptoms? or for pregnant women? 
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.treatment.after.delay', 
-                                      1.91,0,0) 
 
 # *** CONTACT TRACING ---- ## ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'B.MODEL.CONTACT.TRACING',
