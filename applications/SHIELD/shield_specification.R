@@ -2060,7 +2060,6 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
                          corresponding.data.outcome = 'ps.syphilis.diagnoses.among.male', # check if changed
-                         subset.dimension.values = list(sex=c("heterosexual_male", "msm")),
                          keep.dimensions = 'location'
 )
 
