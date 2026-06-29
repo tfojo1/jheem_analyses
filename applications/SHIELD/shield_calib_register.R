@@ -20,7 +20,6 @@ par.aliases.transmission = list(
     trate.5 = c("transmission.rate.multiplier.msm2022", "transmission.rate.multiplier.heterosexual2022")
 )
  
-
 # 6.5 (several changes) ----
 register.calibration.info("calib.6.5.stage0.az",
                           likelihood.instructions = lik.inst.stage0,
@@ -480,15 +479,17 @@ register.calibration.info("calib.6.25.stage2.az",
 )
 # ************************************----
 # Trying out global trates ----
-for (gtr in c(3.6, 3.7, 3.8, 3.9)) {
-    register.calibration.info(paste0("calib.6.12.stg0.", gtr),
+for (gtr in c(3.0, 3.1, 3.2, 3.3, 3.4)) {
+    register.calibration.info(paste0("calib.6.29.stg0.", gtr),
                               likelihood.instructions = lik.inst.stage0,
                               data.manager = SURVEILLANCE.MANAGER,
                               end.year = 2030,
-                              fixed.initial.parameter.values = c("global.transmission.rate"=gtr),  
+                              fixed.initial.parameter.values = c("global.transmission.rate.msm"=gtr,
+                                                                 "global.transmission.rate.het"=gtr),  
                               parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
                                                   AGING.PARAMETERS.PRIOR@var.names,
-                                                  "global.transmission.rate"),
+                                                  "global.transmission.rate.msm",
+                                                  "global.transmission.rate.het"),
                               parameter.aliases = par.aliases.transmission,
                               n.iter = 1000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
     )
