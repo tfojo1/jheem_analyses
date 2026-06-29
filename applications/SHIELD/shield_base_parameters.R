@@ -148,7 +148,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.treatment.aft
 
 # *** CONTACT TRACING ---- ## ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'B.MODEL.CONTACT.TRACING',
-                                      1,0,0)   # SWITCH TOO TURN ON/OFF CONTACT TRACING
+                                      0,0,0)   # SWITCH OO TURN ON/OFF CONTACT TRACING
 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.index.cases.reached.for.contact.tracing',
                                       0.8,0,0)   #0.3, 0.98
@@ -166,7 +166,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.conta
 # *** CONGENITAL SYPHILIS ---- ##----
 # Boolean variable to control prenatal care and congenital syphilis as a switch
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'B.MODEL.PRENATAL.AND.CS',
-                                     1,0,0) # SWITCH TOO TURN ON/OFF PRENATAL CARE ADN CONGENITAL SYPHILIS
+                                     0,0,0) # SWITCH TO TURN ON/OFF PRENATAL CARE ADN CONGENITAL SYPHILIS
 
 ## ---- Prob of Vertical Transmission Based on Disease Stage -----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.early.syphilis',
