@@ -1,7 +1,7 @@
 {
   "metadata": {
     "generated_from": "syphilis.manager_section3",
-    "generated_at": "2026-06-26 16:27:12"
+    "generated_at": "2026-06-29 17:11:48"
   },
   "outcomes": {
     "population": {
@@ -6156,6 +6156,64 @@
                     "min": "US",
                     "max": "US",
                     "values": "US"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "denominator.for.prop.male.ps.diag.among.msm": {
+      "scale": "non.negative.number",
+      "denominator_outcome": {},
+      "sources": {
+        "cdc.sti.surveillance.reports": {
+          "ontologies": {
+            "cdc.pdf.report": {
+              "stratifications": {
+                "year__location": {
+                  "dimensions": ["year", "location"],
+                  "year": {
+                    "n": 8,
+                    "min": "2016",
+                    "max": "2023",
+                    "values": ["2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023"]
+                  },
+                  "location": {
+                    "n": 50,
+                    "min": "AK",
+                    "max": "WY",
+                    "values": ["AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VA", "VT", "WA", "WI", "WV", "WY"]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "prop.male.ps.diag.among.msm": {
+      "scale": "proportion",
+      "denominator_outcome": "denominator.for.prop.male.ps.diag.among.msm",
+      "sources": {
+        "cdc.sti.surveillance.reports": {
+          "ontologies": {
+            "cdc.pdf.report": {
+              "stratifications": {
+                "year__location": {
+                  "dimensions": ["year", "location"],
+                  "year": {
+                    "n": 8,
+                    "min": "2016",
+                    "max": "2023",
+                    "values": ["2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023"]
+                  },
+                  "location": {
+                    "n": 50,
+                    "min": "AK",
+                    "max": "WY",
+                    "values": ["AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VA", "VT", "WA", "WI", "WV", "WY"]
                   }
                 }
               }
