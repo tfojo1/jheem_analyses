@@ -1519,7 +1519,7 @@ register.model.quantity(ADAP.SPECIFICATION,
                         value = expression(baseline.p.of.income.without.medicare.or.medicaid.among.adap * p.uninsured.given.income.and.no.public.insurance))
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.income.private.insurance.among.adap', # baseline.p.of.adap.by.income.private.insurance
+                        name = 'baseline.p.of.income.private.among.adap', # baseline.p.of.adap.by.income.private.insurance
                         value = expression(baseline.p.of.income.without.medicare.or.medicaid.among.adap - baseline.p.of.income.uninsured.among.adap))
 
 
@@ -1556,50 +1556,13 @@ register.model.quantity(ADAP.SPECIFICATION,
 
 # Baseline implies before any threshold changes 
 
-# Have to do this for: 
-# uninsured, medicaid, medicare, medicare + medicaid, private insurance 
-    # Actually, everyone who's uninsured must be on full-pay; that's why there are 0's below (can't have premium assistance or cost-sharing if you're uninsured!)
-    # Need to decide if we're thinking about it as at any given moment or over the course of the year (e.g., can't have full-pay and any of these insurance categories at the same time)
-        # So maybe 9 categories: uninsured, medicaid, medicare, medicare + medicaid, private insurance; 
-        # plus each of the two over the course of a year, only with uninsured: unin/medicaid, unin/medicare, unin/medicare+medicaid, unin/private 
+# Repeated for: 
+# medicaid, medicare, medicare + medicaid, private insurance, uninsured (uninsured: all are on F only - can't have premiums or cost-share without insurance)
+    
+# Need to decide if we're thinking about it as at any given moment or over the course of the year (e.g., can't have full-pay and any of these insurance categories at the same time)
+    # So maybe 9 categories: uninsured, medicaid, medicare, medicare + medicaid, private insurance; 
+    # plus each of the two over the course of a year, only with uninsured: unin/medicaid, unin/medicare, unin/medicare+medicaid, unin/private 
 
-#-- Distribute for Uninsured --#
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.F.income.uninsured.among.adap', # probability of full-pay, and a given income, and uninsured
-                        value = 'baseline.p.of.income.uninsured.among.adap') # defined above; probability that you have a given income and are uninsured among all ADAP --> all of them are full-pay 
-
-# Can formulate as 
-# baseline.p.of.F.among.income.uninsured.adap (this would be 1)
-# would have to multiply this by baseline.p.of.income.uninsured.among.adap
-
-# rename to match above
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.income.with.F.uninsured.among.adap', # baseline.p.of.adap.with.full.pay.only.by.income.uninsured; not used anywhere
-                        value = 'baseline.p.of.income.uninsured.among.adap') # baseline.p.of.adap.by.income.uninsured
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.income.with.FP.uninsured.among.adap', # baseline.p.of.adap.with.full.pay.and.premium.without.cost.sharing.by.income.uninsured; not used anywhere
-                        value = 0)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.income.with.FPCs.uninsured.among.adap', # baseline.p.of.adap.with.full.pay.and.premium.and.cost.sharing.by.income.uninsured; not used anywhere
-                        value = 0)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.income.with.FCs.uninsured.among.adap', # baseline.p.of.adap.with.full.pay.and.premium.and.cost.sharing.by.income.uninsured; not used anywhere
-                        value = 0)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.income.with.P.uninsured.among.adap', # baseline.p.of.adap.with.full.pay.and.premium.and.cost.sharing.by.income.uninsured; not used anywhere
-                        value = 0)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.income.with.PCs.uninsured.among.adap', # baseline.p.of.adap.with.premium.and.cost.sharing.by.income.uninsured; not used anywhere
-                        value = 0)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.income.with.Cs.uninsured.among.adap', # baseline.p.of.adap.with.cost.sharing.without.premium.by.income.uninsured; not used anywhere
-                        value = 0)
 
 #-- Distribute for Medicaid --#
 # Inputs: 
@@ -1750,77 +1713,7 @@ register.model.quantity(ADAP.SPECIFICATION,
                         )) 
 
 
-# Todd's code; I have tried to sub some names to match but it gets messy 
-if(1==2){
-    
-    # Full-Pay Only
-        # OUTPUT 1 ABOVE (F)
-    register.model.quantity(ADAP.SPECIFICATION,
-                            name = 'baseline.p.of.income.with.F.medicaid.among.adap', #  baseline.p.of.adap.with.full.pay.only.by.income.medicaid
-                            value = expression(baseline.p.of.income.medicaid.among.adap * # probability of income and medicaid among adap - always have to multiply this one in to the final p
-                                                   baseline.p.of.F.only.income.medicaid)) # p1 # baseline.p.full.pay.only.by.income.medicaid
-    
-    # Full-Pay Plus 
-    register.model.quantity(ADAP.SPECIFICATION,
-                            name = 'baseline.p.of.income.with.Fplus.medicaid.among.adap', # baseline.p.of.adap.with.full.pay.plus.by.income.medicaid
-                            value = expression(baseline.p.of.income.medicaid.among.adap * 
-                                                   (1-baseline.p.of.F.only.income.medicaid) * # 1 - (F alone) --> among not F alone, (1-p1)
-                                                   baseline.p.of.Fplus.among.not.F.only.income.medicaid)) # p2 # baseline.p.full.pay.plus.if.not.full.pay.only.by.income.medicaid
-    
-    
-    register.model.quantity(ADAP.SPECIFICATION,
-                            name = 'baseline.p.of.income.with.FP.medicaid.among.adap', # baseline.p.of.adap.with.full.pay.and.premium.by.income.medicaid
-                            value = expression(baseline.p.of.income.with.Fplus.medicaid.among.adap * # (1-p1) * p2 
-                                                   baseline.p.of.P.among.Fplus.income.medicaid)) # p3 # baseline.p.premium.if.full.pay.plus.by.income.medicaid
-    
-        # OUTPUT 3 ABOVE (FPCs)
-    register.model.quantity(ADAP.SPECIFICATION,
-                            name = 'baseline.p.of.FPCs.income.medicaid.among.adap', # baseline.p.of.adap.with.full.pay.and.premium.and.cost.sharing.by.income.medicaid
-                            value = expression(baseline.p.of.income.with.FP.medicaid.among.adap * # (1-p1) * p2 * p3
-                                                   baseline.p.of.Cs.among.FP.income.medicaid)) # p4 # baseline.p.cost.sharing.if.full.pay.and.premium.by.income.medicaid
-    
-    register.model.quantity(ADAP.SPECIFICATION,
-                            name = 'baseline.p.of.income.with.P.medicaid.among.adap', # baseline.p.of.adap.with.premium.without.cost.sharing.by.income.medicaid # Melissa this is defined twice??
-                            value = expression(baseline.p.of.income.with.FP.medicaid.among.adap - baseline.p.of.FPCs.income.medicaid.among.adap))
-    
-    register.model.quantity(ADAP.SPECIFICATION,
-                            name = 'baseline.p.of.income.with.Cs.medicaid.among.adap', # baseline.p.of.adap.with.cost.sharing.without.premium.by.income.medicaid # Melissa this is also defined twice?
-                            value = expression(baseline.p.of.income.with.Fplus.medicaid.among.adap - baseline.p.of.income.with.FP.medicaid.among.adap))
-    
-    # No Full-Pay
-    register.model.quantity(ADAP.SPECIFICATION,
-                            name = 'baseline.p.of.income.without.F.medicaid.among.adap', # baseline.p.of.adap.without.full.pay.by.income.medicaid
-                            value = expression(baseline.p.of.income.medicaid.among.adap * 
-                                                   (1-baseline.p.of.F.only.income.medicaid) *
-                                                   (1-baseline.p.of.Fplus.among.not.F.only.income.medicaid)))
-    
-    register.model.quantity(ADAP.SPECIFICATION,
-                            name = 'baseline.p.of.income.with.P.medicaid.among.adap', # baseline.p.of.adap.with.premium.by.income.medicaid # MELISSA - THIS IS AN ISSUE 
-                            value = expression(baseline.p.of.income.without.F.medicaid.among.adap * baseline.p.premium.if.not.full.pay.by.income.medicaid))
-    
-    register.model.quantity(ADAP.SPECIFICATION,
-                            name = 'baseline.p.of.adap.with.premium.and.cost.sharing.by.income.medicaid',
-                            value = expression(baseline.p.of.adap.with.premium.by.income.medicaid * baseline.p.cost.sharing.if.premium.by.income.medicaid))
-    
-    register.model.quantity(ADAP.SPECIFICATION,
-                            name = 'baseline.p.of.adap.with.premium.without.cost.sharing.by.income.medicaid',
-                            value = expression(baseline.p.of.adap.with.premium.by.income.medicaid - baseline.p.of.adap.with.premium.and.cost.sharing.by.income.medicaid))
-    
-    register.model.quantity(ADAP.SPECIFICATION,
-                            name = 'baseline.p.of.adap.with.cost.sharing.without.premium.by.income.medicaid',
-                            value = expression(baseline.p.of.income.without.F.medicaid.among.adap - baseline.p.of.adap.with.premium.by.income.medicaid))
-    
-    
-    
-    # Need to add
-    # baseline.p.full.pay.only.by.income.medicaid --> renamed to: baseline.p.of.F.only.income.medicaid
-    # baseline.p.full.pay.plus.if.not.full.pay.only.by.income.medicaid --> renamed to: baseline.p.of.Fplus.among.not.F.only.income.medicaid
-    # baseline.p.premium.if.full.pay.plus.by.income.medicaid --> renamed to: baseline.p.of.P.among.Fplus.income.medicaid
-    # baseline.p.cost.sharing.if.full.pay.and.premium.by.income.medicaid --> renamed to: baseline.p.of.Cs.among.FP.income.medicaid 
-    # baseline.p.cost.sharing.if.premium.by.income.medicaid --> renamed to: baseline.p.of.Cs.among.P.income.medicaid
-    # baseline.p.premium.if.not.full.pay.by.income.medicaid --> renamed to: baseline.p.of.P.among.no.F.income.medicaid
-    
-}
+
 
 #-- Distribute for Medicare --#
 # COMPLETELY ANALOGOUS TO MEDICAID - see that section for explanations # 
@@ -1927,13 +1820,268 @@ register.model.quantity(ADAP.SPECIFICATION,
                                                )
                         )) 
 
-# Melissa: UP TO HERE !!!!
 
 
 #-- Distribute for Medicare + Medicaid --#
+# COMPLETELY ANALOGOUS TO MEDICAID - see that section for explanations # 
+
+# INPUTS 
+# P1 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.F.only.income.medicare.and.medicaid', 
+                        value = ) 
+
+# P2
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Fplus.among.not.F.only.income.medicare.and.medicaid',
+                        value = ) 
+
+# P3
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.P.among.Fplus.income.medicare.and.medicaid', 
+                        value = ) 
+
+# P4
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Cs.among.FP.income.medicare.and.medicaid',
+                        value = ) 
+
+# P5
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.P.among.no.F.income.medicare.and.medicaid',
+                        value = ) 
+
+# P6
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Cs.among.P.income.medicare.and.medicaid',
+                        value = ) 
+
+
+# OUTPUTS 
+# COMPLETELY ANALOGOUS TO MEDICAID - see that section for explanations 
+# OUTPUT 1: F only
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.F.only.income.medicare.and.medicaid.among.adap', 
+                        value = expression(baseline.p.of.income.medicare.and.medicaid.among.adap * 
+                                               baseline.p.of.F.only.income.medicare.and.medicaid)) 
+
+# OUTPUT 2: FP  
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.FP.income.medicare.and.medicaid.among.adap', 
+                        value = expression(baseline.p.of.income.medicare.and.medicaid.among.adap * 
+                                               (1-baseline.p.of.Cs.among.FP.income.medicare.and.medicaid) * # (1-p4)
+                                               baseline.p.of.P.among.Fplus.income.medicare.and.medicaid * # p3
+                                               baseline.p.of.Fplus.among.not.F.only.income.medicare.and.medicaid * # p2
+                                               (1-baseline.p.of.F.only.income.medicare.and.medicaid) # (1-p1)
+                        )) 
+
+# OUTPUT 3: FPCs
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.FPCs.income.medicare.and.medicaid.among.adap', 
+                        value = expression(baseline.p.of.income.medicare.and.medicaid.among.adap * 
+                                               (baseline.p.of.Cs.among.FP.income.medicare.and.medicaid) * # p4
+                                               baseline.p.of.P.among.Fplus.income.medicare.and.medicaid * # p3
+                                               baseline.p.of.Fplus.among.not.F.only.income.medicare.and.medicaid * # p2
+                                               (1-baseline.p.of.F.only.income.medicare.and.medicaid) # (1-p1)
+                        )) 
+
+# OUTPUT 4: PCs
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.PCs.income.medicare.and.medicaid.among.adap',
+                        value = expression(baseline.p.of.income.medicare.and.medicaid.among.adap * 
+                                               baseline.p.of.Cs.among.P.income.medicare.and.medicaid * # p6 
+                                               baseline.p.of.P.among.no.F.income.medicare.and.medicaid * # p5 
+                                               (1-baseline.p.of.F.only.income.medicare.and.medicaid - # (1-p1 -
+                                                    ((1-baseline.p.of.F.only.income.medicare.and.medicaid) * baseline.p.of.Fplus.among.not.F.only.income.medicare.and.medicaid))  # ((1-p1)*p2))
+                        ))
+
+# OUTPUT 5: P only
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.P.income.medicare.and.medicaid.among.adap',
+                        value = expression(baseline.p.of.income.medicare.and.medicaid.among.adap * 
+                                               (1-baseline.p.of.Cs.among.P.income.medicare.and.medicaid) * # (1-p6) 
+                                               baseline.p.of.P.among.no.F.income.medicare.and.medicaid * # p5 
+                                               (1-baseline.p.of.F.only.income.medicare.and.medicaid - # (1-p1 -
+                                                    ((1-baseline.p.of.F.only.income.medicare.and.medicaid) * baseline.p.of.Fplus.among.not.F.only.income.medicare.and.medicaid))  # ((1-p1)*p2))
+                        ))
+
+# OUTPUT 6: FCs 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.FCs.income.medicare.and.medicaid.among.adap', 
+                        value = expression(baseline.p.of.income.medicare.and.medicaid.among.adap * 
+                                               (1-baseline.p.of.P.among.Fplus.income.medicare.and.medicaid) * # (1-p3)
+                                               baseline.p.of.Fplus.among.not.F.only.income.medicare.and.medicaid * # p2
+                                               (1-baseline.p.of.F.only.income.medicare.and.medicaid) # (1-p1)
+                        )) 
+
+# OUTPUT 7: Cs only 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Cs.income.medicare.and.medicaid.among.adap', 
+                        value = expression(baseline.p.of.income.medicare.and.medicaid.among.adap -  
+                                               (baseline.p.of.F.only.income.medicare.and.medicaid.among.adap + # F only 
+                                                    baseline.p.of.P.only.income.medicare.and.medicaid.among.adap + # P only 
+                                                    baseline.p.of.FP.income.medicare.and.medicaid.among.adap + # FP 
+                                                    baseline.p.of.FCs.income.medicare.and.medicaid.among.adap + # FCs 
+                                                    baseline.p.of.PCs.income.medicare.and.medicaid.among.adap + # PCs 
+                                                    baseline.p.of.FPCs.income.medicare.and.medicaid.among.adap # FPCs 
+                                               )
+                        )) 
+
 
 
 #-- Distribute for Private Insurance --#
+# COMPLETELY ANALOGOUS TO MEDICAID - see that section for explanations # 
+
+# INPUTS 
+# P1 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.F.only.income.private', 
+                        value = ) 
+
+# P2
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Fplus.among.not.F.only.income.private',
+                        value = ) 
+
+# P3
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.P.among.Fplus.income.private', 
+                        value = ) 
+
+# P4
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Cs.among.FP.income.private',
+                        value = ) 
+
+# P5
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.P.among.no.F.income.private',
+                        value = ) 
+
+# P6
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Cs.among.P.income.private',
+                        value = ) 
+
+
+# OUTPUTS 
+# COMPLETELY ANALOGOUS TO MEDICAID - see that section for explanations 
+# OUTPUT 1: F only
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.F.only.income.private.among.adap', 
+                        value = expression(baseline.p.of.income.private.among.adap * 
+                                               baseline.p.of.F.only.income.private)) 
+
+# OUTPUT 2: FP  
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.FP.income.private.among.adap', 
+                        value = expression(baseline.p.of.income.private.among.adap * 
+                                               (1-baseline.p.of.Cs.among.FP.income.private) * # (1-p4)
+                                               baseline.p.of.P.among.Fplus.income.private * # p3
+                                               baseline.p.of.Fplus.among.not.F.only.income.private * # p2
+                                               (1-baseline.p.of.F.only.income.private) # (1-p1)
+                        )) 
+
+# OUTPUT 3: FPCs
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.FPCs.income.private.among.adap', 
+                        value = expression(baseline.p.of.income.private.among.adap * 
+                                               (baseline.p.of.Cs.among.FP.income.private) * # p4
+                                               baseline.p.of.P.among.Fplus.income.private * # p3
+                                               baseline.p.of.Fplus.among.not.F.only.income.private * # p2
+                                               (1-baseline.p.of.F.only.income.private) # (1-p1)
+                        )) 
+
+# OUTPUT 4: PCs
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.PCs.income.private.among.adap',
+                        value = expression(baseline.p.of.income.private.among.adap * 
+                                               baseline.p.of.Cs.among.P.income.private * # p6 
+                                               baseline.p.of.P.among.no.F.income.private * # p5 
+                                               (1-baseline.p.of.F.only.income.private - # (1-p1 -
+                                                    ((1-baseline.p.of.F.only.income.private) * baseline.p.of.Fplus.among.not.F.only.income.private))  # ((1-p1)*p2))
+                        ))
+
+# OUTPUT 5: P only
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.P.income.private.among.adap',
+                        value = expression(baseline.p.of.income.private.among.adap * 
+                                               (1-baseline.p.of.Cs.among.P.income.private) * # (1-p6) 
+                                               baseline.p.of.P.among.no.F.income.private * # p5 
+                                               (1-baseline.p.of.F.only.income.private - # (1-p1 -
+                                                    ((1-baseline.p.of.F.only.income.private) * baseline.p.of.Fplus.among.not.F.only.income.private))  # ((1-p1)*p2))
+                        ))
+
+# OUTPUT 6: FCs 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.FCs.income.private.among.adap', 
+                        value = expression(baseline.p.of.income.private.among.adap * 
+                                               (1-baseline.p.of.P.among.Fplus.income.private) * # (1-p3)
+                                               baseline.p.of.Fplus.among.not.F.only.income.private * # p2
+                                               (1-baseline.p.of.F.only.income.private) # (1-p1)
+                        )) 
+
+# OUTPUT 7: Cs only 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Cs.income.private.among.adap', 
+                        value = expression(baseline.p.of.income.private.among.adap -  
+                                               (baseline.p.of.F.only.income.private.among.adap + # F only 
+                                                    baseline.p.of.P.only.income.private.among.adap + # P only 
+                                                    baseline.p.of.FP.income.private.among.adap + # FP 
+                                                    baseline.p.of.FCs.income.private.among.adap + # FCs 
+                                                    baseline.p.of.PCs.income.private.among.adap + # PCs 
+                                                    baseline.p.of.FPCs.income.private.among.adap # FPCs 
+                                               )
+                        )) 
+
+
+
+#-- Distribute for Uninsured --#
+# Everyone who's uninsured must be on full-pay (can't have premium assistance or cost-sharing if you're uninsured!)
+
+# OUTPUT 1: F only
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.F.only.income.uninsured.among.adap', 
+                        value = 'baseline.p.of.income.uninsured.among.adap') 
+
+# OUTPUT 2: FP  
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.FP.income.uninsured.among.adap', 
+                        value = 0) 
+
+# OUTPUT 3: FPCs
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.FPCs.income.uninsured.among.adap', 
+                        value = 0) 
+
+# OUTPUT 4: PCs
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.PCs.income.uninsured.among.adap',
+                        value = 0)
+
+# OUTPUT 5: P only
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.P.income.uninsured.among.adap',
+                        value = 0)
+
+# OUTPUT 6: FCs 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.FCs.income.uninsured.among.adap', 
+                        value = 0) 
+
+# OUTPUT 7: Cs only 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Cs.income.uninsured.among.adap', 
+                        value = 0) 
+
+
+
+
+
+
+
+
+## Melissa: UP TO HERE
 
 # Also need to add:
 #   income.
