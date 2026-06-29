@@ -26,6 +26,59 @@ STAGE.23.POPULATION.WEIGHT = 1/32
 FUTURE.PENALTY.PS.DIAG.GROWTH.LIKELIHOOD.WEIGHT = 8 # representing the eight points we would have post 2022 (eight times as many points)
 HIV.TESTING.BY.SEX.WEIGHT= 8 #increasing the weight for sex a specific HIV test testing rates because this is the only targets that's available among MSM
 
+SHIELD.PARTITIONING.FUNCTION <- function(arr, version, location)
+{
+    # We only do anything if:
+    #  (a) there is a "sex" dimension,
+    #  (b) both "msm" and "heterosexual_male" are present as sex levels, and
+    #  (c) the two male slices are IDENTICAL everywhere (i.e., they are a duplicated slab).
+    # This matches the EHE pattern: only redistribute when the two male strata are copies.
+    if ("sex" %in% names(dim(arr)) &&
+        all(c("msm","heterosexual_male") %in% dimnames(arr)$sex) &&
+        all(array.access(arr, sex = "msm") == array.access(arr, sex = "heterosexual_male")))
+    {
+        # ---- Pull metadata needed by the helper that returns MSM proportions ----
+        # specification.metadata informs how to shape (age/race) the MSM proportion array.
+        specification.metadata <- get.specification.metadata(version = version, location = location)
+        
+        # ---- Get best-guess MSM proportions for this location ----
+        # keep.age/keep.race tell the helper to return proportions stratified to match 'arr'
+        # (only if those dimensions exist). 'ages' pins the age ordering to arr's dimnames.
+        # The result 'proportion.msm' is typically an array over year/age/race (subset thereof).
+        proportion.msm <- get.best.guess.msm.proportions(
+            location,
+            specification.metadata = specification.metadata,
+            keep.age  = any(names(dim(arr)) == "age"),
+            keep.race = any(names(dim(arr)) == "race"),
+            ages      = dimnames(arr)$age
+        )
+        
+        # ---- Build a partition array over sex = {msm, heterosexual_male} ----
+        # Concatenate p(MSM) and 1 - p(MSM), then give it the same non-sex dimnames as
+        # 'proportion.msm', plus a two-level 'sex' dimension ordered c("msm","heterosexual_male").
+        sex.partition.arr <- c(as.numeric(proportion.msm), 1 - as.numeric(proportion.msm))
+        sex.partition.dimnames <- c(dimnames(proportion.msm), list(sex = c("msm", "heterosexual_male")))
+        dim(sex.partition.arr)    <- sapply(sex.partition.dimnames, length)
+        dimnames(sex.partition.arr) <- sex.partition.dimnames
+        
+        # ---- Select the portion of 'arr' that aligns with the partition dims ----
+        # This pulls the slab of 'arr' whose dimensions match sex.partition.dimnames.
+        sex.modified <- array.access(arr, sex.partition.dimnames)
+        
+        # ---- Apply the partition to split the duplicated male mass ----
+        # expand.array broadcasts the partition over any remaining dims in sex.modified.
+        # Multiplying implements: new(msm) = total_male * p_msm; new(hetero) = total_male * (1 - p_msm).
+        sex.modified <- sex.modified * expand.array(sex.partition.arr, dimnames(sex.modified))
+        
+        # ---- Write the modified slab back into the original array ----
+        array.access(arr, dimnames(sex.modified)) <- sex.modified
+    }
+    
+    # Return the (possibly) modified array. If the condition above didn't hold,
+    # we return 'arr' unchanged (again, matching EHE behavior).
+    arr
+}
+
 #** POPULATION SIZES ** ---- 
 #'# Error variance for population data <From EHE model>
 population.error.sd.shield = function(data, details=attr(data, 'details'), version, location)
@@ -452,7 +505,34 @@ penalty.msm.prop.of.ps.male.likelihood.instructions <-
     )
 
 
-##NEW---- Nestd proportion likelihood: prop of male ps diagnosis among MSM ----
+##NEW---- Nested proportion likelihood: proportion of male ps diagnosis among MSM ----
+proportion.male.diagnosis.among.msm.nested.likelihood.instructions <-
+    create.nested.proportion.likelihood.instructions(outcome.for.data = "prop.male.ps.diag.among.msm",
+                                                     outcome.for.sim = "prop.male.ps.diag.among.msm",
+                                                     denominator.outcome.for.data = "denominator.for.prop.male.ps.diag.among.msm",
+                                                     outcome.for.n.multipliers = "ps.syphilis.diagnoses", # Have to set this to something with county-level data.
+                                                     #
+                                                     location.types = c('STATE','CBSA'),
+                                                     minimum.geographic.resolution.type = "COUNTY",
+                                                     levels.of.stratification = 0,
+                                                     #
+                                                     p.bias.inside.location = 0,
+                                                     p.bias.outside.location = 0,
+                                                     p.bias.sd.inside.location = 0.05,
+                                                     p.bias.sd.outside.location = 0.05,
+                                                     #
+                                                     within.location.p.error.correlation = 0.5, #Default: correlation from one year to other in the bias in the city and outside the city
+                                                     within.location.n.error.correlation = 0.5, #Default: ratio of tests outside MSA to those inside MSA (for MSA we usually dont have fully stratified numbers)
+                                                     #
+                                                     observation.correlation.form = 'compound.symmetry',
+                                                     p.error.variance.term = 0.1, # From sqrt(2 * 0.07^2), where we assume numerator and denominator errors are independent (they're not) and 7% cv each
+                                                     p.error.variance.type = "cv",
+                                                     minimum.error.sd = 0.01, # to fix two Houston points where variance data says 0
+                                                     #
+                                                     partitioning.function = SHIELD.PARTITIONING.FUNCTION, # It won't need to use this
+                                                     #
+                                                     equalize.weight.by.year = T
+    )
 
 # prop.male.ps.diag.among.msm.likelihood.instructions
 
@@ -625,58 +705,7 @@ SHIELD.DUMMY.PARTITIONING.FUNCTION <- function(arr, version = 'shield', location
 }
 proportion.tested.bias.estimates = get.cached.object.for.version(name = "proportion.tested.bias.estimates", 
                                                                  version = 'shield')
-SHIELD.PARTITIONING.FUNCTION <- function(arr, version, location)
-{
-    # We only do anything if:
-    #  (a) there is a "sex" dimension,
-    #  (b) both "msm" and "heterosexual_male" are present as sex levels, and
-    #  (c) the two male slices are IDENTICAL everywhere (i.e., they are a duplicated slab).
-    # This matches the EHE pattern: only redistribute when the two male strata are copies.
-    if ("sex" %in% names(dim(arr)) &&
-        all(c("msm","heterosexual_male") %in% dimnames(arr)$sex) &&
-        all(array.access(arr, sex = "msm") == array.access(arr, sex = "heterosexual_male")))
-    {
-        # ---- Pull metadata needed by the helper that returns MSM proportions ----
-        # specification.metadata informs how to shape (age/race) the MSM proportion array.
-        specification.metadata <- get.specification.metadata(version = version, location = location)
-        
-        # ---- Get best-guess MSM proportions for this location ----
-        # keep.age/keep.race tell the helper to return proportions stratified to match 'arr'
-        # (only if those dimensions exist). 'ages' pins the age ordering to arr's dimnames.
-        # The result 'proportion.msm' is typically an array over year/age/race (subset thereof).
-        proportion.msm <- get.best.guess.msm.proportions(
-            location,
-            specification.metadata = specification.metadata,
-            keep.age  = any(names(dim(arr)) == "age"),
-            keep.race = any(names(dim(arr)) == "race"),
-            ages      = dimnames(arr)$age
-        )
-        
-        # ---- Build a partition array over sex = {msm, heterosexual_male} ----
-        # Concatenate p(MSM) and 1 - p(MSM), then give it the same non-sex dimnames as
-        # 'proportion.msm', plus a two-level 'sex' dimension ordered c("msm","heterosexual_male").
-        sex.partition.arr <- c(as.numeric(proportion.msm), 1 - as.numeric(proportion.msm))
-        sex.partition.dimnames <- c(dimnames(proportion.msm), list(sex = c("msm", "heterosexual_male")))
-        dim(sex.partition.arr)    <- sapply(sex.partition.dimnames, length)
-        dimnames(sex.partition.arr) <- sex.partition.dimnames
-        
-        # ---- Select the portion of 'arr' that aligns with the partition dims ----
-        # This pulls the slab of 'arr' whose dimensions match sex.partition.dimnames.
-        sex.modified <- array.access(arr, sex.partition.dimnames)
-        
-        # ---- Apply the partition to split the duplicated male mass ----
-        # expand.array broadcasts the partition over any remaining dims in sex.modified.
-        # Multiplying implements: new(msm) = total_male * p_msm; new(hetero) = total_male * (1 - p_msm).
-        sex.modified <- sex.modified * expand.array(sex.partition.arr, dimnames(sex.modified))
-        
-        # ---- Write the modified slab back into the original array ----
-        array.access(arr, dimnames(sex.modified)) <- sex.modified
-    }
-    
-    # Return the (possibly) modified array. If the condition above didn't hold,
-    # we return 'arr' unchanged (again, matching EHE behavior).
-    arr
-}
+
 
 ##---- Total and by Race ----
 proportion.tested.total.by.race.nested.likelihood.instructions =
@@ -837,7 +866,8 @@ lik.inst.stage1=join.likelihood.instructions(
     
     #
     historical.diagnosis.likelihood.instructions,
-    penalty.msm.prop.of.ps.male.likelihood.instructions,
+    # penalty.msm.prop.of.ps.male.likelihood.instructions,
+    proportion.male.diagnosis.among.msm.nested.likelihood.instructions,
     penalty.ps.diag.growth.likelihood.instructions,    # Future change penalty
     #
     additional.weights = STAGE.1.WEIGHT
@@ -861,7 +891,8 @@ lik.inst.stage1.plus.penalty=join.likelihood.instructions(
     
     #
     historical.diagnosis.likelihood.instructions,
-    penalty.msm.prop.of.ps.male.likelihood.instructions,
+    # penalty.msm.prop.of.ps.male.likelihood.instructions,
+    proportion.male.diagnosis.among.msm.nested.likelihood.instructions,
     penalty.diag.traject.msm.vs.het.male.likelihood.instructions,
     penalty.ps.diag.growth.likelihood.instructions,    # Future change penalty
     #
@@ -898,7 +929,8 @@ lik.inst.stg23.non.demog=join.likelihood.instructions(
     proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
     #
     historical.diagnosis.likelihood.instructions,
-    penalty.msm.prop.of.ps.male.likelihood.instructions,
+    # penalty.msm.prop.of.ps.male.likelihood.instructions,
+    proportion.male.diagnosis.among.msm.nested.likelihood.instructions,
     penalty.ps.diag.growth.likelihood.instructions    
 )
 
@@ -938,7 +970,8 @@ lik.inst.stg23.non.demog.plus.penalty=join.likelihood.instructions(
     proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
     #
     historical.diagnosis.likelihood.instructions,
-    penalty.msm.prop.of.ps.male.likelihood.instructions,
+    # penalty.msm.prop.of.ps.male.likelihood.instructions,
+    proportion.male.diagnosis.among.msm.nested.likelihood.instructions,
     penalty.ps.diag.growth.likelihood.instructions,    
     ##
     penalty.diag.traject.msm.vs.het.male.likelihood.instructions
