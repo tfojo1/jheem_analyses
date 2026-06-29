@@ -1070,6 +1070,10 @@ get.idu.sexual.oe.functional.form = function(specification.metadata)
 
 get.immigration.rates.functional.form <- function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS){
   
+    if(location == "TGA.OAKLAND"){
+        location = "C.41860" 
+        print("temporarily setting Oakland TGA location to SF MSA for immigration rates")
+    }
   rates = get.immigration.rates(location=location,
                                 specification.metadata = specification.metadata) 
   
@@ -1120,6 +1124,10 @@ get.immigration.rates <- function(location, specification.metadata, population.y
 
 get.emigration.rates.functional.form <- function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS){
   
+    if(location == "TGA.OAKLAND"){
+        location = "C.41860" 
+        print("temporarily setting Oakland TGA location to SF MSA for emigration rates")
+    }
   rates = get.emigration.rates(location=location,
                                specification.metadata = specification.metadata) 
   
