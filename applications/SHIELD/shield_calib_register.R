@@ -19,6 +19,21 @@ par.aliases.transmission = list(
     trate.4 = c("transmission.rate.multiplier.msm2010", "transmission.rate.multiplier.heterosexual2010"),
     trate.5 = c("transmission.rate.multiplier.msm2022", "transmission.rate.multiplier.heterosexual2022")
 )
+
+# 6.29 (removed contact tracing; changed global trates to 3.1; added prop male diag among msm nested prop likelihood)
+register.calibration.info("calib.6.29.stage0.az",
+                          likelihood.instructions = lik.inst.stage0,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          fixed.initial.parameter.values = c("global.transmission.rate.msm"=3.1,
+                                                             "global.transmission.rate.het"=3.1),  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate.msm",
+                                              "global.transmission.rate.het"),
+                          parameter.aliases = par.aliases.transmission,
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
  
 # 6.5 (several changes) ----
 register.calibration.info("calib.6.5.stage0.az",
@@ -479,7 +494,7 @@ register.calibration.info("calib.6.25.stage2.az",
 )
 # ************************************----
 # Trying out global trates ----
-for (gtr in c(3.0, 3.1, 3.2, 3.3, 3.4)) {
+for (gtr in c(3.1, 3.2, 3.3, 3.4)) {
     register.calibration.info(paste0("calib.6.29.stg0.", gtr),
                               likelihood.instructions = lik.inst.stage0,
                               data.manager = SURVEILLANCE.MANAGER,
