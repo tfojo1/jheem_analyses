@@ -1386,7 +1386,7 @@ register.remission(SHIELD.SPECIFICATION,
                    all.remissions.into.compartments = list(profile = 'diagnosed.treated'),
                    remission.rate.value = 'rate.diagnosis.immediate.treatment.sti.screening',
                    remission.proportions.value = 'remission.prp',
-                   tag = 'remission.treated.immediately.sti.sceening')
+                   tag = 'remission.treated.immediately.sti.screening')
 # 3-contact tracing
 register.remission(SHIELD.SPECIFICATION,
                    applies.to = list(continuum = 'undiagnosed'),
@@ -1881,9 +1881,9 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          corresponding.data.outcome = 'total.syphilis.diagnoses',  
                          keep.dimensions = c('location','age','race','sex','stage') 
 )
-### All Diag via Symp.Testing -----
+### 1-Total Diagosis via Symp.Testing -----
 track.cumulative.outcome(SHIELD.SPECIFICATION,
-                         name = 'diagnosis.symptomatic.testing', 
+                         name = 'diagnosis.total.via.symptomatic.testing', 
                          value = expression(diagnosis.immediate.treatment.symptomatic.testing+
                                                 diagnosis.delayed.treatment.symptomatic.testing),
                          outcome.metadata = create.outcome.metadata(display.name = 'Total Diagnosis Via Symptomatic Testing', 
@@ -1895,7 +1895,34 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          scale='non.negative.number',
                          keep.dimensions = c('location','age','race','sex','stage') 
 )
-### All Diag via Contact Tracing -----
+
+### 2-Total Diagosis via STI screening -----
+track.dynamic.outcome(SHIELD.SPECIFICATION,
+                      name = 'diagnosis.immediate.treatment.following.sti.screening',
+                      outcome.metadata = create.outcome.metadata(display.name = 'Number of Individuals Diagnosed Via STI Screening',
+                                                                 description = 'Number of Individuals Diagnosed Via STI Screening in the Past Year',
+                                                                 scale = 'non.negative.number',
+                                                                 axis.name = 'Cases',
+                                                                 units = 'cases',
+                                                                 singular.unit = 'case'),
+                      scale='non.negative.number',
+                      dynamic.quantity.name = 'remission.from', 
+                      include.tags=c('remission.treated.immediately.sti.screening'),
+                      keep.dimensions = c('location','age','race','sex','stage') 
+)
+track.cumulative.outcome(SHIELD.SPECIFICATION,
+                         name = 'diagnosis.total.via.sti.screening', 
+                         value = 'diagnosis.immediate.treatment.following.sti.screening',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Total Diagnosis (and treated) Via (and treated)', 
+                                                                    description = 'Number of Individuals Diagnosed (and treated) Via (and treated)',
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Cases',
+                                                                    units = 'cases',
+                                                                    singular.unit = 'case'),
+                         scale='non.negative.number',
+                         keep.dimensions = c('location','age','race','sex','stage') 
+)
+### 3-Total Diagosis via Contact Tracing -----
 track.dynamic.outcome(SHIELD.SPECIFICATION,
                       name = 'diagnosis.immediate.treatment.following.contact.tracing',
                       outcome.metadata = create.outcome.metadata(display.name = 'Number of Individuals Diagnosed Via Contact Tracing (excluding Emperic Trt)',
@@ -1921,7 +1948,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          scale='non.negative.number',
                          keep.dimensions = c('location','age','race','sex','stage') 
 )
-### All Diag via PRENATAL -----
+### 4-Total Diagosis via via PRENATAL -----
 track.dynamic.outcome(SHIELD.SPECIFICATION,
                       name = 'diagnosis.immediate.treatment.following.prenatal',
                       outcome.metadata = create.outcome.metadata(display.name = 'Number of Individuals Diagnosed (and treated) Via Prenatal Care',
@@ -2019,13 +2046,14 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          corresponding.data.outcome = 'ps.syphilis.diagnoses',
                          keep.dimensions = c('location','age','race','sex')
 )
+# PS diagnosis (among Male)
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'diagnosis.ps.among.male',
                          value = expression(diagnosis.primary.symptomatic + diagnosis.secondary.symptomatic),
                          subset.dimension.values = list(sex=c("heterosexual_male", "msm")),  
                          
-                         outcome.metadata = create.outcome.metadata(display.name = 'Primary & Secondary Diagnosis (Symptomatic Disease)',
-                                                                    description = 'Number of Individuals with a Diagnosis of Primary and Secondary (Symptomatic) Syphilis in the Past Year',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Primary & Secondary Diagnosis (Symptomatic Disease) among Male',
+                                                                    description = 'Number of Males with a Diagnosis of Primary and Secondary (Symptomatic) Syphilis in the Past Year',
                                                                     scale = 'non.negative.number',
                                                                     axis.name = 'Cases',
                                                                     units = 'cases',

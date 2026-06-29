@@ -15,24 +15,59 @@ source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions
 
 calibration.codes <- c(
 
-    "calib.6.16.stage2.az", 
-    "calib.6.16.stg2.penalty"
-
-        "calib.6.12.stage2.az", #
-    # "calib.6.12.stg2.penalty"
-    
-    "calib.6.16.stage2.az", #with Covid reductions for sti screening
-     # "calib.6.16.stg2.penalty"
-
-    
+    "calib.6.25.stage2.az"
     )
 
 # read simulations into the simset
 calib.simsets <- load.calib.simsets(
-    locations         = SHIELD.TEN.MSAS,
+    locations         = 'C.12580',
     calibration.codes = calibration.codes,
     n.sim = 300
 )
+LOCATION="C.12580"
+VERSION="shield"
+lastSim=calib.simsets$`Baltimore-Columbia-Towson, MD – calib.6.25.stage2.az`$last_sim
+param_calib=lastSim$get.params()
+param.manual=param_calib
+
+engine= create.jheem.engine(VERSION, LOCATION, end.year = 2030)
+sim.manual <- engine$run(param.manual)
+
+simplot( sim.manual,
+         c( "diagnosis.total",
+            "diagnosis.total.via.symptomatic.testing",
+            "diagnosis.total.via.sti.screening",
+         "diagnosis.total.via.contact.tracing",
+         "diagnosis.total.via.prenatal")
+        # c( "diagnosis.ps",
+        #     "diagnosis.ps.among.male" )
+)
+apply(sim.manual$diagnosis.ps,1,sum)
+sim.manual$diagnosis.ps.among.male
+
+apply(sim.manual$diagnosis.total,1,sum)==
+    apply(sim.manual$diagnosis.total,1,sum)+
+    apply(sim.manual$diagnosis.via.symptomatic.testing,1,sum)+
+    apply(sim.manual$diagnosis.total.via.prenatal,1,sum)+
+    apply(sim.manual$diagnosis.total.via.contact.tracing,1,sum)
+
+{
+    param.manual=param_calib
+    param.manual["transmission.rate.multiplier.heterosexual2022"]=1.01*param.manual["transmission.rate.multiplier.heterosexual2022"]
+    param.manual["transmission.rate.multiplier.msm2022"]=1.2*param.manual["transmission.rate.multiplier.msm2022"]
+    param.manual["transmission.rate.multiplier.hispanic.msm"]=1*param.manual["transmission.rate.multiplier.hispanic.msm"]
+    param.manual["transmission.rate.multiplier.hispanic.heterosexual"]=1*param.manual["transmission.rate.multiplier.hispanic.heterosexual"]
+    
+    sim.manual <- engine1$run(param.manual)
+    
+    simplot(lastSim,sim.manual,c("diagnosis.ps","hiv.testing"))
+    simplot(lastSim,sim.manual,c("diagnosis.ps"),facet.by = "sex")
+    simplot(lastSim,sim.manual,c("diagnosis.ps"),facet.by = "race")
+    simplot(lastSim,sim.manual,c("diagnosis.ps"),facet.by = "age")
+}
+
+
+
 
 # CREATE ALL STAGE CALIBRATION PLOTS
 # plot.calib.stages(calib.simsets = calib.simsets,
