@@ -23,7 +23,7 @@ STAGE.23.WEIGHT= 1/4
 STAGE.23.POPULATION.WEIGHT = 1/8
 
 #'@Andrew: lets archive these for now
-# FUTURE.PENALTY.PS.DIAG.GROWTH.LIKELIHOOD.WEIGHT = 8 # representing the eight points we would have post 2022 (eight times as many points)
+FUTURE.PENALTY.PS.DIAG.GROWTH.LIKELIHOOD.WEIGHT = 8 # representing the eight points we would have post 2022 (eight times as many points)
 # HIV.TESTING.BY.SEX.WEIGHT= 8 #increasing the weight for sex a specific HIV test testing rates because this is the only targets that's available among MSM
 
 SHIELD.DUMMY.PARTITIONING.FUNCTION <- function(arr, version = 'shield', location) {
