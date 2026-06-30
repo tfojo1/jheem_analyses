@@ -2,44 +2,71 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 
-cost_low    <- 32560
-cost_median <- 40460
-cost_high   <- 76760
 
-# Off-ART cost: applies per person-year to anyone diagnosed but not
-# yet on ART. Single value (200-500 CD4 stratum from doc Table 2),
-# constant across the low/mid/high ART cost gradient.
-cost_off_art <- 3730
+discount_rate <- 0.03  # 3% annual, per standard CEA/health economic convention
+INFLATION_RATE_DRUG <- 0.054   # CMS Rx drug spending growth 2026-2032
+INFLATION_RATE_CARE <- 0.056   # CMS NHE overall growth 2023-2032
+
+# Year 2026 = year 1, so discount factor = 1/(1+r)^(t-1) or 1/(1+r)^t
+# Convention: costs incurred during year t are discounted to start of 2026
+discount_factors <- tibble(
+    year             = 2026:2035,
+    year_index       = 1:10,           # 1 = 2026
+    discount_factor  = 1 / (1 + discount_rate)^(year_index - 1),
+    inflation_factor_drug  = (1 + INFLATION_RATE_DRUG)^(year_index - 1),
+    inflation_factor_care  = (1 + INFLATION_RATE_CARE)^(year_index - 1)  
+)
+
+# -------------------------------------------------
+# CD4 stratified cost structure
+# Unsuppressed population distributional weights are held constant.
+# On-ART and off-ART costs are weighted averages across strata.
+# Source: Neilan 2020 (distribution), Jones 2025 (costs)
+# -------------------------------------------------
+cd4_strata <- tibble(
+    stratum       = c("CD4 >500", "CD4 200-500", "CD4 <200"),
+    wt            = c(0.54, 0.37, 0.09),   # % of pop
+    cost_on_art   = c(1650, 2290, 16800),  # annual routine care on ART ($/yr)
+)
+
+# Weighted average annual cost for someone ON ART
+# Uses suppressed-population weights (on-ART distribution)
+cost_on_art_wtd <- sum(cd4_strata$wt * cd4_strata$cost_on_art)
+
+
+# ART cost tiers from the original code now refer to the drug/treatment
+# component layered on top of routine care. If the intent is to preserve
+# the low/median/high gradient as a sensitivity on the ART drug cost,
+# keep them; otherwise replace with cost_on_art_wtd throughout.
+# Here they are retained as a sensitivity gradient on top of routine care,
+# so total on-ART cost = routine care (CD4-weighted) + ART drug tier.
+# If your original cost_low/median/high already included routine care,
+# replace `annual_cost + cost_on_art_wtd` with just `annual_cost` below
+# and set cost_low/median/high to the drug-only figures.
+
+cost_drug_low    <- 18500
+cost_drug_median <- 33000
+cost_drug_high   <- 47400
 
 # -------------------------------------------------
 # Re-engagement hazard: mixture model
 # F(t) = pi * (1 - exp(-lambda * t))
-#   pi      = fraction of non-starters who EVER start ART
-#   lambda  = annual hazard among the eventual starters
-# Derived from Helleberg 2012:
-#   F(1) = 0.60, F(5) = 0.86 (asymptote)
-# 14% never reengage and accrue off-ART cost through end of horizon.
 # -------------------------------------------------
 pi_reengage     <- 0.86
 lambda_reengage <- 1.2
-horizon_years   <- 10  # follow each non-starter cohort up to 10 years
+horizon_years   <- 10
 
 F_cum <- function(t) pi_reengage * (1 - exp(-lambda_reengage * t))
 
-# Year-by-year incremental return fraction (cohort flow rate of
-# starting ART) AND survival fraction (still off ART at start of
-# each follow-up year). year_offset = 0 means "still in the year
-# of diagnosis, not yet started ART" -- this is when the not_starting_now
-# group begins accruing off-ART cost.
 reengage_schedule <- tibble(
-    year_offset      = 0:horizon_years,
-    F_cum            = F_cum(year_offset),
-    incr_return      = F_cum - lag(F_cum, default = 0),
-    still_offart     = 1 - lag(F_cum, default = 0)   # at START of year
+    year_offset  = 0:horizon_years,
+    F_cum        = F_cum(year_offset),
+    incr_return  = F_cum - lag(F_cum, default = 0),
+    still_offart = 1 - lag(F_cum, default = 0)
 )
 
 # -------------------------------------------------
-# 1. Reshape array
+# Reshape array
 # -------------------------------------------------
 df <- as.data.frame.table(total.results, responseName = "value") %>%
     rename(
@@ -59,7 +86,7 @@ df <- as.data.frame.table(total.results, responseName = "value") %>%
     )
 
 # -------------------------------------------------
-# 2. 2025 baseline care fraction
+# 2025 baseline care fraction
 # -------------------------------------------------
 baseline_2025 <- df %>%
     filter(
@@ -67,28 +94,23 @@ baseline_2025 <- df %>%
         intervention == "noint",
         outcome %in% c("suppression", "diagnosed.prevalence")
     ) %>%
-    select(location, sim, outcome, value) %>%
+    dplyr::dplyr::select(location, sim, outcome, value) %>%
     pivot_wider(names_from = outcome, values_from = value) %>%
-    mutate(
-        care_fraction_2025 = suppression / diagnosed.prevalence
-    ) %>%
-    select(location, sim, care_fraction_2025)
+    mutate(care_fraction_2025 = suppression / diagnosed.prevalence) %>%
+    dplyr::dplyr::select(location, sim, care_fraction_2025)
 
 # -------------------------------------------------
-# 3. Excess new diagnoses by sim-year, split into immediate
-#    starters and non-starters
+# Excess new diagnoses split into immediate starters / non-starters
 # -------------------------------------------------
 new_excess <- df %>%
     filter(
         year >= 2026, year <= 2035,
         outcome == "new",
-        intervention %in% c("noint", "adap.100.end.26") #this needs to be updated depending on simset run
+        intervention %in% c("noint", "adap.100.end.26")
     ) %>%
-    select(location, sim, year, intervention, value) %>%
+    dplyr::select(location, sim, year, intervention, value) %>%
     pivot_wider(names_from = intervention, values_from = value) %>%
-    mutate(
-        excess_new = `adap.100.end.26` - noint
-    ) %>%
+    mutate(excess_new = `adap.100.end.26` - noint) %>%
     left_join(baseline_2025, by = c("location", "sim")) %>%
     mutate(
         immediate_starts = excess_new * care_fraction_2025,
@@ -97,13 +119,10 @@ new_excess <- df %>%
     arrange(location, sim, year)
 
 # -------------------------------------------------
-# 4. Expand each non-starter cohort across follow-up years.
-#    For each diagnosis-year cohort we track:
-#      - delayed_starts: number reengaging this calendar year
-#      - offart_pyears:  person-years off ART contributed this year
+# Expand non-starter cohorts across follow-up years
 # -------------------------------------------------
 nonstarter_followup <- new_excess %>%
-    select(location, sim, index_year = year, not_starting_now) %>%
+    dplyr::select(location, sim, index_year = year, not_starting_now) %>%
     crossing(reengage_schedule) %>%
     mutate(
         year           = index_year + year_offset,
@@ -113,25 +132,19 @@ nonstarter_followup <- new_excess %>%
     filter(year >= 2026, year <= 2035)
 
 lagged_starts <- nonstarter_followup %>%
-    filter(year_offset >= 1) %>%   # year_offset 0 = diagnosis year, no reengagement yet
+    filter(year_offset >= 1) %>%
     group_by(location, sim, year) %>%
-    summarise(
-        delayed_starts = sum(delayed_starts, na.rm = TRUE),
-        .groups = "drop"
-    )
+    summarise(delayed_starts = sum(delayed_starts, na.rm = TRUE), .groups = "drop")
 
 offart_stock <- nonstarter_followup %>%
     group_by(location, sim, year) %>%
-    summarise(
-        offart_pyears = sum(offart_pyears, na.rm = TRUE),
-        .groups = "drop"
-    )
+    summarise(offart_pyears = sum(offart_pyears, na.rm = TRUE), .groups = "drop")
 
 # -------------------------------------------------
-# 5. Total starts and recurring cost burden
+# Total starts and recurring cost burden
 # -------------------------------------------------
 start_paths <- new_excess %>%
-    select(location, sim, year, excess_new, immediate_starts, not_starting_now) %>%
+    dplyr::select(location, sim, year, excess_new, immediate_starts, not_starting_now) %>%
     left_join(lagged_starts, by = c("location", "sim", "year")) %>%
     left_join(offart_stock,  by = c("location", "sim", "year")) %>%
     mutate(
@@ -141,54 +154,105 @@ start_paths <- new_excess %>%
     ) %>%
     arrange(location, sim, year)
 
+
 # -------------------------------------------------
-# 6. Deterministic cost gradient (ART tier varies; off-ART cost fixed)
+# Normalize source costs to 2026 USD
+# BLS CPI Medical Care: 2023 base → 2026 USD
+# -------------------------------------------------
+CPI_2023 <- 549.084
+CPI_2026 <- 591.677
+deflator_2023_to_2026 <- CPI_2026 / CPI_2023   # 1.07757
+
+cost_drug_low_2026    <- cost_drug_low    
+cost_drug_median_2026 <- cost_drug_median 
+cost_drug_high_2026   <- cost_drug_high   
+cost_on_art_wtd_2026  <- cost_on_art_wtd  * deflator_2023_to_2026
+
+# -------------------------------------------------
+# Cost grid
+# ART drug tiers are the sensitivity axis.
+# Routine care costs (CD4-weighted) are added on top and are fixed
+# across the drug-cost gradient.
 # -------------------------------------------------
 cost_grid <- tibble(
     cost_scenario = factor(
         c("Low cost", "Median cost", "High cost"),
         levels = c("Low cost", "Median cost", "High cost")
     ),
-    annual_cost = c(cost_low, cost_median, cost_high)
+    annual_drug_cost = c(cost_drug_low, cost_drug_median, cost_drug_high)
 )
 
 # -------------------------------------------------
-# 7. Expand across cost gradient and compute recurring annual costs.
-#    Annual cost = (people on ART) * ART tier
-#                + (person-years off ART) * off-ART cost
+#  Expand across cost gradient and compute annual incremental costs.
+#
+#   On-ART annual cost per person  = drug tier + CD4-weighted routine care (on-ART)
+#   
+#
+#   annual_incremental_cost = (cumulative people on ART) * total_on_art_cost_pp
+#                           
 # -------------------------------------------------
 inc_cost_grid <- start_paths %>%
     crossing(cost_grid) %>%
+    left_join(discount_factors, by = "year") %>%
+    mutate(
+        # Inflate drug costs at CMS Rx rate, routine care at CMS NHE rate
+        total_on_art_cost_pp_inflated = (annual_drug_cost * inflation_factor_drug) +
+            (cost_on_art_wtd   * inflation_factor_care)
+    ) %>%
     arrange(location, sim, cost_scenario, year) %>%
     group_by(location, sim, cost_scenario) %>%
     mutate(
-        active_excess_on_art        = cumsum(total_starts),
-        annual_on_art_cost          = active_excess_on_art * annual_cost,
-        annual_offart_cost          = offart_pyears * cost_off_art,
-        annual_incremental_cost     = annual_on_art_cost + annual_offart_cost,
-        cumulative_incremental_cost = cumsum(annual_incremental_cost)
+        active_excess_on_art         = cumsum(total_starts),
+        annual_on_art_cost           = active_excess_on_art * total_on_art_cost_pp_inflated,
+        annual_incremental_cost      = annual_on_art_cost,
+        annual_incremental_cost_disc = annual_incremental_cost * discount_factor,
+        cumulative_incremental_cost  = cumsum(annual_incremental_cost_disc)
     ) %>%
     ungroup()
 
 # -------------------------------------------------
-# 8. Ryan White funding by state
+# Ryan White funding
 # -------------------------------------------------
-rw_funding <- read.csv("~/code/rw_funding_by_state.csv", stringsAsFactors = FALSE) %>%
+
+# -------------------------------------------------
+# Ryan White funding — inflate 2025 USD → 2026 USD
+# BLS CPI Medical Care: one-year forward adjustment
+# CMS projections then take over from 2026 onward
+# -------------------------------------------------
+CPI_2025 <- 580.498
+CPI_2026 <- 591.677
+deflator_2025_to_2026 <- CPI_2026 / CPI_2025   # 1.01926
+
+rw_funding <- read.csv("../jheem_analyses/applications/ryan_white/Ryan_white_costing/rw_funding_by_state.csv", stringsAsFactors = FALSE) %>%
     mutate(
         location = trimws(as.character(location)),
-        across(c(part_a, part_b, part_c, part_d, part_f), as.numeric),
+        across(c(part_a, part_b, part_c, part_d, part_f, adap), as.numeric),
+        across(c(part_a, part_b, part_c, part_d, part_f, adap),
+               ~ .x * deflator_2025_to_2026),
         annual_rwhap_total = rowSums(across(c(part_a, part_b, part_c, part_d, part_f)), na.rm = TRUE),
-        annual_drug_only   = part_b
+        annual_drug_only   = adap
     ) %>%
-    select(location, annual_rwhap_total, annual_drug_only) %>%
+    dplyr::select(location, annual_rwhap_total, annual_drug_only) %>%
+    crossing(year = 2026:2035)
+
+
+rw_funding <- read.csv("../jheem_analyses/applications/ryan_white/Ryan_white_costing/rw_funding_by_state.csv", stringsAsFactors = FALSE) %>%
+    mutate(
+        location = trimws(as.character(location)),
+        across(c(part_a, part_b, part_c, part_d, part_f, adap), as.numeric),
+        annual_rwhap_total = rowSums(across(c(part_a, part_b, part_c, part_d, part_f)), na.rm = TRUE),
+        annual_drug_only   = adap
+    ) %>%
+    dplyr::select(location, annual_rwhap_total, annual_drug_only) %>%
     crossing(year = 2026:2035)
 
 rw_funding_cum <- rw_funding %>%
+    left_join(discount_factors, by = "year") %>%
     arrange(location, year) %>%
     group_by(location) %>%
     mutate(
-        cumulative_rwhap_total = cumsum(annual_rwhap_total),
-        cumulative_drug_only   = cumsum(annual_drug_only)
+        cumulative_rwhap_total = cumsum(annual_rwhap_total * discount_factor),
+        cumulative_drug_only   = cumsum(annual_drug_only   * discount_factor)
     ) %>%
     ungroup()
 
@@ -199,96 +263,9 @@ compare_with_rw <- inc_cost_grid %>%
         gap_vs_drug_cumulative  = cumulative_incremental_cost - cumulative_drug_only
     )
 
-# -------------------------------------------------
-# 9. Florida cumulative plot
-# -------------------------------------------------
-fl_band <- compare_with_rw %>%
-    filter(location == "FL") %>%
-    group_by(year) %>%
-    summarise(
-        p05_all = quantile(cumulative_incremental_cost, 0.05, na.rm = TRUE),
-        p25_all = quantile(cumulative_incremental_cost, 0.25, na.rm = TRUE),
-        p75_all = quantile(cumulative_incremental_cost, 0.75, na.rm = TRUE),
-        p95_all = quantile(cumulative_incremental_cost, 0.95, na.rm = TRUE),
-        cumulative_rwhap_total = first(cumulative_rwhap_total),
-        cumulative_drug_only   = first(cumulative_drug_only),
-        .groups = "drop"
-    )
 
-fl_median_line <- compare_with_rw %>%
-    filter(location == "FL", cost_scenario == "Median cost") %>%
-    group_by(year) %>%
-    summarise(
-        p50_median_cost = median(cumulative_incremental_cost, na.rm = TRUE),
-        .groups = "drop"
-    )
 
-fl_plot_df <- fl_band %>%
-    left_join(fl_median_line, by = "year")
 
-p_fl <- ggplot(fl_plot_df, aes(x = year)) +
-    geom_ribbon(
-        aes(ymin = p05_all / 1e6, ymax = p95_all / 1e6),
-        alpha = 0.10
-    ) +
-    geom_ribbon(
-        aes(ymin = p25_all / 1e6, ymax = p75_all / 1e6),
-        alpha = 0.20
-    ) +
-    geom_line(
-        aes(y = p50_median_cost / 1e6, color = "Cumulative Care Cost of Newly Diagnosed HIV Starting ART."),
-        linewidth = 1.2
-    ) +
-    geom_line(
-        aes(y = cumulative_drug_only / 1e6, color = "RWHAP Part-B Spending"),
-        linewidth = 1.2,
-        linetype = 3
-    ) +
-    labs(
-        x = NULL,
-        y = "Cumulative cost (Millions USD)",
-        color = NULL,
-        title = "Florida",
-        subtitle = "Bands reflect transmission + cost-gradient uncertainty"
-    ) +
-    theme_bw()
 
-print(p_fl)
 
-# -------------------------------------------------
-# 10. State boxplot at 2035: NET savings from cutting Part B
-# -------------------------------------------------
-plot_2035 <- compare_with_rw %>%
-    filter(year == 2035, location != "Total") %>%
-    mutate(
-        location = trimws(as.character(location)),
-        net_savings_partb = cumulative_incremental_cost - cumulative_drug_only
-    ) %>%
-    filter(tolower(location) != "total")
 
-state_order <- plot_2035 %>%
-    group_by(location) %>%
-    summarise(
-        med2035 = median(net_savings_partb, na.rm = TRUE),
-        .groups = "drop"
-    ) %>%
-    arrange(desc(med2035)) %>%
-    pull(location)
-
-p_state <- ggplot(
-    plot_2035 %>%
-        mutate(location = factor(location, levels = state_order)),
-    aes(x = location, y = net_savings_partb / 1e6)
-) +
-    geom_boxplot(fill = "grey80", outlier.shape = NA) +
-    scale_x_discrete(drop = TRUE) +
-    labs(
-        x = NULL,
-        y = "Net savings from Keeping ADAP, 
-        Only accounting for additional Diagnosed HIV infections,
-        cumulative through 2035 (millions USD)"
-    ) +
-    theme_bw() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-print(p_state)

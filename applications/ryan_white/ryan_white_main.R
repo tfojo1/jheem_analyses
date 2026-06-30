@@ -20,6 +20,9 @@ source('../jheem_analyses/applications/ryan_white/ryan_white_partb_interventions
 source('../jheem_analyses/applications/ryan_white/rw_adap_biktarvy_interventions.R')
 source('../jheem_analyses/applications/ryan_white/ryan_white_50_adap_interventions.R')
 #source('../jheem_analyses/applications/ryan_white/ryan_white_no_trate_interventions.R')
+source('../jheem_analyses/applications/ryan_white/Ryan_white_costing/ryan_white_no_trate_interventions.R')
+source('../jheem_analyses/applications/cdc_testing/urbanicity_calculations.R')
+
 
 # To pull what we have calibrated
 if (1==2)
