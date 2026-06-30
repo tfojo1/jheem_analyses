@@ -1202,3 +1202,95 @@ verify_calibration <- function(calib.simsets,
         
     }), calibration.codes)
 }
+
+inspect_mixing <- function(calib.simsets,
+                           calibration.codes,
+                           locations          = NULL,
+                           show.mixing        = FALSE,
+                           mixing.n           = 6L,
+                           mixing.threshold   = 100000,
+                           unmixed.allowable  = 2,
+                           verbose            = TRUE) {
+  
+  # Resolve location names
+  all.loc.names <- if (!is.null(locations)) {
+    unique(names(.filter.to.requested.locations(
+      locations,
+      setNames(sapply(calib.simsets, `[[`, "location.code"),
+               sapply(calib.simsets, `[[`, "location.name")),
+      "inspect_mixing"
+    )))
+  } else {
+    unique(sapply(calib.simsets, `[[`, "location.name"))
+  }
+  
+  setNames(lapply(calibration.codes, function(calib_code) {
+    
+    rv <- setNames(sapply(all.loc.names, function(loc) {
+      
+      tryCatch({
+        simset <- extract.calib.simsets(
+          calib.simsets,
+          location         = loc,
+          calibration.code = calib_code,
+          exact            = TRUE
+        )[[1]]$full_simset
+        
+        mixing.stats <- simset$get.mcmc.mixing.statistic()
+        
+        # --- Display mixing statistics as a table ---
+        if (show.mixing) {
+          n.display   <- min(mixing.n, length(mixing.stats))
+          display.df  <- data.frame(
+            parameter         = names(mixing.stats[,1][seq_len(n.display)]),
+            mixing_statistic  = unname(mixing.stats[,1][seq_len(n.display)]),
+            above_threshold   = mixing.stats[,1][seq_len(n.display)] > mixing.threshold,
+            row.names         = NULL
+          )
+          
+          cat("\n===== Mixing Statistics =====\n")
+          cat("Location:         ", loc, "\n")
+          cat("Calibration code: ", calib_code, "\n")
+          cat("Showing:          ", n.display, " of ", length(mixing.stats), " parameters\n")
+          cat("Threshold:        ", mixing.threshold, "\n\n")
+          print(display.df, right = FALSE)
+          cat("\n")
+        }
+        
+        # --- Threshold check: FALSE if too many unmixed ---
+        n.over <- sum(mixing.stats > mixing.threshold)
+        pass   <- n.over < unmixed.allowable
+        
+        if (verbose && !pass) {
+          cat(sprintf(
+            "[WARN] %s in '%s': %d parameters above threshold (%d)\n",
+            loc, calib_code, n.over, mixing.threshold
+          ))
+        }
+        
+        pass
+        
+      }, error = function(e) {
+        if (verbose) {
+          cat(sprintf(
+            "[ERROR] Could not extract simset for %s in '%s': %s\n",
+            loc, calib_code, conditionMessage(e)
+          ))
+        }
+        FALSE
+      })
+      
+    }), all.loc.names)
+    
+    if (verbose && any(!rv)) {
+      cat(sprintf(
+        "\nLocations that did not mix in '%s': %s\n",
+        calib_code,
+        paste0(all.loc.names[!rv], collapse = ", ")
+      ))
+    }
+    
+    rv
+    
+  }), calibration.codes)
+}
