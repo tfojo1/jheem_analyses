@@ -34,6 +34,46 @@ register.calibration.info("calib.6.29.stage0.az",
                           parameter.aliases = par.aliases.transmission,
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
+
+# 6.29 (actually run on 6.30!)
+register.calibration.info('calib.6.29.stage1.az',
+                          preceding.calibration.codes = 'calib.6.29.stage0.az',
+                          likelihood.instructions = lik.inst.stage1,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info("calib.6.29.stage2.az",
+                          preceding.calibration.codes = 'calib.6.29.stage1.az',
+                          likelihood.instructions = lik.inst.stage23,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names
+                          ),
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info("calib.6.29.stage3.az",
+                          preceding.calibration.codes = 'calib.6.29.stage2.az',
+                          likelihood.instructions = lik.inst.stage23,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names
+                          ),
+                          n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
+)
  
 # 6.5 (several changes) ----
 register.calibration.info("calib.6.5.stage0.az",
