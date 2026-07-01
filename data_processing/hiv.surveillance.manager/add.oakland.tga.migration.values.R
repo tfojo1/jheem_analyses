@@ -44,7 +44,7 @@ oakland.all.migration <- rbind(oakland.tga.1, oakland.tga.2, oakland.tga.3, oakl
                                oakland.tga.7, oakland.tga.8, oakland.tga.9, oakland.tga.10, oakland.tga.11, oakland.tga.12)
 
 # Put ---------------------------------------------------------------------
-data.manager$put.long.form(
+surveillance.manager$put.long.form(
     data = oakland.all.migration,
     ontology.name = 'census.immigration',
     source = 'census.population',
