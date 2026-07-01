@@ -10,20 +10,29 @@ source("../jheem_analyses/applications/SHIELD/shield_calib_register.R")
 source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions.R')
  
 # ---- SETUP ----
-# for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.16.stage2.az"))}
+for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.29.stage0.az"))}
  
 
 calibration.codes <- c(
-
-    "calib.6.25.stage2.az"
+    "calib.6.29.stage0.az"
     )
 
 # read simulations into the simset
 calib.simsets <- load.calib.simsets(
-    locations         = 'C.12580',
+    locations         = SHIELD.TEN.MSAS,
     calibration.codes = calibration.codes,
     n.sim = 300
 )
+# Inspect mixing statistics -----
+inspect_mixing (
+    calib.simsets = calib.simsets,
+    calibration.codes =calibration.codes,
+    locations = SHIELD.TEN.MSAS,
+    show.mixing = T,
+    verbose = F
+    )
+    
+
 LOCATION="C.12580"
 VERSION="shield"
 lastSim=calib.simsets$`Baltimore-Columbia-Towson, MD – calib.6.25.stage2.az`$last_sim
@@ -70,11 +79,11 @@ apply(sim.manual$diagnosis.total,1,sum)==
 
 
 # CREATE ALL STAGE CALIBRATION PLOTS
-# plot.calib.stages(calib.simsets = calib.simsets,
-#                   calibration.code =calibration.codes[2],
-#                   stage = 2,
-#                   locations = SHIELD.TEN.MSAS)
-# 
+plot.calib.stages(calib.simsets = calib.simsets,
+                  calibration.code =calibration.codes,
+                  stage = 0,
+                  locations = SHIELD.TEN.MSAS)
+
 # # SINGLE CALIB SINGLE LOCATION
 # plot.single.calib.single.location(calib.simsets = calib.simsets,
 #                     calibration.code = calibration.codes[2],
@@ -169,3 +178,4 @@ p1=plot.calib.comparison(
 p1
 
 calib.simsets$`Atlanta – calib.5.11.stage2.az`$full_simset$traceplot("transmission.rate.multiplier.het")
+head(calib.simsets$`Atlanta – calib.6.29.stage0.az`$full_simset$get.mcmc.mixing.statistic())

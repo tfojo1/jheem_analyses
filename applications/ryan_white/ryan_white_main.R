@@ -11,7 +11,7 @@ RW.DATA.MANAGER$remove_data('oahs.clients', source='ryan.white.program', ontolog
                                                     age=c("13-24 years", "25-34 years", "35-44 years", "45-54 years", "55-64 years", "65+ years")))
 
 source('../jheem_analyses/applications/ryan_white/ryan_white_mcmc.R')
-source('../jheem_analyses/applications/ryan_white/ryan_white_likelihoods.R')
+#source('../jheem_analyses/applications/ryan_white/ryan_white_likelihoods.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 source('../jheem_analyses/applications/ryan_white/ryan_white_interventions.R')
 source('../jheem_analyses/applications/ryan_white/read_rw_costs.R')
@@ -19,9 +19,9 @@ source('../jheem_analyses/applications/ryan_white/ryan_white_nanb_interventions.
 source('../jheem_analyses/applications/ryan_white/ryan_white_partb_interventions.R')
 source('../jheem_analyses/applications/ryan_white/rw_adap_biktarvy_interventions.R')
 source('../jheem_analyses/applications/ryan_white/ryan_white_50_adap_interventions.R')
-#source('../jheem_analyses/applications/ryan_white/ryan_white_no_trate_interventions.R')
-source('../jheem_analyses/applications/ryan_white/Ryan_white_costing/ryan_white_no_trate_interventions.R')
-source('../jheem_analyses/applications/cdc_testing/urbanicity_calculations.R')
+source('../jheem_analyses/applications/ryan_white/ryan_white_100_adap_interventions.R')
+#source('../jheem_analyses/applications/ryan_white/Ryan_white_costing/ryan_white_no_trate_interventions.R')
+source('../jheem_analyses/applications/ryan_white/Ryan_white_costing/urbanicity_calculations_v2.R')
 
 
 # To pull what we have calibrated

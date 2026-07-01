@@ -24,18 +24,20 @@ section1$import.data(section5)
 
 surveillance.manager = section1
 
-# Run this code- it uses both HIV data and adult.population ---------------
+# Run this code- it uses both HIV data and adult.population --------------------
 source('data_processing/hiv.surveillance.manager/tests.per.population.R') # Source code to create hiv.tests.per.population 
 
-# Source code to aggregate proportion.msm  --------------------------------
+# Source code to aggregate proportion.msm  -------------------------------------
 source('data_processing/hiv.surveillance.manager/aggregating.proportion.msm.R')
-# Remove outliers ---------------------------------------------------------
+# Remove outliers --------------------------------------------------------------
 save(surveillance.manager, file="../../cached/surveillance.manager.before.outliers.rdata")
 
 source('data_processing/outliers/outlier.remover.total.level.R')
 source('data_processing/outliers/outlier.remover.one.way.strata.R')
 source('data_processing/outliers/outlier.remover.two.way.strata.R')
 
+#Update for 7-1-26: Oakland TGA adding migration values for modeling -----------
+source('data_processing/hiv.surveillance.manager/add.oakland.tga.migration.values.R')
 
 ###Save surveillance manager####
 save(surveillance.manager, file="../../cached/surveillance.manager.rdata")
