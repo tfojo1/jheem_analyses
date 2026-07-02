@@ -35,8 +35,8 @@ register.calibration.info("calib.6.29.stage0.az",
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
-# 6.29 (actually run on 6.30!)
-register.calibration.info('calib.6.29.stage1.az',
+# 7.2 (There was a 6.29 but the stage 1 LL diagnosis stratified likelihood was -Inf for most, so now stage1 liks are only 0- and 1-way stratified)
+register.calibration.info('calib.7.2.stage1.az',
                           preceding.calibration.codes = 'calib.6.29.stage0.az',
                           likelihood.instructions = lik.inst.stage1,
                           data.manager = SURVEILLANCE.MANAGER,
@@ -46,8 +46,8 @@ register.calibration.info('calib.6.29.stage1.az',
                                               TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-register.calibration.info("calib.6.29.stage2.az",
-                          preceding.calibration.codes = 'calib.6.29.stage1.az',
+register.calibration.info("calib.7.2.stage2.az",
+                          preceding.calibration.codes = 'calib.7.2.stage1.az',
                           likelihood.instructions = lik.inst.stage23,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
@@ -60,8 +60,8 @@ register.calibration.info("calib.6.29.stage2.az",
                           ),
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-register.calibration.info("calib.6.29.stage3.az",
-                          preceding.calibration.codes = 'calib.6.29.stage2.az',
+register.calibration.info("calib.7.2.stage3.az",
+                          preceding.calibration.codes = 'calib.7.2.stage2.az',
                           likelihood.instructions = lik.inst.stage23,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
