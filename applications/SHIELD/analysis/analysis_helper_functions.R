@@ -209,9 +209,11 @@ int.style.manager <- function(intervention.labels,
                  plot.which = plot.which)
     if (!is.null(split.by)) args$split.by <- split.by
     if (!is.null(facet.by)) args$facet.by  <- facet.by
-    if (length(simset.list) > 1 && !is.null(labels)) args$simset.names <- unname(labels)
+    if (length(simset.list) >= 1 && !is.null(labels)) args$simset.names <- unname(labels)
     do.call(simplot, c(unname(simset.list), args))
-}
+    # browser()
+    
+    }
 
 # Patchwork grid - each panel retains its own legend
 # Simply arranges panels in a grid without collecting/sharing legends
@@ -717,7 +719,7 @@ plot.calib.comparison <- function(calib.simsets,
                                   dpi               = 300,
                                   create.dirs       = TRUE,
                                   verbose           = TRUE) {
-    
+    # browser()
     if (!is.null(locations) && is.null(names(locations)))
         stop("Error: 'locations' must be a NAMED vector")
     
@@ -743,6 +745,7 @@ plot.calib.comparison <- function(calib.simsets,
      }
     
     loc.panel <- function(loc, outs) {
+        # browser()
         entries <- extract.calib.simsets(calib.simsets, location = loc)
         entries <- entries[sapply(entries, function(e) e$calib.code %in% all.calibs)]
         if (length(entries) == 0) return(NULL)
@@ -755,6 +758,7 @@ plot.calib.comparison <- function(calib.simsets,
     output <- list()
      if (separate.by == "outcome") {
         for (oi in seq_along(outcomes)) {
+            # browser()
             outcome <- outcomes[oi]
             if (verbose) message(sprintf("[%d/%d] Outcome: %s", oi, length(outcomes), outcome))
             panels   <- setNames(lapply(all.loc.names, loc.panel, outs = outcome), all.loc.names)

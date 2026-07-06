@@ -8,81 +8,124 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 source("../jheem_analyses/applications/SHIELD/shield_specification.R")
 source("../jheem_analyses/applications/SHIELD/shield_calib_register.R")
 source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions.R')
- 
+
 # ---- SETUP ----
 for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.29.stage0.az"))}
- 
+for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.3.stage2.az"))}
 
 calibration.codes <- c(
-    "calib.6.29.stage0.az"
-    )
+    "calib.6.29.stage0.az",
+    "calib.7.2.stage1.az",
+    "calib.7.2.stage2.az",
+    "calib.7.2.stage3.az"
+)
 
-# read simulations into the simset
+# for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.16.stage2.az"))}
+
+
+# Read simulations into calib.simset ----
 calib.simsets <- load.calib.simsets(
-    locations         = SHIELD.TEN.MSAS,
+    locations         =  SHIELD.TEN.MSAS,
     calibration.codes = calibration.codes,
     n.sim = 300
 )
+
 # Inspect mixing statistics -----
 inspect_mixing (
     calib.simsets = calib.simsets,
-    calibration.codes =calibration.codes,
+    calibration.codes =calibration.codes[2],
     locations = SHIELD.TEN.MSAS,
     show.mixing = T,
-    verbose = F
-    )
-    
-
-LOCATION="C.12580"
-VERSION="shield"
-lastSim=calib.simsets$`Baltimore-Columbia-Towson, MD – calib.6.25.stage2.az`$last_sim
-param_calib=lastSim$get.params()
-param.manual=param_calib
-
-engine= create.jheem.engine(VERSION, LOCATION, end.year = 2030)
-sim.manual <- engine$run(param.manual)
-
-simplot( sim.manual,
-         c( "diagnosis.total",
-            "diagnosis.total.via.symptomatic.testing",
-            "diagnosis.total.via.sti.screening",
-         "diagnosis.total.via.contact.tracing",
-         "diagnosis.total.via.prenatal")
-        # c( "diagnosis.ps",
-        #     "diagnosis.ps.among.male" )
+    verbose = T
 )
-apply(sim.manual$diagnosis.ps,1,sum)
-sim.manual$diagnosis.ps.among.male
 
-apply(sim.manual$diagnosis.total,1,sum)==
-    apply(sim.manual$diagnosis.total,1,sum)+
-    apply(sim.manual$diagnosis.via.symptomatic.testing,1,sum)+
-    apply(sim.manual$diagnosis.total.via.prenatal,1,sum)+
-    apply(sim.manual$diagnosis.total.via.contact.tracing,1,sum)
 
-{
-    param.manual=param_calib
-    param.manual["transmission.rate.multiplier.heterosexual2022"]=1.01*param.manual["transmission.rate.multiplier.heterosexual2022"]
-    param.manual["transmission.rate.multiplier.msm2022"]=1.2*param.manual["transmission.rate.multiplier.msm2022"]
-    param.manual["transmission.rate.multiplier.hispanic.msm"]=1*param.manual["transmission.rate.multiplier.hispanic.msm"]
-    param.manual["transmission.rate.multiplier.hispanic.heterosexual"]=1*param.manual["transmission.rate.multiplier.hispanic.heterosexual"]
-    
-    sim.manual <- engine1$run(param.manual)
-    
-    simplot(lastSim,sim.manual,c("diagnosis.ps","hiv.testing"))
-    simplot(lastSim,sim.manual,c("diagnosis.ps"),facet.by = "sex")
-    simplot(lastSim,sim.manual,c("diagnosis.ps"),facet.by = "race")
-    simplot(lastSim,sim.manual,c("diagnosis.ps"),facet.by = "age")
+# ****************************************************************************************************
+# Save summary plots for a calibration version (compares the fit accross all cities)
+# ****************************************************************************************************
+
+save_summary_plots<-function(calibration.code,folder.name){
+    outcomes=c("diagnosis.ps","hiv.testing","diagnosis.total","diagnosis.el.misclassified","diagnosis.ll.misclassified")
+    plot.calib.comparison(calib.simsets = calib.simsets,
+                          calibration.codes = calibration.code,
+                          sim.subset = "last20",
+                          locations = SHIELD.TEN.MSAS,
+                          separate.by = "outcome",
+                          folder.name = folder.name,
+                          outcomes = outcomes,
+                          years = c(1970:2030),
+                          ncol=5,)
+    #
+    plot.calib.comparison(calib.simsets = calib.simsets,
+                          calibration.codes = calibration.code,
+                          sim.subset = "last20",
+                          locations = SHIELD.TEN.MSAS,
+                          separate.by = "outcome",
+                          folder.name = folder.name,
+                          outcomes = outcomes,
+                          years = c(1970:2030),
+                          facet.by = "sex" , ncol = 2)
+    plot.calib.comparison(calib.simsets = calib.simsets,
+                          calibration.codes = calibration.code,
+                          sim.subset = "last20",
+                          locations = SHIELD.TEN.MSAS,
+                          separate.by = "outcome",
+                          folder.name = folder.name,
+                          outcomes = outcomes,
+                          years = c(1970:2030),
+                          split.by = "race" , ncol = 2)
+    #
+    plot.calib.comparison(calib.simsets = calib.simsets,
+                          calibration.codes = calibration.code,
+                          sim.subset = "last20",
+                          locations = SHIELD.TEN.MSAS,
+                          separate.by = "outcome",
+                          folder.name = folder.name,
+                          outcomes = outcomes,
+                          years = c(1970:2030),
+                          facet.by = "sex" , ncol = 2,
+                          plot.which = "sim.only"    )
 }
+###
+save_summary_plots(calibration.code = "calib.6.25.stage2.az",folder.name = "calib.6.25.stage2.summary")
+save_summary_plots(calibration.code = "calib.7.2.stage1.az",folder.name = "calib.7.2.stage1.summary")
+save_summary_plots(calibration.code = "calib.7.2.stage2.az",folder.name = "calib.7.2.stage2.summary")
 
+## ************************************************************************************************************************
 
+plot.calib.comparison(calib.simsets = calib.simsets,
+                      calibration.codes = c("calib.6.29.stage0.az"),
+                      sim.subset = "last20",
+                      locations = SHIELD.TEN.MSAS,
+                      separate.by = "outcome",
+                      folder.name = "calib.6.25.stage.vs.6.19",
+                      outcomes = c("diagnosis.ps","hiv.testing"),
+                      years = c(1970:2030),
+                      # ncol=5
+                      facet.by = "sex" ,ncol = 2,
+                      # plot.which = "sim.only"
+                      # 
+)
 
-
+plot.calib.comparison(calib.simsets = calib.simsets,
+                      calibration.codes = c("calib.6.16.stage2.az","calib.6.16.stg2.penalty"),
+                      sim.subset = "last20",
+                      locations = SHIELD.TEN.MSAS,
+                      separate.by = "outcome",
+                      folder.name = "calib.6.16.stage2.vs.penalty",
+                      outcomes = c("diagnosis.ps","hiv.testing"),
+                      years = c(1970:2030),
+                      # ncol=5
+                      facet.by = "sex" ,ncol = 2,
+                      plot.which = "sim.only"
+                      # 
+)
 # CREATE ALL STAGE CALIBRATION PLOTS
 plot.calib.stages(calib.simsets = calib.simsets,
                   calibration.code =calibration.codes,
                   stage = 0,
                   locations = SHIELD.TEN.MSAS)
+
 
 # # SINGLE CALIB SINGLE LOCATION
 # plot.single.calib.single.location(calib.simsets = calib.simsets,
@@ -105,7 +148,7 @@ plot.calib.comparison(calib.simsets = calib.simsets,
                       # facet.by = "sex" ,
                       # plot.which = "sim.only",
                       # ncol = 2
-                      )
+)
 # plot.calib.comparison(calib.simsets = calib.simsets,
 #                       calibration.codes = c("calib.6.12.stage2.az","calib.6.12.stg2.penalty"),
 #                       sim.subset = "last20",
@@ -119,7 +162,7 @@ plot.calib.comparison(calib.simsets = calib.simsets,
 # )
 
 
-    # head(calib.simsets$`Atlanta – calib.7.12.stage0.test`$full_simset$get.mcmc.mixing.statistic())
+# head(calib.simsets$`Atlanta – calib.7.12.stage0.test`$full_simset$get.mcmc.mixing.statistic())
 # simplot(calib.simsets$`Atlanta – calib.7.12.stage0.test`$full_simset,"diagnosis.ps")
 # simplot(calib.simsets$`Atlanta – calib.7.12.stage0.test`$last_sim,"diagnosis.ps")
 # 
@@ -137,7 +180,7 @@ plot.calib.comparison(calib.simsets = calib.simsets,
 
 lapply(calib.simsets,function(x){
     head(x$full_simset$get.mcmc.mixing.statistic())
-    })
+})
 
 calib.simsets$`Chicago – calib.6.9.stage2.az`$full_simset$traceplot(c("transmission.*19","transmission.*20"))
 calib.simsets$`Chicago – calib.6.9.stage2.az`$last_sim$get.params(c("transmission.*20"))
@@ -174,8 +217,52 @@ p1=plot.calib.comparison(
     style.manager     =create.style.manager(color.sim.by = "simset",alpha.line = .1 
     )
 )
+ 
 
-p1
-
-calib.simsets$`Atlanta – calib.5.11.stage2.az`$full_simset$traceplot("transmission.rate.multiplier.het")
-head(calib.simsets$`Atlanta – calib.6.29.stage0.az`$full_simset$get.mcmc.mixing.statistic())
+# ****************************************************************************************************
+# . TESTUNG ENGINE
+# ****************************************************************************************************
+if (1==2){
+    LOCATION="C.12580"
+    VERSION="shield"
+    lastSim=calib.simsets$`Baltimore-Columbia-Towson, MD – calib.6.25.stage2.az`$last_sim
+    param_calib=lastSim$get.params()
+    param.manual=param_calib
+    #
+    engine= create.jheem.engine(VERSION, LOCATION, end.year = 2030)
+    sim.manual <- engine$run(param.manual)
+    #
+    simplot( sim.manual,
+             c( "diagnosis.total",
+                "diagnosis.total.via.symptomatic.testing",
+                "diagnosis.total.via.sti.screening",
+                "diagnosis.total.via.contact.tracing",
+                "diagnosis.total.via.prenatal")
+             # c( "diagnosis.ps",
+             #     "diagnosis.ps.among.male" )
+    )
+    apply(sim.manual$diagnosis.ps,1,sum)
+    sim.manual$diagnosis.ps.among.male
+    
+    apply(sim.manual$diagnosis.total,1,sum)==
+        apply(sim.manual$diagnosis.total,1,sum)+
+        apply(sim.manual$diagnosis.via.symptomatic.testing,1,sum)+
+        apply(sim.manual$diagnosis.total.via.prenatal,1,sum)+
+        apply(sim.manual$diagnosis.total.via.contact.tracing,1,sum)
+    
+    {
+        param.manual=param_calib
+        param.manual["transmission.rate.multiplier.heterosexual2022"]=1.01*param.manual["transmission.rate.multiplier.heterosexual2022"]
+        param.manual["transmission.rate.multiplier.msm2022"]=1.2*param.manual["transmission.rate.multiplier.msm2022"]
+        param.manual["transmission.rate.multiplier.hispanic.msm"]=1*param.manual["transmission.rate.multiplier.hispanic.msm"]
+        param.manual["transmission.rate.multiplier.hispanic.heterosexual"]=1*param.manual["transmission.rate.multiplier.hispanic.heterosexual"]
+        
+        sim.manual <- engine1$run(param.manual)
+        
+        simplot(lastSim,sim.manual,c("diagnosis.ps","hiv.testing"))
+        simplot(lastSim,sim.manual,c("diagnosis.ps"),facet.by = "sex")
+        simplot(lastSim,sim.manual,c("diagnosis.ps"),facet.by = "race")
+        simplot(lastSim,sim.manual,c("diagnosis.ps"),facet.by = "age")
+        }
+    
+}
