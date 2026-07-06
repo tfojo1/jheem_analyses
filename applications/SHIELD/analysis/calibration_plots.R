@@ -8,14 +8,30 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 source("../jheem_analyses/applications/SHIELD/shield_specification.R")
 source("../jheem_analyses/applications/SHIELD/shield_calib_register.R")
 source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions.R')
- 
+
 # ---- SETUP ----
+<<<<<<< HEAD
 for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.29.stage0.az"))}
  
 
 calibration.codes <- c(
     "calib.6.29.stage0.az"
     )
+=======
+# for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.16.stage2.az"))}
+
+
+calibration.codes <- c(
+    "calib.6.9.stage2.az" #prior run ater making a lot of revisions
+    #         "calib.6.12.stage2.az", #
+    #     # "calib.6.12.stg2.penalty"
+    #     
+    #     "calib.6.16.stage2.az", #with Covid reductions for sti screening
+    #      # "calib.6.16.stg2.penalty"
+    
+    
+)
+>>>>>>> 4f22c0da (x)
 
 # read simulations into the simset
 calib.simsets <- load.calib.simsets(
@@ -105,7 +121,7 @@ plot.calib.comparison(calib.simsets = calib.simsets,
                       # facet.by = "sex" ,
                       # plot.which = "sim.only",
                       # ncol = 2
-                      )
+)
 # plot.calib.comparison(calib.simsets = calib.simsets,
 #                       calibration.codes = c("calib.6.12.stage2.az","calib.6.12.stg2.penalty"),
 #                       sim.subset = "last20",
@@ -119,7 +135,7 @@ plot.calib.comparison(calib.simsets = calib.simsets,
 # )
 
 
-    # head(calib.simsets$`Atlanta – calib.7.12.stage0.test`$full_simset$get.mcmc.mixing.statistic())
+# head(calib.simsets$`Atlanta – calib.7.12.stage0.test`$full_simset$get.mcmc.mixing.statistic())
 # simplot(calib.simsets$`Atlanta – calib.7.12.stage0.test`$full_simset,"diagnosis.ps")
 # simplot(calib.simsets$`Atlanta – calib.7.12.stage0.test`$last_sim,"diagnosis.ps")
 # 
@@ -137,7 +153,7 @@ plot.calib.comparison(calib.simsets = calib.simsets,
 
 lapply(calib.simsets,function(x){
     head(x$full_simset$get.mcmc.mixing.statistic())
-    })
+})
 
 calib.simsets$`Chicago – calib.6.9.stage2.az`$full_simset$traceplot(c("transmission.*19","transmission.*20"))
 calib.simsets$`Chicago – calib.6.9.stage2.az`$last_sim$get.params(c("transmission.*20"))
