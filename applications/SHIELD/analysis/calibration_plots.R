@@ -10,11 +10,16 @@ source("../jheem_analyses/applications/SHIELD/shield_calib_register.R")
 source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions.R')
 
 # ---- SETUP ----
+<<<<<<< HEAD
+=======
+for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.25.stage2.az"))}
+>>>>>>> 5aa23274 (x)
 
 for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.29.stage0.az"))}
  
 
 calibration.codes <- c(
+<<<<<<< HEAD
     "calib.6.29.stage0.az"
     )
 
@@ -29,6 +34,10 @@ calibration.codes <- c(
     #      # "calib.6.16.stg2.penalty"
     
     "calib.6.19.stage2.az" #changed screening to spline
+=======
+"calib.6.25.stage2.az", #adding ps.diag targets for male female 1993-2016
+"calib.6.19.stage2.az", #sti screening is now a linear spline
+>>>>>>> 5aa23274 (x)
 )
 <<<<<<< HEAD
  
@@ -132,24 +141,23 @@ save_summary_plots<-function(calibration.code,folder.name){
                           plot.which = "sim.only"    )
 }
 ###
-save_summary_plots(calibration.code = "calib.6.16.stage2.az",folder.name = "calib.6.16.stage2.summary")
-save_summary_plots(calibration.code = "calib.6.19.stage2.az",folder.name = "calib.6.19.stage2.summary")
+save_summary_plots(calibration.code = "calib.6.25.stage2.az",folder.name = "calib.6.25.stage2.summary")
 
 
 ## ************************************************************************************************************************
 >>>>>>> 03434da4 (calibration plots)
 
 plot.calib.comparison(calib.simsets = calib.simsets,
-                      calibration.codes = c("calib.6.16.stage2.az","calib.6.12.stage2.az"),
+                      calibration.codes = c("calib.6.25.stage2.az","calib.6.19.stage2.az"),
                       sim.subset = "last20",
                       locations = SHIELD.TEN.MSAS,
                       separate.by = "outcome",
-                      folder.name = "calib.6.16.stage.vs.6.12",
+                      folder.name = "calib.6.25.stage.vs.6.19",
                       outcomes = c("diagnosis.ps","hiv.testing"),
                       years = c(1970:2030),
                       # ncol=5
                       facet.by = "sex" ,ncol = 2,
-                      plot.which = "sim.only"
+                      # plot.which = "sim.only"
                       # 
 )
 
@@ -168,10 +176,17 @@ plot.calib.comparison(calib.simsets = calib.simsets,
 )
 # CREATE ALL STAGE CALIBRATION PLOTS
 plot.calib.stages(calib.simsets = calib.simsets,
+<<<<<<< HEAD
                   calibration.code =calibration.codes,
                   stage = 0,
                   locations = SHIELD.TEN.MSAS)
 
+=======
+                  calibration.code ="calib.6.25.stage2.az",,
+                  stage = 2,
+                  locations = SHIELD.TEN.MSAS)
+# 
+>>>>>>> 5aa23274 (x)
 # # SINGLE CALIB SINGLE LOCATION
 # plot.single.calib.single.location(calib.simsets = calib.simsets,
 #                     calibration.code = calibration.codes[2],
