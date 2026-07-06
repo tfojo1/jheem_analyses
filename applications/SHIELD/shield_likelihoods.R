@@ -601,8 +601,8 @@ late.diagnosis.by.strata.stage1.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'compound.symmetry',
                                          #
-                                         equalize.weight.by.year = T 
-                                         # minimum.error.sd = 1#redundant because we have sd in variance structure
+                                         equalize.weight.by.year = T,
+                                         minimum.error.sd = 1
     )
 late.diagnosis.by.strata.stage2.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
@@ -618,8 +618,8 @@ late.diagnosis.by.strata.stage2.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'compound.symmetry',
                                          #
-                                         equalize.weight.by.year = T 
-                                         # minimum.error.sd = 1#redundant because we have sd in variance structure
+                                         equalize.weight.by.year = T,
+                                         minimum.error.sd = 1
     )
 
 ##** PROPORTION TESTED ** ----
