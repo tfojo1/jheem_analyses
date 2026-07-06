@@ -75,9 +75,9 @@ register.calibration.info("calib.7.2.stage3.az",
                           ),
                           n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
 )
-# 7.5 ----
+# 7.6 ----
 # stage 2 and 3 repeated 
-register.calibration.info("calib.7.5.stage2.az",
+register.calibration.info("calib.7.6.stage2.az",
                           preceding.calibration.codes = 'calib.7.2.stage1.az',
                           likelihood.instructions = lik.inst.stage23,
                           data.manager = SURVEILLANCE.MANAGER,
@@ -91,8 +91,8 @@ register.calibration.info("calib.7.5.stage2.az",
                           ),
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-register.calibration.info("calib.7.5.stage3.az",
-                          preceding.calibration.codes = 'calib.7.5.stage2.az',
+register.calibration.info("calib.7.6.stage3.az",
+                          preceding.calibration.codes = 'calib.7.6.stage2.az',
                           likelihood.instructions = lik.inst.stage23,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
