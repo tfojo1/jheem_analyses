@@ -1,6 +1,10 @@
 # Tech2Check — initial intervention results
 
 
+> **FROZEN — meeting-1 result record.** The first finding (meeting 1,
+> May 2026), reviewed; superseded for current work by a later
+> structural-bound characterization. Not maintained.
+
 ## What this shows
 
 Initial result from running the calibrated **Tech2Check intervention on
@@ -72,6 +76,15 @@ specifically.
 
 Maryland, 1000-sim posterior. Median \[95% CI\] of per-sim cumulative
 new HIV infections summed over 2026–2030.
+
+This interval propagates the 1000-sim calibration posterior at a
+**fixed** suppression OR of 2.0 — it is *conditional on the trial’s
+point estimate*. The OR is itself uncertain (trial 95% CI 0.90–4.47,
+which crosses 1 because the trial was underpowered), and that
+uncertainty, not the calibration spread, dominates. The conditional
+interval here should not be read as an unconditional statement that the
+effect excludes zero; the full trial-OR sensitivity is characterized
+separately.
 
 ## The context — why the effect is small
 
