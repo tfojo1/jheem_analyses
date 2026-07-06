@@ -25,14 +25,15 @@ calibration.codes <- c(
     "calib.6.12.stage2.az", # prior trate_2000 for msm set to log(1)
     #     # "calib.6.12.stg2.penalty"
     
-         "calib.6.16.stage2.az", #with Covid reductions for sti screening
+    "calib.6.16.stage2.az", #with Covid reductions for sti screening
     #      # "calib.6.16.stg2.penalty"
     
-        "calib.6.19.stage2.az" #changed screening to spline
-    
-    
+    "calib.6.19.stage2.az" #changed screening to spline
 )
+<<<<<<< HEAD
  
+=======
+>>>>>>> 03434da4 (calibration plots)
 
 # read simulations into the simset
 calib.simsets <- load.calib.simsets(
@@ -40,6 +41,7 @@ calib.simsets <- load.calib.simsets(
     calibration.codes = calibration.codes,
     n.sim = 300
 )
+<<<<<<< HEAD
 # Inspect mixing statistics -----
 inspect_mixing (
     calib.simsets = calib.simsets,
@@ -94,38 +96,75 @@ apply(sim.manual$diagnosis.total,1,sum)==
 
 
 
+=======
+## *******************************************************************************************************************************
+# Save summary plots for a calibration version (compares the fit accross all cities)
+save_summary_plots<-function(calibration.code,folder.name){
+    plot.calib.comparison(calib.simsets = calib.simsets,
+                          calibration.codes = calibration.code,
+                          sim.subset = "last20",
+                          locations = SHIELD.TEN.MSAS,
+                          separate.by = "outcome",
+                          folder.name = folder.name,
+                          outcomes = c("diagnosis.ps","hiv.testing","diagnosis.total"),
+                          years = c(1970:2030),
+                          ncol=5,)
+    #
+    plot.calib.comparison(calib.simsets = calib.simsets,
+                          calibration.codes = calibration.code,
+                          sim.subset = "last20",
+                          locations = SHIELD.TEN.MSAS,
+                          separate.by = "outcome",
+                          folder.name = folder.name,
+                          outcomes = c("diagnosis.ps","hiv.testing","diagnosis.total"),
+                          years = c(1970:2030),
+                          facet.by = "sex" , ncol = 2)
+    #
+    plot.calib.comparison(calib.simsets = calib.simsets,
+                          calibration.codes = calibration.code,
+                          sim.subset = "last20",
+                          locations = SHIELD.TEN.MSAS,
+                          separate.by = "outcome",
+                          folder.name = folder.name,
+                          outcomes = c("diagnosis.ps","hiv.testing","diagnosis.total"),
+                          years = c(1970:2030),
+                          facet.by = "sex" , ncol = 2,
+                          plot.which = "sim.only"    )
+}
+###
+save_summary_plots(calibration.code = "calib.6.16.stage2.az",folder.name = "calib.6.16.stage2.summary")
+save_summary_plots(calibration.code = "calib.6.19.stage2.az",folder.name = "calib.6.19.stage2.summary")
+
+
+## ************************************************************************************************************************
+>>>>>>> 03434da4 (calibration plots)
 
 plot.calib.comparison(calib.simsets = calib.simsets,
-                      calibration.codes = c("calib.6.16.stage2.az"),
+                      calibration.codes = c("calib.6.16.stage2.az","calib.6.12.stage2.az"),
                       sim.subset = "last20",
                       locations = SHIELD.TEN.MSAS,
                       separate.by = "outcome",
-                      folder.name = "calib.6.16.stage2.summary",
-                      outcomes = c("diagnosis.ps","hiv.testing","diagnosis.total"),
-                      years = c(1970:2030),
-                      # ncol=5
-                      facet.by = "sex" ,
-                      plot.which = "sim.only",
-                      ncol = 2
-)
-
- 
-# simplot(calib.simsets$`Seattle – calib.6.12.stage2.az`$last20_sims$diagnosis.ps, outcomes = "diagnosis.ps",facet.by = "sex")
-# x=calib.simsets$`Seattle – calib.6.12.stage2.az`$last20_sims$diagnosis.ps
-# x[,,1,1,,1]
-
-plot.calib.comparison(calib.simsets = calib.simsets,
-                      calibration.codes = c("calib.6.19.stage2.az","calib.6.16.stage2.az"),
-                      sim.subset = "last20",
-                      locations = SHIELD.TEN.MSAS,
-                      separate.by = "outcome",
-                      folder.name = "calib.6.19.stage.vs.6.16",
+                      folder.name = "calib.6.16.stage.vs.6.12",
                       outcomes = c("diagnosis.ps","hiv.testing"),
                       years = c(1970:2030),
                       # ncol=5
-                      # facet.by = "sex" ,
-                      # plot.which = "sim.only",
-                      ncol = 2
+                      facet.by = "sex" ,ncol = 2,
+                      plot.which = "sim.only"
+                      # 
+)
+
+plot.calib.comparison(calib.simsets = calib.simsets,
+                      calibration.codes = c("calib.6.16.stage2.az","calib.6.16.stg2.penalty"),
+                      sim.subset = "last20",
+                      locations = SHIELD.TEN.MSAS,
+                      separate.by = "outcome",
+                      folder.name = "calib.6.16.stage2.vs.penalty",
+                      outcomes = c("diagnosis.ps","hiv.testing"),
+                      years = c(1970:2030),
+                      # ncol=5
+                      facet.by = "sex" ,ncol = 2,
+                      plot.which = "sim.only"
+                      # 
 )
 # CREATE ALL STAGE CALIBRATION PLOTS
 plot.calib.stages(calib.simsets = calib.simsets,
