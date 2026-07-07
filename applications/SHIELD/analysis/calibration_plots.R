@@ -11,13 +11,12 @@ source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions
 
 # ---- SETUP ----
 for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.29.stage0.az"))}
-for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.3.stage2.az"))}
+for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.6.stage3.az"))}
 
 calibration.codes <- c(
-    "calib.6.29.stage0.az",
-    "calib.7.2.stage1.az",
-    "calib.7.2.stage2.az",
-    "calib.7.2.stage3.az"
+    # "calib.6.29.stage0.az",
+    # "calib.7.2.stage1.az",
+    "calib.7.6.stage3.az"
 )
 
 # for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.16.stage2.az"))}
@@ -45,7 +44,7 @@ inspect_mixing (
 # ****************************************************************************************************
 
 save_summary_plots<-function(calibration.code,folder.name){
-    outcomes=c("diagnosis.ps","hiv.testing","diagnosis.total","diagnosis.el.misclassified","diagnosis.ll.misclassified")
+    outcomes=c("diagnosis.ps","hiv.testing","diagnosis.total","diagnosis.el.misclassified","diagnosis.late.misclassified")
     plot.calib.comparison(calib.simsets = calib.simsets,
                           calibration.codes = calibration.code,
                           sim.subset = "last20",
@@ -225,7 +224,7 @@ p1=plot.calib.comparison(
 if (1==2){
     LOCATION="C.12580"
     VERSION="shield"
-    lastSim=calib.simsets$`Baltimore-Columbia-Towson, MD – calib.6.25.stage2.az`$last_sim
+    lastSim=calib.simsets$`Baltimore-Columbia-Towson, MD – calib.7.2.stage1.az`$last_sim
     param_calib=lastSim$get.params()
     param.manual=param_calib
     #
@@ -241,6 +240,22 @@ if (1==2){
              # c( "diagnosis.ps",
              #     "diagnosis.ps.among.male" )
     )
+    simplot( sim.manual,
+             c( 
+                #  "diagnosis.total",
+                # "diagnosis.ps",
+                # "diagnosis.el.misclassified",
+                "diagnosis.late.misclassified"
+             ),
+             split.by = "race",facet.by = "sex"
+             )
+    
+    lik1=instantiate.likelihood(lik.inst.stage1,version = 'shield',location = "C.12580")
+    lik23=instantiate.likelihood(lik.inst.stage23,version = 'shield',location = "C.12580")
+    
+    lik1$compute(sim.manual)
+    lik23$compute(sim.manual)
+    
     apply(sim.manual$diagnosis.ps,1,sum)
     sim.manual$diagnosis.ps.among.male
     
