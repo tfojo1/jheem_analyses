@@ -107,9 +107,19 @@ register.calibration.info("calib.7.6.stage3.az",
 )
 
 # 7.7 ----
-# stage 2 repeated after upweighting the stage 23 prop.male.diag.among.msm likelihood weight to equal 1 overall
-register.calibration.info("calib.7.6.stage2.az",
-                          preceding.calibration.codes = 'calib.7.2.stage1.az',
+# stage 1 and 2 repeated after upweighting the stage 23 prop.male.diag.among.msm likelihood weight to equal 1 overall
+register.calibration.info('calib.7.7.stage1.az',
+                          preceding.calibration.codes = 'calib.6.29.stage0.az',
+                          likelihood.instructions = lik.inst.stage1,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info("calib.7.7.stage2.az",
+                          preceding.calibration.codes = 'calib.7.7.stage1.az',
                           likelihood.instructions = lik.inst.stage23,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
