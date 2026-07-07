@@ -693,19 +693,13 @@ lik.inst.stage1=join.likelihood.instructions(
     proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
     #
     historical.diagnosis.likelihood.instructions,
-    # penalty.msm.prop.of.ps.male.likelihood.instructions,
-    penalty.ps.diag.growth.likelihood.instructions,    
+    penalty.ps.diag.growth.likelihood.instructions, #this has a weight of 8 baked into it     
     prop.male.diagnosis.among.msm.stage1,
     #
     additional.weights = STAGE.1.WEIGHT
 )
 
 # STAGE 2&3: All likelihood combined ----
-
-prop.male.diagnosis.among.msm.stage23=join.likelihood.instructions(
-    proportion.male.diagnosis.among.msm.nested.likelihood.instructions,
-    additional.weights = PROP.MALE.DIAG.AMONG.MSM.WEIGHT.STAGE23
-)
 
 lik.inst.stg23.demog=join.likelihood.instructions(
     population.likelihood.instructions,
@@ -715,7 +709,10 @@ lik.inst.stg23.demog=join.likelihood.instructions(
     emigration.likelihood.instructions,
     additional.weights = STAGE.23.POPULATION.WEIGHT
 )
-
+prop.male.diagnosis.among.msm.stage23=join.likelihood.instructions(
+    proportion.male.diagnosis.among.msm.nested.likelihood.instructions,
+    additional.weights = PROP.MALE.DIAG.AMONG.MSM.WEIGHT.STAGE23
+)
 lik.inst.stg23.non.demog=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
     total.diagnosis.by.strata.stage2.likelihood.instructions,
@@ -732,11 +729,11 @@ lik.inst.stg23.non.demog=join.likelihood.instructions(
     proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
     #
     historical.diagnosis.likelihood.instructions,
-    penalty.ps.diag.growth.likelihood.instructions,
+    penalty.ps.diag.growth.likelihood.instructions,#this has a weight of 8 baked into it 
     prop.male.diagnosis.among.msm.stage23
 )
 
-# We use this one
+# putting them together:
 lik.inst.stage23 = join.likelihood.instructions(
     lik.inst.stg23.demog,
     lik.inst.stg23.non.demog,
