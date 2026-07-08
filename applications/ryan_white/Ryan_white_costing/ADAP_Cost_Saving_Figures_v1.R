@@ -200,20 +200,20 @@ savings_2035 <- compare_with_rw %>%
 
 
 # =============================================================================
-# A. ADAP COVERAGE (% of diagnosed PLWH on ADAP)
+# A. Relative ADAP Suppression (% of Suppressed PWH on ADAP)
 # =============================================================================
 adap_pct_df <- df %>%
     filter(
         year         == 2025,
         intervention == "noint",
-        outcome      %in% c("adap.clients", "diagnosed.prevalence")
+        outcome      %in% c("adap.suppression", "suppression")
     ) %>%
-    select(location, sim, outcome, value) %>%
+    dplyr::select(location, sim, outcome, value) %>%
     pivot_wider(names_from = outcome, values_from = value) %>%
-    mutate(adap_pct = adap.clients / diagnosed.prevalence) %>%
+    mutate(prop_suppressed_on_adap = adap.suppression / suppression) %>%
     group_by(location) %>%
     summarise(
-        avg_adap_pct = mean(adap_pct, na.rm = TRUE),
+        avg_prop_suppressed_on_adap = mean(prop_suppressed_on_adap, na.rm = TRUE),
         .groups      = "drop"
     ) %>%
     filter(location != "Total")
@@ -228,7 +228,12 @@ total.prevalence <- apply(
     na.rm = TRUE
 )
 
-trate_mat <- total.sexual.transmission[BASELINE.YEAR, , , "noint"] / total.prevalence
+total.suppression <- apply(
+    total.results[BASELINE.YEAR, , "suppression", , "noint"],
+    c("sim", "location"), sum, na.rm = TRUE
+)
+
+trate_mat <- total.sexual.transmission[BASELINE.YEAR, , , "noint"] / (total.prevalence - total.suppression) # minus suppressed in denominator
 avg_trate <- apply(trate_mat, "location", mean, na.rm = TRUE)
 
 trate_df <- tibble(
@@ -245,7 +250,7 @@ suppression_pct_df <- df %>%
         intervention == "noint",
         outcome      %in% c("suppression", "diagnosed.prevalence")
     ) %>%
-    select(location, sim, outcome, value) %>%
+    dplyr::select(location, sim, outcome, value) %>%
     pivot_wider(names_from = outcome, values_from = value) %>%
     mutate(suppression_pct = suppression / diagnosed.prevalence) %>%
     group_by(location) %>%
@@ -293,7 +298,7 @@ make_corr_label <- function(x, y, data) {
     sprintf("\u03c1 = %.2f", ct$estimate, ct$p.value)
 }
 
-label_adap        <- make_corr_label("avg_adap_pct",          "med_ratio", plot_df)
+label_adap        <- make_corr_label("avg_prop_suppressed_on_adap",          "med_ratio", plot_df)
 label_trate       <- make_corr_label("avg_transmission_rate",  "med_ratio", plot_df)
 label_suppression <- make_corr_label("avg_suppression_pct",   "med_ratio", plot_df)
 label_urban       <- make_corr_label("urbanicity",          "med_ratio", plot_df)
@@ -415,14 +420,14 @@ make_panel <- function(data,
 # =============================================================================
 p_adap_v2 <- make_panel(
     data       = plot_df,
-    x_var      = "avg_adap_pct",
-    x_lab      = "PWH receiving ADAP sevices, %",
+    x_var      = "avg_prop_suppressed_on_adap",
+    x_lab      = "Proportion of Suppressed PWH on ADAP, %",
     corr_label = label_adap,
     corr_pos   = "topleft",
     pct_x      = TRUE,
     size_var   = "med_adap_spending",
     size_lab = "Cum. ADAP spending\nthrough 2035 (USD)"
-) + labs(tag = "A")
+) + labs(tag = "C")
 
 p_trate_v2 <- make_panel(
     data       = plot_df,
@@ -432,7 +437,7 @@ p_trate_v2 <- make_panel(
     corr_pos   = "topleft",
     size_var   = "med_adap_spending",
     size_lab = "Cum. ADAP spending\nthrough 2035 (USD)"
-) + labs(tag = "B")
+) + labs(tag = "A")
 
 p_suppression_v2 <- make_panel(
     data       = plot_df,
@@ -443,7 +448,7 @@ p_suppression_v2 <- make_panel(
     pct_x      = TRUE,
     size_var   = "med_adap_spending",
     size_lab = "Cum. ADAP spending\nthrough 2035 (USD)"
-) + labs(tag = "C")
+) + labs(tag = "B")
 
 p_urban_v2 <- make_panel(
     data       = plot_df %>% filter(!is.na(urbanicity)),
@@ -460,15 +465,11 @@ p_urban_v2 <- make_panel(
 # 13. COMBINE AND PRINT BOTH FIGURES
 # =============================================================================
 
-p_combined_f2 <- (p_adap_v2 | p_trate_v2) / (p_suppression_v2 | p_urban_v2) +
+p_combined_f2 <- (p_trate_v2 | p_suppression_v2 ) / (p_adap_v2  | p_urban_v2) +
     plot_layout(guides = "collect") &
     theme(legend.position = "bottom", legend.box = "horizontal")
 
 print(p_combined_f2)
-
-
-
-
 
 
 
