@@ -173,6 +173,16 @@ data.manager$register.ontology(
     sex=c('male','female', 'msm')
   ))
 
+data.manager$register.ontology(
+    'state.health.dept',
+    ont = ontology(
+        year= NULL,
+        location= NULL,
+        age=c('0-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-54 years', '55-64 years', '65+ years'),
+        race=c('american indian/alaska native', 'asian', 'black/african american', 'hispanic/latino', 'native hawaiian/other pacific islander', 'white'),
+        sex=c('male','female', 'msm')
+    ))
+
 #Codes:
 source('data_processing/syphilis.manager/syphilis.data.R')
 source('data_processing/syphilis.manager/cdc.sti.surveillance.reports.processing.2003.2017.R') #This pulls one table from 2003-2017 reports, Parastu wanted this report where primary and secondary are reported separate
@@ -181,6 +191,7 @@ source('data_processing/syphilis.manager/cdc.pdf.reports.1941.2022.R') #These re
 source('data_processing/syphilis.manager/syphilis.deaths.R')
 source('data_processing/syphilis.manager/local.health.department.syphilis.data.R')
 source('data_processing/syphilis.manager/sti.pdf.reports.by.sex.msm.R') #This pulls additional ps.syphilis data from cdc pdf reports by sex and msm
+source('data_processing/syphilis.manager/state.health.department.data.R')
 
 # Aggregate Outcomes to MSA 
 syphilis.manager = data.manager

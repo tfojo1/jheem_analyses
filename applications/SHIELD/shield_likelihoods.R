@@ -22,7 +22,9 @@ STAGE.1.WEIGHT= 1/8
 STAGE.23.WEIGHT= 1/4
 STAGE.23.POPULATION.WEIGHT = 1/8
 
-#'@Andrew: lets archive these for now
+PROP.MALE.DIAG.AMONG.MSM.WEIGHT.STAGE1 = 1 / STAGE.1.WEIGHT
+PROP.MALE.DIAG.AMONG.MSM.WEIGHT.STAGE23 = 1 / STAGE.23.WEIGHT
+
 FUTURE.PENALTY.PS.DIAG.GROWTH.LIKELIHOOD.WEIGHT = 8 # representing the eight points we would have post 2022 (eight times as many points)
 # HIV.TESTING.BY.SEX.WEIGHT= 8 #increasing the weight for sex a specific HIV test testing rates because this is the only targets that's available among MSM
 
@@ -497,7 +499,6 @@ proportion.male.diagnosis.among.msm.nested.likelihood.instructions <-
                                                      equalize.weight.by.year = T
     )
 
-
 ## EARLY Diagnosis ----
 # data from 1941-2022 (cdc.pdf.report) for national model Only (total)
 # data from 2000-2023 (cdc.sti) for county; state; national level (total; sex; race; age group; age group+sex; age group + race; race+sex)
@@ -670,6 +671,12 @@ lik.inst.stage0 =join.likelihood.instructions(
 )
 
 ## STAGE 1 : All Syphilis related likelihoods 1-way stratified ----
+
+prop.male.diagnosis.among.msm.stage1=join.likelihood.instructions(
+    proportion.male.diagnosis.among.msm.nested.likelihood.instructions,
+    additional.weights = PROP.MALE.DIAG.AMONG.MSM.WEIGHT.STAGE1
+)
+
 lik.inst.stage1=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
     total.diagnosis.by.strata.stage1.likelihood.instructions,
@@ -686,14 +693,14 @@ lik.inst.stage1=join.likelihood.instructions(
     proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
     #
     historical.diagnosis.likelihood.instructions,
-    # penalty.msm.prop.of.ps.male.likelihood.instructions,
-    penalty.ps.diag.growth.likelihood.instructions,    
-    proportion.male.diagnosis.among.msm.nested.likelihood.instructions,
+    penalty.ps.diag.growth.likelihood.instructions, #this has a weight of 8 baked into it     
+    prop.male.diagnosis.among.msm.stage1,
     #
     additional.weights = STAGE.1.WEIGHT
 )
 
 # STAGE 2&3: All likelihood combined ----
+
 lik.inst.stg23.demog=join.likelihood.instructions(
     population.likelihood.instructions,
     deaths.likelihood.instructions,
@@ -702,7 +709,10 @@ lik.inst.stg23.demog=join.likelihood.instructions(
     emigration.likelihood.instructions,
     additional.weights = STAGE.23.POPULATION.WEIGHT
 )
-
+prop.male.diagnosis.among.msm.stage23=join.likelihood.instructions(
+    proportion.male.diagnosis.among.msm.nested.likelihood.instructions,
+    additional.weights = PROP.MALE.DIAG.AMONG.MSM.WEIGHT.STAGE23
+)
 lik.inst.stg23.non.demog=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
     total.diagnosis.by.strata.stage2.likelihood.instructions,
@@ -719,11 +729,11 @@ lik.inst.stg23.non.demog=join.likelihood.instructions(
     proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
     #
     historical.diagnosis.likelihood.instructions,
-    penalty.ps.diag.growth.likelihood.instructions,
-    proportion.male.diagnosis.among.msm.nested.likelihood.instructions
+    penalty.ps.diag.growth.likelihood.instructions,#this has a weight of 8 baked into it 
+    prop.male.diagnosis.among.msm.stage23
 )
 
-# We use this one
+# putting them together:
 lik.inst.stage23 = join.likelihood.instructions(
     lik.inst.stg23.demog,
     lik.inst.stg23.non.demog,
