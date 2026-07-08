@@ -94,10 +94,10 @@ baseline_2025 <- df %>%
         intervention == "noint",
         outcome %in% c("suppression", "diagnosed.prevalence")
     ) %>%
-    dplyr::dplyr::select(location, sim, outcome, value) %>%
+    dplyr::select(location, sim, outcome, value) %>%
     pivot_wider(names_from = outcome, values_from = value) %>%
     mutate(care_fraction_2025 = suppression / diagnosed.prevalence) %>%
-    dplyr::dplyr::select(location, sim, care_fraction_2025)
+    dplyr::select(location, sim, care_fraction_2025)
 
 # -------------------------------------------------
 # Excess new diagnoses split into immediate starters / non-starters
