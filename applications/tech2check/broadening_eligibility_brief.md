@@ -15,12 +15,11 @@ adults, so we ran it three ways: the adult effect **fully** transports,
 
 ## How much more could it avert, and why
 
-Each point is the median infections averted over 2026-2030 for one
-transport assumption; the line is the 95% range, the dashed line the
-current youth-only program. “Transport” is how much of the trial’s youth
-benefit carries to adults: **full** = the same suppression odds ratio
-the trial found in youth (2.0 active, 1.0 once distant), **half** = 1.5,
-**none** = 1.0.
+Each point below is the median infections averted over 2026-2030 under a
+different assumption about the adult effect. “Transport” is how much of
+the trial’s youth benefit carries to adults: **full** = the same
+suppression odds ratio the trial found in youth (2.0 active, 1.0 once
+distant), **half** = 1.5, **none** = 1.0.
 
 ![](figures/broadening_eligibility_brief-averted-bracket-1.svg)
 
@@ -34,8 +33,8 @@ What moves the number is reach: the diagnosed 25-34 pool is roughly
 
 ![](figures/broadening_eligibility_brief-reach-bar-1.svg)
 
-That reach is the whole engine behind the upper end of the range, but
-only if adults actually benefit.
+That reach is what drives the upper end of the range, though only if
+adults actually benefit.
 
 ## The catch
 
@@ -52,16 +51,16 @@ The big number rests on two things the youth trial does not establish:
 
 ## What it looks like on the epidemic
 
-Even at the top of the range, the effect is real but **small against the
-whole epidemic**, about a 1-2% dip in new infections. On the incidence
-curve the with- and without-program lines essentially overlap:
-calibration uncertainty (the shaded band) dwarfs the program’s effect.
+Even at the top of the range, the effect is **small against the whole
+epidemic**, about a 1-2% dip in new infections. On the incidence curve
+the two lines essentially overlap, since calibration uncertainty dwarfs
+the program’s effect.
 
 ![](figures/broadening_eligibility_brief-traj-incidence-1.svg)
 
 The averted *count* rises a lot in relative terms (2.6 to ~41), but it
-is still a modest share of Maryland’s incidence. The gain is genuine; it
-is just not a visible bend in the curve.
+stays a modest share of Maryland’s incidence: a genuine gain, not a
+visible bend in the curve.
 
 ## How far to broaden
 
@@ -89,8 +88,9 @@ like today.
 
 ## Does running the program longer help?
 
-No. Ten years instead of five does not double the impact, because the
-effect saturates:
+Some, but with diminishing returns. Doubling the horizon (five years to
+ten) lifts the totals by about 1.4-1.6x, not 2x, because the averted
+share shrinks as the epidemic declines:
 
 | Program length          | Youth only | Broadened (full transport) |
 |:------------------------|:-----------|:---------------------------|
@@ -98,12 +98,12 @@ effect saturates:
 | 10 years (through 2035) | 4.2        | 55.5                       |
 
 Cumulative infections averted, Maryland. Doubling the program’s length
-adds well under double the impact (about 1.4-1.6x), because the effect
-saturates.
+adds about 1.4-1.6x, not 2x, because the averted share shrinks as the
+epidemic declines.
 
-Maryland’s incidence is already declining, so a program that averts a
-roughly constant *share* of infections averts fewer each year as the
-epidemic shrinks. Longer duration gives diminishing returns.
+The mechanism is simply that Maryland’s incidence is already declining,
+so a program holding a roughly constant *share* of infections averts
+fewer of them each year.
 
 ## Bottom line
 
@@ -116,24 +116,29 @@ epidemic shrinks. Longer duration gives diminishing returns.
 - **All of it is conditional** on the effect transporting and adults
   enrolling. With no transport, even the broadest program averts ~2,
   like today.
-- **Running longer does not help**: the effect saturates as the epidemic
-  declines.
+- **Running longer helps only modestly**: doubling the horizon adds
+  about 1.4-1.6x, not 2x, as the epidemic declines.
 - So the real question is not “should we broaden?” but **“does
   Tech2Check work in these older groups, and would they enroll?”**
   Evidence on that turns the ladder into a projection.
 
 ## Trajectories (for reference)
 
-Time-series overlays for sanity-checking model behavior. The statewide
-curves show the small aggregate effect; the by-age panels show where it
-lands, and how the recruitable pool widens as eligibility extends from
-25-34 up to 35-44.
+Time-series overlays for sanity-checking model behavior across the main
+epidemic outcomes. The statewide curves show the small aggregate effect
+on incidence, diagnoses, and mortality; the by-age panels show where
+enrollment lands and how the recruitable pool widens as eligibility
+extends from 25-34 up to 35-44.
 
 **Statewide, broadened to 13-34 vs no program (full transport).**
 
-![](figures/broadening_eligibility_brief-traj-suppression-1.svg)
+![](figures/broadening_eligibility_brief-traj-incidence-ref-1.svg)
 
 ![](figures/broadening_eligibility_brief-traj-new-1.svg)
+
+![](figures/broadening_eligibility_brief-traj-mortality-1.svg)
+
+![](figures/broadening_eligibility_brief-traj-suppression-1.svg)
 
 ![](figures/broadening_eligibility_brief-traj-enrollment-1.svg)
 
