@@ -124,30 +124,56 @@ fewer of them each year.
 
 ## Trajectories (for reference)
 
-Time-series overlays for sanity-checking model behavior across the main
-epidemic outcomes. The statewide curves show the small aggregate effect
-on incidence, diagnoses, and mortality; the by-age panels show where
-enrollment lands and how the recruitable pool widens as eligibility
-extends from 25-34 up to 35-44.
+Time-series overlays for sanity-checking model behavior, with each
+outcome shown at both broadening levels (13-34 then 13-44) so the wider
+bracket’s effect on the curve is easy to compare. Each plot is the
+broadened program against its own no-program run (full transport).
 
-**Statewide, broadened to 13-34 vs no program (full transport).**
+**New HIV infections (incidence).**
 
 ![](figures/broadening_eligibility_brief-traj-incidence-ref-1.svg)
 
+![](figures/broadening_eligibility_brief-traj-incidence-1344-1.svg)
+
+The wider bracket helps a touch more visibly: the 13-44 line dips just
+below no-program in the later years, a bit more than 13-34 does above.
+But the gap is still well inside the calibration band, so even ~113
+averted reads as a small effect, not a visible bend in the curve. The
+same near-overlap holds for diagnoses and deaths below.
+
+**New HIV diagnoses.**
+
 ![](figures/broadening_eligibility_brief-traj-new-1.svg)
+
+![](figures/broadening_eligibility_brief-traj-new-1344-1.svg)
+
+**HIV deaths (mortality).**
 
 ![](figures/broadening_eligibility_brief-traj-mortality-1.svg)
 
+![](figures/broadening_eligibility_brief-traj-mortality-1344-1.svg)
+
+**Viral suppression among diagnosed.**
+
 ![](figures/broadening_eligibility_brief-traj-suppression-1.svg)
+
+![](figures/broadening_eligibility_brief-traj-suppression-1344-1.svg)
+
+**Program enrollments per year.**
 
 ![](figures/broadening_eligibility_brief-traj-enrollment-1.svg)
 
-**By age.** Enrollment by band makes the widening pool explicit:
-broadening to 25-34 fills two bands, and extending to 35-44 (the 13-44
-rung) fills a third.
+![](figures/broadening_eligibility_brief-traj-enrollment-1344-1.svg)
+
+**Enrollments by age band.** Broadening to 25-34 fills two bands (13-24
+and 25-34); extending to 35-44 fills a third.
 
 ![](figures/broadening_eligibility_brief-traj-enrollment-age-2534-1.svg)
 
 ![](figures/broadening_eligibility_brief-traj-enrollment-age-1344-1.svg)
+
+**Viral suppression by age band.**
+
+![](figures/broadening_eligibility_brief-traj-suppression-age-2534-1.svg)
 
 ![](figures/broadening_eligibility_brief-traj-suppression-age-1344-1.svg)
