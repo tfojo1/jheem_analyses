@@ -33,18 +33,55 @@ data$location = as.character(data$location)
 data$value = ifelse(data$value == "NA", NA, data$value)
 data$value <- as.numeric(gsub(",", "", data$value))
 
-#Group together race for CA (Asian w PI and NA)
-if(grepl("california.state_race", filename)) {
+#Group together races
+if(grepl("_race", filename)) {
     data<- data%>%
-        mutate(race= case_when(race == "Asian" ~ "asian/pacific islander/native hawaiian",
-                                race == "Asian/Pacific Islander" ~ "asian/pacific islander/native hawaiian",
-                                race == "Native Hawaiian/Other Pacific Islander" ~ "asian/pacific islander/native hawaiian",
-                                TRUE ~ race ))%>%
+        mutate(race = str_to_lower((race)))%>%
+        mutate(race= case_when(race == "american indian or alaska native" ~ "other",
+                            race == "asian" ~ "other",
+                            race == "multi race" ~ "other",
+                            race == "native hawaiian or other pacific islander" ~ "other",
+                            race == "unknown race" ~ "other",
+                            race == "white, non-hispanic" ~ "white",
+                               
+                            race == "asian + native hawaiian/pacific islander + american indian/alaska native" ~ "other",
+                               
+                            race == "american indian/alaska native" ~ "other",
+                            race == "asian/pacific islander/native hawaiian" ~ "other",
+                            race == "other race/not specified" ~ "other",
+                            
+                            race == "native hawaiian/other pacific islander" ~ "other",
+                            race == "asian/pacific islander" ~ "other",
+        
+                            TRUE ~ race ))%>%
+        
                    group_by(outcome, year, race)%>%
-                   mutate(new.value = sum(value))%>%
-                    select(-value)%>%
+                   mutate(new.value = sum(value, na.rm = T))%>%
+                     select(-value)%>%
+         rename(value = new.value)
+}
+
+#Group together age
+if (grepl("_age", filename)) {
+    
+    group_vars <- c("outcome", "year", "age")
+    
+    if ("sex" %in% names(data)) {
+        group_vars <- c("outcome", "year", "sex", "age")
+    }
+    
+        data<- data %>%
+        group_by(across(all_of(group_vars))) %>%
+        mutate(new.value = sum(value, na.rm = TRUE)) %>%
+        select(-value) %>%
         rename(value = new.value)%>%
-        mutate(race = str_to_lower((race)))
+        mutate(age = paste(age, "years"))
+}
+
+if (grepl("sex", filename)) {
+ data$sex = tolower(data$sex)
+ data <- data%>%
+     filter(sex != "unknown sex")
 }
 
     data = as.data.frame(data)
@@ -56,9 +93,6 @@ if(grepl("california.state_race", filename)) {
 # Put ---------------------------------------------------------------------
 #SHOULD THIS BE A SEPARATE ONTOLOGY?
 
-
-###REDISTRIBUTE RACE AND AGE FOR UNKNOWN AND MULTIRACIAL#############
-
 state.health.dept.data.clean.put = lapply(state.health.dept.data.clean, `[[`, 2)  
 
 for (data in state.health.dept.data.clean.put) {
@@ -67,6 +101,7 @@ for (data in state.health.dept.data.clean.put) {
         data = data,
         ontology.name = 'state.health.dept',
         source = 'lhd',
+        dimension.values.to.distribute = list(age = 'Unknown Age years'), #don't need to redistribute race bc i put it all in other
         dimension.values = list(),
         url = 'na',
         details = 'Data pulled from State Health Department websites')
