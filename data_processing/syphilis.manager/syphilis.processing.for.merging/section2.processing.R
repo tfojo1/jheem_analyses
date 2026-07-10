@@ -183,6 +183,18 @@ data.manager$register.ontology(
         sex=c('male','female', 'msm')
     ))
 
+data.manager$register.ontology(
+    'california.health.dept',
+    ont = ontology(
+        year= NULL,
+        location= NULL,
+        age=c('0-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-44 years', '45+ years'),
+        race=c('black', 'hispanic', 'other', 'white'),
+        sex=c('male','female', 'msm')
+    ))
+
+
+
 #Codes:
 source('data_processing/syphilis.manager/syphilis.data.R')
 source('data_processing/syphilis.manager/cdc.sti.surveillance.reports.processing.2003.2017.R') #This pulls one table from 2003-2017 reports, Parastu wanted this report where primary and secondary are reported separate
