@@ -203,7 +203,8 @@ source('data_processing/syphilis.manager/cdc.pdf.reports.1941.2022.R') #These re
 source('data_processing/syphilis.manager/syphilis.deaths.R')
 source('data_processing/syphilis.manager/local.health.department.syphilis.data.R')
 source('data_processing/syphilis.manager/sti.pdf.reports.by.sex.msm.R') #This pulls additional ps.syphilis data from cdc pdf reports by sex and msm
-source('data_processing/syphilis.manager/state.health.department.data.R')
+source('data_processing/syphilis.manager/state.health.department.data.R') #This pulls data manually taken from state health dept reports
+source('data_processing/syphilis.manager/cdc.pdf.reports.additional.msa.totals.R') #This pulls any remaining data from the PDF CDC STI reports that hadn't previously been added
 
 # Aggregate Outcomes to MSA 
 syphilis.manager = data.manager
