@@ -19,7 +19,31 @@ par.aliases.transmission = list(
     trate.4 = c("transmission.rate.multiplier.msm2010", "transmission.rate.multiplier.heterosexual2010"),
     trate.5 = c("transmission.rate.multiplier.msm2022", "transmission.rate.multiplier.heterosexual2022")
 )
-
+# 7.10 ----
+# repeating 7.9; fixing screening rate starting time to 1970; revising oe.female.pairing.msm to 0.3
+register.calibration.info("calib.7.10.stage0.pk",
+                          likelihood.instructions = lik.inst.stage0,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          fixed.initial.parameter.values = c("global.transmission.rate.msm"=3.1,
+                                                             "global.transmission.rate.het"=3.1),  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate.msm",
+                                              "global.transmission.rate.het"),
+                          parameter.aliases = par.aliases.transmission,
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info('calib.7.10.stage1.pk',
+                          preceding.calibration.codes = 'calib.7.10.stage0.pk',
+                          likelihood.instructions = lik.inst.stage1,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
 # 7.9 ----
 # Has additional screening rate knots
 register.calibration.info("calib.7.9.stage0.az",
