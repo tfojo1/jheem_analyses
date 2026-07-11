@@ -10,13 +10,13 @@ source("../jheem_analyses/applications/SHIELD/shield_calib_register.R")
 source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions.R')
 
 # ---- SETUP ----
-for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.29.stage0.az"))}
-for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.6.stage3.az"))}
+for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.9.stage0.az"))}
+for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.9.stage1.az"))}
 
 calibration.codes <- c(
     # "calib.6.29.stage0.az",
     # "calib.7.2.stage1.az",
-    "calib.7.6.stage3.az"
+    "calib.7.9.stage1.az"
 )
 
 # for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.16.stage2.az"))}
@@ -44,14 +44,15 @@ inspect_mixing (
 # ****************************************************************************************************
 
 save_summary_plots<-function(calibration.code,folder.name){
-    outcomes=c("diagnosis.ps","hiv.testing","diagnosis.total","diagnosis.el.misclassified","diagnosis.late.misclassified")
+   
     plot.calib.comparison(calib.simsets = calib.simsets,
                           calibration.codes = calibration.code,
                           sim.subset = "last20",
                           locations = SHIELD.TEN.MSAS,
                           separate.by = "outcome",
                           folder.name = folder.name,
-                          outcomes = outcomes,
+                          outcomes =c("diagnosis.ps","diagnosis.total","diagnosis.el.misclassified","diagnosis.late.misclassified",
+                                        "prop.male.ps.diag.among.msm","hiv.testing","sti.screening"),
                           years = c(1970:2030),
                           ncol=5,)
     #
@@ -61,7 +62,8 @@ save_summary_plots<-function(calibration.code,folder.name){
                           locations = SHIELD.TEN.MSAS,
                           separate.by = "outcome",
                           folder.name = folder.name,
-                          outcomes = outcomes,
+                          outcomes = c("diagnosis.ps","diagnosis.total","diagnosis.el.misclassified","diagnosis.late.misclassified",
+                                       "prop.male.ps.diag.among.msm","hiv.testing","sti.screening"),
                           years = c(1970:2030),
                           facet.by = "sex" , ncol = 2)
     plot.calib.comparison(calib.simsets = calib.simsets,
@@ -70,7 +72,8 @@ save_summary_plots<-function(calibration.code,folder.name){
                           locations = SHIELD.TEN.MSAS,
                           separate.by = "outcome",
                           folder.name = folder.name,
-                          outcomes = outcomes,
+                          outcomes = c("diagnosis.ps","diagnosis.total","diagnosis.el.misclassified","diagnosis.late.misclassified",
+                                       "prop.male.ps.diag.among.msm","hiv.testing","sti.screening"),
                           years = c(1970:2030),
                           split.by = "race" , ncol = 2)
     #
@@ -80,7 +83,7 @@ save_summary_plots<-function(calibration.code,folder.name){
                           locations = SHIELD.TEN.MSAS,
                           separate.by = "outcome",
                           folder.name = folder.name,
-                          outcomes = outcomes,
+                          outcomes = c("diagnosis.ps","hiv.testing","sti.screening"),
                           years = c(1970:2030),
                           facet.by = "sex" , ncol = 2,
                           plot.which = "sim.only"    )

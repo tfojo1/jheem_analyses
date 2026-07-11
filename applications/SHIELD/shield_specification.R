@@ -1120,7 +1120,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = 'rate.sti.screening.over.14.without.covid',
                        scale = 'rate',
                        get.functional.form.function = get_sti_screening_functional_form_OPTION2,
-                       functional.form.from.time = 2010,
+                       functional.form.from.time = 1970,
                        functional.form.scale = 'proportion')
 
 register.model.quantity.subset(SHIELD.SPECIFICATION,

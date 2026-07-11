@@ -198,7 +198,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     
     ## Sexual Mixing by Risk ----
     # see shield_inputManager_pairing.R
-    oe.female.pairings.with.msm = Lognormal.Distribution(meanlog = log(0.0895), sdlog = log(2)), 
+    oe.female.pairings.with.msm = Lognormal.Distribution(meanlog = log(.3), sdlog = log(2)/2), #range [pathela 0.12 -dodge 0.6]
     fraction.heterosexual_male.pairings.with.male = Logitnormal.Distribution(meanlogit = logit(0.004), sdlogit = log(2)), 
     fraction.msm.pairings.with.female = Logitnormal.Distribution(meanlogit = logit(0.1187612), sdlogit = log(2)),
     
