@@ -145,8 +145,9 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     prp.infections.among.msm.1970 = Logitnormal.Distribution(meanlogit = log(.5), sdlogit = log(2)), #CI=[0.13 0.66] larger SD because of uncertainty
     
     ## Global transmission ----
-    global.transmission.rate.msm = Lognormal.Distribution(meanlog = log(3.9), sdlog = 0.5*log(10)), # large SD to allow more mixing
-    global.transmission.rate.het = Lognormal.Distribution(meanlog = log(3.9), sdlog = 0.5*log(10)), # large SD to allow more mixing
+    # Moved back down to 2.2 from 3.1 when raised msm logmean baseline back to log(3) from log(1)
+    global.transmission.rate.msm = Lognormal.Distribution(meanlog = log(2.2), sdlog = 0.5*log(10)), # large SD to allow more mixing
+    global.transmission.rate.het = Lognormal.Distribution(meanlog = log(2.2), sdlog = 0.5*log(10)), # large SD to allow more mixing
     
     # Transmission multipliers 
     # we built a joint prior for: transmission.rate.multiplier.msm & transmission.rate.multiplier.heterosexual
@@ -158,7 +159,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     # this means that over 5 years, trate can change by sqrt(1.5) and by 20 years, it can change by 1.5^2
     make.joint.mv.spline.prior(
         parameters = paste0("transmission.rate.multiplier.", c("msm", "heterosexual")),
-        logmean.baseline = c(log(1), #msm
+        logmean.baseline = c(log(3), #msm
                              log(1)), #het
         logsd.baseline = c(log(2)*2, #msm
                            log(2)*2

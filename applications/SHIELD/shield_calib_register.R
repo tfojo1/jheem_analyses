@@ -19,6 +19,25 @@ par.aliases.transmission = list(
     trate.4 = c("transmission.rate.multiplier.msm2010", "transmission.rate.multiplier.heterosexual2010"),
     trate.5 = c("transmission.rate.multiplier.msm2022", "transmission.rate.multiplier.heterosexual2022")
 )
+
+# 7.10 ----
+# repeating 7.9; fixing screening rate starting time to 1970; revising oe.female.pairing.msm to 0.3
+for (gtr in c(2.1, 2.2, 2.3, 2.4)) {
+    register.calibration.info(paste0("calib.7.13.stg0.", gtr),
+                              likelihood.instructions = lik.inst.stage0,
+                              data.manager = SURVEILLANCE.MANAGER,
+                              end.year = 2030,
+                              fixed.initial.parameter.values = c("global.transmission.rate.msm"=gtr,
+                                                                 "global.transmission.rate.het"=gtr),
+                              parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                                  AGING.PARAMETERS.PRIOR@var.names,
+                                                  "global.transmission.rate.msm",
+                                                  "global.transmission.rate.het"),
+                              parameter.aliases = par.aliases.transmission,
+                              n.iter = 1000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+    )
+}
+
 # 7.10 ----
 # repeating 7.9; fixing screening rate starting time to 1970; revising oe.female.pairing.msm to 0.3
 register.calibration.info("calib.7.10.stage0.pk",
