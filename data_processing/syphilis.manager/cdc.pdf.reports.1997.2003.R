@@ -217,29 +217,30 @@ for (data in msa.totals.put) {
     details = 'CDC STI Surveillance Reports')
 }
 
-#Re-calculate the total diagnoses by removing congenital cases -------------------------------------------------------------------------
-#This will replace the total.diagnoses above:
-#Added this 12-8-25 to align the PDF report total diagnoses with Atlas Plus total diagnoses
-
-total.dx <- as.data.frame.table(data.manager$data$total.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location)%>%rename(total.diagnoses = Freq)
-
-congenital.dx <- as.data.frame.table(data.manager$data$congenital.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location)%>%rename(congenital.diagnoses = Freq)
-
-corrected.total = merge(total.dx, congenital.dx, by = c("year", "location"))
-
-corrected.total <- corrected.total%>%
-    mutate(value = (total.diagnoses - congenital.diagnoses))%>%#this represents total syphilis cases with congenital removed
-    mutate(outcome = "total.syphilis.diagnoses")%>%
-    mutate(year = as.character(year))%>%
-    mutate(location = as.character(location))
-
-
-data.manager$put.long.form(
-    data = corrected.total,
-    ontology.name = 'cdc.pdf.report',
-    source = 'cdc.sti.surveillance.reports',
-    url = 'https://www.cdc.gov/sti-statistics/media/pdfs/2024/07/1997-Surveillance-Report.pdf',
-    details = 'CDC STI Surveillance Reports')
+#Removing this because Nick's code does it through aggregating:
+# #Re-calculate the total diagnoses by removing congenital cases -------------------------------------------------------------------------
+# #This will replace the total.diagnoses above:
+# #Added this 12-8-25 to align the PDF report total diagnoses with Atlas Plus total diagnoses
+# 
+# total.dx <- as.data.frame.table(data.manager$data$total.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location)%>%rename(total.diagnoses = Freq)
+# 
+# congenital.dx <- as.data.frame.table(data.manager$data$congenital.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location)%>%rename(congenital.diagnoses = Freq)
+# 
+# corrected.total = merge(total.dx, congenital.dx, by = c("year", "location"))
+# 
+# corrected.total <- corrected.total%>%
+#     mutate(value = (total.diagnoses - congenital.diagnoses))%>%#this represents total syphilis cases with congenital removed
+#     mutate(outcome = "total.syphilis.diagnoses")%>%
+#     mutate(year = as.character(year))%>%
+#     mutate(location = as.character(location))
+# 
+# 
+# data.manager$put.long.form(
+#     data = corrected.total,
+#     ontology.name = 'cdc.pdf.report',
+#     source = 'cdc.sti.surveillance.reports',
+#     url = 'https://www.cdc.gov/sti-statistics/media/pdfs/2024/07/1997-Surveillance-Report.pdf',
+#     details = 'CDC STI Surveillance Reports')
 
 
 # MSA - Stratified Data ---------------------------------------------------

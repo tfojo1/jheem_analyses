@@ -141,7 +141,11 @@ last.msa.files.clean = lapply(last.msa.files.raw, function(file){
             
             TRUE ~ as.character(locations::get.location.code(msa, "CBSA"))))%>%
             
-            filter(location != "remove")
+            filter(location != "remove")%>%
+            
+            filer(outcome != 'total.syphilis.diagnoses') #Removing this because this total contains congenital cases.  The total will be aggregated in another code.
+        
+        
         
     
     data = as.data.frame(data)
