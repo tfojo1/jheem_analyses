@@ -143,7 +143,7 @@ last.msa.files.clean = lapply(last.msa.files.raw, function(file){
             
             filter(location != "remove")%>%
             
-            filer(outcome != 'total.syphilis.diagnoses') #Removing this because this total contains congenital cases.  The total will be aggregated in another code.
+            filter(outcome != 'total.syphilis.diagnoses') #Removing this because this total contains congenital cases.  The total will be aggregated in another code.
         
         
         
