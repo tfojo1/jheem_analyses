@@ -162,7 +162,7 @@ for (data in last.msa.files.clean.put) {
     
     data.manager$put.long.form(
         data = data,
-        ontology.name = 'cdc.sti',
+        ontology.name = 'cdc.pdf.report',
         source = 'cdc.sti.surveillance.reports',
         url = 'https://www.cdc.gov/sti-statistics/index.html',
         details = 'CDC STI Surveillance Reports')
