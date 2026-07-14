@@ -146,8 +146,8 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     
     ## Global transmission ----
     # Moved back down to 2.2 from 3.1 when raised msm logmean baseline back to log(3) from log(1)
-    global.transmission.rate.msm = Lognormal.Distribution(meanlog = log(2.2), sdlog = 0.5*log(10)), # large SD to allow more mixing
-    global.transmission.rate.het = Lognormal.Distribution(meanlog = log(2.2), sdlog = 0.5*log(10)), # large SD to allow more mixing
+    global.transmission.rate.msm = Lognormal.Distribution(meanlog = log(2.3), sdlog = 0.5*log(10)), # large SD to allow more mixing
+    global.transmission.rate.het = Lognormal.Distribution(meanlog = log(2.3), sdlog = 0.5*log(10)), # large SD to allow more mixing
     
     # Transmission multipliers 
     # we built a joint prior for: transmission.rate.multiplier.msm & transmission.rate.multiplier.heterosexual
