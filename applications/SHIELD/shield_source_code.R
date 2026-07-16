@@ -85,16 +85,16 @@ if (!exists('SURVEILLANCE.MANAGER') ){
 # dimnames(SURVEILLANCE.MANAGER$data$population$estimate$census.population$census$year__location)
 
 # SHIELD specific code ----
-source('applications/SHIELD/shield_calib_parameters.R') ; print("shield_calib_parameters.R sourced")
-source('applications/SHIELD/shield_base_parameters.R') ; print("shield_base_parameters.R sourced")
-source('applications/SHIELD/R/shield_ontology_mappings.R') ; print("shield_ontology_mappings.R sourced")
-source('applications/SHIELD/R/shield_specification_helpers.R'); print("shield_specification_helpers.R sourced")
-source('applications/SHIELD/R/shield_inputManager_pairing.R') ; print("shield_inputManager_pairing.R sourced")
-source('applications/SHIELD/R/shield_inputManager_helpers.R') ; print("shield_inputManager_helpers.R sourced")
-source('applications/SHIELD/R/shield_inputManager_covid.R') ; print("shield_inputManager_covid.R sourced")
+source('../jheem_analyses/applications/SHIELD/shield_calib_parameters.R') ; print("shield_calib_parameters.R sourced")
+source('../jheem_analyses/applications/SHIELD/shield_base_parameters.R') ; print("shield_base_parameters.R sourced")
+source('../jheem_analyses/applications/SHIELD/R/shield_ontology_mappings.R') ; print("shield_ontology_mappings.R sourced")
+source('../jheem_analyses/applications/SHIELD/R/shield_specification_helpers.R'); print("shield_specification_helpers.R sourced")
+source('../jheem_analyses/applications/SHIELD/R/shield_inputManager_pairing.R') ; print("shield_inputManager_pairing.R sourced")
+source('../jheem_analyses/applications/SHIELD/R/shield_inputManager_helpers.R') ; print("shield_inputManager_helpers.R sourced")
+source('../jheem_analyses/applications/SHIELD/R/shield_inputManager_covid.R') ; print("shield_inputManager_covid.R sourced")
 
 ##-- CREATE and STORE --## ----
-PAIRING.INPUT.MANAGER = create.pairing.manager(dir=paste0("applications/SHIELD/data_files/pairing"))
+PAIRING.INPUT.MANAGER = create.pairing.manager(dir=paste0("../jheem_analyses/applications/SHIELD/data_files/pairing"))
 print("PAIRING.INPUT.MANAGER created")
 
 # Global variables used in the code:
