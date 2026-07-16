@@ -173,16 +173,19 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
         correlation = 0.7
     ),
     
-    ## race multipliers (msm and het seperatly) ----
+    ## race multipliers (not sex stratified anymore) ----
     # increased SD to allow more variation CI= [0.25 - 3.9] 
-    transmission.rate.multiplier.black.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    transmission.rate.multiplier.black.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    #
-    transmission.rate.multiplier.hispanic.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    transmission.rate.multiplier.hispanic.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    #
-    transmission.rate.multiplier.other.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    transmission.rate.multiplier.other.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+    # transmission.rate.multiplier.black.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+    # transmission.rate.multiplier.black.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+    # #
+    # transmission.rate.multiplier.hispanic.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+    # transmission.rate.multiplier.hispanic.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+    # #
+    # transmission.rate.multiplier.other.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+    # transmission.rate.multiplier.other.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+    transmission.rate.multiplier.black = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+    transmission.rate.multiplier.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+    transmission.rate.multiplier.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
     
     ## future change ----
     transmission.rate.future.change.mult = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0), #CI=(0.25 - 1.25) #assumption
@@ -578,17 +581,23 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "transmission.rate.msm",
                                                        alpha.name = time,
-                                                       values = parameters[c("transmission.rate.multiplier.black.msm",
-                                                                             "transmission.rate.multiplier.hispanic.msm", 
-                                                                             "transmission.rate.multiplier.other.msm")],
+                                                       # values = parameters[c("transmission.rate.multiplier.black.msm",
+                                                       #                       "transmission.rate.multiplier.hispanic.msm", 
+                                                       #                       "transmission.rate.multiplier.other.msm")],
+                                                       values = parameters[c("transmission.rate.multiplier.black",
+                                                                             "transmission.rate.multiplier.hispanic", 
+                                                                             "transmission.rate.multiplier.other")],
                                                        dimension = "race.to", #recipient
                                                        applies.to.dimension.values = c("black","hispanic", "other"))
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "transmission.rate.heterosexual",
                                                        alpha.name = time,
-                                                       values = parameters[c("transmission.rate.multiplier.black.heterosexual",
-                                                                             "transmission.rate.multiplier.hispanic.heterosexual", 
-                                                                             "transmission.rate.multiplier.other.heterosexual")],
+                                                       # values = parameters[c("transmission.rate.multiplier.black.heterosexual",
+                                                       #                       "transmission.rate.multiplier.hispanic.heterosexual", 
+                                                       #                       "transmission.rate.multiplier.other.heterosexual")],
+                                                       values = parameters[c("transmission.rate.multiplier.black",
+                                                                             "transmission.rate.multiplier.hispanic", 
+                                                                             "transmission.rate.multiplier.other")],
                                                        dimension = "race.to", #recipient
                                                        applies.to.dimension.values = c("black","hispanic", "other"))
         
@@ -1041,15 +1050,20 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
         #"transmission.rate.multiplier.heterosexual2030"
     ),
     #
-    race.transmission.msm = c(
-        "transmission.rate.multiplier.black.msm",
-        "transmission.rate.multiplier.hispanic.msm",
-        "transmission.rate.multiplier.other.msm"
-    ),
-    race.transmission.heterosexual = c(
-        "transmission.rate.multiplier.black.heterosexual",
-        "transmission.rate.multiplier.hispanic.heterosexual",
-        "transmission.rate.multiplier.other.heterosexual"
+    # race.transmission.msm = c(
+    #     "transmission.rate.multiplier.black.msm",
+    #     "transmission.rate.multiplier.hispanic.msm",
+    #     "transmission.rate.multiplier.other.msm"
+    # ),
+    # race.transmission.heterosexual = c(
+    #     "transmission.rate.multiplier.black.heterosexual",
+    #     "transmission.rate.multiplier.hispanic.heterosexual",
+    #     "transmission.rate.multiplier.other.heterosexual"
+    # ),
+    race.transmission = c(
+        "transmission.rate.multiplier.black",
+        "transmission.rate.multiplier.hispanic",
+        "transmission.rate.multiplier.other"
     ),
     #
     trans.rate.future.change=c("transmission.rate.future.change.mult"),
