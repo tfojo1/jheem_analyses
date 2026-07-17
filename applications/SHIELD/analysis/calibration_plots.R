@@ -24,7 +24,7 @@ calibration.codes <- c(
 
 # Read simulations into calib.simset ----
 calib.simsets <- load.calib.simsets(
-    locations         =  SHIELD.TEN.MSAS,
+    locations         =  SHIELD.TEN.MSAS[1],
     calibration.codes = calibration.codes,
     n.sim = 300
 )
@@ -224,19 +224,20 @@ p1=plot.calib.comparison(
 # . TESTUNG ENGINE
 # ****************************************************************************************************
 if (1==2){
-    LOCATION="C.12580"
+    LOCATION="C.12060"
     VERSION="shield"
-    lastSimB=calib.simsets$`Baltimore – calib.7.10.stage1.pk`$last_sim
-    lastSimP=calib.simsets$`Philadelphia – calib.7.10.stage1.pk`$last_sim
+    # lastSimB=calib.simsets$`Baltimore – calib.7.10.stage1.pk`$last_sim
+    # lastSimP=calib.simsets$`Philadelphia – calib.7.10.stage1.pk`$last_sim
+    lastSimA=calib.simsets$`Atlanta – calib.7.10.stage1.pk`$last_sim
     
-    
-    param_calib=lastSim$get.params()
+    param_calib=lastSimA$get.params()
     param.manual=param_calib
     #
     engine= create.jheem.engine(VERSION, LOCATION, end.year = 2030)
     sim.manual <- engine$run(param.manual)
     #
-    simplot( lastSim,
+    simplot( lastSimA,
+             sim.manual,         
              # "sti.screening"
              c( "diagnosis.ps"
                 # "prop.male.ps.diag.among.msm"
@@ -263,7 +264,7 @@ if (1==2){
         #########
         param.manual["transmission.rate.multiplier.heterosexual1990"]=1.2*param.manual["transmission.rate.multiplier.heterosexual1990"]
         param.manual["transmission.rate.multiplier.msm1990"]=1.2*param.manual["transmission.rate.multiplier.msm1990"]
-      
+        
         # param.manual["transmission.rate.multiplier.heterosexual2000"]=param.manual["transmission.rate.multiplier.heterosexual1990"]
         # param.manual["transmission.rate.multiplier.msm2000"]=param.manual["transmission.rate.multiplier.msm1990"]
         # #
@@ -283,14 +284,14 @@ if (1==2){
                  # split.by = "sex",
                  # facet.by="race",
                  # plot.which = "sim.only"
-                 )
+        )
     }
     #
     
     
     
     lik1=instantiate.likelihood(lik.inst.stage1,version = 'shield',location = "C.12580")
-     
+    
     lik1$compare(sim.manual,lastSim)
     lik1$compute(sim.manual)
     
