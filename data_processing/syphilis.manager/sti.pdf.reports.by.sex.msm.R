@@ -262,3 +262,33 @@ data.manager$put.long.form(
     url = 'https://www.cdc.gov/sti-statistics/media/pdfs/2024/07/1997-Surveillance-Report.pdf',
     details = 'CDC STI Surveillance Reports')
 
+#==================================================================
+#Update for 7-20-26
+
+#Removing Wisconsin MSM Data for 2022 and 2023
+#The proportion MSM is nearly 100%- this is what is reported in the PDFs
+
+#This outlier dataframe will overwrite data that was added in the
+#code above
+#==================================================================
+remove.data(
+    data.manager=data.manager,
+    outcome = "ps.syphilis.diagnoses",
+    source= "cdc.sti.surveillance.reports",
+    ontology.name = "cdc.pdf.report",
+    dimension.values = list(location="WI", year=c("2022", "2023"), sex = "msm"),
+    metric = "estimate",
+    details.for.removal = "removed",
+    url.for.removal = "url"
+)
+
+remove.data(
+    data.manager=data.manager,
+    outcome = "prop.male.ps.diag.among.msm",
+    source= "cdc.sti.surveillance.reports",
+    ontology.name = "cdc.pdf.report",
+    dimension.values = list(location="WI", year=c("2022", "2023")),
+    metric = "estimate",
+    details.for.removal = "removed",
+    url.for.removal = "url"
+)
