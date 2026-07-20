@@ -59,6 +59,20 @@ register.calibration.info("calib.7.16.stage2.az",
                           ),
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
+register.calibration.info("calib.7.16.stage3.az",
+                          preceding.calibration.codes = 'calib.7.16.stage2.az',
+                          likelihood.instructions = lik.inst.stage23,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names
+                          ),
+                          n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
+)
 
 # 7.14 ----
 # repeating 7.9; fixing screening rate starting time to 1970; revising oe.female.pairing.msm to 0.3
