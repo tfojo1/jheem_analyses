@@ -133,7 +133,7 @@ data.manager$register.parent.source('NNDSS', full.name = 'National Notifiable Di
 data.manager$register.parent.source('DHHS', full.name = 'U.S. Department of Health and Human Services', short.name= "DHHS") #parent
 data.manager$register.parent.source('NCHS', full.name = 'National Center for Health Statistics', short.name= "NCHS")
 data.manager$register.parent.source('LHD', full.name = 'Local Health Department', short.name= "LHD")
-data.manager$register.parent.source('CDC', full.name = 'Centers for Disease Control and Prevention', short.name= "CDC")
+data.manager$register.parent.source('CDC', full.name = 'Centers for Disease Control and Prevention', short.name= "cdc")
 
 data.manager$register.source('cdc.sti', parent.source= "NNDSS", full.name = "Atlas Plus STI Data", short.name='cdc.sti')
 data.manager$register.source('cdc.aggregated.county', parent.source= "NHSS", full.name = 'CDC Aggregated County', short.name = 'cdc aggd county') #Note this is for the aggregated county data being used to represent MSAs
