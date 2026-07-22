@@ -607,7 +607,7 @@ register.model.element(SHIELD.SPECIFICATION,
 # prp of MSM who are MSMW (have sex with both men and women)
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'oe.female.pairings.with.msm',
-                       value = PAIRING.INPUT.MANAGER$oe.female.pairings.with.msm,
+                       value = 0, #calib_param
                        scale = 'ratio')
 
 #prop of Het_male's sexual contacts that are with other men

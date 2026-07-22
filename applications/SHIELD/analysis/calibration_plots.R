@@ -16,12 +16,11 @@ for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.1
 calibration.codes <- c(
     # "calib.6.29.stage0.az",
     # "calib.7.2.stage1.az",
-    "calib.7.14.stage2.az",
-    "calib.7.16.stage2.az"
+    # "calib.7.14.stage2.az",
+    "calib.7.16.stage3.az"
 )
 
 # for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.16.stage2.az"))}
-
 
 # Read simulations into calib.simset ----
 calib.simsets <- load.calib.simsets(
@@ -33,21 +32,25 @@ calib.simsets <- load.calib.simsets(
 # Inspect mixing statistics -----
 inspect_mixing (
     calib.simsets = calib.simsets,
-    calibration.codes =calibration.codes[1],
+    calibration.codes = "calib.7.16.stage3.az",
+        # calibration.codes,
     locations = SHIELD.TEN.MSAS,
     show.mixing = T,
     verbose = T
 )
 
+head(calib.simsets$`Baltimore – calib.7.16.stage3.az`$full_simset$get.mcmc.mixing.statistic())
+head(calib.simsets$`Baltimore – calib.7.16.stage3.az`$full_simset$get.mcmc.mixing.statistic())
+calib.simsets$`Seattle – calib.7.16.stage3.az`$full_simset$traceplot("tri")
 
-# ****************************************************************************************************
+x# ****************************************************************************************************
 # Save summary plots for a calibration version (compares the fit accross all cities)
 # ****************************************************************************************************
 # 1-compare accross various locations ----
 save_summary_plots_by_outcome<-function(calibration.code,folder.name){
     plot.calib.comparison(calib.simsets = calib.simsets,
                           calibration.codes = calibration.code,
-                          sim.subset = "last20",
+                          sim.subset = "full",
                           locations = SHIELD.TEN.MSAS,
                           separate.by = "outcome",
                           folder.name = folder.name,
@@ -59,7 +62,7 @@ save_summary_plots_by_outcome<-function(calibration.code,folder.name){
     #
     plot.calib.comparison(calib.simsets = calib.simsets,
                           calibration.codes = calibration.code,
-                          sim.subset = "last20",
+                          sim.subset = "full",
                           locations = SHIELD.TEN.MSAS,
                           separate.by = "outcome",
                           folder.name = folder.name,
@@ -72,7 +75,7 @@ save_summary_plots_by_outcome<-function(calibration.code,folder.name){
     #
     plot.calib.comparison(calib.simsets = calib.simsets,
                           calibration.codes = calibration.code,
-                          sim.subset = "last20",
+                          sim.subset = "full",
                           locations = SHIELD.TEN.MSAS,
                           separate.by = "outcome",
                           folder.name = folder.name,
@@ -86,7 +89,7 @@ save_summary_plots_by_outcome<-function(calibration.code,folder.name){
     # Sim-only by sex (to see MSM)
     plot.calib.comparison(calib.simsets = calib.simsets,
                           calibration.codes = calibration.code,
-                          sim.subset = "last20",
+                          sim.subset = "full",
                           locations = SHIELD.TEN.MSAS,
                           separate.by = "outcome",
                           folder.name = folder.name,
@@ -99,7 +102,7 @@ save_summary_plots_by_outcome<-function(calibration.code,folder.name){
     # Two way break down by sex and race
     plot.calib.comparison(calib.simsets = calib.simsets,
                           calibration.codes = calibration.code,
-                          sim.subset = "last20",
+                          sim.subset = "full",
                           locations = SHIELD.TEN.MSAS,
                           separate.by = "outcome",
                           folder.name = folder.name,
@@ -110,7 +113,7 @@ save_summary_plots_by_outcome<-function(calibration.code,folder.name){
     )
     plot.calib.comparison(calib.simsets = calib.simsets,
                           calibration.codes = calibration.code,
-                          sim.subset = "last20",
+                          sim.subset = "full",
                           locations = SHIELD.TEN.MSAS,
                           separate.by = "outcome",
                           folder.name = folder.name,
@@ -126,7 +129,7 @@ save_summary_plots_by_outcome<-function(calibration.code,folder.name){
 save_summary_plots_by_location<-function(calibration.code,folder.name){
     plot.calib.comparison(calib.simsets = calib.simsets,
                           calibration.codes = calibration.code,
-                          sim.subset = "last20",
+                          sim.subset = "full",
                           locations = SHIELD.TEN.MSAS,
                           separate.by = "location",
                           folder.name = folder.name,
@@ -138,7 +141,7 @@ save_summary_plots_by_location<-function(calibration.code,folder.name){
     )
     plot.calib.comparison(calib.simsets = calib.simsets,
                           calibration.codes = calibration.code,
-                          sim.subset = "last20",
+                          sim.subset = "full",
                           locations = SHIELD.TEN.MSAS,
                           separate.by = "location",
                           folder.name = folder.name,
@@ -150,8 +153,11 @@ save_summary_plots_by_location<-function(calibration.code,folder.name){
     )
 }
 
-save_summary_plots_by_outcome(calibration.code = "calib.7.16.stage2.az",folder.name = "calib.7.16.stage2.summary")
-save_summary_plots_by_location(calibration.code = "calib.7.16.stage2.az",folder.name = "calib.7.16.stage2.summary")
+save_summary_plots_by_outcome(calibration.code = "calib.7.16.stage3.az",folder.name = "calib.7.16.stage3.summary")
+save_summary_plots_by_location(calibration.code = "calib.7.16.stage3.az",folder.name = "calib.7.16.stage3.summary")
+
+get.default.style.manager()$shade.increment
+
 # **********************************************************************************************************************************************************
 # 3-compare_calibrations_by_outcome ----
 compare_calibrations_by_outcome<-function(calibration.codes,folder.name){
@@ -233,6 +239,9 @@ sapply(calib.simsets,function(simCalib){
 
 cbind(unlist(calib.simsets$`Atlanta – calib.7.14.stage2.az`$last_sim$get.params()),unlist(calib.simsets$`Atlanta – calib.7.16.stage2.az`$last_sim$get.params()))
 
+calib.simsets$`Atlanta – calib.7.16.stage0.az`$full_simset$traceplot("oe.")
+calib.simsets$`Atlanta – calib.7.16.stage1.az`$full_simset$traceplot("oe.")
+calib.simsets$`Atlanta – calib.7.16.stage2.az`$full_simset$traceplot("oe.")
 
 # CREATE ALL STAGE CALIBRATION PLOTS
 plot.calib.stages(calib.simsets = calib.simsets,

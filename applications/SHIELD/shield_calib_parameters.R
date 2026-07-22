@@ -284,10 +284,12 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
     # multipliers for female and het male:
     screening.rate.multiplier.female = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     screening.rate.multiplier.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    
     # race specific multipliers that apply to both msm and het
     screening.rate.multiplier.black = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     screening.rate.multiplier.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     screening.rate.multiplier.other = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    
     # future change multiplier
     screening.rate.future.change.mult  = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0), #CI=(0.25 - 1.25) #assumption
     
