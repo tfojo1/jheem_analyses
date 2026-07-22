@@ -1,7 +1,7 @@
 {
   "metadata": {
     "generated_from": "syphilis.manager_section3",
-    "generated_at": "2026-07-16 20:01:25"
+    "generated_at": "2026-07-22 17:35:16"
   },
   "outcomes": {
     "population": {
@@ -5211,6 +5211,30 @@
             }
           }
         },
+        "mmwr": {
+          "ontologies": {
+            "mmwr": {
+              "stratifications": {
+                "year__location__sex": {
+                  "dimensions": ["year", "location", "sex"],
+                  "year": {
+                    "n": 9,
+                    "min": "1999",
+                    "max": "2014",
+                    "values": ["1999", "2000", "2001", "2009", "2010", "2011", "2012", "2013", "2014"]
+                  },
+                  "location": {
+                    "n": 2,
+                    "min": "GA",
+                    "max": "NY",
+                    "values": ["GA", "NY"]
+                  },
+                  "sex": ["female", "male", "msm"]
+                }
+              }
+            }
+          }
+        },
         "cdc.aggregated.county": {
           "ontologies": {
             "cdc.sti": {
@@ -6791,6 +6815,29 @@
               }
             }
           }
+        },
+        "mmwr": {
+          "ontologies": {
+            "mmwr": {
+              "stratifications": {
+                "year__location": {
+                  "dimensions": ["year", "location"],
+                  "year": {
+                    "n": 9,
+                    "min": "1999",
+                    "max": "2014",
+                    "values": ["1999", "2000", "2001", "2009", "2010", "2011", "2012", "2013", "2014"]
+                  },
+                  "location": {
+                    "n": 2,
+                    "min": "GA",
+                    "max": "NY",
+                    "values": ["GA", "NY"]
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -6815,6 +6862,29 @@
                     "min": "AK",
                     "max": "WY",
                     "values": ["AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VA", "VT", "WA", "WI", "WV", "WY"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "mmwr": {
+          "ontologies": {
+            "mmwr": {
+              "stratifications": {
+                "year__location": {
+                  "dimensions": ["year", "location"],
+                  "year": {
+                    "n": 9,
+                    "min": "1999",
+                    "max": "2014",
+                    "values": ["1999", "2000", "2001", "2009", "2010", "2011", "2012", "2013", "2014"]
+                  },
+                  "location": {
+                    "n": 2,
+                    "min": "GA",
+                    "max": "NY",
+                    "values": ["GA", "NY"]
                   }
                 }
               }
