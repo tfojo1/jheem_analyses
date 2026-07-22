@@ -203,15 +203,16 @@ int.style.manager <- function(intervention.labels,
 # Core simplot call from a named list of simset objects + display labels
 .make.panel <- function(simset.list, labels, outcomes, split.by, facet.by,
                         style.manager, summary.type, plot.which, years) {
+    # browser()
     if (length(simset.list) == 0) return(NULL)
     args <- list(outcomes = outcomes, dimension.values = list(year = years),
                  style.manager = style.manager, summary.type = summary.type,
-                 plot.which = plot.which)
+                 plot.which = plot.which,debug=T)
     if (!is.null(split.by)) args$split.by <- split.by
     if (!is.null(facet.by)) args$facet.by  <- facet.by
     if (length(simset.list) >= 1 && !is.null(labels)) args$simset.names <- unname(labels)
+    browser()
     do.call(simplot, c(unname(simset.list), args))
-    # browser()
     
     }
 
@@ -719,7 +720,7 @@ plot.calib.comparison <- function(calib.simsets,
                                   dpi               = 300,
                                   create.dirs       = TRUE,
                                   verbose           = TRUE) {
-    # browser()
+
     if (!is.null(locations) && is.null(names(locations)))
         stop("Error: 'locations' must be a NAMED vector")
     
@@ -743,9 +744,8 @@ plot.calib.comparison <- function(calib.simsets,
     if (is.null(save.dir)) {
         save.dir <- file.path(SHIELD.PLOT.PATH, "calibrationPlots","comparison",folder.name,paste0("by_",separate.by))
      }
-    
+    browser()
     loc.panel <- function(loc, outs) {
-        # browser()
         entries <- extract.calib.simsets(calib.simsets, location = loc)
         entries <- entries[sapply(entries, function(e) e$calib.code %in% all.calibs)]
         if (length(entries) == 0) return(NULL)
@@ -771,7 +771,7 @@ plot.calib.comparison <- function(calib.simsets,
                                  width, h, dpi, create.dirs, verbose)
         }
     }
-    
+    # browser()
     if (separate.by == "location") {
         for (li in seq_along(all.loc.names)) {
             loc <- all.loc.names[li]
