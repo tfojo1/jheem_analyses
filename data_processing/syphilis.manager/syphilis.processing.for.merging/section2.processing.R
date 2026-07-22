@@ -133,6 +133,7 @@ data.manager$register.parent.source('NNDSS', full.name = 'National Notifiable Di
 data.manager$register.parent.source('DHHS', full.name = 'U.S. Department of Health and Human Services', short.name= "DHHS") #parent
 data.manager$register.parent.source('NCHS', full.name = 'National Center for Health Statistics', short.name= "NCHS")
 data.manager$register.parent.source('LHD', full.name = 'Local Health Department', short.name= "LHD")
+data.manager$register.parent.source('CDC', full.name = 'Centers for Disease Control and Prevention', short.name= "CDC")
 
 data.manager$register.source('cdc.sti', parent.source= "NNDSS", full.name = "Atlas Plus STI Data", short.name='cdc.sti')
 data.manager$register.source('cdc.aggregated.county', parent.source= "NHSS", full.name = 'CDC Aggregated County', short.name = 'cdc aggd county') #Note this is for the aggregated county data being used to represent MSAs
@@ -140,6 +141,7 @@ data.manager$register.source('cdc.sti.surveillance.reports', parent.source= "DHH
 data.manager$register.source('cdc_wonder', parent.source= "NCHS", full.name = "CDC Wonder", short.name='cdc_wonder')
 data.manager$register.source('lhd', parent.source= "LHD", full.name = "Local Health Department", short.name='lhd')
 data.manager$register.source('cdc.wonder.aggregated.population', parent.source= "NNDSS", full.name = 'CDC Wonder Aggregated Adult Population', short.name = 'cdc.wonder.agg.pop') #Thsi is data from atlas summed into total syphilis dx
+data.manager$register.source('mmwr', parent.source= "CDC", full.name = "Morbidity and Mortality Weekly Report", short.name='mmwr')
 
 #Register Ontologies:
 data.manager$register.ontology(
@@ -193,6 +195,13 @@ data.manager$register.ontology(
         sex=c('male','female', 'msm')
     ))
 
+data.manager$register.ontology(
+    'mmwr',
+    ont = ontology(
+        year= NULL,
+        location= NULL,
+        sex=c('male','female', 'msm')
+    ))
 
 
 #Codes:
@@ -205,6 +214,8 @@ source('data_processing/syphilis.manager/local.health.department.syphilis.data.R
 source('data_processing/syphilis.manager/sti.pdf.reports.by.sex.msm.R') #This pulls additional ps.syphilis data from cdc pdf reports by sex and msm
 source('data_processing/syphilis.manager/state.health.department.data.R') #This pulls data manually taken from state health dept reports
 source('data_processing/syphilis.manager/cdc.pdf.reports.additional.msa.totals.R') #This pulls any remaining data from the PDF CDC STI reports that hadn't previously been added
+source('data_processing/syphilis.manager/mmwr.data.R') #This puts ps.syphilis data (used to calculation proportion ps syphilis cases for msm) pulled manually from old MMWR reports
+
 
 # Aggregate Outcomes to MSA 
 syphilis.manager = data.manager
