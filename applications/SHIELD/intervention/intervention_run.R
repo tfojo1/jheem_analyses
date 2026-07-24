@@ -4,9 +4,9 @@ if (length(args) < 5) stop("Usage: Rscript script.R <location> <calibration.stag
 
 LOCATION         <- as.character(args[1])
 CALIBRATION.NAME <- as.character(args[2])
-N.SIM <- as.character(args[3])
-FIRST.YEAR <- as.character(args[4])
-LAST.YEAR <- as.character(args[5])
+N.SIM <- as.numeric(args[3])
+FIRST.YEAR <- as.numeric(args[4])
+LAST.YEAR <- as.numeric(args[5])
 
 # ============================================================================
 # DoxyPEP Intervention Analysis
