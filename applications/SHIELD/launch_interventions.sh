@@ -87,7 +87,7 @@ run_calib_code() {
     local calib_code="$2"
     echo "[$(date '+%F %T')] START   $loc :: $calib_code"
     Rscript "$SCRIPT" "$loc" "$calib_code" "$N_SIM" "$FIRST_YEAR" "$LAST_YEAR" \
-    > "$LOG_DIR/${loc}_${calib_code}.out" 2>&1
+    > "$LOG_DIR/interventions_${loc}_${calib_code}.out" 2>&1
     local rc=$?
         if (( rc != 0 )); then
     echo "[$(date '+%F %T')] FAILED  $loc :: $calib_code (exit $rc)" >&2
@@ -111,7 +111,7 @@ done
 
 run_calib_code "$loc" "$calib_code" &
     (( running_jobs++ ))
-echo "[$(date '+%F %T')] LAUNCHED $loc :: $calib_code (PID $!, running_jobs=$running_jobs)"
+echo "[$(date '+%F %T')] LAUNCHED INTERVENTIONS FOR $loc :: $calib_code (PID $!, running_jobs=$running_jobs)"
 
 done
 done

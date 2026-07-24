@@ -1,9 +1,12 @@
 # Get location and calibration stage from command-line arguments
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) < 2) stop("Usage: Rscript script.R <location> <calibration.stage> <n.sim> <first.year> <last.year>")
+if (length(args) < 5) stop("Usage: Rscript script.R <location> <calibration.stage> <n.sim> <first.year> <last.year>")
 
 LOCATION         <- as.character(args[1])
 CALIBRATION.NAME <- as.character(args[2])
+N.SIM <- as.character(args[3])
+FIRST.YEAR <- as.character(args[4])
+LAST.YEAR <- as.character(args[5])
 
 # ============================================================================
 # DoxyPEP Intervention Analysis
