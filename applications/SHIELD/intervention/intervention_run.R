@@ -3,7 +3,7 @@ args <- commandArgs(trailingOnly = TRUE)
 if (length(args) < 5) stop("Usage: Rscript script.R <location> <calibration.stage> <n.sim> <first.year> <last.year>")
 
 LOCATION         <- as.character(args[1])
-CALIBRATION.NAME <- as.character(args[2])
+CALIBRATION.CODE <- as.character(args[2])
 N.SIM <- as.numeric(args[3])
 FIRST.YEAR <- as.numeric(args[4])
 LAST.YEAR <- as.numeric(args[5])
