@@ -12,9 +12,7 @@ source("../jheem_analyses/applications/SHIELD/intervention/intervention_helper_f
 LOCATIONS        <- SHIELD.TEN.MSAS    # Named vector: names = city, values = codes
 
 
-CALIBRATION.CODE <- "calib.6.9.stage2.az" # 
-# CALIBRATION.CODE <- "calib.5.19.stage2.pk" # older version
-
+CALIBRATION.CODE <- "calib.6.16.stage3.az"  
 N.SIM <- 300
 FIRST.YEAR <- 2000
 LAST.YEAR <- 2040
@@ -25,7 +23,10 @@ BASE.PATH <- paste0(ROOT.DIR,"/simulations/shield")
 INTERVENTION.LABELS <- c(
     noint        = "No Doxy-PEP Intervention",
     doxy.u.100.p.100   = "Uptake 100% Persistence 100%",
-    doxy.rapid.uptake="Uptake 15%, 40% and then 100%"
+    doxy.u.50.p.100   = "Uptake 50% Persistence 100%",
+    doxy.u.100.p.50   = "Uptake 100% Persistence 50%",
+    doxy.u.50.p.50   = "Uptake 50% Persistence 50%",
+    doxy.kingCounty="Uptake 15%, 40% and then 100%"
     
 )
 INTERVENTION.CODES <- names(INTERVENTION.LABELS)
