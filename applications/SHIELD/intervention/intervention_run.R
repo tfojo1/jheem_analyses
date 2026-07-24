@@ -49,7 +49,7 @@ if (1==1){
     sim.collection <- create.simset.collection(
         version = "shield",
         calibration.code = CALIBRATION.CODE,
-        locations = LOCATIONS,
+        locations = LOCATION,
         interventions = INTERVENTION.CODES,
         n.sim = N.SIM
     )
