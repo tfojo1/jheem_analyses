@@ -1,3 +1,10 @@
+# Get location and calibration stage from command-line arguments
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) < 2) stop("Usage: Rscript script.R <location> <calibration.stage> <n.sim> <first.year> <last.year>")
+
+LOCATION         <- as.character(args[1])
+CALIBRATION.NAME <- as.character(args[2])
+
 # ============================================================================
 # DoxyPEP Intervention Analysis
 # ============================================================================
@@ -9,13 +16,13 @@ source("../jheem_analyses/applications/SHIELD/intervention/intervention_helper_f
 # =============================================================================
 # SECTION 1: Configuration
 # =============================================================================
-LOCATIONS        <- SHIELD.TEN.MSAS    # Named vector: names = city, values = codes
+# LOCATIONS        <- SHIELD.TEN.MSAS    # Named vector: names = city, values = codes
 
 
-CALIBRATION.CODE <- "calib.6.16.stage3.az"  
-N.SIM <- 300
-FIRST.YEAR <- 2000
-LAST.YEAR <- 2040
+# CALIBRATION.CODE <- "calib.6.16.stage3.az"  
+# N.SIM <- 300
+# FIRST.YEAR <- 2000
+# LAST.YEAR <- 2040
 
 BASE.PATH <- paste0(ROOT.DIR,"/simulations/shield")
 
