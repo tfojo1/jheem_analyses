@@ -3,7 +3,7 @@
 
 ## What this looks at
 
-The youth-only program is small: it averts about **2.6 infections**
+The youth-only program is small: it averts about **2.8 infections**
 statewide over 2026-2030, because diagnosed youth are only ~1% of
 Maryland’s epidemic. Young adults (25-34) are the obvious next group to
 add, with far more diagnosed HIV.
@@ -42,7 +42,7 @@ The big number rests on two things the youth trial does not establish:
 
 1.  **Does the effect transport?** The trial measured suppression in
     *youth*. Whether it helps 25-34s as much is unknown, and that is the
-    entire spread: full transport ~41, none ~2.6 (today’s number).
+    entire spread: full transport ~41, none ~2.8 (today’s number).
     Everything below is conditional on where the truth sits in that
     range.
 2.  **Would adults take it up the same way?** We assumed adults enroll
@@ -58,7 +58,7 @@ the program’s effect.
 
 ![](figures/broadening_eligibility_brief-traj-incidence-1.svg)
 
-The averted *count* rises a lot in relative terms (2.6 to ~41), but it
+The averted *count* rises a lot in relative terms (2.8 to ~41), but it
 stays a modest share of Maryland’s incidence: a genuine gain, not a
 visible bend in the curve.
 
@@ -92,6 +92,11 @@ Some, but with diminishing returns. Doubling the horizon (five years to
 ten) lifts the totals by about 1.4-1.6x, not 2x, because the averted
 share shrinks as the epidemic declines:
 
+The horizon comparison below retains its matched inherited-tolerance 5-
+and 10-year runs, so its 5-year row differs slightly from the tight core
+estimates above. Use it for the accumulation pattern, not as the current
+exact effect.
+
 | Program length          | Youth only | Broadened (full transport) |
 |:------------------------|:-----------|:---------------------------|
 | 5 years (through 2030)  | 2.6        | 40.7                       |
@@ -109,7 +114,7 @@ fewer of them each year.
 
 - Youth-only impact is small because the eligible group is small.
 - **Broadening the age range is the lever that moves the number.** It
-  forms a ladder: ~2.6 (youth only) to ~41 (add 25-34) to ~113 (add
+  forms a ladder: ~2.8 (youth only) to ~41 (add 25-34) to ~113 (add
   35-44) under full transport, each rung on a weaker transport
   assumption than the last. “Everyone” adds more, but on the 55+ group
   where a youth program is least likely to work.

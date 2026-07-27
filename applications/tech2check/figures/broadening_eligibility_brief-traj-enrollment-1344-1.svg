@@ -293,8 +293,8 @@
 <g clip-path="url(#clip-17)">
 <path fill="none" stroke-width="1.066978" stroke-linecap="butt" stroke-linejoin="round" stroke="rgb(100%, 100%, 100%)" stroke-opacity="1" stroke-miterlimit="10" d="M 477.957031 215.652344 L 477.957031 41.726562 "/>
 </g>
-<path fill="none" stroke-width="1.173676" stroke-linecap="butt" stroke-linejoin="round" stroke="rgb(0%, 0%, 0%)" stroke-opacity="0.101961" stroke-dasharray="4.694705 4.694705" stroke-miterlimit="10" d="M 66.714844 207.746094 L 272.335938 207.746094 L 313.460938 103.316406 L 354.585938 68.105469 L 395.710938 120.542969 L 436.832031 151.917969 L 477.957031 170.769531 "/>
-<path fill="none" stroke-width="1.173676" stroke-linecap="butt" stroke-linejoin="round" stroke="rgb(0%, 0%, 0%)" stroke-opacity="0.101961" stroke-miterlimit="10" d="M 66.714844 207.746094 L 477.957031 207.746094 "/>
+<path fill="none" stroke-width="1.173676" stroke-linecap="butt" stroke-linejoin="round" stroke="rgb(0%, 0%, 0%)" stroke-opacity="1" stroke-dasharray="4.694705 4.694705" stroke-miterlimit="10" d="M 66.714844 207.746094 L 272.335938 207.746094 L 313.460938 103.316406 L 354.585938 68.105469 L 395.710938 120.542969 L 436.832031 151.917969 L 477.957031 170.769531 "/>
+<path fill="none" stroke-width="1.173676" stroke-linecap="butt" stroke-linejoin="round" stroke="rgb(0%, 0%, 0%)" stroke-opacity="1" stroke-miterlimit="10" d="M 66.714844 207.746094 L 477.957031 207.746094 "/>
 <path fill-rule="nonzero" fill="rgb(97.254902%, 46.27451%, 42.745098%)" fill-opacity="0.2" d="M 66.714844 207.746094 L 272.335938 207.746094 L 313.460938 91.003906 L 354.585938 49.632812 L 395.710938 107.234375 L 436.832031 142.199219 L 477.957031 163.488281 L 477.957031 183.566406 L 436.832031 170.027344 L 395.710938 145.882812 L 354.585938 102.492188 L 313.460938 125.113281 L 272.335938 207.746094 Z M 66.714844 207.746094 "/>
 <g clip-path="url(#clip-18)">
 <path fill-rule="nonzero" fill="rgb(85.098039%, 85.098039%, 85.098039%)" fill-opacity="1" d="M 46.152344 41.726562 L 498.523438 41.726562 L 498.523438 23.960938 L 46.152344 23.960938 Z M 46.152344 41.726562 "/>
