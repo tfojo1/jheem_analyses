@@ -207,11 +207,10 @@ int.style.manager <- function(intervention.labels,
     if (length(simset.list) == 0) return(NULL)
     args <- list(outcomes = outcomes, dimension.values = list(year = years),
                  style.manager = style.manager, summary.type = summary.type,
-                 plot.which = plot.which,debug=T)
+                 plot.which = plot.which)
     if (!is.null(split.by)) args$split.by <- split.by
     if (!is.null(facet.by)) args$facet.by  <- facet.by
     if (length(simset.list) >= 1 && !is.null(labels)) args$simset.names <- unname(labels)
-    browser()
     do.call(simplot, c(unname(simset.list), args))
     
     }
@@ -744,7 +743,6 @@ plot.calib.comparison <- function(calib.simsets,
     if (is.null(save.dir)) {
         save.dir <- file.path(SHIELD.PLOT.PATH, "calibrationPlots","comparison",folder.name,paste0("by_",separate.by))
      }
-    browser()
     loc.panel <- function(loc, outs) {
         entries <- extract.calib.simsets(calib.simsets, location = loc)
         entries <- entries[sapply(entries, function(e) e$calib.code %in% all.calibs)]
@@ -767,7 +765,7 @@ plot.calib.comparison <- function(calib.simsets,
             output[[outcome]] <- combined
             h <- if (is.null(height)) .auto.height(length(Filter(Negate(is.null), panels)), ncol = if (!is.null(ncol)) ncol else ceiling(sqrt(length(panels) * 1.5)), nrow = nrow) else height
             if (save) .save.plot(combined, save.dir,
-                                 paste0("outcome_", .sanitize(outcome), "_by_location", suffix),
+                                 paste0("compare_",.sanitize(outcome), "_accross_locations", suffix),
                                  width, h, dpi, create.dirs, verbose)
         }
     }
@@ -784,7 +782,7 @@ plot.calib.comparison <- function(calib.simsets,
             output[[loc]] <- combined
             h <- if (is.null(height)) .auto.height(length(Filter(Negate(is.null), panels)), ncol = if (!is.null(ncol)) ncol else ceiling(sqrt(length(panels) * 1.5)), nrow = nrow) else height
             if (save) .save.plot(combined, save.dir,
-                                 paste0("location_", .sanitize(loc), "_by_outcome", suffix),
+                                 paste0("compare_outcomes_within_", .sanitize(loc), suffix),
                                  width, h, dpi, create.dirs, verbose)
         }
     }
