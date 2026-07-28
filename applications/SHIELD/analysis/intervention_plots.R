@@ -58,19 +58,26 @@ plot.int.location(int.simsets = int.simsets,
                   years = c(2018:2030),
                   save = T,create.dirs = T )
 
-plot.int.location(int.simsets = int.simsets,
-                  location = "Seattle",
-                  # calib.code ="calib.6.12.stage2.az",
-                  calib.code ="calib.6.12.stg2.penalty",
-                  interventions =intervention.codes,
-                  outcomes = c("diagnosis.total"),
-                  facet.by = "sex",
-                  plot.which = "sim.only",
-                  years = c(2018:2025),
-                  save = T,create.dirs = T )
-
-
-
+ 
+plot.int.comparison(
+    int.simsets = int.simsets,
+    calibration.codes = CALIBRATION.CODE,
+    interventions = INTERVENTION.CODES, 
+    locations = LOCATIONS,
+    outcomes          = c("diagnosis.total"),
+    
+    separate.by       = "outcome",
+    years = 2018:2030,
+    # nrow=2,
+    folder.name       = "7.16.accross.locations", 
+    # facet.by = "sex",
+    save              = TRUE,
+    create.dirs       = TRUE,
+    style.manager     = int.style.manager(
+        intervention.labels = INTERVENTION.CODES,
+        calibration.codes   = CALIBRATION.CODE
+    )
+)
 # ****************************************************************************************************
 # 1. COMPARE BOTH CALIBRATIONS ACROSS ALL CITIES — SEPARATE BY OUTCOME ----
 # ****************************************************************************************************

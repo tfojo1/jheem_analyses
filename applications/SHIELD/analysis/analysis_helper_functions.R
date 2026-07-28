@@ -207,10 +207,11 @@ int.style.manager <- function(intervention.labels,
     if (length(simset.list) == 0) return(NULL)
     args <- list(outcomes = outcomes, dimension.values = list(year = years),
                  style.manager = style.manager, summary.type = summary.type,
-                 plot.which = plot.which)
+                 plot.which = plot.which )
     if (!is.null(split.by)) args$split.by <- split.by
     if (!is.null(facet.by)) args$facet.by  <- facet.by
     if (length(simset.list) >= 1 && !is.null(labels)) args$simset.names <- unname(labels)
+    
     do.call(simplot, c(unname(simset.list), args))
     
     }
