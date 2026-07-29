@@ -498,6 +498,33 @@ proportion.male.diagnosis.among.msm.nested.likelihood.instructions <-
                                                      #
                                                      equalize.weight.by.year = T
     )
+##---- PS Diagnosis Rate Among MSM (per population MSM)----
+ps.diag.rate.among.msm.nested.likelihood.instructions <-
+    create.nested.proportion.likelihood.instructions(
+        outcome.for.data = "ps.diag.rate.among.msm",
+        outcome.for.sim = "ps.diag.rate.among.msm", # need to make
+        denominator.outcome.for.data = "estimated.count.msm",
+        outcome.for.n.multipliers = "population",
+        location.types = c("STATE", "CBSA"),
+        minimum.geographic.resolution.type = "COUNTY",
+        levels.of.stratification = 0,
+        p.bias.inside.location = 0,
+        p.bias.outside.location = 0,
+        p.bias.sd.inside.location = 0.05,
+        p.bias.sd.outside.location = 0.05,
+        
+        within.location.p.error.correlation = 0.5, #Default: correlation from one year to other in the bias in the city and outside the city
+        within.location.n.error.correlation = 0.5, #Default: ratio of tests outside MSA to those inside MSA (for MSA we usually dont have fully stratified numbers)
+        #
+        observation.correlation.form = 'compound.symmetry',
+        p.error.variance.term = 0.1, # From sqrt(2 * 0.07^2), where we assume numerator and denominator errors are independent (they're not) and 7% cv each
+        p.error.variance.type = "cv",
+        minimum.error.sd = 0.01, # to fix two Houston points where variance data says 0
+        #
+        partitioning.function = SHIELD.DUMMY.PARTITIONING.FUNCTION, # It won't need to use this
+        #
+        equalize.weight.by.year = T
+    )
 
 ## EARLY Diagnosis ----
 # data from 1941-2022 (cdc.pdf.report) for national model Only (total)
