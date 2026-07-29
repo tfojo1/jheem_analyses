@@ -40,7 +40,7 @@ register.calibration.info('calib.7.29.stage1.az',
                           preceding.calibration.codes = 'calib.7.29.stage0.az',
                           likelihood.instructions = lik.inst.stage1,
                           special.case.likelihood.instructoins = list(
-                              "C.12580" = like.inst.stage1.2021
+                              "C.12580" = lik.inst.stage1.2021
                           ),
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
@@ -53,16 +53,12 @@ register.calibration.info("calib.7.29.stage2.az",
                           preceding.calibration.codes = 'calib.7.29.stage1.az',
                           likelihood.instructions = lik.inst.stage23,
                           special.case.likelihood.instructoins = list(
-                              "C.12580" = like.inst.stage23.2021
+                              "C.12580" = lik.inst.stage23.2021
                           ),
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
                           parameter.names = c(
-                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                              STI.TESTING.PARAMETERS.PRIOR@var.names,
-                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
-                              POPULATION.PARAMETERS.PRIOR@var.names,
-                              AGING.PARAMETERS.PRIOR@var.names
+                              SHIELD.FULL.PARAMETERS.PRIOR@var.names
                           ),
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
@@ -70,16 +66,12 @@ register.calibration.info("calib.7.29.stage3az",
                           preceding.calibration.codes = 'calib.7.29.stage2.az',
                           likelihood.instructions = lik.inst.stage23,
                           special.case.likelihood.instructoins = list(
-                              "C.12580" = like.inst.stage23.2021
+                              "C.12580" = lik.inst.stage23.2021
                           ),
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
                           parameter.names = c(
-                              TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                              STI.TESTING.PARAMETERS.PRIOR@var.names,
-                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names,
-                              POPULATION.PARAMETERS.PRIOR@var.names,
-                              AGING.PARAMETERS.PRIOR@var.names
+                              SHIELD.FULL.PARAMETERS.PRIOR@var.names
                           ),
                           n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
 )
