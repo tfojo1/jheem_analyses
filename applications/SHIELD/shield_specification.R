@@ -1546,18 +1546,31 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
                          corresponding.data.outcome = 'population' ,
                          keep.dimensions = c('location','age','race','sex')
 )
-track.integrated.outcome(SHIELD.SPECIFICATION,
+track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name="population.msm",
+                         value = "population",
                          outcome.metadata = create.outcome.metadata(display.name = 'Population of MSM',
                                                                     description = 'Population size among MSM',
                                                                     scale = 'non.negative.number',
                                                                     axis.name = 'Persons',
                                                                     units = 'persons',
                                                                     singular.unit = 'person'),
-                         value.to.integrate = 'point.population',
                          corresponding.data.outcome = 'estimated.count.msm',
                          subset.dimension.values = list(sex="msm"),
-                         keep.dimensions = c('location'))
+                         keep.dimensions = c('location')
+                         )
+# track.integrated.outcome(SHIELD.SPECIFICATION,
+#                          name="population.msm",
+#                          outcome.metadata = create.outcome.metadata(display.name = 'Population of MSM',
+#                                                                     description = 'Population size among MSM',
+#                                                                     scale = 'non.negative.number',
+#                                                                     axis.name = 'Persons',
+#                                                                     units = 'persons',
+#                                                                     singular.unit = 'person'),
+#                          value.to.integrate = 'point.population',
+#                          corresponding.data.outcome = 'estimated.count.msm',
+#                          subset.dimension.values = list(sex="msm"),
+#                          keep.dimensions = c('location'))
 
 
 ##---- Fertility Rate ----
