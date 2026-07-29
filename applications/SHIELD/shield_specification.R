@@ -1546,6 +1546,18 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
                          corresponding.data.outcome = 'population' ,
                          keep.dimensions = c('location','age','race','sex')
 )
+track.integrated.outcome(SHIELD.SPECIFICATION,
+                         name="population.msm",
+                         outcome.metadata = create.outcome.metadata(display.name = 'Population of MSM',
+                                                                    description = 'Population size among MSM',
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Persons',
+                                                                    units = 'persons',
+                                                                    singular.unit = 'person'),
+                         value.to.integrate = 'point.population',
+                         corresponding.data.outcome = 'estimated.count.msm',
+                         subset.dimension.values = list(sex="msm"),
+                         keep.dimensions = c('location'))
 
 
 ##---- Fertility Rate ----
@@ -2102,6 +2114,23 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          corresponding.data.outcome = 'prop.male.ps.diag.among.msm',
                          keep.dimensions =  "location"
 )
+
+### Rate of diagnosis among MSM ----
+track.cumulative.outcome(SHIELD.SPECIFICATION,
+                         name='ps.diag.rate.among.msm',
+                         value=expression(diagnosis.ps.among.msm/population.msm),
+                         denominator.outcome = 'population.msm',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Rate of Primary & Secondary (Symptomatic Disease) Among MSM Divided by MSM Population',
+                                                                    description = 'Rate of Primary & Secondary (Symptomatic Disease) Among MSM Divided by MSM Population',
+                                                                    scale = 'proportion', # had to for nested?
+                                                                    axis.name = 'Proportion',
+                                                                    display.as.percent = F,
+                                                                    units = 'cases per person',
+                                                                    singular.unit = 'case per person'),
+                         corresponding.data.outcome = 'ps.diag.rate.among.msm',
+                         keep.dimensions =  "location"
+)
+
 ###---- ** Early Latent Syphilis ----
 # Just counting those in early stage 
 #### 1- true EL ----
