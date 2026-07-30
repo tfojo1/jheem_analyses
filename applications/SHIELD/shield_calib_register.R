@@ -23,7 +23,7 @@ par.aliases.transmission = list(
 # 7.29 ----
 # Same as 7.16 but with the ps.diag.rate.among.msm likelihood instead of the prop.male.diag.among.msm
 # and special case likelihoods ending in 2021 for early DOXY implementers
-register.calibration.info("calib.7.29.stage0.az",
+register.calibration.info("calib.7.30.stage0.az",
                           likelihood.instructions = lik.inst.stage0,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
@@ -36,11 +36,13 @@ register.calibration.info("calib.7.29.stage0.az",
                           parameter.aliases = par.aliases.transmission,
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-register.calibration.info('calib.7.29.stage1.az',
-                          preceding.calibration.codes = 'calib.7.29.stage0.az',
+register.calibration.info('calib.7.30.stage1.az',
+                          preceding.calibration.codes = 'calib.7.30.stage0.az',
                           likelihood.instructions = lik.inst.stage1,
-                          special.case.likelihood.instructoins = list(
-                              "C.12580" = lik.inst.stage1.2021
+                          special.case.likelihood.instructions = list(
+                              "C.31080" = lik.inst.stage1.2021,
+                              "C.37980" = lik.inst.stage1.2021,
+                              "C.42660" = lik.inst.stage1.2021
                           ),
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
@@ -49,11 +51,13 @@ register.calibration.info('calib.7.29.stage1.az',
                                               TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-register.calibration.info("calib.7.29.stage2.az",
-                          preceding.calibration.codes = 'calib.7.29.stage1.az',
+register.calibration.info("calib.7.30.stage2.az",
+                          preceding.calibration.codes = 'calib.7.30.stage1.az',
                           likelihood.instructions = lik.inst.stage23,
-                          special.case.likelihood.instructoins = list(
-                              "C.12580" = lik.inst.stage23.2021
+                          special.case.likelihood.instructions = list(
+                              "C.31080" = lik.inst.stage1.2021,
+                              "C.37980" = lik.inst.stage1.2021,
+                              "C.42660" = lik.inst.stage1.2021
                           ),
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
@@ -62,11 +66,13 @@ register.calibration.info("calib.7.29.stage2.az",
                           ),
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-register.calibration.info("calib.7.29.stage3az",
-                          preceding.calibration.codes = 'calib.7.29.stage2.az',
+register.calibration.info("calib.7.30.stage3az",
+                          preceding.calibration.codes = 'calib.7.30.stage2.az',
                           likelihood.instructions = lik.inst.stage23,
-                          special.case.likelihood.instructoins = list(
-                              "C.12580" = lik.inst.stage23.2021
+                          special.case.likelihood.instructions = list(
+                              "C.31080" = lik.inst.stage1.2021,
+                              "C.37980" = lik.inst.stage1.2021,
+                              "C.42660" = lik.inst.stage1.2021
                           ),
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,

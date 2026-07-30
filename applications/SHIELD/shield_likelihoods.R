@@ -923,7 +923,7 @@ penalty.ps.diag.growth.stage1=join.likelihood.instructions(
     additional.weights = FUTURE.PENALTY.PS.DIAG.GROWTH.WEIGHT.STAGE1
 )
 ps.diag.rate.among.msm.stage1=join.likelihood.instructions(
-    proportion.male.diagnosis.among.msm.nested.likelihood.instructions,
+    ps.diag.rate.among.msm.nested.likelihood.instructions,
     additional.weights = PS.DIAG.RATE.AMONG.MSM.WEIGHT.STAGE1
 )
 # putting them together:
@@ -984,7 +984,7 @@ penalty.ps.diag.growth.stage23=join.likelihood.instructions(
     additional.weights = FUTURE.PENALTY.PS.DIAG.GROWTH.WEIGHT.STAGE23
 )
 ps.diag.rate.among.msm.stage23=join.likelihood.instructions(
-    proportion.male.diagnosis.among.msm.nested.likelihood.instructions,
+    ps.diag.rate.among.msm.nested.likelihood.instructions,
     additional.weights = PS.DIAG.RATE.AMONG.MSM.WEIGHT.STAGE23
 )
 # putting them together:
