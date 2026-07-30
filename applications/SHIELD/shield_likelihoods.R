@@ -21,11 +21,12 @@ STAGE.0.WEIGHT= 1/32 # lowered by half on 3/13/2026
 STAGE.1.WEIGHT= 1/8
 STAGE.23.WEIGHT= 1/4
 STAGE.23.POPULATION.WEIGHT = 1/8
-
-PS.DIAG.RATE.AMONG.MSM.WEIGHT.STAGE1 = 1 / STAGE.1.WEIGHT
+# additional weight to make sure this lilelihood is enforced:
+PS.DIAG.RATE.AMONG.MSM.WEIGHT.STAGE1 = 1 / STAGE.1.WEIGHT 
 PS.DIAG.RATE.AMONG.MSM.WEIGHT.STAGE23 = 1 / STAGE.23.WEIGHT
 
-FUTURE.PENALTY.PS.DIAG.GROWTH.LIKELIHOOD.WEIGHT = 8 # representing the eight points we would have post 2022 (eight times as many points)
+FUTURE.PENALTY.PS.DIAG.GROWTH.WEIGHT.STAGE1 = 1 / STAGE.1.WEIGHT 
+FUTURE.PENALTY.PS.DIAG.GROWTH.WEIGHT.STAGE23 = 1 / STAGE.23.WEIGHT # representing the eight points we would have post 2022 (eight times as many points)
 # HIV.TESTING.BY.SEX.WEIGHT= 8 #increasing the weight for sex a specific HIV test testing rates because this is the only targets that's available among MSM
 
 SHIELD.DUMMY.PARTITIONING.FUNCTION <- function(arr, version = 'shield', location) {
@@ -389,7 +390,7 @@ ps.diagnosis.stage0.total.likelihood.instructions =
                                          error.variance.term = list(diagnosis_cv, 10),  
                                          observation.correlation.form = 'autoregressive.1',
                                          #
-                                         weights = 4, # changed for calib.3.24.stage0.az #'@Andrew: WHY?
+                                         weights = 4, # set emperically to get stage0 going
                                          equalize.weight.by.year = T
     )
 ps.diagnosis.stage0.total.likelihood.instructions.2021 =
@@ -403,7 +404,7 @@ ps.diagnosis.stage0.total.likelihood.instructions.2021 =
                                          error.variance.term = list(diagnosis_cv, 10),  
                                          observation.correlation.form = 'autoregressive.1',
                                          #
-                                         weights = 4, # changed for calib.3.24.stage0.az #'@Andrew: WHY?
+                                         weights = 4, # set emperically to get stage0 going
                                          equalize.weight.by.year = T
     )
 
@@ -437,7 +438,7 @@ ps.diagnosis.total.likelihood.instructions.2021 =
                                          # minimum.error.sd = 1 #redundant because we have sd in variance structure 
     )
 
-##---- Strate Stage1 2019-2022 ----
+##---- Strata Stage1 2019-2022 ----
 ps.diagnosis.by.strata.stage1.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
                                          outcome.for.data = "ps.syphilis.diagnoses",  
@@ -577,10 +578,10 @@ penalty.ps.diag.growth.likelihood.instructions =
                 penalty_cutoff=10 # penalizing sims falling outside of 10X increase
             )
         },
-        weights = FUTURE.PENALTY.PS.DIAG.GROWTH.LIKELIHOOD.WEIGHT
+        weights = 1
     )
 
-##---- (NEW) Nested proportion likelihood: proportion of male ps diagnosis among MSM ----
+##---- (NEW) Nested proportion likelihood: proportion of male ps.diagnosis among MSM ----
 # proportion.male.diagnosis.among.msm.nested.likelihood.instructions <-
 #     create.nested.proportion.likelihood.instructions(outcome.for.data = "prop.male.ps.diag.among.msm",
 #                                                      outcome.for.sim = "prop.male.ps.diag.among.msm",
@@ -900,7 +901,7 @@ lik.inst.stage0 =join.likelihood.instructions(
     immigration.likelihood.instructions,
     emigration.likelihood.instructions,
     #
-    ps.diagnosis.stage0.total.likelihood.instructions, #'@Andrew:this one already has a weight of 4, why?
+    ps.diagnosis.stage0.total.likelihood.instructions, 
     #
     additional.weights = STAGE.0.WEIGHT
 )
@@ -917,12 +918,15 @@ lik.inst.stage0.2021 =join.likelihood.instructions(
 )
 
 ## STAGE 1 : All Syphilis related likelihoods 1-way stratified ----
-
+penalty.ps.diag.growth.stage1=join.likelihood.instructions(
+    penalty.ps.diag.growth.likelihood.instructions,
+    additional.weights = FUTURE.PENALTY.PS.DIAG.GROWTH.WEIGHT.STAGE1
+)
 ps.diag.rate.among.msm.stage1=join.likelihood.instructions(
     proportion.male.diagnosis.among.msm.nested.likelihood.instructions,
     additional.weights = PS.DIAG.RATE.AMONG.MSM.WEIGHT.STAGE1
 )
-
+# putting them together:
 lik.inst.stage1=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
     total.diagnosis.by.strata.stage1.likelihood.instructions,
@@ -939,8 +943,8 @@ lik.inst.stage1=join.likelihood.instructions(
     proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
     #
     historical.diagnosis.likelihood.instructions,
-    penalty.ps.diag.growth.likelihood.instructions, #this has a weight of 8 baked into it     
-    ps.diag.rate.among.msm.stage1,
+    penalty.ps.diag.growth.stage1, #this has a weight of 1/stage1.weight baked into it     
+    ps.diag.rate.among.msm.stage1, #this has a weight of 1/stage1.weight baked into it     
     #
     additional.weights = STAGE.1.WEIGHT
 )
@@ -960,15 +964,14 @@ lik.inst.stage1.2021=join.likelihood.instructions(
     proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
     #
     historical.diagnosis.likelihood.instructions,
-    penalty.ps.diag.growth.likelihood.instructions, #this has a weight of 8 baked into it     
-    ps.diag.rate.among.msm.stage1,
+    penalty.ps.diag.growth.stage1, #this has a weight of 1/stage1.weight baked into it     
+    ps.diag.rate.among.msm.stage1, #this has a weight of 1/stage1.weight baked into it     
     #
     additional.weights = STAGE.1.WEIGHT
 )
 
 # STAGE 2&3: All likelihood combined ----
-
-lik.inst.stg23.demog=join.likelihood.instructions(
+lik.inst.demog.stage23=join.likelihood.instructions(
     population.likelihood.instructions,
     deaths.likelihood.instructions,
     fertility.likelihood.instructions,
@@ -976,11 +979,18 @@ lik.inst.stg23.demog=join.likelihood.instructions(
     emigration.likelihood.instructions,
     additional.weights = STAGE.23.POPULATION.WEIGHT
 )
+penalty.ps.diag.growth.stage23=join.likelihood.instructions(
+    penalty.ps.diag.growth.likelihood.instructions,
+    additional.weights = FUTURE.PENALTY.PS.DIAG.GROWTH.WEIGHT.STAGE23
+)
 ps.diag.rate.among.msm.stage23=join.likelihood.instructions(
     proportion.male.diagnosis.among.msm.nested.likelihood.instructions,
     additional.weights = PS.DIAG.RATE.AMONG.MSM.WEIGHT.STAGE23
 )
-lik.inst.stg23.non.demog=join.likelihood.instructions(
+# putting them together:
+lik.inst.stage23 = join.likelihood.instructions(
+    lik.inst.demog.stage23,
+    #
     total.diagnosis.likelihood.instructions,
     total.diagnosis.by.strata.stage2.likelihood.instructions,
     #
@@ -996,10 +1006,14 @@ lik.inst.stg23.non.demog=join.likelihood.instructions(
     proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
     #
     historical.diagnosis.likelihood.instructions,
-    penalty.ps.diag.growth.likelihood.instructions,#this has a weight of 8 baked into it 
-    ps.diag.rate.among.msm.stage23
+    penalty.ps.diag.growth.stage23, #this has a weight of 1/stage23.weight baked into it     
+    ps.diag.rate.among.msm.stage23, #this has a weight of 1/stage23.weight baked into it  
+    #
+    additional.weights = STAGE.23.WEIGHT
 )
-lik.inst.stg23.non.demog.2021=join.likelihood.instructions(
+lik.inst.stage23.2021 = join.likelihood.instructions(
+    lik.inst.demog.stage23,
+    #
     total.diagnosis.likelihood.instructions.2021,
     total.diagnosis.by.strata.stage2.likelihood.instructions.2021,
     #
@@ -1015,19 +1029,9 @@ lik.inst.stg23.non.demog.2021=join.likelihood.instructions(
     proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
     #
     historical.diagnosis.likelihood.instructions,
-    penalty.ps.diag.growth.likelihood.instructions,#this has a weight of 8 baked into it 
-    ps.diag.rate.among.msm.stage23
-)
-
-# putting them together:
-lik.inst.stage23 = join.likelihood.instructions(
-    lik.inst.stg23.demog,
-    lik.inst.stg23.non.demog,
-    additional.weights = STAGE.23.WEIGHT
-)
-lik.inst.stage23.2021 = join.likelihood.instructions(
-    lik.inst.stg23.demog,
-    lik.inst.stg23.non.demog.2021,
+    penalty.ps.diag.growth.stage23, #this has a weight of 1/stage23.weight baked into it     
+    ps.diag.rate.among.msm.stage23, #this has a weight of 1/stage23.weight baked into it
+    #
     additional.weights = STAGE.23.WEIGHT
 )
 
@@ -1063,7 +1067,7 @@ lik.inst.stage23.2021 = join.likelihood.instructions(
 # ## STAGE 2 & 3 ----
 # # STAGE 3 now has demographics split into a separate group
 # # so that you can set different weights for them if you want.
-# lik.inst.stg23.demog=join.likelihood.instructions(
+# lik.inst.demog.stage23=join.likelihood.instructions(
 #     population.likelihood.instructions,
 #     deaths.likelihood.instructions,
 #     fertility.likelihood.instructions,
@@ -1096,17 +1100,17 @@ lik.inst.stage23.2021 = join.likelihood.instructions(
 # 
 # # We use this one
 # lik.inst.stage23 = join.likelihood.instructions(
-#     lik.inst.stg23.demog,
+#     lik.inst.demog.stage23,
 #     lik.inst.stg23.non.demog,
 #     additional.weights = STAGE.23.WEIGHT
 # )
 # lik.inst.stage23.fourth = join.likelihood.instructions(
-#     lik.inst.stg23.demog,
+#     lik.inst.demog.stage23,
 #     lik.inst.stg23.non.demog,
 #     additional.weights = STAGE.23.WEIGHT * 1/2 # w=1/4
 # )
 # lik.inst.stage23.eight = join.likelihood.instructions(
-#     lik.inst.stg23.demog,
+#     lik.inst.demog.stage23,
 #     lik.inst.stg23.non.demog,
 #     additional.weights = STAGE.23.WEIGHT * 1/4 # w=1/8
 # )
@@ -1136,22 +1140,22 @@ lik.inst.stage23.2021 = join.likelihood.instructions(
 #     penalty.diag.traject.msm.vs.het.male.likelihood.instructions
 # )
 # lik.inst.stage23.plus.penalty = join.likelihood.instructions(
-#     lik.inst.stg23.demog,
+#     lik.inst.demog.stage23,
 #     lik.inst.stg23.non.demog.plus.penalty,
 #     additional.weights = STAGE.23.WEIGHT 
 # )
 # lik.inst.stage23.plus.penalty.fourth = join.likelihood.instructions(
-#     lik.inst.stg23.demog,
+#     lik.inst.demog.stage23,
 #     lik.inst.stg23.non.demog.plus.penalty,
 #     additional.weights = STAGE.23.WEIGHT * 1/2 # w=1/4
 # )
 # lik.inst.stage23.plus.penalty.eight = join.likelihood.instructions(
-#     lik.inst.stg23.demog,
+#     lik.inst.demog.stage23,
 #     lik.inst.stg23.non.demog.plus.penalty,
 #     additional.weights = STAGE.23.WEIGHT * 1/4 # w=1/8
 # )
 # # Alternative weight versions ----
-# lik.inst.stg23.demog.2x=join.likelihood.instructions(
+# lik.inst.demog.stage23.2x=join.likelihood.instructions(
 #     population.likelihood.instructions,
 #     deaths.likelihood.instructions,
 #     fertility.likelihood.instructions,
@@ -1159,7 +1163,7 @@ lik.inst.stage23.2021 = join.likelihood.instructions(
 #     emigration.likelihood.instructions,
 #     additional.weights = 1/2
 # )
-# lik.inst.stg23.demog.4x=join.likelihood.instructions(
+# lik.inst.demog.stage23.4x=join.likelihood.instructions(
 #     population.likelihood.instructions,
 #     deaths.likelihood.instructions,
 #     fertility.likelihood.instructions,
@@ -1167,7 +1171,7 @@ lik.inst.stage23.2021 = join.likelihood.instructions(
 #     emigration.likelihood.instructions,
 #     additional.weights = 1/4
 # )
-# lik.inst.stg23.demog.8x=join.likelihood.instructions(
+# lik.inst.demog.stage23.8x=join.likelihood.instructions(
 #     population.likelihood.instructions,
 #     deaths.likelihood.instructions,
 #     fertility.likelihood.instructions,
@@ -1177,29 +1181,29 @@ lik.inst.stage23.2021 = join.likelihood.instructions(
 # )
 # # testing various weight combinations -----
 # lik.inst.stage23.8x.pop.8x = join.likelihood.instructions(
-#     lik.inst.stg23.demog.8x,
+#     lik.inst.demog.stage23.8x,
 #     lik.inst.stg23.non.demog.plus.penalty,
 #     additional.weights = 1/8
 # )
 # lik.inst.stage23.16x.pop.2x = join.likelihood.instructions(
-#     lik.inst.stg23.demog.2x,
+#     lik.inst.demog.stage23.2x,
 #     lik.inst.stg23.non.demog.plus.penalty,
 #     additional.weights = 1/16
 # )
 # lik.inst.stage23.16x.pop.4x = join.likelihood.instructions(
-#     lik.inst.stg23.demog.4x,
+#     lik.inst.demog.stage23.4x,
 #     lik.inst.stg23.non.demog.plus.penalty,
 #     additional.weights = 1/16
 # )
 # lik.inst.stage23.32x.pop.2x = join.likelihood.instructions(
-#     lik.inst.stg23.demog.2x,
+#     lik.inst.demog.stage23.2x,
 #     lik.inst.stg23.non.demog.plus.penalty,
 #     additional.weights = 1/32
 # )
 # 
 # # 6.26: 
 # lik.inst.stage23.8x.pop.4x = join.likelihood.instructions(
-#     lik.inst.stg23.demog.4x,
+#     lik.inst.demog.stage23.4x,
 #     lik.inst.stg23.non.demog,
 #     additional.weights = 1/8
 # )
