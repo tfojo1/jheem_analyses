@@ -38,6 +38,8 @@ source('data_processing/outliers/outlier.remover.two.way.strata.R')
 
 #Update for 7-1-26: Oakland TGA adding migration values for modeling -----------
 source('data_processing/hiv.surveillance.manager/add.oakland.tga.migration.values.R')
+#Update for 7-30-26: Oakland TGA adding HIV and population data-----------
+source('data_processing/hiv.surveillance.manager/add.oakland.tga.hiv.data.R')
 
 ###Save surveillance manager####
 save(surveillance.manager, file="../../cached/surveillance.manager.rdata")
