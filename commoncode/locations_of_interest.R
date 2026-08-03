@@ -1,6 +1,9 @@
 library(rlang)
 library(locations) # Must call library(locations) prior to sourcing this file
 
+# If this shows 0.1.0, you are on an old version -- restart R and reinstall.
+# stopifnot(packageVersion("locations") >= "0.3.1")
+
 ##-------------------------------##
 ##-- MSAs DEFINED AS CONSTANTS --##
 ##-------------------------------##
@@ -182,4 +185,10 @@ register.sub.and.super.locations(
     super.locations               = c("TGA.OAKLAND", "TGA.OAKLAND"),
     super.completely.encloses.sub = TRUE
 )
+if(1==2){
+    # --- Verify ---
+    cat("Counties in Oakland TGA:\n")
+    print(get.contained.locations("TGA.OAKLAND", sub.type = "county"))
+    cat("TGA comprises COUNTY:", location.type.comprises("TGA", "COUNTY"), "\n")
+}
 
