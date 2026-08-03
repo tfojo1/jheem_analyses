@@ -1096,7 +1096,7 @@ get.immigration.rates <- function(location, specification.metadata, population.y
   
   # this will be one top-level beta for the MSA, then we'll include alphas by strata (race and age only, not sex)? 
 
-  if (get.location.type(location)=='CBSA')
+  if (get.location.type(location) %in% c('CBSA','TGA'))
   {
       immigration.numbers = SURVEILLANCE.MANAGER$pull(outcome = "immigration",
                                                     location = location,
@@ -1149,7 +1149,7 @@ get.emigration.rates.functional.form <- function(location, specification.metadat
 get.emigration.rates <- function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS){
   
   # this will be one top-level beta for the MSA, then we'll include alphas by strata (race and age only, not sex)? 
-  if (get.location.type(location)=='CBSA')
+  if (get.location.type(location) %in% c('CBSA','TGA'))
   {
       emigration.numbers = SURVEILLANCE.MANAGER$pull(outcome = "emigration",
                                                      location = location,
