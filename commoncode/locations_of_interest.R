@@ -1,5 +1,5 @@
-
-# Must call library(locations) prior to sourcing this file
+library(rlang)
+library(locations) # Must call library(locations) prior to sourcing this file
 
 ##-------------------------------##
 ##-- MSAs DEFINED AS CONSTANTS --##
@@ -156,7 +156,6 @@ SHIELD.TEN.MSAS = MSAS.OF.INTEREST[sort(c("NYC", "Miami", "Chicago", "Phoenix", 
 
 
 # Register Oakland TGA
-library(rlang)
 # 1. Register the new TYPE (guarded so re-running doesn't error).
 if (!("TGA" %in% get.location.types())) {
     register.types(
