@@ -1,17 +1,17 @@
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
 
 
-INSURANCE.CATEGORIES = c('medicaid.only',
-                         'medicare.only',
-                         'dual.medicare.medicaid.only',
-                         'private.only',
+INSURANCE.CATEGORIES = c('medicaid.only', 
+                         'medicare.only', 
+                         'dual.medicare.medicaid.only', 
+                         'private.only', # 
                          'uninsured.only',
                          'medicaid.and.uninsured',
                          'medicare.and.uninsured',
                          'dual.medicare.medicaid.and.uninsured',
-                         'private.and.uninsured',
-                         'dual.medicare.medicaid.and.medicaid',
-                         'dual.medicare.medicaid.and.medicare'
+                         'private.and.uninsured'
+                         #'dual.medicare.medicaid.and.medicaid',
+                         #'dual.medicare.medicaid.and.medicare'
                          )
 ADAP.SERVICE.CATEGORIES = c('full.pay.only', # F 
                             'premium.only', # P 
@@ -783,6 +783,7 @@ register.model.element(ADAP.SPECIFICATION,
 ##-- INPUTS: FRACTION OF TIME SPENT if A CLIENT --##
 ##------------------------------------------------##
 
+## ADAP CATEGORIES ##  (repeat below for insurance category overlaps)
 # Individual categories: 
 # F: full pay only 
 # P: premium only 
@@ -794,7 +795,7 @@ register.model.element(ADAP.SPECIFICATION,
 
 # Over the course of a year, can have: 
 #   Only one category during that year (3): 
-#       F, P, or Cs
+#       F, P, or Cs 
 #   Two categories during that year (3): 
 #       FP: full pay and premium
 #       FCs: full pay and cost-sharing
@@ -924,6 +925,38 @@ register.model.quantity(ADAP.SPECIFICATION,
                         scale = 'proportion')
 
 
+## INSURANCE CATEGORIES ## 
+# Individual categories: 
+# uninsured, medicaid, medicare, medicare + medicaid, private insurance
+
+# Over the course of a year, can have: 
+# unin/medicaid, unin/medicare, unin/medicare+medicaid, unin/private
+
+# 50/50 Medicaid/uninsured 
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'fraction.time.uninsured.among.uninsured.and.medicaid',  
+                       value = 0.5, 
+                       scale = 'proportion')
+
+# 50/50 Medicare/uninsured 
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'fraction.time.uninsured.among.uninsured.and.medicare',  
+                       value = 0.5, 
+                       scale = 'proportion')
+
+# 50/50 Medicare+Medicaid/uninsured 
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'fraction.time.uninsured.among.uninsured.and.medicare.and.medicaid',  
+                       value = 0.5, 
+                       scale = 'proportion')
+
+# 50/50 Private/uninsured 
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'fraction.time.uninsured.among.uninsured.and.private',  
+                       value = 0.5, 
+                       scale = 'proportion')
+
+
 ##---------------------------------------------------------------------------##
 ##-- INPUTS: PROPORTION OF COST-SHARING CLIENTS WHO RECEIVE COPAY SERVICES --##
 ##---------------------------------------------------------------------------##
@@ -965,6 +998,7 @@ register.model.quantity(ADAP.SPECIFICATION,
                                                (1-adap.covers.deductible)*adap.covers.copay))
 
 # melissa and todd circle back to this section: 
+# Melissa maybe rename these
 ##----------------------------------------------##
 ##-- INPUTS: P ADAP SERVICE TYPE GIVEN INCOME --##
 ##----------------------------------------------##
@@ -1559,10 +1593,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 # Repeated for: 
 # medicaid, medicare, medicare + medicaid, private insurance, uninsured (uninsured: all are on F only - can't have premiums or cost-share without insurance)
     
-# Need to decide if we're thinking about it as at any given moment or over the course of the year (e.g., can't have full-pay and any of these insurance categories at the same time)
-    # So maybe 9 categories: uninsured, medicaid, medicare, medicare + medicaid, private insurance; 
-    # plus each of the two over the course of a year, only with uninsured: unin/medicaid, unin/medicare, unin/medicare+medicaid, unin/private 
-
+# For the below section, we mean they had Medicaid (or other insurance type) AT THAT GIVEN MOMENT; not over the course of the year 
 
 #-- Distribute for Medicaid --#
 # Inputs: 
@@ -1585,32 +1616,33 @@ register.model.quantity(ADAP.SPECIFICATION,
 # P1 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.F.only.income.medicaid', 
-                        value = ) # will be a function that takes the 4 params
+                        value = expression(1/(1+exp(-(baseline.log.odds.F.only+log.OR.F.only.medicaid))))) # formula for converting from log odds to p 
+                                            # baseline.log.odds.F.only will be a logistic function (of income) that takes the 4 params; times an OR for medicaid 
 
 # P2
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Fplus.among.not.F.only.income.medicaid', 
-                        value = ) 
+                        value = expression(1/(1+exp(-(baseline.log.odds.Fplus.among.not.F.only+log.OR.Fplus.among.not.F.only.medicaid))))) 
 
 # P3
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.P.among.Fplus.income.medicaid',
-                        value = ) 
+                        value = expression(1/(1+exp(-(baseline.log.odds.P.among.Fplus+log.OR.P.among.Fplus.medicaid))))) 
 
 # P4
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Cs.among.FP.income.medicaid',
-                        value = ) 
+                        value = expression(1/(1+exp(-(baseline.log.odds.Cs.among.FP+log.OR.Cs.among.FP.medicaid))))) 
 
 # P5
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.P.among.no.F.income.medicaid', 
-                        value = ) 
+                        value = expression(1/(1+exp(-(baseline.log.odds.P.among.no.F+log.OR.P.among.no.F.medicaid))))) 
 
 # P6
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Cs.among.P.income.medicaid',
-                        value = ) 
+                        value = expression(1/(1+exp(-(baseline.log.odds.Cs.among.P+log.OR.Cs.among.P.medicaid))))) 
 
 
 # OUTPUTS 
@@ -1722,32 +1754,32 @@ register.model.quantity(ADAP.SPECIFICATION,
 # P1 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.F.only.income.medicare', 
-                        value = ) 
-
+                        value = expression(1/(1+exp(-(baseline.log.odds.F.only+log.OR.F.only.medicare))))) 
 # P2
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.Fplus.among.not.F.only.income.medicare',
-                        value = ) 
+                        name = 'baseline.p.of.Fplus.among.not.F.only.income.medicare', 
+                        value = expression(1/(1+exp(-(baseline.log.odds.Fplus.among.not.F.only+log.OR.Fplus.among.not.F.only.medicare)))))
 
 # P3
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.P.among.Fplus.income.medicare', 
-                        value = ) 
+                        name = 'baseline.p.of.P.among.Fplus.income.medicare',
+                        value = expression(1/(1+exp(-(baseline.log.odds.P.among.Fplus+log.OR.P.among.Fplus.medicare))))) 
 
 # P4
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Cs.among.FP.income.medicare',
-                        value = ) 
+                        value = expression(1/(1+exp(-(baseline.log.odds.Cs.among.FP+log.OR.Cs.among.FP.medicare))))) 
 
 # P5
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.P.among.no.F.income.medicare',
-                        value = ) 
+                        name = 'baseline.p.of.P.among.no.F.income.medicare', 
+                        value = expression(1/(1+exp(-(baseline.log.odds.P.among.no.F+log.OR.P.among.no.F.medicare))))) 
 
 # P6
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Cs.among.P.income.medicare',
-                        value = ) 
+                        value = expression(1/(1+exp(-(baseline.log.odds.Cs.among.P+log.OR.Cs.among.P.medicare))))) 
+
 
 
 # OUTPUTS 
@@ -1829,32 +1861,31 @@ register.model.quantity(ADAP.SPECIFICATION,
 # P1 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.F.only.income.medicare.and.medicaid', 
-                        value = ) 
-
+                        value = expression(1/(1+exp(-(baseline.log.odds.F.only+log.OR.F.only.medicare.and.medicaid))))) 
 # P2
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.Fplus.among.not.F.only.income.medicare.and.medicaid',
-                        value = ) 
+                        name = 'baseline.p.of.Fplus.among.not.F.only.income.medicare.and.medicaid', 
+                        value = expression(1/(1+exp(-(baseline.log.odds.Fplus.among.not.F.only+log.OR.Fplus.among.not.F.only.medicare.and.medicaid)))))
 
 # P3
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.P.among.Fplus.income.medicare.and.medicaid', 
-                        value = ) 
+                        name = 'baseline.p.of.P.among.Fplus.income.medicare.and.medicaid',
+                        value = expression(1/(1+exp(-(baseline.log.odds.P.among.Fplus+log.OR.P.among.Fplus.medicare.and.medicaid))))) 
 
 # P4
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Cs.among.FP.income.medicare.and.medicaid',
-                        value = ) 
+                        value = expression(1/(1+exp(-(baseline.log.odds.Cs.among.FP+log.OR.Cs.among.FP.medicare.and.medicaid))))) 
 
 # P5
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.P.among.no.F.income.medicare.and.medicaid',
-                        value = ) 
+                        name = 'baseline.p.of.P.among.no.F.income.medicare.and.medicaid', 
+                        value = expression(1/(1+exp(-(baseline.log.odds.P.among.no.F+log.OR.P.among.no.F.medicare.and.medicaid))))) 
 
 # P6
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Cs.among.P.income.medicare.and.medicaid',
-                        value = ) 
+                        value = expression(1/(1+exp(-(baseline.log.odds.Cs.among.P+log.OR.Cs.among.P.medicare.and.medicaid))))) 
 
 
 # OUTPUTS 
@@ -1936,32 +1967,31 @@ register.model.quantity(ADAP.SPECIFICATION,
 # P1 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.F.only.income.private', 
-                        value = ) 
-
+                        value = expression(1/(1+exp(-(baseline.log.odds.F.only+log.OR.F.only.private))))) 
 # P2
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.Fplus.among.not.F.only.income.private',
-                        value = ) 
+                        name = 'baseline.p.of.Fplus.among.not.F.only.income.private', 
+                        value = expression(1/(1+exp(-(baseline.log.odds.Fplus.among.not.F.only+log.OR.Fplus.among.not.F.only.private)))))
 
 # P3
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.P.among.Fplus.income.private', 
-                        value = ) 
+                        name = 'baseline.p.of.P.among.Fplus.income.private',
+                        value = expression(1/(1+exp(-(baseline.log.odds.P.among.Fplus+log.OR.P.among.Fplus.private))))) 
 
 # P4
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Cs.among.FP.income.private',
-                        value = ) 
+                        value = expression(1/(1+exp(-(baseline.log.odds.Cs.among.FP+log.OR.Cs.among.FP.private))))) 
 
 # P5
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.P.among.no.F.income.private',
-                        value = ) 
+                        name = 'baseline.p.of.P.among.no.F.income.private', 
+                        value = expression(1/(1+exp(-(baseline.log.odds.P.among.no.F+log.OR.P.among.no.F.private))))) 
 
 # P6
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Cs.among.P.income.private',
-                        value = ) 
+                        value = expression(1/(1+exp(-(baseline.log.odds.Cs.among.P+log.OR.Cs.among.P.private))))) 
 
 
 # OUTPUTS 
