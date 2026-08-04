@@ -11,13 +11,14 @@ source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions
 
 
 # ---- SETUP ----
-for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.30.stage2.az"))}
+# for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.30.stage2.az"))}
 # for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.1.stage1.az"))}
 
 calibration.codes <- c(
-    "calib.7.16.stage2.az",
-    # "calib.7.30.stage1.az",
-    "calib.7.30.stage2.az"
+    "calib.7.16.stage2.az", #calibrating prp of male diagnosis directly 
+  
+      # "calib.7.30.stage1.az",
+    "calib.7.30.stage2.az" #calibrating diag rate among men
 )
 
 # for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.16.stage2.az"))}
@@ -32,7 +33,7 @@ calib.simsets <- load.calib.simsets(
 # Inspect mixing statistics -----
 inspect_mixing (
     calib.simsets = calib.simsets,
-    calibration.codes = calibration.codes[2],
+    calibration.codes = calibration.codes[1],
     locations = SHIELD.TEN.MSAS,
     show.mixing = T,
     verbose = T

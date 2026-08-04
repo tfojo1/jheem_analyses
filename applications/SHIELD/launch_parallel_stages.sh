@@ -62,11 +62,15 @@ all_except_ten_cities=(
     C.26900 C.17140 C.18140 C.12940 C.40900 C.17460
 )
 
+
+two_cities=(
+    C.31080 C.37980
+)
 # ── set active cities and calibration codes here ───────────────────────────────
-CITIES=("${ten_cities[@]}")
+CITIES=("${two_cities[@]}")
 
 CALIBRATION_CODES=(
-    calib.6.25.stage2.az
+    calib.7.30.stage2.LA.PA
 )
 
 SCRIPT="$SCRIPT_DIR/shield_calib_setup_and_run.R"
