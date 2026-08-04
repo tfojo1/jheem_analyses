@@ -998,7 +998,7 @@ register.model.quantity(ADAP.SPECIFICATION,
                                                (1-adap.covers.deductible)*adap.covers.copay))
 
 # melissa and todd circle back to this section: 
-# Melissa maybe rename these
+
 ##----------------------------------------------##
 ##-- INPUTS: P ADAP SERVICE TYPE GIVEN INCOME --##
 ##----------------------------------------------##
@@ -1006,292 +1006,289 @@ register.model.quantity(ADAP.SPECIFICATION,
 # we presume that: p_full_pay = min + (max-min) / (1 + exp(slope * (income - midpoint)))
 # *NB that slope here is constrained to be positive - ie, a strictly decreasing p with increasing income
 
+# These are the inputs to P1-6 in the section "DISTRIBUTE P by INCOME on ADAP INTO SERVICE CATEGORIES"
 
-# @redo - these are all just placeholder parameters
+# P1: F.only
+# P2: Fplus.among.not.F.only
+# P3: P.among.Fplus
+# P4: Cs.among.FP
+# P5: P.among.no.F
+# P6: Cs.among.P
 
+
+#-- P1: Probability of having ONLY full-pay services if on ADAP (F.only) --#
 # Given ADAP, there is a probability of having full-pay; defined by these 4 parameters 
-#-- Probability of having ONLY full-pay services if on ADAP --#
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.only.if.adap.midpoint',
+                       name = 'p.F.only.midpoint', # 'p.full.pay.only.if.adap.midpoint', # midpoint of probability that you have full pay only, given that we know you have ADAP 
                        value = 250,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.only.if.adap.logistic.slope',
+                       name = 'p.F.only.slope', # p.full.pay.only.if.adap.logistic.slope
                        value = 0.05,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.only.if.adap.min',
+                       name = 'p.F.only.min', # p.full.pay.only.if.adap.min
                        value = 0.2,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.only.if.adap.max',
+                       name = 'p.F.only.max', # p.full.pay.only.if.adap.max
                        value = 0.95,
                        scale = 'proportion')
 
-# odds ratios based on insurance
+# Melissa: do we need this? 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.log.odds.F.only',
+                        value = calculate.baseline.log.odds.F.only # will define this 
+                        )
+
+
+# Then, apply an odds ratio to that probability, based on insurance (medicaid, medicare, medicare and medicaid, private)
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.only.if.adap.medicaid.or',
-                       value = 0.1,
+                       name = 'log.OR.F.only.medicaid', # p.full.pay.only.if.adap.medicaid.or
+                       value = log(0.1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.only.if.adap.medicare.or',
-                       value = 0.1,
+                       name = 'log.OR.F.only.medicare', # p.full.pay.only.if.adap.medicare.or
+                       value = log(0.1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.only.if.adap.medicare.and.medicaid.or',
-                       value = 0.1,
+                       name = 'log.OR.F.only.medicare.and.medicaid', # p.full.pay.only.if.adap.medicare.and.medicaid.or
+                       value = log(0.1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.only.if.adap.private.or',
-                       value = 0.1,
+                       name = 'log.OR.F.only.private', # p.full.pay.only.if.adap.private.or
+                       value = log(0.1),
                        scale = 'ratio')
 
-register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.only.if.adap.uninsured.or',
-                       value = 1,
-                       scale = 'ratio')
 
-#-- Probablity of having full-pay plus other services if on ADAP not full pay only --#
+
+#-- P2: Probablity of having full-pay plus other services if on ADAP not full pay only (Fplus.among.not.F.only) --#
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.plus.if.not.full.pay.only.midpoint',
+                       name = 'p.Fplus.among.not.F.only.midpoint', # p.full.pay.plus.if.not.full.pay.only.midpoint
                        value = 250,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.plus.if.not.full.pay.only.logistic.slope',
+                       name = 'p.Fplus.among.not.F.only.slope', # p.full.pay.plus.if.not.full.pay.only.logistic.slope
                        value = 0.05,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.plus.if.not.full.pay.only.adap.min',
+                       name = 'p.Fplus.among.not.F.only.min', # p.full.pay.plus.if.not.full.pay.only.adap.min
                        value = 0.2,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.plus.if.not.full.pay.only.max',
+                       name = 'p.Fplus.among.not.F.only.max', # p.full.pay.plus.if.not.full.pay.only.max
                        value = 0.95,
                        scale = 'proportion')
 
-# odds ratios based on insurance
+
+# Then, apply an odds ratio to that probability, based on insurance (medicaid, medicare, medicare and medicaid, private)
+# Melissa: QUESTION: why aren't these all 0.1 like above? Also, do we need uninsured for these? 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.plus.if.not.full.pay.only.medicaid.or',
-                       value = 0.2,
+                       name = 'log.OR.Fplus.among.not.F.only.medicaid', #p.full.pay.plus.if.not.full.pay.only.medicaid.or
+                       value = log(0.2),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.plus.if.not.full.pay.only.medicare.or',
-                       value = 0.2,
+                       name = 'log.OR.Fplus.among.not.F.only.medicare', # p.full.pay.plus.if.not.full.pay.only.medicare.or
+                       value = log(0.2),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.plus.if.not.full.pay.only.medicare.and.medicaid.or',
-                       value = 1,
+                       name = 'log.OR.Fplus.among.not.F.only.medicare.and.medicaid', # p.full.pay.plus.if.not.full.pay.only.medicare.and.medicaid.or
+                       value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.plus.if.not.full.pay.only.private.or',
-                       value = 1,
-                       scale = 'ratio')
-
-register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.plus.if.not.full.pay.only.uninsured.or',
-                       value = 0.1,
+                       name = 'log.OR.Fplus.among.not.F.only.private', # p.full.pay.plus.if.not.full.pay.only.private.or
+                       value = log(1),
                        scale = 'ratio')
 
 
-#-- Probability of receiving premium assistance if also on full pay --#
+
+#-- P3: Probability of receiving premium assistance if also on full pay (P.among.Fplus) --#
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.full.pay.midpoint',
+                       name = 'p.P.among.Fplus.midpoint', # p.premium.if.full.pay.midpoint
                        value = 250,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.full.pay.logistic.slope',
+                       name = 'p.P.among.Fplus.slope', # p.premium.if.full.pay.logistic.slope
                        value = 0.05,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.full.pay.min',
+                       name = 'p.P.among.Fplus.min', # p.premium.if.full.pay.min
                        value = 0.2,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.full.pay.max',
+                       name = 'p.P.among.Fplus.max', # p.premium.if.full.pay.max
                        value = 0.95,
                        scale = 'proportion')
 
-# odds ratios based on insurance
+# Then, apply an odds ratio to that probability, based on insurance (medicaid, medicare, medicare and medicaid, private)
+# Melissa: QUESTION: why aren't these all 0.1 like above? Also, do we need uninsured for these? 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.full.pay.medicaid.or',
-                       value = 0.1,
+                       name = 'log.OR.P.among.Fplus.medicaid', # p.premium.if.full.pay.medicaid.or
+                       value = log(0.1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.full.pay.medicare.or',
-                       value = 0.1,
+                       name = 'log.OR.P.among.Fplus.medicare', # p.premium.if.full.pay.medicare.or
+                       value = log(0.1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.full.pay.medicare.and.medicaid.or',
-                       value = 1,
+                       name = 'log.OR.P.among.Fplus.medicare.and.medicaid', # p.premium.if.full.pay.medicare.and.medicaid.or
+                       value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.full.pay.private.or',
-                       value = 1,
+                       name = 'log.OR.P.among.Fplus.private',  #p.premium.if.full.pay.private.or
+                       value = log(1),
                        scale = 'ratio')
 
-register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.full.pay.uninsured.or',
-                       value = 0.01,
-                       scale = 'ratio')
 
-#--Probability of receiving cost-sharing assistance if on full.pay and premium assistance --#
+#--P4: Probability of receiving cost-sharing assistance if on full.pay and premium assistance (Cs.among.FP) --#
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.full.pay.and.premium.midpoint',
+                       name = 'p.Cs.among.FP.midpoint', # p.cost.sharing.if.full.pay.and.premium.midpoint
                        value = 250,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.full.pay.and.premium.slope',
+                       name = 'p.Cs.among.FP.slope', # p.cost.sharing.if.full.pay.and.premium.slope
                        value = 0.05,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.full.pay.and.premium.min',
+                       name = 'p.Cs.among.FP.min', # p.cost.sharing.if.full.pay.and.premium.min
                        value = 0.2,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.full.pay.and.premium.max',
+                       name = 'p.Cs.among.FP.max', # p.cost.sharing.if.full.pay.and.premium.max
                        value = 0.95,
                        scale = 'proportion')
 
-# odds ratios based on insurance
+# Then, apply an odds ratio to that probability, based on insurance (medicaid, medicare, medicare and medicaid, private)
+# Melissa: QUESTION: why aren't these all 0.1 like above? Also, do we need uninsured for these? 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.full.pay.and.premium.medicaid.or',
-                       value = 1,
+                       name = 'log.OR.Cs.among.FP.medicaid', # p.cost.sharing.if.full.pay.and.premium.medicaid.or
+                       value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.full.pay.and.premium.medicare.or',
-                       value = 1,
+                       name = 'log.OR.Cs.among.FP.medicare', # p.cost.sharing.if.full.pay.and.premium.medicare.or
+                       value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.full.pay.and.premium.medicare.and.medicaid.or',
-                       value = 1,
+                       name = 'log.OR.Cs.among.FP.medicare.and.medicaid', # p.cost.sharing.if.full.pay.and.premium.medicare.and.medicaid.or
+                       value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.full.pay.and.premium.private.or',
-                       value = 1,
+                       name = 'log.OR.Cs.among.FP.private', # p.cost.sharing.if.full.pay.and.premium.private.or
+                       value = log(1),
                        scale = 'ratio')
 
-register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.full.pay.and.premium.uninsured.or',
-                       value = 1,
-                       scale = 'ratio')
 
-#-- Probability of receiving premium assistance if not receiving any full pay services --#
+#-- P5: Probability of receiving premium assistance if not receiving any full pay services (P.among.no.F) --#
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.no.full.pay.midpoint',
+                       name = 'p.P.among.no.F.midpoint', # p.premium.if.no.full.pay.midpoint
                        value = 250,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.no.full.pay.logistic.slope',
+                       name = 'p.P.among.no.F.slope', # p.premium.if.no.full.pay.logistic.slope
                        value = 0.05,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.no.full.pay.min',
+                       name = 'p.P.among.no.F.min', # p.premium.if.no.full.pay.min
                        value = 0.2,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.no.full.pay.max',
+                       name = 'p.P.among.no.F.max', # p.premium.if.no.full.pay.max
                        value = 0.95,
                        scale = 'proportion')
 
-# odds ratios based on insurance
+# Then, apply an odds ratio to that probability, based on insurance (medicaid, medicare, medicare and medicaid, private)
+# Melissa: QUESTION: why aren't these all 0.1 like above? Also, do we need uninsured for these? 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.no.full.pay.medicaid.or',
-                       value = 0.1,
+                       name = 'log.OR.P.among.no.F.medicaid', # p.premium.if.no.full.pay.medicaid.or
+                       value = log(0.1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.no.full.pay.medicare.or',
-                       value = 0.1,
+                       name = 'log.OR.P.among.no.F.medicare', # p.premium.if.no.full.pay.medicare.or
+                       value = log(0.1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.no.full.pay.medicare.and.medicaid.or',
-                       value = 1,
+                       name = 'log.OR.P.among.no.F.medicare.and.medicaid', # p.premium.if.no.full.pay.medicare.and.medicaid.or
+                       value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.no.full.pay.private.or',
-                       value = 1,
+                       name = 'log.OR.P.among.no.F.private', # p.premium.if.no.full.pay.private.or
+                       value = log(1),
                        scale = 'ratio')
 
-register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.no.full.pay.uninsured.or',
-                       value = 0.01,
-                       scale = 'ratio')
 
-#-- Probability of receiving cost-sharing assistance if on premium assistance but not full pay --#
+#-- P6: Probability of receiving cost-sharing assistance if on premium assistance but not full pay (Cs.among.P)--#
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.premium.without.full.pay.midpoint',
+                       name = 'p.Cs.among.P.midpoint', # p.cost.sharing.if.premium.without.full.pay.midpoint
                        value = 250,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.premium.without.full.pay.slope',
+                       name = 'p.Cs.among.P.slope', # p.cost.sharing.if.premium.without.full.pay.slope
                        value = 0.05,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.premium.without.full.pay.premium.min',
+                       name = 'p.Cs.among.P.min', # p.cost.sharing.if.premium.without.full.pay.premium.min
                        value = 0.2,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.premium.without.full.pay.premium.max',
+                       name = 'p.Cs.among.P.max', # p.cost.sharing.if.premium.without.full.pay.premium.max
                        value = 0.95,
                        scale = 'proportion')
 
-# odds ratios based on insurance
+# Then, apply an odds ratio to that probability, based on insurance (medicaid, medicare, medicare and medicaid, private)
+# Melissa: QUESTION: why aren't these all 0.1 like above? Also, do we need uninsured for these? 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.premium.without.full.pay.medicaid.or',
-                       value = 1,
+                       name = 'log.OR.Cs.among.P.medicaid', # p.cost.sharing.if.premium.without.full.pay.medicaid.or
+                       value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.premium.without.full.pay.medicare.or',
-                       value = 1,
+                       name = 'log.OR.Cs.among.P.medicare', # p.cost.sharing.if.premium.without.full.pay.medicare.or
+                       value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.premium.without.full.pay.medicare.and.medicaid.or',
-                       value = 1,
+                       name = 'log.OR.Cs.among.P.medicare.and.medicaid', # p.cost.sharing.if.premium.without.full.pay.medicare.and.medicaid.or
+                       value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.premium.without.full.pay.private.or',
-                       value = 1,
+                       name = 'log.OR.Cs.among.P.private', # p.cost.sharing.if.premium.without.full.pay.private.or
+                       value = log(1),
                        scale = 'ratio')
 
-register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.premium.without.full.pay.uninsured.or',
-                       value = 1,
-                       scale = 'ratio')
 
 ####---------------------------####
 ####---------------------------####
@@ -1423,6 +1420,14 @@ calculate.max.baseline.adap.income <- function(baseline.adap.full.pay.fpl.thresh
         ssi.breakeven.fpl)
 }
     
+distribute.adap.incomes <- function(max.baseline.adap.income){
+    rv = array(0:max.baseline.adap.income,
+               dim = c(income = max.baseline.adap.income + 1),
+               dimnames = list(income = 0:max.baseline.adap.income))
+    
+    rv
+}
+
 
 # A helper to generate a set of logistic probabilities
 calculate.logistic.p <- function(logistic.midpoint,
@@ -1450,6 +1455,10 @@ calculate.logistic.p <- function(logistic.midpoint,
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'max.adap.baseline.income',
                         value = calculate.max.baseline.adap.income)
+
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'adap.incomes',
+                        value = distribute.adap.incomes)
 
 # Calculate income distribution, stratified by SSI, for all ADAP clients 
 # This is among ADAP, probability of being in a certain income bracket AND having SSI (or not having SSI, below)
@@ -1612,37 +1621,48 @@ register.model.quantity(ADAP.SPECIFICATION,
     # FP, FCs, PCs
     # FPCs
 
-# INPUTS - these are our priors, we will use them below; calculated from the 4 parameters of the logistic functions 
+# INPUTS - these are our priors, we will use them below; calculated from the 4 parameters of the logistic functions (defined in INPUTS: P ADAP SERVICE TYPE GIVEN INCOME)
 # P1 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.F.only.income.medicaid', 
-                        value = expression(1/(1+exp(-(baseline.log.odds.F.only+log.OR.F.only.medicaid))))) # formula for converting from log odds to p 
-                                            # baseline.log.odds.F.only will be a logistic function (of income) that takes the 4 params; times an OR for medicaid 
+                        value = expression(p.F.only.min + (p.F.only.max - p.F.only.min) /
+                                                   (1 + exp(p.F.only.slope * (adap.incomes - p.F.only.midpoint) + 
+                                                                log.OR.F.only.medicaid)))) # this last term will be the only thing that changes when I switch to other insurance types
 
 # P2
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Fplus.among.not.F.only.income.medicaid', 
-                        value = expression(1/(1+exp(-(baseline.log.odds.Fplus.among.not.F.only+log.OR.Fplus.among.not.F.only.medicaid))))) 
+                        value = expression(p.Fplus.among.not.F.only.min + (p.Fplus.among.not.F.only.max - p.Fplus.among.not.F.only.min) /
+                                               (1 + exp(p.Fplus.among.not.F.only.slope * (adap.incomes - p.Fplus.among.not.F.only.midpoint) + 
+                                                            log.OR.Fplus.among.not.F.only.medicaid))))
 
 # P3
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.P.among.Fplus.income.medicaid',
-                        value = expression(1/(1+exp(-(baseline.log.odds.P.among.Fplus+log.OR.P.among.Fplus.medicaid))))) 
+                        value = expression(p.P.among.Fplus.min + (p.P.among.Fplus.max - p.P.among.Fplus.min) /
+                                               (1 + exp(p.P.among.Fplus.slope * (adap.incomes - p.P.among.Fplus.midpoint) + 
+                                                            log.OR.P.among.Fplus.medicaid))))
 
 # P4
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Cs.among.FP.income.medicaid',
-                        value = expression(1/(1+exp(-(baseline.log.odds.Cs.among.FP+log.OR.Cs.among.FP.medicaid))))) 
+                        value = expression(p.Cs.among.FP.min + (p.Cs.among.FP.max - p.Cs.among.FP.min) /
+                                               (1 + exp(p.Cs.among.FP.slope * (adap.incomes - p.Cs.among.FP.midpoint) + 
+                                                            log.OR.Cs.among.FP.medicaid))))
 
 # P5
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.P.among.no.F.income.medicaid', 
-                        value = expression(1/(1+exp(-(baseline.log.odds.P.among.no.F+log.OR.P.among.no.F.medicaid))))) 
+                        value = expression(p.P.among.no.F.min + (p.P.among.no.F.max - p.P.among.no.F.min) /
+                                               (1 + exp(p.P.among.no.F.slope * (adap.incomes - p.P.among.no.F.midpoint) + 
+                                                            log.OR.P.among.no.F.medicaid))))
 
 # P6
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Cs.among.P.income.medicaid',
-                        value = expression(1/(1+exp(-(baseline.log.odds.Cs.among.P+log.OR.Cs.among.P.medicaid))))) 
+                        value = expression(p.Cs.among.P.min + (p.Cs.among.P.max - p.Cs.among.P.min) /
+                                               (1 + exp(p.Cs.among.P.slope * (adap.incomes - p.Cs.among.P.midpoint) + 
+                                                            log.OR.Cs.among.P.medicaid))))
 
 
 # OUTPUTS 
@@ -1754,31 +1774,44 @@ register.model.quantity(ADAP.SPECIFICATION,
 # P1 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.F.only.income.medicare', 
-                        value = expression(1/(1+exp(-(baseline.log.odds.F.only+log.OR.F.only.medicare))))) 
+                        value = expression(p.F.only.min + (p.F.only.max - p.F.only.min) /
+                                               (1 + exp(p.F.only.slope * (adap.incomes - p.F.only.midpoint) + 
+                                                            log.OR.F.only.medicare)))) 
+
 # P2
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Fplus.among.not.F.only.income.medicare', 
-                        value = expression(1/(1+exp(-(baseline.log.odds.Fplus.among.not.F.only+log.OR.Fplus.among.not.F.only.medicare)))))
+                        value = expression(p.Fplus.among.not.F.only.min + (p.Fplus.among.not.F.only.max - p.Fplus.among.not.F.only.min) /
+                                               (1 + exp(p.Fplus.among.not.F.only.slope * (adap.incomes - p.Fplus.among.not.F.only.midpoint) + 
+                                                            log.OR.Fplus.among.not.F.only.medicare))))
 
 # P3
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.P.among.Fplus.income.medicare',
-                        value = expression(1/(1+exp(-(baseline.log.odds.P.among.Fplus+log.OR.P.among.Fplus.medicare))))) 
+                        value = expression(p.P.among.Fplus.min + (p.P.among.Fplus.max - p.P.among.Fplus.min) /
+                                               (1 + exp(p.P.among.Fplus.slope * (adap.incomes - p.P.among.Fplus.midpoint) + 
+                                                            log.OR.P.among.Fplus.medicare))))
 
 # P4
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Cs.among.FP.income.medicare',
-                        value = expression(1/(1+exp(-(baseline.log.odds.Cs.among.FP+log.OR.Cs.among.FP.medicare))))) 
+                        value = expression(p.Cs.among.FP.min + (p.Cs.among.FP.max - p.Cs.among.FP.min) /
+                                               (1 + exp(p.Cs.among.FP.slope * (adap.incomes - p.Cs.among.FP.midpoint) + 
+                                                            log.OR.Cs.among.FP.medicare))))
 
 # P5
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.P.among.no.F.income.medicare', 
-                        value = expression(1/(1+exp(-(baseline.log.odds.P.among.no.F+log.OR.P.among.no.F.medicare))))) 
+                        value = expression(p.P.among.no.F.min + (p.P.among.no.F.max - p.P.among.no.F.min) /
+                                               (1 + exp(p.P.among.no.F.slope * (adap.incomes - p.P.among.no.F.midpoint) + 
+                                                            log.OR.P.among.no.F.medicare))))
 
 # P6
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Cs.among.P.income.medicare',
-                        value = expression(1/(1+exp(-(baseline.log.odds.Cs.among.P+log.OR.Cs.among.P.medicare))))) 
+                        value = expression(p.Cs.among.P.min + (p.Cs.among.P.max - p.Cs.among.P.min) /
+                                               (1 + exp(p.Cs.among.P.slope * (adap.incomes - p.Cs.among.P.midpoint) + 
+                                                            log.OR.Cs.among.P.medicare))))
 
 
 
@@ -1861,31 +1894,44 @@ register.model.quantity(ADAP.SPECIFICATION,
 # P1 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.F.only.income.medicare.and.medicaid', 
-                        value = expression(1/(1+exp(-(baseline.log.odds.F.only+log.OR.F.only.medicare.and.medicaid))))) 
+                        value = expression(p.F.only.min + (p.F.only.max - p.F.only.min) /
+                                               (1 + exp(p.F.only.slope * (adap.incomes - p.F.only.midpoint) + 
+                                                            log.OR.F.only.medicare.and.medicaid)))) 
+
 # P2
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Fplus.among.not.F.only.income.medicare.and.medicaid', 
-                        value = expression(1/(1+exp(-(baseline.log.odds.Fplus.among.not.F.only+log.OR.Fplus.among.not.F.only.medicare.and.medicaid)))))
+                        value = expression(p.Fplus.among.not.F.only.min + (p.Fplus.among.not.F.only.max - p.Fplus.among.not.F.only.min) /
+                                               (1 + exp(p.Fplus.among.not.F.only.slope * (adap.incomes - p.Fplus.among.not.F.only.midpoint) + 
+                                                            log.OR.Fplus.among.not.F.only.medicare.and.medicaid))))
 
 # P3
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.P.among.Fplus.income.medicare.and.medicaid',
-                        value = expression(1/(1+exp(-(baseline.log.odds.P.among.Fplus+log.OR.P.among.Fplus.medicare.and.medicaid))))) 
+                        value = expression(p.P.among.Fplus.min + (p.P.among.Fplus.max - p.P.among.Fplus.min) /
+                                               (1 + exp(p.P.among.Fplus.slope * (adap.incomes - p.P.among.Fplus.midpoint) + 
+                                                            log.OR.P.among.Fplus.medicare.and.medicaid))))
 
 # P4
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Cs.among.FP.income.medicare.and.medicaid',
-                        value = expression(1/(1+exp(-(baseline.log.odds.Cs.among.FP+log.OR.Cs.among.FP.medicare.and.medicaid))))) 
+                        value = expression(p.Cs.among.FP.min + (p.Cs.among.FP.max - p.Cs.among.FP.min) /
+                                               (1 + exp(p.Cs.among.FP.slope * (adap.incomes - p.Cs.among.FP.midpoint) + 
+                                                            log.OR.Cs.among.FP.medicare.and.medicaid))))
 
 # P5
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.P.among.no.F.income.medicare.and.medicaid', 
-                        value = expression(1/(1+exp(-(baseline.log.odds.P.among.no.F+log.OR.P.among.no.F.medicare.and.medicaid))))) 
+                        value = expression(p.P.among.no.F.min + (p.P.among.no.F.max - p.P.among.no.F.min) /
+                                               (1 + exp(p.P.among.no.F.slope * (adap.incomes - p.P.among.no.F.midpoint) + 
+                                                            log.OR.P.among.no.F.medicare.and.medicaid))))
 
 # P6
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Cs.among.P.income.medicare.and.medicaid',
-                        value = expression(1/(1+exp(-(baseline.log.odds.Cs.among.P+log.OR.Cs.among.P.medicare.and.medicaid))))) 
+                        value = expression(p.Cs.among.P.min + (p.Cs.among.P.max - p.Cs.among.P.min) /
+                                               (1 + exp(p.Cs.among.P.slope * (adap.incomes - p.Cs.among.P.midpoint) + 
+                                                            log.OR.Cs.among.P.medicare.and.medicaid))))
 
 
 # OUTPUTS 
@@ -1967,31 +2013,44 @@ register.model.quantity(ADAP.SPECIFICATION,
 # P1 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.F.only.income.private', 
-                        value = expression(1/(1+exp(-(baseline.log.odds.F.only+log.OR.F.only.private))))) 
+                        value = expression(p.F.only.min + (p.F.only.max - p.F.only.min) /
+                                               (1 + exp(p.F.only.slope * (adap.incomes - p.F.only.midpoint) + 
+                                                            log.OR.F.only.private)))) 
+
 # P2
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Fplus.among.not.F.only.income.private', 
-                        value = expression(1/(1+exp(-(baseline.log.odds.Fplus.among.not.F.only+log.OR.Fplus.among.not.F.only.private)))))
+                        value = expression(p.Fplus.among.not.F.only.min + (p.Fplus.among.not.F.only.max - p.Fplus.among.not.F.only.min) /
+                                               (1 + exp(p.Fplus.among.not.F.only.slope * (adap.incomes - p.Fplus.among.not.F.only.midpoint) + 
+                                                            log.OR.Fplus.among.not.F.only.private))))
 
 # P3
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.P.among.Fplus.income.private',
-                        value = expression(1/(1+exp(-(baseline.log.odds.P.among.Fplus+log.OR.P.among.Fplus.private))))) 
+                        value = expression(p.P.among.Fplus.min + (p.P.among.Fplus.max - p.P.among.Fplus.min) /
+                                               (1 + exp(p.P.among.Fplus.slope * (adap.incomes - p.P.among.Fplus.midpoint) + 
+                                                            log.OR.P.among.Fplus.private))))
 
 # P4
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Cs.among.FP.income.private',
-                        value = expression(1/(1+exp(-(baseline.log.odds.Cs.among.FP+log.OR.Cs.among.FP.private))))) 
+                        value = expression(p.Cs.among.FP.min + (p.Cs.among.FP.max - p.Cs.among.FP.min) /
+                                               (1 + exp(p.Cs.among.FP.slope * (adap.incomes - p.Cs.among.FP.midpoint) + 
+                                                            log.OR.Cs.among.FP.private))))
 
 # P5
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.P.among.no.F.income.private', 
-                        value = expression(1/(1+exp(-(baseline.log.odds.P.among.no.F+log.OR.P.among.no.F.private))))) 
+                        value = expression(p.P.among.no.F.min + (p.P.among.no.F.max - p.P.among.no.F.min) /
+                                               (1 + exp(p.P.among.no.F.slope * (adap.incomes - p.P.among.no.F.midpoint) + 
+                                                            log.OR.P.among.no.F.private))))
 
 # P6
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Cs.among.P.income.private',
-                        value = expression(1/(1+exp(-(baseline.log.odds.Cs.among.P+log.OR.Cs.among.P.private))))) 
+                        value = expression(p.Cs.among.P.min + (p.Cs.among.P.max - p.Cs.among.P.min) /
+                                               (1 + exp(p.Cs.among.P.slope * (adap.incomes - p.Cs.among.P.midpoint) + 
+                                                            log.OR.Cs.among.P.private))))
 
 
 # OUTPUTS 
@@ -2103,8 +2162,6 @@ register.model.quantity(ADAP.SPECIFICATION,
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Cs.income.uninsured.among.adap', 
                         value = 0) 
-
-
 
 
 
