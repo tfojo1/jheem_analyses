@@ -11,14 +11,13 @@ source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions
 
 
 # ---- SETUP ----
-for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.16.stage3.az"))}
+for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.30.stage2.az"))}
 # for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.1.stage1.az"))}
 
 calibration.codes <- c(
-    # "calib.6.29.stage0.az",
-    # "calib.7.2.stage1.az",
-    # "calib.7.14.stage2.az",
-    "calib.7.16.stage3.az"
+    # "calib.7.16.stage3.az"
+    "calib.7.30.stage1.az",
+    "calib.7.30.stage2.az"
 )
 
 # for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.16.stage2.az"))}
@@ -27,14 +26,13 @@ calibration.codes <- c(
 calib.simsets <- load.calib.simsets(
     locations         =  SHIELD.TEN.MSAS,
     calibration.codes = calibration.codes,
-    n.sim = 400
+    n.sim = 300
 )
 
 # Inspect mixing statistics -----
 inspect_mixing (
     calib.simsets = calib.simsets,
-    calibration.codes = "calib.7.16.stage3.az",
-        # calibration.codes,
+    calibration.codes = calibration.codes[2],
     locations = SHIELD.TEN.MSAS,
     show.mixing = T,
     verbose = T
@@ -52,7 +50,7 @@ save_summary_plots_by_outcome<-function(calibration.code,folder.name,sim.subset=
                           separate.by = "outcome",
                           folder.name = folder.name,
                           outcomes =c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.late.misclassified",
-                                      "hiv.testing","sti.screening", "prop.male.ps.diag.among.msm"),
+                                      "hiv.testing","sti.screening", "prop.male.ps.diag.among.msm","ps.diag.rate.among.msm"),
                           years = c(1970:2030),
                           ncol=5
     )
@@ -60,7 +58,7 @@ save_summary_plots_by_outcome<-function(calibration.code,folder.name,sim.subset=
     plot.calib.comparison(calib.simsets = calib.simsets,
                           calibration.codes = calibration.code,
                           sim.subset = sim.subset,
-                          locations = SHIELD.TEN.MSAS[1],
+                          locations = SHIELD.TEN.MSAS,
                           separate.by = "outcome",
                           folder.name = folder.name,
                           outcomes = c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.late.misclassified",
@@ -131,7 +129,7 @@ save_summary_plots_by_location<-function(calibration.code,folder.name,sim.subset
                           separate.by = "location",
                           folder.name = folder.name,
                           outcomes =c("diagnosis.total", "diagnosis.ps","diagnosis.el.misclassified","diagnosis.late.misclassified",
-                                      "hiv.testing","sti.screening", "prop.male.ps.diag.among.msm"),
+                                      "hiv.testing","sti.screening", "prop.male.ps.diag.among.msm","ps.diag.rate.among.msm"),
                           years = c(1970:2030)
     )
     plot.calib.comparison(calib.simsets = calib.simsets,
@@ -147,8 +145,8 @@ save_summary_plots_by_location<-function(calibration.code,folder.name,sim.subset
     )
 }
 
-save_summary_plots_by_outcome(calibration.code = "calib.7.16.stage3.az",folder.name = "calib.7.16.stage3.summary",sim.subset="full")
-save_summary_plots_by_location(calibration.code = "calib.7.16.stage3.az",folder.name = "calib.7.16.stage3.summary",sim.subset="full")
+save_summary_plots_by_outcome(calibration.code = "calib.7.30.stage2.az",folder.name = "calib.7.30.stage2.summary",sim.subset="full")
+save_summary_plots_by_location(calibration.code = "calib.7.30.stage2.az",folder.name = "calib.7.30.stage2.summary",sim.subset="full")
 
 # get.default.style.manager()$shade.increment
 
@@ -162,7 +160,7 @@ compare_calibrations_by_outcome<-function(calibration.codes,folder.name){
                           separate.by = "outcome",
                           folder.name = folder.name,
                           outcomes = c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.late.misclassified",
-                                       "hiv.testing","sti.screening", "prop.male.ps.diag.among.msm"),
+                                       "hiv.testing","sti.screening", "prop.male.ps.diag.among.msm","ps.diag.rate.among.msm"),
                           years = c(1970:2030),
                           ncol=5
     )
