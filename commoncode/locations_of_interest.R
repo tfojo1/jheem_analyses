@@ -157,38 +157,38 @@ EHE.MSAS = MSAS.OF.INTEREST[1:32]
 SHIELD.EIGHT.MSAS = MSAS.OF.INTEREST[sort(c("NYC", "Miami", "Chicago", "Phoenix", "Houston", "LA", "Atlanta", "Baltimore"))]
 SHIELD.TEN.MSAS = MSAS.OF.INTEREST[sort(c("NYC", "Miami", "Chicago", "Phoenix", "Houston", "LA", "Atlanta", "Baltimore","Seattle","Philadelphia"))]
 
-
-# Register Oakland TGA
-# 1. Register the new TYPE (guarded so re-running doesn't error).
-if (!("TGA" %in% get.location.types())) {
-    register.types(
-        type            = "TGA",
-        prefix          = "TGA.",
-        prefix.longform = "Transitional Grant Area"
-    )
-}
-
-# 2. Declare that a TGA completely contains counties (guarded).
-if (!location.type.comprises("TGA", "COUNTY")) {
-    register.relationship.between.types("TGA", "COUNTY", TRUE)
-}
-
-# 3. Register the single TGA location: code, then display name (guarded).
-if (!is.location.valid("TGA.OAKLAND")) {
-    register.locations(type = "TGA", locations = "TGA.OAKLAND", location.names = "Oakland")
-}
-
-# 4. Attach the two counties as completely-enclosed sub-locations.
-#    (Safe to re-run.)
-register.sub.and.super.locations(
-    sub.locations                 = c("06001", "06013"),   # Alameda, Contra Costa
-    super.locations               = c("TGA.OAKLAND", "TGA.OAKLAND"),
-    super.completely.encloses.sub = TRUE
-)
-if(1==2){
-    # --- Verify ---
-    cat("Counties in Oakland TGA:\n")
-    print(get.contained.locations("TGA.OAKLAND", sub.type = "county"))
-    cat("TGA comprises COUNTY:", location.type.comprises("TGA", "COUNTY"), "\n")
-}
+# 
+# # Register Oakland TGA
+# # 1. Register the new TYPE (guarded so re-running doesn't error).
+# if (!("TGA" %in% get.location.types())) {
+#     register.types(
+#         type            = "TGA",
+#         prefix          = "TGA.",
+#         prefix.longform = "Transitional Grant Area"
+#     )
+# }
+# 
+# # 2. Declare that a TGA completely contains counties (guarded).
+# if (!location.type.comprises("TGA", "COUNTY")) {
+#     register.relationship.between.types("TGA", "COUNTY", TRUE)
+# }
+# 
+# # 3. Register the single TGA location: code, then display name (guarded).
+# if (!is.location.valid("TGA.OAKLAND")) {
+#     register.locations(type = "TGA", locations = "TGA.OAKLAND", location.names = "Oakland")
+# }
+# 
+# # 4. Attach the two counties as completely-enclosed sub-locations.
+# #    (Safe to re-run.)
+# register.sub.and.super.locations(
+#     sub.locations                 = c("06001", "06013"),   # Alameda, Contra Costa
+#     super.locations               = c("TGA.OAKLAND", "TGA.OAKLAND"),
+#     super.completely.encloses.sub = TRUE
+# )
+# if(1==2){
+#     # --- Verify ---
+#     cat("Counties in Oakland TGA:\n")
+#     print(get.contained.locations("TGA.OAKLAND", sub.type = "county"))
+#     cat("TGA comprises COUNTY:", location.type.comprises("TGA", "COUNTY"), "\n")
+# }
 
