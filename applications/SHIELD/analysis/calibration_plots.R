@@ -15,8 +15,8 @@ for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.3
 # for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.1.stage1.az"))}
 
 calibration.codes <- c(
-    # "calib.7.16.stage3.az"
-    "calib.7.30.stage1.az",
+    "calib.7.16.stage2.az",
+    # "calib.7.30.stage1.az",
     "calib.7.30.stage2.az"
 )
 
