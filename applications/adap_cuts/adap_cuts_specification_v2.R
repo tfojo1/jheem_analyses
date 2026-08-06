@@ -1019,50 +1019,43 @@ register.model.quantity(ADAP.SPECIFICATION,
 #-- P1: Probability of having ONLY full-pay services if on ADAP (F.only) --#
 # Given ADAP, there is a probability of having full-pay; defined by these 4 parameters 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.F.only.midpoint', # 'p.full.pay.only.if.adap.midpoint', # midpoint of probability that you have full pay only, given that we know you have ADAP 
+                       name = 'p.F.only.midpoint', # midpoint of probability that you have full pay only, given that we know you have ADAP 
                        value = 250,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.F.only.slope', # p.full.pay.only.if.adap.logistic.slope
+                       name = 'p.F.only.slope', 
                        value = 0.05,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.F.only.min', # p.full.pay.only.if.adap.min
+                       name = 'p.F.only.min', 
                        value = 0.2,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.F.only.max', # p.full.pay.only.if.adap.max
+                       name = 'p.F.only.max', 
                        value = 0.95,
                        scale = 'proportion')
 
-# Melissa: do we need this? 
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.log.odds.F.only',
-                        value = calculate.baseline.log.odds.F.only # will define this 
-                        )
-
-
 # Then, apply an odds ratio to that probability, based on insurance (medicaid, medicare, medicare and medicaid, private)
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.F.only.medicaid', # p.full.pay.only.if.adap.medicaid.or
+                       name = 'log.OR.F.only.medicaid', 
                        value = log(0.1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.F.only.medicare', # p.full.pay.only.if.adap.medicare.or
+                       name = 'log.OR.F.only.medicare', 
                        value = log(0.1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.F.only.medicare.and.medicaid', # p.full.pay.only.if.adap.medicare.and.medicaid.or
+                       name = 'log.OR.F.only.medicare.and.medicaid', 
                        value = log(0.1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.F.only.private', # p.full.pay.only.if.adap.private.or
+                       name = 'log.OR.F.only.private', 
                        value = log(0.1),
                        scale = 'ratio')
 
@@ -1070,45 +1063,43 @@ register.model.element(ADAP.SPECIFICATION,
 
 #-- P2: Probablity of having full-pay plus other services if on ADAP not full pay only (Fplus.among.not.F.only) --#
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.Fplus.among.not.F.only.midpoint', # p.full.pay.plus.if.not.full.pay.only.midpoint
+                       name = 'p.Fplus.among.not.F.only.midpoint', 
                        value = 250,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.Fplus.among.not.F.only.slope', # p.full.pay.plus.if.not.full.pay.only.logistic.slope
+                       name = 'p.Fplus.among.not.F.only.slope', 
                        value = 0.05,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.Fplus.among.not.F.only.min', # p.full.pay.plus.if.not.full.pay.only.adap.min
+                       name = 'p.Fplus.among.not.F.only.min',
                        value = 0.2,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.Fplus.among.not.F.only.max', # p.full.pay.plus.if.not.full.pay.only.max
+                       name = 'p.Fplus.among.not.F.only.max',
                        value = 0.95,
                        scale = 'proportion')
 
-
 # Then, apply an odds ratio to that probability, based on insurance (medicaid, medicare, medicare and medicaid, private)
-# Melissa: QUESTION: why aren't these all 0.1 like above? Also, do we need uninsured for these? 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.Fplus.among.not.F.only.medicaid', #p.full.pay.plus.if.not.full.pay.only.medicaid.or
+                       name = 'log.OR.Fplus.among.not.F.only.medicaid', 
                        value = log(0.2),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.Fplus.among.not.F.only.medicare', # p.full.pay.plus.if.not.full.pay.only.medicare.or
+                       name = 'log.OR.Fplus.among.not.F.only.medicare', 
                        value = log(0.2),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.Fplus.among.not.F.only.medicare.and.medicaid', # p.full.pay.plus.if.not.full.pay.only.medicare.and.medicaid.or
+                       name = 'log.OR.Fplus.among.not.F.only.medicare.and.medicaid', 
                        value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.Fplus.among.not.F.only.private', # p.full.pay.plus.if.not.full.pay.only.private.or
+                       name = 'log.OR.Fplus.among.not.F.only.private',
                        value = log(1),
                        scale = 'ratio')
 
@@ -1116,176 +1107,172 @@ register.model.element(ADAP.SPECIFICATION,
 
 #-- P3: Probability of receiving premium assistance if also on full pay (P.among.Fplus) --#
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.P.among.Fplus.midpoint', # p.premium.if.full.pay.midpoint
+                       name = 'p.P.among.Fplus.midpoint',
                        value = 250,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.P.among.Fplus.slope', # p.premium.if.full.pay.logistic.slope
+                       name = 'p.P.among.Fplus.slope', 
                        value = 0.05,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.P.among.Fplus.min', # p.premium.if.full.pay.min
+                       name = 'p.P.among.Fplus.min', 
                        value = 0.2,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.P.among.Fplus.max', # p.premium.if.full.pay.max
+                       name = 'p.P.among.Fplus.max', 
                        value = 0.95,
                        scale = 'proportion')
 
 # Then, apply an odds ratio to that probability, based on insurance (medicaid, medicare, medicare and medicaid, private)
-# Melissa: QUESTION: why aren't these all 0.1 like above? Also, do we need uninsured for these? 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.P.among.Fplus.medicaid', # p.premium.if.full.pay.medicaid.or
+                       name = 'log.OR.P.among.Fplus.medicaid', 
                        value = log(0.1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.P.among.Fplus.medicare', # p.premium.if.full.pay.medicare.or
+                       name = 'log.OR.P.among.Fplus.medicare', 
                        value = log(0.1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.P.among.Fplus.medicare.and.medicaid', # p.premium.if.full.pay.medicare.and.medicaid.or
+                       name = 'log.OR.P.among.Fplus.medicare.and.medicaid', 
                        value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.P.among.Fplus.private',  #p.premium.if.full.pay.private.or
+                       name = 'log.OR.P.among.Fplus.private',
                        value = log(1),
                        scale = 'ratio')
 
 
 #--P4: Probability of receiving cost-sharing assistance if on full.pay and premium assistance (Cs.among.FP) --#
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.Cs.among.FP.midpoint', # p.cost.sharing.if.full.pay.and.premium.midpoint
+                       name = 'p.Cs.among.FP.midpoint', 
                        value = 250,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.Cs.among.FP.slope', # p.cost.sharing.if.full.pay.and.premium.slope
+                       name = 'p.Cs.among.FP.slope', 
                        value = 0.05,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.Cs.among.FP.min', # p.cost.sharing.if.full.pay.and.premium.min
+                       name = 'p.Cs.among.FP.min',
                        value = 0.2,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.Cs.among.FP.max', # p.cost.sharing.if.full.pay.and.premium.max
+                       name = 'p.Cs.among.FP.max',
                        value = 0.95,
                        scale = 'proportion')
 
 # Then, apply an odds ratio to that probability, based on insurance (medicaid, medicare, medicare and medicaid, private)
-# Melissa: QUESTION: why aren't these all 0.1 like above? Also, do we need uninsured for these? 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.Cs.among.FP.medicaid', # p.cost.sharing.if.full.pay.and.premium.medicaid.or
+                       name = 'log.OR.Cs.among.FP.medicaid',
                        value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.Cs.among.FP.medicare', # p.cost.sharing.if.full.pay.and.premium.medicare.or
+                       name = 'log.OR.Cs.among.FP.medicare',
                        value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.Cs.among.FP.medicare.and.medicaid', # p.cost.sharing.if.full.pay.and.premium.medicare.and.medicaid.or
+                       name = 'log.OR.Cs.among.FP.medicare.and.medicaid', 
                        value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.Cs.among.FP.private', # p.cost.sharing.if.full.pay.and.premium.private.or
+                       name = 'log.OR.Cs.among.FP.private', 
                        value = log(1),
                        scale = 'ratio')
 
 
 #-- P5: Probability of receiving premium assistance if not receiving any full pay services (P.among.no.F) --#
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.P.among.no.F.midpoint', # p.premium.if.no.full.pay.midpoint
+                       name = 'p.P.among.no.F.midpoint', 
                        value = 250,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.P.among.no.F.slope', # p.premium.if.no.full.pay.logistic.slope
+                       name = 'p.P.among.no.F.slope', 
                        value = 0.05,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.P.among.no.F.min', # p.premium.if.no.full.pay.min
+                       name = 'p.P.among.no.F.min',
                        value = 0.2,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.P.among.no.F.max', # p.premium.if.no.full.pay.max
+                       name = 'p.P.among.no.F.max',
                        value = 0.95,
                        scale = 'proportion')
 
 # Then, apply an odds ratio to that probability, based on insurance (medicaid, medicare, medicare and medicaid, private)
-# Melissa: QUESTION: why aren't these all 0.1 like above? Also, do we need uninsured for these? 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.P.among.no.F.medicaid', # p.premium.if.no.full.pay.medicaid.or
+                       name = 'log.OR.P.among.no.F.medicaid', 
                        value = log(0.1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.P.among.no.F.medicare', # p.premium.if.no.full.pay.medicare.or
+                       name = 'log.OR.P.among.no.F.medicare', 
                        value = log(0.1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.P.among.no.F.medicare.and.medicaid', # p.premium.if.no.full.pay.medicare.and.medicaid.or
+                       name = 'log.OR.P.among.no.F.medicare.and.medicaid', 
                        value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.P.among.no.F.private', # p.premium.if.no.full.pay.private.or
+                       name = 'log.OR.P.among.no.F.private', 
                        value = log(1),
                        scale = 'ratio')
 
 
 #-- P6: Probability of receiving cost-sharing assistance if on premium assistance but not full pay (Cs.among.P)--#
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.Cs.among.P.midpoint', # p.cost.sharing.if.premium.without.full.pay.midpoint
+                       name = 'p.Cs.among.P.midpoint', 
                        value = 250,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.Cs.among.P.slope', # p.cost.sharing.if.premium.without.full.pay.slope
+                       name = 'p.Cs.among.P.slope', 
                        value = 0.05,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.Cs.among.P.min', # p.cost.sharing.if.premium.without.full.pay.premium.min
+                       name = 'p.Cs.among.P.min', 
                        value = 0.2,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.Cs.among.P.max', # p.cost.sharing.if.premium.without.full.pay.premium.max
+                       name = 'p.Cs.among.P.max', 
                        value = 0.95,
                        scale = 'proportion')
 
 # Then, apply an odds ratio to that probability, based on insurance (medicaid, medicare, medicare and medicaid, private)
-# Melissa: QUESTION: why aren't these all 0.1 like above? Also, do we need uninsured for these? 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.Cs.among.P.medicaid', # p.cost.sharing.if.premium.without.full.pay.medicaid.or
+                       name = 'log.OR.Cs.among.P.medicaid', 
                        value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.Cs.among.P.medicare', # p.cost.sharing.if.premium.without.full.pay.medicare.or
+                       name = 'log.OR.Cs.among.P.medicare', 
                        value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.Cs.among.P.medicare.and.medicaid', # p.cost.sharing.if.premium.without.full.pay.medicare.and.medicaid.or
+                       name = 'log.OR.Cs.among.P.medicare.and.medicaid', 
                        value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'log.OR.Cs.among.P.private', # p.cost.sharing.if.premium.without.full.pay.private.or
+                       name = 'log.OR.Cs.among.P.private', 
                        value = log(1),
                        scale = 'ratio')
 
@@ -1627,7 +1614,7 @@ register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.F.only.income.medicaid', 
                         value = expression(p.F.only.min + (p.F.only.max - p.F.only.min) /
                                                    (1 + exp(p.F.only.slope * (adap.incomes - p.F.only.midpoint) + 
-                                                                log.OR.F.only.medicaid)))) # this last term will be the only thing that changes when I switch to other insurance types
+                                                                log.OR.F.only.medicaid)))) # this last term will be the only thing that changes for other insurance types
 
 # P2
 register.model.quantity(ADAP.SPECIFICATION,
