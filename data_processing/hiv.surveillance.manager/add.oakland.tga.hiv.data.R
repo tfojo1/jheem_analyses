@@ -167,6 +167,33 @@ put.msa.data.as.new.source(outcome = 'engagement',
                            source.for.denominator= 'cdc.hiv',
                            ontology.for.denominator= 'cdc')
 
+put.msa.data.as.new.source(outcome = 'gonorrhea',
+                           from.source.name = 'cdc.sti',
+                           to.source.name = 'cdc.aggregated.county',
+                           to.locations =  oakland,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'TGA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = surveillance.manager)
+
+put.msa.data.as.new.source(outcome = 'ps.syphilis',
+                           from.source.name = 'cdc.sti',
+                           to.source.name = 'cdc.aggregated.county',
+                           to.locations =  oakland,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'TGA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = surveillance.manager)
+
+put.msa.data.as.new.source(outcome = 'early.syphilis',
+                           from.source.name = 'cdc.sti',
+                           to.source.name = 'cdc.aggregated.county',
+                           to.locations =  oakland,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'TGA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = surveillance.manager)
+
 
 # Aggregate proportion.msm to MSA ---------------------------------------
     
