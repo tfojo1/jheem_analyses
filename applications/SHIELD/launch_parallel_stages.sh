@@ -64,7 +64,7 @@ all_except_ten_cities=(
 
 
 two_cities=(
-    C.31080 C.37980
+    C.37980
 )
 # ── set active cities and calibration codes here ───────────────────────────────
 CITIES=("${two_cities[@]}")

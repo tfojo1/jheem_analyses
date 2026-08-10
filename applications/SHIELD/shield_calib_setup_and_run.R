@@ -15,7 +15,7 @@ source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases
 
 VERSION<- 'shield'
 START_FROM_SCRATCH <- TRUE
-set.seed(12345)
+set.seed(12121)
 CACHE.FREQ= 500 # how often should write the results to disk (Default: 100)
 UPDATE.FREQ= 50 # how often to print messages (Default: 50)
 
