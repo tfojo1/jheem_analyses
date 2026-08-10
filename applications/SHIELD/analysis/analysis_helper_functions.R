@@ -203,15 +203,18 @@ int.style.manager <- function(intervention.labels,
 # Core simplot call from a named list of simset objects + display labels
 .make.panel <- function(simset.list, labels, outcomes, split.by, facet.by,
                         style.manager, summary.type, plot.which, years) {
+    # browser()
     if (length(simset.list) == 0) return(NULL)
     args <- list(outcomes = outcomes, dimension.values = list(year = years),
                  style.manager = style.manager, summary.type = summary.type,
-                 plot.which = plot.which)
+                 plot.which = plot.which )
     if (!is.null(split.by)) args$split.by <- split.by
     if (!is.null(facet.by)) args$facet.by  <- facet.by
-    if (length(simset.list) > 1 && !is.null(labels)) args$simset.names <- unname(labels)
+    if (length(simset.list) >= 1 && !is.null(labels)) args$simset.names <- unname(labels)
+    
     do.call(simplot, c(unname(simset.list), args))
-}
+    
+    }
 
 # Patchwork grid - each panel retains its own legend
 # Simply arranges panels in a grid without collecting/sharing legends
@@ -531,7 +534,7 @@ extract.calib.simsets <- function(calib.simsets,
         p <- simplot(last20, last_sim, outcomes = outcome, 
                      facet.by = facet.by, split.by = split.by,plot.which=plot.which,
                      style.manager = style.manager, title.suffix = suffix,
-                     dimension.values = list(year = 2000:2030))
+                     dimension.values = list(year = 1970:2030))
         # browser()
       filename <- paste0(paste(.sanitize(outcome), collapse = "_"),
                            .build.file.suffix(split.by, facet.by,plot.which))
@@ -648,7 +651,7 @@ plot.single.calib.single.location <- function(calib.simsets,
                                 sim.subset        = "full",
                                 split.by          = NULL,
                                 facet.by          = NULL,
-                                years             = 2000:2030,
+                                years             = 1970:2030,
                                 plot.which        = "sim.and.data",
                                 style.manager     = NULL,
                                 summary.type      = "median.and.interval",
@@ -703,7 +706,7 @@ plot.calib.comparison <- function(calib.simsets,
                                   sim.subset        = "full",
                                   split.by          = NULL,
                                   facet.by          = NULL,
-                                  years             = 2000:2030,
+                                  years             = 1970:2030,
                                   nrow              = NULL,
                                   ncol              = NULL,
                                   plot.which        = "sim.and.data",
@@ -717,7 +720,7 @@ plot.calib.comparison <- function(calib.simsets,
                                   dpi               = 300,
                                   create.dirs       = TRUE,
                                   verbose           = TRUE) {
-    
+
     if (!is.null(locations) && is.null(names(locations)))
         stop("Error: 'locations' must be a NAMED vector")
     
@@ -741,7 +744,6 @@ plot.calib.comparison <- function(calib.simsets,
     if (is.null(save.dir)) {
         save.dir <- file.path(SHIELD.PLOT.PATH, "calibrationPlots","comparison",folder.name,paste0("by_",separate.by))
      }
-    
     loc.panel <- function(loc, outs) {
         entries <- extract.calib.simsets(calib.simsets, location = loc)
         entries <- entries[sapply(entries, function(e) e$calib.code %in% all.calibs)]
@@ -755,6 +757,7 @@ plot.calib.comparison <- function(calib.simsets,
     output <- list()
      if (separate.by == "outcome") {
         for (oi in seq_along(outcomes)) {
+            # browser()
             outcome <- outcomes[oi]
             if (verbose) message(sprintf("[%d/%d] Outcome: %s", oi, length(outcomes), outcome))
             panels   <- setNames(lapply(all.loc.names, loc.panel, outs = outcome), all.loc.names)
@@ -763,11 +766,11 @@ plot.calib.comparison <- function(calib.simsets,
             output[[outcome]] <- combined
             h <- if (is.null(height)) .auto.height(length(Filter(Negate(is.null), panels)), ncol = if (!is.null(ncol)) ncol else ceiling(sqrt(length(panels) * 1.5)), nrow = nrow) else height
             if (save) .save.plot(combined, save.dir,
-                                 paste0("outcome_", .sanitize(outcome), "_by_location", suffix),
+                                 paste0("compare_",.sanitize(outcome), "_accross_locations", suffix),
                                  width, h, dpi, create.dirs, verbose)
         }
     }
-    
+    # browser()
     if (separate.by == "location") {
         for (li in seq_along(all.loc.names)) {
             loc <- all.loc.names[li]
@@ -780,7 +783,7 @@ plot.calib.comparison <- function(calib.simsets,
             output[[loc]] <- combined
             h <- if (is.null(height)) .auto.height(length(Filter(Negate(is.null), panels)), ncol = if (!is.null(ncol)) ncol else ceiling(sqrt(length(panels) * 1.5)), nrow = nrow) else height
             if (save) .save.plot(combined, save.dir,
-                                 paste0("location_", .sanitize(loc), "_by_outcome", suffix),
+                                 paste0("compare_outcomes_within_", .sanitize(loc), suffix),
                                  width, h, dpi, create.dirs, verbose)
         }
     }
@@ -968,7 +971,7 @@ plot.int.location <- function(int.simsets,
                               outcomes,
                               split.by      = NULL,
                               facet.by      = NULL,
-                              years         = 2000:2030,
+                              years         = 1970:2030,
                               plot.which    = "sim.and.data",
                               style.manager = NULL,
                               summary.type  = "median.and.interval",
@@ -1017,7 +1020,7 @@ plot.int.comparison <- function(int.simsets,
                                 folder.name       = NULL,
                                 split.by          = NULL,
                                 facet.by          = NULL,
-                                years             = 2000:2030,
+                                years             = 1970:2030,
                                 nrow              = NULL,
                                 ncol              = NULL,
                                 plot.which        = "sim.and.data",
@@ -1201,4 +1204,96 @@ verify_calibration <- function(calib.simsets,
         rv
         
     }), calibration.codes)
+}
+
+inspect_mixing <- function(calib.simsets,
+                           calibration.codes,
+                           locations          = NULL,
+                           show.mixing        = FALSE,
+                           mixing.n           = 6L,
+                           mixing.threshold   = 100000,
+                           unmixed.allowable  = 2,
+                           verbose            = TRUE) {
+  
+  # Resolve location names
+  all.loc.names <- if (!is.null(locations)) {
+    unique(names(.filter.to.requested.locations(
+      locations,
+      setNames(sapply(calib.simsets, `[[`, "location.code"),
+               sapply(calib.simsets, `[[`, "location.name")),
+      "inspect_mixing"
+    )))
+  } else {
+    unique(sapply(calib.simsets, `[[`, "location.name"))
+  }
+  
+  setNames(lapply(calibration.codes, function(calib_code) {
+    
+    rv <- setNames(sapply(all.loc.names, function(loc) {
+      
+      tryCatch({
+        simset <- extract.calib.simsets(
+          calib.simsets,
+          location         = loc,
+          calibration.code = calib_code,
+          exact            = TRUE
+        )[[1]]$full_simset
+        
+        mixing.stats <- simset$get.mcmc.mixing.statistic()
+        
+        # --- Display mixing statistics as a table ---
+        if (show.mixing) {
+          n.display   <- min(mixing.n, length(mixing.stats))
+          display.df  <- data.frame(
+            parameter         = names(mixing.stats[,1][seq_len(n.display)]),
+            mixing_statistic  = unname(mixing.stats[,1][seq_len(n.display)]),
+            above_threshold   = mixing.stats[,1][seq_len(n.display)] > mixing.threshold,
+            row.names         = NULL
+          )
+          
+          cat("\n===== Mixing Statistics =====\n")
+          cat("Location:         ", loc, "\n")
+          cat("Calibration code: ", calib_code, "\n")
+          cat("Showing:          ", n.display, " of ", length(mixing.stats), " parameters\n")
+          cat("Threshold:        ", mixing.threshold, "\n\n")
+          print(display.df, right = FALSE)
+          cat("\n")
+        }
+        
+        # --- Threshold check: FALSE if too many unmixed ---
+        n.over <- sum(mixing.stats > mixing.threshold)
+        pass   <- n.over < unmixed.allowable
+        
+        if (verbose && !pass) {
+          cat(sprintf(
+            "[WARN] %s in '%s': %d parameters above threshold (%d)\n",
+            loc, calib_code, n.over, mixing.threshold
+          ))
+        }
+        
+        pass
+        
+      }, error = function(e) {
+        if (verbose) {
+          cat(sprintf(
+            "[ERROR] Could not extract simset for %s in '%s': %s\n",
+            loc, calib_code, conditionMessage(e)
+          ))
+        }
+        FALSE
+      })
+      
+    }), all.loc.names)
+    
+    if (verbose && any(!rv)) {
+      cat(sprintf(
+        "\nLocations that did not mix in '%s': %s\n",
+        calib_code,
+        paste0(all.loc.names[!rv], collapse = ", ")
+      ))
+    }
+    
+    rv
+    
+  }), calibration.codes)
 }

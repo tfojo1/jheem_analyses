@@ -138,15 +138,16 @@ AGING.PARAMETERS.PRIOR=join.distributions(
 ## TRANSMISSION.PARAMETERS.PRIOR ----
 TRANSMISSION.PARAMETERS.PRIOR=join.distributions( 
     ## Initial infections in 1970 ----
-    # because we don't have true infection counts, we estimate estimated from reported diagnosis in 1970
-    # we assume a certain ratio of infected to diagnosed cases in 1970 that is theoritically >=1
-    # we also assume a certain proportion of diagnosis were made among MSM, and the rest are divided among heterosexual men and women
-    prp.diagnoses.are.msm.1970 = Logitnormal.Distribution(meanlogit = log(.5), sdlogit = log(2)), #CI=[0.13 0.66] larger SD because of uncertainty
-    ratio.of.infected.to.diagnosed.1970 = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)), #CI=[1.5, 5.9]
+    # because we don't have true infection counts, we estimated from reported diagnosis in 1970
+    # we assume a certain ratio of undiagnosed to diagnosed cases in 1970
+    # we also assume a certain proportion of infections were made among MSM, and the rest are divided among heterosexual men and women
+    ratio.of.undiagnosed.to.diagnosed.1970 = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)), #CI=[1.5, 5.9]
+    prp.infections.among.msm.1970 = Logitnormal.Distribution(meanlogit = log(.5), sdlogit = log(2)), #CI=[0.13 0.66] larger SD because of uncertainty
     
     ## Global transmission ----
-    global.transmission.rate.msm = Lognormal.Distribution(meanlog = log(3.9), sdlog = 0.5*log(10)), # large SD to allow more mixing
-    global.transmission.rate.het = Lognormal.Distribution(meanlog = log(3.9), sdlog = 0.5*log(10)), # large SD to allow more mixing
+    # Moved back down to 2.2 from 3.1 when raised msm logmean baseline back to log(3) from log(1)
+    global.transmission.rate.msm = Lognormal.Distribution(meanlog = log(2.3), sdlog = 0.5*log(10)), # large SD to allow more mixing
+    global.transmission.rate.het = Lognormal.Distribution(meanlog = log(2.3), sdlog = 0.5*log(10)), # large SD to allow more mixing
     
     # Transmission multipliers 
     # we built a joint prior for: transmission.rate.multiplier.msm & transmission.rate.multiplier.heterosexual
@@ -158,7 +159,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     # this means that over 5 years, trate can change by sqrt(1.5) and by 20 years, it can change by 1.5^2
     make.joint.mv.spline.prior(
         parameters = paste0("transmission.rate.multiplier.", c("msm", "heterosexual")),
-        logmean.baseline = c(log(1), #msm
+        logmean.baseline = c(log(3), #msm
                              log(1)), #het
         logsd.baseline = c(log(2)*2, #msm
                            log(2)*2
@@ -172,16 +173,19 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
         correlation = 0.7
     ),
     
-    ## race multipliers (msm and het seperatly) ----
+    ## race multipliers (not sex stratified anymore) ----
     # increased SD to allow more variation CI= [0.25 - 3.9] 
-    transmission.rate.multiplier.black.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    transmission.rate.multiplier.black.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    #
-    transmission.rate.multiplier.hispanic.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    transmission.rate.multiplier.hispanic.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    #
-    transmission.rate.multiplier.other.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    transmission.rate.multiplier.other.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+    # transmission.rate.multiplier.black.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+    # transmission.rate.multiplier.black.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+    # #
+    # transmission.rate.multiplier.hispanic.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+    # transmission.rate.multiplier.hispanic.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+    # #
+    # transmission.rate.multiplier.other.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+    # transmission.rate.multiplier.other.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+    transmission.rate.multiplier.black = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+    transmission.rate.multiplier.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+    transmission.rate.multiplier.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
     
     ## future change ----
     transmission.rate.future.change.mult = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0), #CI=(0.25 - 1.25) #assumption
@@ -198,7 +202,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     
     ## Sexual Mixing by Risk ----
     # see shield_inputManager_pairing.R
-    oe.female.pairings.with.msm = Lognormal.Distribution(meanlog = log(0.0895), sdlog = log(2)), 
+    oe.female.pairings.with.msm = Lognormal.Distribution(meanlog = log(.3), sdlog = log(2)/2), #range [pathela 0.12 -dodge 0.6]
     fraction.heterosexual_male.pairings.with.male = Logitnormal.Distribution(meanlogit = logit(0.004), sdlogit = log(2)), 
     fraction.msm.pairings.with.female = Logitnormal.Distribution(meanlogit = logit(0.1187612), sdlogit = log(2)),
     
@@ -214,15 +218,6 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
 
 ## STI.TESTING.PARAMETERS.PRIOR ----
 STI.TESTING.PARAMETERS.PRIOR=join.distributions( 
-    ## COVID ----
-    # sti.screening: 5 alphas (leaving out age for now) #'@Melissa: why log? not logit?
-    # parameter: max.covid.effect.sti.screening.reduction
-    black.sti.screening.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
-    hispanic.sti.screening.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
-    other.sti.screening.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
-    
-    heterosexual.sti.screening.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
-    msm.sti.screening.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
     
     ## Fraction Symptomatic ----
     #  inputs/input_prop_symp_primary.R
@@ -251,6 +246,16 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
     # can lead to very large increases in the odds ratio)
     or.slope.careseeking.symptomatic.ps = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10), #smaller sd for slopes 
     
+    ## COVID ----
+    # sti.screening: 5 alphas (leaving out age for now) #'@Melissa: why log? not logit?
+    # parameter: max.covid.effect.sti.screening.reduction
+    black.sti.screening.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    hispanic.sti.screening.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    other.sti.screening.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    
+    heterosexual.sti.screening.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    msm.sti.screening.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    
     ## STI Screening ----
     
     #OPTION1: using logistic linear function with an intercept and slope
@@ -265,35 +270,45 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
     # or.slope.sti.screening.msm = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10),
     # or.slope.sti.screening.heterosexual = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10),
     
-    #OPTION2: using a linear spline function (knots 2010,2020) 
-    #by sex, by race in each knot
+    #OPTION2: using a linear spline function (knots 1990,2000,2010,2020)  
+    # for msm seperately
+    screening.rate.multiplier.msm.1990 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    screening.rate.multiplier.msm.2000 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     screening.rate.multiplier.msm.2010 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    screening.rate.multiplier.het.2010 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    #
     screening.rate.multiplier.msm.2020 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    screening.rate.multiplier.het.2020 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    #
-    screening.rate.multiplier.black.2010 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    screening.rate.multiplier.hispanic.2010 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    screening.rate.multiplier.other.2010 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    #
-    screening.rate.multiplier.black.2020 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    screening.rate.multiplier.hispanic.2020 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    screening.rate.multiplier.other.2020 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # for heterosexuals
+    screening.rate.multiplier.heterosexuals.1990 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    screening.rate.multiplier.heterosexuals.2000 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    screening.rate.multiplier.heterosexuals.2010 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    screening.rate.multiplier.heterosexuals.2020 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # multipliers for female and het male:
+    screening.rate.multiplier.female = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    screening.rate.multiplier.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    
+    # race specific multipliers that apply to both msm and het
+    screening.rate.multiplier.black = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    screening.rate.multiplier.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    screening.rate.multiplier.other = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    
     # future change multiplier
     screening.rate.future.change.mult  = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0), #CI=(0.25 - 1.25) #assumption
-
+    
     
     ## Syphilis to HIV Testing Ratio ----
-    # Stratify intercept by race and sex
-    or.syphilis.to.hiv.testing.msm = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    or.syphilis.to.hiv.testing.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    or.syphilis.to.hiv.testing.female = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # Stratify intercept by race and sex: I think that this is creating an identifiability problem
+    # weu have two sets of subgroup multipliers — one on the screening rate, one on the ratio — but only one calibration target (BRFSS HIV testing proportions by subgroup). 
+    # The model cannot distinguish whether a subgroup's high HIV testing rate reflects higher syphilis screening or a higher ratio of HIV testing to syphilis screening. 
+    # The two sets of parameters are interchangeable in fitting the data, so neither is uniquely estimable.
+    
+    # or.syphilis.to.hiv.testing.msm = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # or.syphilis.to.hiv.testing.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # or.syphilis.to.hiv.testing.female = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # #
+    # or.syphilis.to.hiv.testing.black = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # or.syphilis.to.hiv.testing.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # or.syphilis.to.hiv.testing.other = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     #
-    or.syphilis.to.hiv.testing.black = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    or.syphilis.to.hiv.testing.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    or.syphilis.to.hiv.testing.other = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    #
+    or.syphilis.to.hiv.testing = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     or.slope.syphilis.to.hiv.testing = Lognormal.Distribution(meanlog = 0, sdlog = (0.5*log(2))/10), # changed from 2 to make change slower
     
     ## Misclassification Error ----
@@ -568,17 +583,23 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "transmission.rate.msm",
                                                        alpha.name = time,
-                                                       values = parameters[c("transmission.rate.multiplier.black.msm",
-                                                                             "transmission.rate.multiplier.hispanic.msm", 
-                                                                             "transmission.rate.multiplier.other.msm")],
+                                                       # values = parameters[c("transmission.rate.multiplier.black.msm",
+                                                       #                       "transmission.rate.multiplier.hispanic.msm", 
+                                                       #                       "transmission.rate.multiplier.other.msm")],
+                                                       values = parameters[c("transmission.rate.multiplier.black",
+                                                                             "transmission.rate.multiplier.hispanic", 
+                                                                             "transmission.rate.multiplier.other")],
                                                        dimension = "race.to", #recipient
                                                        applies.to.dimension.values = c("black","hispanic", "other"))
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "transmission.rate.heterosexual",
                                                        alpha.name = time,
-                                                       values = parameters[c("transmission.rate.multiplier.black.heterosexual",
-                                                                             "transmission.rate.multiplier.hispanic.heterosexual", 
-                                                                             "transmission.rate.multiplier.other.heterosexual")],
+                                                       # values = parameters[c("transmission.rate.multiplier.black.heterosexual",
+                                                       #                       "transmission.rate.multiplier.hispanic.heterosexual", 
+                                                       #                       "transmission.rate.multiplier.other.heterosexual")],
+                                                       values = parameters[c("transmission.rate.multiplier.black",
+                                                                             "transmission.rate.multiplier.hispanic", 
+                                                                             "transmission.rate.multiplier.other")],
                                                        dimension = "race.to", #recipient
                                                        applies.to.dimension.values = c("black","hispanic", "other"))
         
@@ -713,29 +734,42 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
     #                                                dimension = "sex", #recipient
     #                                                applies.to.dimension.values = c("heterosexual_male", "female"))
     #OPTION2:
-    for(time in c("2010","2020")){
+    for(time in c("1990","2000","2010","2020")){
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "rate.sti.screening.over.14.without.covid",
                                                        alpha.name = time,
                                                        values = parameters[paste0("screening.rate.multiplier.msm.",time)],
                                                        dimension = 'sex',
-                                                       applies.to.dimension.values = c('msm'))
+                                                       applies.to.dimension.values = "msm")
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "rate.sti.screening.over.14.without.covid",
                                                        alpha.name = time,
-                                                       values = parameters[paste0("screening.rate.multiplier.het.",time)],
+                                                       values = parameters[paste0("screening.rate.multiplier.heterosexuals.",time)],
                                                        dimension = 'sex',
-                                                       applies.to.dimension.values = c("heterosexual_male", "female"))
-        for(race in races){
-            set.element.functional.form.main.effect.alphas(model.settings,
+                                                       applies.to.dimension.values = c("female","heterosexual_male"))
+    }
+    set.element.functional.form.main.effect.alphas(model.settings,
+                                                   element.name = "rate.sti.screening.over.14.without.covid",
+                                                   alpha.name = time,
+                                                   values = parameters[paste0("screening.rate.multiplier.female")],
+                                                   dimension = 'sex',
+                                                   applies.to.dimension.values = c("female"))
+    set.element.functional.form.main.effect.alphas(model.settings,
+                                                   element.name = "rate.sti.screening.over.14.without.covid",
+                                                   alpha.name = time,
+                                                   values = parameters[paste0("screening.rate.multiplier.heterosexual_male")],
+                                                   dimension = 'sex',
+                                                   applies.to.dimension.values = c("heterosexual_male"))
+    for(race in races){
+        set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "rate.sti.screening.over.14.without.covid",
                                                        alpha.name = time,
-                                                       values = parameters[paste0("screening.rate.multiplier.",race,".",time)],
+                                                       values = parameters[paste0("screening.rate.multiplier.",race)],
                                                        dimension = 'race',
                                                        applies.to.dimension.values = race)
-        }
-
     }
+    
+    
     # Future change multiplier ----
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "rate.sti.screening.over.14.without.covid",
@@ -747,18 +781,25 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
     
     ## Syphilis to HIV tests Ratio ----
     # Change intercept and slope
+    # set.element.functional.form.main.effect.alphas(model.settings,
+    #                                                element.name = "ratio.syphilis.screening.to.hiv.tests",
+    #                                                alpha.name = "intercept",
+    #                                                values = parameters[paste0("or.syphilis.to.hiv.testing.", sexes)],
+    #                                                dimension = "sex", #recipient
+    #                                                applies.to.dimension.values = sexes)
+    # set.element.functional.form.main.effect.alphas(model.settings,
+    #                                                element.name = "ratio.syphilis.screening.to.hiv.tests",
+    #                                                alpha.name = "intercept",
+    #                                                values = parameters[paste0("or.syphilis.to.hiv.testing.", races)],
+    #                                                dimension = "race", #recipient
+    #                                                applies.to.dimension.values = races)
+    
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "ratio.syphilis.screening.to.hiv.tests",
                                                    alpha.name = "intercept",
-                                                   values = parameters[paste0("or.syphilis.to.hiv.testing.", sexes)],
-                                                   dimension = "sex", #recipient
-                                                   applies.to.dimension.values = sexes)
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "ratio.syphilis.screening.to.hiv.tests",
-                                                   alpha.name = "intercept",
-                                                   values = parameters[paste0("or.syphilis.to.hiv.testing.", races)],
-                                                   dimension = "race", #recipient
-                                                   applies.to.dimension.values = races)
+                                                   values = parameters["or.syphilis.to.hiv.testing"],
+                                                   dimension = "all", #recipient
+                                                   applies.to.dimension.values = "all")
     
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "ratio.syphilis.screening.to.hiv.tests",
@@ -985,9 +1026,9 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
     #
     infectiousness=c("el.rel.secondary.transmissibility"),
     #
-    prp.inf.msm.1970=c("prp.diagnoses.are.msm.1970"),
+    prp.inf.msm.1970=c("prp.infections.among.msm.1970"),
     #
-    inf.to.diag.1970=c("ratio.of.infected.to.diagnosed.1970"),
+    inf.to.diag.1970=c("ratio.of.undiagnosed.to.diagnosed.1970"),
     #
     msm.transmission.block1 = c(
         "transmission.rate.multiplier.msm1970",
@@ -1011,15 +1052,20 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
         #"transmission.rate.multiplier.heterosexual2030"
     ),
     #
-    race.transmission.msm = c(
-        "transmission.rate.multiplier.black.msm",
-        "transmission.rate.multiplier.hispanic.msm",
-        "transmission.rate.multiplier.other.msm"
-    ),
-    race.transmission.heterosexual = c(
-        "transmission.rate.multiplier.black.heterosexual",
-        "transmission.rate.multiplier.hispanic.heterosexual",
-        "transmission.rate.multiplier.other.heterosexual"
+    # race.transmission.msm = c(
+    #     "transmission.rate.multiplier.black.msm",
+    #     "transmission.rate.multiplier.hispanic.msm",
+    #     "transmission.rate.multiplier.other.msm"
+    # ),
+    # race.transmission.heterosexual = c(
+    #     "transmission.rate.multiplier.black.heterosexual",
+    #     "transmission.rate.multiplier.hispanic.heterosexual",
+    #     "transmission.rate.multiplier.other.heterosexual"
+    # ),
+    race.transmission = c(
+        "transmission.rate.multiplier.black",
+        "transmission.rate.multiplier.hispanic",
+        "transmission.rate.multiplier.other"
     ),
     #
     trans.rate.future.change=c("transmission.rate.future.change.mult"),
@@ -1079,39 +1125,47 @@ STI.TESTING.SAMPLING.BLOCKS = list(
     #     'or.slope.sti.screening.heterosexual'
     # ),
     #OPTION2
-    sti.screening.sex<- c(
+    sti.screening.sex1<- c(
+        "screening.rate.multiplier.msm.1990",
+        "screening.rate.multiplier.msm.2000",
         "screening.rate.multiplier.msm.2010",
-        "screening.rate.multiplier.het.2010",
-        "screening.rate.multiplier.msm.2020",
-        "screening.rate.multiplier.het.2020"
-        ),
+        "screening.rate.multiplier.msm.2020"
+    ),
+    sti.screening.sex2<- c(
+        "screening.rate.multiplier.heterosexuals.1990",
+        "screening.rate.multiplier.heterosexuals.2000",
+        "screening.rate.multiplier.heterosexuals.2010",
+        "screening.rate.multiplier.heterosexuals.2020"
+    ),
+    sti.screening.sex3<-c(
+        "screening.rate.multiplier.female",
+        "screening.rate.multiplier.heterosexual_male"
+    ),
     sti.screening.race1<-c(
-        "screening.rate.multiplier.black.2010" ,
-        "screening.rate.multiplier.hispanic.2010",
-        "screening.rate.multiplier.other.2010"
-        ),
-    sti.screening.race2<-c(
-        "screening.rate.multiplier.black.2020" ,
-        "screening.rate.multiplier.hispanic.2020",
-        "screening.rate.multiplier.other.2020"
-        ),
+        "screening.rate.multiplier.black" ,
+        "screening.rate.multiplier.hispanic",
+        "screening.rate.multiplier.other"
+    ),
     sti.screening.future.change<-c(
         "screening.rate.future.change.mult"
-        ),
-
+    ),
+    
+    #
+    # syphilis.to.hiv.testing.ratio.sex<-c(
+    #     # "or.syphilis.to.hiv.testing.msm",
+    #     "or.syphilis.to.hiv.testing.heterosexual_male",
+    #     "or.syphilis.to.hiv.testing.female",
+    # ),
+    # syphilis.to.hiv.testing.ratio.race<-c(
+    #     "or.syphilis.to.hiv.testing.black",
+    #     "or.syphilis.to.hiv.testing.hispanic",
+    #     "or.syphilis.to.hiv.testing.other"
+    # ),
     #
     syphilis.to.hiv.testing.ratio.sex.slope<-c(
-        "or.syphilis.to.hiv.testing.msm",
-        "or.syphilis.to.hiv.testing.heterosexual_male",
-        "or.syphilis.to.hiv.testing.female",
+        "or.syphilis.to.hiv.testing",
         "or.slope.syphilis.to.hiv.testing"
     ),
-    syphilis.to.hiv.testing.ratio.race<-c(
-        "or.syphilis.to.hiv.testing.black",
-        "or.syphilis.to.hiv.testing.hispanic",
-        "or.syphilis.to.hiv.testing.other"
-    ),
-    #
     misclas.error<-c(
         "fraction.el.misclassified.ll",
         "fraction.ll.misclassified.el"

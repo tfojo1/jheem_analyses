@@ -3,6 +3,9 @@ library(locations)
 library(tidyverse)
 library(readxl)
 library(haven)
+library(readxl)
+library(purrr)
+library(tools)
 
 Q_ROOT <- Sys.getenv("Q_ROOT", "Q:")
 
@@ -105,6 +108,24 @@ data.manager$register.outcome(
     units = 'cases',
     description = "Congenital Syphilis Deaths"))
 
+data.manager$register.outcome(
+    'denominator.for.prop.male.ps.diag.among.msm',
+    metadata = create.outcome.metadata(
+        scale = 'non.negative.number',
+        display.name = 'Denominator Value for Proportion of Male PS Syphilis Diagnoses Among MSM',
+        axis.name = 'Denominator Value for Proportion of Male PS Syphilis Diagnoses Among MSM',
+        units = 'cases',
+        description = "Denominator Value for Proportion of Male PS Syphilis Diagnoses Among MSM"))
+
+data.manager$register.outcome(
+    'prop.male.ps.diag.among.msm',
+    metadata = create.outcome.metadata(
+        scale = 'proportion',
+        display.name = 'Proportion Male PS Syphilis Diagnoses Among MSM',
+        axis.name = 'Proportion Male PS Syphilis Diagnoses Among MSM',
+        units = '%',
+        description = "Proportion Male PS Syphilis Diagnoses Among MSM"), denominator.outcome = 'denominator.for.prop.male.ps.diag.among.msm')
+
 
 #Register Sources:
 data.manager$register.parent.source('NHSS', full.name = 'National HIV Surveillance System', short.name= "NHSS") #parent
@@ -112,6 +133,7 @@ data.manager$register.parent.source('NNDSS', full.name = 'National Notifiable Di
 data.manager$register.parent.source('DHHS', full.name = 'U.S. Department of Health and Human Services', short.name= "DHHS") #parent
 data.manager$register.parent.source('NCHS', full.name = 'National Center for Health Statistics', short.name= "NCHS")
 data.manager$register.parent.source('LHD', full.name = 'Local Health Department', short.name= "LHD")
+data.manager$register.parent.source('CDC', full.name = 'Centers for Disease Control and Prevention', short.name= "cdc")
 
 data.manager$register.source('cdc.sti', parent.source= "NNDSS", full.name = "Atlas Plus STI Data", short.name='cdc.sti')
 data.manager$register.source('cdc.aggregated.county', parent.source= "NHSS", full.name = 'CDC Aggregated County', short.name = 'cdc aggd county') #Note this is for the aggregated county data being used to represent MSAs
@@ -119,6 +141,7 @@ data.manager$register.source('cdc.sti.surveillance.reports', parent.source= "DHH
 data.manager$register.source('cdc_wonder', parent.source= "NCHS", full.name = "CDC Wonder", short.name='cdc_wonder')
 data.manager$register.source('lhd', parent.source= "LHD", full.name = "Local Health Department", short.name='lhd')
 data.manager$register.source('cdc.wonder.aggregated.population', parent.source= "NNDSS", full.name = 'CDC Wonder Aggregated Adult Population', short.name = 'cdc.wonder.agg.pop') #Thsi is data from atlas summed into total syphilis dx
+data.manager$register.source('mmwr', parent.source= "CDC", full.name = "Morbidity and Mortality Weekly Report", short.name='mmwr')
 
 #Register Ontologies:
 data.manager$register.ontology(
@@ -149,9 +172,37 @@ data.manager$register.ontology(
     location= NULL,
     age=c('0-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-54 years', '55-64 years', '65+ years'),
     race=c('white, non hispanic', 'black, non hispanic', 'hispanic', 'asian pacific islander', 'american indian alaska native'),
-    sex=c('male','female'),
-    risk=c('msm','idu','msm_idu','heterosexual','other')
+    sex=c('male','female', 'msm')
   ))
+
+data.manager$register.ontology(
+    'state.health.dept',
+    ont = ontology(
+        year= NULL,
+        location= NULL,
+        age=c('0-14 years', '15-24 years', '25-34 years', '35-44 years', '45-54 years', '55-64 years', '65+ years'),
+        race=c('black', 'hispanic', 'other', 'white'),
+        sex=c('male','female', 'msm')
+    ))
+
+data.manager$register.ontology(
+    'california.health.dept',
+    ont = ontology(
+        year= NULL,
+        location= NULL,
+        age=c('0-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-44 years', '45+ years'),
+        race=c('black', 'hispanic', 'other', 'white'),
+        sex=c('male','female', 'msm')
+    ))
+
+data.manager$register.ontology(
+    'mmwr',
+    ont = ontology(
+        year= NULL,
+        location= NULL,
+        sex=c('male','female', 'msm')
+    ))
+
 
 #Codes:
 source('data_processing/syphilis.manager/syphilis.data.R')
@@ -160,6 +211,11 @@ source('data_processing/syphilis.manager/cdc.pdf.reports.1997.2003.R') #This pul
 source('data_processing/syphilis.manager/cdc.pdf.reports.1941.2022.R') #These replace the US totals for certain years above, they are more recent. This pulls one table from a 2022 report that reports cases back to 1941
 source('data_processing/syphilis.manager/syphilis.deaths.R')
 source('data_processing/syphilis.manager/local.health.department.syphilis.data.R')
+source('data_processing/syphilis.manager/sti.pdf.reports.by.sex.msm.R') #This pulls additional ps.syphilis data from cdc pdf reports by sex and msm
+source('data_processing/syphilis.manager/state.health.department.data.R') #This pulls data manually taken from state health dept reports
+source('data_processing/syphilis.manager/cdc.pdf.reports.additional.msa.totals.R') #This pulls any remaining data from the PDF CDC STI reports that hadn't previously been added
+source('data_processing/syphilis.manager/mmwr.data.R') #This puts ps.syphilis data (used to calculation proportion ps syphilis cases for msm) pulled manually from old MMWR reports
+
 
 # Aggregate Outcomes to MSA 
 syphilis.manager = data.manager

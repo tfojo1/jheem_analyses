@@ -2,7 +2,7 @@
 #
 # USAGE
 #   Launch over SSH (survives logout):
-#       nohup bash applications/SHIELD/launch_multiprocess_parallel_modular_stages.sh > applications/SHIELD/logs/launcher.out 2>&1 &
+#       nohup bash applications/SHIELD/launch_multiChain_stage3.sh > applications/SHIELD/logs/launcher.out 2>&1 &
 #   Kill Runs:
 #       pkill -u pkasaie1 -x R
 #       pkill -u pkasaie1 -f "Rscript"
@@ -67,10 +67,11 @@ all_except_ten_cities=(
 
 # ── set active cities and calibration codes here ───────────────────────────────
 CITIES=(
-    C.12060 C.12580 C.16980 C.26420 C.31080
+    C.12060 C.12580 C.16980 C.26420
+    C.33100 C.35620 C.38060 C.42660
 )
 CALIBRATION_CODES=(
-    calib.5.11.stage3.az
+    calib.7.30.stage3.az
 )
 N_CHAINS=4
 SCRIPT="$SCRIPT_DIR/shield_calib_setup_and_run_modular.R"

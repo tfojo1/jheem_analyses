@@ -1067,102 +1067,117 @@ get.max.covid.effect.sti.screening.reduction = function(specification.metadata){
 
 #-- STI SCREENING --# ----
 # OPTION1: Using logistic linear function
-get_sti_screening_functional_form_OPTION1 <- function(specification.metadata) {
-  # Get a cached object
-  # We read the HIV testing prior from BRFSS in, then shift it to serve as our STI screening functional form's priors
-  # (After implementation in the model, we will calculate HIV tests based on simulated sti screenings again and fit it against BRFSS)
-  #
-  hiv_testing_prior <- get.cached.object.for.version(name = "hiv.testing.prior",
-                                                     version = specification.metadata$version)
-
-  # Use HIV testing prior slope and intercept and shift to find STI screening functional form slope and intercept
-  # We will add log(0.5) assuming half the odds of an syphilis screen compared to the odds of an HIV test in the last year.
-  # The 0.9 that was in here was to say we never think we screen more than 90% of people in a stratum, and must subtract log(0.9) to compensate mathematically.
-  sti_screening_functional_form <- create.logistic.linear.functional.form(intercept = hiv_testing_prior$intercepts + log(0.5),
-                                                                          slope = hiv_testing_prior$slopes,
-                                                                          anchor.year = 2010,
-                                                                          max = 1,
-                                                                          parameters.are.on.logit.scale = T)
-
-
-  sti_screening_functional_form
-}
+# get_sti_screening_functional_form_OPTION1 <- function(specification.metadata) {
+#   # Get a cached object
+#   # We read the HIV testing prior from BRFSS in, then shift it to serve as our STI screening functional form's priors
+#   # (After implementation in the model, we will calculate HIV tests based on simulated sti screenings again and fit it against BRFSS)
+#   #
+#   hiv_testing_prior <- get.cached.object.for.version(name = "hiv.testing.prior",
+#                                                      version = specification.metadata$version)
+# 
+#   # Use HIV testing prior slope and intercept and shift to find STI screening functional form slope and intercept
+#   # We will add log(0.5) assuming half the odds of an syphilis screen compared to the odds of an HIV test in the last year.
+#   # The 0.9 that was in here was to say we never think we screen more than 90% of people in a stratum, and must subtract log(0.9) to compensate mathematically.
+#   sti_screening_functional_form <- create.logistic.linear.functional.form(intercept = hiv_testing_prior$intercepts + log(0.5),
+#                                                                           slope = hiv_testing_prior$slopes,
+#                                                                           anchor.year = 2010,
+#                                                                           max = 1,
+#                                                                           parameters.are.on.logit.scale = T)
+# 
+# 
+#   sti_screening_functional_form
+# }
 
 # OPTION2: Using linear spline function (provides the flexibility to change after modifier)
+# get_sti_screening_functional_form_OPTION2 <- function(specification.metadata) {
+#   hiv_testing_prior <- get.cached.object.for.version(name = "hiv.testing.prior",
+#                                                      version = specification.metadata$version)
+#   # specification.metadata=get.specification.metadata('shield',"C.12580")
+#   # HIV testing data starts in 2014, however, the anchor year that was used to fit the function was set at 2010
+#   expit = function(x){return(1/(1+exp(-x)))}
+#     sti_screening_functional_form <- create.linear.spline.functional.form(knot.times = c("2010"=2010,"2020"=2020),
+#                                                                           knot.values = list("2010"= expit(hiv_testing_prior$intercepts +log(.6)), #0.6 is the prior for ratio of syphilis to HIV testing
+#                                                                                              "2020"=expit(hiv_testing_prior$intercepts +log(.6)+ 
+#                                                                                                             hiv_testing_prior$slopes* (2020-2010))),
+#                                                                           link = "logit",
+#                                                                           knot.link="logit",
+#                                                                           knots.are.on.transformed.scale = F,
+#                                                                           after.time = 2030,
+#                                                                           after.modifier = .5,
+#                                                                           after.modifier.increasing.change.link = 'logit',
+#                                                                           after.modifier.decreasing.change.link = 'logit', 
+#                                                                           min=0,
+#                                                                           max=0.9
+#                                                                             )
+#     #logit(2030)=logit(2020)+ logit(2020)/logit(2010) * after_modifier
+#     # after modifier is unique for everyone
+#     sti_screening_functional_form
+#     
+# }
+
 get_sti_screening_functional_form_OPTION2 <- function(specification.metadata) {
   hiv_testing_prior <- get.cached.object.for.version(name = "hiv.testing.prior",
                                                      version = specification.metadata$version)
-  #
+  # specification.metadata=get.specification.metadata('shield',"C.12580")
+  # HIV testing data starts in 2014, however, the anchor year that was used to fit the function was set at 2010
   expit = function(x){return(1/(1+exp(-x)))}
-    sti_screening_functional_form <- create.linear.spline.functional.form(knot.times = c("2010"=2010,"2020"=2020),
-                                                                          knot.values = list("2010"= expit(hiv_testing_prior$intercepts +log(.5)),
-                                                                                             "2020"=expit(hiv_testing_prior$intercepts +log(.5)+ hiv_testing_prior$slopes* (2020-2010))),
-                                                                          link = "logit",
-                                                                          knot.link="logit",
-                                                                          knots.are.on.transformed.scale = F,
-                                                                          after.time = 2030,
-                                                                          after.modifier = .5,
-                                                                          after.modifier.increasing.change.link = 'logit',
-                                                                          after.modifier.decreasing.change.link = 'logit', 
-                                                                          min=0,
-                                                                          max=0.9
-                                                                            )
-    #logit(2030)=logit(2020)+ logit(2020)/logit(2010) * after_modifier
-    # after modifier is unique for everyone
-    sti_screening_functional_form
-    
-}
- 
-
-
+  val_2010= hiv_testing_prior$intercepts +log(.6)  #0.6 is the prior for ratio of syphilis to HIV testing
+  sti_screening_functional_form <- create.linear.spline.functional.form(knot.times = c("1990"=1990,"2000"=2000, "2010"=2010,"2020"=2020),
+                                                                        knot.values = list(
+                                                                          "1990"=expit(val_2010 +  hiv_testing_prior$slopes* (1990-2010)),
+                                                                          "2000"=expit(val_2010 +  hiv_testing_prior$slopes* (2000-2010)),
+                                                                          "2010"=expit(val_2010 ),
+                                                                          "2020"=expit(val_2010 +  hiv_testing_prior$slopes* (2020-2010))),
+                                                                        link = "logit",
+                                                                        knot.link="logit",
+                                                                        knots.are.on.transformed.scale = F,
+                                                                        after.time = 2030,
+                                                                        after.modifier = .5,
+                                                                        after.modifier.increasing.change.link = 'logit',
+                                                                        after.modifier.decreasing.change.link = 'logit', 
+                                                                        min=0,
+                                                                        max=0.9
+  )
+  #logit(2030)=logit(2020)+ logit(2020)/logit(2010) * after_modifier
+  # after modifier is unique for everyone
+  sti_screening_functional_form
+  
+} 
 
 #-- STI TO HIV TESTS RATIO --# ----
-get_sti_to_hiv_testing_ratio_functional_form <- function(specification.metadata) {
+get_syphilis_to_hiv_testing_ratio_functional_form <- function(specification.metadata) {
   # we use this to calculate hiv tests and fit them against BRFSS data
-  # since BRFSS is available seince 2014, we can anchor at that year 
-  #'@Andrew: to review with todd (should we keep logistic or use log.linear (allow values>1))
-  syphilis_to_hiv_testing_ratio_functional_form <-  create.logistic.linear.functional.form(intercept = 0.5,
-                                                                                        slope = 1,
-                                                                                        anchor.year = 2014,
+  syphilis_to_hiv_testing_ratio_functional_form <-  create.logistic.linear.functional.form(intercept = logit(0.6), # reported ratio of syphilis to HIV testing in MSM NHBS: PMID: 28604440
+                                                                                        slope = 0.0987, # on the logit scale: (logit(0.69) − logit(0.6)) / 4 = (0.8001 − 0.4055) / 4 = 0.0987
+                                                                                        anchor.year = 2010,
                                                                                         max = 1,
-                                                                                        parameters.are.on.logit.scale = F)
-  
+                                                                                        parameters.are.on.logit.scale = T)
   syphilis_to_hiv_testing_ratio_functional_form
 }
 
 #-- PRENTAL CARE BY TRIMESTER FUNCTIONAL FORM --# -----
 get.prp.prenatal.care.functional.form = function(specification.metadata,trimester){
   # cashed object from input_prenatal_prior_wonder
-  prenatal.care.prior = get.cached.object.for.version(name = paste0("prenatal.care.initiation.",trimester,".trimester.prior"),
+  prenatal.care.prior = get.cached.object.for.version(name = paste0("prenatal.care.initiation.",trimester,".prior"),
                                                       version = specification.metadata$version)
-  #' #'@Todd: this is fix for now but we should find the issue with these additional ages in the specifications
-  # browser()
-  # new_ages <- c('0-14 years',"45-49 years", "50-54 years", "55-64 years","65+ years")
-  # new_data=matrix(rep(0,15),nrow=5, dimnames = list(age=new_ages, race=c('black','hispanic','other')))
-  # dim(new_data)
-  # 
-  # prenatal.care.prior$intercepts <- rbind(prenatal.care.prior$intercepts, new_data)
-  # names( dimnames(prenatal.care.prior$intercepts ))=c('age','race')
-  # 
-  # prenatal.care.prior$slopes <- rbind(prenatal.care.prior$slopes,new_data)
-  # names( dimnames(prenatal.care.prior$slopes ))=c('age','race')
-  # 
-  prenatal.care.functional.form = create.logistic.linear.functional.form(intercept = prenatal.care.prior$intercepts - log(0.9), #helps counteract max value below a bit
+  # we use a max 90% but this is really capping the first-trimester care 
+  # if we want to ensure a structural floor on late/no care (~7%) we need to add lower cap to each trimester
+  prenatal.care.functional.form = create.logistic.linear.functional.form(intercept = prenatal.care.prior$intercepts - log(0.9), #The GLM gives you an intercept on the standard logit scale assuming max = 1.0. When you set max = 0.9, the function output at the same intercept value is scaled down by 0.9, so you need to inflate the intercept to recover the same probability. The code subtracts log(0.9) ≈ −(−0.105) = adds 0.105 to the logit-scale intercept
                                                                          slope = prenatal.care.prior$slopes,
-                                                                         anchor.year = 2010,
-                                                                         max = 0.9,
+                                                                         anchor.year = prenatal.care.prior$anchor.year,
+                                                                         max = 0.9, #The function becomes: P(t) = 0.9 / (1 + exp(−(α + β · t))) instead of 1.0 in the denominator. This is a structural assumption that at least ~10% of births will never receive prenatal care in this trimester, regardless of trends.
                                                                          parameters.are.on.logit.scale = T)
   prenatal.care.functional.form
 }
 
 get.prp.prenatal.care.functional.form.first.trimester<-function(specification.metadata){
-  get.prp.prenatal.care.functional.form(specification.metadata,"first")
+  get.prp.prenatal.care.functional.form(specification.metadata,trimester = "first.trimester")
 }
 get.prp.prenatal.care.functional.form.second.trimester.of.those.not.screened.first<-function(specification.metadata){
-  get.prp.prenatal.care.functional.form(specification.metadata,"second")
+  get.prp.prenatal.care.functional.form(specification.metadata,trimester = "second.trimester")
 }
 get.prp.prenatal.care.functional.form.third.trimester.of.those.not.screened.first.second<-function(specification.metadata){
-  get.prp.prenatal.care.functional.form(specification.metadata,"third")
+  get.prp.prenatal.care.functional.form(specification.metadata,trimester = "third.trimester")
 }
 
 #'@:Todd: need to add an option for the national model ----
@@ -1312,3 +1327,35 @@ get_doxy_coverage_functional_form<-function(specification.metadata) {
 # par(mfrow = c(1,2))
 # plot(t, logit_x, type = "l", main = "logit(x) — linear")
 # plot(t, x,       type = "l", main = "x — S-shaped logistic")
+
+## Initial population proportion of syphilis diagnosis 1970 -----
+# First, we need to estimate the POPULATION PROPORTION (RATE) of diagnosis in year 1970 as = "n diag/population size" 
+# Since diagnoses data is unavailable in 1970, we need to use another (later year) to approximate 1970
+# We will use the first year that data is reported in each city (1993)
+# Population Proportion (Rate)= #diagnosesin stage X / population size 
+# 1993 is the earliest year of data
+# proportion of PS diagnoses that are in the primary stage in 1970:
+# we estimate this as 25% based on duration of primary (4 weeks relative to PS duration of 12 months)
+get_popProp_primary_diag_1970<-function(location){
+  popProp.ps.diag.1970= 0.25 * 
+    SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location["1993",location]/
+    SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location["1993",location]
+  popProp.ps.diag.1970
+}
+get_popProp_secondary_diag_1970<-function(location){
+  popProp.ps.diag.1970= 0.75 * 
+    SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location["1993",location]/
+    SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location["1993",location]
+  popProp.ps.diag.1970
+}
+get_popProp_el_diag_1970<-function(location){
+  popProp.el.diag.1970= SURVEILLANCE.MANAGER$data$early.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location["1993",location]/
+    SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location["1993",location]
+  popProp.el.diag.1970
+}
+get_popProp_lu_diag_1970<-function(location){
+  popProp.lu.diag.1970= SURVEILLANCE.MANAGER$data$unknown.duration.or.late.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location["1993",location]/
+    SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location["1993",location]
+  popProp.lu.diag.1970
+}
+ 

@@ -1,9 +1,9 @@
 
-#see this example:
-### Estimating xxx
-### Data: xxx
-### Returning xxxx
-### called by  shield_calib_parameters.R
+### Estimating proportion of EL cases missed classified as LL or unknown, and vice versa
+### Data: Peterman 2005
+### Returning 2 proportions saved in the base parameters
+### called by  shield_base_parameters.R
+## ******************************* ******************************* ******************************* ******************************* ##
 
 ### Estimating the % of EL cases that are misclassified as LL/Unknown and LL/U cases misclassified as EL
 ### Data from a manuscript (see below)

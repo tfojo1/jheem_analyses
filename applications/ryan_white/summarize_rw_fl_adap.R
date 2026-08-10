@@ -2,7 +2,7 @@ library(ggplot2)
 
 FL.PLOT.DIR = '../../results/ryan_whit_fl_adap'
 
-INTERVENTION.CODE = 'rw.bik.end.26' # 'fl.adap.end.26', 'fl.adap.end.cons.26'
+INTERVENTION.CODE = 'adap.36.9.end.26' #'rw.bik.end.26' # 'fl.adap.end.26', 'fl.adap.end.cons.26'
 INTERVENTION.DESCRIPTION =  "Lose Biktarvy Access" # "50% Cut to ADAP"
 PLOT.TITLE = "Lose Biktarvy Access"  # "Cessation"
 PLOT.FILE.NAME = 'fl_no_biktarvy' #' fl_adap_cut'

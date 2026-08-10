@@ -1,5 +1,14 @@
+library(rlang)
+library(locations) # Must call library(locations) prior to sourcing this file
 
-# Must call library(locations) prior to sourcing this file
+# The Oakland TGA is built into the locations package as of 0.4.0, so it does not
+# need to be registered here. Fail early with a clear message if the installed
+# package is too old, rather than erroring later inside the location manager.
+if (packageVersion("locations") < "0.4.0")
+    stop("Your `locations` package is out of date (",
+         packageVersion("locations"), "; need >= 0.4.0, which adds the Oakland TGA).\n",
+         "  Update with: devtools::install_github('tfojo1/locations')\n",
+         "  Then RESTART R -- reinstalling does not replace the copy already loaded.")
 
 ##-------------------------------##
 ##-- MSAs DEFINED AS CONSTANTS --##
@@ -153,4 +162,5 @@ EHE.MSAS = MSAS.OF.INTEREST[1:32]
 
 SHIELD.EIGHT.MSAS = MSAS.OF.INTEREST[sort(c("NYC", "Miami", "Chicago", "Phoenix", "Houston", "LA", "Atlanta", "Baltimore"))]
 SHIELD.TEN.MSAS = MSAS.OF.INTEREST[sort(c("NYC", "Miami", "Chicago", "Phoenix", "Houston", "LA", "Atlanta", "Baltimore","Seattle","Philadelphia"))]
+
 

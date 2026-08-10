@@ -22,6 +22,13 @@ TECH2CHECK.RECRUIT.YOUTH.AGES <- '13-24 years'
 # original single-band model. See docs/plan_broaden_pool.md.
 TECH2CHECK.RECRUIT.ADULT.AGES <- '25-34 years'
 
+# Older-adult recruitment band (35-44) for the "under-44" ladder rung. The screen
+# (age_pool_screen.R) found 35-44 is the second-largest diagnosed pool, and a much
+# more plausible transport target than 55+. Added as a SEPARATE band (defaults to
+# 0) so the 25-34 scenarios stay reproducible -- non-overlapping with youth/adult,
+# and the effect-adult OR (25+) already covers it, so it needs no OR change.
+TECH2CHECK.RECRUIT.OLDER.AGES <- '35-44 years'
+
 # Effect-adult age set for the suppression OR (#35): 25+ (all bands at/above 25),
 # NOT just the 25-34 recruitment band. Under current-age semantics individuals
 # age across bands while enrolled (confirmed in verify_broaden_recruitment.R), so
@@ -87,6 +94,11 @@ register.model.element(TECH2CHECK.SPECIFICATION,
                        scale = 'rate',
                        value = 0)
 
+register.model.element(TECH2CHECK.SPECIFICATION,
+                       name = 'tech2check.recruitment.rate.older',
+                       scale = 'rate',
+                       value = 0)
+
 # Age dispatcher: default 0 (no recruitment); the youth/adult age bands override
 # to their band-specific underlying rate element. Non-overlapping subsets
 # (13-24 vs 25-34) -- overlapping-subset precedence is unverified in jheem2
@@ -106,6 +118,11 @@ register.model.quantity.subset(TECH2CHECK.SPECIFICATION,
                                name = 'tech2check.recruitment.rate',
                                value = 'tech2check.recruitment.rate.adult',
                                applies.to = list(age = TECH2CHECK.RECRUIT.ADULT.AGES))
+
+register.model.quantity.subset(TECH2CHECK.SPECIFICATION,
+                               name = 'tech2check.recruitment.rate',
+                               value = 'tech2check.recruitment.rate.older',
+                               applies.to = list(age = TECH2CHECK.RECRUIT.OLDER.AGES))
 
 register.transition(TECH2CHECK.SPECIFICATION,
                     dimension = 'continuum',
@@ -315,7 +332,8 @@ track.integrated.outcome(TECH2CHECK.SPECIFICATION,
                          multiply.by = 'tech2check.recruitment.rate',
                          subset.dimension.values = list(continuum = 'diagnosed_chronic',
                                                         age = c(TECH2CHECK.RECRUIT.YOUTH.AGES,
-                                                                TECH2CHECK.RECRUIT.ADULT.AGES)),
+                                                                TECH2CHECK.RECRUIT.ADULT.AGES,
+                                                                TECH2CHECK.RECRUIT.OLDER.AGES)),
                          keep.dimensions = c('location','age','race','sex','risk'))
 
 track.integrated.outcome(TECH2CHECK.SPECIFICATION,
@@ -344,6 +362,20 @@ track.integrated.outcome(TECH2CHECK.SPECIFICATION,
                          multiply.by = 'tech2check.recruitment.rate.adult',
                          subset.dimension.values = list(continuum = 'diagnosed_chronic',
                                                         age = TECH2CHECK.RECRUIT.ADULT.AGES),
+                         keep.dimensions = c('location','age','race','sex','risk'))
+
+track.integrated.outcome(TECH2CHECK.SPECIFICATION,
+                         name = 'tech2check.enrollments.older',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Tech2Check Enrollments (Older 35-44)',
+                                                                    description = "Number of Adults (35-44) Enrolling in Tech2Check in the Past Year",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Enrollments',
+                                                                    units = 'persons',
+                                                                    singular.unit = 'person'),
+                         value.to.integrate = 'infected',
+                         multiply.by = 'tech2check.recruitment.rate.older',
+                         subset.dimension.values = list(continuum = 'diagnosed_chronic',
+                                                        age = TECH2CHECK.RECRUIT.OLDER.AGES),
                          keep.dimensions = c('location','age','race','sex','risk'))
 
 # Population in each lifecycle compartment (continuum kept to break out by state).

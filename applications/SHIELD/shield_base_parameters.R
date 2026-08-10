@@ -5,6 +5,7 @@
 # source("../jheem_analyses/applications/SHIELD/inputs/x-input_untreated_syphilis_progression_rates.R)
 # source("../jheem_analyses/applications/SHIELD/inputs/input_congenital_relative_risks.R")
 # source(../jheem_analyses/applications/SHIELD/inputs/input_fraction_hiv_test_by_age.R)
+# source(../jheem_analyses/applications/SHIELD/inputs/input_syphilis_misclassification_error.R)
 
 # what are the citation numbers?
 add.parameter <- function(params, param.name,
@@ -30,46 +31,89 @@ SHIELD_BASE_PARAMETER = list(values=numeric(),
 # ci's are not used
 # citation numbers are pubmed ID, they're for our own records'
 
-# *** INITIAL POPULATION INFECTED in 1970 ---- ## ----
-# Because the true size of infected compartments are unknown, we approximate them based on number of new diagnosis (and will add multipliers to tune the true compartment sizes in the model). 
-# First, we need to estimate the POPULATION PROPORTION (RATE) of diagnosis in year 1970 as = "n diag/population size" 
-# Since diagnoses data is unavailable in 1970, we need to use another (later year) to approximate 1970
-# We will use the first year that data is reported in each city 
-# Population Proportion (Rate)= #diagnosesin stage X / population size 
+# *** SYPHILIS NATURAL HISTORY *** ##-----
+## STATE DURATIONS ----
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.primary',
+                                      4/52, 0,0) #2-6weeks 
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.secondary',
+                                      2/12, 0,0) #1-3 months
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.early.latent',
+                                      9/12, 0,0) #9-11 months (to sum to 1year with secondary)
 
-# Finding the first year of reporting:
-#'@Andrew: this is based on C.12580 now. How can we generalize to other locations?
-x=SURVEILLANCE.MANAGER$data$total.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location[,'C.12580']
-y0=names(x)[!is.na(x)][1] #1993 in baltimore
+# Assuming a duration of 1 month for tertiary and cns: they're symptomatic stages, followed by immediate testing 
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.tertiary',
+                                      1/12,0,0) #average of 1 month
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.cns',
+                                      1/12,0,0) #average of 1 month
 
-# Estimating the population proportion of diagnoses in each stage in the max year (num: # of diag / denom: population)
-popProp.ps.diag.1970= SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location[y0,'C.12580']/SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location[y0,'C.12580']
-popProp.el.diag.1970= SURVEILLANCE.MANAGER$data$early.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location[y0,'C.12580']/SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location[y0,'C.12580']
-popProp.lu.diag.1970= SURVEILLANCE.MANAGER$data$unknown.duration.or.late.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location[y0,'C.12580']/SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location[y0,'C.12580']
-
-# save these to use in the model (populationProportion of diagnosis in each stage in 1970)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'popProp.ps.diag.1970',
-                                      popProp.ps.diag.1970,0,0)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'popProp.el.diag.1970',
-                                      popProp.el.diag.1970,0,0)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'popProp.lu.diag.1970',
-                                      popProp.lu.diag.1970,0,0)
-
-# proportion of PS diagnoses that are in the primary stage in 1970
-# we estimate this as 25% based on duration of primary (4 weeks relative to PS duration of 12 months)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.ps.in.primary.stage.1970',
+## TRANSITION RATES ----
+# RELAPSE: 25% of persons leaving EL go to secondary, the rest go to LL
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.early.latent.to.secondary',
                                       0.25,0,0)
 
-# *** INFECTIOUSNESS ---- ## ----
+# Early stages to CNS: #used for primary, secondary and EL
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.early.stage.to.cns',
+                                      0.015 ,0,0) #0.012-0.017
+# Late Latent to CNS: inputs/untreated_syphilis_progression_rates.R
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.cns.male',
+                                      0.0045 ,0,0) #[95% CI: 0.0028 - 0.0062]
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.cns.female',
+                                      0.0022 ,0,0) #[95% CI: 0.0014 - 0.0031] 
+
+# Late Latent to Tertiary: inputs/untreated_syphilis_progression_rates.R
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.tertiary.male',
+                                      0.0102,0,0) #0.0085 - 0.0119
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.tertiary.female',
+                                      0.0099 ,0,0) #0.0079 – 0.0119
+## *** CARE CASCADE *** ----
+## SYMPTOMATIC INFECTIONS ----                        
+## Fraction with symptomatic disesase: changed as calib params
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.msm',
+                                      0.25, 0,0)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.prp.symptomatic.primary.female', #relative to MSM
+                                      0.66, 0,0)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.prp.symptomatic.primary.heterosexual_male',#relative to MSM
+                                      1, 0,0)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.secondary',
+                                      0.16, 0,0)                                      
+## HIV TESTING ##-----
+# inputs/input_fraction_hiv_test_by_age.R
+# what fraction of tests reported in 15-19 agegroup are carried among 18-19 year olds
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.hiv.tests.18.19.among.15.19',
+                                      0.62, 0,0,
+                                      citation = "input_fraction_hiv_test_by_age.R")
+## MISCLASSIFICATION ERROR -----
+# source("applications/SHIELD/inputs/input_syphilis_misclassification_error.R")
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.el.misclassified.ll',
+                                      0.096, 0,0)
+
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.ll.misclassified.el',
+                                      0.272, 0,0)
+
+#*** TREATMENTS INITIATION  **** ## ---- 
+#*#'@PK:double check
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.screening', 
+                                      0.89,0,0)
+
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.symptomatic.testing', 
+                                      0.89,0,0)
+#differences by stage of infection (early vs late) was too small to include 
+
+#if someone is diagnosed and doesn't receive immediate treatment, what is the rate of treatment
+#'@Todd: should we separate this based on symptoms? or for pregnant women? 
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.treatment.after.delay', 
+                                      1.91,0,0) 
+
+# *** TRANSMISSION ****  ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'secondary.transmissibility',  
                                       1,0,0)  # Max value
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'primary.rel.secondary.transmissibility',  
                                       1,0,0) 
- 
+
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'el.rel.secondary.transmissibility',  
                                       .25,0,0)
 
-## ---- SEXUAL TRANSMISSION RATES ---- ##----
+## SEXUAL TRANSMISSION RATES ---- ##----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'male.to.female.sexual.transmission',
                                       4.75, 2.4, 7.1,
                                       citation=26362321) 
@@ -84,20 +128,43 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.msm.sex.with.f
                                       0.18, 0.18*5, 0.18*2,
                                       citation=9525438) 
 
-# *** CONGENITAL SYPHILIS ---- ##----
-# Boolean variable to control prenatal care as a switch
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'b.model.prenatal.care',
-                                      1,0,0)
 
+# *** NEW BIRTHS ---- ##----
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'ratio.birth.male.to.female',
+                                      1.048,0,0) # 1.04, 1.06
+## Prop Multibirths
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.births.multi.born', #proportion of births that are multibirth
+                                      0.031,0,0) #we are not including the trend here
+
+
+
+# *** CONTACT TRACING ---- ## ----
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'B.MODEL.CONTACT.TRACING',
+                                      0,0,0)   # SWITCH OO TURN ON/OFF CONTACT TRACING
+
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.index.cases.reached.for.contact.tracing',
+                                      0.8,0,0)   #0.3, 0.98
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'contacts.diagnosed.treated.per.index.case',
+                                      0.1, 0,0) #.05, 0.2,
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'contacts.empirically.treated.infected.per.index.case',
+                                      0.1, 0,0) #0.04, 0.19,
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.primary',
+                                      0.1425, 0,0)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.secondary',
+                                      0.4275, 0,0)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.early.latent',
+                                      0.215, 0,0)
+
+# *** CONGENITAL SYPHILIS ---- ##----
+# Boolean variable to control prenatal care and congenital syphilis as a switch
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'B.MODEL.PRENATAL.AND.CS',
+                                     0,0,0) # SWITCH TO TURN ON/OFF PRENATAL CARE ADN CONGENITAL SYPHILIS
 
 ## ---- Prob of Vertical Transmission Based on Disease Stage -----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.early.syphilis',
-                                      0.5,0.3,0.6,
-                                      citation = "syphilis_natural_history.docx") 
+                                      0.5,0,0) #0.3 - 0.70 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.late.syphilis',
-                                      0.1,0.05,0.15,
-                                      citation = "syphilis_natural_history.docx") 
-
+                                      0.1,0,0)# 0.02 - 0.2
 
 ## ---- Risk Ratios Based on Prenatal Cares timing  ----
 # inputs/input_congenital_relative_risks.R
@@ -112,116 +179,6 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syph
                                       0.5160727, 0,0)
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.care.third.trimester',
                                       0.8182090, 0,0)
-
-# *** NEW BIRTHS ---- ##----
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'ratio.birth.male.to.female',
-                                      1.048, 1.04, 1.06,
-                                      citation = "syphilis_natural_history.docx")
-## ---- Prop Multibirths -----
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.births.multi.born', #proportion of births that are multibirth
-                                      0.031,0.031,0.031) #we are not including the trend here
-# *** NATURAL HISTORY ---- ##-----
-## ---- STATE DURATIONS ---- assuming as fixed 
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.primary',
-                                      4/52, 0,0, #2-6weeks 
-                                      citation = "syphilis_natural_history.docx")
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.secondary',
-                                      2/12, 0,0, #1-3 months
-                                      citation = "syphilis_natural_history.docx")
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.early.latent',
-                                      9/12, 0,0, #9-11 months (to sum to 1year with secondary)
-                                      citation = "syphilis_natural_history.docx")
-
-# Assuming a duration of 1 month for tertiary and cns: they're symptomatic stages, followed by immediate testing 
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.tertiary',
-                                      1/12,0,0, #average of 1 month
-                                      citation = "syphilis_natural_history.docx")
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.cns',
-                                      1/12,0,0, #average of 1 month
-                                      citation = "syphilis_natural_history.docx")
-
-## ---- TRANSITION RATES ----
-# RELAPSE: 25% of persons leaving EL go to secondary, the rest go to LL
-
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.early.latent.to.secondary',
-                                      0.25,0,0)
-
-# Early stages to CNS: #used for primary, secondary and EL
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.early.stage.to.cns',
-                                      0.085 ,0,0,# 0.05, 0.12,
-                                      citation = "syphilis_natural_history.docx")
-
-# Late Latent to Tertiary:
-# see  inputs/untreated_syphilis_progression_rates.R
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.tertiary.male',
-                                      0.010771530, 0.009749247, 0.011793814)
-
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.tertiary.female',
-                                      0.010346077, 0.008499934, 0.012192221)
-
-# Late Latent to CNS (by sex):
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.cns.male',
-                                      0.004538942,0,0)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.cns.female',
-                                      0.002246082,0,0)
-
-## ---- SYMPTOMATIC INFECTIONS ----                        
-## Fraction with symptomatic disesase: changed as calib params
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.msm',
-                                      0.25, 0,0)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.prp.symptomatic.primary.female',
-                                       0.66, 0,0)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.prp.symptomatic.primary.heterosexual_male',
-                                      1, 0,0)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.secondary',
-                                      0.16, 0,0)                                      
-
-# *** HIV TESTING ---- ##-----
-# inputs/input_fraction_hiv_test_by_age.R
-# what fraction of tests reported in 15-19 agegroup are carried among 18-19 year olds
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.hiv.tests.18.19.among.15.19',
-                                      0.62, 0,0,
-                                      citation = "input_fraction_hiv_test_by_age.R")
-
-
-# *** CONTACT TRACING ---- ## ----
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.index.cases.reached.for.contact.tracing',
-                                      0.8,0,0)   #0.3, 0.98
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'contacts.diagnosed.treated.per.index.case',
-                                      0.1, 0,0) #.05, 0.2,
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'contacts.empirically.treated.infected.per.index.case',
-                                      0.1, 0,0) #0.04, 0.19,
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.primary',
-                                      0.1425, 0,0)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.secondary',
-                                      0.4275, 0,0)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.early.latent',
-                                      0.215, 0,0)
-
-
-#*** MISCLASSIFICATION ERROR **** ## -----
-# source("applications/SHIELD/inputs/input_syphilis_misclassification_error.R")
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.el.misclassified.ll',
-                                      0.096, 0,0)
-
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.ll.misclassified.el',
-                                      0.272, 0,0)
-
-
-#*** TREATMENTS INITIATION  **** ## ---- 
-#*#'@PK:double check
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.screening', 
-                                      0.89,0,0)
-
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.symptomatic.testing', 
-                                      0.89,0,0,
-                                      citation = "syphilis_natural_history.docx")
-#differences by stage of infection (early vs late) was too small to include 
-
-#if someone is diagnosed and doesn't receive immediate treatment, what is the rate of treatment
-#'@Todd: should we separate this based on symptoms? or for pregnant women? 
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.treatment.after.delay', 
-                                      1.91,0,0) 
 
 ## ********** -----
 SHIELD_BASE_PARAMETER_VALUES = SHIELD_BASE_PARAMETER$values

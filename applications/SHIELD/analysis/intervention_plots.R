@@ -10,25 +10,37 @@ source("../jheem_analyses/applications/SHIELD/shield_source_code.R")
 source("../jheem_analyses/applications/SHIELD/shield_calib_register.R")
 source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions.R')
 
-
 # ---- SETUP ----
-calibration.codes <- c(
-    "calib.6.12.stage2.az",
-    "calib.6.12.stg2.penalty"
+LOCATIONS        <- SHIELD.TEN.MSAS    # Named vector: names = city, values = codes
+CALIBRATION.CODE <- "calib.7.16.stage3.az"  
+N.SIM <- 400
+BASE.PATH <- paste0(ROOT.DIR,"/simulations/shield")
+
+
+INTERVENTION.LABELS <- c(
+    noint        = "No Doxy-PEP Intervention",
+    doxy.u.100.p.100   = "Uptake 100% Persistence 100%",
+    doxy.u.50.p.100   = "Uptake 50% Persistence 100%",
+    doxy.u.100.p.50   = "Uptake 100% Persistence 50%",
+    doxy.u.50.p.50   = "Uptake 50% Persistence 50%",
+    doxy.kingCounty="Uptake 15%, 40% and then 100%"
+    
+)
+INTERVENTION.CODES <- names(INTERVENTION.LABELS)
+
+# ---- READ SIMULATIONS ----
+
+int.simsets <- load.int.simsets(
+    locations           = LOCATIONS,
+    intervention.codes  = INTERVENTION.CODES,
+    calibration.code    = CALIBRATION.CODE,
+    n.sim               = N.SIM,
+    base.path           = BASE.PATH,
+    intervention.labels = INTERVENTION.LABELS,
+    append=T
 )
 
-intervention.codes <-c(
-    "noint",
-    "doxy.u.100.p.100",
-    "doxy.rapid.uptake"
-)
-# read simulations into the simset
-int.simsets <- load.int.simsets(
-    locations         = SHIELD.TEN.MSAS[10],
-    n.sim = 300,
-    intervention.codes = intervention.codes,
-    calibration.codes = calibration.codes
-)
+ 
 
 
 # Outcome sets used across examples below
@@ -38,29 +50,34 @@ int.simsets <- load.int.simsets(
 
 
 plot.int.location(int.simsets = int.simsets,
-                  location = "Seattle",
-                  # calib.code ="calib.6.12.stage2.az",
-                  calib.code ="calib.6.12.stg2.penalty",
-                  interventions =intervention.codes,
-                  outcomes = c("diagnosis.total", "diagnosis.ps", "diagnosis.el.misclassified", "diagnosis.late.misclassified","hiv.testing","doxy.uptake"),
-                  # facet.by = "sex",
-                  # plot.which = "sim.only",
-                  years = c(2018:2025),
+                  location = names(LOCATIONS[1]),
+                  calib.code =CALIBRATION.CODE,
+                  interventions =INTERVENTION.CODES,
+                  outcomes = c("diagnosis.total", "diagnosis.ps", "diagnosis.el.misclassified", "diagnosis.late.misclassified",
+                               "hiv.testing","prop.male.ps.diag.among.msm", "doxy.uptake"),
+                  years = c(2018:2030),
                   save = T,create.dirs = T )
 
-plot.int.location(int.simsets = int.simsets,
-                  location = "Seattle",
-                  # calib.code ="calib.6.12.stage2.az",
-                  calib.code ="calib.6.12.stg2.penalty",
-                  interventions =intervention.codes,
-                  outcomes = c("diagnosis.total"),
-                  facet.by = "sex",
-                  plot.which = "sim.only",
-                  years = c(2018:2025),
-                  save = T,create.dirs = T )
-
-
-
+ 
+plot.int.comparison(
+    int.simsets = int.simsets,
+    calibration.codes = CALIBRATION.CODE,
+    interventions = INTERVENTION.CODES, 
+    locations = LOCATIONS,
+    outcomes          = c("diagnosis.total"),
+    
+    separate.by       = "outcome",
+    years = 2018:2030,
+    # nrow=2,
+    folder.name       = "7.16.accross.locations", 
+    # facet.by = "sex",
+    save              = TRUE,
+    create.dirs       = TRUE,
+    style.manager     = int.style.manager(
+        intervention.labels = INTERVENTION.CODES,
+        calibration.codes   = CALIBRATION.CODE
+    )
+)
 # ****************************************************************************************************
 # 1. COMPARE BOTH CALIBRATIONS ACROSS ALL CITIES — SEPARATE BY OUTCOME ----
 # ****************************************************************************************************

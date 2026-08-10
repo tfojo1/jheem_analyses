@@ -217,29 +217,30 @@ for (data in msa.totals.put) {
     details = 'CDC STI Surveillance Reports')
 }
 
-#Re-calculate the total diagnoses by removing congenital cases -------------------------------------------------------------------------
-#This will replace the total.diagnoses above:
-#Added this 12-8-25 to align the PDF report total diagnoses with Atlas Plus total diagnoses
-
-total.dx <- as.data.frame.table(data.manager$data$total.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location)%>%rename(total.diagnoses = Freq)
-
-congenital.dx <- as.data.frame.table(data.manager$data$congenital.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location)%>%rename(congenital.diagnoses = Freq)
-
-corrected.total = merge(total.dx, congenital.dx, by = c("year", "location"))
-
-corrected.total <- corrected.total%>%
-    mutate(value = (total.diagnoses - congenital.diagnoses))%>%#this represents total syphilis cases with congenital removed
-    mutate(outcome = "total.syphilis.diagnoses")%>%
-    mutate(year = as.character(year))%>%
-    mutate(location = as.character(location))
-
-
-data.manager$put.long.form(
-    data = corrected.total,
-    ontology.name = 'cdc.pdf.report',
-    source = 'cdc.sti.surveillance.reports',
-    url = 'https://www.cdc.gov/sti-statistics/media/pdfs/2024/07/1997-Surveillance-Report.pdf',
-    details = 'CDC STI Surveillance Reports')
+#Removing this because Nick's code does it through aggregating:
+# #Re-calculate the total diagnoses by removing congenital cases -------------------------------------------------------------------------
+# #This will replace the total.diagnoses above:
+# #Added this 12-8-25 to align the PDF report total diagnoses with Atlas Plus total diagnoses
+# 
+# total.dx <- as.data.frame.table(data.manager$data$total.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location)%>%rename(total.diagnoses = Freq)
+# 
+# congenital.dx <- as.data.frame.table(data.manager$data$congenital.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location)%>%rename(congenital.diagnoses = Freq)
+# 
+# corrected.total = merge(total.dx, congenital.dx, by = c("year", "location"))
+# 
+# corrected.total <- corrected.total%>%
+#     mutate(value = (total.diagnoses - congenital.diagnoses))%>%#this represents total syphilis cases with congenital removed
+#     mutate(outcome = "total.syphilis.diagnoses")%>%
+#     mutate(year = as.character(year))%>%
+#     mutate(location = as.character(location))
+# 
+# 
+# data.manager$put.long.form(
+#     data = corrected.total,
+#     ontology.name = 'cdc.pdf.report',
+#     source = 'cdc.sti.surveillance.reports',
+#     url = 'https://www.cdc.gov/sti-statistics/media/pdfs/2024/07/1997-Surveillance-Report.pdf',
+#     details = 'CDC STI Surveillance Reports')
 
 
 # MSA - Stratified Data ---------------------------------------------------
@@ -720,3 +721,45 @@ for (data in neurosyphilis.clean.put) {
     url = 'https://www.cdc.gov/sti-statistics/media/pdfs/2024/07/1997-Surveillance-Report.pdf',
     details = 'CDC STI Surveillance Reports. Neurosyphilis cases are not included with Total Syphilis cases but are included in the late and late latent syphilis cases.')
 }
+
+
+#=============================================================================
+#National- Congenital Syphilis by Race
+#============================================================================
+national.congenital.by.race <- read_excel("Q:/data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/national.stratified/US Congenital Syphilis by Race_CDC PDF Reports.xlsx")
+
+national.congenital.by.race.clean <- national.congenital.by.race%>%
+    mutate(race.new = case_when(race == "white" ~ "white, non hispanic",
+                                race == "black" ~"black, non hispanic",
+                                race == "hispanic" ~ "hispanic",
+                                race == "asian" ~ "asian pacific islander",
+                                race == "asian/PI" ~ "asian pacific islander",
+                                race == "native hawaiian" ~ "asian pacific islander",
+                                race == "american indian/alaska native" ~ "american indian alaska native",
+                                race == "multiracial" ~ "multiracial",
+                                race == "other" ~ "unknown",
+                                race == "other/unknown" ~ "unknown",
+                                race == "unknown" ~ "unknown"))%>%
+    group_by(outcome, year, location, race.new)%>%
+    mutate(new.value = sum(value))%>%
+    select(-race, -value)%>%
+    rename(value = new.value)%>%
+    rename(race = race.new)
+    
+    national.congenital.by.race.clean$year = as.character(national.congenital.by.race.clean$year)
+    national.congenital.by.race.clean$value = as.numeric(national.congenital.by.race.clean$value)
+    
+    national.congenital.by.race.clean = as.data.frame(national.congenital.by.race.clean)
+    
+
+    #Put:
+#Redistribute race = multiracial; unknown
+    
+        data.manager$put.long.form(
+            data = national.congenital.by.race.clean,
+            ontology.name = 'cdc.pdf.report',
+            source = 'cdc.sti.surveillance.reports',
+            dimension.values.to.distribute = list(race=c('multiracial', 'unknown')),
+            url = 'https://www.cdc.gov/sti-statistics/media/pdfs/2024/07/1997-Surveillance-Report.pdf',
+            details = 'CDC STI Surveillance Reports')
+

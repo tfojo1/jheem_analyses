@@ -36,6 +36,9 @@ source('data_processing/syphilis.manager/syphilis.processing.for.merging/compute
 # Aggregate Outcomes from County to MSA using a New Method-2026 (Andrew) 
 source('data_processing/syphilis.manager/syphilis.processing.for.merging/new.aggregation.method.R')
 
+# Calculates outcomes 'estimated.count.msm' and 'ps.diag.rate.among.msm': 
+source('data_processing/syphilis.manager/ps.diag.rate.among.msm.R')
+
 # Inspect Marginals QA Check ----------------------------------------------
 syphilis.manager$inspect_marginals()
 

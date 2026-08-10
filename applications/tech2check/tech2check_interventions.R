@@ -50,6 +50,7 @@ TECH2CHECK.END.YEAR   <- 2030
 make.tech2check.intervention <- function(recruitment.rate       = 0.5,   # legacy: YOUTH rate (adult defaults to 0)
                                          recruitment.rate.youth = NULL,
                                          recruitment.rate.adult = NULL,
+                                         recruitment.rate.older = NULL,  # 35-44 band ("under-44" ladder rung)
                                          on.or        = NULL,   # legacy: sets BOTH youth + adult
                                          recently.or  = NULL,
                                          distantly.or = NULL,
@@ -67,6 +68,7 @@ make.tech2check.intervention <- function(recruitment.rate       = 0.5,   # legac
     # and is NOT silently broadened. Explicit `recruitment.rate.youth/.adult` override.
     youth.rate <- if (!is.null(recruitment.rate.youth)) recruitment.rate.youth else recruitment.rate
     adult.rate <- if (!is.null(recruitment.rate.adult)) recruitment.rate.adult else 0
+    older.rate <- if (!is.null(recruitment.rate.older)) recruitment.rate.older else 0  # 35-44, default 0
 
     # Validate inputs up front (before scenario configs start passing these around):
     # a malformed rate should error loudly, not silently fall through the
@@ -81,6 +83,7 @@ make.tech2check.intervention <- function(recruitment.rate       = 0.5,   # legac
     }
     require.scalar(youth.rate, 'recruitment.rate.youth')
     require.scalar(adult.rate, 'recruitment.rate.adult')
+    require.scalar(older.rate, 'recruitment.rate.older')
 
     # Resolve youth/adult ORs (#35). Legacy `on.or` etc. set BOTH bands (harmless:
     # in the youth-only base no adult carries an OR, since adult recruitment is 0);
@@ -126,6 +129,8 @@ make.tech2check.intervention <- function(recruitment.rate       = 0.5,   # legac
     effects <- list(rate.effect('tech2check.recruitment.rate.youth', youth.rate))
     if (adult.rate > 0)
         effects <- c(effects, list(rate.effect('tech2check.recruitment.rate.adult', adult.rate)))
+    if (older.rate > 0)  # 35-44 band: the "under-44" ladder rung; 0 = no-op
+        effects <- c(effects, list(rate.effect('tech2check.recruitment.rate.older', older.rate)))
 
     # Optional OR overrides on the six youth/adult x {on,recently,distantly}
     # quantities (resolved + validated above). scale = 'ratio' matches the OR

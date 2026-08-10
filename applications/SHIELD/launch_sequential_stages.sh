@@ -2,7 +2,7 @@
 #
 # USAGE
 #   Launch over SSH (survives logout):
-#       nohup bash applications/SHIELD/launch_multiprocess_sequential_stages.sh > applications/SHIELD/logs/launcher.out 2>&1 &
+#       nohup bash applications/SHIELD/launch_sequential_stages.sh > applications/SHIELD/logs/launcher.out 2>&1 &
 #   Kill Runs:
 #       pkill -u pkasaie1 -x R
 #       pkill -u pkasaie1 -f "Rscript"
@@ -68,8 +68,8 @@ CITIES=("${ten_cities[@]}")
 # Calibration codes run sequentially per city — each is a separate Rscript process
 # so the OS fully reclaims memory between them
 CALIBRATION_CODES=(
-    calib.5.7.stage0.pk
-    calib.5.7.stage1.pk
+    calib.7.10.stage0.pk
+    calib.7.10.stage1.pk
 )
 
 SCRIPT="$SCRIPT_DIR/shield_calib_setup_and_run.R"

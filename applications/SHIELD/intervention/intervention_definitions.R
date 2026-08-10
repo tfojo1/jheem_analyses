@@ -47,11 +47,11 @@ DOXY.PARAMS <- matrix(effectiveness_samples,
 # U is the proportion of eligible population filling a prescription for doxy (regardless app having been on Doxy before)
 # C is the proportion of eligible population receiving doxyPep by the end of the year?
 
-# Intervention control uptake levels
 clear.interventions() 
 
-for (uptake in c(100)){ # change to full range later on [20-100]
-    for (persistence in c(100)){ # change to full range later on [20-100]
+# scenario1: hyp uptake persistence combo ----
+for (uptake in c(50,100)){ # change to full range later on [20-100]
+    for (persistence in c(50,100)){ # change to full range later on [20-100]
         
         # uptake is scaled up linearly
         uptake.effect =  create.intervention.effect(
@@ -86,8 +86,8 @@ for (uptake in c(100)){ # change to full range later on [20-100]
     }
 }
 
+# scenario2: kingcounty sceale up + full persistence ----
 {
-    # uptake is scaled up fast similar to kingcounty
     uptake.effect =  create.intervention.effect(
         quantity.name    = "doxy.uptake",
         effect.values    = c(0.15,0.4,1),
@@ -114,13 +114,14 @@ for (uptake in c(100)){ # change to full range later on [20-100]
           persistence.effect),
         parameters = DOXY.PARAMS,
         WHOLE.POPULATION, 
-        code = paste0("doxy.rapid.uptake")
+        code = paste0("doxy.kingCounty")
     )
-    print(paste0("created: ", "doxy.rapid.uptake"))
+    print(paste0("created: ", "doxy.kingCounty"))
 }
-    noint = get.null.intervention()
+#no int ---
+noint = get.null.intervention()
 
-    print(paste0("created: ", "noint"))
+print(paste0("created: ", "noint"))
 
 # # NEW ----
 # if (1==2)

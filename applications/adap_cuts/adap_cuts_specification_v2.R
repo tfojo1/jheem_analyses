@@ -1,25 +1,25 @@
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
 
 
-INSURANCE.CATEGORIES = c('medicaid.only',
-                         'medicare.only',
-                         'dual.medicare.medicaid.only',
-                         'private.only',
+INSURANCE.CATEGORIES = c('medicaid.only', 
+                         'medicare.only', 
+                         'dual.medicare.medicaid.only', 
+                         'private.only', # 
                          'uninsured.only',
                          'medicaid.and.uninsured',
                          'medicare.and.uninsured',
                          'dual.medicare.medicaid.and.uninsured',
-                         'private.and.uninsured',
-                         'dual.medicare.medicaid.and.medicaid',
-                         'dual.medicare.medicaid.and.medicare'
+                         'private.and.uninsured'
+                         #'dual.medicare.medicaid.and.medicaid',
+                         #'dual.medicare.medicaid.and.medicare'
                          )
 ADAP.SERVICE.CATEGORIES = c('full.pay.only', # F 
-                            'premium.only', # P renamed from: premium.without.cost.sharing
+                            'premium.only', # P 
                             'premium.and.cost.sharing', # PCs 
-                            'cost.sharing.only', # Cs # renamed from: cost.sharing.without.premium
-                            'full.pay.and.premium', # FP # renamed from: full.pay.and.premium.without.cost.sharing
+                            'cost.sharing.only', # Cs  
+                            'full.pay.and.premium', # FP 
                             'full.pay.and.premium.and.cost.sharing', # FPCs
-                            'full.pay.and.cost.sharing' # FCs # renamed from: full.pay.and.cost.sharing.without.premium
+                            'full.pay.and.cost.sharing' # FCs 
 )
 
 # Cost-sharing subcategories: 
@@ -234,76 +234,77 @@ register.model.quantity(ADAP.SPECIFICATION,
 ##-- INPUTS: EFFECTS of ELIGIBILITY RESTRICTIONS --##
 # Loss: 4 effects
 register.model.element(ADAP.SPECIFICATION,
-                       name = "lose.F.suppression.rr", # lose.adap.full.pay.suppression.rr
+                       name = "lose.F.suppression.rr", 
                        value = 0.5,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "lose.P.suppression.rr", # lose.adap.premium.without.cost.sharing.suppression.rr
+                       name = "lose.P.suppression.rr", 
                        value = 0.5,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "lose.PCs.suppression.rr", # lose.adap.premium.and.cost.sharing.suppression.rr
+                       name = "lose.PCs.suppression.rr", 
                        value = 0.5,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "lose.Cs.suppression.rr", # lose.adap.cost.sharing.without.premium.suppression.rr
+                       name = "lose.Cs.suppression.rr", 
                        value = 0.5,
                        scale = 'proportion')
 
 # Change: 3 effects
 register.model.element(ADAP.SPECIFICATION,
-                       name = "change.P.to.F.suppression.rr",# change.adap.premium.without.cost.sharing.to.full.pay.suppression.rr
+                       name = "change.P.to.F.suppression.rr",
                        value = 1,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "change.PCs.to.F.suppression.rr", # change.adap.premium.and.cost.sharing.to.full.pay.suppression.rr
+                       name = "change.PCs.to.F.suppression.rr", 
                        value = 1,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "change.PCs.to.P.suppression.rr", # change.adap.premium.and.cost.sharing.to.premium.without.cost.sharing.suppression.rr
+                       name = "change.PCs.to.P.suppression.rr",
                        value = 0.5,
                        scale = 'proportion')
 
 
 ##-- INPUTS: EFFECTS of FORMULARY RESTRICTIONS --##
 register.model.element(ADAP.SPECIFICATION,
-                       name = "change.F.formulary.suppression.rr", # change.adap.full.pay.formulary.suppression.rr
+                       name = "change.F.formulary.suppression.rr", 
                        value = 0.5,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "change.PCp.formulary.suppression.rr", # change.adap.copay.and.premium.formulary.suppression.rr - swapped order
+                       name = "change.PCp.formulary.suppression.rr", 
                        value = 0.5,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "change.Cp.formulary.suppression.rr", #change.adap.copay.without.premium.formulary.suppression.rr
+                       name = "change.Cp.formulary.suppression.rr", 
                        value = 0.5,
                        scale = 'proportion')
 
 ##-- INPUTS: HOW MANY EXPERIENCE FORMULARY RESTRICTIONS --##
 register.model.element(ADAP.SPECIFICATION,
-                       name = "proportion.F.clients.with.formulary.change", #proportion.adap.full.pay.clients.with.formulary.change
+                       name = "proportion.F.clients.with.formulary.change", 
                        value = 0.5,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "proportion.PCp.clients.with.formulary.change", #proportion.adap.premium.and.copay.clients.with.formulary.change
+                       name = "proportion.PCp.clients.with.formulary.change", 
                        value = 0.5,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "proportion.Cp.clients.with.formulary.change", # proportion.adap.copay.without.premium.clients.with.formulary.change
+                       name = "proportion.Cp.clients.with.formulary.change", 
                        value = 0.5,
                        scale = 'proportion')
 
+## among those who change from anything to full pay, what proportion have a formulary change (proportion who change will be dependent on income eligibility)
 register.model.element(ADAP.SPECIFICATION,
-                       name = "proportion.adap.change.to.full.pay.clients.with.formulary.change", ## melissa question: WHAT DOES THIS MEAN? 
+                       name = "proportion.change.to.F.with.formulary.change", 
                        value = 0.5,
                        scale = 'proportion')
 
@@ -734,45 +735,45 @@ register.model.element(ADAP.SPECIFICATION,
 
 # Full-pay only
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'proportion.F.only.suppressed', # proportion.adap.full.pay.only.suppressed
+                       name = 'proportion.F.only.suppressed', 
                        scale = 'proportion',
                        functional.form = get.adap.full.pay.only.suppression.functional.form(),
                        functional.form.from.time = 2010)
 
 # Insurance assistance only
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'proportion.P.only.suppressed', # proportion.adap.premium.without.cost.sharing.suppressed
+                       name = 'proportion.P.only.suppressed', 
                        scale = 'proportion',
                        functional.form = get.adap.insurance.assistance.only.functional.form(),
                        functional.form.from.time = 2010)
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'proportion.Cs.only.suppressed', # proportion.adap.cost.sharing.without.premium.suppressed
+                       name = 'proportion.Cs.only.suppressed', 
                        scale = 'proportion',
                        functional.form = get.adap.insurance.assistance.only.functional.form(),
                        functional.form.from.time = 2010)
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'proportion.PCs.suppressed', # proportion.adap.premium.and.cost.sharing.suppressed
+                       name = 'proportion.PCs.suppressed', 
                        scale = 'proportion',
                        functional.form = get.adap.insurance.assistance.only.functional.form(),
                        functional.form.from.time = 2010)
 
 # Full-pay PLUS Insurance assistance
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'proportion.FP.suppressed', # proportion.adap.full.pay.and.premium.without.cost.sharing.suppressed
+                       name = 'proportion.FP.suppressed', 
                        scale = 'proportion',
                        functional.form = get.adap.full.pay.and.insurance.assistance.functional.form(),
                        functional.form.from.time = 2010)
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'proportion.FCs.suppressed', # proportion.adap.full.pay.and.cost.sharing.without.premium.suppressed
+                       name = 'proportion.FCs.suppressed', 
                        scale = 'proportion',
                        functional.form = get.adap.full.pay.and.insurance.assistance.functional.form(),
                        functional.form.from.time = 2010)
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'proportion.FPCs.suppressed', # proportion.adap.full.pay.and.premium.and.cost.sharing.suppressed
+                       name = 'proportion.FPCs.suppressed', 
                        scale = 'proportion',
                        functional.form = get.adap.full.pay.and.insurance.assistance.functional.form(),
                        functional.form.from.time = 2010)
@@ -782,6 +783,7 @@ register.model.element(ADAP.SPECIFICATION,
 ##-- INPUTS: FRACTION OF TIME SPENT if A CLIENT --##
 ##------------------------------------------------##
 
+## ADAP CATEGORIES ##  (repeat below for insurance category overlaps)
 # Individual categories: 
 # F: full pay only 
 # P: premium only 
@@ -792,14 +794,14 @@ register.model.element(ADAP.SPECIFICATION,
     # Cannot have full-pay at the same time as either premium or cost-sharing, but can have premium and cost-sharing at the same time 
 
 # Over the course of a year, can have: 
-    # Only one category during that year (3): 
-        # F, P, or Cs
-    # Two categories during that year (3): 
-        # FP: full pay and premium
-        # FCs: full pay and cost-sharing
-        # PCs: premium and cost-sharing 
-    # All three categories during that year (1)
-        # FPCs: full pay, premium, and cost-sharing 
+#   Only one category during that year (3): 
+#       F, P, or Cs 
+#   Two categories during that year (3): 
+#       FP: full pay and premium
+#       FCs: full pay and cost-sharing
+#       PCs: premium and cost-sharing
+#   All three categories during that year (1)
+#       FPCs: full pay, premium, and cost-sharing
 
 # Later on, cost-sharing split into: deductible and/or co-pay assistance
 # D: deductible
@@ -850,13 +852,13 @@ register.model.element(ADAP.SPECIFICATION,
 
 # Finally, multiply these two to get fraction time spent on full-pay out of the full calendar year 
 register.model.quantity(ADAP.SPECIFICATION,
-                       name = 'fraction.time.F.among.FP', 
+                       name = 'fraction.time.F.among.FP', # fraction.time.on.adap.full.pay.from.full.pay.and.premium.without.cost.sharing
                        value = expression(fraction.time.covered.among.FP*fraction.time.F.of.time.covered.among.FP),
                        scale = 'proportion')
 
 # and the same thing for premium (1-full pay)
 register.model.quantity(ADAP.SPECIFICATION,
-                       name = 'fraction.time.P.among.FP', 
+                       name = 'fraction.time.P.among.FP', # fraction.time.on.adap.premium.without.cost.sharing.from.with.full.pay
                        value = expression(fraction.time.covered.among.FP*(1-fraction.time.F.of.time.covered.among.FP)),
                        scale = 'proportion')
 
@@ -876,13 +878,13 @@ register.model.element(ADAP.SPECIFICATION,
 
 # Finally, multiply these two to get fraction time spent on full-pay out of the full calendar year 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'fraction.time.F.among.FCs', 
+                        name = 'fraction.time.F.among.FCs', # fraction.time.on.adap.full.pay.from.full.pay.and.cost.sharing.without.premium
                         value = expression(fraction.time.covered.among.FCs*fraction.time.F.of.time.covered.among.FCs),
                         scale = 'proportion')
 
 # and the same thing for cost-sharing (1-full pay)
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'fraction.time.Cs.among.FCs', 
+                        name = 'fraction.time.Cs.among.FCs', # fraction.time.on.adap.cost.sharing.without.premium.from.with.full.pay
                         value = expression(fraction.time.covered.among.FCs*(1-fraction.time.F.of.time.covered.among.FCs)),
                         scale = 'proportion')
 
@@ -890,7 +892,7 @@ register.model.quantity(ADAP.SPECIFICATION,
     # NOT mutually exclusive: could in theory spend time in: neither, each individually, or both
     # For simplicity, assume full coverage period was both (not either individually)
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'fraction.time.covered.among.PCs', 
+                       name = 'fraction.time.covered.among.PCs', # fraction.time.on.adap.premium.and.cost.sharing.from.without.full.pay
                        value = 0.875,
                        scale = 'proportion')
 
@@ -912,95 +914,47 @@ register.model.element(ADAP.SPECIFICATION,
 
 # Finally, multiply these two to get fraction time spent on full-pay out of the full calendar year 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'fraction.time.F.among.FPCs', 
+                        name = 'fraction.time.F.among.FPCs', # fraction.time.on.adap.full.pay.from.full.pay.and.premium.and.cost.sharing
                         value = expression(fraction.time.covered.among.FPCs*fraction.time.F.of.time.covered.among.FPCs),
                         scale = 'proportion')
 
 # and the same thing for premium + cost-sharing (1-full pay)
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'fraction.time.PCs.among.FPCs', 
+                        name = 'fraction.time.PCs.among.FPCs', # fraction.time.on.adap.premium.and.cost.sharing.from.with.full.pay
                         value = expression(fraction.time.covered.among.FPCs*(1-fraction.time.F.of.time.covered.among.FPCs)),
                         scale = 'proportion')
 
-## Todd's old code, with some comments from me to compare
-if(1==2){
-    # F among FP
-    register.model.element(ADAP.SPECIFICATION,
-                           name = 'fraction.time.on.adap.full.pay.among.full.pay.and.premium.without.cost.sharing',
-                           value = 0.25,
-                           scale = 'proportion')
-    
-    
-    # quantity used to calculate P among FP (below)
-    register.model.element(ADAP.SPECIFICATION,
-                           name = 'fraction.non.full.pay.time.on.adap.premium.without.cost.sharing.from.with.full.pay',
-                           value = 0.875,
-                           scale = 'proportion')
-    
-    
-    
-    # F among FPCs
-    register.model.element(ADAP.SPECIFICATION,
-                           name = 'fraction.time.on.adap.full.pay.from.full.pay.and.premium.and.cost.sharing',
-                           value = 0.25,
-                           scale = 'proportion')
-    
-    # F among FCs
-    register.model.element(ADAP.SPECIFICATION,
-                           name = 'fraction.time.on.adap.full.pay.from.full.pay.and.cost.sharing.without.premium',
-                           value = 0.25,
-                           scale = 'proportion')
-    
-    # Time on premium and/or cost-sharing from no full-pay
-    # # P alone 
-    register.model.element(ADAP.SPECIFICATION,
-                           name = 'fraction.time.on.adap.premium.without.cost.sharing.from.without.full.pay',
-                           value = 0.875,
-                           scale = 'proportion')
-    
-    # PCs alone
-    register.model.element(ADAP.SPECIFICATION,
-                           name = 'fraction.time.on.adap.premium.and.cost.sharing.from.without.full.pay',
-                           value = 0.875,
-                           scale = 'proportion')
-    
-    # P alone - SAME AS ABOVE, I think he meant to do Cs alone 
-    register.model.element(ADAP.SPECIFICATION,
-                           name = 'fraction.time.on.adap.premium.without.cost.sharing.from.without.full.pay',
-                           value = 0.875,
-                           scale = 'proportion')
-    
-    # Time on premium and/or cost-sharing as fraction of time not on full-pay when both
-    # quantity used to calculate PCs among FPCs (below)
-    register.model.element(ADAP.SPECIFICATION,
-                           name = 'fraction.non.full.pay.time.on.adap.premium.and.cost.sharing.from.with.full.pay',
-                           value = 0.875,
-                           scale = 'proportion')
-    
-    # quantity used to calculate Cs among FCs (below)
-    register.model.element(ADAP.SPECIFICATION,
-                           name = 'fraction.non.full.pay.time.on.adap.cost.sharing.without.premium.from.with.full.pay',
-                           value = 0.875,
-                           scale = 'proportion')
-    
-    # Quick calculation for the non-full pay services when combined with full-pay
-    # P among FP
-    register.model.quantity(ADAP.SPECIFICATION,
-                            name = 'fraction.time.on.adap.premium.without.cost.sharing.from.with.full.pay',
-                            value = expression( (1 - fraction.time.on.adap.premium.without.cost.sharing.from.without.full.pay) *
-                                                    fraction.non.full.pay.time.on.adap.premium.without.cost.sharing.from.with.full.pay))
-    # PCs among FPCs
-    register.model.quantity(ADAP.SPECIFICATION,
-                            name = 'fraction.time.on.adap.premium.and.cost.sharing.from.with.full.pay',
-                            value = expression( (1 - fraction.time.on.adap.premium.and.cost.sharing.from.without.full.pay) *
-                                                    fraction.non.full.pay.time.on.adap.premium.and.cost.sharing.from.with.full.pay))
-    # Cs among FCs
-    register.model.quantity(ADAP.SPECIFICATION,
-                            name = 'fraction.time.on.adap.cost.sharing.without.premium.from.with.full.pay',
-                            value = expression( (1 - fraction.time.on.adap.cost.sharing.without.premium.from.without.full.pay) *
-                                                    fraction.non.full.pay.time.on.adap.cost.sharing.without.premium.from.with.full.pay))
-    
-}
+
+## INSURANCE CATEGORIES ## 
+# Individual categories: 
+# uninsured, medicaid, medicare, medicare + medicaid, private insurance
+
+# Over the course of a year, can have: 
+# unin/medicaid, unin/medicare, unin/medicare+medicaid, unin/private
+
+# 50/50 Medicaid/uninsured 
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'fraction.time.uninsured.among.uninsured.and.medicaid',  
+                       value = 0.5, 
+                       scale = 'proportion')
+
+# 50/50 Medicare/uninsured 
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'fraction.time.uninsured.among.uninsured.and.medicare',  
+                       value = 0.5, 
+                       scale = 'proportion')
+
+# 50/50 Medicare+Medicaid/uninsured 
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'fraction.time.uninsured.among.uninsured.and.medicare.and.medicaid',  
+                       value = 0.5, 
+                       scale = 'proportion')
+
+# 50/50 Private/uninsured 
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'fraction.time.uninsured.among.uninsured.and.private',  
+                       value = 0.5, 
+                       scale = 'proportion')
 
 
 ##---------------------------------------------------------------------------##
@@ -1008,18 +962,18 @@ if(1==2){
 ##---------------------------------------------------------------------------##
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "proportion.Cs.clients.with.Cp.if.allowed", # p.adap.cost.sharing.without.premium.clients.with.copay.if.allowed
-                       functional.form = proportion.adap.cost.sharing.without.premium.clients.with.copay(), # melissa question: should this be a functional form?
+                       name = "proportion.Cs.clients.with.Cp.if.allowed", 
+                       functional.form = get.proportion.Cs.clients.with.Cp.functional.form(), 
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "proportion.PCs.clients.with.Cp.if.allowed", # p.adap.premium.and.cost.sharing.clients.with.copay.if.allowed
-                       functional.form = get.p.adap.cost.sharing.clients.with.copay.functional.form(),
+                       name = "proportion.PCs.clients.with.Cp.if.allowed", 
+                       functional.form = get.proportion.PCs.clients.with.Cp.functional.form(), 
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "proportion.FPCs.clients.with.Cp.if.allowed", # p.adap.full.pay.premium.and.cost.sharing.clients.with.copay.if.allowed
-                       functional.form = proportion.adap.full.pay.premium.and.cost.sharing.clients.with.copay(), # melissa question: should this be a functional form?
+                       name = "proportion.FPCs.clients.with.Cp.if.allowed", 
+                       functional.form = get.proportion.FPCs.clients.with.Cp.functional.form(), 
                        scale = 'proportion')
 
 
@@ -1029,20 +983,21 @@ register.model.element(ADAP.SPECIFICATION,
 #   - 0                                         IF  state ADAP does not cover copays
 #   - 1                                         IF  state ADAP does not cover deductibles
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = "proportion.PCs.clients.with.Cp", # proportion.adap.premium.and.cost.sharing.clients.with.copay
+                        name = "proportion.PCs.clients.with.Cp", 
                         value = expression(adap.covers.copay * adap.covers.deductible * proportion.PCs.clients.with.Cp.if.allowed + 
                                                (1-adap.covers.deductible)*adap.covers.copay))
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = "proportion.FPCs.clients.with.Cp", # proportion.adap.full.pay.premium.and.cost.sharing.clients.with.copay
+                        name = "proportion.FPCs.clients.with.Cp", 
                         value = expression(adap.covers.copay * adap.covers.deductible * proportion.FPCs.clients.with.Cp.if.allowed + 
                                                (1-adap.covers.deductible)*adap.covers.copay))
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = "proportion.Cs.clients.with.Cp", # proportion.adap.cost.sharing.without.premium.clients.with.copay
+                        name = "proportion.Cs.clients.with.Cp", 
                         value = expression(adap.covers.copay * adap.covers.deductible * proportion.Cs.clients.with.Cp.if.allowed + 
                                                (1-adap.covers.deductible)*adap.covers.copay))
-# melissa stopped here 6/17
+
+# melissa and todd circle back to this section: 
 
 ##----------------------------------------------##
 ##-- INPUTS: P ADAP SERVICE TYPE GIVEN INCOME --##
@@ -1051,291 +1006,276 @@ register.model.quantity(ADAP.SPECIFICATION,
 # we presume that: p_full_pay = min + (max-min) / (1 + exp(slope * (income - midpoint)))
 # *NB that slope here is constrained to be positive - ie, a strictly decreasing p with increasing income
 
+# These are the inputs to P1-6 in the section "DISTRIBUTE P by INCOME on ADAP INTO SERVICE CATEGORIES"
 
-# @redo - these are all just placeholder parameters
+# P1: F.only
+# P2: Fplus.among.not.F.only
+# P3: P.among.Fplus
+# P4: Cs.among.FP
+# P5: P.among.no.F
+# P6: Cs.among.P
 
-#-- Probability of having ONLY full-pay services if on ADAP --#
+
+#-- P1: Probability of having ONLY full-pay services if on ADAP (F.only) --#
+# Given ADAP, there is a probability of having full-pay; defined by these 4 parameters 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.only.if.adap.midpoint',
+                       name = 'p.F.only.midpoint', # midpoint of probability that you have full pay only, given that we know you have ADAP 
                        value = 250,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.only.if.adap.logistic.slope',
+                       name = 'p.F.only.slope', 
                        value = 0.05,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.only.if.adap.min',
+                       name = 'p.F.only.min', 
                        value = 0.2,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.only.if.adap.max',
+                       name = 'p.F.only.max', 
                        value = 0.95,
                        scale = 'proportion')
 
-# odds ratios based on insurance
+# Then, apply an odds ratio to that probability, based on insurance (medicaid, medicare, medicare and medicaid, private)
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.only.if.adap.medicaid.or',
-                       value = 0.1,
+                       name = 'log.OR.F.only.medicaid', 
+                       value = log(0.1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.only.if.adap.medicare.or',
-                       value = 0.1,
+                       name = 'log.OR.F.only.medicare', 
+                       value = log(0.1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.only.if.adap.medicare.and.medicaid.or',
-                       value = 0.1,
+                       name = 'log.OR.F.only.medicare.and.medicaid', 
+                       value = log(0.1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.only.if.adap.private.or',
-                       value = 0.1,
+                       name = 'log.OR.F.only.private', 
+                       value = log(0.1),
                        scale = 'ratio')
 
-register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.only.if.adap.uninsured.or',
-                       value = 1,
-                       scale = 'ratio')
 
-#-- Probablity of having full-pay plus other services if on ADAP not full pay only --#
+
+#-- P2: Probablity of having full-pay plus other services if on ADAP not full pay only (Fplus.among.not.F.only) --#
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.plus.if.not.full.pay.only.midpoint',
+                       name = 'p.Fplus.among.not.F.only.midpoint', 
                        value = 250,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.plus.if.not.full.pay.only.logistic.slope',
+                       name = 'p.Fplus.among.not.F.only.slope', 
                        value = 0.05,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.plus.if.not.full.pay.only.adap.min',
+                       name = 'p.Fplus.among.not.F.only.min',
                        value = 0.2,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.plus.if.not.full.pay.only.max',
+                       name = 'p.Fplus.among.not.F.only.max',
                        value = 0.95,
                        scale = 'proportion')
 
-# odds ratios based on insurance
+# Then, apply an odds ratio to that probability, based on insurance (medicaid, medicare, medicare and medicaid, private)
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.plus.if.not.full.pay.only.medicaid.or',
-                       value = 0.2,
+                       name = 'log.OR.Fplus.among.not.F.only.medicaid', 
+                       value = log(0.2),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.plus.if.not.full.pay.only.medicare.or',
-                       value = 0.2,
+                       name = 'log.OR.Fplus.among.not.F.only.medicare', 
+                       value = log(0.2),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.plus.if.not.full.pay.only.medicare.and.medicaid.or',
-                       value = 1,
+                       name = 'log.OR.Fplus.among.not.F.only.medicare.and.medicaid', 
+                       value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.plus.if.not.full.pay.only.private.or',
-                       value = 1,
-                       scale = 'ratio')
-
-register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.full.pay.plus.if.not.full.pay.only.uninsured.or',
-                       value = 0.1,
+                       name = 'log.OR.Fplus.among.not.F.only.private',
+                       value = log(1),
                        scale = 'ratio')
 
 
-#-- Probability of receiving premium assistance if also on full pay --#
+
+#-- P3: Probability of receiving premium assistance if also on full pay (P.among.Fplus) --#
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.full.pay.midpoint',
+                       name = 'p.P.among.Fplus.midpoint',
                        value = 250,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.full.pay.logistic.slope',
+                       name = 'p.P.among.Fplus.slope', 
                        value = 0.05,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.full.pay.min',
+                       name = 'p.P.among.Fplus.min', 
                        value = 0.2,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.full.pay.max',
+                       name = 'p.P.among.Fplus.max', 
                        value = 0.95,
                        scale = 'proportion')
 
-# odds ratios based on insurance
+# Then, apply an odds ratio to that probability, based on insurance (medicaid, medicare, medicare and medicaid, private)
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.full.pay.medicaid.or',
-                       value = 0.1,
+                       name = 'log.OR.P.among.Fplus.medicaid', 
+                       value = log(0.1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.full.pay.medicare.or',
-                       value = 0.1,
+                       name = 'log.OR.P.among.Fplus.medicare', 
+                       value = log(0.1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.full.pay.medicare.and.medicaid.or',
-                       value = 1,
+                       name = 'log.OR.P.among.Fplus.medicare.and.medicaid', 
+                       value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.full.pay.private.or',
-                       value = 1,
+                       name = 'log.OR.P.among.Fplus.private',
+                       value = log(1),
                        scale = 'ratio')
 
-register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.full.pay.uninsured.or',
-                       value = 0.01,
-                       scale = 'ratio')
 
-#--Probability of receiving cost-sharing assistance if on full.pay and premium assistance --#
+#--P4: Probability of receiving cost-sharing assistance if on full.pay and premium assistance (Cs.among.FP) --#
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.full.pay.and.premium.midpoint',
+                       name = 'p.Cs.among.FP.midpoint', 
                        value = 250,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.full.pay.and.premium.slope',
+                       name = 'p.Cs.among.FP.slope', 
                        value = 0.05,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.full.pay.and.premium.min',
+                       name = 'p.Cs.among.FP.min',
                        value = 0.2,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.full.pay.and.premium.max',
+                       name = 'p.Cs.among.FP.max',
                        value = 0.95,
                        scale = 'proportion')
 
-# odds ratios based on insurance
+# Then, apply an odds ratio to that probability, based on insurance (medicaid, medicare, medicare and medicaid, private)
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.full.pay.and.premium.medicaid.or',
-                       value = 1,
+                       name = 'log.OR.Cs.among.FP.medicaid',
+                       value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.full.pay.and.premium.medicare.or',
-                       value = 1,
+                       name = 'log.OR.Cs.among.FP.medicare',
+                       value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.full.pay.and.premium.medicare.and.medicaid.or',
-                       value = 1,
+                       name = 'log.OR.Cs.among.FP.medicare.and.medicaid', 
+                       value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.full.pay.and.premium.private.or',
-                       value = 1,
+                       name = 'log.OR.Cs.among.FP.private', 
+                       value = log(1),
                        scale = 'ratio')
 
-register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.full.pay.and.premium.uninsured.or',
-                       value = 1,
-                       scale = 'ratio')
 
-#-- Probability of receiving premium assistance if not receiving any full pay services --#
+#-- P5: Probability of receiving premium assistance if not receiving any full pay services (P.among.no.F) --#
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.no.full.pay.midpoint',
+                       name = 'p.P.among.no.F.midpoint', 
                        value = 250,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.no.full.pay.logistic.slope',
+                       name = 'p.P.among.no.F.slope', 
                        value = 0.05,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.no.full.pay.min',
+                       name = 'p.P.among.no.F.min',
                        value = 0.2,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.no.full.pay.max',
+                       name = 'p.P.among.no.F.max',
                        value = 0.95,
                        scale = 'proportion')
 
-# odds ratios based on insurance
+# Then, apply an odds ratio to that probability, based on insurance (medicaid, medicare, medicare and medicaid, private)
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.no.full.pay.medicaid.or',
-                       value = 0.1,
+                       name = 'log.OR.P.among.no.F.medicaid', 
+                       value = log(0.1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.no.full.pay.medicare.or',
-                       value = 0.1,
+                       name = 'log.OR.P.among.no.F.medicare', 
+                       value = log(0.1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.no.full.pay.medicare.and.medicaid.or',
-                       value = 1,
+                       name = 'log.OR.P.among.no.F.medicare.and.medicaid', 
+                       value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.no.full.pay.private.or',
-                       value = 1,
+                       name = 'log.OR.P.among.no.F.private', 
+                       value = log(1),
                        scale = 'ratio')
 
-register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.premium.if.no.full.pay.uninsured.or',
-                       value = 0.01,
-                       scale = 'ratio')
 
-#-- Probability of receiving cost-sharing assistance if on premium assistance but not full pay --#
+#-- P6: Probability of receiving cost-sharing assistance if on premium assistance but not full pay (Cs.among.P)--#
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.premium.without.full.pay.midpoint',
+                       name = 'p.Cs.among.P.midpoint', 
                        value = 250,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.premium.without.full.pay.slope',
+                       name = 'p.Cs.among.P.slope', 
                        value = 0.05,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.premium.without.full.pay.premium.min',
+                       name = 'p.Cs.among.P.min', 
                        value = 0.2,
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.premium.without.full.pay.premium.max',
+                       name = 'p.Cs.among.P.max', 
                        value = 0.95,
                        scale = 'proportion')
 
-# odds ratios based on insurance
+# Then, apply an odds ratio to that probability, based on insurance (medicaid, medicare, medicare and medicaid, private)
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.premium.without.full.pay.medicaid.or',
-                       value = 1,
+                       name = 'log.OR.Cs.among.P.medicaid', 
+                       value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.premium.without.full.pay.medicare.or',
-                       value = 1,
+                       name = 'log.OR.Cs.among.P.medicare', 
+                       value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.premium.without.full.pay.medicare.and.medicaid.or',
-                       value = 1,
+                       name = 'log.OR.Cs.among.P.medicare.and.medicaid', 
+                       value = log(1),
                        scale = 'ratio')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.premium.without.full.pay.private.or',
-                       value = 1,
+                       name = 'log.OR.Cs.among.P.private', 
+                       value = log(1),
                        scale = 'ratio')
 
-register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.cost.sharing.if.premium.without.full.pay.uninsured.or',
-                       value = 1,
-                       scale = 'ratio')
 
 ####---------------------------####
 ####---------------------------####
@@ -1391,7 +1331,7 @@ register.model.element(ADAP.SPECIFICATION,
 #     p
 # }
 
-calculate.baseline.p.of.adap.by.income.with.ssi <- function(adap.fpl.median,
+calculate.baseline.p.of.income.with.ssi.among.adap <- function(adap.fpl.median,
                                                             adap.fpl.cv,
                                                             p.ssi.if.income.eligible,
                                                             ssi.benefit.fpl,
@@ -1425,7 +1365,7 @@ calculate.baseline.p.of.adap.by.income.with.ssi <- function(adap.fpl.median,
     p
 }
 
-calculate.baseline.p.of.adap.by.income.without.ssi <- function(adap.fpl.median,
+calculate.baseline.p.of.income.without.ssi.among.adap <- function(adap.fpl.median,
                                                                adap.fpl.cv,
                                                                p.ssi.if.income.eligible,
                                                                ssi.benefit.fpl,
@@ -1467,6 +1407,14 @@ calculate.max.baseline.adap.income <- function(baseline.adap.full.pay.fpl.thresh
         ssi.breakeven.fpl)
 }
     
+distribute.adap.incomes <- function(max.baseline.adap.income){
+    rv = array(0:max.baseline.adap.income,
+               dim = c(income = max.baseline.adap.income + 1),
+               dimnames = list(income = 0:max.baseline.adap.income))
+    
+    rv
+}
+
 
 # A helper to generate a set of logistic probabilities
 calculate.logistic.p <- function(logistic.midpoint,
@@ -1490,32 +1438,42 @@ calculate.logistic.p <- function(logistic.midpoint,
 ##-- CALCULATED: INCOME DISTRIBUTION of ADAP CLIENTS --##
 ##-----------------------------------------------------##
 
-
+# Max ADAP income threshold - just defined by the state - gives us the upper bound for how high we need to break up the % FPL 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'max.adap.baseline.income',
                         value = calculate.max.baseline.adap.income)
 
-# Calculate income distribution, stratified by SSI, for all ADAP clients
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.by.income.with.ssi',
-                        value = calculate.baseline.p.of.adap.by.income.with.ssi)
+                        name = 'adap.incomes',
+                        value = distribute.adap.incomes)
 
+# Calculate income distribution, stratified by SSI, for all ADAP clients 
+# This is among ADAP, probability of being in a certain income bracket AND having SSI (or not having SSI, below)
+# numerator: have ADAP, have SSI, in a certain income bracket; denominator: everyone with ADAP
+# bounded by 75% FPL (SSI max benefit), and SSI breakeven (~150%; benefit is 0 because no longer qualifying for it)
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.by.income.without.ssi',
-                        value = calculate.baseline.p.of.adap.by.income.without.ssi)
+                        name = 'baseline.p.of.income.with.ssi.among.adap', 
+                        value = calculate.baseline.p.of.income.with.ssi.among.adap)  
+
+# numerator: have ADAP, no SSI, in a certain income bracket; denominator: everyone with ADAP 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.income.without.ssi.among.adap', 
+                        value = calculate.baseline.p.of.income.without.ssi.among.adap) 
+
+
 
 # Fold in Medicare
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.by.income.with.medicare.and.ssi',
-                        value = expression(baseline.p.of.adap.by.income.with.ssi *
+                        name = 'baseline.p.of.income.with.medicare.and.ssi.among.adap', 
+                        value = expression(baseline.p.of.income.with.ssi.among.adap *
                                                p.baseline.benefits.eligible *
                                                (p.medicare.by.age.if.benefits.eligible +
                                                     (1-p.medicare.by.age.if.benefits.eligible) * p.medicare.if.not.by.age.if.benefits.eligible))
 )
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.by.income.with.medicare.without.ssi',
-                        value = expression(baseline.p.of.adap.by.income.without.ssi *
+                        name = 'baseline.p.of.income.with.medicare.without.ssi.among.adap', 
+                        value = expression(baseline.p.of.income.without.ssi.among.adap *
                                                p.baseline.benefits.eligible *
                                                (p.medicare.by.age.if.benefits.eligible +
                                                     (1-p.medicare.by.age.if.benefits.eligible) * p.medicare.if.not.by.age.if.benefits.eligible))
@@ -1523,26 +1481,25 @@ register.model.quantity(ADAP.SPECIFICATION,
 
 
 # Fold in Medicaid
-
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'income.is.below.medicaid.threshold',
                         value = calculate.income.is.below.medicaid.threshold)
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.by.income.with.medicare.and.medicaid',
+                        name = 'baseline.p.of.income.with.medicare.and.medicaid.among.adap', 
                         value = expression(adap.allows.medicare.and.medicaid * (
-                            baseline.p.of.adap.by.income.with.medicare.and.ssi +
-                                baseline.p.of.adap.by.income.with.medicare.without.ssi * 
+                            baseline.p.of.income.with.medicare.and.ssi.among.adap +
+                                baseline.p.of.income.with.medicare.without.ssi.among.adap * 
                                 (income.is.below.medicaid.threshold +
                                      (1-income.is.below.medicaid.threshold) *
                                      p.medicaid.not.by.income.or.ssi.if.medicare * p.base.ssi.and.medicaid.eligible)
                         )))
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.by.income.with.medicaid.without.medicare',
+                        name = 'baseline.p.of.income.with.medicaid.without.medicare.among.adap', 
                         value = expression(adap.allows.medicaid.only * (
-                            (baseline.p.of.adap.by.income.with.ssi - baseline.p.of.adap.by.income.with.medicare.and.ssi) +
-                                (baseline.p.of.adap.by.income.without.ssi - baseline.p.of.adap.by.income.with.medicare.without.ssi) *
+                            (baseline.p.of.income.with.ssi.among.adap - baseline.p.of.income.with.medicare.and.ssi.among.adap) +
+                                (baseline.p.of.income.without.ssi.among.adap - baseline.p.of.income.with.medicare.without.ssi.among.adap) *
                                 (income.is.below.medicaid.threshold +
                                      (1-income.is.below.medicaid.threshold) *
                                      p.medicaid.not.by.income.or.ssi.if.no.medicare.and.benefits.eligible * p.base.ssi.and.medicaid.eligible)
@@ -1558,18 +1515,18 @@ register.model.quantity(ADAP.SPECIFICATION,
 #   5) uninsured
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.by.income.with.medicare.without.medicaid',
-                        value = expression(baseline.p.of.adap.by.income.with.medicare.and.ssi + 
-                                               baseline.p.of.adap.by.income.with.medicare.without.ssi -
-                                               baseline.p.of.adap.by.income.with.medicare.and.medicaid))
+                        name = 'baseline.p.of.income.with.medicare.without.medicaid.among.adap', # baseline.p.of.adap.by.income.with.medicare.without.medicaid
+                        value = expression(baseline.p.of.income.with.medicare.and.ssi.among.adap + 
+                                               baseline.p.of.income.with.medicare.without.ssi.among.adap -
+                                               baseline.p.of.income.with.medicare.and.medicaid.among.adap))
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.by.income.without.medicare.or.medicaid',
-                        value = expression(baseline.p.of.adap.by.income.with.ssi + 
-                                               baseline.p.of.adap.by.income.without.ssi -
-                                               baseline.p.of.adap.by.income.with.medicare.and.medicaid -
-                                               baseline.p.of.adap.by.income.with.medicare.without.medicaid -
-                                               baseline.p.of.adap.by.income.with.medicaid.without.medicare))
+                        name = 'baseline.p.of.income.without.medicare.or.medicaid.among.adap', # baseline.p.of.adap.by.income.without.medicare.or.medicaid
+                        value = expression(baseline.p.of.income.with.ssi.among.adap + 
+                                               baseline.p.of.income.without.ssi.among.adap -
+                                               baseline.p.of.income.with.medicare.and.medicaid.among.adap -
+                                               baseline.p.of.income.with.medicare.without.medicaid.among.adap -
+                                               baseline.p.of.income.with.medicaid.without.medicare.among.adap))
 
 calculate.p.uninsured.given.income.and.no.public.insurance <- function(p.uninsured.given.income.and.no.public.insurance.midpoint,
                                                                        p.uninsured.given.income.and.no.public.insurance.slope,
@@ -1588,12 +1545,12 @@ register.model.quantity(ADAP.SPECIFICATION,
                         value = calculate.p.uninsured.given.income.and.no.public.insurance)
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.by.income.uninsured',
-                        value = expression(baseline.p.of.adap.by.income.without.medicare.or.medicaid * p.uninsured.given.income.and.no.public.insurance))
+                        name = 'baseline.p.of.income.uninsured.among.adap',
+                        value = expression(baseline.p.of.income.without.medicare.or.medicaid.among.adap * p.uninsured.given.income.and.no.public.insurance))
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.by.income.private.insurance',
-                        value = expression(baseline.p.of.adap.by.income.without.medicare.or.medicaid - baseline.p.of.adap.by.income.uninsured))
+                        name = 'baseline.p.of.income.private.among.adap', # baseline.p.of.adap.by.income.private.insurance
+                        value = expression(baseline.p.of.income.without.medicare.or.medicaid.among.adap - baseline.p.of.income.uninsured.among.adap))
 
 
 
@@ -1601,109 +1558,604 @@ register.model.quantity(ADAP.SPECIFICATION,
 ##-- CALCULATED: DISTRIBUTE P by INCOME on ADAP INTO SERVICE CATEGORIES --##
 ##------------------------------------------------------------------------##
 
+# Given ADAP and income and Medicare/Medicaid, we need to split them into the following 7 categories, and they need to sum to 1
+# Safest way to do this is through nesting 
+
+# Over the course of a year, can have: 
+#   Only one category during that year (3): 
+#       F, P, or Cs
+#   Two categories during that year (3): 
+#       FP: full pay and premium
+#       FCs: full pay and cost-sharing
+#       PCs: premium and cost-sharing
+#   All three categories during that year (1)
+#       FPCs: full pay, premium, and cost-sharing
+
+# Nested proportions (to ensure they sum to 1):
+# P1: First, F only
+# P2: Given not F only; probability of any F? (F+)
+# P3: Given F+, probability of any P? (FP, FPCs)
+# P4: Given FP, probability of FPCs (vs FP only)? 
+# P5: Given no F, probability of any P? (P, PCs) 
+# P6: Given P, probability of PCs (vs P only)? 
+
+# --> 6 probabilities to split into 7 categories 
+#           P3 and P5 might be the same (probability of P)
+#           P4 and P6 might be the same (probability of Cs)
 
 
-#-- Distribute for Uninsured --#
+# Baseline implies before any threshold changes 
 
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.full.pay.only.by.income.uninsured',
-                        value = 'baseline.p.of.adap.by.income.uninsured')
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.full.pay.and.premium.without.cost.sharing.by.income.uninsured',
-                        value = 0)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.full.pay.and.premium.and.cost.sharing.by.income.uninsured',
-                        value = 0)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.full.pay.and.cost.sharing.without.premium.by.income.uninsured',
-                        value = 0)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.premium.without.cost.sharing.by.income.uninsured',
-                        value = 0)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.premium.and.cost.sharing.by.income.uninsured',
-                        value = 0)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.cost.sharing.without.premium.by.income.uninsured',
-                        value = 0)
+# Repeated for: 
+# medicaid, medicare, medicare + medicaid, private insurance, uninsured (uninsured: all are on F only - can't have premiums or cost-share without insurance)
+    
+# For the below section, we mean they had Medicaid (or other insurance type) AT THAT GIVEN MOMENT; not over the course of the year 
 
 #-- Distribute for Medicaid --#
+# Inputs: 
+# P1: First, F only 
+# P2: Given not F only; probability of any F? (F+)
+# P3: Given F+, probability of any P? (FP, FPCs)
+# P4: Given FP, probability of FPCs (vs FP only)? 
+# P5: Given no F, probability of any P? (P, PCs) 
+# P6: Given P, probability of PCs (vs P only)? 
 
-# Full-Pay Only
+# P3 and P5 might be the same (probability of P)
+# P4 and P6 might be the same (probability of Cs)
+
+# Outputs (need to get to 7 proportions that sum to 1): 
+    # F, P, Cs, 
+    # FP, FCs, PCs
+    # FPCs
+
+# INPUTS - these are our priors, we will use them below; calculated from the 4 parameters of the logistic functions (defined in INPUTS: P ADAP SERVICE TYPE GIVEN INCOME)
+# P1 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.full.pay.only.by.income.medicaid',
-                        value = expression(baseline.p.of.adap.by.income.uninsured * baseline.p.full.pay.only.by.income.medicaid))
+                        name = 'baseline.p.of.F.only.income.medicaid', 
+                        value = expression(p.F.only.min + (p.F.only.max - p.F.only.min) /
+                                                   (1 + exp(p.F.only.slope * (adap.incomes - p.F.only.midpoint) + 
+                                                                log.OR.F.only.medicaid)))) # this last term will be the only thing that changes for other insurance types
 
-# Full-Pay Plus
+# P2
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.full.pay.plus.by.income.medicaid',
-                        value = expression(baseline.p.of.adap.by.income.uninsured * 
-                                               (1-baseline.p.full.pay.only.by.income.medicaid) *
-                                               baseline.p.full.pay.plus.if.not.full.pay.only.by.income.medicaid))
+                        name = 'baseline.p.of.Fplus.among.not.F.only.income.medicaid', 
+                        value = expression(p.Fplus.among.not.F.only.min + (p.Fplus.among.not.F.only.max - p.Fplus.among.not.F.only.min) /
+                                               (1 + exp(p.Fplus.among.not.F.only.slope * (adap.incomes - p.Fplus.among.not.F.only.midpoint) + 
+                                                            log.OR.Fplus.among.not.F.only.medicaid))))
 
+# P3
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.full.pay.and.premium.by.income.medicaid',
-                        value = expression(baseline.p.of.adap.with.full.pay.plus.by.income.medicaid * baseline.p.premium.if.full.pay.plus.by.income.medicaid))
+                        name = 'baseline.p.of.P.among.Fplus.income.medicaid',
+                        value = expression(p.P.among.Fplus.min + (p.P.among.Fplus.max - p.P.among.Fplus.min) /
+                                               (1 + exp(p.P.among.Fplus.slope * (adap.incomes - p.P.among.Fplus.midpoint) + 
+                                                            log.OR.P.among.Fplus.medicaid))))
 
+# P4
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.full.pay.and.premium.and.cost.sharing.by.income.medicaid',
-                        value = expression(baseline.p.of.adap.with.full.pay.and.premium.by.income.medicaid * baseline.p.cost.sharing.if.full.pay.and.premium.by.income.medicaid))
+                        name = 'baseline.p.of.Cs.among.FP.income.medicaid',
+                        value = expression(p.Cs.among.FP.min + (p.Cs.among.FP.max - p.Cs.among.FP.min) /
+                                               (1 + exp(p.Cs.among.FP.slope * (adap.incomes - p.Cs.among.FP.midpoint) + 
+                                                            log.OR.Cs.among.FP.medicaid))))
 
+# P5
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.premium.without.cost.sharing.by.income.medicaid',
-                        value = expression(baseline.p.of.adap.with.full.pay.and.premium.by.income.medicaid - baseline.p.of.adap.with.full.pay.and.premium.and.cost.sharing.by.income.medicaid))
+                        name = 'baseline.p.of.P.among.no.F.income.medicaid', 
+                        value = expression(p.P.among.no.F.min + (p.P.among.no.F.max - p.P.among.no.F.min) /
+                                               (1 + exp(p.P.among.no.F.slope * (adap.incomes - p.P.among.no.F.midpoint) + 
+                                                            log.OR.P.among.no.F.medicaid))))
 
+# P6
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.cost.sharing.without.premium.by.income.medicaid',
-                        value = expression(baseline.p.of.adap.with.full.pay.plus.by.income.medicaid - baseline.p.of.adap.with.full.pay.and.premium.by.income.medicaid))
+                        name = 'baseline.p.of.Cs.among.P.income.medicaid',
+                        value = expression(p.Cs.among.P.min + (p.Cs.among.P.max - p.Cs.among.P.min) /
+                                               (1 + exp(p.Cs.among.P.slope * (adap.incomes - p.Cs.among.P.midpoint) + 
+                                                            log.OR.Cs.among.P.medicaid))))
 
-# No Full-Pay
+
+# OUTPUTS 
+# OUTPUT 1: F only
+# Basically just set to input p1, but need to multiply in the "among adap" part 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.without.full.pay.by.income.medicaid',
-                        value = expression(baseline.p.of.adap.by.income.uninsured * 
-                                               (1-baseline.p.full.pay.only.by.income.medicaid) *
-                                               (1-baseline.p.full.pay.plus.if.not.full.pay.only.by.income.medicaid)))
+                        name = 'baseline.p.of.F.only.income.medicaid.among.adap', # probability of F, and a given income, and medicaid; denominator: all adap #
+                        value = expression(baseline.p.of.income.medicaid.among.adap * # just have to multiply in the "among adap" 
+                                               baseline.p.of.F.only.income.medicaid)) 
 
+# OUTPUT 2: FP  
+# (FP)/all = (FP/FPx) * (FPx/Fx) * (Fx/all)
+#          = (1-p4) * p3 * (Fx/all)
+#       (Fx/all) = (Fx/(Fx + no F))*(1-F/all)
+#                = p2 * (1 - p1)
+#                 first quantity: out of the people who are not getting full pay only, what proportion get any full pay? (p2)
+#                 second quantity: all the people who are not getting full pay only (all except p1)
+# so, full equation: 
+# (FP)/all = (1-p4) * p3 * p2 * (1 - p1)
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.premium.by.income.medicaid',
-                        value = expression(baseline.p.of.adap.without.full.pay.by.income.medicaid * baseline.p.premium.if.not.full.pay.by.income.medicaid))
+                        name = 'baseline.p.of.FP.income.medicaid.among.adap', # probability of FP, and a given income, and medicaid; denominator: all adap 
+                        value = expression(baseline.p.of.income.medicaid.among.adap * # always have to include "among adap"
+                                               (1-baseline.p.of.Cs.among.FP.income.medicaid) * # (1-p4)
+                                               baseline.p.of.P.among.Fplus.income.medicaid * # p3
+                                               baseline.p.of.Fplus.among.not.F.only.income.medicaid * # p2
+                                               (1-baseline.p.of.F.only.income.medicaid) # (1-p1)
+                                           )) 
 
+# OUTPUT 3: FPCs
+# FPCs/all = (FPCs/FPx) * (FPx/Fx) * (Fx/all)
+#          = p4 * p3 * (p2 * (1-p1))
+#           (See FP for Fx/all explanation)
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.premium.and.cost.sharing.by.income.medicaid',
-                        value = expression(baseline.p.of.adap.with.premium.by.income.medicaid * baseline.p.cost.sharing.if.premium.by.income.medicaid))
+                        name = 'baseline.p.of.FPCs.income.medicaid.among.adap', # probability of FPCs, and a given income, and medicaid; denominator: all adap 
+                        value = expression(baseline.p.of.income.medicaid.among.adap * # always have to include "among adap"
+                                               (baseline.p.of.Cs.among.FP.income.medicaid) * # p4
+                                               baseline.p.of.P.among.Fplus.income.medicaid * # p3
+                                               baseline.p.of.Fplus.among.not.F.only.income.medicaid * # p2
+                                               (1-baseline.p.of.F.only.income.medicaid) # (1-p1)
+                        )) 
 
+
+# OUTPUT 4: PCs
+# PCs/all = (PCs/Px) * (Px/all)
+#         = p6 * (Px/all)
+#        (Px/all) = (Px/(Px + no P))*(1 - no F)
+#                 = p5 * (1-p1 - ((1-p1)*p2))
+#                 first quantity: out of all the people who are not getting F, what proportion get P (p5)
+#                 second quantity: everyone who is not getting F, i.e., all except:
+#                       F only (p1)
+#                       F+ : (1-p1)*p2 
+# so, full equation: 
+# (PCs/all) = p6 * p5 * (1-p1 - ((1-p1)*p2))
+    # this can be simplified more but leaving as is 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.premium.without.cost.sharing.by.income.medicaid',
-                        value = expression(baseline.p.of.adap.with.premium.by.income.medicaid - baseline.p.of.adap.with.premium.and.cost.sharing.by.income.medicaid))
+                        name = 'baseline.p.of.PCs.income.medicaid.among.adap',
+                        value = expression(baseline.p.of.income.medicaid.among.adap * # always have to include "among adap"
+                                               baseline.p.of.Cs.among.P.income.medicaid * # p6 
+                                               baseline.p.of.P.among.no.F.income.medicaid * # p5 
+                                               (1-baseline.p.of.F.only.income.medicaid - # (1-p1 -
+                                                    ((1-baseline.p.of.F.only.income.medicaid) * baseline.p.of.Fplus.among.not.F.only.income.medicaid))  # ((1-p1)*p2))
+                        ))
 
+# OUTPUT 5: P only
+# (P/all) = (1-(PCs/Px)) * (Px/all)
+#       (using math from PCs, just 1-p6 instead of p6 [probability of cost-share]): 
+# (P/all) = (1-p6) * p5 * (1-p1 - ((1-p1)*p2))
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.cost.sharing.without.premium.by.income.medicaid',
-                        value = expression(baseline.p.of.adap.without.full.pay.by.income.medicaid - baseline.p.of.adap.with.premium.by.income.medicaid))
+                        name = 'baseline.p.of.P.income.medicaid.among.adap',
+                        value = expression(baseline.p.of.income.medicaid.among.adap * # always have to include "among adap"
+                                               (1-baseline.p.of.Cs.among.P.income.medicaid) * # (1-p6) 
+                                               baseline.p.of.P.among.no.F.income.medicaid * # p5 
+                                               (1-baseline.p.of.F.only.income.medicaid - # (1-p1 -
+                                                    ((1-baseline.p.of.F.only.income.medicaid) * baseline.p.of.Fplus.among.not.F.only.income.medicaid))  # ((1-p1)*p2))
+                        ))
+
+# OUTPUT 6: FCs 
+# (FCs/all) = (FCs/Fx)*(Fx/all)
+#          = (1-p3) * (p2 * (1-p1))
+#           (See FP for Fx/all explanation)
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.FCs.income.medicaid.among.adap', 
+                        value = expression(baseline.p.of.income.medicaid.among.adap * # always have to include "among adap"
+                                               (1-baseline.p.of.P.among.Fplus.income.medicaid) * # (1-p3)
+                                               baseline.p.of.Fplus.among.not.F.only.income.medicaid * # p2
+                                               (1-baseline.p.of.F.only.income.medicaid) # (1-p1)
+                        )) 
+
+# OUTPUT 7: Cs only 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Cs.income.medicaid.among.adap', 
+                        value = expression(baseline.p.of.income.medicaid.among.adap -  
+                                               (baseline.p.of.F.only.income.medicaid.among.adap + # F only 
+                                                    baseline.p.of.P.only.income.medicaid.among.adap + # P only 
+                                                    baseline.p.of.FP.income.medicaid.among.adap + # FP 
+                                                    baseline.p.of.FCs.income.medicaid.among.adap + # FCs 
+                                                    baseline.p.of.PCs.income.medicaid.among.adap + # PCs 
+                                                    baseline.p.of.FPCs.income.medicaid.among.adap # FPCs 
+                                               )
+                        )) 
 
 
 
-# Need to add
-# baseline.p.full.pay.only.by.income.medicaid
-# baseline.p.full.pay.plus.if.not.full.pay.only.by.income.medicaid
-# baseline.p.premium.if.full.pay.plus.by.income.medicaid
-# baseline.p.cost.sharing.if.full.pay.and.premium.by.income.medicaid
-# baseline.p.cost.sharing.if.premium.by.income.medicaid
-# baseline.p.premium.if.not.full.pay.by.income.medicaid
 
-# UP TO HERE !!!!
+#-- Distribute for Medicare --#
+# COMPLETELY ANALOGOUS TO MEDICAID - see that section for explanations # 
+
+# INPUTS 
+# P1 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.F.only.income.medicare', 
+                        value = expression(p.F.only.min + (p.F.only.max - p.F.only.min) /
+                                               (1 + exp(p.F.only.slope * (adap.incomes - p.F.only.midpoint) + 
+                                                            log.OR.F.only.medicare)))) 
+
+# P2
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Fplus.among.not.F.only.income.medicare', 
+                        value = expression(p.Fplus.among.not.F.only.min + (p.Fplus.among.not.F.only.max - p.Fplus.among.not.F.only.min) /
+                                               (1 + exp(p.Fplus.among.not.F.only.slope * (adap.incomes - p.Fplus.among.not.F.only.midpoint) + 
+                                                            log.OR.Fplus.among.not.F.only.medicare))))
+
+# P3
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.P.among.Fplus.income.medicare',
+                        value = expression(p.P.among.Fplus.min + (p.P.among.Fplus.max - p.P.among.Fplus.min) /
+                                               (1 + exp(p.P.among.Fplus.slope * (adap.incomes - p.P.among.Fplus.midpoint) + 
+                                                            log.OR.P.among.Fplus.medicare))))
+
+# P4
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Cs.among.FP.income.medicare',
+                        value = expression(p.Cs.among.FP.min + (p.Cs.among.FP.max - p.Cs.among.FP.min) /
+                                               (1 + exp(p.Cs.among.FP.slope * (adap.incomes - p.Cs.among.FP.midpoint) + 
+                                                            log.OR.Cs.among.FP.medicare))))
+
+# P5
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.P.among.no.F.income.medicare', 
+                        value = expression(p.P.among.no.F.min + (p.P.among.no.F.max - p.P.among.no.F.min) /
+                                               (1 + exp(p.P.among.no.F.slope * (adap.incomes - p.P.among.no.F.midpoint) + 
+                                                            log.OR.P.among.no.F.medicare))))
+
+# P6
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Cs.among.P.income.medicare',
+                        value = expression(p.Cs.among.P.min + (p.Cs.among.P.max - p.Cs.among.P.min) /
+                                               (1 + exp(p.Cs.among.P.slope * (adap.incomes - p.Cs.among.P.midpoint) + 
+                                                            log.OR.Cs.among.P.medicare))))
+
+
+
+# OUTPUTS 
+# COMPLETELY ANALOGOUS TO MEDICAID - see that section for explanations 
+# OUTPUT 1: F only
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.F.only.income.medicare.among.adap', 
+                        value = expression(baseline.p.of.income.medicare.among.adap * 
+                                               baseline.p.of.F.only.income.medicare)) 
+
+# OUTPUT 2: FP  
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.FP.income.medicare.among.adap', 
+                        value = expression(baseline.p.of.income.medicare.among.adap * 
+                                               (1-baseline.p.of.Cs.among.FP.income.medicare) * # (1-p4)
+                                               baseline.p.of.P.among.Fplus.income.medicare * # p3
+                                               baseline.p.of.Fplus.among.not.F.only.income.medicare * # p2
+                                               (1-baseline.p.of.F.only.income.medicare) # (1-p1)
+                        )) 
+
+# OUTPUT 3: FPCs
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.FPCs.income.medicare.among.adap', 
+                        value = expression(baseline.p.of.income.medicare.among.adap * 
+                                               (baseline.p.of.Cs.among.FP.income.medicare) * # p4
+                                               baseline.p.of.P.among.Fplus.income.medicare * # p3
+                                               baseline.p.of.Fplus.among.not.F.only.income.medicare * # p2
+                                               (1-baseline.p.of.F.only.income.medicare) # (1-p1)
+                        )) 
+
+# OUTPUT 4: PCs
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.PCs.income.medicare.among.adap',
+                        value = expression(baseline.p.of.income.medicare.among.adap * 
+                                               baseline.p.of.Cs.among.P.income.medicare * # p6 
+                                               baseline.p.of.P.among.no.F.income.medicare * # p5 
+                                               (1-baseline.p.of.F.only.income.medicare - # (1-p1 -
+                                                    ((1-baseline.p.of.F.only.income.medicare) * baseline.p.of.Fplus.among.not.F.only.income.medicare))  # ((1-p1)*p2))
+                        ))
+
+# OUTPUT 5: P only
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.P.income.medicare.among.adap',
+                        value = expression(baseline.p.of.income.medicare.among.adap * 
+                                               (1-baseline.p.of.Cs.among.P.income.medicare) * # (1-p6) 
+                                               baseline.p.of.P.among.no.F.income.medicare * # p5 
+                                               (1-baseline.p.of.F.only.income.medicare - # (1-p1 -
+                                                    ((1-baseline.p.of.F.only.income.medicare) * baseline.p.of.Fplus.among.not.F.only.income.medicare))  # ((1-p1)*p2))
+                        ))
+
+# OUTPUT 6: FCs 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.FCs.income.medicare.among.adap', 
+                        value = expression(baseline.p.of.income.medicare.among.adap * 
+                                               (1-baseline.p.of.P.among.Fplus.income.medicare) * # (1-p3)
+                                               baseline.p.of.Fplus.among.not.F.only.income.medicare * # p2
+                                               (1-baseline.p.of.F.only.income.medicare) # (1-p1)
+                        )) 
+
+# OUTPUT 7: Cs only 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Cs.income.medicare.among.adap', 
+                        value = expression(baseline.p.of.income.medicare.among.adap -  
+                                               (baseline.p.of.F.only.income.medicare.among.adap + # F only 
+                                                    baseline.p.of.P.only.income.medicare.among.adap + # P only 
+                                                    baseline.p.of.FP.income.medicare.among.adap + # FP 
+                                                    baseline.p.of.FCs.income.medicare.among.adap + # FCs 
+                                                    baseline.p.of.PCs.income.medicare.among.adap + # PCs 
+                                                    baseline.p.of.FPCs.income.medicare.among.adap # FPCs 
+                                               )
+                        )) 
+
 
 
 #-- Distribute for Medicare + Medicaid --#
+# COMPLETELY ANALOGOUS TO MEDICAID - see that section for explanations # 
 
-#-- Distribute for Medicare --#
+# INPUTS 
+# P1 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.F.only.income.medicare.and.medicaid', 
+                        value = expression(p.F.only.min + (p.F.only.max - p.F.only.min) /
+                                               (1 + exp(p.F.only.slope * (adap.incomes - p.F.only.midpoint) + 
+                                                            log.OR.F.only.medicare.and.medicaid)))) 
+
+# P2
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Fplus.among.not.F.only.income.medicare.and.medicaid', 
+                        value = expression(p.Fplus.among.not.F.only.min + (p.Fplus.among.not.F.only.max - p.Fplus.among.not.F.only.min) /
+                                               (1 + exp(p.Fplus.among.not.F.only.slope * (adap.incomes - p.Fplus.among.not.F.only.midpoint) + 
+                                                            log.OR.Fplus.among.not.F.only.medicare.and.medicaid))))
+
+# P3
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.P.among.Fplus.income.medicare.and.medicaid',
+                        value = expression(p.P.among.Fplus.min + (p.P.among.Fplus.max - p.P.among.Fplus.min) /
+                                               (1 + exp(p.P.among.Fplus.slope * (adap.incomes - p.P.among.Fplus.midpoint) + 
+                                                            log.OR.P.among.Fplus.medicare.and.medicaid))))
+
+# P4
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Cs.among.FP.income.medicare.and.medicaid',
+                        value = expression(p.Cs.among.FP.min + (p.Cs.among.FP.max - p.Cs.among.FP.min) /
+                                               (1 + exp(p.Cs.among.FP.slope * (adap.incomes - p.Cs.among.FP.midpoint) + 
+                                                            log.OR.Cs.among.FP.medicare.and.medicaid))))
+
+# P5
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.P.among.no.F.income.medicare.and.medicaid', 
+                        value = expression(p.P.among.no.F.min + (p.P.among.no.F.max - p.P.among.no.F.min) /
+                                               (1 + exp(p.P.among.no.F.slope * (adap.incomes - p.P.among.no.F.midpoint) + 
+                                                            log.OR.P.among.no.F.medicare.and.medicaid))))
+
+# P6
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Cs.among.P.income.medicare.and.medicaid',
+                        value = expression(p.Cs.among.P.min + (p.Cs.among.P.max - p.Cs.among.P.min) /
+                                               (1 + exp(p.Cs.among.P.slope * (adap.incomes - p.Cs.among.P.midpoint) + 
+                                                            log.OR.Cs.among.P.medicare.and.medicaid))))
+
+
+# OUTPUTS 
+# COMPLETELY ANALOGOUS TO MEDICAID - see that section for explanations 
+# OUTPUT 1: F only
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.F.only.income.medicare.and.medicaid.among.adap', 
+                        value = expression(baseline.p.of.income.medicare.and.medicaid.among.adap * 
+                                               baseline.p.of.F.only.income.medicare.and.medicaid)) 
+
+# OUTPUT 2: FP  
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.FP.income.medicare.and.medicaid.among.adap', 
+                        value = expression(baseline.p.of.income.medicare.and.medicaid.among.adap * 
+                                               (1-baseline.p.of.Cs.among.FP.income.medicare.and.medicaid) * # (1-p4)
+                                               baseline.p.of.P.among.Fplus.income.medicare.and.medicaid * # p3
+                                               baseline.p.of.Fplus.among.not.F.only.income.medicare.and.medicaid * # p2
+                                               (1-baseline.p.of.F.only.income.medicare.and.medicaid) # (1-p1)
+                        )) 
+
+# OUTPUT 3: FPCs
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.FPCs.income.medicare.and.medicaid.among.adap', 
+                        value = expression(baseline.p.of.income.medicare.and.medicaid.among.adap * 
+                                               (baseline.p.of.Cs.among.FP.income.medicare.and.medicaid) * # p4
+                                               baseline.p.of.P.among.Fplus.income.medicare.and.medicaid * # p3
+                                               baseline.p.of.Fplus.among.not.F.only.income.medicare.and.medicaid * # p2
+                                               (1-baseline.p.of.F.only.income.medicare.and.medicaid) # (1-p1)
+                        )) 
+
+# OUTPUT 4: PCs
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.PCs.income.medicare.and.medicaid.among.adap',
+                        value = expression(baseline.p.of.income.medicare.and.medicaid.among.adap * 
+                                               baseline.p.of.Cs.among.P.income.medicare.and.medicaid * # p6 
+                                               baseline.p.of.P.among.no.F.income.medicare.and.medicaid * # p5 
+                                               (1-baseline.p.of.F.only.income.medicare.and.medicaid - # (1-p1 -
+                                                    ((1-baseline.p.of.F.only.income.medicare.and.medicaid) * baseline.p.of.Fplus.among.not.F.only.income.medicare.and.medicaid))  # ((1-p1)*p2))
+                        ))
+
+# OUTPUT 5: P only
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.P.income.medicare.and.medicaid.among.adap',
+                        value = expression(baseline.p.of.income.medicare.and.medicaid.among.adap * 
+                                               (1-baseline.p.of.Cs.among.P.income.medicare.and.medicaid) * # (1-p6) 
+                                               baseline.p.of.P.among.no.F.income.medicare.and.medicaid * # p5 
+                                               (1-baseline.p.of.F.only.income.medicare.and.medicaid - # (1-p1 -
+                                                    ((1-baseline.p.of.F.only.income.medicare.and.medicaid) * baseline.p.of.Fplus.among.not.F.only.income.medicare.and.medicaid))  # ((1-p1)*p2))
+                        ))
+
+# OUTPUT 6: FCs 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.FCs.income.medicare.and.medicaid.among.adap', 
+                        value = expression(baseline.p.of.income.medicare.and.medicaid.among.adap * 
+                                               (1-baseline.p.of.P.among.Fplus.income.medicare.and.medicaid) * # (1-p3)
+                                               baseline.p.of.Fplus.among.not.F.only.income.medicare.and.medicaid * # p2
+                                               (1-baseline.p.of.F.only.income.medicare.and.medicaid) # (1-p1)
+                        )) 
+
+# OUTPUT 7: Cs only 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Cs.income.medicare.and.medicaid.among.adap', 
+                        value = expression(baseline.p.of.income.medicare.and.medicaid.among.adap -  
+                                               (baseline.p.of.F.only.income.medicare.and.medicaid.among.adap + # F only 
+                                                    baseline.p.of.P.only.income.medicare.and.medicaid.among.adap + # P only 
+                                                    baseline.p.of.FP.income.medicare.and.medicaid.among.adap + # FP 
+                                                    baseline.p.of.FCs.income.medicare.and.medicaid.among.adap + # FCs 
+                                                    baseline.p.of.PCs.income.medicare.and.medicaid.among.adap + # PCs 
+                                                    baseline.p.of.FPCs.income.medicare.and.medicaid.among.adap # FPCs 
+                                               )
+                        )) 
+
+
 
 #-- Distribute for Private Insurance --#
+# COMPLETELY ANALOGOUS TO MEDICAID - see that section for explanations # 
+
+# INPUTS 
+# P1 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.F.only.income.private', 
+                        value = expression(p.F.only.min + (p.F.only.max - p.F.only.min) /
+                                               (1 + exp(p.F.only.slope * (adap.incomes - p.F.only.midpoint) + 
+                                                            log.OR.F.only.private)))) 
+
+# P2
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Fplus.among.not.F.only.income.private', 
+                        value = expression(p.Fplus.among.not.F.only.min + (p.Fplus.among.not.F.only.max - p.Fplus.among.not.F.only.min) /
+                                               (1 + exp(p.Fplus.among.not.F.only.slope * (adap.incomes - p.Fplus.among.not.F.only.midpoint) + 
+                                                            log.OR.Fplus.among.not.F.only.private))))
+
+# P3
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.P.among.Fplus.income.private',
+                        value = expression(p.P.among.Fplus.min + (p.P.among.Fplus.max - p.P.among.Fplus.min) /
+                                               (1 + exp(p.P.among.Fplus.slope * (adap.incomes - p.P.among.Fplus.midpoint) + 
+                                                            log.OR.P.among.Fplus.private))))
+
+# P4
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Cs.among.FP.income.private',
+                        value = expression(p.Cs.among.FP.min + (p.Cs.among.FP.max - p.Cs.among.FP.min) /
+                                               (1 + exp(p.Cs.among.FP.slope * (adap.incomes - p.Cs.among.FP.midpoint) + 
+                                                            log.OR.Cs.among.FP.private))))
+
+# P5
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.P.among.no.F.income.private', 
+                        value = expression(p.P.among.no.F.min + (p.P.among.no.F.max - p.P.among.no.F.min) /
+                                               (1 + exp(p.P.among.no.F.slope * (adap.incomes - p.P.among.no.F.midpoint) + 
+                                                            log.OR.P.among.no.F.private))))
+
+# P6
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Cs.among.P.income.private',
+                        value = expression(p.Cs.among.P.min + (p.Cs.among.P.max - p.Cs.among.P.min) /
+                                               (1 + exp(p.Cs.among.P.slope * (adap.incomes - p.Cs.among.P.midpoint) + 
+                                                            log.OR.Cs.among.P.private))))
+
+
+# OUTPUTS 
+# COMPLETELY ANALOGOUS TO MEDICAID - see that section for explanations 
+# OUTPUT 1: F only
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.F.only.income.private.among.adap', 
+                        value = expression(baseline.p.of.income.private.among.adap * 
+                                               baseline.p.of.F.only.income.private)) 
+
+# OUTPUT 2: FP  
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.FP.income.private.among.adap', 
+                        value = expression(baseline.p.of.income.private.among.adap * 
+                                               (1-baseline.p.of.Cs.among.FP.income.private) * # (1-p4)
+                                               baseline.p.of.P.among.Fplus.income.private * # p3
+                                               baseline.p.of.Fplus.among.not.F.only.income.private * # p2
+                                               (1-baseline.p.of.F.only.income.private) # (1-p1)
+                        )) 
+
+# OUTPUT 3: FPCs
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.FPCs.income.private.among.adap', 
+                        value = expression(baseline.p.of.income.private.among.adap * 
+                                               (baseline.p.of.Cs.among.FP.income.private) * # p4
+                                               baseline.p.of.P.among.Fplus.income.private * # p3
+                                               baseline.p.of.Fplus.among.not.F.only.income.private * # p2
+                                               (1-baseline.p.of.F.only.income.private) # (1-p1)
+                        )) 
+
+# OUTPUT 4: PCs
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.PCs.income.private.among.adap',
+                        value = expression(baseline.p.of.income.private.among.adap * 
+                                               baseline.p.of.Cs.among.P.income.private * # p6 
+                                               baseline.p.of.P.among.no.F.income.private * # p5 
+                                               (1-baseline.p.of.F.only.income.private - # (1-p1 -
+                                                    ((1-baseline.p.of.F.only.income.private) * baseline.p.of.Fplus.among.not.F.only.income.private))  # ((1-p1)*p2))
+                        ))
+
+# OUTPUT 5: P only
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.P.income.private.among.adap',
+                        value = expression(baseline.p.of.income.private.among.adap * 
+                                               (1-baseline.p.of.Cs.among.P.income.private) * # (1-p6) 
+                                               baseline.p.of.P.among.no.F.income.private * # p5 
+                                               (1-baseline.p.of.F.only.income.private - # (1-p1 -
+                                                    ((1-baseline.p.of.F.only.income.private) * baseline.p.of.Fplus.among.not.F.only.income.private))  # ((1-p1)*p2))
+                        ))
+
+# OUTPUT 6: FCs 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.FCs.income.private.among.adap', 
+                        value = expression(baseline.p.of.income.private.among.adap * 
+                                               (1-baseline.p.of.P.among.Fplus.income.private) * # (1-p3)
+                                               baseline.p.of.Fplus.among.not.F.only.income.private * # p2
+                                               (1-baseline.p.of.F.only.income.private) # (1-p1)
+                        )) 
+
+# OUTPUT 7: Cs only 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Cs.income.private.among.adap', 
+                        value = expression(baseline.p.of.income.private.among.adap -  
+                                               (baseline.p.of.F.only.income.private.among.adap + # F only 
+                                                    baseline.p.of.P.only.income.private.among.adap + # P only 
+                                                    baseline.p.of.FP.income.private.among.adap + # FP 
+                                                    baseline.p.of.FCs.income.private.among.adap + # FCs 
+                                                    baseline.p.of.PCs.income.private.among.adap + # PCs 
+                                                    baseline.p.of.FPCs.income.private.among.adap # FPCs 
+                                               )
+                        )) 
+
+
+
+#-- Distribute for Uninsured --#
+# Everyone who's uninsured must be on full-pay (can't have premium assistance or cost-sharing if you're uninsured!)
+
+# OUTPUT 1: F only
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.F.only.income.uninsured.among.adap', 
+                        value = 'baseline.p.of.income.uninsured.among.adap') 
+
+# OUTPUT 2: FP  
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.FP.income.uninsured.among.adap', 
+                        value = 0) 
+
+# OUTPUT 3: FPCs
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.FPCs.income.uninsured.among.adap', 
+                        value = 0) 
+
+# OUTPUT 4: PCs
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.PCs.income.uninsured.among.adap',
+                        value = 0)
+
+# OUTPUT 5: P only
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.P.income.uninsured.among.adap',
+                        value = 0)
+
+# OUTPUT 6: FCs 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.FCs.income.uninsured.among.adap', 
+                        value = 0) 
+
+# OUTPUT 7: Cs only 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Cs.income.uninsured.among.adap', 
+                        value = 0) 
+
+
+
+
+
+
+## Melissa: UP TO HERE
 
 # Also need to add:
 #   income.
@@ -1735,19 +2187,19 @@ register.model.quantity(ADAP.SPECIFICATION,
 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.adap.with.full.pay.only.by.income.and.uninsured',
-                        value = expression(baseline.p.of.adap.by.income.uninsured * baseline.p.full.pay.only.by.income))
+                        value = expression(baseline.p.of.income.uninsured.among.adap * baseline.p.full.pay.only.by.income))
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.adap.with.full.pay.only.by.income.and.private.insurance',
-                        value = expression(baseline.p.of.adap.by.income.private.insurance * baseline.p.full.pay.only.by.income * rr.full.pay.only.if.private.insurance))
+                        value = expression(baseline.p.of.income.private.insurance.among.adap * baseline.p.full.pay.only.by.income * rr.full.pay.only.if.private.insurance))
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.adap.with.full.pay.only.by.income.with.medicare.without.medicaid',
-                        value = expression(baseline.p.full.pay.only.by.income * baseline.p.of.adap.by.income.with.medicare.without.medicaid * rr.full.pay.with.medicare.only))
+                        value = expression(baseline.p.full.pay.only.by.income * baseline.p.of.income.with.medicare.without.medicaid.among.adap * rr.full.pay.with.medicare.only))
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.adap.with.full.pay.only.by.income.with.medicaid.without.medicare',
-                        value = expression(baseline.p.full.pay.only.by.income * baseline.p.of.adap.by.income.with.medicaid.without.medicare * rr.full.pay.with.medicaid.only))
+                        value = expression(baseline.p.full.pay.only.by.income * baseline.p.of.income.with.medicaid.without.medicare.among.adap * rr.full.pay.with.medicaid.only))
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.adap.with.full.pay.only.by.income.with.medicare.and.medicaid',
-                        value = expression(baseline.p.full.pay.only.by.income * baseline.p.of.adap.by.income.with.medicare.and.medicaid * rr.full.pay.with.medicare.and.medicaid))
+                        value = expression(baseline.p.full.pay.only.by.income * baseline.p.of.income.with.medicare.and.medicaid.among.adap * rr.full.pay.with.medicare.and.medicaid))
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.adap.with.full.pay.only.by.income',
                         value = expression(p.of.adap.with.full.pay.only.by.income.without.medicare.or.medicaid +
@@ -1776,18 +2228,18 @@ register.model.quantity(ADAP.SPECIFICATION,
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.adap.with.premium.if.not.full.pay.only.by.income.without.medicare.or.medicaid',
                         value = expression(baseline.p.premium.if.not.full.pay.only.by.income * 
-                                               (baseline.p.of.adap.by.income.without.medicare.or.medicaid - p.of.adap.with.full.pay.only.by.income.without.medicare.or.medicaid)))
+                                               (baseline.p.of.income.without.medicare.or.medicaid.among.adap - p.of.adap.with.full.pay.only.by.income.without.medicare.or.medicaid)))
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.adap.with.premium.if.not.full.pay.only.by.income.with.medicare.without.medicaid',
                         value = expression(baseline.p.premium.if.not.full.pay.only.by.income * rr.premium.with.medicare.only *
-                                               (baseline.p.of.adap.by.income.with.medicare.without.medicaid - baseline.p.of.adap.with.full.pay.only.by.income.with.medicare.without.medicaid)))
+                                               (baseline.p.of.income.with.medicare.without.medicaid.among.adap - baseline.p.of.adap.with.full.pay.only.by.income.with.medicare.without.medicaid)))
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.adap.with.premium.if.not.full.pay.only.by.income.with.medicaid.without.medicare',
                         value = expression(baseline.p.premium.if.not.full.pay.only.by.income * rr.full.pay.with.medicaid.only *
-                                               (baseline.p.of.adap.by.income.with.medicaid.without.medicare - baseline.p.of.adap.with.full.pay.only.by.income.with.medicaid.without.medicare)))e
+                                               (baseline.p.of.income.with.medicaid.without.medicare.among.adap - baseline.p.of.adap.with.full.pay.only.by.income.with.medicaid.without.medicare)))e
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.adap.with.premium.if.not.full.pay.only.by.income.with.medicare.and.medicaid',
-                        value = expression(baseline.p.premium.if.not.full.pay.only.by.income * baseline.p.of.adap.by.income.with.medicare.and.medicaid * rr.full.pay.with.medicare.and.medicaid))
+                        value = expression(baseline.p.premium.if.not.full.pay.only.by.income * baseline.p.of.income.with.medicare.and.medicaid.among.adap * rr.full.pay.with.medicare.and.medicaid))
 
 
 
@@ -1812,10 +2264,10 @@ register.model.quantity(ADAP.SPECIFICATION,
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'p.of.adap.with.full.pay.plus.by.income',
                         value = expression(p.full.pay.plus.if.not.full.pay.only.by.income * (
-                            baseline.p.of.adap.by.income.without.medicare.or.medicaid +
-                                baseline.p.of.adap.by.income.with.medicaid.without.medicare * rr.full.pay.with.medicaid.only +
-                                baseline.p.of.adap.by.income.with.medicare.without.medicaid * rr.full.pay.with.medicare.only +
-                                baseline.p.of.adap.by.income.with.medicare.and.medicaid * rr.full.pay.with.medicare.and.medicaid
+                            baseline.p.of.income.without.medicare.or.medicaid.among.adap +
+                                baseline.p.of.income.with.medicaid.without.medicare.among.adap * rr.full.pay.with.medicaid.only +
+                                baseline.p.of.income.with.medicare.without.medicaid.among.adap * rr.full.pay.with.medicare.only +
+                                baseline.p.of.income.with.medicare.and.medicaid.among.adap * rr.full.pay.with.medicare.and.medicaid
                         )))
 
 
@@ -2182,12 +2634,12 @@ register.model.quantity(ADAP.SPECIFICATION,
                                 proportion.pwh.who.are.suppressed.and.keep.adap.premium.and.copay.but.change.formulary * change.PCp.formulary.suppression.rr +
                                 proportion.pwh.who.are.suppressed.and.keep.adap.copay.without.premium.but.change.formulary * change.Cp.formulary.suppression.rr +
                                 
-                                proportion.pwh.who.are.suppressed.and.change.adap.premium.without.copay.to.full.pay.and.change.formulary * change.adap.full.pay.formulary.suppression.rr + #change.F.formulary.suppression.rr? I think this was a copy paste error
-                                proportion.pwh.who.are.suppressed.and.change.adap.premium.and.cost.sharing.to.full.pay.and.change.formulary * change.adap.full.pay.formulary.suppression.rr #change.F.formulary.suppression.rr? I think this was a copy paste error
+                                proportion.pwh.who.are.suppressed.and.change.adap.premium.without.copay.to.full.pay.and.change.formulary * change.F.formulary.suppression.rr + 
+                                proportion.pwh.who.are.suppressed.and.change.adap.premium.and.cost.sharing.to.full.pay.and.change.formulary * change.F.formulary.suppression.rr 
                                 )
 )
 
-#-- Suppression Among Full Pay --#
+#-- Suppression Among Full Pay (F) --#
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.and.lose.adap.full.pay',
                         value = expression(baseline.proportion.pwh.with.adap * 
@@ -2229,37 +2681,38 @@ register.model.quantity(ADAP.SPECIFICATION,
 )
 
 
-# Full-pay suppression components
+# Full-pay (F) suppression components
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.only',
                         value = expression(baseline.p.of.adap.with.full.pay.only * 
-                                               fraction.time.on.adap.full.pay.from.full.pay.only * 
+                                               fraction.time.covered.among.F * 
                                                proportion.F.only.suppressed
                         ))
 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.and.premium.without.cost.sharing',
                         value = expression(baseline.p.of.adap.with.full.pay.and.premium.without.cost.sharing *
-                                               fraction.time.on.adap.full.pay.from.full.pay.and.premium.without.cost.sharing *
+                                               fraction.time.F.among.FP *
                                                proportion.FP.suppressed
                         ))
 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.and.premium.and.cost.sharing',
                         value = expression(baseline.p.of.adap.with.full.pay.and.premium.and.cost.sharing *
-                                               fraction.time.on.adap.full.pay.from.full.pay.and.premium.and.cost.sharing *
+                                               fraction.time.F.among.FPCs *
                                                proportion.FPCs.suppressed
                         ))
 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.and.cost.sharing.without.premium',
                         value = expression(baseline.p.of.adap.with.full.pay.and.cost.sharing.without.premium *
-                                               fraction.time.on.adap.full.pay.from.full.pay.and.cost.sharing.without.premium *
-                                               proportion.adap.full.pay.and.cost.sharing.without.premium.suppressed
+                                               fraction.time.F.among.FCs *
+                                               proportion.FCs.suppressed
                         ))
 
-#-- Suppression Among Premium WithOUT Cost-Sharing --#
 
+
+#-- Suppression Among Premium (P) --#
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.and.lose.adap.premium.without.cost.sharing',
                         value = expression(baseline.proportion.pwh.with.adap * 
@@ -2276,10 +2729,10 @@ register.model.quantity(ADAP.SPECIFICATION,
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.without.full.pay *
                                                     proportion.adap.premium.without.cost.sharing.who.change.eligibility.to.full.pay *
-                                                    (1-proportion.adap.change.to.full.pay.clients.with.formulary.change) +
+                                                    (1-proportion.change.to.F.with.formulary.change) +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.with.full.pay *
                                                     proportion.adap.full.pay.and.premium.without.cost.sharing.who.change.eligibility.to.full.pay *
-                                                    (1-proportion.adap.change.to.full.pay.clients.with.formulary.change)
+                                                    (1-proportion.change.to.F.with.formulary.change)
                                                ))
 )
 
@@ -2288,10 +2741,10 @@ register.model.quantity(ADAP.SPECIFICATION,
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.without.full.pay *
                                                     proportion.adap.premium.without.cost.sharing.who.change.eligibility.to.full.pay *
-                                                    proportion.adap.change.to.full.pay.clients.with.formulary.change +
+                                                    proportion.change.to.F.with.formulary.change +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.with.full.pay *
                                                     proportion.adap.full.pay.and.premium.without.cost.sharing.who.change.eligibility.to.full.pay *
-                                                    proportion.adap.change.to.full.pay.clients.with.formulary.change
+                                                    proportion.change.to.F.with.formulary.change
                                                ))
 )
 
@@ -2307,24 +2760,24 @@ register.model.quantity(ADAP.SPECIFICATION,
 
 
 
-# Premium without cost-sharing suppression components
+# Premium (P) suppression components
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.without.full.pay',
                         value = expression(baseline.p.of.adap.with.premium.without.cost.sharing *
-                                               fraction.time.on.adap.premium.without.cost.sharing.from.without.full.pay *
+                                               fraction.time.covered.among.P *
                                                proportion.P.only.suppressed
                         ))
 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.with.full.pay',
                         value = expression(baseline.p.of.adap.with.full.pay.and.premium.without.cost.sharing *
-                                               fraction.time.on.adap.premium.without.cost.sharing.from.with.full.pay *
+                                               fraction.time.P.among.FP *
                                                proportion.FP.suppressed
                         ))
 
 
-#-- Suppression Among Premium AND Cost-Sharing --#
 
+#-- Suppression Among Premium AND Cost-Sharing (PCs) --#
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.and.lose.adap.premium.and.cost.sharing',
                         value = expression(baseline.proportion.pwh.with.adap * 
@@ -2340,10 +2793,10 @@ register.model.quantity(ADAP.SPECIFICATION,
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.without.full.pay *
                                                     proportion.adap.premium.and.cost.sharing.who.change.eligibility.to.full.pay *
-                                                    proportion.adap.change.to.full.pay.clients.with.formulary.change +
+                                                    proportion.change.to.F.with.formulary.change +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.with.full.pay *
                                                     proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.full.pay *
-                                                    proportion.adap.change.to.full.pay.clients.with.formulary.change
+                                                    proportion.change.to.F.with.formulary.change
                                                ))
 )
 
@@ -2352,10 +2805,10 @@ register.model.quantity(ADAP.SPECIFICATION,
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.without.full.pay *
                                                     proportion.adap.premium.and.cost.sharing.who.change.eligibility.to.full.pay *
-                                                    (1 - proportion.adap.change.to.full.pay.clients.with.formulary.change) +
+                                                    (1 - proportion.change.to.F.with.formulary.change) +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.with.full.pay *
                                                     proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.full.pay *
-                                                    (1 - proportion.adap.change.to.full.pay.clients.with.formulary.change)
+                                                    (1 - proportion.change.to.F.with.formulary.change)
                                                ))
 )
 
@@ -2408,24 +2861,24 @@ register.model.quantity(ADAP.SPECIFICATION,
  
 
 
-# Premium and cost-sharing suppression components
+# Premium and cost-sharing (PCs) suppression components
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.without.full.pay',
                         value = expression(baseline.p.of.adap.with.premium.and.cost.sharing *
-                                               fraction.time.on.adap.premium.and.cost.sharing.from.without.full.pay *
+                                               fraction.time.covered.among.PCs *
                                                proportion.PCs.suppressed
                         ))
 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.with.full.pay',
                         value = expression(baseline.p.of.adap.with.full.pay.and.premium.and.cost.sharing *
-                                               fraction.time.on.adap.premium.and.cost.sharing.from.with.full.pay *
+                                               fraction.time.PCs.among.FPCs *
                                                proportion.FPCs.suppressed
                         ))
 
 
-#-- Suppression Among Cost-Sharing withOUT Premium --#
 
+#-- Suppression Among Cost-Sharing (Cs) --#
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.and.lose.adap.cost.sharing.without.premium',
                         value = expression(baseline.proportion.pwh.with.adap * 
@@ -2463,19 +2916,19 @@ register.model.quantity(ADAP.SPECIFICATION,
 )
 
 
-# Cost-sharing without premium suppression components
+# Cost-sharing (Cs) suppression components
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.cost.sharing.without.premium.from.without.full.pay',
                         value = expression(baseline.p.of.adap.with.cost.sharing.without.premium *
-                                               fraction.time.on.adap.cost.sharing.without.premium.from.without.full.pay *
+                                               fraction.time.covered.among.Cs *
                                                proportion.Cs.only.suppressed
                         ))
 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.cost.sharing.without.premium.from.with.full.pay',
                         value = expression(baseline.p.of.adap.with.full.pay.and.cost.sharing.without.premium *
-                                               fraction.time.on.adap.cost.sharing.without.premium.from.with.full.pay *
-                                               proportion.adap.full.pay.and.cost.sharing.without.premium.suppressed
+                                               fraction.time.Cs.among.FCs *
+                                               proportion.FCs.suppressed
                         ))
 
 

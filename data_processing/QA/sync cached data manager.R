@@ -13,13 +13,13 @@ source('commoncode/cache_manager.R')
 
 # SURVEILLANCE MANAGER ----------------------------------------------------
 
-surveillance.manager = load.data.manager(name="surveillance.manager", file="Q:/data_managers/cached/surveillance.manager.rdata")
+surveillance.manager = load.data.manager(name="surveillance.manager", file="Q:/data_managers/surveillance.manager.rdata")
 
 
 
 #You have to change the link everytime
 sync.cached.data.manager("surveillance.manager.rdata",
-                         "https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/tfojo1_jh_edu/IQAOQASXMoqoRrstFflQejrNAfSyoPltqMtS_ETpkoxjWI4?e=lBTtCl",
+                         "https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/tfojo1_jh_edu/IQAOQASXMoqoRrstFflQejrNAfSyoPltqMtS_ETpkoxjWI4?e=QpsftX",
                          allow.flag = T)
 get.data.manager.cache.metadata()
 
