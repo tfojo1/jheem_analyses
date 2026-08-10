@@ -582,33 +582,33 @@ penalty.ps.diag.growth.likelihood.instructions =
     )
 
 ##---- (NEW) Nested proportion likelihood: proportion of male ps.diagnosis among MSM ----
-# proportion.male.diagnosis.among.msm.nested.likelihood.instructions <-
-#     create.nested.proportion.likelihood.instructions(outcome.for.data = "prop.male.ps.diag.among.msm",
-#                                                      outcome.for.sim = "prop.male.ps.diag.among.msm",
-#                                                      denominator.outcome.for.data = "denominator.for.prop.male.ps.diag.among.msm",
-#                                                      outcome.for.n.multipliers = "ps.syphilis.diagnoses", # Have to set this to something with county-level data.
-#                                                      #
-#                                                      location.types = c('STATE','CBSA'),
-#                                                      minimum.geographic.resolution.type = "COUNTY",
-#                                                      levels.of.stratification = 0,
-#                                                      #
-#                                                      p.bias.inside.location = 0,
-#                                                      p.bias.outside.location = 0,
-#                                                      p.bias.sd.inside.location = 0.05, #'@PK: I need to find a couple of locations (NY, CA?) that report the MSM number and derive these estimates
-#                                                      p.bias.sd.outside.location = 0.05,
-#                                                      #
-#                                                      within.location.p.error.correlation = 0.5, #Default: correlation from one year to other in the bias in the city and outside the city
-#                                                      within.location.n.error.correlation = 0.5, #Default: ratio of tests outside MSA to those inside MSA (for MSA we usually dont have fully stratified numbers)
-#                                                      #
-#                                                      observation.correlation.form = 'compound.symmetry',
-#                                                      p.error.variance.term = 0.1, # From sqrt(2 * 0.07^2), where we assume numerator and denominator errors are independent (they're not) and 7% cv each
-#                                                      p.error.variance.type = "cv",
-#                                                      minimum.error.sd = 0.01, # to fix two Houston points where variance data says 0
-#                                                      #
-#                                                      partitioning.function = SHIELD.DUMMY.PARTITIONING.FUNCTION, # It won't need to use this
-#                                                      #
-#                                                      equalize.weight.by.year = T
-#     )
+proportion.male.diagnosis.among.msm.nested.likelihood.instructions <-
+    create.nested.proportion.likelihood.instructions(outcome.for.data = "prop.male.ps.diag.among.msm",
+                                                     outcome.for.sim = "prop.male.ps.diag.among.msm",
+                                                     denominator.outcome.for.data = "denominator.for.prop.male.ps.diag.among.msm",
+                                                     outcome.for.n.multipliers = "ps.syphilis.diagnoses", # Have to set this to something with county-level data.
+                                                     #
+                                                     location.types = c('STATE','CBSA'),
+                                                     minimum.geographic.resolution.type = "COUNTY",
+                                                     levels.of.stratification = 0,
+                                                     #
+                                                     p.bias.inside.location = 0,
+                                                     p.bias.outside.location = 0,
+                                                     p.bias.sd.inside.location = 0.05, #'@PK: I need to find a couple of locations (NY, CA?) that report the MSM number and derive these estimates
+                                                     p.bias.sd.outside.location = 0.05,
+                                                     #
+                                                     within.location.p.error.correlation = 0.5, #Default: correlation from one year to other in the bias in the city and outside the city
+                                                     within.location.n.error.correlation = 0.5, #Default: ratio of tests outside MSA to those inside MSA (for MSA we usually dont have fully stratified numbers)
+                                                     #
+                                                     observation.correlation.form = 'compound.symmetry',
+                                                     p.error.variance.term = 0.1, # From sqrt(2 * 0.07^2), where we assume numerator and denominator errors are independent (they're not) and 7% cv each
+                                                     p.error.variance.type = "cv",
+                                                     minimum.error.sd = 0.01, # to fix two Houston points where variance data says 0
+                                                     #
+                                                     partitioning.function = SHIELD.DUMMY.PARTITIONING.FUNCTION, # It won't need to use this
+                                                     #
+                                                     equalize.weight.by.year = T
+    )
 ##---- PS Diagnosis Rate Among MSM (per population MSM)----
 ps.diag.rate.among.msm.nested.likelihood.instructions <-
     create.nested.proportion.likelihood.instructions(
@@ -628,9 +628,9 @@ ps.diag.rate.among.msm.nested.likelihood.instructions <-
         within.location.n.error.correlation = 0.5, #Default: ratio of tests outside MSA to those inside MSA (for MSA we usually dont have fully stratified numbers)
         #
         observation.correlation.form = 'compound.symmetry',
-        p.error.variance.term = 0.1, # From sqrt(2 * 0.07^2), where we assume numerator and denominator errors are independent (they're not) and 7% cv each
+        p.error.variance.term = 0.1, #10% of the mean value
         p.error.variance.type = "cv",
-        minimum.error.sd = 0.01, # to fix two Houston points where variance data says 0
+        minimum.error.sd = 0.00001, 
         #
         partitioning.function = SHIELD.DUMMY.PARTITIONING.FUNCTION, # It won't need to use this
         #
@@ -893,7 +893,8 @@ proportion.tested.total.by.age.race.sex.nested.likelihood.instructions <-
                                                      equalize.weight.by.year = T
     )
 #-- LIKELIHOODS --# ----
-## STAGE0 : All Demog likelihoods + ps.diag ----
+## *** STAGE 0 *** ##: All Demog likelihoods + total PS diag ----
+# 2022: using all data to 2022 ----
 lik.inst.stage0 =join.likelihood.instructions(
     population.likelihood.instructions,
     deaths.likelihood.instructions, 
@@ -905,6 +906,7 @@ lik.inst.stage0 =join.likelihood.instructions(
     #
     additional.weights = STAGE.0.WEIGHT
 )
+# 2021: using all data to 2021 ----
 lik.inst.stage0.2021 =join.likelihood.instructions(
     population.likelihood.instructions,
     deaths.likelihood.instructions, 
@@ -917,17 +919,18 @@ lik.inst.stage0.2021 =join.likelihood.instructions(
     additional.weights = STAGE.0.WEIGHT
 )
 
-## STAGE 1 : All Syphilis related likelihoods 1-way stratified ----
+## *** STAGE 1 *** ##: All Syphilis related likelihoods 1-way stratified ----
 penalty.ps.diag.growth.stage1=join.likelihood.instructions(
     penalty.ps.diag.growth.likelihood.instructions,
     additional.weights = FUTURE.PENALTY.PS.DIAG.GROWTH.WEIGHT.STAGE1
 )
-ps.diag.rate.among.msm.stage1=join.likelihood.instructions(
-    ps.diag.rate.among.msm.nested.likelihood.instructions,
+# V1: Fitting to prop male ps diag among MSM ----
+ps.diag.target.msm.stage1.V1=join.likelihood.instructions(
+    proportion.male.diagnosis.among.msm.nested.likelihood.instructions,
     additional.weights = PS.DIAG.RATE.AMONG.MSM.WEIGHT.STAGE1
 )
-# putting them together:
-lik.inst.stage1=join.likelihood.instructions(
+# stage1.2022.V1 ----
+lik.inst.stage1.2022.V1=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
     total.diagnosis.by.strata.stage1.likelihood.instructions,
     #
@@ -944,11 +947,13 @@ lik.inst.stage1=join.likelihood.instructions(
     #
     historical.diagnosis.likelihood.instructions,
     penalty.ps.diag.growth.stage1, #this has a weight of 1/stage1.weight baked into it     
-    ps.diag.rate.among.msm.stage1, #this has a weight of 1/stage1.weight baked into it     
+    #
+    ps.diag.target.msm.stage1.V1, #this has a weight of 1/stage1.weight baked into it     
     #
     additional.weights = STAGE.1.WEIGHT
 )
-lik.inst.stage1.2021=join.likelihood.instructions(
+# stage1.2021.V1 ----
+lik.inst.stage1.2021.V1=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions.2021,
     total.diagnosis.by.strata.stage1.likelihood.instructions.2021,
     #
@@ -965,12 +970,64 @@ lik.inst.stage1.2021=join.likelihood.instructions(
     #
     historical.diagnosis.likelihood.instructions,
     penalty.ps.diag.growth.stage1, #this has a weight of 1/stage1.weight baked into it     
-    ps.diag.rate.among.msm.stage1, #this has a weight of 1/stage1.weight baked into it     
+    #
+    ps.diag.target.msm.stage1.V1, #this has a weight of 1/stage1.weight baked into it     
+    #
+    additional.weights = STAGE.1.WEIGHT
+)
+# V2: Fitting to ps diagnosis rate among MSM ----
+ps.diag.target.msm.stage1.V2=join.likelihood.instructions(
+    ps.diag.rate.among.msm.nested.likelihood.instructions,
+    additional.weights = PS.DIAG.RATE.AMONG.MSM.WEIGHT.STAGE1
+)
+# stage1.2022.V2 ----
+lik.inst.stage1.2022.V2=join.likelihood.instructions(
+    total.diagnosis.likelihood.instructions,
+    total.diagnosis.by.strata.stage1.likelihood.instructions,
+    #
+    ps.diagnosis.total.likelihood.instructions,
+    ps.diagnosis.by.strata.stage1.likelihood.instructions,
+    #
+    early.diagnosis.total.likelihood.instructions,
+    early.diagnosis.by.strata.stage1.likelihood.instructions,
+    #
+    late.diagnosis.total.likelihood.instructions,
+    late.diagnosis.by.strata.stage1.likelihood.instructions,
+    #
+    proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
+    #
+    historical.diagnosis.likelihood.instructions,
+    penalty.ps.diag.growth.stage1, #this has a weight of 1/stage1.weight baked into it     
+    #
+    ps.diag.target.msm.stage1.V2, #this has a weight of 1/stage1.weight baked into it     
+    #
+    additional.weights = STAGE.1.WEIGHT
+)
+# stage1.2021.V2 ----
+lik.inst.stage1.2021.V2=join.likelihood.instructions(
+    total.diagnosis.likelihood.instructions.2021,
+    total.diagnosis.by.strata.stage1.likelihood.instructions.2021,
+    #
+    ps.diagnosis.total.likelihood.instructions.2021,
+    ps.diagnosis.by.strata.stage1.likelihood.instructions.2021,
+    #
+    early.diagnosis.total.likelihood.instructions.2021,
+    early.diagnosis.by.strata.stage1.likelihood.instructions.2021,
+    #
+    late.diagnosis.total.likelihood.instructions.2021,
+    late.diagnosis.by.strata.stage1.likelihood.instructions.2021,
+    #
+    proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
+    #
+    historical.diagnosis.likelihood.instructions,
+    penalty.ps.diag.growth.stage1, #this has a weight of 1/stage1.weight baked into it     
+    #
+    ps.diag.target.msm.stage1.V2, #this has a weight of 1/stage1.weight baked into it     
     #
     additional.weights = STAGE.1.WEIGHT
 )
 
-# STAGE 2&3: All likelihood combined ----
+## *** STAGE 23 *** ## All likelihood combined ----
 lik.inst.demog.stage23=join.likelihood.instructions(
     population.likelihood.instructions,
     deaths.likelihood.instructions,
@@ -983,12 +1040,13 @@ penalty.ps.diag.growth.stage23=join.likelihood.instructions(
     penalty.ps.diag.growth.likelihood.instructions,
     additional.weights = FUTURE.PENALTY.PS.DIAG.GROWTH.WEIGHT.STAGE23
 )
-ps.diag.rate.among.msm.stage23=join.likelihood.instructions(
-    ps.diag.rate.among.msm.nested.likelihood.instructions,
+# V1: Fitting to prop male ps diag among MSM ----
+ps.diag.target.msm.stage23.V1=join.likelihood.instructions(
+    proportion.male.diagnosis.among.msm.nested.likelihood.instructions,
     additional.weights = PS.DIAG.RATE.AMONG.MSM.WEIGHT.STAGE23
 )
-# putting them together:
-lik.inst.stage23 = join.likelihood.instructions(
+# stage23.2022.V1 ----
+lik.inst.stage23.2022.V1 = join.likelihood.instructions(
     lik.inst.demog.stage23,
     #
     total.diagnosis.likelihood.instructions,
@@ -1007,11 +1065,13 @@ lik.inst.stage23 = join.likelihood.instructions(
     #
     historical.diagnosis.likelihood.instructions,
     penalty.ps.diag.growth.stage23, #this has a weight of 1/stage23.weight baked into it     
-    ps.diag.rate.among.msm.stage23, #this has a weight of 1/stage23.weight baked into it  
+    #
+    ps.diag.target.msm.stage23.V1, #this has a weight of 1/stage23.weight baked into it  
     #
     additional.weights = STAGE.23.WEIGHT
 )
-lik.inst.stage23.2021 = join.likelihood.instructions(
+# stage23.2021.V1 ----
+lik.inst.stage23.2021.V1 = join.likelihood.instructions(
     lik.inst.demog.stage23,
     #
     total.diagnosis.likelihood.instructions.2021,
@@ -1030,11 +1090,66 @@ lik.inst.stage23.2021 = join.likelihood.instructions(
     #
     historical.diagnosis.likelihood.instructions,
     penalty.ps.diag.growth.stage23, #this has a weight of 1/stage23.weight baked into it     
-    ps.diag.rate.among.msm.stage23, #this has a weight of 1/stage23.weight baked into it
+    #
+    ps.diag.target.msm.stage23.V1, #this has a weight of 1/stage23.weight baked into it
     #
     additional.weights = STAGE.23.WEIGHT
 )
-
+# V2: Fitting to ps diagnosis rate among MSM ----
+ps.diag.target.msm.stage23.V2=join.likelihood.instructions(
+    ps.diag.rate.among.msm.nested.likelihood.instructions,
+    additional.weights = PS.DIAG.RATE.AMONG.MSM.WEIGHT.STAGE23
+)
+# stage23.2022.V2 ----
+lik.inst.stage23.2022.V2 = join.likelihood.instructions(
+    lik.inst.demog.stage23,
+    #
+    total.diagnosis.likelihood.instructions,
+    total.diagnosis.by.strata.stage2.likelihood.instructions,
+    #
+    ps.diagnosis.total.likelihood.instructions,
+    ps.diagnosis.by.strata.stage2.likelihood.instructions,
+    #
+    early.diagnosis.total.likelihood.instructions,
+    early.diagnosis.by.strata.stage2.likelihood.instructions,
+    #
+    late.diagnosis.total.likelihood.instructions,
+    late.diagnosis.by.strata.stage2.likelihood.instructions,
+    #
+    proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
+    #
+    historical.diagnosis.likelihood.instructions,
+    penalty.ps.diag.growth.stage23, #this has a weight of 1/stage23.weight baked into it     
+    #
+    ps.diag.target.msm.stage23.V2, #this has a weight of 1/stage23.weight baked into it  
+    #
+    additional.weights = STAGE.23.WEIGHT
+)
+# stage23.2021.V2 ----
+lik.inst.stage23.2021.V2 = join.likelihood.instructions(
+    lik.inst.demog.stage23,
+    #
+    total.diagnosis.likelihood.instructions.2021,
+    total.diagnosis.by.strata.stage2.likelihood.instructions.2021,
+    #
+    ps.diagnosis.total.likelihood.instructions.2021,
+    ps.diagnosis.by.strata.stage2.likelihood.instructions.2021,
+    #
+    early.diagnosis.total.likelihood.instructions.2021,
+    early.diagnosis.by.strata.stage2.likelihood.instructions.2021,
+    #
+    late.diagnosis.total.likelihood.instructions.2021,
+    late.diagnosis.by.strata.stage2.likelihood.instructions.2021,
+    #
+    proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
+    #
+    historical.diagnosis.likelihood.instructions,
+    penalty.ps.diag.growth.stage23, #this has a weight of 1/stage23.weight baked into it     
+    #
+    ps.diag.target.msm.stage23.V2, #this has a weight of 1/stage23.weight baked into it
+    #
+    additional.weights = STAGE.23.WEIGHT
+)
 # #### ************ #'@Andrew: we can remove the rest
 # 
 # 

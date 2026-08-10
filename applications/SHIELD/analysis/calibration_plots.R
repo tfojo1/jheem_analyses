@@ -11,19 +11,21 @@ source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions
 
 
 # ---- SETUP ----
-for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.30.stage2.LA.PA"))} #LA completed. PA stuck
-for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.30.stage3.az"))} #all completed except LA PA
+# for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.30.stage2.LA.PA"))} #LA completed. PA stuck
+for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.30.stage3.az"))} 
+#all completed except LA PA
+#repeated for 4 cities 
 
 # for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.1.stage1.az"))}
 
 calibration.codes <- c(
     # Version 7.16 #calibrating prp of male diagnosis among msm
     # "calib.7.16.stage2.az", #all except PA complete. LA was repeated with a diff seed
-    "calib.7.16.stage3.az" # completed for 8 cities except for LA/PA
+    # "calib.7.16.stage3.az" # completed for 8 cities except for LA/PA
     
     #Version 7.30 #calibrating diag rate among men
     # ,"calib.7.30.stage2.az" #all cities complete. LA was repeated with a diff seed
-    ,"calib.7.30.stage3.az"   # completed for 10 cities
+    "calib.7.30.stage3.az"   # completed for 10 cities
     
 )
 
@@ -156,8 +158,8 @@ save_summary_plots_by_location<-function(calibration.code,folder.name,sim.subset
     )
 }
 
-save_summary_plots_by_outcome(calibration.code = "calib.7.30.stage2.az",folder.name = "calib.7.30.stage2.summary",sim.subset="last20")
-save_summary_plots_by_location(calibration.code = "calib.7.30.stage2.az",folder.name = "calib.7.30.stage2.summary",sim.subset="last20")
+# save_summary_plots_by_outcome(calibration.code = "calib.7.30.stage2.az",folder.name = "calib.7.30.stage2.summary",sim.subset="last20")
+# save_summary_plots_by_location(calibration.code = "calib.7.30.stage2.az",folder.name = "calib.7.30.stage2.summary",sim.subset="last20")
 
 save_summary_plots_by_outcome(calibration.code = "calib.7.30.stage3.az",folder.name = "calib.7.30.stage3.summary",sim.subset="full")
 save_summary_plots_by_location(calibration.code = "calib.7.30.stage3.az",folder.name = "calib.7.30.stage3.summary",sim.subset="full")
