@@ -895,7 +895,7 @@ proportion.tested.total.by.age.race.sex.nested.likelihood.instructions <-
 #-- LIKELIHOODS --# ----
 ## *** STAGE 0 *** ##: All Demog likelihoods + total PS diag ----
 # 2022: using all data to 2022 ----
-lik.inst.stage0 =join.likelihood.instructions(
+lik.inst.stage0.2022 =join.likelihood.instructions(
     population.likelihood.instructions,
     deaths.likelihood.instructions, 
     fertility.likelihood.instructions,
@@ -914,7 +914,7 @@ lik.inst.stage0.2021 =join.likelihood.instructions(
     immigration.likelihood.instructions,
     emigration.likelihood.instructions,
     #
-    ps.diagnosis.stage0.total.likelihood.instructions.2021, #'@Andrew:this one already has a weight of 4, why?
+    ps.diagnosis.stage0.total.likelihood.instructions.2021, #'@Andrew:this one already has a weight of 4, why? #@Parastu: we upweighted it to make sure it had some influence to get diagnoses in the right ballpark; otherwise, there was no point to having it and demographics would completely dominate. 
     #
     additional.weights = STAGE.0.WEIGHT
 )
