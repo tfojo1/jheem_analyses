@@ -70,6 +70,7 @@ SHIELD.PLOT.PATH <- file.path(get.jheem.root.directory(), "shield")
 }
 
 .filter.to.requested.locations <- function(requested, available, caller = "unknown") {
+    # browser()
     if (is.null(requested)) return(available)
     if (length(requested) == 0) { warning("[", caller, "] Empty locations vector"); return(character(0)) }
     req.names   <- if (!is.null(names(requested))) names(requested) else unname(requested)
@@ -730,6 +731,7 @@ plot.calib.comparison <- function(calib.simsets,
     
     all.calibs <- if (!is.null(calibration.codes)) calibration.codes else
         unique(sapply(calib.simsets, `[[`, "calib.code"))
+    # browser()
     all.loc.names <- if (!is.null(locations)) {
         unique(names(.filter.to.requested.locations(locations,
                                                     setNames(sapply(calib.simsets, `[[`, "location.code"),
