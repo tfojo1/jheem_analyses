@@ -928,8 +928,9 @@ extract.int.simsets <- function(int.simsets,
                                 location     = NULL,
                                 calib.code   = NULL,
                                 intervention = NULL,
-                                exact        = FALSE) {
-    
+                                exact        = FALSE,
+                                debug        = FALSE) {
+    if (debug) browser()
     if (is.null(location) && is.null(calib.code) && is.null(intervention))
         stop("Provide at least one filter argument: location, calib.code, or intervention")
     
@@ -940,10 +941,14 @@ extract.int.simsets <- function(int.simsets,
         else       result <- result[grepl(location, sapply(result, `[[`, "location.name"), fixed = TRUE)]
     }
     
+    if (length(result) == 0) stop("No intervention simsets match the specified criteria")
+    
     if (!is.null(calib.code)) {
         if (exact) result <- result[sapply(result, function(e) e$calib.code == calib.code)]
         else       result <- result[grepl(calib.code, sapply(result, `[[`, "calib.code"), fixed = TRUE)]
     }
+    
+    if (length(result) == 0) stop("No intervention simsets match the specified criteria")
     
     if (!is.null(intervention)) {
         if (exact) result <- result[sapply(result, function(e)
@@ -983,8 +988,9 @@ plot.int.location <- function(int.simsets,
                               width         = 12,
                               height        = 7,
                               dpi           = 300,
-                              create.dirs   = FALSE) {
-    
+                              create.dirs   = FALSE,
+                              debug         = FALSE) {
+    if (debug) browser()
     entries <- extract.int.simsets(int.simsets, location = location, calib.code = calib.code, exact = TRUE)
     
     if (!is.null(interventions))
@@ -1034,8 +1040,10 @@ plot.int.comparison <- function(int.simsets,
                                 height            = NULL,
                                 dpi               = 300,
                                 create.dirs       = TRUE,
-                                verbose           = TRUE) {
+                                verbose           = TRUE,
+                                debug             = FALSE) {
     
+    if (debug) browser()
     separate.by <- match.arg(separate.by)
     if (is.null(style.manager)) style.manager <- .auto.style.manager(split.by, facet.by)
     suffix      <- .build.file.suffix( split.by, facet.by,plot.which)
@@ -1043,8 +1051,12 @@ plot.int.comparison <- function(int.simsets,
     filtered <- int.simsets
     if (!is.null(calibration.codes))
         filtered <- filtered[sapply(filtered, function(e) e$calib.code  %in% calibration.codes)]
+    
+    if (length(filtered) == 0) stop("No intervention simsets match the specified filters")
     if (!is.null(locations))
         filtered <- filtered[sapply(filtered, function(e) e$location.name %in% locations)]
+    
+    if (length(filtered) == 0) stop("No intervention simsets match the specified filters")
     if (!is.null(interventions))
         filtered <- filtered[sapply(filtered, function(e)
             e$int.label %in% interventions || e$int.code %in% interventions)]
