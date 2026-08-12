@@ -24,6 +24,15 @@ git diff data_processing/syphilis.manager/validation/syphilis_manager_spec.json
 # Review the diff, then commit
 ```
 
+### Compare Ryan White manager versions
+
+The Ryan White compatibility tool performs a hash-gated, selective structural and exact shared-value
+comparison between the April 2025 web/display manager and the March 2026 full manager. It also
+validates the candidate manager's ADAP-derived likelihood formulas. It does not assert whole-manager
+interchangeability or historical identity for candidate-only outcomes. See
+[`../ryan.white.data.manager/validation/README.md`](../ryan.white.data.manager/validation/README.md)
+for the command, status contract, and provenance boundary.
+
 ## File Layout
 
 ```
