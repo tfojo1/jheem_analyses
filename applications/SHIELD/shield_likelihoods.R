@@ -588,6 +588,7 @@ proportion.male.diagnosis.among.msm.nested.likelihood.instructions <-
                                                      denominator.outcome.for.data = "denominator.for.prop.male.ps.diag.among.msm",
                                                      outcome.for.n.multipliers = "ps.syphilis.diagnoses", # Have to set this to something with county-level data.
                                                      #
+                                                     from.year = 2000,
                                                      location.types = c('STATE','CBSA'),
                                                      minimum.geographic.resolution.type = "COUNTY",
                                                      levels.of.stratification = 0,
