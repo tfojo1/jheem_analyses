@@ -35,6 +35,8 @@ SHIELD.DUMMY.PARTITIONING.FUNCTION <- function(arr, version = 'shield', location
 }
 proportion.tested.bias.estimates = get.cached.object.for.version(name = "proportion.tested.bias.estimates", 
                                                                  version = 'shield')
+prop_male_diag_among_msm_bias_estimates = get.cached.object.for.version(name = "prop_male_diag_among_msm_bias_estimates", 
+                                                                 version = 'shield')
 SHIELD.PARTITIONING.FUNCTION <- function(arr, version, location)
 {
     # We only do anything if:
@@ -594,9 +596,9 @@ proportion.male.diagnosis.among.msm.nested.likelihood.instructions <-
                                                      levels.of.stratification = 0,
                                                      #
                                                      p.bias.inside.location = 0,
-                                                     p.bias.outside.location = 0,
+                                                     p.bias.outside.location = prop_male_diag_among_msm_bias_estimates$out.mean, # from SHIELD/inputs/
                                                      p.bias.sd.inside.location = 0.05, #'@PK: I need to find a couple of locations (NY, CA?) that report the MSM number and derive these estimates
-                                                     p.bias.sd.outside.location = 0.05,
+                                                     p.bias.sd.outside.location = prop_male_diag_among_msm_bias_estimates$out.sd,
                                                      #
                                                      within.location.p.error.correlation = 0.5, #Default: correlation from one year to other in the bias in the city and outside the city
                                                      within.location.n.error.correlation = 0.5, #Default: ratio of tests outside MSA to those inside MSA (for MSA we usually dont have fully stratified numbers)
