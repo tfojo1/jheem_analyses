@@ -83,3 +83,17 @@ total_sample <- lapply(cities, function(city) {
 
 p_bias_mean <- mean(unlist(total_sample, recursive = T)) # 0.0743
 p_bias_sd <- sd(unlist(total_sample, recursive = T)) # 0.0572
+
+prop_male_diag_among_msm_bias_estimates <- list(
+    in.mean = NA,
+    out.mean = p_bias_mean,
+    in.sd = NA,
+    out.sd = p_bias_sd,
+    n.in = NA,
+    n.out = length(unlist(total_sample, recursive = T))
+)
+
+if (1==2)
+    cache.object.for.version(object = prop_male_diag_among_msm_bias_estimates, 
+                             name = "prop_male_diag_among_msm_bias_estimates", 
+                             version = 'shield', overwrite=T)  
