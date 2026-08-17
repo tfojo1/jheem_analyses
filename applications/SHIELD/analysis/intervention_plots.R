@@ -10,7 +10,9 @@ source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions
 
 # ---- SETUP ----
 LOCATIONS        <- SHIELD.TEN.MSAS    # Named vector: names = city, values = codes
+ 
 CALIBRATION.CODE <- "calib.8.21.stage3.az"  
+ 
 N.SIM <- 400
 BASE.PATH <- paste0(ROOT.DIR,"/simulations/shield")
 
@@ -28,7 +30,7 @@ INTERVENTION.CODES <- names(INTERVENTION.LABELS)
 int.simsets <- load.int.simsets(
     locations           = LOCATIONS[1],
     intervention.codes  = INTERVENTION.CODES,
-    calibration.code    = CALIBRATION.CODE,
+    calibration.code    = CALIBRATION.CODE[1],
     n.sim               = N.SIM,
     base.path           = BASE.PATH,
     intervention.labels = INTERVENTION.LABELS,

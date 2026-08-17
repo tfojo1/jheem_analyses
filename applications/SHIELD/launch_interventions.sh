@@ -71,7 +71,8 @@ all_ten_except_chicago=(
 CITIES=("${ten_cities[@]}")
 
 CALIBRATION_CODES=(
-    calib.7.16.stage3.az
+    calib.8.10.stage3.v1
+
 )
 
 N_SIM=400
