@@ -836,8 +836,9 @@ load.int.simsets <- function(locations,
                              cache.name          = "int.simsets",
                              force.reload        = FALSE,
                              append              = TRUE,
-                             verbose             = TRUE) {
-    # browser()
+                             verbose             = TRUE,
+                             debug               = FALSE) {
+    if (debug) browser()
     city.names     <- if (!is.null(names(locations))) names(locations) else unname(locations)
     location.codes <- unname(locations)
     

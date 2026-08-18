@@ -48,22 +48,24 @@ int.simsets <- load.int.simsets(
 #                   "diagnosis.el.misclassified", "diagnosis.late.misclassified","hiv.testing")
 # outcomes.all <- c("diagnosis.ps","doxy.uptake")
 
-
+# Note: "plot.int.location" can only take one location at a time. Consider adding argument validation.
+for (loc in names(LOCATIONS)[2:10]){
 plot.int.location(int.simsets = int.simsets,
-                  location = names(LOCATIONS[1]),
+                  location = loc,
+                  # location = LOCATIONS[[1]],
                   calib.code =CALIBRATION.CODE,
                   interventions =INTERVENTION.CODES,
                   outcomes = c("diagnosis.total", "diagnosis.ps", "diagnosis.el.misclassified", "diagnosis.late.misclassified",
                                "hiv.testing","prop.male.ps.diag.among.msm", "doxy.uptake"),
                   years = c(2018:2030),
-                  save = T,create.dirs = T )
+                  save = T,create.dirs = T)}
 
  
 plot.int.comparison(
     int.simsets = int.simsets,
     calibration.codes = CALIBRATION.CODE,
     interventions = INTERVENTION.CODES, 
-    locations = LOCATIONS,
+    locations = names(LOCATIONS),
     outcomes          = c("diagnosis.total"),
     
     separate.by       = "outcome",
@@ -76,7 +78,8 @@ plot.int.comparison(
     style.manager     = int.style.manager(
         intervention.labels = INTERVENTION.CODES,
         calibration.codes   = CALIBRATION.CODE
-    )
+    ),
+    debug = F
 )
 # ****************************************************************************************************
 # 1. COMPARE BOTH CALIBRATIONS ACROSS ALL CITIES — SEPARATE BY OUTCOME ----
