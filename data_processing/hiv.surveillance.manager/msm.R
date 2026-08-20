@@ -644,3 +644,166 @@ for (data in msm.emory.state ) {
     url = 'https://prismhealth.emory.edu/estimating-the-population-sizes-of-men-who-have-sex-with-men-in-us-states-and-counties-using-data-from-the-american-community-survey/',
     details = 'Emory University MSM Research from American Community Survey')
 }
+
+
+#===============================================================================
+
+#2026 MSM Data Update from Emory
+
+#===============================================================================
+Q_ROOT <- Sys.getenv("Q_ROOT", "Q:")
+DATA.DIR.EMORY <- file.path(
+    Q_ROOT,
+    "data_raw/emory/2026 update"
+)
+
+emory.new.files <- Sys.glob(paste0(DATA.DIR.EMORY, "/*.xlsx"))
+
+emory.new.data <- list()
+
+for (file in emory.new.files) {
+    
+    file_name <- file_path_sans_ext(basename(file))
+    sheets <- excel_sheets(file)
+    
+    for (sheet in sheets) {
+        
+        sheet_name <- paste(file_name, sheet, sep = "_")
+        
+        emory.new.data[[sheet_name]] <- list(
+            filename = sheet_name,
+            data = read_excel(file, sheet = sheet, skip=1)
+        )}}
+
+#Clean Emory data:
+emory.new.data.clean = lapply(emory.new.data, function(file){
+    
+    data=file[["data"]]
+    filename = file[["filename"]]
+    
+    data$year = "2020"
+    data$outcome= "proportion.msm"
+    data$value = data$`MSM (%)` / 100
+    
+    if(grepl("state", filename)) {
+        names(state.abb) <- state.name
+        data$location =ifelse (data$State == "District of Colombia", "DC", state.abb[data$State])
+    }
+    if(grepl("county", filename)) {
+        data$location <- sub(",.*", "", data$NAME)
+        data$location = locations::get.location.code(data$location, 'COUNTY')
+        
+        data<- data %>%
+        rename(state = State)%>%
+            mutate(
+                state_fips = case_when(
+                    state == "AL" ~ "01",
+                    state == "AK" ~ "02",
+                    state == "AZ" ~ "04",
+                    state == "AR" ~ "05",
+                    state == "CA" ~ "06",
+                    state == "CO" ~ "08",
+                    state == "CT" ~ "09",
+                    state == "DE" ~ "10",
+                    state == "DC" ~ "11",
+                    state == "FL" ~ "12",
+                    state == "GA" ~ "13",
+                    state == "HI" ~ "15",
+                    state == "ID" ~ "16",
+                    state == "IL" ~ "17",
+                    state == "IN" ~ "18",
+                    state == "IA" ~ "19",
+                    state == "KS" ~ "20",
+                    state == "KY" ~ "21",
+                    state == "LA" ~ "22",
+                    state == "ME" ~ "23",
+                    state == "MD" ~ "24",
+                    state == "MA" ~ "25",
+                    state == "MI" ~ "26",
+                    state == "MN" ~ "27",
+                    state == "MS" ~ "28",
+                    state == "MO" ~ "29",
+                    state == "MT" ~ "30",
+                    state == "NE" ~ "31",
+                    state == "NV" ~ "32",
+                    state == "NH" ~ "33",
+                    state == "NJ" ~ "34",
+                    state == "NM" ~ "35",
+                    state == "NY" ~ "36",
+                    state == "NC" ~ "37",
+                    state == "ND" ~ "38",
+                    state == "OH" ~ "39",
+                    state == "OK" ~ "40",
+                    state == "OR" ~ "41",
+                    state == "PA" ~ "42",
+                    state == "RI" ~ "44",
+                    state == "SC" ~ "45",
+                    state == "SD" ~ "46",
+                    state == "TN" ~ "47",
+                    state == "TX" ~ "48",
+                    state == "UT" ~ "49",
+                    state == "VT" ~ "50",
+                    state == "VA" ~ "51",
+                    state == "WA" ~ "53",
+                    state == "WV" ~ "54",
+                    state == "WI" ~ "55",
+                    state == "WY" ~ "56",
+                    TRUE ~ NA_character_
+                )
+            )%>%
+        
+        mutate(
+            correct_fips = map2_chr(location, state_fips, ~ {
+                x <- as.character(.x)
+                x <- x[str_sub(x, 1, 2) == .y]
+                
+                if (length(x) > 0) x[1] else NA_character_
+            })
+        ) %>%
+            mutate(location.fixed = case_when(
+                NAME == "DoÃ±a Ana County, New Mexico" ~ "35013",
+                NAME == "St. John the Baptist Parish, Louisiana" ~ "22095",
+                NAME == "Lake of the Woods County, Minnesota" ~ "27077",
+                NAME == "Prince of Wales-Hyder Census Area, Alaska" ~ "02198",
+                
+                NAME == "Fairfield County, Connecticut" ~ "09110",  #Mapping old CT counties to their new names
+                NAME == "New Haven County, Connecticut" ~ "09150",
+                NAME == "Hartford County, Connecticut" ~ "09120",
+                NAME == "New London County, Connecticut" ~ "09160",
+                NAME == "Middlesex County, Connecticut" ~ "09140",
+                NAME == "Tolland County, Connecticut" ~ "09170",
+                NAME == "Windham County, Connecticut" ~ "09180",
+                NAME == "Litchfield County, Connecticut" ~ "09130",
+                
+                TRUE ~ correct_fips
+                ))%>%
+            select(-location)%>%
+            rename(location = location.fixed)
+        
+    }
+    if(grepl("cbsa", filename)) {
+        data$location = ifelse(!is.na(data$cbsa.code), data$cbsa.code, locations::get.location.code(data$State, 'CBSA'))
+        data = subset(data, data$location != "not.in.locations.package")
+    }
+    
+    data$location = as.character(data$location)
+    data= as.data.frame(data)
+    
+    list(filename, data)
+})
+
+
+emory.new.data.clean.put = lapply(emory.new.data.clean, `[[`, 2)
+
+for (data in emory.new.data.clean.put ) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'emory',
+        source = 'emory',
+        #dimension.values = list(sex = "male"),
+        url = 'https://academic.oup.com/ofid/article/13/4/ofag148/8651134',
+        details = 'Emory University MSM Research from American Community Survey')
+}
+
+
