@@ -801,7 +801,7 @@ for (data in emory.new.data.clean.put ) {
         data = data,
         ontology.name = 'emory',
         source = 'emory',
-        #dimension.values = list(sex = "male"),
+        dimension.values = list(sex = "male"),
         url = 'https://academic.oup.com/ofid/article/13/4/ofag148/8651134',
         details = 'Emory University MSM Research from American Community Survey')
 }
