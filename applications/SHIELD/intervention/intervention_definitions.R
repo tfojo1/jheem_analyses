@@ -46,14 +46,14 @@ for (coverage in c(50,100)){
             allow.values.less.than.otherwise  = FALSE,
             allow.values.greater.than.otherwise = TRUE
         )
-        
+        name=paste0("doxy.cov.",coverage)
         doxy_int <- create.intervention(
             coverage.effect,
             parameters = DOXY.PARAMS,
             WHOLE.POPULATION, 
             code = paste0("doxy.cov.",coverage)
         )
-        print(paste0("created: ", "doxy.cov.",coverage))
+        print(name)
     }
 
 #no int ---
