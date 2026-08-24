@@ -14,7 +14,9 @@ brfss_sex = as.data.frame.table(surveillance.manager$data$proportion.msm$estimat
   mutate(location = as.character(location))%>%
   mutate(sex = as.character(sex))%>%
   mutate(value = as.numeric(value))%>%
-  mutate(outcome = "proportion.msm")
+  mutate(outcome = "proportion.msm")%>%
+    select(-sex)%>%
+    filter(!is.na(value))
 
 brfss_race_sex = as.data.frame.table(surveillance.manager$data$proportion.msm$estimate$brfss$brfss$year__location__race__sex)%>%
 rename(value = Freq)%>%
@@ -24,7 +26,9 @@ rename(value = Freq)%>%
   mutate(race = as.character(race))%>%
   mutate(value = as.numeric(value))%>%
   mutate(outcome = "proportion.msm")%>%
-  mutate(race = tolower(race))
+  mutate(race = tolower(race))%>%
+    select(-sex)%>%
+    filter(!is.na(value))
 
 brfss_age_sex = as.data.frame.table(surveillance.manager$data$proportion.msm$estimate$brfss$brfss$year__location__age__sex)%>%
   rename(value = Freq)%>%
@@ -33,7 +37,9 @@ brfss_age_sex = as.data.frame.table(surveillance.manager$data$proportion.msm$est
   mutate(sex = as.character(sex))%>%
   mutate(age = as.character(age))%>%
   mutate(value = as.numeric(value))%>%
-  mutate(outcome = "proportion.msm")
+  mutate(outcome = "proportion.msm")%>%
+    select(-sex)%>%
+    filter(!is.na(value))
 
 #Combine BRFSS
 prop.msm.brfss = list(
@@ -51,7 +57,9 @@ rename(value = Freq)%>%
   mutate(sex = as.character(sex))%>%
   mutate(value = as.numeric(value))%>%
   mutate(outcome = "proportion.msm")%>%
-  filter(location != "51515") #Removed this from the locations package March 2025
+  filter(location != "51515")%>% #Removed this from the locations package March 2025%>%
+select(-sex)%>%
+    filter(!is.na(value))
 
 
 # Need Two Put Statements because Sources are different -------------------
@@ -63,7 +71,6 @@ for (data in prop.msm.brfss) {
     data = data,
     ontology.name = 'brfss.msm',
     source = 'brfss',
-    dimension.values = list(sex = "male"),
     url = 'https://www.cdc.gov/brfss/index.html',
     details = 'Behavioral Risk Factor Surveillance System')
 }
@@ -73,7 +80,6 @@ for (data in prop.msm.brfss) {
     data = emory_sex,
     ontology.name = 'emory',
     source = 'emory',
-    dimension.values = list(sex = "male"),
     url = 'https://prismhealth.emory.edu/estimating-the-population-sizes-of-men-who-have-sex-with-men-in-us-states-and-counties-using-data-from-the-american-community-survey/',
     details = 'Emory University MSM Research from American Community Survey')
   
@@ -105,12 +111,10 @@ for (data in prop.msm.brfss) {
     
     data$value = as.numeric(data$sum_msm/data$sum_adult_men)
     data$value = round(data$value, digits=2)
-    
-    #Need to add sex column in for put statement dimensions
-    data$sex = "male"
+
     
     data <- data %>%
-      select(year, location, outcome, sex, value)
+      select(year, location, outcome, value)
     
     data<- data[!duplicated(data), ]
     
@@ -127,7 +131,6 @@ for (data in prop.msm.brfss) {
       data = data,
       ontology.name = 'emory',
       source = 'emory',
-      dimension.values = list(sex = "male"),
       url = 'https://prismhealth.emory.edu/estimating-the-population-sizes-of-men-who-have-sex-with-men-in-us-states-and-counties-using-data-from-the-american-community-survey/',
       details = 'Emory University MSM Research from American Community Survey')
   }
@@ -137,3 +140,25 @@ for (data in prop.msm.brfss) {
 
   #I'm going to write a separate code for this.
 
+  
+
+# -------------------------------------------------------------------------
+#Adding aggregated proportion.msm by MSA for 2013 only.  This is because
+  #2020 data already has data by MSA.
+  
+  agg.msa.2013 <- as.data.frame.table(surveillance.manager$data$proportion.msm$estimate$emory.aggregated$emory$year__location__sex)%>%
+      select(-sex)%>%
+      mutate(year = as.character(year),
+             value = as.numeric(Freq),
+             location = as.character(location),
+             outcome = "proportion.msm")
+  
+      
+      data.manager$put.long.form(
+          data = agg.msa.2013,
+          ontology.name = 'emory',
+          source = 'emory',
+          url = 'https://prismhealth.emory.edu/estimating-the-population-sizes-of-men-who-have-sex-with-men-in-us-states-and-counties-using-data-from-the-american-community-survey/',
+          details = 'Aggregated from County Data')
+
+  
