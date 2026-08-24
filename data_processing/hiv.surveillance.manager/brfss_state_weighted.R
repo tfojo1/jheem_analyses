@@ -227,6 +227,7 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
       data$sex = data$`_SEX`
       data$age = data$`_AGEG5YR`
       data$ever.tested = data$HIVTST7
+      data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
       
   }
   
@@ -236,6 +237,7 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
       data$sex = data$`_SEX`
       data$age = data$`_AGEG5YR`
       data$ever.tested = data$HIVTST7
+      data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
       
   }
   
