@@ -18,6 +18,7 @@
 #' available data even if the available counties aren't sufficient according to 
 #' coverage? Can also be used on counts, though caution is advised.
 #' @param source.for.denominator If aggregating a proportion or rate, this will default to the "from.source.name" unless specified.
+#' @param ontology.for.denominator Normally needs it (and assumes it) to be the same as the ontology it's getting proportion or rate data from. But if you need to override this somehow, try this (at your own risk)
 #' 
 put.msa.data.as.new.source.NEW <- function(data.manager,
                                            outcome,
@@ -30,11 +31,15 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
                                            outcome.for.relative.contribution,
                                            source.for.relative.contribution,
                                            ontology.for.relative.contribution,
+                                           years = NULL,
                                            required.coverage=0.9,
                                            skip.coverage.condition=F,
                                            metric = 'estimate',
                                            source.for.denominator=NULL,
+                                           ontology.for.denominator=NULL,
                                            debug=F) {
+    
+    if (debug) browser()
     
     error_prefix <- paste0("Cannot estimate ", geographic.type.to, " ", outcome, " data from ", geographic.type.from, " data: ")
     
@@ -42,8 +47,7 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
     
     outcome_data_all_ontologies <- data.manager$data[[outcome]][[metric]][[from.source.name]]
     outcome_url_all_ontologies <- data.manager$url[[outcome]][[metric]][[from.source.name]]
-    
-    if (debug) browser()
+
     if (scale %in% c("proportion", "rate")) {
         # Need to have these arguments supplied, or use same as proportion
         if (is.null(source.for.denominator)) {
@@ -57,7 +61,6 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
     }
     
     for (to_location in to.locations) {
-        # if (debug) browser()
         from_locations <- locations::get.contained.locations(to_location, geographic.type.from)
         
         error_prefix <- paste0("Cannot aggregate ", geographic.type.from, " data for 'to.location' ", to_location, ": ")
@@ -85,10 +88,14 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
         }
         
         for (ont_name in names(outcome_data_all_ontologies)) {
-            
+            # if (debug) browser()
             if (scale %in% c("proportion", "rate")) {
-                if (!(ont_name %in% names(denominator_data_for_source))) next
-                denominator_data_for_ontology <- denominator_data_for_source[[ont_name]]
+                if (!is.null(ontology.for.denominator)) {
+                    denominator_data_for_ontology <- denominator_data_for_source[[ontology.for.denominator]]
+                } else {
+                    if (!(ont_name %in% names(denominator_data_for_source))) next
+                    denominator_data_for_ontology <- denominator_data_for_source[[ont_name]]
+                }
             }
             
             for (strat_name in names(outcome_data_all_ontologies[[ont_name]])) {
@@ -108,7 +115,10 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
                 
                 if (!skip.coverage.condition) {
                     # For proportions, we don't need contr data necessarily, but will simplify code by assuming we DO have it, since we normally do.
+                    # Also, here we take the intersect with the requested years
                     years_in_this_strat_and_contr_data <- intersect(dimnames(strat_data)$year, years_with_contribution_data)
+                    if (!is.null(years))
+                        years_in_this_strat_and_contr_data <- intersect(years, years_in_this_strat_and_contr_data)
                     if (length(years_in_this_strat_and_contr_data)==0) next
                     
                     strat_data_from_locs_only <- subset_by_year_location(strat_data,
@@ -118,11 +128,13 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
                                                                         years_in_this_strat_and_contr_data,
                                                                         from_locations_present)
                 } else {
+                    
+                    # Need to intersect with requested years
                     strat_data_from_locs_only <- subset_by_year_location(strat_data,
-                                                                         dimnames(strat_data)$year,
+                                                                         if (!is.null(years)) intersect(dimnames(strat_data)$year) else dimnames(strat_data)$year,
                                                                          from_locations_present)
                     strat_url_from_locs_only <- subset_by_year_location(strat_url,
-                                                                         dimnames(strat_url)$year,
+                                                                        if (!is.null(years)) intersect(dimnames(strat_url)$year) else dimnames(strat_url)$year,
                                                                          from_locations_present)
                 }
                 if (is.null(strat_data_from_locs_only) || is.null(strat_url_from_locs_only)) next
@@ -173,6 +185,10 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
                     } else {
                         years_in_both <- intersect(dimnames(strat_data)$year, dimnames(strat_denominator_data)$year)
                     }
+                    
+                    if (!is.null(years))
+                        years_in_both <- intersect(years, years_in_both)
+                    
                     if (length(years_in_both)==0) next
                     
                     strat_data_from_locs_only <- subset_by_year_location(strat_data_from_locs_only,
