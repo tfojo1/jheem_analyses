@@ -12,7 +12,7 @@ source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions
 
 # ---- SETUP ----
 # for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.30.stage2.LA.PA"))} #LA completed. PA stuck
-for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.30.stage3.az"))} 
+for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.8.21.stage3.az"))} 
 #all completed except LA PA
 #repeated for 4 cities 
 
@@ -25,7 +25,9 @@ calibration.codes <- c(
     
     #Version 7.30 #calibrating diag rate among men
     # ,"calib.7.30.stage2.az" #all cities complete. LA was repeated with a diff seed
-    "calib.7.30.stage3.az"   # completed for 10 cities
+    # "calib.7.30.stage3.az"   # completed for 10 cities
+    
+    "calib.8.21.stage3.az"   # completed for 10 cities
     
 )
 
@@ -33,7 +35,7 @@ calibration.codes <- c(
 
 # Read simulations into calib.simset ----
 calib.simsets <- load.calib.simsets(
-    locations         =  SHIELD.TEN.MSAS[1],
+    locations         =  SHIELD.TEN.MSAS,
     calibration.codes = calibration.codes,
     n.sim = 400
 )
@@ -41,7 +43,7 @@ calib.simsets <- load.calib.simsets(
 # Inspect mixing statistics -----
 inspect_mixing (
     calib.simsets = calib.simsets,
-    calibration.codes = calibration.codes[2],
+    calibration.codes = calibration.codes,
     locations = SHIELD.TEN.MSAS,
     show.mixing = T,
     verbose = T

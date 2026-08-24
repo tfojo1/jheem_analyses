@@ -11,7 +11,7 @@ source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions
 
 # ---- SETUP ----
 LOCATIONS        <- SHIELD.TEN.MSAS    # Named vector: names = city, values = codes
-CALIBRATION.CODE <- "calib.7.16.stage3.az"  
+CALIBRATION.CODE <- "calib.8.21.stage3.az"  
 N.SIM <- 400
 BASE.PATH <- paste0(ROOT.DIR,"/simulations/shield")
 
