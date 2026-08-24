@@ -767,28 +767,34 @@ register.model.element(SHIELD.SPECIFICATION,
 
 
 ##---- DOXY PEP ----
+#option1: 
 # intervention control uptake directly
 # C = U/(1+r): C is coverage; r is discontinuation rate, U is uptake
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'doxy.uptake',
                         scale = 'proportion',
                         value = 0)
+register.model.element(SHIELD.SPECIFICATION,
+                       name = "doxy.discontinuationRate",
+                       scale="rate",
+                       value = 0
+)
+# register.model.quantity(SHIELD.SPECIFICATION,
+#                         name = "doxy.coverage",
+#                         scale="proportion",
+#                         value = expression(doxy.uptake/(1+ doxy.discontinuationRate))
+# )
 
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = "doxy.coverage",
                         scale="proportion",
-                        value = expression(doxy.uptake/(1+ doxy.discontinuationRate))
+                        value = 0
 )
 
 # we are sampling effectiveness & discontinuation in the intervention code from appropriate distributions
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'doxy.effectiveness', 
                        scale = 'proportion',
-                       value = 0
-)
-register.model.element(SHIELD.SPECIFICATION,
-                       name = "doxy.discontinuationRate",
-                       scale="rate",
                        value = 0
 )
 
@@ -821,6 +827,9 @@ register.model.element(SHIELD.SPECIFICATION,
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = "doxy.uptake.times.eligibility",
                         value = expression(doxy.uptake * doxy.eligibility))
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = "doxy.coverage.times.eligibility",
+                        value = expression(doxy.coverage * doxy.eligibility))
 
 ## Infectiousness ----
 # Secondary stage has max infection, the primary and EL infectiousness is set as a ratio relative to secondary
@@ -2417,11 +2426,10 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
 )
 
 ## Doxy-PEP treatment ----
-
 track.integrated.outcome(SHIELD.SPECIFICATION,
                          name = "doxy.uptake",
                          outcome.metadata = create.outcome.metadata(display.name = 'Doxy-PEP Uptake',
-                                                                    description = 'Number of MSM Using Doxy-PEP in a Year',
+                                                                    description = 'Number of Eligible MSM Starting Doxy-PEP in a Year',
                                                                     scale = 'non.negative.number',
                                                                     axis.name = 'Persons',
                                                                     units = 'persons',
@@ -2429,8 +2437,22 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
                          value.to.integrate = "point.population",
                          multiply.by = "doxy.uptake.times.eligibility",
                          keep.dimensions = c("location", "age", "race", "sex"),
-                         subset.dimension.values = list(sex = "msm"),
-                         corresponding.data.outcome = "doxy.uptake") # waiting for it to be added
+                         subset.dimension.values = list(sex = "msm")
+                         )  
+
+track.integrated.outcome(SHIELD.SPECIFICATION,
+                         name = "doxy.coverage",
+                         outcome.metadata = create.outcome.metadata(display.name = 'Doxy-PEP Uptake',
+                                                                    description = 'Number of Eligible MSM Using Doxy-PEP in a Year',
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Persons',
+                                                                    units = 'persons',
+                                                                    singular.unit = 'person'),
+                         value.to.integrate = "point.population",
+                         multiply.by = "doxy.coverage.times.eligibility",
+                         keep.dimensions = c("location", "age", "race", "sex"),
+                         subset.dimension.values = list(sex = "msm")
+                         ) 
 
 # track.cumulative.outcome(SHIELD.SPECIFICATION,
 #                          name = 'prop.sexual.susceptibile',

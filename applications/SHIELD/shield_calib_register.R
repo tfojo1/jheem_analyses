@@ -20,6 +20,53 @@ par.aliases.transmission = list(
     trate.5 = c("transmission.rate.multiplier.msm2022", "transmission.rate.multiplier.heterosexual2022")
 )
 
+# 8.21
+# Beyond 8.14, has doxy.coverage changed in specification and all cities using 2021 likelihood
+
+register.calibration.info("calib.8.21.stage0.az",
+                          likelihood.instructions = lik.inst.stage0.2021,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          fixed.initial.parameter.values = c("global.transmission.rate.msm"=2.3,
+                                                             "global.transmission.rate.het"=2.3),
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate.msm",
+                                              "global.transmission.rate.het"),
+                          parameter.aliases = par.aliases.transmission,
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info('calib.8.21.stage1.az',
+                          preceding.calibration.codes = 'calib.8.21.stage0.az',
+                          likelihood.instructions = lik.inst.stage1.2021.V1,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info("calib.8.21.stage2.az",
+                          preceding.calibration.codes = 'calib.8.21.stage1.az',
+                          likelihood.instructions = lik.inst.stage23.2021.V1,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              SHIELD.FULL.PARAMETERS.PRIOR@var.names
+                          ),
+                          n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info("calib.8.21.stage3.az",
+                          preceding.calibration.codes = 'calib.8.21.stage2.az',
+                          likelihood.instructions = lik.inst.stage23.2021.V1,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              SHIELD.FULL.PARAMETERS.PRIOR@var.names
+                          ),
+                          n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
+)
+
 # # 7.30 ----
 # # Same as 7.16 but with the ps.diag.rate.among.msm likelihood instead of the prop.male.diag.among.msm
 # # and special case likelihoods ending in 2021 for early DOXY implementers
@@ -36,6 +83,7 @@ register.calibration.info("calib.7.30.stage0.az",
                           parameter.aliases = par.aliases.transmission,
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
+
 
 # # 8.10.v1 ----
 # # Like 7.30 but now has version 1 and 2 (differ by which MSM target they use)

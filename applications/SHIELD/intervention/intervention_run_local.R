@@ -1,12 +1,4 @@
-# Get location and calibration stage from command-line arguments
-args <- commandArgs(trailingOnly = TRUE)
-if (length(args) < 5) stop("Usage: Rscript script.R <location> <calibration.stage> <n.sim> <first.year> <last.year>")
 
-LOCATION         <- as.character(args[1])
-CALIBRATION.CODE <- as.character(args[2])
-N.SIM <- as.numeric(args[3])
-FIRST.YEAR <- as.numeric(args[4])
-LAST.YEAR <- as.numeric(args[5])
 
 # ============================================================================
 # DoxyPEP Intervention Analysis
@@ -19,21 +11,18 @@ source("../jheem_analyses/applications/SHIELD/intervention/intervention_definiti
 # =============================================================================
 # SECTION 1: Configuration
 # =============================================================================
-# LOCATIONS        <- SHIELD.TEN.MSAS    # Named vector: names = city, values = codes
-
-
-# CALIBRATION.CODE <- "calib.6.16.stage3.az"  
-# N.SIM <- 300
-# FIRST.YEAR <- 2000
-# LAST.YEAR <- 2040
-
 BASE.PATH <- paste0(ROOT.DIR,"/simulations/shield")
 
+LOCATION         <- "C.12580"
+CALIBRATION.CODE <- "calib.8.14.stage3.az"
+N.SIM <- 400
+FIRST.YEAR <- 2000
+LAST.YEAR <- 2040
 
 INTERVENTION.LABELS <- c(
     noint        = "No Doxy-PEP Intervention",
     doxy.cov.100   = "coverage 100%",
-    doxy.cov.50   = "coverage 50%",
+    doxy.cov.50   = "coverage 50%"
     
 )
 INTERVENTION.CODES <- names(INTERVENTION.LABELS)
