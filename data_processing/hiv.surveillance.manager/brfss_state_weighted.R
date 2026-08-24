@@ -221,6 +221,36 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
     data$ever.tested = data$HIVTST7
   }
   
+  if(grepl("2023", filename)) {
+      data$year = as.numeric("2023")
+      data$race = data$`_RACE`
+      data$sex = data$`_SEX`
+      data$age = data$`_AGEG5YR`
+      data$ever.tested = data$HIVTST7
+      
+      data <- data %>%
+          mutate(msm = case_when(
+              `_SEX` == "1" & SOMALE == "1" ~ "msm",
+              `_SEX` == "1" & SOMALE == "3" ~ 'msm',
+              TRUE ~ NA))
+      
+  }
+  
+  if(grepl("2024", filename)) {
+      data$year = as.numeric("2024")
+      data$race = data$`_RACE`
+      data$sex = data$`_SEX`
+      data$age = data$`_AGEG5YR`
+      data$ever.tested = data$HIVTST7
+      
+      data <- data %>%
+          mutate(msm = case_when(
+              `_SEX` == "1" & SOMALE == "1" ~ "msm",
+              `_SEX` == "1" & SOMALE == "3" ~ 'msm',
+              TRUE ~ NA))
+      
+  }
+  
   data$location = state.to.fips.mappings[data$state_fips]
   data$outcome = "proportion.tested" 
   
