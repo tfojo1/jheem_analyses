@@ -32,9 +32,16 @@ BASE.PATH <- paste0(ROOT.DIR,"/simulations/shield")
 
 INTERVENTION.LABELS <- c(
     noint        = "No Doxy-PEP Intervention",
-    doxy.cov.100   = "coverage 100%",
+    doxy.cov.10   = "coverage 10%",
+    doxy.cov.20   = "coverage 20%",
+    doxy.cov.30   = "coverage 30%",
+    doxy.cov.40   = "coverage 40%",
     doxy.cov.50   = "coverage 50%",
-    
+    doxy.cov.60   = "coverage 60%",
+    doxy.cov.70   = "coverage 70%",
+    doxy.cov.80   = "coverage 80%",
+    doxy.cov.90   = "coverage 90%",
+    doxy.cov.100  = "coverage 100%"
 )
 INTERVENTION.CODES <- names(INTERVENTION.LABELS)
 

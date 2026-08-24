@@ -35,11 +35,11 @@ DOXY.PARAMS <- matrix(effectiveness_samples,
 clear.interventions() 
 
 # scenarios: changing target coverage in 2030 -----
-for (coverage in c(50,100)){  
+for (coverage in seq(10,100,10)){  
         coverage.effect =  create.intervention.effect(
             quantity.name    = "doxy.coverage",
             effect.values    = coverage/100,
-            start.time       = 2022,# when scale up begins
+            start.time       = 2023,# when scale up begins
             times            = 2030, # when scale up ends
             scale            = "proportion",
             apply.effects.as = "value",
