@@ -228,12 +228,6 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
       data$age = data$`_AGEG5YR`
       data$ever.tested = data$HIVTST7
       
-      data <- data %>%
-          mutate(msm = case_when(
-              `_SEX` == "1" & SOMALE == "1" ~ "msm",
-              `_SEX` == "1" & SOMALE == "3" ~ 'msm',
-              TRUE ~ NA))
-      
   }
   
   if(grepl("2024", filename)) {
@@ -242,12 +236,6 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
       data$sex = data$`_SEX`
       data$age = data$`_AGEG5YR`
       data$ever.tested = data$HIVTST7
-      
-      data <- data %>%
-          mutate(msm = case_when(
-              `_SEX` == "1" & SOMALE == "1" ~ "msm",
-              `_SEX` == "1" & SOMALE == "3" ~ 'msm',
-              TRUE ~ NA))
       
   }
   
