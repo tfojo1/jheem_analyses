@@ -14,7 +14,11 @@
 #==================================================================
 
 #there is proportion.msm data for more locations but i'm filtering for only county:
-proportion.msm.county <- as.data.frame.table(syphilis.manager$data$proportion.msm$estimate$emory$emory$year__location__sex)%>% filter(sex == 'male')%>% rename(proprtion.msm = Freq)%>% select(-year)%>% filter(str_detect(location, "^\\d{5}$"))
+
+#I'm pulling the 2020 proportion msm from Emory#
+
+proportion.msm.county <- as.data.frame.table(surveillance.manager$data$proportion.msm$estimate$emory$emory$year__location)%>% rename(proprtion.msm = Freq) %>% filter(str_detect(location, "^\\d{5}$"))%>%
+    filter(year == "2020") %>% select(-year)
 
 #2010-2019
 male.population.county.1 <- as.data.frame.table(syphilis.manager$data$population$estimate$census.population$stratified.census$year__location__sex) %>% filter(sex == 'male')%>% rename(male.population.count = Freq)
