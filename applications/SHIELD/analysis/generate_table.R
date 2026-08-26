@@ -211,7 +211,97 @@ make_single_location_table <- function(data,
     
     rv
 }
+# Resolve location identifiers to codes and display labels
+resolve_locations <- function(arr, locations) {
+    dn <- dimnames(arr)$location
+    if (is.null(dn)) stop("Array has no 'location' dimension.")
+    nm <- names(dn)
+    if (is.null(nm)) nm <- dn          # fall back to codes if unnamed
+    
+    # accept either MSA codes ("C.12060") or city names ("Atlanta")
+    codes <- ifelse(locations %in% dn, locations, dn[match(locations, nm)])
+    if (any(is.na(codes)))
+        stop("Location(s) not found: ", paste(locations[is.na(codes)], collapse = ", "))
+    
+    labels <- nm[match(codes, dn)]
+    labels[is.na(labels) | !nzchar(labels)] <- codes[is.na(labels) | !nzchar(labels)]
+    list(code = unname(codes), label = unname(labels))
+}
+#  Write a table to CSV, creating the directory if needed
+save_table_csv <- function(rv, save.dir = "", filename = NULL) {
+    if (is.null(filename) || !nzchar(filename))
+        stop("Error: 'filename' must be supplied when save = TRUE")
+    if (!grepl("\\.csv$", filename, ignore.case = TRUE))
+        filename <- paste0(filename, ".csv")
+    target.dir <- if (nzchar(save.dir)) save.dir else "."
+    if (!dir.exists(target.dir))
+        dir.create(target.dir, recursive = TRUE, showWarnings = FALSE)
+    full.path <- file.path(target.dir, filename)
+    readr::write_csv(rv, file = full.path, na = "")
+    message("Table written to: ", normalizePath(full.path, winslash = "/"))
+    invisible(full.path)
+}
 
+#' Compare multiple locations in one table.
+#' Rows: location (plus anything named in row.vars, plus the stat sub-rows).
+#' Columns: whichever of outcome / intervention / year are not in row.vars.
+#' @param locations Character vector of MSA codes or city names, in the order
+#'   you want them stacked.
+#' @param repeat.location.label If FALSE, the label is printed only on the first
+#'   sub-row of each location (manuscript style) and blank beneath.
+make_multi_location_table <- function(data,
+                                      locations,
+                                      outcomes,
+                                      interventions,
+                                      years,
+                                      row.vars = "",
+                                      stat.type = c("mean.ci", "mean", "median.ci", "median"),
+                                      location.label = "location",
+                                      repeat.location.label = TRUE,
+                                      save = FALSE,
+                                      save.dir = "",
+                                      filename = NULL,
+                                      debug = FALSE) {
+    
+    if (debug) browser()
+    stat.type <- match.arg(stat.type)
+    
+    loc <- resolve_locations(data[[1]], locations)
+    
+    per.loc <- lapply(seq_along(loc$code), function(i) {
+        tbl <- tryCatch(
+            make_single_location_table(data          = data,
+                                       location      = loc$code[i],
+                                       outcomes      = outcomes,
+                                       interventions = interventions,
+                                       years         = years,
+                                       row.vars      = row.vars,
+                                       stat.type     = stat.type,
+                                       save          = FALSE),
+            error = function(e)
+                stop("Failed at location ", loc$label[i], " (", loc$code[i], "): ",
+                     conditionMessage(e), call. = FALSE)
+        )
+        
+        lab <- rep(loc$label[i], nrow(tbl))
+        if (!repeat.location.label && nrow(tbl) > 1) lab[-1] <- ""
+        
+        tbl %>% mutate(!!location.label := lab, .before = 1)
+    })
+    
+    # every location must yield the same columns, or rbind would silently misalign
+    ref.names <- names(per.loc[[1]])
+    bad <- which(!vapply(per.loc, function(d) identical(names(d), ref.names), logical(1)))
+    if (length(bad) > 0)
+        stop("Column structure differs at location(s): ",
+             paste(loc$label[bad], collapse = ", "))
+    
+    rv <- dplyr::bind_rows(per.loc)
+    
+    if (save) save_table_csv(rv, save.dir, filename)
+    
+    rv
+}
 # added new integrated outcome, and interventions run, but they don't report it.
 # what does it take to report a new outcome without re-calibrating?
 
@@ -231,4 +321,65 @@ x1=make_single_location_table(data = list(total_results),
                               years = c("2022", "2026", "2035"),
                               row.vars="intervention",  
                               save = T,save.dir = paste0(BASE.PATH,"/tables/"),filename = "total.by.int"
+)
+
+# % incidence averted
+loc.tbl = make_multi_location_table(
+    data          = list(total_results),
+    locations     = names(SHIELD.TEN.MSAS),
+    outcomes      = c("pct_cum_incidence_averted"),
+    interventions = paste0("doxy.cov.",seq(10,100,10)),
+    years         = c("2035"),
+    stat.type     = "median",
+    save          = TRUE,
+    save.dir      = paste0(BASE.PATH, "/tables/"),
+    filename      = "multi.loc_pct.inc.averted_2035"
+)
+# % diagnosis averted
+loc.tbl = make_multi_location_table(
+    data          = list(total_results),
+    locations     = names(SHIELD.TEN.MSAS),
+    outcomes      = c("pct_diagnosis_averted"),
+    interventions = paste0("doxy.cov.",seq(10,100,10)),
+    years         = c("2035"),
+    stat.type     = "median",
+    save          = TRUE,
+    save.dir      = paste0(BASE.PATH, "/tables/"),
+    filename      = "multi.loc_pct.diag.averted_2035"
+)
+# cumulative incidence averted
+loc.tbl = make_multi_location_table(
+    data          = list(total_results),
+    locations     = names(SHIELD.TEN.MSAS),
+    outcomes      = c("cum_incidence_averted"),
+    interventions = paste0("doxy.cov.",seq(10,100,10)),
+    years         = c("2035"),
+    stat.type     = "median",
+    save          = TRUE,
+    save.dir      = paste0(BASE.PATH, "/tables/"),
+    filename      = "multi.loc_cum.inc.averted_2035"
+)
+#cumulative diagnosis averted
+loc.tbl = make_multi_location_table(
+    data          = list(total_results),
+    locations     = names(SHIELD.TEN.MSAS),
+    outcomes      = c("cum_diagnosis_averted"),
+    interventions = paste0("doxy.cov.",seq(10,100,10)),
+    years         = c("2035"),
+    stat.type     = "median",
+    save          = TRUE,
+    save.dir      = paste0(BASE.PATH, "/tables/"),
+    filename      = "multi.loc_cum.diag.averted_2035"
+)
+#annual incidence averted
+loc.tbl = make_multi_location_table(
+    data          = list(total_results),
+    locations     = names(SHIELD.TEN.MSAS),
+    outcomes      = c("cum_incidence_averted"),
+    interventions = paste0("doxy.cov.",seq(10,100,10)),
+    years         = c("2035"),
+    stat.type     = "median",
+    save          = TRUE,
+    save.dir      = paste0(BASE.PATH, "/tables/"),
+    filename      = "multi.loc_inc.averted_2035"
 )
