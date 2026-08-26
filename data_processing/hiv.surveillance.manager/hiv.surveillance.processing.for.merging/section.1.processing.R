@@ -220,60 +220,13 @@ source('data_processing/hiv.surveillance.manager/state.to.state.migration.race.r
 source('data_processing/hiv.surveillance.manager/state.level.total.deaths.R') #This adds state level total deaths from the Census
 source('data_processing/hiv.surveillance.manager/national.immigration.R')#this code puts national immigration data which is used in the syphilis manager
 
-#Aggregate Outcomes:
+surveillance.manager=data.manager
 
+#Adult Population:
 census.manager = load.data.manager("../../cached/census.manager.rdata")
 
-source('data_processing/put_msa_data_without_estimation_script.R') #Creates adult.population for single year ages
-source('data_processing/put_msa_data_as_new_source_script.R') #This aggregates county level data to other locations
-source('data_processing/hiv.surveillance.manager/adult.population.10.23.R') #creates adult population for 2010-2023, stratified data
-source('../jheem2/R/HELPERS_array_helpers.R')
-source('commoncode/locations_of_interest.R')
-source('commoncode/additional_locations_of_interest.R')
-
-#This aggregates county level data to state level for the recent census years for adult.population (as well as county to MSAs of interest)
-#where I wrote the restructure.recent.age.groups code to estimate for adult.pop
-surveillance.manager=data.manager
-all.states = locations::get.all.for.type('state')
-
-put.msa.data.as.new.source(outcome = 'adult.population',
-                           from.source.name = 'census.population',
-                           to.source.name = 'census.aggregated.adult.population',
-                           to.locations =  all.states,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'STATE',
-                           aggregate.counts.with.whatever.we.have = T,
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
-
-put.msa.data.as.new.source(outcome = 'adult.population',
-                           from.source.name = 'census.population',
-                           to.source.name = 'census.aggregated.adult.population',
-                           to.locations =  MSAS.OF.INTEREST,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'CBSA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
-
-put.msa.data.as.new.source(outcome = 'adult.population',
-                           from.source.name = 'census.population',
-                           to.source.name = 'census.aggregated.adult.population',
-                           to.locations =  NSDUH.REGIONS.CONTAINING.LOCATIONS.OF.INTEREST,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'CBSA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
-
-source('data_processing/simple_aggregate_county_to_msa_script.R')
-
-get.msa.totals.from.county.simple(outcome= 'deaths',  #Sum deaths by county into deaths by MSA using this code/function
-                                  metric='estimate',
-                                  msas= MSAS.OF.INTEREST,
-                                  source.from = 'census.deaths', 
-                                  source.to='census.deaths.aggregated',
-                                  details.for.put= 'estimated from county data',
-                                  data.manager.from=census.manager,
-                                  data.manager.to= surveillance.manager)
+ source('data_processing/put_msa_data_without_estimation_script.R') #Creates adult.population for single year ages
+ source('data_processing/hiv.surveillance.manager/adult.population.10.23.R') #creates adult population for 2010-2023, stratified data
 
 
 # This aggregates specific NSDUH Data to MSA ------------------------------

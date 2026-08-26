@@ -24,6 +24,12 @@ section1$import.data(section5)
 
 surveillance.manager = section1
 
+# Aggregate all outcomes --------------------
+source('data_processing/hiv.surveillance.manager/hiv.surveillance.processing.for.merging/updated.data.aggregation.jheem.R') # Aggregates outcomes using updated methods for 2026
+
+#Calculates STI Ratio data --------------------
+source('data_processing/hiv.surveillance.manager/sti_ratio_calculation.R') 
+
 # Run this code- it uses both HIV data and adult.population --------------------
 source('data_processing/hiv.surveillance.manager/tests.per.population.R') # Source code to create hiv.tests.per.population
 
