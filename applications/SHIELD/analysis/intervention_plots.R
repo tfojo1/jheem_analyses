@@ -1,8 +1,7 @@
 # ****************************************************************************************************
-# SHIELD CALIBRATION COMPARISON — SAMPLE CODE
+# SHIELD CALIBRATION PLOT
 # ****************************************************************************************************
-# Demonstrates how to compare calib.5.11.stage2.az vs calib.5.19.stage2.pk
-# across all 10 cities using plot.calib.comparison() and plot.calib.location()
+# 
 # ****************************************************************************************************
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
@@ -18,11 +17,8 @@ BASE.PATH <- paste0(ROOT.DIR,"/simulations/shield")
 
 INTERVENTION.LABELS <- c(
     noint        = "No Doxy-PEP Intervention",
-    doxy.u.100.p.100   = "Uptake 100% Persistence 100%",
-    doxy.u.50.p.100   = "Uptake 50% Persistence 100%",
-    doxy.u.100.p.50   = "Uptake 100% Persistence 50%",
-    doxy.u.50.p.50   = "Uptake 50% Persistence 50%",
-    doxy.kingCounty="Uptake 15%, 40% and then 100%"
+    doxy.cov.20 ="20% coverage",
+    doxy.cov.100 ="100% coverage"
     
 )
 INTERVENTION.CODES <- names(INTERVENTION.LABELS)
@@ -30,7 +26,7 @@ INTERVENTION.CODES <- names(INTERVENTION.LABELS)
 # ---- READ SIMULATIONS ----
 
 int.simsets <- load.int.simsets(
-    locations           = LOCATIONS,
+    locations           = LOCATIONS[1],
     intervention.codes  = INTERVENTION.CODES,
     calibration.code    = CALIBRATION.CODE,
     n.sim               = N.SIM,
@@ -39,7 +35,7 @@ int.simsets <- load.int.simsets(
     append=T
 )
 
- 
+
 
 
 # Outcome sets used across examples below
@@ -48,18 +44,31 @@ int.simsets <- load.int.simsets(
 # outcomes.all <- c("diagnosis.ps","doxy.uptake")
 
 # Note: "plot.int.location" can only take one location at a time. Consider adding argument validation.
-for (loc in names(LOCATIONS)[2:10]){
-plot.int.location(int.simsets = int.simsets,
-                  location = loc,
-                  # location = LOCATIONS[[1]],
-                  calib.code =CALIBRATION.CODE,
-                  interventions =INTERVENTION.CODES,
-                  outcomes = c("diagnosis.total", "diagnosis.ps", "diagnosis.el.misclassified", "diagnosis.late.misclassified",
-                               "hiv.testing","prop.male.ps.diag.among.msm", "doxy.uptake"),
-                  years = c(2018:2030),
-                  save = T,create.dirs = T)}
+for (loc in names(LOCATIONS)[1]){
+    plot.int.location(int.simsets = int.simsets,
+                      location = loc,
+                      calib.code =CALIBRATION.CODE,
+                      interventions =INTERVENTION.CODES,
+                      outcomes = c("diagnosis.total", "diagnosis.ps", "diagnosis.el.misclassified", "diagnosis.late.misclassified",
+                                   "hiv.testing","prop.male.ps.diag.among.msm"),
+                      # outcomes=c( "doxy.uptake","doxy.coverage"), #!! generates an error
+                      years = c(2018:2040),
+                      save = T,
+                      create.dirs = T,debug = F)
+    
+    
+    plot.int.location(int.simsets = int.simsets,
+                      location = loc,
+                      calib.code =CALIBRATION.CODE,
+                      interventions =INTERVENTION.CODES,
+                      outcomes = c("diagnosis.total", "diagnosis.ps"),
+                      facet.by = "sex",
+                      plot.which = "sim.only",
+                      years = c(2018:2040),
+                      save = T,create.dirs = T,debug = F)
+}
 
- 
+
 plot.int.comparison(
     int.simsets = int.simsets,
     calibration.codes = CALIBRATION.CODE,

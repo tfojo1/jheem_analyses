@@ -1,7 +1,11 @@
 library(tidyverse)
+# ROOT.DIR # is set by the specification
+BASE.PATH <- paste0(ROOT.DIR,"/shield/outputs/calib.8.21.stage3.az")
+# ****************************************************************************************************
 
-total_results=get(load(file = "Q:/shield/outputs/calib.8.21.stage3.az/total_results.Rdata"))
-age_results=get(load(file = "Q:/shield/outputs/calib.8.21.stage3.az/age_results.Rdata"))
+total_results=get(load(file = paste0(BASE.PATH,"/total_results.Rdata")))
+age_results=get(load(file = paste0(BASE.PATH,"/age_results.Rdata")))
+
 
 subset_array <- function(arr, dim_indices, drop = FALSE) {
     # dim_indices: named list where names are dimension *names*
@@ -67,20 +71,36 @@ make_single_location_table <- function(data,
                                        outcomes,
                                        interventions,
                                        years,
-                                       debug = F) {
+                                       row.vars="",
+                                       save = FALSE,
+                                       save.dir = "",
+                                       filename = NULL,
+                                       debug = F
+) {
     
     if (debug) browser()
     
     # for stratifications that don't have an outcome, fill with NA
     
+    # all of variables: 
     id_cols <- c("outcome", "intervention", "year")
+ 
+    # arranging those that go to rows vs columns
+    # accept "", NULL, NA, or c() as "no row variables"
+    if (is.null(row.vars)) row.vars <- character(0)
+    row.vars <- row.vars[!is.na(row.vars) & nzchar(row.vars)]
+    
+    if (!all(row.vars %in% id_cols))
+        stop("Error: 'row.vars' must be a subset of ", paste(id_cols, collapse = ", "),
+             " (or blank for none)")
+    col_vars <- setdiff(id_cols, row.vars)
     
     num_stratification_cols_for_table <- max(sapply(data, function(arr) {
         length(setdiff(names(dim(arr)),
                        c(id_cols, "sim", "location")))
     }))
     
-    Reduce(rbind, lapply(data, function(arr) {
+    rv<-Reduce(rbind, lapply(data, function(arr) {
         
         if (!all(interventions %in% dimnames(arr)$intervention))
             stop("Error: at least one intervention in 'interventions' isn't present in one of the supplied arrays")
@@ -102,7 +122,7 @@ make_single_location_table <- function(data,
             pivot_wider(names_from = "metric") %>%
             select(-median) %>%
             mutate(ci = paste0("[", lower, "-", upper, "]")) %>%
-            select(all_of(c(id_cols, stratification_cols)), mean, ci) %>%
+            select(all_of(c(stratification_cols,id_cols)), mean, ci) %>%
             mutate(mean = as.character(mean)) %>%
             pivot_longer(
                 cols = c(mean, ci),
@@ -110,9 +130,9 @@ make_single_location_table <- function(data,
                 values_to = "value"
             ) %>%
             mutate(stat = factor(stat, levels = c("mean", "ci"))) %>%  # ensures mean comes before ci
-            arrange(across(all_of(c(id_cols, stratification_cols))), stat) %>%
+            arrange(across(all_of(c(stratification_cols,row.vars, col_vars))), stat) %>%
             pivot_wider(
-                names_from = all_of(id_cols),
+                names_from = all_of(col_vars),
                 values_from = value
             ) %>%
             select(-stat)
@@ -130,16 +150,44 @@ make_single_location_table <- function(data,
         
         df
     }))
+    
+    if (save) {
+        if (is.null(filename) || !nzchar(filename))
+            stop("Error: 'filename' must be supplied when save = TRUE")
+        
+        # auto-append extension if absent
+        if (!grepl("\\.csv$", filename, ignore.case = TRUE))
+            filename <- paste0(filename, ".csv")
+        
+        # "" resolves to the working directory
+        target.dir <- if (nzchar(save.dir)) save.dir else "."
+        if (!dir.exists(target.dir))
+            dir.create(target.dir, recursive = TRUE, showWarnings = FALSE)
+        
+        full.path <- file.path(target.dir, filename)
+        readr::write_csv(rv, file = full.path, na = "")
+        message("Table written to: ", normalizePath(full.path, winslash = "/"))
+    }
+    
+    rv
 }
 
 # added new integrated outcome, and interventions run, but they don't report it.
 # what does it take to report a new outcome without re-calibrating?
 
-xx=make_single_location_table(data = list(total_results,
-                                          age_results),
+xx=make_single_location_table(data = list(total_results),
+                              location = "C.12060",
+                              outcomes = c("diagnosis.total","diagnosis.ps","incidence_averted"),
+                              interventions = c("noint", "doxy.cov.50", "doxy.cov.100"),
+                              years = c("2022", "2026", "2035"),
+                              save = T,save.dir = paste0(BASE.PATH,"/tables/"),filename = "total"
+)
+
+x1=make_single_location_table(data = list(total_results),
                               location = "C.12060",
                               outcomes = c("diagnosis.total", "incidence_averted"),
                               interventions = c("noint", "doxy.cov.50", "doxy.cov.100"),
-                              years = c("2022", "2026", "2035")
+                              years = c("2022", "2026", "2035"),
+                              row.vars="intervention",  
+                              save = T,save.dir = paste0(BASE.PATH,"/tables/"),filename = "total.by.int"
 )
-write_csv(xx, file = "applications/SHIELD/analysis/example_table.csv")
