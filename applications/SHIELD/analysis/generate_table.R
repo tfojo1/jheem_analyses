@@ -1,12 +1,10 @@
 library(tidyverse)
 # ROOT.DIR # is set by the specification
 BASE.PATH <- paste0(ROOT.DIR,"/shield/outputs/calib.8.21.stage3.az")
-# ****************************************************************************************************
-
 total_results=get(load(file = paste0(BASE.PATH,"/total_results.Rdata")))
-# age_results=get(load(file = paste0(BASE.PATH,"/age_results.Rdata")))
+# sex_results=get(load(file = paste0(BASE.PATH,"/sex_results.Rdata")))
 
-
+# ****************************************************************************************************
 subset_array <- function(arr, dim_indices, drop = FALSE) {
     # dim_indices: named list where names are dimension *names*
     # (matching names(dimnames(arr))) and values are the indices
@@ -158,24 +156,24 @@ make_single_location_table <- function(data,
             ) %>%
             select(-stat)
         
-            # 
-            # pivot_wider(names_from = "metric") %>%
-            # select(-median) %>%
-            # mutate(ci = paste0("[", lower, "-", upper, "]")) %>%
-            # select(all_of(c(stratification_cols,id_cols)), mean, ci) %>%
-            # mutate(mean = as.character(mean)) %>%
-            # pivot_longer(
-            #     cols = c(mean, ci),
-            #     names_to = "stat",
-            #     values_to = "value"
-            # ) %>%
-            # mutate(stat = factor(stat, levels = c("mean", "ci"))) %>%  # ensures mean comes before ci
-            # arrange(across(all_of(c(stratification_cols,row.vars, col_vars))), stat) %>%
-            # pivot_wider(
-            #     names_from = all_of(col_vars),
-            #     values_from = value
-            # ) %>%
-            # select(-stat)
+        # 
+        # pivot_wider(names_from = "metric") %>%
+        # select(-median) %>%
+        # mutate(ci = paste0("[", lower, "-", upper, "]")) %>%
+        # select(all_of(c(stratification_cols,id_cols)), mean, ci) %>%
+        # mutate(mean = as.character(mean)) %>%
+        # pivot_longer(
+        #     cols = c(mean, ci),
+        #     names_to = "stat",
+        #     values_to = "value"
+        # ) %>%
+        # mutate(stat = factor(stat, levels = c("mean", "ci"))) %>%  # ensures mean comes before ci
+        # arrange(across(all_of(c(stratification_cols,row.vars, col_vars))), stat) %>%
+        # pivot_wider(
+        #     names_from = all_of(col_vars),
+        #     values_from = value
+        # ) %>%
+        # select(-stat)
         
         num_extra_cols_needed <- num_stratification_cols_for_table - length(stratification_cols)
         if (num_extra_cols_needed > 0) {
@@ -305,81 +303,84 @@ make_multi_location_table <- function(data,
 # added new integrated outcome, and interventions run, but they don't report it.
 # what does it take to report a new outcome without re-calibrating?
 
-xx=make_single_location_table(data = list(total_results),
-                              location = "C.12060",
-                              outcomes = c("diagnosis.total","diagnosis.ps","incidence_averted"),
-                              interventions = c("noint", "doxy.cov.50", "doxy.cov.100"),
-                              years = c("2022", "2026", "2035"),
-                              stat.type = "mean.ci",
-                              save = F,save.dir = paste0(BASE.PATH,"/tables/"),filename = "total"
-)
-
-x1=make_single_location_table(data = list(total_results),
-                              location = "C.12060",
-                              outcomes = c("diagnosis.total", "incidence_averted"),
-                              interventions = c("noint", "doxy.cov.50", "doxy.cov.100"),
-                              years = c("2022", "2026", "2035"),
-                              row.vars="intervention",  
-                              save = T,save.dir = paste0(BASE.PATH,"/tables/"),filename = "total.by.int"
-)
-
-# % incidence averted
-loc.tbl = make_multi_location_table(
-    data          = list(total_results),
-    locations     = names(SHIELD.TEN.MSAS),
-    outcomes      = c("pct_cum_incidence_averted"),
-    interventions = paste0("doxy.cov.",seq(10,100,10)),
-    years         = c("2035"),
-    stat.type     = "median",
-    save          = TRUE,
-    save.dir      = paste0(BASE.PATH, "/tables/"),
-    filename      = "multi.loc_pct.inc.averted_2035"
-)
-# % diagnosis averted
-loc.tbl = make_multi_location_table(
-    data          = list(total_results),
-    locations     = names(SHIELD.TEN.MSAS),
-    outcomes      = c("pct_diagnosis_averted"),
-    interventions = paste0("doxy.cov.",seq(10,100,10)),
-    years         = c("2035"),
-    stat.type     = "median",
-    save          = TRUE,
-    save.dir      = paste0(BASE.PATH, "/tables/"),
-    filename      = "multi.loc_pct.diag.averted_2035"
-)
-# cumulative incidence averted
-loc.tbl = make_multi_location_table(
-    data          = list(total_results),
-    locations     = names(SHIELD.TEN.MSAS),
-    outcomes      = c("cum_incidence_averted"),
-    interventions = paste0("doxy.cov.",seq(10,100,10)),
-    years         = c("2035"),
-    stat.type     = "median",
-    save          = TRUE,
-    save.dir      = paste0(BASE.PATH, "/tables/"),
-    filename      = "multi.loc_cum.inc.averted_2035"
-)
-#cumulative diagnosis averted
-loc.tbl = make_multi_location_table(
-    data          = list(total_results),
-    locations     = names(SHIELD.TEN.MSAS),
-    outcomes      = c("cum_diagnosis_averted"),
-    interventions = paste0("doxy.cov.",seq(10,100,10)),
-    years         = c("2035"),
-    stat.type     = "median",
-    save          = TRUE,
-    save.dir      = paste0(BASE.PATH, "/tables/"),
-    filename      = "multi.loc_cum.diag.averted_2035"
-)
-#annual incidence averted
-loc.tbl = make_multi_location_table(
-    data          = list(total_results),
-    locations     = names(SHIELD.TEN.MSAS),
-    outcomes      = c("cum_incidence_averted"),
-    interventions = paste0("doxy.cov.",seq(10,100,10)),
-    years         = c("2035"),
-    stat.type     = "median",
-    save          = TRUE,
-    save.dir      = paste0(BASE.PATH, "/tables/"),
-    filename      = "multi.loc_inc.averted_2035"
-)
+# examples ----
+if (1==1){
+    x1=make_single_location_table(data = list(total_results),
+                                  location = "C.12060",
+                                  outcomes = c("diagnosis.total","diagnosis.ps","incidence_averted"),
+                                  interventions = c("noint", "doxy.cov.50", "doxy.cov.100"),
+                                  years = c("2022", "2026", "2035"),
+                                  stat.type = "mean.ci",
+                                  save = F,save.dir = paste0(BASE.PATH,"/tables/"),filename = "total"
+    )
+    
+    x2=make_single_location_table(data = list(total_results),
+                                  location = "C.12060",
+                                  outcomes = c("diagnosis.total", "incidence_averted"),
+                                  interventions = c("noint", "doxy.cov.50", "doxy.cov.100"),
+                                  years = c("2022", "2026", "2035"),
+                                  row.vars="intervention",  
+                                  save = F,save.dir = paste0(BASE.PATH,"/tables/"),filename = "total.by.int"
+    )
+    
+    # % incidence averted
+    loc.tbl = make_multi_location_table(
+        data          = list(total_results),
+        locations     = names(SHIELD.TEN.MSAS),
+        outcomes      = c("pct_cum_incidence_averted"),
+        interventions = paste0("doxy.cov.",seq(10,100,10)),
+        years         = c("2035"),
+        stat.type     = "median",
+        save          = TRUE,
+        save.dir      = paste0(BASE.PATH, "/tables/"),
+        filename      = "multi.loc_pct.inc.averted_20351"
+    )
+    # % diagnosis averted
+    loc.tbl = make_multi_location_table(
+        data          = list(total_results),
+        locations     = names(SHIELD.TEN.MSAS),
+        outcomes      = c("pct_diagnosis_averted"),
+        interventions = paste0("doxy.cov.",seq(10,100,10)),
+        years         = c("2035"),
+        stat.type     = "median",
+        save          = TRUE,
+        save.dir      = paste0(BASE.PATH, "/tables/"),
+        filename      = "multi.loc_pct.diag.averted_20351"
+    )
+    # cumulative incidence averted
+    loc.tbl = make_multi_location_table(
+        data          = list(total_results),
+        locations     = names(SHIELD.TEN.MSAS),
+        outcomes      = c("cum_incidence_averted"),
+        interventions = paste0("doxy.cov.",seq(10,100,10)),
+        years         = c("2035"),
+        stat.type     = "median",
+        save          = TRUE,
+        save.dir      = paste0(BASE.PATH, "/tables/"),
+        filename      = "multi.loc_cum.inc.averted_20351"
+    )
+    #cumulative diagnosis averted
+    loc.tbl = make_multi_location_table(
+        data          = list(total_results),
+        locations     = names(SHIELD.TEN.MSAS),
+        outcomes      = c("cum_diagnosis_averted"),
+        interventions = paste0("doxy.cov.",seq(10,100,10)),
+        years         = c("2035"),
+        stat.type     = "median",
+        save          = TRUE,
+        save.dir      = paste0(BASE.PATH, "/tables/"),
+        filename      = "multi.loc_cum.diag.averted_20351"
+    )
+    #annual incidence averted
+    loc.tbl = make_multi_location_table(
+        data          = list(total_results),
+        locations     = names(SHIELD.TEN.MSAS),
+        outcomes      = c("incidence_averted"),
+        interventions = paste0("doxy.cov.",seq(10,100,10)),
+        years         = c("2035"),
+        stat.type     = "median",
+        save          = TRUE,
+        save.dir      = paste0(BASE.PATH, "/tables/"),
+        filename      = "multi.loc_inc.averted_20351"
+    )
+}

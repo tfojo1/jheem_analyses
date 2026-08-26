@@ -44,14 +44,15 @@ int.simsets <- load.int.simsets(
 # outcomes.all <- c("diagnosis.ps","doxy.uptake")
 
 # Note: "plot.int.location" can only take one location at a time. Consider adding argument validation.
+
 for (loc in names(LOCATIONS)[1]){
     plot.int.location(int.simsets = int.simsets,
                       location = loc,
                       calib.code =CALIBRATION.CODE,
                       interventions =INTERVENTION.CODES,
                       outcomes = c("diagnosis.total", "diagnosis.ps", "diagnosis.el.misclassified", "diagnosis.late.misclassified",
-                                   "hiv.testing","prop.male.ps.diag.among.msm"),
-                      # outcomes=c( "doxy.uptake","doxy.coverage"), #!! generates an error
+                                   "hiv.testing","prop.male.ps.diag.among.msm","doxy.coverage"),
+                      # outcomes=c( "doxy.uptake"),#"doxy.coverage"), #because of repeated names
                       years = c(2018:2040),
                       save = T,
                       create.dirs = T,debug = F)
