@@ -4,7 +4,7 @@ BASE.PATH <- paste0(ROOT.DIR,"/shield/outputs/calib.8.21.stage3.az")
 # ****************************************************************************************************
 
 total_results=get(load(file = paste0(BASE.PATH,"/total_results.Rdata")))
-age_results=get(load(file = paste0(BASE.PATH,"/age_results.Rdata")))
+# age_results=get(load(file = paste0(BASE.PATH,"/age_results.Rdata")))
 
 
 subset_array <- function(arr, dim_indices, drop = FALSE) {
@@ -31,22 +31,36 @@ subset_array <- function(arr, dim_indices, drop = FALSE) {
     do.call(`[`, c(list(arr), args, list(drop = drop)))
 }
 
-get_stats <- function(arr, keep.dimensions='year', round=T, digits=0, include.mean=T, include.quartiles=F, multiply.by.100=F, floor=F) {
+get_stats <- function(arr, 
+                      keep.dimensions='year', 
+                      stat.type = c("median.ci", "median","mean.ci", "mean"), #takes the first argument as default
+                      round=T, 
+                      digits=0, 
+                      multiply.by.100=F, 
+                      floor=F) {
+    stat.type <- match.arg(stat.type)
+    point.col <- if (grepl("^mean", stat.type)) "mean" else "median"
+    show.ci   <- grepl("\\.ci$", stat.type)
+    
+    #which metrics to compute, in output order
+    metrics <- point.col
+    if (show.ci)  metrics <- c(metrics, "lower", "upper")
+    metric.fns <- list(
+        mean     = function(x) mean(x),
+        median   = function(x) median(x),
+        lower    = function(x) unname(quantile(x, probs = 0.025)),
+        upper    = function(x) unname(quantile(x, probs = 0.975))
+    )
+    
     arr_data <- apply(arr, keep.dimensions, function(x) {
-        rv <- c(lower = quantile(x, probs=0.025), median = median(x), upper = quantile(x, probs=0.975))
-        if (include.quartiles) rv <- c(rv,
-                                       lowermid = quantile(x, probs=0.25),
-                                       uppermid = quantile(x, probs=0.75))
-        if (include.mean) rv <- c(rv, mean = mean(x))
-        rv
+        vapply(metric.fns[metrics], function(f) f(x), numeric(1))
     })
+    
     if (floor) arr_data <- floor(arr_data)
     if (round) arr_data <- round(arr_data, digits=digits)
     if (multiply.by.100) arr_data <- arr_data * 100
-    metric_dimension = c("lower", "median", "upper")
-    if (include.quartiles) metric_dimension <- c(metric_dimension, "lowermid", "uppermid")
-    if (include.mean) metric_dimension <- c(metric_dimension, "mean")
-    final_dimnames <- c(list(metric=metric_dimension),
+    
+    final_dimnames <- c(list(metric = metrics),
                         dimnames(arr)[keep.dimensions])
     array(
         arr_data,
@@ -72,6 +86,7 @@ make_single_location_table <- function(data,
                                        interventions,
                                        years,
                                        row.vars="",
+                                       stat.type = c("median.ci", "median","mean.ci", "mean"), #takes the first argument as default
                                        save = FALSE,
                                        save.dir = "",
                                        filename = NULL,
@@ -84,7 +99,7 @@ make_single_location_table <- function(data,
     
     # all of variables: 
     id_cols <- c("outcome", "intervention", "year")
- 
+    
     # arranging those that go to rows vs columns
     # accept "", NULL, NA, or c() as "no row variables"
     if (is.null(row.vars)) row.vars <- character(0)
@@ -94,6 +109,11 @@ make_single_location_table <- function(data,
         stop("Error: 'row.vars' must be a subset of ", paste(id_cols, collapse = ", "),
              " (or blank for none)")
     col_vars <- setdiff(id_cols, row.vars)
+    
+    # which point estimate, and whether to append a 95% interval row
+    stat.type <- match.arg(stat.type)
+    point.col <- if (grepl("^mean", stat.type)) "mean" else "median"
+    show.ci   <- grepl("\\.ci$", stat.type)
     
     num_stratification_cols_for_table <- max(sapply(data, function(arr) {
         length(setdiff(names(dim(arr)),
@@ -117,25 +137,45 @@ make_single_location_table <- function(data,
                                         outcome = outcomes,
                                         intervention = interventions,
                                         location = location)),
-                      keep.dimensions = c("year", "intervention", "outcome", stratification_cols))
+                      keep.dimensions = c("year", "intervention", "outcome", stratification_cols),
+                      stat.type = stat.type)
         ) %>%
             pivot_wider(names_from = "metric") %>%
-            select(-median) %>%
-            mutate(ci = paste0("[", lower, "-", upper, "]")) %>%
-            select(all_of(c(stratification_cols,id_cols)), mean, ci) %>%
-            mutate(mean = as.character(mean)) %>%
+            mutate(estimate = as.character(.data[[point.col]]),
+                   ci       = if (show.ci) paste0("[", lower, "-", upper, "]") else NULL) %>%
+            select(all_of(c(stratification_cols, id_cols)),
+                   all_of(if (show.ci) c("estimate", "ci") else "estimate")) %>%
             pivot_longer(
-                cols = c(mean, ci),
+                cols = any_of(c("estimate", "ci")),
                 names_to = "stat",
                 values_to = "value"
             ) %>%
-            mutate(stat = factor(stat, levels = c("mean", "ci"))) %>%  # ensures mean comes before ci
-            arrange(across(all_of(c(stratification_cols,row.vars, col_vars))), stat) %>%
+            mutate(stat = factor(stat, levels = c("estimate", "ci"))) %>%
+            arrange(across(all_of(c(stratification_cols, row.vars, col_vars))), stat) %>%
             pivot_wider(
                 names_from = all_of(col_vars),
                 values_from = value
             ) %>%
             select(-stat)
+        
+            # 
+            # pivot_wider(names_from = "metric") %>%
+            # select(-median) %>%
+            # mutate(ci = paste0("[", lower, "-", upper, "]")) %>%
+            # select(all_of(c(stratification_cols,id_cols)), mean, ci) %>%
+            # mutate(mean = as.character(mean)) %>%
+            # pivot_longer(
+            #     cols = c(mean, ci),
+            #     names_to = "stat",
+            #     values_to = "value"
+            # ) %>%
+            # mutate(stat = factor(stat, levels = c("mean", "ci"))) %>%  # ensures mean comes before ci
+            # arrange(across(all_of(c(stratification_cols,row.vars, col_vars))), stat) %>%
+            # pivot_wider(
+            #     names_from = all_of(col_vars),
+            #     values_from = value
+            # ) %>%
+            # select(-stat)
         
         num_extra_cols_needed <- num_stratification_cols_for_table - length(stratification_cols)
         if (num_extra_cols_needed > 0) {
@@ -180,7 +220,8 @@ xx=make_single_location_table(data = list(total_results),
                               outcomes = c("diagnosis.total","diagnosis.ps","incidence_averted"),
                               interventions = c("noint", "doxy.cov.50", "doxy.cov.100"),
                               years = c("2022", "2026", "2035"),
-                              save = T,save.dir = paste0(BASE.PATH,"/tables/"),filename = "total"
+                              stat.type = "mean.ci",
+                              save = F,save.dir = paste0(BASE.PATH,"/tables/"),filename = "total"
 )
 
 x1=make_single_location_table(data = list(total_results),
