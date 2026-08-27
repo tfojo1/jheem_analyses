@@ -454,4 +454,90 @@ put.msa.data.as.new.source.NEW(outcome = 'ps.syphilis',
                                ontology.for.relative.contribution = 'census.grouped.age')
 
 
+# This aggregates specific NSDUH Data to MSA ------------------------------
+#It needs to be here bc it uses adult.pop
+
+#Aggregate cocaine + heroin for LA (C.31080), Vegas (C.29820), San Diego (C.41740)
+
+los.angeles.msa <- c('CA.11', 'CA.14') 
+
+las.vegas.msa <- c("NV.2") 
+
+san.diego.msa <- c("CA.16R")
+
+la.cocaine.aggregated = surveillance.manager$pull(outcome = "cocaine",
+                                                  metric = "estimate",
+                                                  dimension.values=list(location=los.angeles.msa),
+                                                  keep.dimensions='year')
+
+la.heroin.aggregated = surveillance.manager$pull(outcome = "heroin",
+                                                 metric = "estimate",
+                                                 dimension.values=list(location=los.angeles.msa),
+                                                 keep.dimensions='year')
+
+sd.cocaine.aggregated = surveillance.manager$pull(outcome = "cocaine",
+                                                  metric = "estimate",
+                                                  dimension.values=list(location=san.diego.msa),
+                                                  keep.dimensions='year')
+
+sd.heroin.aggregated = surveillance.manager$pull(outcome = "heroin",
+                                                 metric = "estimate",
+                                                 dimension.values=list(location=san.diego.msa),
+                                                 keep.dimensions='year')
+
+vegas.cocaine.aggregated = surveillance.manager$pull(outcome = "cocaine",
+                                                     metric = "estimate",
+                                                     dimension.values=list(location=las.vegas.msa),
+                                                     keep.dimensions='year')
+
+vegas.heroin.aggregated = surveillance.manager$pull(outcome = "heroin",
+                                                    metric = "estimate",
+                                                    dimension.values=list(location=las.vegas.msa),
+                                                    keep.dimensions='year')
+
+la.cocaine = as.data.frame.table(la.cocaine.aggregated)%>%
+    mutate(year = as.character(year))%>%
+    mutate(value = as.numeric(Freq))%>%
+    mutate(outcome = "cocaine")%>%
+    mutate(location = 'C.31080')
+
+sd.cocaine = as.data.frame.table(sd.cocaine.aggregated)%>%
+    mutate(year = as.character(year))%>%
+    mutate(value = as.numeric(Freq))%>%
+    mutate(outcome = "cocaine")%>%
+    mutate(location = 'C.41740')
+
+vegas.cocaine = as.data.frame.table(vegas.cocaine.aggregated)%>%
+    mutate(year = as.character(year))%>%
+    mutate(value = as.numeric(Freq))%>%
+    mutate(outcome = "cocaine")%>%
+    mutate(location = 'C.29820')
+
+la.heroin = as.data.frame.table(la.heroin.aggregated)%>%
+    mutate(year = as.character(year))%>%
+    mutate(value = as.numeric(Freq))%>%
+    mutate(outcome = "heroin")%>%
+    mutate(location = 'C.31080')
+
+sd.heroin = as.data.frame.table(sd.heroin.aggregated)%>%
+    mutate(year = as.character(year))%>%
+    mutate(value = as.numeric(Freq))%>%
+    mutate(outcome = "heroin")%>%
+    mutate(location = 'C.41740')
+
+vegas.heroin = as.data.frame.table(vegas.heroin.aggregated)%>%
+    mutate(year = as.character(year))%>%
+    mutate(value = as.numeric(Freq))%>%
+    mutate(outcome = "heroin")%>%
+    mutate(location = 'C.29820')
+
+aggregated.nsduh.data <- rbind(la.cocaine, sd.cocaine, vegas.cocaine, la.heroin, sd.heroin, vegas.heroin)
+
+surveillance.manager$put.long.form(
+    data = aggregated.nsduh.data,
+    ontology.name = 'nsduh',
+    source = 'nsduh',
+    dimension.values = list(),
+    url = 'https://pdas.samhsa.gov/saes/substate',
+    details = 'NSDUH Substate Estimates, aggregated from substate to MSA')
 
