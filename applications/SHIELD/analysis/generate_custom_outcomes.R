@@ -33,168 +33,331 @@ subset_array <- function(arr, dim_indices, drop = FALSE) {
     do.call(`[`, c(list(arr), args, list(drop = drop)))
 }
 
+calculate_averted_count <- function(arr, dn.one.outcome, noint = NOINT) {
+    stratification_dimensions <- setdiff(names(dn.one.outcome), c("year", "sim", "intervention", "location"))
+    apply(array(apply(arr,
+                      c("year", stratification_dimensions, "sim", "location"),
+                      function(x) {
+                          x[noint] - x
+                      }),
+                sapply(dn.one.outcome, length),
+                dn.one.outcome),
+          c("year", stratification_dimensions, "sim", "intervention", "location"),
+          function(x) {x})
+}
+
+calculate_averted_pct <- function(arr, dn.one.outcome, noint = NOINT) {
+    stratification_dimensions <- setdiff(names(dn.one.outcome), c("year", "sim", "intervention", "location"))
+    apply(array(apply(arr,
+                      c("year", stratification_dimensions, "sim", "location"),
+                      function(x) {
+                          100 * (x[noint] - x) / x[noint]
+                      }),
+                sapply(dn.one.outcome, length),
+                dn.one.outcome),
+          c("year", stratification_dimensions, "sim", "intervention", "location"),
+          function(x) {x})
+}
+
+calculate_rate_averted <- function(arr, num.outcome, denom.outcome, dn.one.outcome, denom.multiplier = NULL, noint = NOINT) {
+    stratification_dimensions <- setdiff(names(dn.one.outcome), c("year", "sim", "intervention", "location"))
+    apply(array(apply(arr,
+                      c("year", stratification_dimensions, "sim", "location"),
+                      function(x) {
+                          100000 * (x[noint, num.outcome] - x[,num.outcome]) /
+                              (x[,denom.outcome] *
+                                   if (!is.null(denom.multiplier)) x[,denom.multiplier] else 1)
+                      }),
+                sapply(dn.one.outcome, length),
+                dn.one.outcome),
+          c("year", stratification_dimensions, "sim", "intervention", "location"),
+          function(x) {x})
+}
+
+calculate_cumulative <- function(arr, stratification.dimensions = NULL) {
+    array(
+        apply(arr,
+              c(stratification.dimensions, "sim", "intervention", "location"),
+              cumsum),
+        dim(arr),
+        dimnames(arr)
+    )
+}
+
+calculate_pct_reduction_versus_year <- function(arr, yr, dn.one.outcome, noint = NOINT) {
+    stratification_dimensions <- setdiff(names(dn.one.outcome), c("year", "sim", "intervention", "location"))
+    apply(array(apply(arr,
+                      c(stratification_dimensions, "sim", "intervention", "location"),
+                      function(x) {
+                          100 * (x[yr] - x) / x[yr]
+                      }),
+                sapply(dn.one.outcome, length),
+                dn.one.outcome),
+          c("year", stratification_dimensions, "sim", "intervention", "location"),
+          function(x) {x})
+}
+
 calculate_custom_outcomes <- function(raw_results, debug=F) {
     if (debug) browser()
     
     # STRATIFICATION_DIMENSIONS = NULL
     STRATIFICATION_DIMENSIONS = setdiff(names(dim(raw_results)), c("year", "sim", "intervention", "location", "outcome"))
+    if (length(STRATIFICATION_DIMENSIONS)==0) STRATIFICATION_DIMENSIONS <- NULL
     
     print("Re-ordering results to have outcome last")
-    results <- apply(raw_results,
-                           c("year", STRATIFICATION_DIMENSIONS, "sim", "intervention", "location", "outcome"),
-                           function(x) {x})
+    CHOSEN_OUTCOMES <- c("incidence", "diagnosis.total", "diagnosis.ps", "population")
+    if (is.null(STRATIFICATION_DIMENSIONS))
+        CHOSEN_OUTCOMES <- c(CHOSEN_OUTCOMES, "population.msm", "doxy.coverage")
+    results <- subset_array(raw_results, list(outcome = CHOSEN_OUTCOMES))
+    results <- apply(results,
+                     c("year", STRATIFICATION_DIMENSIONS, "sim", "intervention", "location", "outcome"),
+                     function(x) {x})
     
+    # Intervention is on the front because most of the apply's will leave it on the front
     dn_one_outcome <- dimnames(results)[c("intervention", "year", STRATIFICATION_DIMENSIONS, "sim","location")]
     
-    # Num incidence cases averted vs. noint
-    print("Calculating outcome 1/8")
-    incidence_averted_count <-
-        apply(array(apply(subset_array(results, list(outcome = "incidence"), drop=T),
-                          c("year", STRATIFICATION_DIMENSIONS, "sim", "location"),
-                          function(x) {
-                              # Will be positive if cases have been averted
-                              x[NOINT] - x
-                          }),
-                    sapply(dn_one_outcome, length),
-                    dn_one_outcome),
-              c("year", STRATIFICATION_DIMENSIONS, "sim", "intervention", "location"),
-              function(x) {x})
+    # But if we're doing something based on year (like percent reduction relative to 2022), year will remain in front
+    dn_one_outcome_yr_first <- dimnames(results)[c("year", STRATIFICATION_DIMENSIONS, "sim","intervention", "location")]
     
-    print("Calculating outcome 2/8")
-    percent_reduction_incidence <-
-        apply(array(apply(subset_array(results, list(outcome = "incidence"), drop=T),
-                          c("year", STRATIFICATION_DIMENSIONS, "sim", "location"),
-                          function(x) {
-                              # Will be positive if cases have been averted
-                              100 * (x[NOINT] - x) / x[NOINT]
-                          }),
-                    sapply(dn_one_outcome, length),
-                    dn_one_outcome),
-              c("year", STRATIFICATION_DIMENSIONS, "sim", "intervention", "location"),
-              function(x) {x})
+    print("Calculating incidence outcomes")
+    incidence_averted <-
+        calculate_averted_count(subset_array(results, list(outcome = "incidence"), drop=T),
+                                dn_one_outcome)
+    incidence_averted_percent <-
+        calculate_averted_pct(subset_array(results, list(outcome = "incidence"), drop=T),
+                              dn_one_outcome)
+    incidence_averted_rate_per_pop <-
+        calculate_rate_averted(subset_array(results, list(outcome = c("incidence", "population")), drop=T),
+                               num.outcome = "incidence",
+                               denom.outcome = "population",
+                               dn_one_outcome)
+    if (is.null(STRATIFICATION_DIMENSIONS)) {
+        incidence_averted_rate_per_msm <-
+            calculate_rate_averted(subset_array(results, list(outcome = c("incidence", "population.msm")), drop=T),
+                                   num.outcome = "incidence",
+                                   denom.outcome = "population.msm",
+                                   dn_one_outcome)
+        incidence_averted_ppy_doxy <-
+            calculate_rate_averted(subset_array(results, list(outcome = c("incidence", "population.msm", "doxy.coverage")), drop=T),
+                                   num.outcome = "incidence",
+                                   denom.outcome = "population.msm",
+                                   dn_one_outcome,
+                                   denom.multiplier = "doxy.coverage")
+    }
+    pct_incidence_reduction_vs_2022 <-
+        calculate_pct_reduction_versus_year(subset_array(results, list(outcome = "incidence"), drop=T),
+                                            "2022",
+                                            dn_one_outcome_yr_first)
     
-    # Num diagnoses averted vs. noint
+    print("Calculating total diagnosis outcomes")
+    diagnosis_total_averted <-
+        calculate_averted_count(subset_array(results, list(outcome = "diagnosis.total"), drop=T),
+                                dn_one_outcome)
     
-    print("Calculating outcome 3/8")
-    diagnosis_averted_count <-
-        apply(array(apply(subset_array(results, list(outcome = "diagnosis.total"), drop=T),
-                          c("year", STRATIFICATION_DIMENSIONS, "sim", "location"),
-                          function(x) {
-                              # Will be positive if cases have been averted
-                              x[NOINT] - x
-                          }),
-                    sapply(dn_one_outcome, length),
-                    dn_one_outcome),
-              c("year", STRATIFICATION_DIMENSIONS, "sim", "intervention", "location"),
-              function(x) {x})
+    diagnosis_total_averted_percent <-
+        calculate_averted_pct(subset_array(results, list(outcome = "diagnosis.total"), drop=T),
+                              dn_one_outcome)
+    diagnosis_total_averted_rate_per_pop <-
+        calculate_rate_averted(subset_array(results, list(outcome = c("diagnosis.total", "population")), drop=T),
+                               num.outcome = "diagnosis.total",
+                               denom.outcome = "population",
+                               dn_one_outcome)
+    if (is.null(STRATIFICATION_DIMENSIONS)) {
+        diagnosis_total_averted_rate_per_msm <-
+            calculate_rate_averted(subset_array(results, list(outcome = c("diagnosis.total", "population.msm")), drop=T),
+                                   num.outcome = "diagnosis.total",
+                                   denom.outcome = "population.msm",
+                                   dn_one_outcome)
+        diagnosis_total_averted_rate_ppy_doxy <-
+            calculate_rate_averted(subset_array(results, list(outcome = c("diagnosis.total", "population.msm", "doxy.coverage")), drop=T),
+                                   num.outcome = "diagnosis.total",
+                                   denom.outcome = "population.msm",
+                                   dn_one_outcome,
+                                   denom.multiplier = "doxy.coverage")
+    }
+    pct_diagnosis_total_reduction_vs_2022 <-
+        calculate_pct_reduction_versus_year(subset_array(results, list(outcome = "diagnosis.total"), drop=T),
+                                            "2022",
+                                            dn_one_outcome_yr_first)
     
-    print("Calculating outcome 4/8")
-    percent_reduction_diagnosis <-
-        apply(array(apply(subset_array(results, list(outcome = "diagnosis.total"), drop=T),
-                          c("year", STRATIFICATION_DIMENSIONS, "sim", "location"),
-                          function(x) {
-                              # Will be positive if cases have been averted
-                              100 * (x[NOINT] - x) / x[NOINT]
-                          }),
-                    sapply(dn_one_outcome, length),
-                    dn_one_outcome),
-              c("year", STRATIFICATION_DIMENSIONS, "sim", "intervention", "location"),
-              function(x) {x})
+    print("Calculating PS diagnosis outcomes")
+    diagnosis_ps_averted <-
+        calculate_averted_count(subset_array(results, list(outcome = "diagnosis.ps"), drop=T),
+                                dn_one_outcome)
+    diagnosis_ps_averted_percent <-
+        calculate_averted_pct(subset_array(results, list(outcome = "diagnosis.ps"), drop=T),
+                              dn_one_outcome)
+    diagnosis_ps_averted_rate_per_pop <-
+        calculate_rate_averted(subset_array(results, list(outcome = c("diagnosis.ps", "population")), drop=T),
+                               num.outcome = "diagnosis.ps",
+                               denom.outcome = "population",
+                               dn_one_outcome)
+    if (is.null(STRATIFICATION_DIMENSIONS)) {
+        diagnosis_ps_averted_rate_per_msm <-
+            calculate_rate_averted(subset_array(results, list(outcome = c("diagnosis.ps", "population.msm")), drop=T),
+                                   num.outcome = "diagnosis.ps",
+                                   denom.outcome = "population.msm",
+                                   dn_one_outcome)
+        diagnosis_ps_averted_rate_ppy_doxy <-
+            calculate_rate_averted(subset_array(results, list(outcome = c("diagnosis.ps", "population.msm", "doxy.coverage")), drop=T),
+                                   num.outcome = "diagnosis.ps",
+                                   denom.outcome = "population.msm",
+                                   dn_one_outcome,
+                                   denom.multiplier = "doxy.coverage")
+    }
+    pct_diagnosis_ps_reduction_vs_2022 <-
+        calculate_pct_reduction_versus_year(subset_array(results, list(outcome = "diagnosis.ps"), drop=T),
+                                            "2022",
+                                            dn_one_outcome_yr_first)
     
     # Cumulative incidence averted
-    print("Calculating outcome 5/8")
+    print("Calculating cumulative incidence outcomes")
     cumulative_incidence <- 
-        array(
-            apply(subset_array(results, list(outcome = "incidence"), drop=T),
-                  c(STRATIFICATION_DIMENSIONS, "sim", "intervention", "location"),
-                  cumsum),
-            dim(subset_array(results, list(outcome = "incidence"), drop=T)),
-            dimnames(subset_array(results, list(outcome = "incidence"), drop=T))
-        )
-    cumulative_incidence_averted <-
-        apply(array(apply(cumulative_incidence,
-                          c("year", STRATIFICATION_DIMENSIONS, "sim", "location"),
-                          function(x) {
-                              # Will be positive if cases have been averted
-                              x[NOINT] - x
-                          }),
-                    sapply(dn_one_outcome, length),
-                    dn_one_outcome),
-              c("year", STRATIFICATION_DIMENSIONS, "sim", "intervention", "location"),
-              function(x) {x})
-    print("Calculating outcome 6/8")
-    percent_reduction_cumulative_incidence <-
-        cumulative_incidence_averted <-
-        apply(array(apply(cumulative_incidence,
-                          c("year", STRATIFICATION_DIMENSIONS, "sim", "location"),
-                          function(x) {
-                              # Will be positive if cases have been averted
-                              100 * (x[NOINT] - x) / x[NOINT]
-                          }),
-                    sapply(dn_one_outcome, length),
-                    dn_one_outcome),
-              c("year", STRATIFICATION_DIMENSIONS, "sim", "intervention", "location"),
-              function(x) {x})
+        calculate_cumulative(subset_array(results, list(outcome = "incidence"), drop=T), stratification.dimensions = STRATIFICATION_DIMENSIONS)
+    cum_incidence_averted <-
+        calculate_averted_count(cumulative_incidence, dn_one_outcome)
+    cum_incidence_averted_percent <-
+        calculate_averted_pct(cumulative_incidence, dn_one_outcome)
     
     # Cumulative diagnoses averted
-    print("Calculating outcome 7/8")
-    cumulative_diagnosis <- 
-        array(
-            apply(subset_array(results, list(outcome = "diagnosis.total"), drop=T),
-                  c(STRATIFICATION_DIMENSIONS, "sim", "intervention", "location"),
-                  cumsum),
-            dim(subset_array(results, list(outcome = "incidence"), drop=T)),
-            dimnames(subset_array(results, list(outcome = "incidence"), drop=T))
-        )
-    cumulative_diagnosis_averted <-
-        apply(array(apply(cumulative_diagnosis,
-                          c("year", STRATIFICATION_DIMENSIONS, "sim", "location"),
-                          function(x) {
-                              # Will be positive if cases have been averted
-                              x[NOINT] - x
-                          }),
-                    sapply(dn_one_outcome, length),
-                    dn_one_outcome),
-              c("year", STRATIFICATION_DIMENSIONS, "sim", "intervention", "location"),
-              function(x) {x})
-    print("Calculating outcome 8/8")
-    percent_reduction_cumulative_diagnosis <-
-        apply(array(apply(cumulative_diagnosis,
-                          c("year", STRATIFICATION_DIMENSIONS, "sim", "location"),
-                          function(x) {
-                              # Will be positive if cases have been averted
-                              100 * (x[NOINT] - x) / x[NOINT]
-                          }),
-                    sapply(dn_one_outcome, length),
-                    dn_one_outcome),
-              c("year", STRATIFICATION_DIMENSIONS, "sim", "intervention", "location"),
-              function(x) {x})
+    print("Calculating cumulative total diagnosis outcomes")
+    cumulative_diagnosis_total <- 
+        calculate_cumulative(subset_array(results, list(outcome = "diagnosis.total"), drop=T), stratification.dimensions = STRATIFICATION_DIMENSIONS)
+    cum_diagnosis_total_averted <-
+        calculate_averted_count(cumulative_diagnosis_total, dn_one_outcome)
+    cum_diagnosis_total_averted_percent <-
+        calculate_averted_pct(cumulative_diagnosis_total, dn_one_outcome)
     
-    # Combine
+    print("Calculating cumulative PS diagnosis outcomes")
+    cumulative_diagnosis_ps <- 
+        calculate_cumulative(subset_array(results, list(outcome = "diagnosis.ps"), drop=T), stratification.dimensions = STRATIFICATION_DIMENSIONS)
+    cum_diagnosis_ps_averted <-
+        calculate_averted_count(cumulative_diagnosis_ps, dn_one_outcome)
+    cum_diagnosis_ps_averted_percent <-
+        calculate_averted_pct(cumulative_diagnosis_ps, dn_one_outcome)
+    
+    # Combine, but DO NOT INCLUDE ORIGINAL OUTCOMES (to keep it smaller)
     dn_w_custom <- dimnames(results)
-    dn_w_custom[["outcome"]] <- c(dn_w_custom[["outcome"]],
-                                  "incidence_averted",
-                                  "pct_incidence_averted",
-                                  "diagnosis_averted",
-                                  "pct_diagnosis_averted",
-                                  "cum_incidence_averted",
-                                  "pct_cum_incidence_averted",
-                                  "cum_diagnosis_averted",
-                                  "pct_cum_diagnosis_averted")
-    results_w_custom <-
-        array(
-            c(results,
-              incidence_averted_count,
-              percent_reduction_incidence,
-              diagnosis_averted_count,
-              percent_reduction_diagnosis,
-              cumulative_incidence_averted,
-              percent_reduction_cumulative_incidence,
-              cumulative_diagnosis_averted,
-              percent_reduction_cumulative_diagnosis),
-            sapply(dn_w_custom, length),
-            dn_w_custom
-        )
+    # Add names of locations back in
+    dn_w_custom[["location"]] <- dimnames(raw_results)[["location"]]
+    if (is.null(STRATIFICATION_DIMENSIONS)) {
+        dn_w_custom[["outcome"]] <- c("incidence_averted",
+                                      "incidence_averted_percent",
+                                      "incidence_averted_rate_per_pop",
+                                      "incidence_averted_rate_per_msm",
+                                      "incidence_averted_ppy_doxy",
+                                      "pct_incidence_reduction_vs_2022",
+                                      
+                                      "diagnosis_total_averted",
+                                      "diagnosis_total_averted_percent",
+                                      "diagnosis_total_averted_rate_per_pop",
+                                      "diagnosis_total_averted_rate_per_msm",
+                                      "diagnosis_total_averted_rate_ppy_doxy",
+                                      "pct_diagnosis_total_reduction_vs_2022",
+                                      
+                                      "diagnosis_ps_averted",
+                                      "diagnosis_ps_averted_percent",
+                                      "diagnosis_ps_averted_rate_per_pop",
+                                      "diagnosis_ps_averted_rate_per_msm",
+                                      "diagnosis_ps_averted_rate_ppy_doxy",
+                                      "pct_diagnosis_ps_reduction_vs_2022",
+                                      
+                                      "cum_incidence_averted",
+                                      "cum_incidence_averted_percent", # Not useful because denominator is 2000-2040 cumulative
+                                      
+                                      "cum_diagnosis_total_averted",
+                                      "cum_diagnosis_total_averted_percent",
+                                      
+                                      "cum_diagnosis_ps_averted",
+                                      "cum_diagnosis_ps_averted_percent")
+        results_w_custom <-
+            array(
+                c(incidence_averted,
+                  incidence_averted_percent,
+                  incidence_averted_rate_per_pop,
+                  incidence_averted_rate_per_msm,
+                  incidence_averted_ppy_doxy,
+                  pct_incidence_reduction_vs_2022,
+                  
+                  diagnosis_total_averted,
+                  diagnosis_total_averted_percent,
+                  diagnosis_total_averted_rate_per_pop,
+                  diagnosis_total_averted_rate_per_msm,
+                  diagnosis_total_averted_rate_ppy_doxy,
+                  pct_diagnosis_total_reduction_vs_2022,
+                  
+                  diagnosis_ps_averted,
+                  diagnosis_ps_averted_percent,
+                  diagnosis_ps_averted_rate_per_pop,
+                  diagnosis_ps_averted_rate_per_msm,
+                  diagnosis_ps_averted_rate_ppy_doxy,
+                  pct_diagnosis_ps_reduction_vs_2022,
+                  
+                  cum_incidence_averted,
+                  cum_incidence_averted_percent,
+                  
+                  cum_diagnosis_total_averted,
+                  cum_diagnosis_total_averted_percent,
+                  
+                  cum_diagnosis_ps_averted,
+                  cum_diagnosis_ps_averted_percent),
+                sapply(dn_w_custom, length),
+                dn_w_custom
+            )
+    } else {
+        dn_w_custom[["outcome"]] <- c("incidence_averted",
+                                      "incidence_averted_percent",
+                                      "incidence_averted_rate_per_pop",
+                                      "pct_incidence_reduction_vs_2022",
+                                      
+                                      "diagnosis_total_averted",
+                                      "diagnosis_total_averted_percent",
+                                      "diagnosis_total_averted_rate_per_pop",
+                                      "pct_diagnosis_total_reduction_vs_2022",
+                                      
+                                      "diagnosis_ps_averted",
+                                      "diagnosis_ps_averted_percent",
+                                      "diagnosis_ps_averted_rate_per_pop",
+                                      "pct_diagnosis_ps_reduction_vs_2022",
+                                      
+                                      "cum_incidence_averted",
+                                      "cum_incidence_averted_percent", # Not useful because denominator is 2000-2040 cumulative
+                                      
+                                      "cum_diagnosis_total_averted",
+                                      "cum_diagnosis_total_averted_percent",
+                                      
+                                      "cum_diagnosis_ps_averted",
+                                      "cum_diagnosis_ps_averted_percent")
+        results_w_custom <-
+            array(
+                c(incidence_averted,
+                  incidence_averted_percent,
+                  incidence_averted_rate_per_pop,
+                  pct_incidence_reduction_vs_2022,
+                  
+                  diagnosis_total_averted,
+                  diagnosis_total_averted_percent,
+                  diagnosis_total_averted_rate_per_pop,
+                  pct_diagnosis_total_reduction_vs_2022,
+                  
+                  diagnosis_ps_averted,
+                  diagnosis_ps_averted_percent,
+                  diagnosis_ps_averted_rate_per_pop,
+                  pct_diagnosis_ps_reduction_vs_2022,
+                  
+                  cum_incidence_averted,
+                  cum_incidence_averted_percent,
+                  
+                  cum_diagnosis_total_averted,
+                  cum_diagnosis_total_averted_percent,
+                  
+                  cum_diagnosis_ps_averted,
+                  cum_diagnosis_ps_averted_percent),
+                sapply(dn_w_custom, length),
+                dn_w_custom
+            )
+    }
+    
 }
 
 
@@ -205,13 +368,21 @@ calculate_custom_outcomes <- function(raw_results, debug=F) {
 
 if (1==2) {
     total_raw_results <- get(load(paste0("Q:/shield/outputs/", CALIB_CODE, "/total_raw_results.Rdata")))
-    total_results <- calculate_custom_outcomes(total_results)
-    save(total_results,
-         file = paste0("Q:/shield/outputs/", CALIB_CODE, "/total_results.Rdata"))
+    total_calc_results <- calculate_custom_outcomes(total_raw_results)
+    
+    save(total_calc_results,
+         file = paste0("Q:/shield/outputs/", CALIB_CODE, "/total_calc_results.Rdata"))
+    
 }
 if (1==2) {
     age_raw_results <- get(load(paste0("Q:/shield/outputs/", CALIB_CODE, "/age_raw_results.Rdata")))
     age_results <- calculate_custom_outcomes(age_raw_results)
     save(age_results,
          file = paste0("Q:/shield/outputs/", CALIB_CODE, "/age_results.Rdata"))
+}
+if (1==2) {
+    sex_raw_results <- get(load(paste0("Q:/shield/outputs/", CALIB_CODE, "/sex_raw_results.Rdata")))
+    sex_calc_results <- calculate_custom_outcomes(sex_raw_results)
+    save(sex_calc_results,
+         file = paste0("Q:/shield/outputs/", CALIB_CODE, "/sex_results.Rdata"))
 }
