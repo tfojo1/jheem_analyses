@@ -1,8 +1,9 @@
 library(tidyverse)
+source('../jheem_analyses/commoncode/locations_of_interest.R')
+source('../jheem_analyses/applications/SHIELD/shield_specification.R')
+source("../jheem_analyses/applications/SHIELD/shield_calib_register.R")
+# source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions.R')
 # ROOT.DIR # is set by the specification
-BASE.PATH <- paste0(ROOT.DIR,"/shield/outputs/calib.8.21.stage3.az")
-total_results=get(load(file = paste0(BASE.PATH,"/total_results.Rdata")))
-# sex_results=get(load(file = paste0(BASE.PATH,"/sex_results.Rdata")))
 
 # ****************************************************************************************************
 subset_array <- function(arr, dim_indices, drop = FALSE) {
@@ -85,6 +86,7 @@ make_single_location_table <- function(data,
                                        years,
                                        row.vars="",
                                        stat.type = c("median.ci", "median","mean.ci", "mean"), #takes the first argument as default
+                                       filter.by.strat=NULL,
                                        save = FALSE,
                                        save.dir = "",
                                        filename = NULL,
@@ -178,17 +180,36 @@ make_single_location_table <- function(data,
         num_extra_cols_needed <- num_stratification_cols_for_table - length(stratification_cols)
         if (num_extra_cols_needed > 0) {
             for (i in 1:num_extra_cols_needed) {
-                df <- cbind(rep(NA, nrow(df)), df)
+                df <- cbind(rep("Total", nrow(df)), df)
             }
         }
         
         if (num_stratification_cols_for_table > 0) {
-            colnames(df)[1:num_stratification_cols_for_table] <- LETTERS[1:num_stratification_cols_for_table]
+            # colnames(df)[1:num_stratification_cols_for_table] <- LETTERS[1:num_stratification_cols_for_table]
+            colnames(df)[1:num_stratification_cols_for_table] <-
+                make.unique(rep("subgroup", num_stratification_cols_for_table))
         } 
         
         df
     }))
+    # filter for a stratification
+    if (!is.null(filter.by.strat)) {
+        strat.cols <- grep("^subgroup", names(rv), value = TRUE)
+        if (length(strat.cols) == 0)
+            stop("No 'subgroup' column in the table -- nothing to filter on.")
+        
+        keep <- Reduce(`|`, lapply(rv[strat.cols],
+                                   function(x) as.character(x) %in% filter.by.strat))
+        
+        if (!any(keep))
+            stop("No rows match filter.by.strat = ",
+                 paste(filter.by.strat, collapse = ", "), ".\nAvailable values: ",
+                 paste(sort(unique(unlist(rv[strat.cols]))), collapse = ", "))
+        
+        rv <- rv[keep, , drop = FALSE]
+    }
     
+    # Save results 
     if (save) {
         if (is.null(filename) || !nzchar(filename))
             stop("Error: 'filename' must be supplied when save = TRUE")
@@ -256,6 +277,7 @@ make_multi_location_table <- function(data,
                                       stat.type = c("mean.ci", "mean", "median.ci", "median"),
                                       location.label = "location",
                                       repeat.location.label = TRUE,
+                                      filter.by.strat=NULL,
                                       save = FALSE,
                                       save.dir = "",
                                       filename = NULL,
@@ -274,6 +296,7 @@ make_multi_location_table <- function(data,
                                        interventions = interventions,
                                        years         = years,
                                        row.vars      = row.vars,
+                                       filter.by.strat   = filter.by.strat,
                                        stat.type     = stat.type,
                                        save          = FALSE),
             error = function(e)
@@ -296,33 +319,53 @@ make_multi_location_table <- function(data,
     
     rv <- dplyr::bind_rows(per.loc)
     
+    
     if (save) save_table_csv(rv, save.dir, filename)
     
     rv
 }
 # added new integrated outcome, and interventions run, but they don't report it.
 # what does it take to report a new outcome without re-calibrating?
-
+# ****************************************************************************************************
 # examples ----
+
 if (1==1){
-    x1=make_single_location_table(data = list(total_results),
-                                  location = "C.12060",
-                                  outcomes = c("diagnosis.total","diagnosis.ps","incidence_averted"),
-                                  interventions = c("noint", "doxy.cov.50", "doxy.cov.100"),
-                                  years = c("2022", "2026", "2035"),
-                                  stat.type = "mean.ci",
-                                  save = F,save.dir = paste0(BASE.PATH,"/tables/"),filename = "total"
-    )
+    BASE.PATH <- paste0(ROOT.DIR,"/shield/outputs/calib.8.21.stage3.az")
+    total_raw_results=get(load(file = paste0(BASE.PATH,"/total_raw_results.Rdata")))
+    sex_raw_results=get(load(file = paste0(BASE.PATH,"/sex_raw_results.Rdata")))
+    total_calc_results=get(load(file = paste0(BASE.PATH,"/total_calc_results")))
+    # sex_calc_results=get(load(file = paste0(BASE.PATH,"/sex_calc_results")))
+    # 
     
-    x2=make_single_location_table(data = list(total_results),
-                                  location = "C.12060",
-                                  outcomes = c("diagnosis.total", "incidence_averted"),
-                                  interventions = c("noint", "doxy.cov.50", "doxy.cov.100"),
-                                  years = c("2022", "2026", "2035"),
-                                  row.vars="intervention",  
-                                  save = F,save.dir = paste0(BASE.PATH,"/tables/"),filename = "total.by.int"
+    # x1=make_single_location_table(data = list(total_results,
+    #                                           sex_results),
+    #                               location = "C.12060",
+    #                               outcomes = c("diagnosis.total","diagnosis.ps","incidence_averted"),
+    #                               interventions = c("noint", "doxy.cov.50", "doxy.cov.100"),
+    #                               years = c("2022", "2026", "2035"),
+    #                               stat.type = "mean",
+    #                               save = F,save.dir = paste0(BASE.PATH,"/tables/"),filename = "total"
+    # )
+    # 
+    # x2=make_single_location_table(data = list(total_results),
+    #                               location = "C.12060",
+    #                               outcomes = c("diagnosis.total", "incidence_averted"),
+    #                               interventions = c("noint", "doxy.cov.50", "doxy.cov.100"),
+    #                               years = c("2022", "2026", "2035"),
+    #                               row.vars="intervention",  
+    #                               save = F,save.dir = paste0(BASE.PATH,"/tables/"),filename = "total.by.int"
+    # )
+    loc.tbl = make_multi_location_table(
+        data          = list(total_results,sex_results),
+        locations     = names(SHIELD.TEN.MSAS),
+        outcomes      = c("pct_cum_incidence_averted"),
+        interventions = paste0("doxy.cov.",seq(10,100,10)),
+        years         = c("2035"),
+        stat.type     = "median",
+        save          = T,
+        save.dir      = paste0(BASE.PATH, "/tables/"),
+        filename      = "multi.loc_pct.inc.averted_20352"
     )
-    
     # % incidence averted
     loc.tbl = make_multi_location_table(
         data          = list(total_results),
@@ -333,11 +376,11 @@ if (1==1){
         stat.type     = "median",
         save          = TRUE,
         save.dir      = paste0(BASE.PATH, "/tables/"),
-        filename      = "multi.loc_pct.inc.averted_20351"
+        filename      = "multi.loc_pct.inc.averted_20352"
     )
     # % diagnosis averted
     loc.tbl = make_multi_location_table(
-        data          = list(total_results),
+        data          = list(total_results, sex_results),
         locations     = names(SHIELD.TEN.MSAS),
         outcomes      = c("pct_diagnosis_averted"),
         interventions = paste0("doxy.cov.",seq(10,100,10)),
@@ -361,7 +404,7 @@ if (1==1){
     )
     #cumulative diagnosis averted
     loc.tbl = make_multi_location_table(
-        data          = list(total_results),
+        data          = list(total_results, sex_results),
         locations     = names(SHIELD.TEN.MSAS),
         outcomes      = c("cum_diagnosis_averted"),
         interventions = paste0("doxy.cov.",seq(10,100,10)),
@@ -373,7 +416,7 @@ if (1==1){
     )
     #annual incidence averted
     loc.tbl = make_multi_location_table(
-        data          = list(total_results),
+        data          = list(total_results, sex_results),
         locations     = names(SHIELD.TEN.MSAS),
         outcomes      = c("incidence_averted"),
         interventions = paste0("doxy.cov.",seq(10,100,10)),
