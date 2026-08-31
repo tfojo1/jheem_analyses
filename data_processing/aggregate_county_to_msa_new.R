@@ -61,7 +61,7 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
     }
     
     for (to_location in to.locations) {
-        from_locations <- locations::get.contained.locations(to_location, geographic.type.from)
+        from_locations <- locations::get.contained.locations(to_location, geographic.type.from, , include.partial = TRUE)
         
         error_prefix <- paste0("Cannot aggregate ", geographic.type.from, " data for 'to.location' ", to_location, ": ")
         
