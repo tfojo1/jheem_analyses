@@ -70,14 +70,13 @@ calculate_rate <- function(arr, num.outcome, denom.outcome, dn.one.outcome) {
     
 }
 
-calculate_rate_averted <- function(arr, num.outcome, denom.outcome, dn.one.outcome, denom.multiplier = NULL, noint = NOINT) {
+calculate_rate_averted <- function(arr, num.outcome, denom.outcome, dn.one.outcome, noint = NOINT) {
     stratification_dimensions <- setdiff(names(dn.one.outcome), c("year", "sim", "intervention", "location"))
     apply(array(apply(arr,
                       c("year", stratification_dimensions, "sim", "location"),
                       function(x) {
                           100000 * (x[noint, num.outcome] - x[,num.outcome]) /
-                              (x[,denom.outcome] *
-                                   if (!is.null(denom.multiplier)) x[,denom.multiplier] else 1)
+                              x[,denom.outcome]
                       }),
                 sapply(dn.one.outcome, length),
                 dn.one.outcome),
@@ -108,18 +107,23 @@ calculate_pct_reduction_versus_year <- function(arr, yr, dn.one.outcome, noint =
           function(x) {x})
 }
 
-calculate_custom_outcomes <- function(raw_results, debug=F) {
+calculate_custom_outcomes <- function(raw_results, baseline.year, debug=F) {
     if (debug) browser()
     
-    # STRATIFICATION_DIMENSIONS = NULL
+    end_year <- dimnames(raw_results)$year[dim(raw_results)["year"]]
+    YEARS_TO_KEEP <- as.character(baseline.year:end_year)
+    
     STRATIFICATION_DIMENSIONS = setdiff(names(dim(raw_results)), c("year", "sim", "intervention", "location", "outcome"))
     if (length(STRATIFICATION_DIMENSIONS)==0) STRATIFICATION_DIMENSIONS <- NULL
     
     print("Re-ordering results to have outcome last")
+    
+    # This has to have all outcomes we'll ever use for calculations (it gets extended just below)
+    # Subsetting now lets us shrink the array and speed up the runtime
     CHOSEN_OUTCOMES <- c("incidence", "diagnosis.total", "diagnosis.ps", "population")
     if (is.null(STRATIFICATION_DIMENSIONS))
         CHOSEN_OUTCOMES <- c(CHOSEN_OUTCOMES, "population.msm", "doxy.coverage")
-    results <- subset_array(raw_results, list(outcome = CHOSEN_OUTCOMES))
+    results <- subset_array(raw_results, list(year = YEARS_TO_KEEP, outcome = CHOSEN_OUTCOMES))
     results <- apply(results,
                      c("year", STRATIFICATION_DIMENSIONS, "sim", "intervention", "location", "outcome"),
                      function(x) {x})
@@ -143,14 +147,14 @@ calculate_custom_outcomes <- function(raw_results, debug=F) {
                                denom.outcome = "population",
                                dn_one_outcome)
     if (is.null(STRATIFICATION_DIMENSIONS)) {
-        #Total results:
+        # For total results only
         incidence_averted_rate_per_msm <-
             calculate_rate_averted(subset_array(results, list(outcome = c("incidence", "population.msm")), drop=T),
                                    num.outcome = "incidence",
                                    denom.outcome = "population.msm",
                                    dn_one_outcome)
         incidence_averted_ppy_doxy <-
-            calculate_rate_averted(subset_array(results, list(outcome = c("incidence", "population.msm", "doxy.coverage")), drop=T),
+            calculate_rate_averted(subset_array(results, list(outcome = c("incidence", "doxy.coverage")), drop=T),
                                    num.outcome = "incidence",
                                    denom.outcome = "doxy.coverage",
                                    dn_one_outcome)
@@ -159,12 +163,17 @@ calculate_custom_outcomes <- function(raw_results, debug=F) {
         calculate_pct_reduction_versus_year(subset_array(results, list(outcome = "incidence"), drop=T),
                                             "2022",
                                             dn_one_outcome_yr_first)
-
+    incidence_rate <- 
+        calculate_rate(subset_array(results, list(outcome = c("incidence","population")), drop=T), 
+                       num.outcome = "incidence",
+                       denom.outcome = "population",
+                       dn_one_outcome)
+    
     print("Calculating total diagnosis outcomes")
     diagnosis_total_averted <-
         calculate_averted_count(subset_array(results, list(outcome = "diagnosis.total"), drop=T),
                                 dn_one_outcome)
-
+    
     diagnosis_total_averted_percent <-
         calculate_averted_pct(subset_array(results, list(outcome = "diagnosis.total"), drop=T),
                               dn_one_outcome)
@@ -174,23 +183,29 @@ calculate_custom_outcomes <- function(raw_results, debug=F) {
                                denom.outcome = "population",
                                dn_one_outcome)
     if (is.null(STRATIFICATION_DIMENSIONS)) {
+        # For total results only
         diagnosis_total_averted_rate_per_msm <-
             calculate_rate_averted(subset_array(results, list(outcome = c("diagnosis.total", "population.msm")), drop=T),
                                    num.outcome = "diagnosis.total",
                                    denom.outcome = "population.msm",
                                    dn_one_outcome)
         diagnosis_total_averted_rate_ppy_doxy <-
-            calculate_rate_averted(subset_array(results, list(outcome = c("diagnosis.total", "population.msm", "doxy.coverage")), drop=T),
+            calculate_rate_averted(subset_array(results, list(outcome = c("diagnosis.total", "doxy.coverage")), drop=T),
                                    num.outcome = "diagnosis.total",
                                    denom.outcome = "doxy.coverage",
                                    dn_one_outcome 
-                                   )
+            )
     }
     pct_diagnosis_total_reduction_vs_2022 <-
         calculate_pct_reduction_versus_year(subset_array(results, list(outcome = "diagnosis.total"), drop=T),
                                             "2022",
                                             dn_one_outcome_yr_first)
-
+    diagnosis_total_rate <- 
+        calculate_rate(subset_array(results, list(outcome = c("diagnosis.total","population")), drop=T), 
+                       num.outcome = "diagnosis.total",
+                       denom.outcome = "population",
+                       dn_one_outcome)
+    
     print("Calculating PS diagnosis outcomes")
     diagnosis_ps_averted <-
         calculate_averted_count(subset_array(results, list(outcome = "diagnosis.ps"), drop=T),
@@ -204,13 +219,14 @@ calculate_custom_outcomes <- function(raw_results, debug=F) {
                                denom.outcome = "population",
                                dn_one_outcome)
     if (is.null(STRATIFICATION_DIMENSIONS)) {
+        # For total results only
         diagnosis_ps_averted_rate_per_msm <-
             calculate_rate_averted(subset_array(results, list(outcome = c("diagnosis.ps", "population.msm")), drop=T),
                                    num.outcome = "diagnosis.ps",
                                    denom.outcome = "population.msm",
                                    dn_one_outcome)
         diagnosis_ps_averted_rate_ppy_doxy <-
-            calculate_rate_averted(subset_array(results, list(outcome = c("diagnosis.ps", "population.msm", "doxy.coverage")), drop=T),
+            calculate_rate_averted(subset_array(results, list(outcome = c("diagnosis.ps", "doxy.coverage")), drop=T),
                                    num.outcome = "diagnosis.ps",
                                    denom.outcome = "doxy.coverage",
                                    dn_one_outcome )
@@ -219,41 +235,56 @@ calculate_custom_outcomes <- function(raw_results, debug=F) {
         calculate_pct_reduction_versus_year(subset_array(results, list(outcome = "diagnosis.ps"), drop=T),
                                             "2022",
                                             dn_one_outcome_yr_first)
-
-    # Cumulative incidence averted
-    print("Calculating cumulative incidence outcomes")
-    cumulative_incidence <-
-        calculate_cumulative(subset_array(results, list(outcome = "incidence"), drop=T), stratification.dimensions = STRATIFICATION_DIMENSIONS)
-    cum_incidence_averted <-
-        calculate_averted_count(cumulative_incidence, dn_one_outcome)
-    cum_incidence_averted_percent <-
-        calculate_averted_pct(cumulative_incidence, dn_one_outcome)
-
-    # Cumulative diagnoses averted
-    print("Calculating cumulative total diagnosis outcomes")
-    cumulative_diagnosis_total <-
-        calculate_cumulative(subset_array(results, list(outcome = "diagnosis.total"), drop=T), stratification.dimensions = STRATIFICATION_DIMENSIONS)
-    cum_diagnosis_total_averted <-
-        calculate_averted_count(cumulative_diagnosis_total, dn_one_outcome)
-    cum_diagnosis_total_averted_percent <-
-        calculate_averted_pct(cumulative_diagnosis_total, dn_one_outcome)
-
-    print("Calculating cumulative PS diagnosis outcomes")
-    cumulative_diagnosis_ps <-
-        calculate_cumulative(subset_array(results, list(outcome = "diagnosis.ps"), drop=T), stratification.dimensions = STRATIFICATION_DIMENSIONS)
-    cum_diagnosis_ps_averted <-
-        calculate_averted_count(cumulative_diagnosis_ps, dn_one_outcome)
-    cum_diagnosis_ps_averted_percent <-
-        calculate_averted_pct(cumulative_diagnosis_ps, dn_one_outcome)
-    
-    print("Calculating PS diagnosis rate outcomes")
     diagnosis_ps_rate <- 
         calculate_rate(subset_array(results, list(outcome = c("diagnosis.ps","population")), drop=T), 
                        num.outcome = "diagnosis.ps",
                        denom.outcome = "population",
                        dn_one_outcome)
     
-
+    if (is.null(STRATIFICATION_DIMENSIONS)) {
+        print("Calculating cumulative doxy coverage")
+        cum_doxy_coverage <-
+            calculate_cumulative(subset_array(results, list(outcome = "doxy.coverage"), drop=T), stratification.dimensions = STRATIFICATION_DIMENSIONS)
+    }
+    
+    # Cumulative incidence averted
+    print("Calculating cumulative incidence outcomes")
+    cum_incidence <-
+        calculate_cumulative(subset_array(results, list(outcome = "incidence"), drop=T), stratification.dimensions = STRATIFICATION_DIMENSIONS)
+    cum_incidence_averted <-
+        calculate_averted_count(cum_incidence, dn_one_outcome)
+    cum_incidence_averted_percent <-
+        calculate_averted_pct(cum_incidence, dn_one_outcome)
+    if (is.null(STRATIFICATION_DIMENSIONS)) {
+        rate_cum_incidence_averted_ppy_doxy <-
+            100000 * cum_incidence_averted / cum_doxy_coverage
+    }
+    
+    # Cumulative diagnoses averted
+    print("Calculating cumulative total diagnosis outcomes")
+    cum_diagnosis_total <-
+        calculate_cumulative(subset_array(results, list(outcome = "diagnosis.total"), drop=T), stratification.dimensions = STRATIFICATION_DIMENSIONS)
+    cum_diagnosis_total_averted <-
+        calculate_averted_count(cum_diagnosis_total, dn_one_outcome)
+    cum_diagnosis_total_averted_percent <-
+        calculate_averted_pct(cum_diagnosis_total, dn_one_outcome)
+    if (is.null(STRATIFICATION_DIMENSIONS)) {
+        rate_cum_diagnosis_total_averted_ppy_doxy <-
+            100000 * cum_diagnosis_total_averted / cum_doxy_coverage
+    }
+    
+    print("Calculating cumulative PS diagnosis outcomes")
+    cum_diagnosis_ps <-
+        calculate_cumulative(subset_array(results, list(outcome = "diagnosis.ps"), drop=T), stratification.dimensions = STRATIFICATION_DIMENSIONS)
+    cum_diagnosis_ps_averted <-
+        calculate_averted_count(cum_diagnosis_ps, dn_one_outcome)
+    cum_diagnosis_ps_averted_percent <-
+        calculate_averted_pct(cum_diagnosis_ps, dn_one_outcome)
+    if (is.null(STRATIFICATION_DIMENSIONS)) {
+        rate_cum_diagnosis_ps_averted_ppy_doxy <-
+            100000 * cum_diagnosis_ps / cum_doxy_coverage
+    }
+    
     # Combine, but DO NOT INCLUDE ORIGINAL OUTCOMES (to keep it smaller)
     dn_w_custom <- dimnames(results)
     # Add names of locations back in
@@ -267,6 +298,7 @@ calculate_custom_outcomes <- function(raw_results, debug=F) {
             "incidence_averted_rate_per_msm",
             "incidence_averted_ppy_doxy",
             "pct_incidence_reduction_vs_2022",
+            "incidence_rate",
             
             "diagnosis_total_averted",
             "diagnosis_total_averted_percent",
@@ -274,6 +306,7 @@ calculate_custom_outcomes <- function(raw_results, debug=F) {
             "diagnosis_total_averted_rate_per_msm",
             "diagnosis_total_averted_rate_ppy_doxy",
             "pct_diagnosis_total_reduction_vs_2022",
+            "diagnosis_total_rate",
             
             "diagnosis_ps_averted",
             "diagnosis_ps_averted_percent",
@@ -281,17 +314,24 @@ calculate_custom_outcomes <- function(raw_results, debug=F) {
             "diagnosis_ps_averted_rate_per_msm",
             "diagnosis_ps_averted_rate_ppy_doxy",
             "pct_diagnosis_ps_reduction_vs_2022",
+            "diagnosis_ps_rate",
             
+            "cum_doxy_coverage",
+            
+            "cum_incidence",
             "cum_incidence_averted",
-            "cum_incidence_averted_percent", # Not useful because denominator is 2000-2040 cumulative
+            "cum_incidence_averted_percent",
+            "rate_cum_incidence_averted_ppy_doxy",
             
+            "cum_diagnosis_total",
             "cum_diagnosis_total_averted",
             "cum_diagnosis_total_averted_percent",
+            "rate_cum_diagnosis_total_averted_ppy_doxy",
             
+            "cum_diagnosis_ps",
             "cum_diagnosis_ps_averted",
             "cum_diagnosis_ps_averted_percent",
-            
-            "diagnosis_ps_rate"
+            "rate_cum_diagnosis_ps_averted_ppy_doxy"
         )
         results_w_custom <-
             array(
@@ -302,6 +342,7 @@ calculate_custom_outcomes <- function(raw_results, debug=F) {
                     incidence_averted_rate_per_msm,
                     incidence_averted_ppy_doxy,
                     pct_incidence_reduction_vs_2022,
+                    incidence_rate,
                     
                     diagnosis_total_averted,
                     diagnosis_total_averted_percent,
@@ -309,6 +350,7 @@ calculate_custom_outcomes <- function(raw_results, debug=F) {
                     diagnosis_total_averted_rate_per_msm,
                     diagnosis_total_averted_rate_ppy_doxy,
                     pct_diagnosis_total_reduction_vs_2022,
+                    diagnosis_total_rate,
                     
                     diagnosis_ps_averted,
                     diagnosis_ps_averted_percent,
@@ -316,17 +358,24 @@ calculate_custom_outcomes <- function(raw_results, debug=F) {
                     diagnosis_ps_averted_rate_per_msm,
                     diagnosis_ps_averted_rate_ppy_doxy,
                     pct_diagnosis_ps_reduction_vs_2022,
+                    diagnosis_ps_rate,
                     
+                    cum_doxy_coverage,
+                    
+                    cum_incidence,
                     cum_incidence_averted,
                     cum_incidence_averted_percent,
+                    rate_cum_incidence_averted_ppy_doxy,
                     
+                    cum_diagnosis_total,
                     cum_diagnosis_total_averted,
                     cum_diagnosis_total_averted_percent,
+                    rate_cum_diagnosis_total_averted_ppy_doxy,
                     
+                    cum_diagnosis_ps,
                     cum_diagnosis_ps_averted,
                     cum_diagnosis_ps_averted_percent,
-                    
-                    diagnosis_ps_rate
+                    rate_cum_diagnosis_ps_averted_ppy_doxy
                 ),
                 sapply(dn_w_custom, length),
                 dn_w_custom
@@ -336,55 +385,64 @@ calculate_custom_outcomes <- function(raw_results, debug=F) {
                                       "incidence_averted_percent",
                                       "incidence_averted_rate_per_pop",
                                       "pct_incidence_reduction_vs_2022",
+                                      "incidence_rate",
                                       
                                       "diagnosis_total_averted",
                                       "diagnosis_total_averted_percent",
                                       "diagnosis_total_averted_rate_per_pop",
                                       "pct_diagnosis_total_reduction_vs_2022",
+                                      "diagnosis_total_rate",
                                       
                                       "diagnosis_ps_averted",
                                       "diagnosis_ps_averted_percent",
                                       "diagnosis_ps_averted_rate_per_pop",
                                       "pct_diagnosis_ps_reduction_vs_2022",
+                                      "diagnosis_ps_rate",
                                       
+                                      "cum_incidence",
                                       "cum_incidence_averted",
-                                      "cum_incidence_averted_percent", # Not useful because denominator is 2000-2040 cumulative
+                                      "cum_incidence_averted_percent",
                                       
+                                      "cum_diagnosis_total",
                                       "cum_diagnosis_total_averted",
                                       "cum_diagnosis_total_averted_percent",
                                       
+                                      "cum_diagnosis_ps",
                                       "cum_diagnosis_ps_averted",
-                                      "cum_diagnosis_ps_averted_percent",
-                                      
-                                      "diagnosis_ps_rate")
+                                      "cum_diagnosis_ps_averted_percent"
+        )
         results_w_custom <-
             array(
                 c(incidence_averted,
                   incidence_averted_percent,
                   incidence_averted_rate_per_pop,
                   pct_incidence_reduction_vs_2022,
+                  incidence_rate,
                   
                   diagnosis_total_averted,
                   diagnosis_total_averted_percent,
                   diagnosis_total_averted_rate_per_pop,
                   pct_diagnosis_total_reduction_vs_2022,
+                  diagnosis_total_rate,
                   
                   diagnosis_ps_averted,
                   diagnosis_ps_averted_percent,
                   diagnosis_ps_averted_rate_per_pop,
                   pct_diagnosis_ps_reduction_vs_2022,
+                  diagnosis_ps_rate,
                   
+                  cum_incidence,
                   cum_incidence_averted,
                   cum_incidence_averted_percent,
                   
+                  cum_diagnosis_total,
                   cum_diagnosis_total_averted,
                   cum_diagnosis_total_averted_percent,
                   
+                  cum_diagnosis_ps,
                   cum_diagnosis_ps_averted,
-                  cum_diagnosis_ps_averted_percent,
-                  
-                  diagnosis_ps_rate
-                  ),
+                  cum_diagnosis_ps_averted_percent
+                ),
                 sapply(dn_w_custom, length),
                 dn_w_custom
             )
@@ -405,23 +463,18 @@ if (1==2) {
     BASE.PATH <- paste0(ROOT.DIR,"/shield/outputs/calib.8.21.stage3.az")
     
     total_raw_results <- get(load(paste0(BASE.PATH, "/total_raw_results.Rdata")))
-    total_calc_results <- calculate_custom_outcomes(total_raw_results)
+    total_calc_results <- calculate_custom_outcomes(total_raw_results, baseline.year = "2022")
     
     save(total_calc_results,
          file = paste0(BASE.PATH, "/total_calc_results1.Rdata"))
     
 }
 if (1==2) {
-    # age_raw_results <- get(load(paste0("Q:/shield/outputs/", CALIB_CODE, "/age_raw_results.Rdata")))
-    # age_results <- calculate_custom_outcomes(age_raw_results)
-    # save(age_results,
-    #      file = paste0("Q:/shield/outputs/", CALIB_CODE, "/age_results.Rdata"))
-}
-if (1==2) {
-    sex_raw_results <- get(load(paste0("Q:/shield/outputs/", CALIB_CODE, "/sex_raw_results.Rdata")))
-    sex_calc_results <- calculate_custom_outcomes(sex_raw_results)
+    BASE.PATH <- paste0(ROOT.DIR,"/shield/outputs/calib.8.21.stage3.az")
+    sex_raw_results <- get(load(paste0(BASE.PATH, "/sex_raw_results.Rdata")))
+    sex_calc_results <- calculate_custom_outcomes(sex_raw_results, baseline.year = "2022")
     save(sex_calc_results,
-         file = paste0("Q:/shield/outputs/", CALIB_CODE, "/sex_results.Rdata"))
+         file = paste0(BASE.PATH, "/sex_results.Rdata"))
 }
 
 #cumulative incidence : add a baseline year: 2022 update all instances 
