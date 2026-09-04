@@ -19,6 +19,8 @@ Rendered analysis notebooks (GitHub-previewable Markdown; figures in `figures/`)
 |---|---|
 | `initial_intervention_results.md` | Headline result: the calibrated intervention on Maryland youth (13-24). Trajectories, population-level effects, cumulative infections averted, and recruitment / OR sensitivity. |
 | `broadening_eligibility_brief.md` | Broaden-the-pool analysis (#35): infections averted if eligibility extends to young adults (25-34) and to 35-44 (the 13-44 rung), under full / half / no transport of the youth effect; reach, the age-pool ceiling, and program-duration sensitivity. |
+| `multistate_youth_brief.md` | Comparative results across 31 jurisdictions, including trial-effect sensitivity, surveillance-linked reach sensitivity, participant-centered metrics, and the bounded Maryland eligibility bridge. |
+| `croi_2027_abstract_draft.md` | Draft CROI 2027 abstract for team review, with the optional submission-format effect-sensitivity figure. |
 
 ## Quick start
 
