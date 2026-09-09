@@ -20,6 +20,19 @@ JHEEM.ANALYSES.PATH <- "../jheem_analyses"
 JHEEM2.PATH         <- "../jheem2"
 JHEEM2.BRANCH       <- "dev"      # branch required for all SHIELD work
 
+## Leave NULL to use the current promoted syphilis manager. Set an immutable
+## release tag here before sourcing this file, or via the environment variable,
+## to reproduce or temporarily continue a run with an earlier manager.
+if (!exists("SYPHILIS.MANAGER.RELEASE.TAG", inherits = FALSE)) {
+  configured.manager.tag <- trimws(Sys.getenv("JHEEM_SYPHILIS_MANAGER_TAG"))
+  SYPHILIS.MANAGER.RELEASE.TAG <- if (nzchar(configured.manager.tag)) {
+    configured.manager.tag
+  } else {
+    NULL
+  }
+  rm(configured.manager.tag)
+}
+
 ## =============================================================================
 ## 1. PACKAGES
 ## =============================================================================
@@ -156,8 +169,11 @@ if (!exists("CENSUS.MANAGER")) {
 if (!exists("SURVEILLANCE.MANAGER")) {
   cat("Reading syphilis surveillance manager ...\n")
   SURVEILLANCE.MANAGER <- load.data.manager.from.cache("syphilis.manager.rdata",
-                                                       set.as.default = TRUE)
+                                                       set.as.default = TRUE,
+                                                       release.tag = SYPHILIS.MANAGER.RELEASE.TAG)
   cat("Syphilis surveillance manager read\n")
+} else if (!is.null(SYPHILIS.MANAGER.RELEASE.TAG)) {
+  warning("SYPHILIS.MANAGER.RELEASE.TAG was ignored because SURVEILLANCE.MANAGER was already loaded")
 }
 
 ## =============================================================================
