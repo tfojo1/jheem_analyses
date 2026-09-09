@@ -7,8 +7,12 @@
 
 cat('*** Running shield_specification.R ***\n')
 
-# Working directory is set to the main JHEEM_Analysis folder:
-source('../jheem_analyses/applications/SHIELD/shield_source_code.R')
+# Working directory is set to the main JHEEM_Analysis folder. Compatibility
+# checks initialize the same runtime from explicit, already-resolved inputs and
+# therefore skip the mutating convenience bootstrap.
+if (!exists("SHIELD.RUNTIME.INITIALIZED", inherits = TRUE) ||
+    !isTRUE(get("SHIELD.RUNTIME.INITIALIZED", inherits = TRUE)))
+  source('../jheem_analyses/applications/SHIELD/shield_source_code.R')
 source('../jheem_analyses/applications/SHIELD/R/shield_locations_of_interest.R')
 
 
@@ -2499,4 +2503,4 @@ cat('*** Shield_specification.R completed! ***\n')
 #'
 #'
 #'@PK: check parameterization: prop immediate diagnosis
-#'@PK: check parameterization: prop symptomatic women 
+#'@PK: check parameterization: prop symptomatic women

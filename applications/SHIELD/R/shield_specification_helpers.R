@@ -79,6 +79,7 @@ get.n.initial.population.for.sex <- function(location, specification.metadata, s
 }
 
 ## get msm popualtion proportion ----
+
 #'
 #' @title get.proportion.msm.of.male.by.race.functional.form
 #' @description Generates proportion of male who are msm by race
@@ -1358,4 +1359,3 @@ get_popProp_lu_diag_1970<-function(location){
     SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location["1993",location]
   popProp.lu.diag.1970
 }
- 

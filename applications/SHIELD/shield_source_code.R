@@ -117,22 +117,14 @@ if (USE.JHEEM2.PACKAGE) {
 }
 
 ## =============================================================================
-## 5. COMMON JHEEM CODE
+## 5. RESOLVE RUNTIME INPUTS
 ## =============================================================================
-## cache_manager.R is sourced after JHEEM2 so its definitions can rely on the
-## package being available.
+## Materialization stays in this legacy convenience bootstrap. The runtime
+## initializer called below is intentionally read-only and accepts resolved
+## manager objects, which is also the path used by compatibility checks.
 
 source(file.path(JHEEM.ANALYSES.PATH, "commoncode/cache_manager.R"))
-clear.all.managers()
-
-source(file.path(JHEEM.ANALYSES.PATH, "commoncode/target_populations.R"))
-source(file.path(JHEEM.ANALYSES.PATH, "commoncode/age_mappings.R"))
-source(file.path(JHEEM.ANALYSES.PATH, "commoncode/cache_object_for_version_functions.R"))
-source(file.path(JHEEM.ANALYSES.PATH, "commoncode/logitnorm_helpers.R"))
-source(file.path(JHEEM.ANALYSES.PATH, "commoncode/file_paths.R"))   # defines ROOT.DIR, JHEEM.CACHE.DIR
-source(file.path(JHEEM.ANALYSES.PATH, "commoncode/locations_of_interest.R"))
-
-set.jheem.root.directory(ROOT.DIR)
+source(file.path(JHEEM.ANALYSES.PATH, "commoncode/file_paths.R"))
 
 ## =============================================================================
 ## 6. CACHED DATA
@@ -161,65 +153,18 @@ if (!exists("SURVEILLANCE.MANAGER")) {
 }
 
 ## =============================================================================
-## 7. SHIELD-SPECIFIC CODE
+## 7. INITIALIZE SHIELD FROM RESOLVED INPUTS
 ## =============================================================================
 
-SHIELD.DIR <- file.path(JHEEM.ANALYSES.PATH, "applications/SHIELD")
+source(file.path(JHEEM.ANALYSES.PATH,
+                 "applications/SHIELD/R/initialize_shield_runtime.R"))
+initialize.shield.runtime(
+  census.manager = CENSUS.MANAGER,
+  surveillance.manager = SURVEILLANCE.MANAGER,
+  root.dir = ROOT.DIR,
+  analyses.path = JHEEM.ANALYSES.PATH,
+  envir = .GlobalEnv
+)
 
-for (f in c("shield_calib_parameters.R",
-            "shield_base_parameters.R",
-            "R/shield_ontology_mappings.R",
-            "R/shield_specification_helpers.R",
-            "R/shield_inputManager_pairing.R",
-            "R/shield_inputManager_helpers.R",
-            "R/shield_inputManager_covid.R")) {
-  source(file.path(SHIELD.DIR, f))
-  cat(basename(f), " sourced\n", sep = "")
-}
-rm(f)
-
-PAIRING.INPUT.MANAGER <- create.pairing.manager(dir = file.path(SHIELD.DIR,
-                                                                "data_files/pairing"))
-cat("PAIRING.INPUT.MANAGER created\n")
-
-## =============================================================================
-## 8. GLOBAL CONSTANTS
-## =============================================================================
-
-## Census age strata, as lower bounds (character), ascending
-CENSUS.AGES <- as.character(sort(
-  parse.age.strata.names(CENSUS.MANAGER$ontologies$census$age)$lower))
-cat("CENSUS.AGES set to ", paste(CENSUS.AGES, collapse = ", "), "\n", sep = "")
-
-## --- Simulation timeline -----------------------------------------------------
-## Most demographic data begin in 2007 or 2010. Functional forms are mapped back
-## to ~2005 for a smooth transition; values are held constant before the
-## functional.form.from.time year.
-DEFAULT.START.YEAR            <- 1970   # simulation start
-DEFAULT.FIX.STRATA.YEAR       <- 2010   # full population breakdown available post-2010
-# (also used for proportion-MSM estimation)
-DEFAULT.POPULATION.YEARS      <- 2010   # initial population + sexual contact O/E by race
-DEFAULT.AGING.START.YEAR      <- 2005
-DEFAULT.MIGRATION.START.YEAR  <- 2005
-DEFAULT.MORTALITY.RATE.YEARS  <- c("2001-2010", "2011-2020")
-
-## --- Fertility ---------------------------------------------------------------
-DEFAULT.FERTILITY.START.YEARS <- 2005
-DEFAULT.FERTILITY.RATE.YEARS  <- 2007:2023
-FERTILE.AGES     <- c("15-19 years", "20-24 years", "25-29 years",
-                      "30-34 years", "35-39 years", "40-44 years")
-NON.FERTILE.AGES <- c("0-14 years", "45-49 years", "50-54 years",
-                      "55-64 years", "65+ years")
-SEXUAL.ACTIVITY.AGES <- c("15-19 years", "20-24 years", "25-29 years",
-                          "30-34 years", "35-39 years", "40-44 years",
-                          "45-49 years", "50-54 years", "55-64 years")
-
-## --- Intervention / testing start years --------------------------------------
-## Projections are held at these years' values for all earlier years.
-DEFAULT.STI.SCREENING.START.YEAR <- 1980
-DEFAULT.PRENATAL.CARE.START.YEAR <- 1980
-DEFAULT.TRANSMISSION.START.YEAR  <- 1980
-DEFAULT.HIV.TESTING.START.YEAR   <- 2010
-
-cat("Global variables are defined\n")
+cat("SHIELD runtime initialized\n")
 cat("*** Shield_source_code.R completed! ***\n")

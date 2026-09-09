@@ -73,6 +73,7 @@ jobs:
         run: |
           install.packages(c("remotes", "jsonlite", "readxl", "dplyr", "stringr", "tidyr"))
           remotes::install_github("tfojo1/locations")
+          remotes::install_github("tfojo1/distributions")
           remotes::install_local("_jheem2", upgrade = "never")
         shell: Rscript {0}
 
@@ -186,6 +187,29 @@ jobs:
           Dependencies: ${{ inputs.deps_release_tag }}
           jheem2: ${{ inputs.jheem2_ref }}"
           git push
+
+      - name: Validate release baseline
+        run: |
+          set -o pipefail
+          Rscript data_processing/syphilis.manager/validation/run_validation.R \
+            _ci_outputs/syphilis.manager.rdata \
+            2>&1 | tee _ci_outputs/validation_report.txt
+
+      - name: Check SHIELD manager contract
+        run: |
+          set -o pipefail
+          Rscript applications/SHIELD/tests/test_manager_contract.R \
+            _ci_outputs/syphilis.manager.rdata \
+            _ci_inputs/deps/census.manager.rdata \
+            2>&1 | tee _ci_outputs/shield_manager_contract.txt
+
+      - name: Smoke-test SHIELD in Baltimore
+        run: |
+          set -o pipefail
+          Rscript applications/SHIELD/tests/smoke_manager_compatibility.R \
+            _ci_outputs/syphilis.manager.rdata \
+            _ci_inputs/deps/census.manager.rdata \
+            2>&1 | tee _ci_outputs/shield_manager_smoke.txt
 
       - name: Upload build artifacts
         if: always()
