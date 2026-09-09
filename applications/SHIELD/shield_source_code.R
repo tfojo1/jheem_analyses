@@ -138,6 +138,7 @@ if (USE.JHEEM2.PACKAGE) {
 ## package being available.
 
 source(file.path(JHEEM.ANALYSES.PATH, "commoncode/cache_manager.R"))
+source(file.path(JHEEM.ANALYSES.PATH, "commoncode/run_provenance.R"))
 clear.all.managers()
 
 source(file.path(JHEEM.ANALYSES.PATH, "commoncode/target_populations.R"))

@@ -18,6 +18,7 @@ START_FROM_SCRATCH <- TRUE
 set.seed(00000)
 CACHE.FREQ= 500 # how often should write the results to disk (Default: 100)
 UPDATE.FREQ= 50 # how often to print messages (Default: 50)
+RUN.ROOT.DIR <- get.jheem.root.directory()
 
 #SECTION1: SETUP
 if (START_FROM_SCRATCH) {
@@ -26,13 +27,28 @@ if (START_FROM_SCRATCH) {
     clear.calibration.cache(version=VERSION,
                             location=LOCATION,
                             calibration.code = CALIBRATION.NAME,
+                            root.dir = RUN.ROOT.DIR,
                             allow.remove.incomplete = T)
     print("Cache is cleared")
     #
     set.up.calibration(version=VERSION,
                        location=LOCATION,
                        calibration.code = CALIBRATION.NAME,
-                       cache.frequency = CACHE.FREQ #100 #how often write the results to disk
+                       cache.frequency = CACHE.FREQ, #100 #how often write the results to disk
+                       root.dir = RUN.ROOT.DIR
+    )
+    capture.jheem.provenance.safely(
+        start.calibration.provenance(
+            version = VERSION,
+            location = LOCATION,
+            calibration.code = CALIBRATION.NAME,
+            root.dir = RUN.ROOT.DIR,
+            application = "SHIELD",
+            managers = list(
+                census = CENSUS.MANAGER,
+                syphilis = SURVEILLANCE.MANAGER
+            )
+        )
     )
     print(paste0("Calibration is set up for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 }
@@ -45,16 +61,51 @@ print(paste0("STARTING MCMC RUN OF ", LOCATION, " (", locations::get.location.na
 attempts <- 1
 while (attempts < 100) {
     finished <- F
+    capture.jheem.provenance.safely(
+        record.calibration.provenance.event(
+            version = VERSION,
+            location = LOCATION,
+            calibration.code = CALIBRATION.NAME,
+            root.dir = RUN.ROOT.DIR,
+            status = "attempt_started",
+            chain = 1,
+            attempt = attempts
+        )
+    )
     tryCatch({
         mcmc <- run.calibration(version = VERSION,
                                 location = LOCATION,
                                 calibration.code = CALIBRATION.NAME,
+                                root.dir = RUN.ROOT.DIR,
                                 chains = 1,
                                 update.frequency = UPDATE.FREQ,
                                 update.detail = 'med')
         finished <- T
+        capture.jheem.provenance.safely(
+            record.calibration.provenance.event(
+                version = VERSION,
+                location = LOCATION,
+                calibration.code = CALIBRATION.NAME,
+                root.dir = RUN.ROOT.DIR,
+                status = "attempt_completed",
+                chain = 1,
+                attempt = attempts
+            )
+        )
     },
     error = function(e) {
+        capture.jheem.provenance.safely(
+            record.calibration.provenance.event(
+                version = VERSION,
+                location = LOCATION,
+                calibration.code = CALIBRATION.NAME,
+                root.dir = RUN.ROOT.DIR,
+                status = "attempt_failed",
+                chain = 1,
+                attempt = attempts,
+                details = list(error = conditionMessage(e))
+            )
+        )
         print("MCMC was probably interrupted during write step. Sleeping 5 minutes before retrying...")
         Sys.sleep(60 * 5)
     })
@@ -75,8 +126,10 @@ print(paste0("DONE RUNNING MCMC: Took ",
 simset <- assemble.simulations.from.calibration(version = VERSION,
                                                 location = LOCATION,
                                                 calibration.code = CALIBRATION.NAME,
+                                                root.dir = RUN.ROOT.DIR,
                                                 allow.incomplete = T)
-save.simulation.set(simset)
-
-
+save.simulation.set(simset, root.dir = RUN.ROOT.DIR)
+capture.jheem.provenance.safely(
+    finalize.calibration.provenance(simset, root.dir = RUN.ROOT.DIR)
+)
 

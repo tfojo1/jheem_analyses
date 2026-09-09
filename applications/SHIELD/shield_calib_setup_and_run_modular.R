@@ -21,6 +21,7 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 VERSION<- 'shield'
 CACHE.FREQ= 500 # how often should write the results to disk (Default: 100)
 UPDATE.FREQ= 50 # how often to print messages (Default: 50)
+RUN.ROOT.DIR <- get.jheem.root.directory()
 
 #SECTION1: SETUP ----
 if (RUN.STAGE == 'setup' | RUN.STAGE == 'all') {
@@ -31,13 +32,28 @@ if (RUN.STAGE == 'setup' | RUN.STAGE == 'all') {
     clear.calibration.cache(version=VERSION,
                             location=LOCATION,
                             calibration.code = CALIBRATION.NAME,
+                            root.dir = RUN.ROOT.DIR,
                             allow.remove.incomplete = T)
     print("Cache is cleared")
     #
     set.up.calibration(version=VERSION,
                        location=LOCATION,
                        calibration.code = CALIBRATION.NAME,
-                       cache.frequency = CACHE.FREQ )
+                       cache.frequency = CACHE.FREQ,
+                       root.dir = RUN.ROOT.DIR)
+    capture.jheem.provenance.safely(
+        start.calibration.provenance(
+            version = VERSION,
+            location = LOCATION,
+            calibration.code = CALIBRATION.NAME,
+            root.dir = RUN.ROOT.DIR,
+            application = "SHIELD",
+            managers = list(
+                census = CENSUS.MANAGER,
+                syphilis = SURVEILLANCE.MANAGER
+            )
+        )
+    )
     print(paste0("Setup complete for ", LOCATION))
 }
 
@@ -52,16 +68,51 @@ if (RUN.STAGE == 'run'| RUN.STAGE == 'all') {
     attempts <- 1
     while (attempts < 100) {
         finished <- F
+        capture.jheem.provenance.safely(
+            record.calibration.provenance.event(
+                version = VERSION,
+                location = LOCATION,
+                calibration.code = CALIBRATION.NAME,
+                root.dir = RUN.ROOT.DIR,
+                status = "attempt_started",
+                chain = CHAIN,
+                attempt = attempts
+            )
+        )
         tryCatch({
             mcmc <- run.calibration(version = VERSION,
                                     location = LOCATION,
                                     calibration.code = CALIBRATION.NAME,
+                                    root.dir = RUN.ROOT.DIR,
                                     chains = CHAIN,
                                     update.frequency = UPDATE.FREQ,
                                     update.detail = 'med')
             finished <- T
+            capture.jheem.provenance.safely(
+                record.calibration.provenance.event(
+                    version = VERSION,
+                    location = LOCATION,
+                    calibration.code = CALIBRATION.NAME,
+                    root.dir = RUN.ROOT.DIR,
+                    status = "attempt_completed",
+                    chain = CHAIN,
+                    attempt = attempts
+                )
+            )
         },
         error = function(e) {
+            capture.jheem.provenance.safely(
+                record.calibration.provenance.event(
+                    version = VERSION,
+                    location = LOCATION,
+                    calibration.code = CALIBRATION.NAME,
+                    root.dir = RUN.ROOT.DIR,
+                    status = "attempt_failed",
+                    chain = CHAIN,
+                    attempt = attempts,
+                    details = list(error = conditionMessage(e))
+                )
+            )
             print(paste0("MCMC chain ", CHAIN, " was probably interrupted during write step. Sleeping 5 minutes before retrying..."))
             Sys.sleep(60 * 5)
         })
@@ -84,9 +135,11 @@ if (RUN.STAGE == 'assemble'| RUN.STAGE == 'all') {
     simset <- assemble.simulations.from.calibration(version = VERSION,
                                                     location = LOCATION,
                                                     calibration.code = CALIBRATION.NAME,
+                                                    root.dir = RUN.ROOT.DIR,
                                                     allow.incomplete = T)
-    save.simulation.set(simset)
+    save.simulation.set(simset, root.dir = RUN.ROOT.DIR)
+    capture.jheem.provenance.safely(
+        finalize.calibration.provenance(simset, root.dir = RUN.ROOT.DIR)
+    )
     print(paste0("Assembly complete for ", LOCATION))
 }
-
-
