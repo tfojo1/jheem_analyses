@@ -1,7 +1,7 @@
 {
   "metadata": {
     "generated_from": "syphilis.manager_section3",
-    "generated_at": "2026-08-26 20:02:33"
+    "generated_at": "2026-09-09 19:22:42"
   },
   "outcomes": {
     "population": {
@@ -6910,10 +6910,10 @@
                     "values": ["2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024"]
                   },
                   "location": {
-                    "n": 45,
+                    "n": 46,
                     "min": "AK",
                     "max": "WY",
-                    "values": ["AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NJ", "NM", "NV", "NY", "OH", "OK", "PA", "RI", "SC", "TN", "TX", "UT", "VA", "VT", "WA", "WI", "WV", "WY"]
+                    "values": ["AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NJ", "NM", "NV", "NY", "OH", "OK", "PA", "RI", "SC", "TN", "TX", "US", "UT", "VA", "VT", "WA", "WI", "WV", "WY"]
                   }
                 },
                 "year__location__race": {
@@ -6925,10 +6925,10 @@
                     "values": ["2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024"]
                   },
                   "location": {
-                    "n": 45,
+                    "n": 46,
                     "min": "AK",
                     "max": "WY",
-                    "values": ["AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NJ", "NM", "NV", "NY", "OH", "OK", "PA", "RI", "SC", "TN", "TX", "UT", "VA", "VT", "WA", "WI", "WV", "WY"]
+                    "values": ["AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NJ", "NM", "NV", "NY", "OH", "OK", "PA", "RI", "SC", "TN", "TX", "US", "UT", "VA", "VT", "WA", "WI", "WV", "WY"]
                   },
                   "race": ["american indian/alaska native", "asian", "black", "hispanic", "native hawaiian/other pacific islander", "other race", "white"]
                 },
@@ -6941,62 +6941,12 @@
                     "values": ["2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024"]
                   },
                   "location": {
-                    "n": 45,
+                    "n": 46,
                     "min": "AK",
                     "max": "WY",
-                    "values": ["AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NJ", "NM", "NV", "NY", "OH", "OK", "PA", "RI", "SC", "TN", "TX", "UT", "VA", "VT", "WA", "WI", "WV", "WY"]
+                    "values": ["AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NJ", "NM", "NV", "NY", "OH", "OK", "PA", "RI", "SC", "TN", "TX", "US", "UT", "VA", "VT", "WA", "WI", "WV", "WY"]
                   },
                   "age": ["18-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years", "65-69 years", "70-74 years", "75-79 years", "80+ years"]
-                },
-                "year__location__sex": {
-                  "dimensions": ["year", "location", "sex"],
-                  "year": {
-                    "n": 11,
-                    "min": "2014",
-                    "max": "2024",
-                    "values": ["2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024"]
-                  },
-                  "location": {
-                    "n": 1,
-                    "min": "US",
-                    "max": "US",
-                    "values": "US"
-                  },
-                  "sex": ["female", "male"]
-                },
-                "year__location__race__sex": {
-                  "dimensions": ["year", "location", "race", "sex"],
-                  "year": {
-                    "n": 11,
-                    "min": "2014",
-                    "max": "2024",
-                    "values": ["2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024"]
-                  },
-                  "location": {
-                    "n": 1,
-                    "min": "US",
-                    "max": "US",
-                    "values": "US"
-                  },
-                  "race": ["american indian/alaska native", "asian", "black", "hispanic", "native hawaiian/other pacific islander", "other race", "white"],
-                  "sex": ["female", "male"]
-                },
-                "year__location__age__sex": {
-                  "dimensions": ["year", "location", "age", "sex"],
-                  "year": {
-                    "n": 11,
-                    "min": "2014",
-                    "max": "2024",
-                    "values": ["2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024"]
-                  },
-                  "location": {
-                    "n": 1,
-                    "min": "US",
-                    "max": "US",
-                    "values": "US"
-                  },
-                  "age": ["18-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years", "65-69 years", "70-74 years", "75-79 years", "80+ years"],
-                  "sex": ["female", "male"]
                 }
               }
             }
