@@ -8,6 +8,9 @@ if (nchar(system.file(package = "jsonlite")) == 0) {
 if (nchar(system.file(package = "filelock")) == 0) {
     install.packages("filelock")
 }
+if (nchar(system.file(package = "openssl")) == 0) {
+    install.packages("openssl")
+}
 
 JHEEM.CACHE.DIR <- NULL
 if (dir.exists("../../cached")) {
@@ -35,11 +38,24 @@ if (is.null(JHEEM.CACHE.DIR)) {
 #' @param file Name of a data manager file, with its extension, that can be appended to the JHEEM.CACHE.DIR path.
 #' @param set.as.default Should this data manager be set as the default data manager for this session?
 #' @param offline If TRUE, having a missing or out of date data manager will not trigger a download from the internet. Use if offline to avoid errors.
-load.data.manager.from.cache <- function(file, set.as.default = F, offline=F) {
+#' @param release.tag Optional GitHub Release tag. Immutable version tags are
+#' recommended; the configured latest alias is resolved to its promoted version.
+#' When omitted, the existing latest-manager behavior is unchanged.
+load.data.manager.from.cache <- function(file, set.as.default = F, offline=F,
+                                         release.tag = NULL) {
     error.prefix <- "Cannot load.data.manager.from.cache(): "
 
     # Check if this manager has a GitHub Release source
     gh.source <- get.github.release.source(file)
+
+    if (!is.null(release.tag)) {
+        if (is.null(gh.source)) {
+            stop(paste0(error.prefix, "'release.tag' is only supported for data managers backed by GitHub Releases"))
+        }
+        return(load.data.manager.from.github.release(
+            file, gh.source, release.tag, set.as.default, offline, error.prefix
+        ))
+    }
 
     if (!is.null(gh.source)) {
         return(load.data.manager.from.github(file, gh.source, set.as.default, offline, error.prefix))
@@ -47,6 +63,16 @@ load.data.manager.from.cache <- function(file, set.as.default = F, offline=F) {
 
     # Fall back to legacy OneDrive path
     load.data.manager.from.onedrive.cache(file, set.as.default, offline, error.prefix)
+}
+
+#' @title Get the Release Identity of a Loaded Data Manager
+#' @description
+#' Returns the release tag, repository, asset, digest, and local cache path for a
+#' data manager loaded with an explicit `release.tag`. Returns NULL for managers
+#' loaded through the legacy or latest-manager paths.
+#' @param data.manager A loaded JHEEM data manager.
+get.data.manager.resolution <- function(data.manager) {
+    attr(data.manager, "jheem.manager.resolution", exact = TRUE)
 }
 
 #' @title Get Data Manager Cache Metadata
@@ -217,6 +243,244 @@ get.github.release.source <- function(file) {
     entry <- sources[[file]]
     if (is.null(entry$source) || entry$source != "github-release") return(NULL)
     entry
+}
+
+validate.github.release.component <- function(value, label, error.prefix) {
+    if (!is.character(value) || length(value) != 1 || is.na(value) ||
+        !grepl("^[A-Za-z0-9][A-Za-z0-9._-]*$", value)) {
+        stop(paste0(error.prefix, "Invalid GitHub Release ", label, ": '", value, "'"))
+    }
+    value
+}
+
+github.release.request <- function(url) {
+    req <- httr2::request(url) |>
+        httr2::req_headers(
+            "Accept" = "application/vnd.github+json",
+            "X-GitHub-Api-Version" = "2022-11-28",
+            "User-Agent" = "jheem-cache-manager"
+        )
+    token <- Sys.getenv("GITHUB_TOKEN")
+    if (!nzchar(token)) token <- Sys.getenv("GH_TOKEN")
+    if (nzchar(token)) req <- httr2::req_auth_bearer_token(req, token)
+    req
+}
+
+get.github.release.by.tag <- function(repo, tag, error.prefix) {
+    tag <- validate.github.release.component(tag, "tag", error.prefix)
+    api.url <- paste0(
+        "https://api.github.com/repos/", repo, "/releases/tags/",
+        utils::URLencode(tag, reserved = TRUE)
+    )
+    tryCatch({
+        resp <- github.release.request(api.url) |> httr2::req_perform()
+        jsonlite::fromJSON(httr2::resp_body_string(resp), simplifyVector = FALSE)
+    }, error = function(e) {
+        stop(paste0(error.prefix, "Could not resolve GitHub Release tag '", tag,
+                    "' in ", repo, ": ", conditionMessage(e)), call. = FALSE)
+    })
+}
+
+promoted.github.release.tag <- function(release.info) {
+    body <- release.info$body
+    if (is.null(body) || length(body) != 1 || is.na(body)) return(NULL)
+    match <- regexec("Promoted from:.*?`([^`]+)`", body, perl = TRUE)
+    groups <- regmatches(body, match)[[1]]
+    if (length(groups) < 2) NULL else groups[[2]]
+}
+
+resolve.github.release.asset <- function(file, gh.source, release.tag, error.prefix) {
+    if (!is.character(release.tag) || length(release.tag) != 1 ||
+        is.na(release.tag) || !nzchar(release.tag)) {
+        stop(paste0(error.prefix, "'release.tag' must be one non-empty character value"))
+    }
+
+    requested.tag <- validate.github.release.component(release.tag, "tag", error.prefix)
+    resolved.tag <- requested.tag
+    release.info <- get.github.release.by.tag(gh.source$repo, requested.tag, error.prefix)
+
+    if (identical(requested.tag, gh.source$latest_tag)) {
+        resolved.tag <- promoted.github.release.tag(release.info)
+        if (is.null(resolved.tag)) {
+            stop(paste0(error.prefix, "The mutable alias '", requested.tag,
+                        "' does not identify its promoted immutable release"))
+        }
+        resolved.tag <- validate.github.release.component(resolved.tag, "promoted tag", error.prefix)
+        release.info <- get.github.release.by.tag(gh.source$repo, resolved.tag, error.prefix)
+    }
+
+    asset.name <- if (!is.null(gh.source$asset)) gh.source$asset else file
+    asset.name <- validate.github.release.component(asset.name, "asset name", error.prefix)
+    matching.assets <- Filter(
+        function(asset) !is.null(asset$name) && identical(asset$name, asset.name),
+        release.info$assets
+    )
+    if (length(matching.assets) != 1) {
+        stop(paste0(error.prefix, "Release '", resolved.tag, "' in ", gh.source$repo,
+                    " does not contain exactly one asset named '", asset.name, "'"))
+    }
+
+    asset <- matching.assets[[1]]
+    digest <- asset$digest
+    if (is.null(digest) || length(digest) != 1 || is.na(digest) ||
+        !grepl("^sha256:[0-9a-fA-F]{64}$", digest)) {
+        stop(paste0(error.prefix, "Release asset '", asset.name,
+                    "' does not publish a valid SHA-256 digest"))
+    }
+
+    list(
+        schema_version = 1L,
+        manager = file,
+        repository = gh.source$repo,
+        requested_tag = requested.tag,
+        resolved_tag = resolved.tag,
+        asset = asset.name,
+        sha256 = tolower(sub("^sha256:", "", digest)),
+        download_url = asset$browser_download_url,
+        published_at = release.info$published_at
+    )
+}
+
+data.manager.release.paths <- function(resolution, error.prefix) {
+    manager <- validate.github.release.component(resolution$manager, "manager name", error.prefix)
+    tag <- validate.github.release.component(resolution$resolved_tag, "tag", error.prefix)
+    asset <- validate.github.release.component(resolution$asset, "asset name", error.prefix)
+    directory <- file.path(JHEEM.CACHE.DIR, "data-managers", manager, tag)
+    list(
+        directory = directory,
+        artifact = file.path(directory, asset),
+        metadata = file.path(directory, "resolution.json"),
+        lock = paste0(directory, ".lock")
+    )
+}
+
+sha256.file <- function(path) {
+    connection <- file(path, open = "rb")
+    on.exit(close(connection), add = TRUE)
+    as.vector(as.character(openssl::sha256(connection)))
+}
+
+read.data.manager.resolution <- function(path) {
+    if (!file.exists(path)) return(NULL)
+    tryCatch(
+        jsonlite::fromJSON(path, simplifyVector = TRUE),
+        error = function(e) NULL
+    )
+}
+
+cached.release.is.valid <- function(paths, resolution) {
+    if (!file.exists(paths$artifact) || !file.exists(paths$metadata)) return(FALSE)
+    cached <- read.data.manager.resolution(paths$metadata)
+    required <- c("schema_version", "manager", "repository", "requested_tag",
+                  "resolved_tag", "asset", "sha256", "published_at")
+    if (is.null(cached) || !all(required %in% names(cached))) return(FALSE)
+    expected <- unlist(resolution[required], use.names = TRUE)
+    actual <- unlist(cached[required], use.names = TRUE)
+    if (!identical(as.character(actual), as.character(expected))) return(FALSE)
+    identical(tolower(sha256.file(paths$artifact)), tolower(resolution$sha256))
+}
+
+write.release.resolution <- function(resolution, path) {
+    persisted <- resolution[c(
+        "schema_version", "manager", "repository", "requested_tag",
+        "resolved_tag", "asset", "sha256", "published_at"
+    )]
+    jsonlite::write_json(persisted, path, auto_unbox = TRUE, pretty = TRUE)
+}
+
+get.cached.github.release.resolution <- function(file, gh.source, release.tag,
+                                                 error.prefix) {
+    if (identical(release.tag, gh.source$latest_tag)) {
+        stop(paste0(error.prefix, "The mutable alias '", release.tag,
+                    "' cannot be resolved offline; use its immutable release tag"))
+    }
+    tag <- validate.github.release.component(release.tag, "tag", error.prefix)
+    asset <- if (!is.null(gh.source$asset)) gh.source$asset else file
+    candidate <- list(manager = file, resolved_tag = tag, asset = asset)
+    paths <- data.manager.release.paths(candidate, error.prefix)
+    resolution <- read.data.manager.resolution(paths$metadata)
+    if (is.null(resolution) ||
+        !identical(as.character(resolution$manager), file) ||
+        !identical(as.character(resolution$repository), gh.source$repo) ||
+        !identical(as.character(resolution$resolved_tag), tag) ||
+        !identical(as.character(resolution$asset), asset) ||
+        is.null(resolution$sha256) ||
+        !grepl("^[0-9a-fA-F]{64}$", resolution$sha256) ||
+        !cached.release.is.valid(paths, resolution)) {
+        stop(paste0(error.prefix, "The cached copy of '", file,
+                    "' for release '", tag,
+                    "' is missing or failed metadata or digest verification, and 'offline' is TRUE"))
+    }
+    resolution
+}
+
+download.github.release.asset <- function(resolution, destination, error.prefix) {
+    tryCatch(
+        github.release.request(resolution$download_url) |>
+            httr2::req_perform(path = destination),
+        error = function(e) {
+            stop(paste0(error.prefix, "Failed to download '", resolution$asset,
+                        "' from release '", resolution$resolved_tag, "': ",
+                        conditionMessage(e)), call. = FALSE)
+        }
+    )
+}
+
+materialize.github.release.asset <- function(resolution, offline, error.prefix) {
+    paths <- data.manager.release.paths(resolution, error.prefix)
+    dir.create(paths$directory, recursive = TRUE, showWarnings = FALSE)
+    lock <- filelock::lock(paths$lock, timeout = 300000)
+    if (is.null(lock)) {
+        stop(paste0(error.prefix, "Could not acquire lock for release '",
+                    resolution$resolved_tag, "' (timed out after 5 minutes)"))
+    }
+    on.exit(filelock::unlock(lock), add = TRUE)
+
+    if (cached.release.is.valid(paths, resolution)) return(paths$artifact)
+    if (offline) {
+        stop(paste0(error.prefix, "The cached copy of '", resolution$manager,
+                    "' for release '", resolution$resolved_tag,
+                    "' is missing or failed digest verification, and 'offline' is TRUE"))
+    }
+
+    temporary.artifact <- paste0(paths$artifact, ".download.", Sys.getpid())
+    temporary.metadata <- paste0(paths$metadata, ".write.", Sys.getpid())
+    on.exit(unlink(c(temporary.artifact, temporary.metadata)), add = TRUE)
+
+    download.github.release.asset(resolution, temporary.artifact, error.prefix)
+    actual.digest <- tolower(sha256.file(temporary.artifact))
+    if (!identical(actual.digest, tolower(resolution$sha256))) {
+        stop(paste0(error.prefix, "SHA-256 verification failed for '",
+                    resolution$asset, "' from release '", resolution$resolved_tag,
+                    "': expected ", resolution$sha256, ", got ", actual.digest))
+    }
+
+    write.release.resolution(resolution, temporary.metadata)
+    if (file.exists(paths$artifact)) unlink(paths$artifact)
+    if (!file.rename(temporary.artifact, paths$artifact)) {
+        stop(paste0(error.prefix, "Could not move verified release asset into the cache"))
+    }
+    if (file.exists(paths$metadata)) unlink(paths$metadata)
+    if (!file.rename(temporary.metadata, paths$metadata)) {
+        unlink(paths$artifact)
+        stop(paste0(error.prefix, "Could not record release metadata in the cache"))
+    }
+    paths$artifact
+}
+
+load.data.manager.from.github.release <- function(file, gh.source, release.tag,
+                                                  set.as.default, offline,
+                                                  error.prefix) {
+    resolution <- if (offline) {
+        get.cached.github.release.resolution(file, gh.source, release.tag, error.prefix)
+    } else {
+        resolve.github.release.asset(file, gh.source, release.tag, error.prefix)
+    }
+    local.path <- materialize.github.release.asset(resolution, offline, error.prefix)
+    data.manager <- load.data.manager(local.path, set.as.default = set.as.default)
+    resolution$local_path <- normalizePath(local.path, mustWork = TRUE)
+    attr(data.manager, "jheem.manager.resolution") <- resolution
+    invisible(data.manager)
 }
 
 load.data.manager.from.github <- function(file, gh.source, set.as.default, offline, error.prefix) {

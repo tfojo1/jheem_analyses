@@ -13,6 +13,15 @@ if (nchar(system.file(package='ggnewscale'))==0)
 if (nchar(system.file(package='httr2'))==0)
     install.packages('httr2')
 
+if (nchar(system.file(package='jsonlite'))==0)
+    install.packages('jsonlite')
+
+if (nchar(system.file(package='filelock'))==0)
+    install.packages('filelock')
+
+if (nchar(system.file(package='openssl'))==0)
+    install.packages('openssl')
+
 if (nchar(system.file(package='deSolve'))==0)
     install.packages("deSolve")
 
