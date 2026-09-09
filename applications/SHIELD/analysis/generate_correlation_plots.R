@@ -1,5 +1,5 @@
 
-pct_inc_2030 <- reshape2::melt(apply(total_calc_results["2030",,,,"cum_incidence_averted_percent"], c("intervention", "location"), mean), value.name = "pct_inc_2030")
+pct_inc_2030 <- reshape2::melt(apply(total_calc_results["2030",,,,"pct_cum_incidence_averted"], c("intervention", "location"), mean), value.name = "pct_inc_2030")
 
 prp_mpsdam_2021 <- reshape2::melt(apply(total_raw_results["2021",,"prop.male.ps.diag.among.msm",,], c("intervention", "location"), mean), value.name = "prp_mpsdam_2021")
 

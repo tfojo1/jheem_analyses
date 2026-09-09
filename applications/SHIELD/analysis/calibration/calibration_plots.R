@@ -6,7 +6,7 @@
 # ****************************************************************************************************
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 source("../jheem_analyses/applications/SHIELD/shield_specification.R")
-source('../jheem_analyses/applications/SHIELD/analysis/analysis_helper_functions.R')
+source('../jheem_analyses/applications/SHIELD/analysis/calibration/calibration_helper_functions.R')
 # source("../jheem_analyses/applications/SHIELD/shield_calib_register.R")
 
 

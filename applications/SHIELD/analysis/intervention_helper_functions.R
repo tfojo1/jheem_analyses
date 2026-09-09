@@ -58,6 +58,10 @@
 # ============================================================================
 
 library(tidyverse)
+library(patchwork)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
 
 
 # ============================================================================
@@ -164,23 +168,67 @@ resolve_locations <- function(arr, locations) {
 }
 
 
+# ============================================================================
+# SAVING: ONE CONVENTION FOR TABLES AND FIGURES
+#
+#   save.dir   where the file goes. Defaults to the TABLE.DIR / FIG.DIR you
+#              set in your driver script; falls back to "tables/" / "figures/"
+#              when those are not defined.
+#   filename   THE SWITCH. Give one and the file is written; leave it NULL
+#              (the default) and nothing is. The extension is appended for you.
+#
+# So every table and figure function takes the same two arguments and behaves
+# the same way, and no function writes to disk unless you name a file.
+# ============================================================================
+
+#' Default output directories, taken from the driver script if it set them
+#' @noRd
+.default_table_dir <- function() if (exists("TABLE.DIR")) get("TABLE.DIR") else "tables/"
+
+#' @noRd
+.default_fig_dir <- function() if (exists("FIG.DIR")) get("FIG.DIR") else "figures/"
+
+
+#' Build the output path, or NULL when nothing should be written
+#'
+#' @param ext Extension appended when `filename` does not already carry it.
+#' @param save Kept for older `save = TRUE / FALSE` calls: FALSE suppresses the
+#'   write even when a filename is given, TRUE demands one. Leave it NULL and
+#'   `filename` alone decides.
+#' @noRd
+.resolve_out_path <- function(save.dir, filename, ext, save = NULL) {
+
+    if (isTRUE(save) && (is.null(filename) || !nzchar(filename)))
+        stop("save = TRUE but no 'filename' was given.")
+    if (isFALSE(save)) return(NULL)
+    if (is.null(filename) || !nzchar(filename)) return(NULL)
+
+    if (!grepl(paste0("\\.", ext, "$"), filename, ignore.case = TRUE))
+        filename <- paste0(filename, ".", ext)
+
+    target.dir <- if (is.null(save.dir) || !nzchar(save.dir)) "." else save.dir
+    target.dir <- sub("(.)/+$", "\\1", target.dir)      # tolerate a trailing slash
+    if (!dir.exists(target.dir))
+        dir.create(target.dir, recursive = TRUE, showWarnings = FALSE)
+
+    file.path(target.dir, filename)
+}
+
+
 #' Write a table to CSV, creating the directory if needed
 #'
 #' NOTE: the column map (see .attach_col_map) does NOT survive a trip through
 #' CSV. A table read back from disk is still plottable, but the figures then
 #' fall back to parsing the column names with `col.pattern`.
-save_table_csv <- function(rv, save.dir = "", filename = NULL) {
-    if (is.null(filename) || !nzchar(filename))
-        stop("Error: 'filename' must be supplied when save = TRUE")
-    if (!grepl("\\.csv$", filename, ignore.case = TRUE))
-        filename <- paste0(filename, ".csv")
-    target.dir <- if (nzchar(save.dir)) save.dir else "."
-    if (!dir.exists(target.dir))
-        dir.create(target.dir, recursive = TRUE, showWarnings = FALSE)
-    full.path <- file.path(target.dir, filename)
-    readr::write_csv(rv, file = full.path, na = "")
-    message("Table written to: ", normalizePath(full.path, winslash = "/"))
-    invisible(full.path)
+save_table_csv <- function(rv,
+                           save.dir = .default_table_dir(),
+                           filename = NULL,
+                           save     = NULL) {
+    path <- .resolve_out_path(save.dir, filename, "csv", save)
+    if (is.null(path)) return(invisible(NULL))
+    readr::write_csv(rv, file = path, na = "")
+    message("Table written to: ", normalizePath(path, winslash = "/"))
+    invisible(path)
 }
 
 
@@ -210,9 +258,121 @@ save_table_csv <- function(rv, save.dir = "", filename = NULL) {
     value.lists <- list(outcome      = outcomes,
                         intervention = interventions,
                         year         = years)[col_vars]
-    map <- expand.grid(value.lists, stringsAsFactors = FALSE, KEEP.OUT.ATTRS = FALSE)
+    # expand.grid varies its FIRST argument fastest, but the table's columns
+    # vary the LAST col_var fastest, so feed it the reversed list and put the
+    # columns back in order afterwards. The map then lists the value columns
+    # in exactly the order they appear in the table.
+    map <- expand.grid(rev(value.lists), stringsAsFactors = FALSE,
+                       KEEP.OUT.ATTRS = FALSE)[, col_vars, drop = FALSE]
     map$colname <- do.call(paste, c(as.list(map[col_vars]), sep = "_"))
     map
+}
+
+
+#' Does this array cover every requested year, intervention and the location?
+#' @noRd
+.covers <- function(arr, years, interventions, location.code) {
+    dn <- dimnames(arr)
+    all(years %in% dn$year) &&
+        all(interventions %in% dn$intervention) &&
+        location.code %in% dn$location
+}
+
+
+#' Say, in words, what an array is missing
+#' @noRd
+.coverage_gap <- function(arr, years, interventions, location.code) {
+    dn <- dimnames(arr); bits <- character(0)
+    miss.y <- setdiff(years, dn$year)
+    miss.i <- setdiff(interventions, dn$intervention)
+    if (length(miss.y)) bits <- c(bits, paste("year(s)", paste(miss.y, collapse = ", ")))
+    if (length(miss.i)) bits <- c(bits, paste("intervention(s)", paste(miss.i, collapse = ", ")))
+    if (!location.code %in% dn$location) bits <- c(bits, paste("location", location.code))
+    paste(bits, collapse = "; ")
+}
+
+
+#' Melt one array's chosen outcomes into long form
+#'
+#' Returns one row per (stratum, outcome, intervention, year, stat), where
+#' `stat` is "estimate" or "ci". Everything is character so that the pieces
+#' coming from different arrays can be stacked and joined without type clashes.
+#' @noRd
+#' Digits for each outcome, from a scalar or a named vector
+#'
+#' `digits` may be a single number (all outcomes), or a named vector keyed by
+#' outcome name with an optional ".default" entry. Unnamed outcomes get the
+#' default, which is 0 -- the historical behaviour.
+#' @noRd
+.digits_for <- function(outcome, digits) {
+    if (is.null(digits))        return(rep(0, length(outcome)))
+    if (is.null(names(digits))) return(rep(digits[1], length(outcome)))
+    d    <- unname(digits[as.character(outcome)])
+    dflt <- if (".default" %in% names(digits)) digits[[".default"]] else 0
+    d[is.na(d)] <- dflt
+    d
+}
+
+.melt_outcomes <- function(arr, outcomes, interventions, years, location.code,
+                           stratification_cols, stat.type, point.col, show.ci,
+                           id_cols, digits = 0) {
+
+    metric.cols <- c(point.col, if (show.ci) c("lower", "upper"))
+
+    reshape2::melt(
+        get_stats(subset_array(arr,
+                               list(year = years,
+                                    outcome = outcomes,
+                                    intervention = interventions,
+                                    location = location.code)),
+                  keep.dimensions = c("year", "intervention", "outcome",
+                                      stratification_cols),
+                  stat.type = stat.type,
+                  round     = FALSE)
+    ) %>%
+        pivot_wider(names_from = "metric") %>%
+        # Rounding happens HERE, not inside get_stats(): get_stats() sees one
+        # array spanning every outcome and can only apply a single `digits`,
+        # but a rate wants 0 digits and a ratio wants 2-3. At digits = 0 this
+        # is bit-identical to round(x, 0), so existing tables do not move.
+        mutate(.dig = .digits_for(outcome, digits)) %>%
+        mutate(across(all_of(metric.cols), ~ round(.x * 10^.dig) / 10^.dig)) %>%
+        select(-.dig) %>%
+        mutate(estimate = as.character(.data[[point.col]]),
+               ci       = if (show.ci) paste0("[", lower, "-", upper, "]") else NULL) %>%
+        select(all_of(c(stratification_cols, id_cols)),
+               all_of(if (show.ci) c("estimate", "ci") else "estimate")) %>%
+        pivot_longer(cols      = any_of(c("estimate", "ci")),
+                     names_to  = "stat",
+                     values_to = "value") %>%
+        mutate(across(all_of(c(stratification_cols, id_cols, "stat")), as.character))
+}
+
+
+#' Say where each outcome came from, once per table
+#'
+#' Only speaks up when there is something to say: more than one array in a
+#' stratification group, or an outcome that had to be filled with NA.
+#' @noRd
+.report_outcome_sources <- function(resolved, groups) {
+    gaps <- any(vapply(resolved, function(r)
+        any(vapply(r, function(x) is.na(x$src), logical(1))), logical(1)))
+    if (!any(vapply(groups, length, integer(1)) > 1) && !gaps)
+        return(invisible(NULL))
+
+    for (g in seq_along(resolved)) {
+        r   <- resolved[[g]]
+        lab <- names(groups)[g]
+        got <- names(r)[vapply(r, function(x) !is.na(x$src), logical(1))]
+        if (length(got))
+            message("  ", lab, ": ",
+                    paste0(got, " <- data[[",
+                           vapply(r[got], function(x) x$src, integer(1)), "]]",
+                           collapse = "; "))
+        for (nm in setdiff(names(r), got))
+            message("  ", lab, ": ", nm, " -- ", r[[nm]]$why, ", filled NA")
+    }
+    invisible(NULL)
 }
 
 
@@ -222,10 +382,21 @@ save_table_csv <- function(rv, save.dir = "", filename = NULL) {
 #' location as well as ten, and it is the entry point the figures are written
 #' against. This function is the worker underneath it.
 #'
-#' @param data A list of arrays, each with a different stratification (totals,
-#'   sex-stratified, age-stratified, ...). Each array contributes a set of rows:
-#'   one row for a totals-level array, one row per stratum for a stratified one.
-#'   A bare array is accepted and wrapped in a list for you.
+#' @param data A list of arrays. Arrays that share a stratification level
+#'   (e.g. total raw and total calculated results) are merged: each outcome is
+#'   taken from whichever of them carries it, so you can pass raw and
+#'   calculated results together and ask for outcomes from both. Arrays with
+#'   DIFFERENT stratifications (total vs sex) contribute different sets of
+#'   rows. An outcome that no array at a given level carries is filled with
+#'   NA rather than raising an error; an outcome no array anywhere carries is
+#'   an error. A bare array is accepted and wrapped in a list for you.
+#'
+#'   The table always has at least one `subgroup` column. It holds "Total"
+#'   for unstratified rows, so a table built from totals-only data has the
+#'   same columns as one built from totals plus sex.
+#' @param quiet TRUE suppresses the note saying which array each outcome came
+#'   from. make_multi_location_table() sets it after the first location so the
+#'   note appears once per table rather than once per city.
 #' @param location A SINGLE MSA code or city name. Supplying more than one is
 #'   an error: the sims would be pooled across locations and the resulting
 #'   median/CI would be meaningless.
@@ -241,6 +412,12 @@ save_table_csv <- function(rv, save.dir = "", filename = NULL) {
 #'   Those rows are for reading, not for plotting -- the figures drop them.
 #' @param filter.by.strat Optional character vector of stratum values to keep.
 #' @param location.label Name given to the location column.
+#' @param save.dir,filename Where to write the CSV and what to call it.
+#'   `filename` is the switch: give one and a CSV is written, leave it NULL
+#'   (the default) and nothing is. The ".csv" extension is appended for you and
+#'   `save.dir` defaults to TABLE.DIR when your driver script has set it.
+#' @param save Only needed for older calls: `save = FALSE` suppresses the write
+#'   even when a filename is given. Leave it NULL and `filename` alone decides.
 make_single_location_table <- function(data,
                                        location,
                                        outcomes,
@@ -248,10 +425,12 @@ make_single_location_table <- function(data,
                                        years,
                                        row.vars = "",
                                        stat.type = c("median.ci", "median", "mean.ci", "mean"),
+                                       digits = 0,
                                        filter.by.strat = NULL,
                                        location.label = "location",
-                                       save = FALSE,
-                                       save.dir = "",
+                                       quiet = FALSE,
+                                       save = NULL,
+                                       save.dir = .default_table_dir(),
                                        filename = NULL,
                                        debug = FALSE
 ) {
@@ -290,69 +469,158 @@ make_single_location_table <- function(data,
     point.col <- if (grepl("^mean", stat.type)) "mean" else "median"
     show.ci   <- grepl("\\.ci$", stat.type)
 
-    num_stratification_cols_for_table <- max(sapply(data, function(arr) {
-        length(setdiff(names(dim(arr)),
-                       c(id_cols, "sim", "location")))
-    }))
+    # ------------------------------------------------------------------
+    # Group the supplied arrays by stratification level
+    #
+    # You typically pass four arrays: raw and calculated results at the total
+    # level, and raw and calculated results at the sex level. Arrays that
+    # share a stratification are two halves of ONE source -- each carries
+    # some of the outcomes -- so they are merged. Arrays with different
+    # stratifications become different sets of ROWS.
+    # ------------------------------------------------------------------
+    strat_cols_of <- function(arr)
+        setdiff(names(dimnames(arr)), c(id_cols, "sim", "location"))
 
-    rv <- Reduce(rbind, lapply(data, function(arr) {
+    sigs      <- vapply(data, function(a) paste(strat_cols_of(a), collapse = "|"),
+                        character(1))
+    group.ids <- unique(sigs)
+    groups    <- lapply(group.ids, function(g) which(sigs == g))
+    # the unstratified level has an empty signature; give it a printable name
+    names(groups) <- ifelse(nzchar(group.ids), group.ids, "total")
 
-        if (!all(interventions %in% dimnames(arr)$intervention))
-            stop("Error: at least one intervention in 'interventions' isn't present in one of the supplied arrays")
-        if (!all(outcomes %in% dimnames(arr)$outcome))
-            stop("Error: at least one outcome in 'outcomes' isn't present in one of the supplied arrays")
-        if (!all(years %in% dimnames(arr)$year))
-            stop("Error: year(s) not present in one of the supplied arrays: ",
-                 paste(setdiff(years, dimnames(arr)$year), collapse = ", "))
+    # arrays in the same group must agree on the stratum values, or the rows
+    # they contribute would not line up
+    for (idx in groups) {
+        ref <- dimnames(data[[idx[1]]])[strat_cols_of(data[[idx[1]]])]
+        for (i in idx)
+            if (!identical(dimnames(data[[i]])[strat_cols_of(data[[i]])], ref))
+                stop("data[[", i, "]] and data[[", idx[1], "]] have the same ",
+                     "stratification dimensions but different values.")
+    }
 
-        stratification_cols <- setdiff(names(dim(arr)),
-                                       c(id_cols, "sim", "location"))
+    # ---- which array supplies which outcome, at each stratification level -
+    # An array can supply an outcome only if it also carries every requested
+    # year and intervention and this location, otherwise subsetting it would
+    # fail further down. When it cannot, we record WHY so the note below can
+    # say so rather than just leaving a column of NAs unexplained.
+    resolve <- function(idx) lapply(outcomes, function(o) {
+        holders <- idx[vapply(idx, function(i) o %in% dimnames(data[[i]])$outcome,
+                              logical(1))]
+        if (length(holders) == 0)
+            return(list(src = NA_integer_, why = "not present at this level"))
+        ok <- holders[vapply(holders, function(i)
+            .covers(data[[i]], years, interventions, loc$code), logical(1))]
+        if (length(ok) > 0)
+            return(list(src = ok[1], why = NA_character_))
+        list(src = NA_integer_,
+             why = paste0("in data[[", holders[1], "]], but that array is missing ",
+                          .coverage_gap(data[[holders[1]]], years, interventions,
+                                        loc$code)))
+    })
+    resolved  <- lapply(groups, function(idx) setNames(resolve(idx), outcomes))
+    source_of <- lapply(resolved, function(r)
+        vapply(r, function(x) x$src, integer(1)))
 
-        # long form: one row per id combination per stat (estimate, then ci)
-        long.df <- reshape2::melt(
-            get_stats(subset_array(arr,
-                                   list(year = years,
-                                        outcome = outcomes,
-                                        intervention = interventions,
-                                        location = loc$code)),
-                      keep.dimensions = c("year", "intervention", "outcome",
-                                          stratification_cols),
-                      stat.type = stat.type)
-        ) %>%
-            pivot_wider(names_from = "metric") %>%
-            mutate(estimate = as.character(.data[[point.col]]),
-                   ci       = if (show.ci) paste0("[", lower, "-", upper, "]") else NULL) %>%
-            select(all_of(c(stratification_cols, id_cols)),
-                   all_of(if (show.ci) c("estimate", "ci") else "estimate")) %>%
-            pivot_longer(
-                cols = any_of(c("estimate", "ci")),
-                names_to = "stat",
-                values_to = "value"
-            ) %>%
-            mutate(stat = factor(stat, levels = c("estimate", "ci"))) %>%
-            arrange(across(all_of(c(stratification_cols, row.vars, col_vars))), stat)
+    # a name that appears in NO array is a typo, and is worth stopping for
+    absent <- outcomes[vapply(outcomes, function(o)
+        !any(vapply(data, function(a) o %in% dimnames(a)$outcome, logical(1))),
+        logical(1))]
+    if (length(absent) > 0)
+        stop("None of the supplied arrays contains outcome(s): ",
+             paste(absent, collapse = ", "),
+             ".\nAvailable outcomes: ",
+             paste(sort(unique(unlist(lapply(data, function(a) dimnames(a)$outcome)))),
+                   collapse = ", "))
 
-        # wide form: col_vars become columns, joined by "_" in that order
-        df <- long.df %>%
-            pivot_wider(
-                names_from = all_of(col_vars),
-                values_from = value
-            ) %>%
-            select(-stat)
+    # a name that exists but cannot be served anywhere yields an all-NA column
+    unservable <- outcomes[vapply(outcomes, function(o)
+        all(vapply(source_of, function(x) is.na(x[[o]]), logical(1))), logical(1))]
+    if (length(unservable) > 0 && !quiet)
+        warning("Outcome(s) ", paste(unservable, collapse = ", "),
+                " could not be taken from any array, so their columns are all NA. ",
+                "See the note above for what was missing.", call. = FALSE)
 
-        # pad arrays with fewer stratification dimensions so every array
-        # contributes the same number of leading columns and rbind lines up
+    if (!quiet) .report_outcome_sources(resolved, groups)
+
+    # Every table gets at least one subgroup column, holding "Total" when the
+    # data are not stratified, so the shape does not depend on what you pass.
+    num_stratification_cols_for_table <-
+        max(1L, vapply(data, function(a) length(strat_cols_of(a)), integer(1)))
+
+    stat_levels <- if (show.ci) c("estimate", "ci") else "estimate"
+
+    rv <- dplyr::bind_rows(lapply(seq_along(groups), function(g) {
+
+        idx                 <- groups[[g]]
+        stratification_cols <- strat_cols_of(data[[idx[1]]])
+        src                 <- source_of[[g]]
+        served              <- outcomes[!is.na(src)]
+
+        # ---- pull each outcome from its array, one call per array ---------
+        long.df <- NULL
+        if (length(served) > 0) {
+            by.source <- split(served, src[served])
+            long.df <- dplyr::bind_rows(lapply(names(by.source), function(i)
+                .melt_outcomes(arr                 = data[[as.integer(i)]],
+                               outcomes            = by.source[[i]],
+                               interventions       = interventions,
+                               years               = years,
+                               location.code       = loc$code,
+                               stratification_cols = stratification_cols,
+                               stat.type           = stat.type,
+                               point.col           = point.col,
+                               show.ci             = show.ci,
+                               id_cols             = id_cols,
+                               digits              = digits)))
+        }
+
+        # ---- fill the gaps ------------------------------------------------
+        # Outcomes no array at this level carries become NA cells, so every
+        # group contributes exactly the same columns and rbind cannot
+        # misalign them.
+        grid <- expand.grid(
+            c(dimnames(data[[idx[1]]])[stratification_cols],
+              list(outcome      = outcomes,
+                   intervention = interventions,
+                   year         = years,
+                   stat         = stat_levels)),
+            stringsAsFactors = FALSE, KEEP.OUT.ATTRS = FALSE)
+        grid <- tibble::as_tibble(grid)
+
+        df <- if (is.null(long.df)) {
+            grid %>% mutate(value = NA_character_)
+        } else {
+            dplyr::left_join(grid, long.df,
+                             by = c(stratification_cols, id_cols, "stat"))
+        }
+
+        # order the id variables as they were REQUESTED, so the columns come
+        # out in the order you asked for rather than alphabetically
+        df <- df %>%
+            mutate(stat         = factor(stat, levels = stat_levels),
+                   outcome      = factor(outcome,      levels = outcomes),
+                   intervention = factor(intervention, levels = interventions),
+                   year         = factor(year,         levels = years)) %>%
+            arrange(across(all_of(c(stratification_cols, row.vars, col_vars))), stat) %>%
+            pivot_wider(names_from = all_of(col_vars), values_from = value) %>%
+            # `stat` is kept (it used to be dropped here, leaving the leading
+            # "[" as the only marker of a CI row), but as CHARACTER: it is a
+            # factor at this point, and a factor/character mismatch is a
+            # nuisance when joining two tables on c("location", "stat").
+            mutate(stat = as.character(stat))
+
+        # pad groups with fewer stratification dimensions so every group
+        # contributes the same number of leading columns
         num_extra_cols_needed <- num_stratification_cols_for_table - length(stratification_cols)
         if (num_extra_cols_needed > 0) {
-            for (i in 1:num_extra_cols_needed) {
-                df <- cbind(rep("Total", nrow(df)), df)
-            }
+            pad <- as.data.frame(matrix("Total", nrow(df), num_extra_cols_needed),
+                                 stringsAsFactors = FALSE)
+            names(pad) <- paste0(".pad", seq_len(num_extra_cols_needed))
+            df <- dplyr::bind_cols(pad, df)
         }
 
-        if (num_stratification_cols_for_table > 0) {
-            colnames(df)[1:num_stratification_cols_for_table] <-
-                make.unique(rep("subgroup", num_stratification_cols_for_table))
-        }
+        colnames(df)[1:num_stratification_cols_for_table] <-
+            make.unique(rep("subgroup", num_stratification_cols_for_table))
 
         df
     }))
@@ -382,7 +650,7 @@ make_single_location_table <- function(data,
     # ---- record what the value columns mean (A5) --------------------------
     rv <- .attach_col_map(rv, .build_col_map(col_vars, outcomes, interventions, years))
 
-    if (save) save_table_csv(rv, save.dir, filename)
+    save_table_csv(rv, save.dir, filename, save)
 
     rv
 }
@@ -400,6 +668,12 @@ make_single_location_table <- function(data,
 #'   you want them stacked.
 #' @param stat.type "median.ci" (default), "median", "mean.ci" or "mean". Same
 #'   default as make_single_location_table() -- these two used to disagree.
+#' @param save.dir,filename Where to write the CSV and what to call it.
+#'   `filename` is the switch: give one and a CSV is written, leave it NULL
+#'   (the default) and nothing is. The ".csv" extension is appended for you and
+#'   `save.dir` defaults to TABLE.DIR when your driver script has set it.
+#' @param save Only needed for older calls: `save = FALSE` suppresses the write
+#'   even when a filename is given. Leave it NULL and `filename` alone decides.
 #' @param repeat.location.label If FALSE the label is printed only on the first
 #'   sub-row of each location (manuscript style) and blank beneath. This makes
 #'   the table PRINT-ONLY: the blank cells are real empty strings, so do not
@@ -411,11 +685,12 @@ make_multi_location_table <- function(data,
                                       years,
                                       row.vars = "",
                                       stat.type = c("median.ci", "median", "mean.ci", "mean"),
+                                      digits = 0,
                                       location.label = "location",
                                       repeat.location.label = TRUE,
                                       filter.by.strat = NULL,
-                                      save = FALSE,
-                                      save.dir = "",
+                                      save = NULL,
+                                      save.dir = .default_table_dir(),
                                       filename = NULL,
                                       debug = FALSE) {
 
@@ -437,6 +712,8 @@ make_multi_location_table <- function(data,
                                        filter.by.strat = filter.by.strat,
                                        stat.type       = stat.type,
                                        location.label  = location.label,
+                                       quiet           = (i > 1),
+                                       digits          = digits,
                                        save            = FALSE),
             error = function(e)
                 stop("Failed at location ", loc$label[i], " (", loc$code[i], "): ",
@@ -465,7 +742,7 @@ make_multi_location_table <- function(data,
 
     rv <- .attach_col_map(rv, col.map)
 
-    if (save) save_table_csv(rv, save.dir, filename)
+    save_table_csv(rv, save.dir, filename, save)
 
     rv
 }
@@ -512,22 +789,81 @@ make_multi_location_table <- function(data,
 }
 
 
-#' Drop the "[lower-upper]" rows a .ci table carries (A3)
+#' Turn the "[lower-upper]" rows of a .ci table into numbers, or drop them (A3)
 #'
-#' CI rows are a table feature. They are text, not numbers, so they cannot be
-#' plotted -- previously they became NA silently. Now they are removed and you
-#' are told about it.
+#' CI cells are text, so they cannot be plotted as they stand. `keep.ci = FALSE`
+#' (what every coverage figure wants) removes them and says so. `keep.ci = TRUE`
+#' pairs each CI cell with its estimate and returns `lower` and `upper`
+#' columns, which is what plot_trend_with_ci() shades.
 #' @noRd
-.drop_ci_values <- function(long) {
-    is.ci <- grepl("^\\s*\\[", as.character(long$value))
-    if (any(is.ci)) {
+.split_ci_values <- function(long, keep.ci = FALSE) {
+
+    # `stat` is exact; the regex is the fallback for a table that lost the
+    # column (e.g. one built before stat was kept, or hand-assembled).
+    is.ci <- if ("stat" %in% names(long)) as.character(long$stat) == "ci"
+             else grepl("^\\s*\\[", as.character(long$value))
+
+    if (!any(is.ci)) {
+        if (keep.ci)
+            stop("This table carries no credible intervals to shade. Rebuild it ",
+                 "with stat.type = \"median.ci\" (or \"mean.ci\").")
+        return(long)
+    }
+
+    if (!keep.ci) {
         message("Dropped ", sum(is.ci), " credible-interval cell(s): figures plot ",
                 "point estimates only. Build the table with stat.type = \"median\" ",
                 "or \"mean\" to avoid this message.")
         long <- long[!is.ci, , drop = FALSE]
+        if (nrow(long) == 0)
+            stop("Nothing left to plot after removing credible-interval rows.")
+        return(long)
     }
-    if (nrow(long) == 0)
-        stop("Nothing left to plot after removing credible-interval rows.")
+
+    # every id combination has exactly one estimate row and one CI row, so the
+    # two halves can be matched on everything except the value itself
+    # `stat` MUST be excluded: it is "estimate" on one side of this join and
+    # "ci" on the other, so including it would match nothing and silently
+    # return all-NA lower/upper -- i.e. figures with no CI shading.
+    keys <- setdiff(names(long), c("value", "stat"))
+    est  <- long[!is.ci, , drop = FALSE]
+    ci   <- long[ is.ci, , drop = FALSE]
+    ci   <- dplyr::bind_cols(ci[keys], .parse_ci(ci$value))
+
+    dplyr::left_join(est, ci, by = keys)
+}
+
+
+#' Pull the two numbers out of a "[lower-upper]" string
+#'
+#' Written to survive negative bounds ("[-5-3]" is lower -5, upper 3), which a
+#' naive split on "-" would get wrong.
+#' @noRd
+.parse_ci <- function(x) {
+    inner <- sub("^\\s*\\[\\s*(.*?)\\s*\\]\\s*$", "\\1", as.character(x))
+    num   <- "-?[0-9.]+(?:[eE][-+]?[0-9]+)?"
+    m     <- stringr::str_match(inner, paste0("^(", num, ")-(", num, ")$"))
+    if (any(is.na(m[, 1])))
+        warning("Could not read ", sum(is.na(m[, 1])), " credible interval(s), e.g. ",
+                inner[is.na(m[, 1])][1], call. = FALSE)
+    tibble::tibble(lower = as.numeric(m[, 2]), upper = as.numeric(m[, 3]))
+}
+
+
+#' Error helpfully when a figure needs a coverage level and the table has none
+#' @noRd
+.require_coverage <- function(long, cov.pattern) {
+    if (all(is.na(long$coverage)))
+        stop("This figure plots impact against coverage, but no coverage level ",
+             "could be read from the intervention names using 'cov.pattern':\n  ",
+             cov.pattern, "\nIntervention(s) seen: ",
+             paste(unique(long$intervention), collapse = ", "),
+             "\nFor a single scenario over time, use plot_trend_with_ci().")
+    if (any(is.na(long$coverage))) {
+        message("Ignoring intervention(s) with no coverage level: ",
+                paste(unique(long$intervention[is.na(long$coverage)]), collapse = ", "))
+        long <- long[!is.na(long$coverage), , drop = FALSE]
+    }
     long
 }
 
@@ -541,25 +877,36 @@ make_multi_location_table <- function(data,
 #'   Three capture groups: outcome, coverage, year.
 #' @param cov.pattern Regex with one capture group pulling the coverage level
 #'   out of an intervention name. Change this if your scenarios are not named
-#'   "doxy.cov.NN".
-#' @return Tibble with columns location, subgroup, outcome, coverage (int),
-#'   year (int), value (num). `subgroup` is NA when the table has no
+#'   "doxy.cov.NN". An intervention the pattern cannot read (e.g. "noint")
+#'   gets coverage NA rather than raising an error -- the figures that need a
+#'   coverage level complain for themselves.
+#' @param keep.ci TRUE returns `lower` and `upper` columns parsed from the
+#'   "[lower-upper]" rows of a .ci table, for shading. FALSE (the default)
+#'   drops those rows, which is what the coverage figures want.
+#' @return Tibble with columns location, subgroup, outcome, intervention,
+#'   coverage (int, may be NA), year (int), value (num), plus lower and upper
+#'   when `keep.ci` is TRUE. `subgroup` is NA when the table has no
 #'   stratification column.
 table_to_long <- function(tbl,
                           location.col = "location",
                           col.pattern  = "^(.*)_doxy\\.cov\\.(\\d+)_(\\d+)$",
-                          cov.pattern  = "doxy\\.cov\\.(\\d+)") {
+                          cov.pattern  = "doxy\\.cov\\.(\\d+)",
+                          keep.ci      = FALSE) {
 
     # ---- already long? ----------------------------------------------------
     if (all(c("coverage", "value") %in% names(tbl))) {
-        if (!"subgroup" %in% names(tbl)) tbl$subgroup <- NA_character_
+        if (!"subgroup" %in% names(tbl))     tbl$subgroup     <- NA_character_
+        if (!"intervention" %in% names(tbl)) tbl$intervention <- NA_character_
         if (!"location" %in% names(tbl) && location.col %in% names(tbl))
             tbl <- dplyr::rename(tbl, location = all_of(location.col))
+        keep <- c("location", "subgroup", "outcome", "intervention",
+                  "coverage", "year", "value",
+                  intersect(c("lower", "upper"), names(tbl)))
         return(tibble::as_tibble(tbl) %>%
                    mutate(value    = as.numeric(value),
                           coverage = as.integer(coverage),
                           year     = as.integer(year)) %>%
-                   select(location, subgroup, outcome, coverage, year, value))
+                   select(all_of(keep)))
     }
 
     if (!location.col %in% names(tbl))
@@ -573,7 +920,12 @@ table_to_long <- function(tbl,
 
     # id variables that went to the ROWS stay as real columns; everything else
     # that is left over is a stratification column
-    strat.cols <- setdiff(id.cols, c(location.col, "outcome", "intervention", "year"))
+    # "stat" is excluded or it would be pasted into `subgroup` ("msm / estimate")
+    # and every subgroup filter downstream would match nothing. It is dropped
+    # entirely by the whitelist select() at the end of this function, so the
+    # long form handed to the figures is unchanged.
+    strat.cols <- setdiff(id.cols,
+                          c(location.col, "outcome", "intervention", "year", "stat"))
 
     # ---- long form --------------------------------------------------------
     long <- tbl %>%
@@ -583,7 +935,7 @@ table_to_long <- function(tbl,
         left_join(meta, by = "colname") %>%
         select(-colname)
 
-    long <- .drop_ci_values(long)
+    long <- .split_ci_values(long, keep.ci = keep.ci)
 
     # ---- one subgroup column, however many stratification columns there are -
     if (length(strat.cols) == 0) {
@@ -600,13 +952,11 @@ table_to_long <- function(tbl,
         if (!"intervention" %in% names(long))
             stop("Cannot work out coverage: the table has neither a 'coverage' ",
                  "nor an 'intervention' column.")
-        cov <- stringr::str_match(as.character(long$intervention), cov.pattern)[, 2]
-        if (all(is.na(cov)))
-            stop("No coverage level could be read from the intervention names ",
-                 "using 'cov.pattern':\n  ", cov.pattern,
-                 "\nIntervention(s) seen: ",
-                 paste(unique(long$intervention), collapse = ", "))
-        long$coverage <- as.integer(cov)
+        # An intervention with no number in its name -- "noint" -- gets NA.
+        # That is not an error here: only the coverage figures care, and they
+        # say so themselves via .require_coverage().
+        long$coverage <- as.integer(
+            stringr::str_match(as.character(long$intervention), cov.pattern)[, 2])
     }
 
     if (!"outcome" %in% names(long))
@@ -630,7 +980,9 @@ table_to_long <- function(tbl,
         long <- long[!is.na(long$value), , drop = FALSE]
     }
 
-    long %>% select(location, subgroup, outcome, coverage, year, value)
+    long %>% select(all_of(c("location", "subgroup", "outcome", "intervention",
+                             "coverage", "year", "value",
+                             intersect(c("lower", "upper"), names(long)))))
 }
 
 
@@ -678,6 +1030,63 @@ parse_coverage_table <- function(tbl, location.col = "location", ...) {
 }
 
 
+#' Same rule as .series_levels(), but returning location levels only
+#' @noRd
+.location_order <- function(present, locations, order.by, value.order) {
+    mode <- if (!is.null(order.by))
+        match.arg(order.by, c("input", "value", "alpha"))
+    else if (!is.null(locations)) "input" else "value"
+
+    u   <- unique(as.character(present))
+    lev <- switch(mode,
+                  input = c(intersect(as.character(locations), u),
+                            setdiff(u, as.character(locations))),
+                  value = as.character(value.order),
+                  alpha = sort(u))
+    c(intersect(lev, u), setdiff(u, lev))
+}
+
+
+#' Decide the order of the rows / series of a figure
+#'
+#' ONE RULE FOR EVERY FIGURE, so panels can be compared side by side:
+#'   * pass `locations` and that order is used, in all five figures;
+#'   * pass nothing and the figure falls back to its own value-based ranking
+#'     (coverage needed, terminal impact, and so on);
+#'   * `order.by` overrides either way -- "input", "value" or "alpha".
+#'
+#' Within a location, strata follow the order you gave in `subgroup`.
+#' A location named in `locations` but absent from the data is skipped; one
+#' present but not named is appended, so a level can never be lost.
+#'
+#' @param df Data frame carrying `location`, `subgroup` and `series` columns.
+#' @param value.order Series labels in the figure's own ranking, best first.
+#' @noRd
+.series_levels <- function(df, locations, subgroup, order.by, value.order) {
+
+    mode <- if (!is.null(order.by))
+        match.arg(order.by, c("input", "value", "alpha"))
+    else if (!is.null(locations)) "input" else "value"
+
+    if (mode == "value") return(as.character(value.order))
+
+    u.loc   <- unique(as.character(df$location))
+    loc.lev <- if (mode == "alpha") sort(u.loc)
+               else c(intersect(as.character(locations), u.loc),
+                      setdiff(u.loc, as.character(locations)))
+    loc.lev <- c(intersect(loc.lev, u.loc), setdiff(u.loc, loc.lev))
+
+    u.sub   <- unique(as.character(df$subgroup))
+    sub.lev <- if (is.null(subgroup)) u.sub
+               else c(intersect(as.character(subgroup), u.sub),
+                      setdiff(u.sub, as.character(subgroup)))
+
+    o <- order(match(as.character(df$location), loc.lev),
+               match(as.character(df$subgroup), sub.lev))
+    unique(as.character(df$series)[o])
+}
+
+
 #' Row / series label: the city on its own, or "City - stratum" when more than
 #' one stratum is on the plot.
 #' @noRd
@@ -695,13 +1104,15 @@ parse_coverage_table <- function(tbl, location.col = "location", ...) {
     if (!is.null(subgroup) && length(subgroup) == 1) paste0(" (", subgroup, ")") else ""
 
 
-#' Save a figure if a path was supplied
+#' Write a figure if a filename was supplied -- same rule as save_table_csv()
 #' @noRd
-.save_fig <- function(p, save.path, width, height, dpi) {
-    if (!is.null(save.path)) {
-        dir.create(dirname(save.path), recursive = TRUE, showWarnings = FALSE)
-        ggsave(save.path, p, width = width, height = height, dpi = dpi)
-        message("Figure written to: ", normalizePath(save.path, winslash = "/"))
+.save_fig <- function(p, save.dir, filename, width, height, dpi, save = NULL) {
+    path <- .resolve_out_path(save.dir, filename, "png", save)
+    if (!is.null(path)) {
+        # bg = "white": without it the PNG can carry a transparent
+        # background, which renders as black in some viewers and in slides
+        ggsave(path, p, width = width, height = height, dpi = dpi, bg = "white")
+        message("Figure written to: ", normalizePath(path, winslash = "/"))
     }
     invisible(p)
 }
@@ -743,9 +1154,11 @@ parse_coverage_table <- function(tbl, location.col = "location", ...) {
 
 #' Shared front end for every figure: long form, then the two row filters.
 #' @noRd
-.prep_long <- function(tbl, location.col, locations, subgroup, col.pattern, cov.pattern) {
+.prep_long <- function(tbl, location.col, locations, subgroup, col.pattern,
+                       cov.pattern, keep.ci = FALSE) {
     long <- table_to_long(tbl, location.col = location.col,
-                          col.pattern = col.pattern, cov.pattern = cov.pattern)
+                          col.pattern = col.pattern, cov.pattern = cov.pattern,
+                          keep.ci = keep.ci)
 
     # a blank location means the table was built with
     # repeat.location.label = FALSE, which is a print-only format
@@ -759,6 +1172,265 @@ parse_coverage_table <- function(tbl, location.col = "location", ...) {
     if (nrow(long) == 0) stop("No rows left after filtering.")
     long
 }
+
+#' Ten hues for one-line-per-location figures
+#'
+#' Slots 1-8 are a validated categorical palette; 9-10 are appended for the
+#' ten-MSA figures. At ten overlapping series NO palette is reliably
+#' colourblind-safe, which is why plot_trend_by_location() labels the lines
+#' by default: the label is the identity channel and colour only helps the
+#' eye follow one line, and trace a city between panels.
+SHIELD.PALETTE.10 <- c("#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4",
+                       "#008300", "#4a3aa7", "#e34948", "#8c564b", "#00a2c7")
+
+
+#' One panel, one line per location -- the comparative view
+#'
+#' The companion to plot_trend_with_ci(), which facets by location and answers
+#' "what does each city do". This function answers the other question -- "how
+#' do the cities compare" -- which a facet grid cannot: free.y gives every
+#' panel its own axis, and a shared axis is squeezed by the largest city.
+#'
+#' Deliberate differences from plot_trend_with_ci():
+#'
+#'   MEDIANS ONLY. Ten overlapping credible-interval ribbons is unreadable, so
+#'   CI rows are dropped (with a message) and the intervals live in the table.
+#'   Build with stat.type = "median" to silence the message.
+#'
+#'   NO FACETING, EVER. That is the point; there is no facet argument to set
+#'   by accident.
+#'
+#'   ONE LINE PER LOCATION. If the filtered table still holds several series
+#'   per city (>1 subgroup or intervention) that is an error, not a silently
+#'   overplotted panel -- narrow it with `subgroup` / `interventions`.
+#'
+#'   COLOUR FOLLOWS THE CITY, NOT ITS RANK. Levels come from `locations` as
+#'   supplied, or alphabetically -- never from the values. A city keeps its
+#'   colour across panels whose orderings differ, which is what lets a
+#'   multi-panel figure read as one figure.
+#'
+#' @param dashed Locations drawn dashed. Highlights an exception without
+#'   spending a second colour on it, and unlike colour it survives greyscale
+#'   printing.
+#' @param label.lines Print each city's name at the end of its line. TRUE by
+#'   default and effectively required beyond ~8 series. Uses ggrepel to avoid
+#'   collisions when installed, a plain offset when not.
+#' @param target Optional horizontal reference line, e.g. 1 on a fold-change
+#'   panel, where it separates growth from decline.
+#' @param log.y Draw the y axis on a log10 scale. Two things it buys, and one
+#'   it costs:
+#'
+#'   It un-squashes a wide range. Incidence rates run ~50 to ~960 per 100,000,
+#'   so on a linear axis the low-burden cities and the whole 2022 baseline
+#'   flatten onto the bottom of the panel and a decline of 67 -> 50 is
+#'   invisible beside a rise of 182 -> 960.
+#'
+#'   It makes the SHAPE readable: on a log axis a constant growth rate is a
+#'   straight line, so acceleration and deceleration can be read off directly,
+#'   and equal vertical distances are equal PROPORTIONAL change. On a
+#'   fold-change panel this also makes the axis symmetric about the reference
+#'   line -- a doubling and a halving are the same distance from 1.
+#'
+#'   The cost is that readers routinely misread log axes, and the values no
+#'   longer correspond to evenly spaced gridlines the way a table does. The
+#'   axis title gains "(log scale)" automatically for that reason. Zero and
+#'   negative values are dropped by log10 -- a warning says how many.
+#' @param y.breaks Explicit y breaks. Worth setting with `log.y`, where the
+#'   default breaks are often too sparse, e.g. c(50, 100, 200, 400, 800).
+#' @param x.breaks Explicit x (year) breaks. NULL derives them from the data
+#'   and then CLIPS them to the observed year range. That clipping matters:
+#'   scales::breaks_pretty() wraps base pretty(), which is documented not to
+#'   keep its breaks inside the data range, and ggplot computes a panel's
+#'   breaks over the EXPANDED range rather than the data range -- so the gap
+#'   left on the right for the direct labels could otherwise produce a tick
+#'   for a year that was never modelled (2032 on a 2022-2030 panel). On a
+#'   projection figure that is not cosmetic: the axis would imply results
+#'   that do not exist.
+#' @param y.limits Zoom the y axis, as c(low, high). Applied with
+#'   coord_cartesian(), which CLIPS the view: lines that leave the range are
+#'   cut at the edge and re-enter, and every point still contributes to the
+#'   panel. The obvious alternative, scale_y_continuous(limits = ...), does
+#'   something quite different -- it DROPS every observation outside the range
+#'   before anything is drawn, so a trajectory that briefly exceeds the limit
+#'   is broken into disconnected pieces and any summary layer is silently
+#'   recomputed on the survivors. That is a good way to publish a figure that
+#'   disagrees with its own table, which is why this argument does not expose
+#'   it. Note that zooming hides data by design: say so in the caption, and
+#'   prefer `log.y` when the aim is only to stop a large series squashing the
+#'   small ones.
+plot_trend_by_location <- function(tbl,
+                                   locations     = NULL,
+                                   subgroup      = NULL,
+                                   interventions = NULL,
+                                   outcome       = NULL,
+                                   year.range    = NULL,
+                                   dashed        = NULL,
+                                   label.lines   = TRUE,
+                                   label.size    = 3.0,
+                                   palette       = SHIELD.PALETTE.10,
+                                   loc.labels    = NULL,
+                                   target        = NULL,
+                                   log.y         = FALSE,
+                                   y.breaks      = NULL,
+                                   y.limits      = NULL,
+                                   x.breaks      = NULL,
+                                   x.lab         = "Year",
+                                   y.lab         = NULL,
+                                   title         = NA,
+                                   location.col  = "location",
+                                   col.pattern   = "^(.*)_doxy\\.cov\\.(\\d+)_(\\d+)$",
+                                   cov.pattern   = "doxy\\.cov\\.(\\d+)",
+                                   save.dir      = .default_fig_dir(),
+                                   filename      = NULL,
+                                   width = 6, height = 4.5, dpi = 300) {
+
+    # keep.ci = FALSE: medians only, by design
+    long <- .prep_long(tbl, location.col, locations, subgroup,
+                       col.pattern, cov.pattern, keep.ci = FALSE)
+
+    # ---- exactly one outcome ----------------------------------------------
+    if (!is.null(outcome)) {
+        .outcome <- outcome
+        long <- long %>% filter(outcome == .outcome)
+        if (nrow(long) == 0) stop("Outcome '", .outcome, "' not present in table.")
+    }
+    if (dplyr::n_distinct(long$outcome) > 1)
+        stop("Table holds >1 outcome (", paste(unique(long$outcome), collapse = ", "),
+             "). Supply 'outcome' to pick one.")
+
+    # ---- remaining subsets -------------------------------------------------
+    if (!is.null(interventions)) {
+        miss <- setdiff(interventions, unique(long$intervention))
+        if (length(miss))
+            stop("Intervention(s) not in table: ", paste(miss, collapse = ", "),
+                 ".\nAvailable: ", paste(unique(long$intervention), collapse = ", "))
+        long <- long %>% filter(intervention %in% interventions)
+    }
+    if (!is.null(year.range))
+        long <- long %>% filter(year >= min(year.range), year <= max(year.range))
+
+    if (nrow(long) == 0) stop("No rows left after filtering.")
+    if (dplyr::n_distinct(long$year) < 2)
+        stop("Need >= 2 years to draw a trajectory. Build the table with, say, ",
+             "years = as.character(2022:2030).")
+
+    # ---- one line per location, or say so ----------------------------------
+    dup <- duplicated(paste(long$location, long$year, sep = "\r"))
+    if (any(dup))
+        stop("More than one series per location per year: this figure draws ONE ",
+             "line per city. Narrow the table with 'subgroup' and/or ",
+             "'interventions' first.\n  subgroups present: ",
+             paste(unique(as.character(long$subgroup)), collapse = ", "),
+             "\n  interventions present: ",
+             paste(unique(as.character(long$intervention)), collapse = ", "))
+
+    # ---- colour follows the city, never its rank ---------------------------
+    lev <- if (!is.null(locations))
+               c(intersect(locations, unique(as.character(long$location))),
+                 setdiff(unique(as.character(long$location)), locations))
+           else sort(unique(as.character(long$location)))
+    long$location <- factor(as.character(long$location), levels = lev)
+
+    if (length(lev) > length(palette))
+        warning(length(lev), " locations but only ", length(palette), " hues. ",
+                "Colours will repeat -- pass a longer 'palette', or split the ",
+                "figure.", call. = FALSE)
+    pal <- stats::setNames(rep_len(palette, length(lev)), lev)
+
+    bad <- setdiff(dashed, lev)
+    if (length(bad))
+        warning("dashed: no such location: ", paste(bad, collapse = ", "),
+                call. = FALSE)
+    long$.lt <- ifelse(as.character(long$location) %in% dashed, "dashed", "solid")
+
+    # ---- labels ------------------------------------------------------------
+    lab.fn <- .make_labeller(loc.labels)
+    if (is.null(y.lab)) y.lab <- unique(as.character(long$outcome))
+    # never let a log axis go unlabelled as one
+    if (log.y && !grepl("log", y.lab, ignore.case = TRUE))
+        y.lab <- paste0(y.lab, " (log scale)")
+    if (length(title) == 1 && is.na(title)) title <- NULL
+
+    # ---- plot --------------------------------------------------------------
+    p <- ggplot(long, aes(x = year, y = value,
+                          colour = location, group = location))
+
+    if (!is.null(target))
+        p <- p + geom_hline(yintercept = target, linetype = "dashed",
+                            colour = "grey35", linewidth = 0.4)
+
+    p <- p +
+        geom_line(aes(linetype = .lt), linewidth = 0.9) +
+        scale_linetype_manual(values = c(solid = "solid", dashed = "22"),
+                              guide = "none") +
+        scale_colour_manual(values = pal, name = NULL, labels = lab.fn)
+
+    if (label.lines) {
+        ends <- long[long$year == max(long$year), ]
+        p <- p + if (requireNamespace("ggrepel", quietly = TRUE))
+                     ggrepel::geom_text_repel(
+                         data = ends, aes(label = lab.fn(as.character(location))),
+                         size = label.size, hjust = 0, direction = "y",
+                         nudge_x = 0.45, segment.size = 0.2,
+                         min.segment.length = 0, seed = 1, show.legend = FALSE)
+                 else
+                     geom_text(data = ends,
+                               aes(label = lab.fn(as.character(location))),
+                               size = label.size, hjust = 0, nudge_x = 0.15,
+                               show.legend = FALSE)
+    }
+
+    # ---- y scale -----------------------------------------------------------
+    if (log.y) {
+        n.bad <- sum(long$value <= 0, na.rm = TRUE)
+        if (n.bad > 0)
+            warning("log.y = TRUE: log10 is undefined at zero and below, so ",
+                    n.bad, " value(s) will be dropped from the panel.",
+                    call. = FALSE)
+        p <- p + scale_y_log10(
+            breaks = if (is.null(y.breaks)) waiver() else y.breaks,
+            labels = scales::comma)
+    } else if (!is.null(y.breaks)) {
+        p <- p + scale_y_continuous(breaks = y.breaks)
+    }
+
+    if (!is.null(y.limits)) {
+        if (length(y.limits) != 2 || any(is.na(y.limits)))
+            stop("y.limits must be c(low, high).")
+        n.out <- sum(long$value < min(y.limits) | long$value > max(y.limits),
+                     na.rm = TRUE)
+        if (n.out > 0)
+            message("y.limits: ", n.out, " point(s) fall outside the view and ",
+                    "are clipped, not dropped. Note the zoom in the caption.")
+        p <- p + coord_cartesian(ylim = y.limits)
+    }
+
+    # ---- x breaks: never invent a year the model did not run --------------
+    if (is.null(x.breaks)) {
+        yr.rng   <- range(long$year, na.rm = TRUE)
+        x.breaks <- scales::breaks_pretty(4)(yr.rng)
+        x.breaks <- x.breaks[x.breaks >= yr.rng[1] & x.breaks <= yr.rng[2]]
+        # the direct labels sit at the final year, so always tick it
+        if (max(x.breaks) < yr.rng[2]) x.breaks <- c(x.breaks, yr.rng[2])
+    }
+
+    p <- p +
+        scale_x_continuous(
+            breaks = x.breaks,
+            # room on the right for the direct labels
+            expand = if (label.lines) expansion(mult = c(0.02, 0.20))
+                     else waiver()) +
+        labs(x = x.lab, y = y.lab, title = title) +
+        theme_minimal(base_size = 11) +
+        theme(panel.grid.minor = element_blank(),
+              plot.title       = element_text(face = "bold", size = 12),
+              # a legend repeating the direct labels is redundant clutter
+              legend.position  = if (label.lines) "none" else "bottom")
+
+    .save_fig(p, save.dir, filename, width, height, dpi)
+    p
+}
+
 
 
 #' Keep one year, with a helpful message when it isn't there
@@ -791,10 +1463,42 @@ parse_coverage_table <- function(tbl, location.col = "location", ...) {
 #' @param order.rows "threshold" (lowest coverage reaching `threshold`), "max",
 #'   "alpha", or "none".
 #' @param row.sep Separator used when both location and subgroup label a row.
+#' @param save.dir,filename Where to write the figure and what to call it.
+#'   `filename` is the switch: give one and a PNG is written, leave it NULL
+#'   (the default) and nothing is. The ".png" extension is appended for you and
+#'   `save.dir` defaults to FIG.DIR when your driver script has set it. Same
+#'   two arguments, same behaviour, as the table functions.
+#' Blend a colour towards white. amount 0 = unchanged, 1 = white.
+#' @noRd
+.lighten <- function(hex, amount) {
+    v <- grDevices::col2rgb(hex) / 255
+    grDevices::rgb(t(v + (1 - v) * amount))
+}
+
+#' WCAG relative luminance of one or more colours
+#' @noRd
+.rel_lum <- function(hex) {
+    m   <- grDevices::col2rgb(hex) / 255
+    lin <- ifelse(m <= 0.03928, m / 12.92, ((m + 0.055) / 1.055)^2.4)
+    as.numeric(0.2126 * lin[1, ] + 0.7152 * lin[2, ] + 0.0722 * lin[3, ])
+}
+
+#' Pick white or near-black text for a given fill, by contrast ratio
+#'
+#' A shaded band runs from a pale end to a saturated one, so no single text
+#' colour works across it -- this picks per cell instead of guessing.
+#' @noRd
+.text_on <- function(hex) {
+    L <- .rel_lum(hex)
+    ifelse(1.05 / (L + 0.05) >= (L + 0.05) / 0.0694, "white", "grey15")
+}
+
+
 plot_coverage_heatmap <- function(tbl,
                                   location.col = "location",
                                   locations    = NULL,
                                   subgroup     = NULL,
+                                  order.by     = NULL,
                                   year         = NULL,
                                   col.pattern  = "^(.*)_doxy\\.cov\\.(\\d+)_(\\d+)$",
                                   cov.pattern  = "doxy\\.cov\\.(\\d+)",
@@ -803,24 +1507,62 @@ plot_coverage_heatmap <- function(tbl,
                                   limits       = NULL,
                                   higher.is.better = TRUE,
                                   order.rows   = c("threshold", "max", "alpha", "none"),
+                                  fill.style   = c("diverging", "banded"),
+                                  band.breaks  = NULL,
+                                  band.colours = c("#e34948",   # below the first break
+                                                   "#2a78d6",   # between the breaks
+                                                   "#008300"),  # at/above the last break
+                                  band.shade   = TRUE,
+                                  band.light   = 0.78,
+                                  legend.dir   = c("vertical", "horizontal"),
+                                  legend.breaks = NULL,
+                                  # "auto" marks a squished end with <= / >=
+                                  # only when THIS panel's data runs past the
+                                  # limit. That makes the labels depend on the
+                                  # data, so two panels sharing a scale can end
+                                  # up with different legends -- and patchwork's
+                                  # guides = "collect" then cannot merge them,
+                                  # which is how a 2x2 ends up with two
+                                  # colourbars. Force "always" or "never" when
+                                  # panels must share one legend.
+                                  squish.marks = c("auto", "always", "never"),
+                                  legend.labels = NULL,
                                   label.digits = 0,
                                   show.labels  = TRUE,
+                                  # NULL picks per cell by contrast against the
+                                  # fill; a colour string uses that everywhere
+                                  label.colour = NULL,
                                   row.sep      = " — ",
                                   title        = NULL,
                                   x.lab        = "Doxy-PEP coverage (%)",
                                   fill.lab     = NULL,
-                                  save.path    = NULL,
+                                  # TRUE locks the panel's aspect with
+                                  # coord_fixed(), which is what leaves an
+                                  # empty margin when the saved width/height
+                                  # do not match that aspect. Set FALSE for a
+                                  # panel going into a patchwork grid, so the
+                                  # tiles stretch to fill their cell instead.
+                                  fixed.aspect = TRUE,
+                                  save.dir     = .default_fig_dir(),
+                                  filename     = NULL,
                                   width = 8, height = 5, dpi = 300) {
 
     order.rows <- match.arg(order.rows)
+    fill.style <- match.arg(fill.style)
+    legend.dir   <- match.arg(legend.dir)
+    squish.marks <- match.arg(squish.marks)
 
     long <- .prep_long(tbl, location.col, locations, subgroup, col.pattern, cov.pattern)
+    long <- .require_coverage(long, cov.pattern)
 
     long <- .filter_year(long, year)
 
+    subgroup.order <- subgroup          # shadowed by the column inside dplyr
     long$row.id <- .series_label(long, row.sep)
 
     # ---- row ordering ------------------------------------------------------
+    # `order.rows` picks WHICH value ranking to use; `order.by` decides whether
+    # a value ranking is used at all (see .series_levels).
     crossed <- function(v) if (higher.is.better) v >= threshold else v <= threshold
     ord <- long %>%
         group_by(row.id) %>%
@@ -828,17 +1570,119 @@ plot_coverage_heatmap <- function(tbl,
                   best  = if (higher.is.better) max(value, na.rm = TRUE)
                           else min(value, na.rm = TRUE),
                   .groups = "drop")
-    row.order <- switch(order.rows,
+    value.order <- switch(order.rows,
                         threshold = ord %>% arrange(cross, if (higher.is.better) desc(best) else best) %>% pull(row.id),
                         max       = ord %>% arrange(if (higher.is.better) desc(best) else best) %>% pull(row.id),
                         alpha     = sort(unique(long$row.id)),
                         none      = unique(long$row.id))
+    row.order <- .series_levels(
+        dplyr::distinct(long, location, subgroup, series = row.id),
+        locations, subgroup.order, order.by, value.order)
 
     long <- long %>%
         mutate(row.id   = factor(row.id, levels = rev(row.order)),
                coverage = factor(coverage, levels = sort(unique(coverage))))
 
     # ---- fill scale --------------------------------------------------------
+    # "banded" cuts the values at meaningful thresholds instead of shading them
+    # continuously. Two reasons to prefer it here:
+    #
+    #   The default continuous scale runs limits = c(0, 100) with
+    #   oob = squish, so a NEGATIVE value -- the intervention leaving a group
+    #   worse off -- is clamped to 0 and painted the same as no effect at all.
+    #   A band below zero gives that its own colour.
+    #
+    #   The cut points are the ones the figure already reasons about: 0
+    #   separates benefit from harm, and `threshold` is the policy target that
+    #   crossed() and the row ordering already use. Banding makes "did this
+    #   city clear the target" a colour rather than a value to be read off.
+    #
+    # The cost is that magnitude within a band is no longer encoded, which is
+    # why show.labels should stay TRUE (see below -- it is also what makes the
+    # red/green pair legitimate).
+    if (fill.style == "banded") {
+        if (is.null(band.breaks)) band.breaks <- c(0, threshold)
+        band.breaks <- sort(unique(band.breaks))
+        if (length(band.colours) != length(band.breaks) + 1L)
+            stop("band.colours needs one more entry than band.breaks: ",
+                 length(band.breaks) + 1L, " colours for breaks ",
+                 paste(band.breaks, collapse = ", "), ", got ",
+                 length(band.colours), ".")
+
+        # The default limits of c(0, 100) would squish every negative value
+        # onto the bottom of the scale, which is the thing this style exists
+        # to stop -- so span the data instead.
+        if (is.null(limits))
+            limits <- range(c(long$value, band.breaks), na.rm = TRUE)
+
+        if (band.shade) {
+            # A piecewise ramp: the hue changes abruptly at every break, and
+            # within a band the colour runs pale -> saturated so magnitude is
+            # still readable. Band 1 is reversed (darkest at the LOW end), so
+            # "more negative" and "more positive" both read as more intense.
+            edges    <- c(limits[1], band.breaks, limits[2])
+            stop.pos <- numeric(0); stop.col <- character(0)
+            for (k in seq_along(band.colours)) {
+                base <- unname(band.colours[k])
+                pale <- .lighten(base, band.light)
+                stop.col <- c(stop.col, if (k == 1) c(base, pale) else c(pale, base))
+                stop.pos <- c(stop.pos, edges[k], edges[k + 1])
+            }
+            stop.pos <- scales::rescale(stop.pos, from = limits)
+            # gradient_n_pal() needs strictly increasing stops; the duplicated
+            # boundary is what makes the hue change a step rather than a blend
+            for (s in seq_along(stop.pos)[-1])
+                if (stop.pos[s] <= stop.pos[s - 1])
+                    stop.pos[s] <- stop.pos[s - 1] + 1e-6
+
+            # Legend ticks at the band edges, because those are the values
+            # that mean something. Where data is being squished onto an end,
+            # the tick says so -- otherwise "-100" reads as the minimum
+            # observed rather than "everything at or below this".
+            if (is.null(legend.breaks))
+                legend.breaks <- sort(unique(c(limits[1], band.breaks, limits[2])))
+            mark.lo <- switch(squish.marks,
+                              always = TRUE, never = FALSE,
+                              auto   = any(long$value < limits[1], na.rm = TRUE))
+            mark.hi <- switch(squish.marks,
+                              always = TRUE, never = FALSE,
+                              auto   = any(long$value > limits[2], na.rm = TRUE))
+
+            legend.labs <- format(legend.breaks, trim = TRUE)
+            if (mark.lo)
+                legend.labs[legend.breaks == limits[1]] <-
+                    paste0("\u2264 ", format(limits[1], trim = TRUE))
+            if (mark.hi)
+                legend.labs[legend.breaks == limits[2]] <-
+                    paste0("\u2265 ", format(limits[2], trim = TRUE))
+
+            # explicit labels win outright -- the last resort for making
+            # several panels present byte-identical guides
+            if (!is.null(legend.labels)) {
+                if (length(legend.labels) != length(legend.breaks))
+                    stop("legend.labels must have one entry per legend break (",
+                         length(legend.breaks), " needed, got ",
+                         length(legend.labels), ").")
+                legend.labs <- legend.labels
+            }
+
+            band.pal   <- scales::gradient_n_pal(stop.col, values = stop.pos)
+            long$.txt  <- .text_on(band.pal(scales::rescale(
+                              scales::squish(long$value, limits), from = limits)))
+        } else {
+            band.labs <- c(
+                paste0("< ", band.breaks[1]),
+                if (length(band.breaks) > 1)
+                    paste0(utils::head(band.breaks, -1), " to <", band.breaks[-1]),
+                paste0("\u2265 ", band.breaks[length(band.breaks)]))
+            # right = FALSE so the top band is [threshold, Inf), matching the
+            # crossed() test above, which counts v >= threshold as crossed
+            long$.band <- cut(long$value, breaks = c(-Inf, band.breaks, Inf),
+                              labels = band.labs, right = FALSE)
+            names(band.colours) <- band.labs
+        }
+    }
+
     if (is.null(limits)) limits <- c(0, 100)
     pal <- if (higher.is.better) c("#B2182B", "#1A9850") else c("#1A9850", "#B2182B")
 
@@ -850,14 +1694,42 @@ plot_coverage_heatmap <- function(tbl,
             title <- paste0(title, " (", subgroup, ")")
     }
 
-    p <- ggplot(long, aes(x = coverage, y = row.id, fill = value)) +
-        geom_tile(color = "white", linewidth = 0.6) +
-        scale_fill_gradientn(colours = c(pal[1], "#F7F7F7", pal[2]),
-                             values  = scales::rescale(c(limits[1], midpoint, limits[2]),
-                                                       from = limits),
-                             limits  = limits,
-                             oob     = scales::squish,
-                             name    = fill.lab) +
+    banded.flat <- fill.style == "banded" && !band.shade
+    fill.col    <- if (banded.flat) ".band" else "value"
+
+    p <- ggplot(long, aes(x = coverage, y = row.id, fill = .data[[fill.col]])) +
+        geom_tile(color = "white", linewidth = 0.6)
+
+    p <- p + if (banded.flat)
+                 scale_fill_manual(values = band.colours, name = fill.lab,
+                                   drop = FALSE, na.value = "grey90")
+             else if (fill.style == "banded")
+                 scale_fill_gradientn(
+                     colours = stop.col,
+                     values  = stop.pos,
+                     limits  = limits,
+                     oob     = scales::squish,
+                     name    = fill.lab,
+                     breaks  = legend.breaks,
+                     labels  = legend.labs,
+                     guide   = if (legend.dir == "horizontal")
+                                   guide_colourbar(direction = "horizontal",
+                                                   title.position = "top",
+                                                   barwidth  = unit(7, "cm"),
+                                                   barheight = unit(0.45, "cm"))
+                               else
+                                   guide_colourbar(barwidth  = unit(0.5, "cm"),
+                                                   barheight = unit(4.5, "cm")))
+             else
+                 scale_fill_gradientn(colours = c(pal[1], "#F7F7F7", pal[2]),
+                                      values  = scales::rescale(
+                                          c(limits[1], midpoint, limits[2]),
+                                          from = limits),
+                                      limits  = limits,
+                                      oob     = scales::squish,
+                                      name    = fill.lab)
+
+    p <- p +
         scale_x_discrete(expand = c(0, 0)) +
         scale_y_discrete(expand = c(0, 0)) +
         labs(x = x.lab, y = NULL, title = title) +
@@ -865,23 +1737,55 @@ plot_coverage_heatmap <- function(tbl,
         theme(panel.grid = element_blank(),
               axis.ticks = element_blank(),
               plot.title = element_text(face = "bold", size = 12),
-              legend.key.height = unit(1.2, "cm"))
+              legend.position = if (legend.dir == "horizontal") "bottom" else "right",
+              # the colourbar guides above set their own size in banded mode;
+              # this stays for the continuous default
+              legend.key.height = if (fill.style == "banded") NULL
+                                  else unit(1.2, "cm"))
 
-    if (show.labels)
-        p <- p +
-        geom_text(aes(label = format(round(value, label.digits),
-                                     nsmall = label.digits),
-                      color = ifelse(value >= midpoint,
-                                     (value - midpoint) / (limits[2] - midpoint),
-                                     (midpoint - value) / (midpoint - limits[1])) > 0.55),
-                  size = 3.4, fontface = "bold", show.legend = FALSE) +
-        scale_color_manual(values = c(`TRUE` = "white", `FALSE` = "grey15"))
+    if (show.labels) {
+        val.lab <- aes(label = format(round(value, label.digits),
+                                      nsmall = label.digits))
+        if (!is.null(label.colour)) {
+            # One colour for every cell. Mixed black/white labels are chosen
+            # for contrast, but they read as if they encode something, so a
+            # single colour is often the better call -- check it against the
+            # darkest fill before using it. For the default band colours,
+            # black clears 4.2:1 on all three saturated ends (red 5.3,
+            # blue 4.7, green 4.2), so it is legible throughout.
+            p <- p + geom_text(val.lab, colour = label.colour, size = 3.4,
+                               fontface = "bold", show.legend = FALSE)
+        } else if (banded.flat) {
+            # the three flat fills all clear 3:1 against white (red 3.9,
+            # blue 4.4, green 4.9), so bold white reads on every one
+            p <- p + geom_text(val.lab, colour = "white", size = 3.4,
+                               fontface = "bold", show.legend = FALSE)
+        } else if (fill.style == "banded") {
+            # shaded bands run pale -> saturated, so the text colour is chosen
+            # per cell from the actual fill's luminance
+            p <- p + geom_text(aes(label = format(round(value, label.digits),
+                                                  nsmall = label.digits),
+                                   colour = .txt),
+                               size = 3.4, fontface = "bold",
+                               show.legend = FALSE) +
+                     scale_colour_identity()
+        } else {
+            p <- p +
+                geom_text(aes(label = format(round(value, label.digits),
+                                             nsmall = label.digits),
+                              color = ifelse(value >= midpoint,
+                                             (value - midpoint) / (limits[2] - midpoint),
+                                             (midpoint - value) / (midpoint - limits[1])) > 0.55),
+                          size = 3.4, fontface = "bold", show.legend = FALSE) +
+                scale_color_manual(values = c(`TRUE` = "white", `FALSE` = "grey15"))
+        }
+    }
 
     n.facet <- dplyr::n_distinct(paste(long$outcome, long$year))
-    if (n.facet > 1) p <- p + facet_wrap(~ outcome + year, scales = "free_x")
-    else             p <- p + coord_fixed(ratio = 0.75)
+    if (n.facet > 1)          p <- p + facet_wrap(~ outcome + year, scales = "free_x")
+    else if (fixed.aspect)    p <- p + coord_fixed(ratio = 0.75)
 
-    .save_fig(p, save.path, width, height, dpi)
+    .save_fig(p, save.dir, filename, width, height, dpi)
     p
 }
 
@@ -900,11 +1804,17 @@ plot_coverage_heatmap <- function(tbl,
 #' @param subgroup Optional stratum filter, e.g. "msm".
 #' @param higher.is.better TRUE if larger values are the goal (e.g. % averted).
 #' @param locations Optional subset of locations to show.
+#' @param save.dir,filename Where to write the figure and what to call it.
+#'   `filename` is the switch: give one and a PNG is written, leave it NULL
+#'   (the default) and nothing is. The ".png" extension is appended for you and
+#'   `save.dir` defaults to FIG.DIR when your driver script has set it. Same
+#'   two arguments, same behaviour, as the table functions.
 plot_coverage_needed <- function(tbl,
                                  target       = 50,
                                  year         = NULL,
                                  locations    = NULL,
                                  subgroup     = NULL,
+                                 order.by     = NULL,
                                  higher.is.better = TRUE,
                                  location.col = "location",
                                  col.pattern  = "^(.*)_doxy\\.cov\\.(\\d+)_(\\d+)$",
@@ -914,20 +1824,24 @@ plot_coverage_needed <- function(tbl,
                                  x.lab        = "Coverage required (%)",
                                  bar.fill     = "#2166AC",
                                  unreached.lab = "not reached",
-                                 save.path = NULL, width = 7, height = 4.5, dpi = 300) {
+                                 save.dir     = .default_fig_dir(),
+                                 filename     = NULL,
+                                 width = 7, height = 4.5, dpi = 300) {
 
     long <- .prep_long(tbl, location.col, locations, subgroup, col.pattern, cov.pattern)
+    long <- .require_coverage(long, cov.pattern)
 
     if (is.null(year)) year <- max(long$year, na.rm = TRUE)
     long <- .filter_year(long, year)
 
+    subgroup.order <- subgroup          # shadowed by the column inside dplyr
     long$series <- .series_label(long, row.sep)
 
     max.cov <- max(long$coverage, na.rm = TRUE)
     hit <- function(v) if (higher.is.better) v >= target else v <= target
 
     summ <- long %>%
-        group_by(series) %>%
+        group_by(location, subgroup, series) %>%
         summarise(cov.needed = suppressWarnings(min(coverage[hit(value)])),
                   best       = if (higher.is.better) max(value, na.rm = TRUE)
                                else min(value, na.rm = TRUE),
@@ -936,9 +1850,16 @@ plot_coverage_needed <- function(tbl,
                bar.len  = ifelse(reached, cov.needed, max.cov),
                lab      = ifelse(reached, paste0(cov.needed, "%"),
                                  paste0(unreached.lab, " (max ",
-                                        round(best), "%)"))) %>%
-        arrange(desc(reached), cov.needed, desc(best)) %>%
-        mutate(series = factor(series, levels = rev(series)))
+                                        round(best), "%)")))
+
+    # this figure's own ranking: reached first, then by the coverage needed
+    value.order <- summ %>%
+        arrange(desc(reached), cov.needed, desc(best)) %>% pull(series)
+    summ <- summ %>%
+        mutate(series = factor(series,
+                               levels = rev(.series_levels(summ, locations,
+                                                           subgroup.order, order.by,
+                                                           value.order))))
 
     if (is.null(title))
         title <- paste0("Doxy-PEP coverage needed to reach ", target,
@@ -961,7 +1882,7 @@ plot_coverage_needed <- function(tbl,
               axis.ticks         = element_blank(),
               plot.title         = element_text(face = "bold", size = 12))
 
-    .save_fig(p, save.path, width, height, dpi)
+    .save_fig(p, save.dir, filename, width, height, dpi)
     p
 }
 
@@ -971,11 +1892,17 @@ plot_coverage_needed <- function(tbl,
 # ----------------------------------------------------------------------------
 #' One line per series (location, or location x subgroup when several strata
 #' are present), ordered by the impact reached at the highest coverage.
+#' @param save.dir,filename Where to write the figure and what to call it.
+#'   `filename` is the switch: give one and a PNG is written, leave it NULL
+#'   (the default) and nothing is. The ".png" extension is appended for you and
+#'   `save.dir` defaults to FIG.DIR when your driver script has set it. Same
+#'   two arguments, same behaviour, as the table functions.
 plot_dose_response <- function(tbl,
                                target       = 50,
                                year         = NULL,
                                locations    = NULL,
                                subgroup     = NULL,
+                               order.by     = NULL,
                                location.col = "location",
                                col.pattern  = "^(.*)_doxy\\.cov\\.(\\d+)_(\\d+)$",
                                cov.pattern  = "doxy\\.cov\\.(\\d+)",
@@ -985,21 +1912,29 @@ plot_dose_response <- function(tbl,
                                y.lab        = NULL,
                                direct.label = TRUE,
                                palette      = NULL,
-                               save.path = NULL, width = 7.5, height = 5, dpi = 300) {
+                               save.dir     = .default_fig_dir(),
+                               filename     = NULL,
+                               width = 7.5, height = 5, dpi = 300) {
 
     long <- .prep_long(tbl, location.col, locations, subgroup, col.pattern, cov.pattern)
+    long <- .require_coverage(long, cov.pattern)
 
     if (is.null(year)) year <- max(long$year, na.rm = TRUE)
     long <- .filter_year(long, year)
 
+    subgroup.order <- subgroup          # shadowed by the column inside dplyr
     long$series <- .series_label(long, row.sep)
 
-    # order the key by terminal impact so it reads as a ranking
-    ord <- long %>%
+    # this figure's own ranking: terminal impact, so the key reads as a ranking
+    value.order <- long %>%
         group_by(series) %>%
         slice_max(coverage, n = 1, with_ties = FALSE) %>%
         arrange(desc(value)) %>% pull(series)
-    long <- long %>% mutate(series = factor(series, levels = ord))
+    long <- long %>%
+        mutate(series = factor(series,
+                               levels = .series_levels(
+                                   dplyr::distinct(long, location, subgroup, series),
+                                   locations, subgroup.order, order.by, value.order)))
 
     ends <- long %>% group_by(series) %>%
         slice_max(coverage, n = 1, with_ties = FALSE) %>% ungroup()
@@ -1033,7 +1968,7 @@ plot_dose_response <- function(tbl,
 
     if (!is.null(palette)) p <- p + scale_color_manual(values = palette)
 
-    .save_fig(p, save.path, width, height, dpi)
+    .save_fig(p, save.dir, filename, width, height, dpi)
     p
 }
 
@@ -1069,11 +2004,17 @@ plot_dose_response <- function(tbl,
 #' @param free.y Free y scales across facets.
 #' @param direct.label End-of-line labels when colouring by location.
 #' @param annotate.ends Endpoint value labels; single-series plots only.
+#' @param save.dir,filename Where to write the figure and what to call it.
+#'   `filename` is the switch: give one and a PNG is written, leave it NULL
+#'   (the default) and nothing is. The ".png" extension is appended for you and
+#'   `save.dir` defaults to FIG.DIR when your driver script has set it. Same
+#'   two arguments, same behaviour, as the table functions.
 plot_impact_over_time <- function(tbl,
                                   color.by      = c("coverage", "location"),
                                   locations     = NULL,
                                   coverages     = NULL,
                                   subgroup      = NULL,
+                                  order.by      = NULL,
                                   year.range    = NULL,
                                   target        = 50,
                                   outcome       = NULL,
@@ -1095,11 +2036,14 @@ plot_impact_over_time <- function(tbl,
                                   x.lab         = "Year",
                                   y.lab         = NULL,
                                   title         = NULL,
-                                  save.path = NULL, width = 10, height = 6, dpi = 300) {
+                                  save.dir      = .default_fig_dir(),
+                                  filename      = NULL,
+                                  width = 10, height = 6, dpi = 300) {
 
     color.by <- match.arg(color.by)
 
     long <- .prep_long(tbl, location.col, locations, subgroup, col.pattern, cov.pattern)
+    long <- .require_coverage(long, cov.pattern)
 
     # ---- outcome ----------------------------------------------------------
     if (!is.null(outcome)) {
@@ -1129,15 +2073,12 @@ plot_impact_over_time <- function(tbl,
 
     # ---- ordering ---------------------------------------------------------
     # user-supplied order wins; anything unmatched is appended rather than dropped
-    u.loc <- as.character(unique(long$location))
-    ord.loc <- if (!is.null(locations)) {
-        c(intersect(locations, u.loc), setdiff(u.loc, locations))
-    } else {
-        long %>%
-            filter(coverage == max(coverage)) %>%
-            group_by(location) %>% slice_max(year, n = 1, with_ties = FALSE) %>%
-            arrange(desc(value)) %>% pull(location) %>% as.character()
-    }
+    # this figure's own ranking: endpoint value at the highest coverage
+    value.order <- long %>%
+        filter(coverage == max(coverage)) %>%
+        group_by(location) %>% slice_max(year, n = 1, with_ties = FALSE) %>%
+        arrange(desc(value)) %>% pull(location) %>% as.character()
+    ord.loc <- .location_order(long$location, locations, order.by, value.order)
     long <- long %>% mutate(location = factor(as.character(location), levels = ord.loc))
 
     if (has.strat) {
@@ -1265,7 +2206,228 @@ plot_impact_over_time <- function(tbl,
               plot.title       = element_text(face = "bold", size = 12),
               legend.position  = if (single.line || use.direct.label) "none" else "right")
 
-    .save_fig(p, save.path, width, height, dpi)
+    .save_fig(p, save.dir, filename, width, height, dpi)
+    p
+}
+
+
+
+# ----------------------------------------------------------------------------
+# FIGURE 4: Trend over time with a shaded credible interval
+# ----------------------------------------------------------------------------
+#' Median trajectory with a shaded credible interval, one panel per city
+#'
+#' The one figure that USES the CI rows instead of dropping them, so the table
+#' must be built with stat.type = "median.ci" (or "mean.ci"). It also does not
+#' need a coverage level in the intervention name, so a "noint"-only table --
+#' the natural summary of the baseline scenario -- plots fine here.
+#'
+#' Layout is read off the table and can be overridden:
+#'   colour  the stratum when several are present, otherwise the intervention
+#'           when several are present, otherwise a single colour
+#'   facets  every remaining dimension that varies (location first, then
+#'           whichever of subgroup / intervention did not take the colour)
+#'
+#' @param tbl A table from make_multi_location_table() built with a .ci stat.
+#' @param locations,subgroup,interventions Optional subsets. The order you
+#'   supply is respected in facets, legends and line stacking.
+#' @param outcome Required when the table holds more than one outcome.
+#' @param year.range Two-element numeric range, inclusive.
+#' @param facet.by Any of "location", "subgroup", "intervention". NULL works it
+#'   out; character(0) forces a single panel. Two entries give a grid, with the
+#'   first across and the second down.
+#' @param color.by One of the same three, or NA for a single colour. NULL works
+#'   it out.
+#' @param show.ribbon FALSE draws the median lines alone.
+#' @param ribbon.alpha Opacity of the interval band. Lower it when many bands
+#'   overlap in one panel.
+#' @param target Horizontal reference line; NULL to omit.
+#' @param free.y Free y scales across panels.
+#' @param strat.labels Named vector mapping stratum values to display labels.
+#' @param palette Named vector of colours for the colour dimension; NULL uses
+#'   the ColorBrewer palette named in `strat.palette`.
+#' @param title NULL auto-generates one, NA suppresses it.
+#' @return A ggplot object.
+#' @param save.dir,filename Where to write the figure and what to call it.
+#'   `filename` is the switch: give one and a PNG is written, leave it NULL
+#'   (the default) and nothing is. The ".png" extension is appended for you and
+#'   `save.dir` defaults to FIG.DIR when your driver script has set it. Same
+#'   two arguments, same behaviour, as the table functions.
+plot_trend_with_ci <- function(tbl,
+                               locations     = NULL,
+                               subgroup      = NULL,
+                               interventions = NULL,
+                               outcome       = NULL,
+                               order.by      = NULL,
+                               year.range    = NULL,
+                               facet.by      = NULL,
+                               color.by      = NULL,
+                               show.ribbon   = TRUE,
+                               ribbon.alpha  = 0.20,
+                               target        = NULL,
+                               facet.ncol    = NULL,
+                               free.y        = FALSE,
+                               location.col  = "location",
+                               col.pattern   = "^(.*)_doxy\\.cov\\.(\\d+)_(\\d+)$",
+                               cov.pattern   = "doxy\\.cov\\.(\\d+)",
+                               strat.palette = "Set1",
+                               strat.labels  = c(Total             = "Total population",
+                                                 msm               = "MSM",
+                                                 heterosexual_male = "Heterosexual men",
+                                                 female            = "Women"),
+                               palette       = NULL,
+                               loc.labels    = NULL,
+                               x.lab         = "Year",
+                               y.lab         = NULL,
+                               title         = NULL,
+                               save.dir      = .default_fig_dir(),
+                               filename      = NULL,
+                               width = 11, height = 6, dpi = 300) {
+
+    # the `subgroup` argument is shadowed by the column of the same name once
+    # we are inside mutate(), so keep a copy of the requested order
+    subgroup.order <- subgroup
+
+    long <- .prep_long(tbl, location.col, locations, subgroup,
+                       col.pattern, cov.pattern, keep.ci = TRUE)
+
+    # ---- outcome ----------------------------------------------------------
+    if (!is.null(outcome)) {
+        .outcome <- outcome
+        long <- long %>% filter(outcome == .outcome)
+        if (nrow(long) == 0) stop("Outcome '", .outcome, "' not present in table.")
+    }
+    if (dplyr::n_distinct(long$outcome) > 1)
+        stop("Table holds >1 outcome (", paste(unique(long$outcome), collapse = ", "),
+             "). Supply 'outcome' to pick one.")
+
+    # ---- remaining subsets -------------------------------------------------
+    if (!is.null(interventions)) {
+        miss <- setdiff(interventions, unique(long$intervention))
+        if (length(miss))
+            stop("Intervention(s) not in table: ", paste(miss, collapse = ", "),
+                 ".\nAvailable: ", paste(unique(long$intervention), collapse = ", "))
+        long <- long %>% filter(intervention %in% interventions)
+    }
+    if (!is.null(year.range))
+        long <- long %>% filter(year >= min(year.range), year <= max(year.range))
+
+    if (nrow(long) == 0) stop("No rows left after filtering.")
+    if (dplyr::n_distinct(long$year) < 2)
+        stop("Need >= 2 years to draw a trajectory. Build the table with, say, ",
+             "years = as.character(2022:2030).")
+
+    # ---- ordering: what you asked for first, anything else appended -------
+    ord <- function(x, wanted) {
+        u <- as.character(unique(x))
+        if (is.null(wanted)) u else c(intersect(wanted, u), setdiff(u, wanted))
+    }
+    # this figure's own ranking: value in the final year, averaged over series
+    value.order <- long %>%
+        filter(year == max(year)) %>%
+        group_by(location) %>% summarise(v = mean(value, na.rm = TRUE), .groups = "drop") %>%
+        arrange(desc(v)) %>% pull(location) %>% as.character()
+
+    long <- long %>%
+        mutate(location     = factor(as.character(location),
+                                     levels = .location_order(location, locations,
+                                                              order.by, value.order)),
+               subgroup     = factor(as.character(subgroup),
+                                     levels = ord(subgroup, subgroup.order)),
+               intervention = factor(as.character(intervention),
+                                     levels = ord(intervention, interventions)),
+               # one line per location x subgroup x intervention
+               .series = paste(location, subgroup, intervention, sep = "|"))
+
+    # ---- which dimensions vary, and what each one is used for -------------
+    n.of <- c(location     = dplyr::n_distinct(long$location),
+              subgroup     = dplyr::n_distinct(long$subgroup),
+              intervention = dplyr::n_distinct(long$intervention))
+    varies <- names(n.of)[n.of > 1]
+    if (all(is.na(long$subgroup))) varies <- setdiff(varies, "subgroup")
+
+    if (is.null(color.by))
+        color.by <- if ("subgroup" %in% varies) "subgroup"
+                    else if ("intervention" %in% varies) "intervention"
+                    else NA_character_
+    if (is.null(facet.by))
+        facet.by <- setdiff(varies, if (is.na(color.by)) character(0) else color.by)
+    facet.by <- intersect(facet.by, c("location", "subgroup", "intervention"))
+
+    # ---- labels ------------------------------------------------------------
+    if (is.null(y.lab)) y.lab <- unique(as.character(long$outcome))
+    if (length(title) == 1 && is.na(title)) {
+        title <- NULL
+    } else if (is.null(title)) {
+        ci.lab <- "median and 95% credible interval"
+        title  <- paste0(y.lab, " over time (", ci.lab, ")")
+    }
+
+    # ---- plot --------------------------------------------------------------
+    p <- ggplot(long, aes(x = year, y = value, group = .series))
+
+    if (!is.null(target))
+        p <- p + geom_hline(yintercept = target, linetype = "dashed",
+                            color = "grey35", linewidth = 0.4)
+
+    if (is.na(color.by)) {
+        if (show.ribbon)
+            p <- p + geom_ribbon(aes(ymin = lower, ymax = upper),
+                                 fill = "#2166AC", alpha = ribbon.alpha, colour = NA)
+        p <- p + geom_line(linewidth = 0.9, colour = "#2166AC")
+
+    } else {
+        lab.fn <- if (color.by == "subgroup") .strat_labeller(strat.labels)
+                  else function(x) x
+        if (show.ribbon)
+            p <- p + geom_ribbon(aes(ymin = lower, ymax = upper,
+                                     fill = .data[[color.by]]),
+                                 alpha = ribbon.alpha, colour = NA,
+                                 show.legend = FALSE)
+        p <- p + geom_line(aes(colour = .data[[color.by]]), linewidth = 0.9)
+
+        if (!is.null(palette))
+            p <- p + scale_colour_manual(values = palette, name = NULL, labels = lab.fn) +
+                     scale_fill_manual(values = palette, guide = "none")
+        else
+            p <- p + scale_colour_brewer(palette = strat.palette, name = NULL,
+                                         drop = FALSE, labels = lab.fn) +
+                     scale_fill_brewer(palette = strat.palette, guide = "none",
+                                       drop = FALSE)
+    }
+
+    # ---- faceting ----------------------------------------------------------
+    lab.for <- function(d)
+        if (d == "location") .make_labeller(loc.labels)
+        else if (d == "subgroup") .strat_labeller(strat.labels)
+        else function(x) x
+
+    scales.arg <- if (free.y) "free_y" else "fixed"
+    if (length(facet.by) >= 2) {
+        lg <- list(); lg[[facet.by[1]]] <- lab.for(facet.by[1])
+        lg[[facet.by[2]]] <- lab.for(facet.by[2])
+        p <- p + facet_grid(stats::as.formula(paste(facet.by[2], "~", facet.by[1])),
+                            labeller = do.call(labeller, lg), scales = scales.arg)
+    } else if (length(facet.by) == 1) {
+        p <- p + facet_wrap(stats::as.formula(paste("~", facet.by)),
+                            ncol = facet.ncol,
+                            labeller = as_labeller(lab.for(facet.by)),
+                            scales = scales.arg)
+    }
+
+    p <- p +
+        # fewer year breaks and a gap between panels, so neighbouring axes do
+        # not run their labels together when there are many cities
+        scale_x_continuous(breaks = scales::breaks_pretty(4)) +
+        labs(x = x.lab, y = y.lab, title = title) +
+        theme_minimal(base_size = 11) +
+        theme(panel.grid.minor = element_blank(),
+              panel.spacing.x  = unit(0.9, "lines"),
+              strip.text       = element_text(face = "bold"),
+              plot.title       = element_text(face = "bold", size = 12),
+              legend.position  = if (is.na(color.by)) "none" else "bottom")
+
+    .save_fig(p, save.dir, filename, width, height, dpi)
     p
 }
 
@@ -1312,7 +2474,7 @@ if (1 == 2) {
         target    = 50,
         subgroup  = "msm",
         title     = "Doxy coverage needed to reach 50% incidence reduction among MSM by 2030",
-        save.path = paste0(FIG.DIR, "fig1_coverage_needed.png"))
+        filename  = "fig1_coverage_needed")
     f1
 
     # ------------------------------------------------------------------------
@@ -1322,7 +2484,7 @@ if (1 == 2) {
                              subgroup  = "msm",
                              target    = 50,
                              y.lab     = "Diagnoses averted (%)",
-                             save.path = paste0(FIG.DIR, "fig2_dose_response_msm.png"))
+                             filename  = "fig2_dose_response_msm")
     f2
 
     # all subgroups within one city   (was: locations = c("Atlanta *"))
@@ -1379,7 +2541,50 @@ if (1 == 2) {
                           coverages  = c(10, 30, 60, 90),
                           year.range = c(2026, 2035),
                           facet.ncol = 4,
-                          save.path  = paste0(FIG.DIR, "fig3_multi_by_location.png"))
+                          filename   = "fig3_multi_by_location")
+
+    # ------------------------------------------------------------------------
+    # FIGURE 4: trend with a shaded credible interval
+    # ------------------------------------------------------------------------
+    # Needs a .ci table. Works with a single scenario, so "noint" is fine --
+    # the coverage figures cannot take a noint-only table because there is no
+    # coverage level to put on the x axis.
+    summary_no_int <- make_multi_location_table(
+        data          = list(total_raw_results, total_calc_results, sex_calc_results),
+        locations     = names(SHIELD.TEN.MSAS),
+        outcomes      = c("rate_diagnosis_total_per_pop"),
+        interventions = "noint",
+        years         = as.character(2022:2030),
+        stat.type     = "median.ci")
+
+    # one panel per city, one line per stratum, ribbon = 95% CrI
+    plot_trend_with_ci(summary_no_int,
+                       facet.ncol   = 5,
+                       ribbon.alpha = 0.15,
+                       y.lab        = "Diagnoses per 100,000",
+                       title        = "Diagnosis rate with no intervention",
+                       filename     = "fig4_noint_trend")
+
+    # a single stratum: one line and one band per panel
+    plot_trend_with_ci(summary_no_int, subgroup = "msm", facet.ncol = 5)
+
+    # four cities, strata down the side, one line per panel
+    plot_trend_with_ci(summary_no_int,
+                       locations = c("Atlanta", "Baltimore", "Chicago", "Dallas"),
+                       facet.by  = c("location", "subgroup"),
+                       color.by  = NA)
+
+    # comparing scenarios instead of strata: colour falls to intervention
+    plot_trend_with_ci(
+        make_multi_location_table(
+            data            = list(total_calc_results, sex_calc_results),
+            locations       = names(SHIELD.TEN.MSAS),
+            outcomes        = "rate_diagnosis_total_per_pop",
+            interventions   = c("noint", "doxy.cov.50", "doxy.cov.100"),
+            years           = as.character(2022:2030),
+            stat.type       = "median.ci",
+            filter.by.strat = "msm"),
+        facet.ncol = 5)
 
     # ------------------------------------------------------------------------
     # HEAT MAP
@@ -1387,7 +2592,7 @@ if (1 == 2) {
     plot_coverage_heatmap(ten.city.tbl,
                           subgroup  = "msm",
                           midpoint  = 50,
-                          save.path = paste0(FIG.DIR, "heatmap_msm_2030.png"))
+                          filename  = "heatmap_msm_2030")
 
     # ------------------------------------------------------------------------
     # row.vars now works with the figures too (issue A5): the table records
@@ -1402,4 +2607,14 @@ if (1 == 2) {
         row.vars      = "year",          # year goes down the rows
         stat.type     = "median")
     plot_coverage_needed(by.year.rows, subgroup = "msm", year = 2035)
+}
+
+.remove.duplicate.rows<-function(tbl){
+    # REMOVE Duplicate Location and Population names
+    #    Compute BOTH flags before overwriting either column, or the second
+    #    duplicated() call sees the blanks the first one just wrote.
+    dup <- duplicated(paste(tbl$Population, tbl$MSA, sep = "\r"))
+    tbl$MSA        <- ifelse(dup, "", as.character(tbl$MSA))
+    tbl$Population <- ifelse(dup, "", as.character(tbl$Population))
+    tbl
 }
