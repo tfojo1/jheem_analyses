@@ -56,7 +56,19 @@ register.calibration.info("calib.8.21.stage2.az",
                           ),
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-register.calibration.info("calib.8.21.stage3.az",
+# register.calibration.info("calib.8.21.stage3.az",
+#                           preceding.calibration.codes = 'calib.8.21.stage2.az',
+#                           likelihood.instructions = lik.inst.stage23.2021.V1,
+#                           data.manager = SURVEILLANCE.MANAGER,
+#                           end.year = 2030,
+#                           parameter.names = c(
+#                               SHIELD.FULL.PARAMETERS.PRIOR@var.names
+#                           ),
+#                           n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
+# )
+
+# 9-10-2026
+register.calibration.info("calib.9.10.stage3.az",
                           preceding.calibration.codes = 'calib.8.21.stage2.az',
                           likelihood.instructions = lik.inst.stage23.2021.V1,
                           data.manager = SURVEILLANCE.MANAGER,
@@ -64,7 +76,7 @@ register.calibration.info("calib.8.21.stage3.az",
                           parameter.names = c(
                               SHIELD.FULL.PARAMETERS.PRIOR@var.names
                           ),
-                          n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
+                          n.iter = 250000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
 )
 
 # # 7.30 ----
