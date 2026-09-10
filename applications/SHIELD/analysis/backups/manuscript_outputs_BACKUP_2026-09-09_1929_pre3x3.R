@@ -1053,7 +1053,7 @@ print(as.data.frame(chk3), digits = 4, row.names = FALSE)
 # ROW 3 RIGHT DOES NOT SUM TO ROW 3 LEFT: heterosexual men are omitted from
 # the by-group panels, so MSM + women is less than the total.
 # ****************************************************************************************************
-{
+
 # ---- 0. locate the calculated arrays inside `results` -----------------------
 .has.oc <- function(a, oc) oc %in% dimnames(a)$outcome
 .arr.tot <- Filter(function(a) !("sex" %in% names(dimnames(a))) &&
@@ -1119,73 +1119,50 @@ f5.box <- f5.raw %>%
            population = factor(population, levels = c("Total", "MSM", "Women")))
 
 # ---- 4. panels --------------------------------------------------------------
-# ONE POPULATION PER PANEL, in a 3 x 3 grid: rows are the three metrics,
-# columns are total population / MSM / women.
-#
-# MSM and women are NOT plotted on a shared axis. Their incidence rates differ
-# by one to two orders of magnitude -- MSM run in the thousands per 100,000
-# MSM, women in the tens per 100,000 women -- so a shared axis compresses the
-# female boxes to a line and hides all the between-city variation that the
-# panel exists to show. Each panel therefore carries its own y scale, EXCEPT
-# row 1, where the metric is a percentage and a common 0-100 axis is what makes
-# the three columns comparable.
-#
-# One colour per population, applied consistently down each column. No legend:
-# every panel holds a single series and its title names it.
 F5.COLS <- c(Total = "#4D4D4D", MSM = "#2166AC", Women = "#B2182B")   # CVD-checked
 
-.f5.panel <- function(met, pop, ttl, ylab, log.y = FALSE, fix.pct = FALSE) {
-    d <- f5.box %>% filter(metric == met, population == pop)
+.f5.panel <- function(met, pops, ttl, ylab, log.y = FALSE, legend = FALSE) {
+    d <- f5.box %>% filter(metric == met, population %in% pops) %>%
+         mutate(population = droplevels(population))
     p <- ggplot(d, aes(x = location, ymin = ymin, lower = lower, middle = middle,
-                       upper = upper, ymax = ymax)) +
-        geom_boxplot(stat = "identity", width = 0.6, linewidth = 0.35,
-                     colour = "grey25", fill = unname(F5.COLS[pop])) +
+                       upper = upper, ymax = ymax, fill = population)) +
+        geom_boxplot(stat = "identity", width = 0.62, linewidth = 0.35,
+                     colour = "grey25",
+                     position = position_dodge(width = 0.72)) +
+        scale_fill_manual(values = F5.COLS, name = NULL, drop = TRUE) +
         labs(title = ttl, x = NULL, y = ylab) +
-        theme_minimal(base_size = 9) +
+        theme_minimal(base_size = 10) +
         theme(panel.grid.major.x = element_blank(),
               panel.grid.minor   = element_blank(),
-              axis.text.x        = element_text(angle = 45, hjust = 1, size = 9),
-              plot.title         = element_text(face = "bold", size = 9),
-              legend.position    = "none")
-    if (met == "rel")
-        p <- p + geom_hline(yintercept = 50, linetype = "dashed",
-                            colour = "grey55", linewidth = 0.3)
-    if (fix.pct)     p <- p + scale_y_continuous(limits = c(0, 100),
-                                                 breaks = seq(0, 100, 25))
-    else if (log.y)  p <- p + scale_y_log10(labels = scales::comma)
-    else             p <- p + scale_y_continuous(labels = scales::comma)
+              axis.text.x        = element_text(angle = 45, hjust = 1),
+              plot.title         = element_text(face = "bold", size = 10),
+              legend.position    = if (legend) "top" else "none")
+    if (met == "rel") p <- p + geom_hline(yintercept = 50, linetype = "dashed",
+                                          colour = "grey55", linewidth = 0.3)
+    if (log.y) p <- p + scale_y_log10(labels = scales::comma)
+    else       p <- p + scale_y_continuous(labels = scales::comma)
     p
 }
 
-.yr <- EVAL.YEAR
-# row 1 -- relative reduction, shared 0-100 axis so the columns are comparable
-p5.A <- .f5.panel("rel","Total","A. Relative reduction, total population",
-                  paste0("Incidence averted by ", .yr, " (%)"), fix.pct = TRUE)
-p5.B <- .f5.panel("rel","MSM",  "B. Relative reduction, MSM",
-                  paste0("Incidence averted by ", .yr, " (%)"), fix.pct = TRUE)
-p5.C <- .f5.panel("rel","Women","C. Relative reduction, women",
-                  paste0("Incidence averted by ", .yr, " (%)"), fix.pct = TRUE)
-# row 2 -- absolute reduction, INDEPENDENT y scales (see note above)
-p5.D <- .f5.panel("abs","Total","D. Absolute reduction, total population",
-                  "Averted per 100,000 population")
-p5.E <- .f5.panel("abs","MSM",  "E. Absolute reduction, MSM",
-                  "Averted per 100,000 MSM")
-p5.F <- .f5.panel("abs","Women","F. Absolute reduction, women",
-                  "Averted per 100,000 women")
-# row 3 -- cumulative counts, log scale (they span more than an order of magnitude)
-p5.G <- .f5.panel("cum","Total","G. Cumulative infections averted, total population",
-                  paste0("Infections averted, 2022-", .yr), log.y = F)
-p5.H <- .f5.panel("cum","MSM",  "H. Cumulative infections averted, MSM",
-                  paste0("Infections averted, 2022-", .yr), log.y = F)
-p5.I <- .f5.panel("cum","Women","I. Cumulative infections averted, women",
-                  paste0("Infections averted, 2022-", .yr), log.y = F)
+p5.A <- .f5.panel("rel", "Total", "A. Relative reduction, total population",
+                  paste0("Incidence averted by ", EVAL.YEAR, " (%)"))
+p5.B <- .f5.panel("rel", c("MSM","Women"), "B. Relative reduction, by group",
+                  paste0("Incidence averted by ", EVAL.YEAR, " (%)"), legend = TRUE)
+p5.C <- .f5.panel("abs", "Total", "C. Absolute reduction, total population",
+                  "Incidence averted per 100,000")
+p5.D <- .f5.panel("abs", c("MSM","Women"), "D. Absolute reduction, by group",
+                  "Incidence averted per 100,000 of that group")
+p5.E <- .f5.panel("cum", "Total", "E. Cumulative infections averted, total",
+                  paste0("Infections averted, 2022-", EVAL.YEAR), log.y = TRUE)
+p5.F <- .f5.panel("cum", c("MSM","Women"), "F. Cumulative infections averted, by group",
+                  paste0("Infections averted, 2022-", EVAL.YEAR), log.y = TRUE)
 
-fig.impact <- (p5.A | p5.B | p5.C) /
-              (p5.D | p5.E | p5.F) /
-              (p5.G | p5.H | p5.I); fig.impact
+fig.impact <- (p5.A | p5.B) / (p5.C | p5.D) / (p5.E | p5.F) +
+    plot_layout(guides = "collect") &
+    theme(legend.position = "top"); fig.impact
 
 ggsave(file.path(FIG.DIR, "fig5_impact_boxplots.png"), fig.impact,
-       width = 14, height = 12, dpi = 300, bg = "white")
+       width = 12, height = 13, dpi = 300, bg = "white")
 
 cat("\n=== FIGURE 5: impact at", CCRIT.MS, "in", EVAL.YEAR, "===\n")
 cat("    Box = IQR, midline = median, whiskers = 2.5th-97.5th percentile\n")
@@ -1194,4 +1171,3 @@ cat("    (the 95% credible interval), across", length(unique(f5.raw$sim)),
 cat("    No outliers drawn: every simulation is a valid draw.\n")
 cat("    City order (all six panels), by total-population relative reduction:\n      ",
     paste(F5.ORDER, collapse = " > "), "\n")
-}

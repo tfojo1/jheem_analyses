@@ -805,7 +805,7 @@ register.model.quantity(SHIELD.SPECIFICATION,
 )
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sexual.susceptibility',
-                               applies.to = list(sex="msm"),
+                               applies.to = list(sex="msm", age= SEXUAL.ACTIVITY.AGES),
                                value = expression((1 - doxy.coverage) + doxy.coverage * (1-doxy.effectiveness))
 )
 
@@ -2437,12 +2437,12 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
                          value.to.integrate = "point.population",
                          multiply.by = "doxy.uptake.times.eligibility",
                          keep.dimensions = c("location", "age", "race", "sex"),
-                         subset.dimension.values = list(sex = "msm")
+                         subset.dimension.values = list(sex = "msm", age= SEXUAL.ACTIVITY.AGES)
                          )  
 
 track.integrated.outcome(SHIELD.SPECIFICATION,
                          name = "doxy.coverage",
-                         outcome.metadata = create.outcome.metadata(display.name = 'Doxy-PEP Uptake',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Doxy-PEP Coverage',
                                                                     description = 'Number of Eligible MSM Using Doxy-PEP in a Year',
                                                                     scale = 'non.negative.number',
                                                                     axis.name = 'Persons',
@@ -2451,7 +2451,7 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
                          value.to.integrate = "point.population",
                          multiply.by = "doxy.coverage.times.eligibility",
                          keep.dimensions = c("location", "age", "race", "sex"),
-                         subset.dimension.values = list(sex = "msm")
+                         subset.dimension.values = list(sex = "msm", age= SEXUAL.ACTIVITY.AGES)
                          ) 
 
 # track.cumulative.outcome(SHIELD.SPECIFICATION,
