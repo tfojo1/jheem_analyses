@@ -68,7 +68,7 @@ register.calibration.info("calib.8.21.stage2.az",
 # )
 
 # 9-10-2026
-register.calibration.info("calib.9.10.stage3.az",
+register.calibration.info("calib.9.11.stage3.az",
                           preceding.calibration.codes = 'calib.8.21.stage2.az',
                           likelihood.instructions = lik.inst.stage23.2021.V1,
                           data.manager = SURVEILLANCE.MANAGER,
@@ -76,7 +76,7 @@ register.calibration.info("calib.9.10.stage3.az",
                           parameter.names = c(
                               SHIELD.FULL.PARAMETERS.PRIOR@var.names
                           ),
-                          n.iter = 250000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
+                          n.iter = 250000, thin = 50, n.burn=0, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
 )
 
 # # 7.30 ----
