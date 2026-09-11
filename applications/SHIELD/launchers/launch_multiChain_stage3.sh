@@ -76,6 +76,12 @@ CALIBRATION_CODES=(
 N_CHAINS=4
 SCRIPT="$SCRIPT_DIR/shield_calib_setup_and_run_modular.R"
 
+# ── preflight ──────────────────────────────────────────────────────────────────
+if [[ ! -f "$SCRIPT" ]]; then
+    echo "[$(date '+%F %T')] Error: R script not found at $SCRIPT" >&2
+    exit 1
+fi
+
 # Peak core usage = MAX_CITIES x N_CHAINS (e.g. 20/4 = 5)
 # each city would require four cores to run 4 parallel chains and we limit total cores to 20 to leave some cores open for Rscript work
 MAX_CITIES=5 

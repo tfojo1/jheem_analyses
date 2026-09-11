@@ -2,65 +2,70 @@
 # SHIELD / Doxy-PEP -- MANUSCRIPT OUTPUTS
 # ****************************************************************************************************
 #
-# Every manuscript table and figure is built HERE, in this file, in the order
-# below. Run CONFIGURATION first, then SHARED INPUTS, then any section on its
-# own -- the sections are independent except for the dependency noted below.
+# MANIFEST -- every table and figure in the paper, and where it is built.
 #
-#   BUILD ORDER          R OBJECT       WRITES
-#   Table 1              final          tables/1-notInt.csv
-#   Figure 3             fig.heatmap    figures/fig3_heatmaps.png
-#   Figure 3a (suppl.)   fig.critcov    figures/fig3a_crit_coverage.png
-#   Figure 4             fig.impact     figures/fig5_impact_boxplots.png    <- see NAMING
-#   Table S1             final2         tables/S1-impact-cov<c>-<yr>.csv
-#   Table S2             final4         tables/S2-spillover-cov<c>.csv      [builds `table4`]
-#   Table S2a            final5         tables/5-spillover-associations-cov<c>.csv
-#   Figure 5             fig.spillover  figures/fig4_spillover_drivers.png  <- see NAMING
-#   Check 1              --             console only
+# Every manuscript table and figure is built HERE, in this file, in order.
 #
-# NOT BUILT HERE
-#   Figure 1   model schematic, drawn separately
-#   Figure 2   baseline trends -- see the calibration / pretty-plot script
-#   Table 3    doxycycline efficiency (person-years per infection averted), and
-#              the two reconciliation checks that go with it -- see
-#              table_efficiency.R. `table3` does NOT exist in this file; do not
-#              add checks here that assume it does.
+# OBJECT NAMES DESCRIBE CONTENT, NOT FIGURE NUMBER. Manuscript numbering
+# changes as figures are added or reordered; the code should not have to. The
+# numbers below are the CURRENT manuscript numbers and will drift -- the
+# object names and filenames will not.
 #
-# NAMING. Object and file names describe CONTENT, not manuscript number, because
-# the manuscript numbering drifts and the code should not have to follow it. Two
-# names are currently one ahead of their section: the FIGURE 4 section writes
-# fig5_impact_boxplots.png using p5.* panel objects, and the FIGURE 5 section
-# writes fig4_spillover_drivers.png. The SECTION HEADINGS are the manuscript
-# truth; the filenames are historical. Same for Table S2a, which still writes
-# 5-spillover-associations-*.csv.
+#   MS #   R OBJECT        CONTENT                        FILE WRITTEN
+#   Tab 1  final           Baseline epidemiology, no int  1-notInt.csv
+#   Tab 2  final2          Impact at one coverage         2-impact-cov<c>-<yr>.csv
+#   Tab 3  final3          Efficiency: person-years of    3-efficiency.csv
+#                          doxycycline per infection
+#                          averted; Total / MSM / female
+#   Tab 4  final4          Spillover + candidate drivers  4-spillover-cov<c>.csv
+#   Tab 5  final5          Driver associations            5-spillover-associations-cov<c>.csv
+#   Fig 1  (not built here -- model schematic, drawn separately)
+#   Fig 2  fig.baseline    Baseline trends, 4 panels      fig2_noint.png
+#   Fig 3  fig.heatmap     Impact heatmaps, 2x2           fig3_heatmaps.png
+#   ---    fig.critcov     Critical coverage, 2x2         fig3a_crit_coverage.png
+#                          SUPPLEMENTARY -- related to Figure 3 but NOT a
+#                          numbered manuscript figure. Runs the full 10-100%
+#                          coverage ladder, where Figure 3 stops at 50%, so it
+#                          is the source for any claim about coverage above
+#                          50% (e.g. whether a city reaches a target at all).
+#   Fig 4  fig.spillover   Spillover vs four drivers      fig4_spillover_drivers.png
 #
-# DEPENDENCY. Table S2 builds `table4` (and `t4.share`, `t4.impact`, `av`).
-# Table S2a, Figure 5 and Check 1 all read those, so Table S2 must run first.
-# Figures 3 and 3a both read the SHARED INPUTS block. Nothing else is coupled.
+# BASELINE FIGURE PANEL ORDER is deliberate and not alphabetical:
+#   (p.base.A | p.base.B) / (p.base.D | p.base.C), so the panel TAGGED C is the
+#   P&S diagnosis rate and the panel TAGGED D is the MSM share. Cite them by
+#   TAG, not by object name -- p.base.C is tagged D and vice versa.
 #
-# CONSOLE vs FILE. Each section writes its table to TABLE.DIR and prints a
+# CONSOLE vs FILE: each section writes its table to TABLE.DIR and prints a
 # definition block to the console. The console text is the audit trail -- what
-# each column means, which comparator it uses, what is deliberately absent. It
-# is not duplicated in the CSV, so read it when regenerating.
+# each column means, which comparator it uses, what is deliberately absent.
+# It is not duplicated in the CSV, so read it when regenerating.
 #
-# PREREQUISITES. `results` (the four arrays), SHIELD.TEN.MSAS, and the helper
-# functions sourced in the guarded block below. TABLE.DIR / FIG.DIR are set
-# there. Colours come from SHIELD FIGURE PALETTE in
-# intervention_helper_functions.R -- not from this file.
+# PREREQUISITES: `results` (the four arrays), SHIELD.TEN.MSAS, and the helper
+# functions sourced below. TABLE.DIR / FIG.DIR are set in the guarded block.
 #
-# ----------------------------------------------------------------------------
-# TWO METHOD CHOICES THAT DIFFER FROM THE EXPLORATORY CODE IN doxy_figures.R
+# ----
+# WHAT CHANGED FROM THE EXPLORATORY VERSION IN doxy_figures.R
 #
-#   1. HETEROSEXUAL GROWTH IS COMPUTED FROM COUNTS, NOT FROM A SUM OF RATES.
-#      rate_incidence_per_pop for heterosexual_male and for female have
-#      DIFFERENT denominators, so their sum is not the heterosexual incidence
-#      rate, and its year-on-year ratio is not the heterosexual growth rate. On
-#      a worked example the error was ~6%, and it fed straight into `divergence`
-#      and therefore into the driver correlation. Summing incident COUNTS is
-#      well defined. Table S2a prints the old and new correlations side by side.
+#   1. HETEROSEXUAL GROWTH IS NOW COMPUTED FROM COUNTS, NOT FROM A SUM OF
+#      RATES. The exploratory code summed rate_incidence_per_pop across
+#      heterosexual_male and female. Those two rates have DIFFERENT
+#      denominators (male population, female population), so their sum is not
+#      the heterosexual incidence rate and its year-on-year ratio is not the
+#      heterosexual growth rate. On a worked example the error was ~6%, and it
+#      fed straight into `divergence` and therefore into the driver
+#      correlation. Summing incident COUNTS is well defined, and the count
+#      growth ratio is what the divergence argument actually needs.
+#      Section 4 prints the old and new correlations side by side.
 #
-#   2. PERCENTAGES ARE PULLED AT 3 DECIMALS, not rounded to whole numbers. The
-#      spillover ratio divides two percentages and get_stats() rounds before
-#      dividing; at digits = 0 a ratio like 8/29 carried avoidable rounding error.
+#   2. THE DECOMPOSITION CHECK IS LIVE AGAIN. It was commented out with a note
+#      that it passed. A check that does not run is not a check; it costs
+#      nothing to re-run and it is what licenses the whole decomposition
+#      argument.
+#
+#   3. PERCENTAGES ARE PULLED AT 3 DECIMALS, not rounded to whole numbers.
+#      The spillover ratio divides two percentages, and get_stats() rounds
+#      before dividing; at digits = 0 a ratio like 8/29 carried avoidable
+#      rounding error.
 # ****************************************************************************************************
 # CONFIGURATION ------------------------------------------------------
 if(1==2){
@@ -90,7 +95,11 @@ if(1==2){
 }
 {
   CCRIT.MS   <- "doxy.cov.30"                        # policy coverage level
-  EVAL.YEAR  <- "2030"                               # policy evaluation horizon
+  # Table 3 runs at EVAL.YEAR only. To add a second horizon, pass
+  # c(EVAL.YEAR, "2035") to the `years` argument in the Table 3 block and
+  # to .ref in CHECK 2 -- both must move together or the join in CHECK 2
+  # silently drops rows.
+  EVAL.YEAR  <- "2030"                               # Table 4 / Figure 4 year
   BASE.YEAR  <- "2022"
   COVERAGE.LEVELS <- paste0("doxy.cov.", seq(10, 50, 10))
   .ccrit     <- as.integer(sub("doxy\\.cov\\.", "", CCRIT.MS))
@@ -102,71 +111,16 @@ if(1==2){
       ggrepel::geom_text_repel(aes(label = location), size = 3.2)
     else geom_text(aes(label = location), size = 3.2, hjust = -0.15, vjust = -0.4)
   }
-
-  # ---- FIGURE PALETTE ------------------------------------------------------
-  # Defined once for the whole project in intervention_helper_functions.R, under
-  # "SHIELD FIGURE PALETTE": SHIELD.PAL plus the PAL.* aliases (WOMEN / MSM /
-  # TOTAL / TINT / BAR / POINT / FIT / OFF), and SHIELD.HEAT.COLS +
-  # SHIELD.HEAT.SHADE for the ordered 3-band heat scale. The plotting helpers
-  # already default to those, so the figures below need no colour arguments.
-  #
-  # To try a different heat palette for THIS run only, uncomment one line -- the
-  # defaults are resolved at call time, so this wins over the helper:
-  # SHIELD.HEAT.COLS <- SHIELD.HEAT.PALETTES[["rdylbu"]]   # or "teal" / "legacy"
-
-  HEAT.MIDPOINT <- 49      # policy target; also the upper break between bands
-  HEAT.LABEL    <- NULL    # NULL = per-cell contrast, which shaded bands need
-
   MSAS <- names(SHIELD.TEN.MSAS)
   PRINT.VERSION = T #
 }
-
 # ****************************************************************************************************
-# SHARED INPUTS -- the coverage x location surfaces used by Figures 3 and 3a ----
-# ****************************************************************************************************
-# WHAT   Median % incidence reduction for every MSA x coverage level in
-#        EVAL.YEAR, under the two comparators the paper uses throughout:
-#          tbl.cov.vs2022     vs the 2022 baseline          (pct_incidence_reduction_vs_baseline)
-#          tbl.cov.vs.noint   vs no intervention, same year (pct_incidence_averted)
-# WHY    Figures 3 and 3a plot the SAME surface two ways -- Figure 3 reads it as
-#        a dose-response, Figure 3a searches it for a threshold -- so it is
-#        built once here rather than twice under two sets of object names.
-# SCOPE  COVERAGE.LEVELS only, currently 10-50%. See the note in FIGURE 3a about
-#        what that does and does not let the threshold search conclude.
-{
-  tbl.cov.vs2022 <- make_multi_location_table(
-    data          = results,
-    locations     = MSAS,
-    outcomes      = c("pct_incidence_reduction_vs_baseline"),
-    interventions = COVERAGE.LEVELS,
-    years         = EVAL.YEAR,
-    stat.type     = "median",
-    save          = F
-  )
-  tbl.cov.vs.noint <- make_multi_location_table(
-    data          = results,
-    locations     = MSAS,
-    outcomes      = c("pct_incidence_averted"),
-    interventions = COVERAGE.LEVELS,
-    years         = EVAL.YEAR,
-    stat.type     = "median",
-    save          = F
-  )
-}
 
 
-# ****************************************************************************************************
-# TABLE 1 -- BASELINE EPIDEMIOLOGY, NO INTERVENTION ----
-# ****************************************************************************************************
-# WHAT   One row per MSA describing the epidemic BEFORE Doxy-PEP: incidence rate,
-#        fold-change 2022 -> 2030, total diagnosis rate, P&S diagnoses per
-#        incident infection, and the MSM share of incidence.
-# INPUT  results, MSAS; `noint` only; 2022 and 2030; median with 95% CrI.
-# OUTPUT tables/1-notInt.csv  (object `final`)
-# NOTE   tbl1 is the Total stratum; tbl2 supplies the MSM share and is joined on
-#        location + stat, so both must be pulled at the SAME stat.type or the
-#        join silently drops rows.
 
+# ************************************************************************************************
+# TABLE 1 -- NO INTERVENTION DATA ----
+# ************************************************************************************************
 {
   tbl1 = make_multi_location_table(
     data = results, locations = MSAS,
@@ -216,34 +170,40 @@ if(1==2){
 }
 
 # ****************************************************************************************************
-# FIGURE 2 <NOT BUILT HERE -- see the calibration / pretty-plot script> ----
-# FIGURE 3 -- IMPACT HEATMAPS ----
+# FIGURE 2 <NOT HERE; See Calibration/Pretty plot> ----
+# FIGURE 3 -- HEATMAPS ----
 # ****************************************************************************************************
-# WHAT   MSA x coverage heatmaps of the median % incidence reduction in
-#        EVAL.YEAR, 2 x 2:
-#          A  MSM   vs the 2022 baseline        B  Total vs the 2022 baseline
-#          C  MSM   vs no intervention, 2030    D  Total vs no intervention, 2030
-# INPUT  tbl.cov.vs2022 and tbl.cov.vs.noint from SHARED INPUTS above.
-# OUTPUT figures/fig3_heatmaps.png  (object `fig.heatmap`)
-# COLOUR SHIELD.HEAT.COLS / SHIELD.HEAT.SHADE, from the helper's SHIELD
-#        FIGURE PALETTE; HEAT.MIDPOINT / HEAT.LABEL from CONFIGURATION here.
-# NOTE   fixed limits c(-100, 100) plus squish.marks = "always" keep the legend
-#        byte-identical on all four panels, which is what lets patchwork's
-#        guides = "collect" merge them into one bar instead of four.
-
 {
-
+  ### Relative to 2022 
+  tbl.rel.2022 = make_multi_location_table(
+    data          = results,
+    locations     = MSAS,
+    outcomes      = c("pct_incidence_reduction_vs_baseline"),
+    interventions = COVERAGE.LEVELS,
+    years         = EVAL.YEAR,
+    stat.type     = "median",
+    save          = F
+  );
+  ### Relative to 2030 with no intervention  
+  tbl.rel.2030 = make_multi_location_table(
+    data          = results,
+    locations     = MSAS,
+    outcomes      = c("pct_incidence_averted"),
+    interventions = COVERAGE.LEVELS,
+    years         = EVAL.YEAR,
+    stat.type     = "median",
+    save          = F
+  );
   # helper code to build the heatmap from each table
   .mk.heat <- function(tbl, strat, ttl){
     plot_coverage_heatmap(
       tbl, 
       locations = MSAS,
-      subgroup     = strat,
-      midpoint     = HEAT.MIDPOINT,
+      subgroup = strat, midpoint = 49,
       fill.style   = "banded",
       limits       = c(-100, 100),
       order.rows   = "alpha",
-      label.colour = HEAT.LABEL,
+      label.colour = "black",
       squish.marks = "always",        # <- identical labels on every panel
       title        = ttl,
       fill.lab     = "%Reduction In Incidence",
@@ -251,10 +211,10 @@ if(1==2){
       fixed.aspect = FALSE)
   }
   
-  p.heat.A <- .mk.heat(tbl.cov.vs2022, "msm",   "A: Projected Reductions among MSM \n(Incidence in 2030 vs. 2022)")
-  p.heat.B <- .mk.heat(tbl.cov.vs2022, "Total", "B: Projected Reductions in Total Population \n(Incidence in 2030 vs. 2022)")
-  p.heat.C <- .mk.heat(tbl.cov.vs.noint,          "msm",   "C: Projected Reductions among MSM \n(Incidence in 2030, with DoxyPEP vs. No Intervention)")
-  p.heat.D <- .mk.heat(tbl.cov.vs.noint,          "Total", "D: Projected Reductions in Total Population \n(Incidence 2030, with DoxyPEP vs. No Intervention)")
+  p.heat.A <- .mk.heat(tbl.rel.2022, "msm",   "A: Projected Reductions among MSM \n(Incidence in 2030 vs. 2022)")
+  p.heat.B <- .mk.heat(tbl.rel.2022, "Total", "B: Projected Reductions in Total Population \n(Incidence in 2030 vs. 2022)")
+  p.heat.C <- .mk.heat(tbl.rel.2030,          "msm",   "C: Projected Reductions among MSM \n(Incidence in 2030, with DoxyPEP vs. No Intervention)")
+  p.heat.D <- .mk.heat(tbl.rel.2030,          "Total", "D: Projected Reductions in Total Population \n(Incidence 2030, with DoxyPEP vs. No Intervention)")
   
   .no.y.heat <- theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
   .no.x.heat <- theme(axis.title.x = element_blank(), axis.text.x = element_blank())
@@ -267,47 +227,67 @@ if(1==2){
   ggsave(file.path(FIG.DIR, "fig3_heatmaps.png"), fig.heatmap,
          width = 10, height = 10, dpi = 300, bg = "white")
 }
-
 # ****************************************************************************************************
-# FIGURE 3a -- CRITICAL COVERAGE (SUPPLEMENTARY) ----
+# FIGURE 3a -- DOXY CRITICAL COVERAGE ----
 # ****************************************************************************************************
-# WHAT   The coverage each MSA needs to reach a 50% reduction. Same 2 x 2 layout
-#        and reading order as Figure 3, so the two can sit side by side:
-#          A  MSM   vs the 2022 baseline        B  Total vs the 2022 baseline
-#          C  MSM   vs no intervention, 2030    D  Total vs no intervention, 2030
-# INPUT  tbl.cov.vs2022 and tbl.cov.vs.noint from SHARED INPUTS above.
-# OUTPUT figures/fig3a_crit_coverage.png  (object `fig.critcov`)
-#        Supplementary -- related to Figure 3, but not a numbered figure.
+# Same 2x2 layout and the same reading order as Figure 2, so the two can sit
+# side by side:
 #
-# Figure 3 asks how much reduction each coverage level buys. This figure reads
-# the same surface the other way round: how much coverage is needed to cross 50%.
+#   A: MSM   vs the 2022 baseline          B: Total vs the 2022 baseline
+#   C: MSM   vs no intervention in 2030    D: Total vs no intervention in 2030
 #
-# THE LADDER STOPS AT 50%. "not reached" therefore means "not reached at or
-# below 50% coverage", and CANNOT distinguish "needs 70%" from "never gets
-# there". To answer anything about coverage above 50%, widen COVERAGE.LEVELS to
-# paste0("doxy.cov.", seq(10, 100, 10)) and re-run SHARED INPUTS -- both figures
-# then use the wider ladder.
+# Figure 2 asks how much reduction each coverage level buys. This figure reads
+# the same surface the other way: how much coverage is needed to cross 50%.
 #
-# ROWS ARE IN THE COMMON CITY ORDER, not ranked by coverage needed. Ranking is
-# right for a standalone single panel, where the ranking IS the message; inside
-# a 2 x 2 it lets cities move between panels and destroys the comparison the
-# figure exists to make. For a ranked single panel, call plot_coverage_needed()
-# directly with order.by = "value" and a filename.
+# TWO DELIBERATE DIFFERENCES FROM FIGURE 2:
 #
-# EXPECT MANY "not reached" BARS IN A AND B. That is the finding, not a failure.
-# Because the untreated epidemic grows, a given coverage can avert most of the
-# infections projected for 2030 (C and D) while incidence still sits above its
-# 2022 level (A and B). The gap between the top and bottom rows is the whole
-# point of showing both comparators.
+#  1. The coverage ladder runs to 100%, not 50%. Figure 2 displays a
+#     dose-response across the policy-relevant range; this figure SEARCHES for
+#     a threshold, and a ladder stopping at 50% cannot tell "needs 70%" apart
+#     from "never gets there" -- both would print as "not reached", which
+#     would understate what the model can actually answer.
 #
-# COUNT-VS-RATE CAVEAT, top row: pct_incidence_reduction_vs_baseline is computed
-# on incident COUNTS, so "50% reduction vs 2022" means half the INFECTIONS, not
-# half the incidence RATE. With a growing population those differ, and the count
-# target is the harder of the two.
-
+#  2. Rows are in the common city order, not ranked by coverage needed.
+#     Ranking is right for a standalone single panel, where the ranking IS the
+#     message; in a 2x2 it lets cities move between panels and destroys the
+#     comparison the figure exists to make. For a ranked single panel, call
+#     plot_coverage_needed() directly with order.by = "value" and a filename.
+#
+# EXPECT MANY "not reached" BARS IN A AND B. That is the finding, not a
+# failure. Because the untreated epidemic grows, a given coverage can avert
+# most of the infections projected for 2030 (C and D) while incidence still
+# sits above its 2022 level (A and B). The gap between the top and bottom rows
+# is the whole point of showing both comparators.
+#
+# NOTE the top row inherits the count-vs-rate caveat: 
+# pct_incidence_reduction_vs_baseline is computed on incident COUNTS, so "50%
+# reduction vs 2022" here means half the infections, not half the incidence
+# RATE. With a growing population those differ, and the count target is the
+# harder of the two.
 {
-
-  # helper, mirroring .mk.heat in the FIGURE 3 block above.
+  
+  ### Relative to 2022
+  crit.rel.2022 <- make_multi_location_table(
+    data          = results,
+    locations     = MSAS,
+    outcomes      = c("pct_incidence_reduction_vs_baseline"),
+    interventions = COVERAGE.LEVELS,
+    years         = EVAL.YEAR,
+    stat.type     = "median",
+    save          = F
+  )
+  ### Relative to no intervention in the same year
+  crit.rel.noint <- make_multi_location_table(
+    data          = results,
+    locations     = MSAS,
+    outcomes      = c("pct_incidence_averted"),
+    interventions = COVERAGE.LEVELS,
+    years         = EVAL.YEAR,
+    stat.type     = "median",
+    save          = F
+  )
+  
+  # helper, mirroring `mk` in the Figure 2 block above.
   # filename = NULL so nothing is written per-panel; the composed figure is
   # saved once at the end.
   .mk.crit <- function(tbl, strat, ttl)
@@ -320,13 +300,13 @@ if(1==2){
       title     = ttl,
       filename  = NULL)
   
-  p.crit.A <- .mk.crit(tbl.cov.vs2022,  "msm",   "A: MSM (vs. 2022 baseline)")
-  p.crit.B <- .mk.crit(tbl.cov.vs2022,  "Total", "B: Total Population (vs. 2022 baseline)")
-  p.crit.C <- .mk.crit(tbl.cov.vs.noint, "msm",   paste0("C: MSM (vs. ", EVAL.YEAR, " No Intervention)"))
-  p.crit.D <- .mk.crit(tbl.cov.vs.noint, "Total", paste0("D: Total Population (vs. ", EVAL.YEAR, " No Intervention)"))
+  p.crit.A <- .mk.crit(crit.rel.2022,  "msm",   "A: MSM (vs. 2022 baseline)")
+  p.crit.B <- .mk.crit(crit.rel.2022,  "Total", "B: Total Population (vs. 2022 baseline)")
+  p.crit.C <- .mk.crit(crit.rel.noint, "msm",   paste0("C: MSM (vs. ", EVAL.YEAR, " No Intervention)"))
+  p.crit.D <- .mk.crit(crit.rel.noint, "Total", paste0("D: Total Population (vs. ", EVAL.YEAR, " No Intervention)"))
   
-  # same two theme strippers as FIGURE 3; redefined here so this block runs
-  # standalone rather than depending on the FIGURE 3 block having been sourced
+  # same two theme strippers as Figure 2; redefined here so this block runs
+  # standalone rather than depending on the Figure 2 block having been sourced
   .no.y.crit <- theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
   .no.x.crit <- theme(axis.title.x = element_blank(), axis.text.x = element_blank())
   
@@ -336,25 +316,20 @@ if(1==2){
   ggsave(file.path(FIG.DIR, "fig3a_crit_coverage.png"), fig.critcov,
          width = 12, height = 9, dpi = 300, bg = "white")
 }
-
 # ****************************************************************************************************
 # FIGURE 4 -- DOXY-PEP IMPACT AT ONE COVERAGE LEVEL ----
 # ****************************************************************************************************
-# WHAT   Nine box plots in a 3 x 3 grid, all at CCRIT.MS in EVAL.YEAR. Rows are
-#        the three impact metrics, columns are the three populations:
-#
-#                          Total   MSM   Women
-#          relative          A      B      C     % incidence averted
-#          absolute          D      E      F     averted per 100,000 (own denominator)
-#          cumulative        G      H      I     infections averted, 2022-EVAL.YEAR
-#
-# INPUT  the CALCULATED arrays inside `results`, read at simulation level (see
-#        WHY SIM-LEVEL below). Independent of every other section.
-# OUTPUT figures/fig5_impact_boxplots.png  (object `fig.impact`; the filename
-#        keeps the old numbering -- see NAMING in the file header).
-# COLOUR PAL.TOTAL / PAL.MSM / PAL.WOMEN, from the SHIELD FIGURE PALETTE.
-
 {
+  # Six panels, three metrics x two population groupings, all at CCRIT.MS in
+  # EVAL.YEAR:
+  #
+  #              LEFT: total population        RIGHT: MSM and women
+  #   Row 1   A  relative reduction (%)     B  same, by group
+  #   Row 2   C  absolute reduction in      D  same, by group
+  #              incidence rate per 100,000
+  #   Row 3   E  cumulative infections      F  same, by group
+  #              averted, 2022-EVAL.YEAR
+  #
   # WHY THIS NEEDS SIM-LEVEL VALUES. A box plot is a summary of a DISTRIBUTION.
   # make_multi_location_table() returns a median and a 2.5/97.5 pair -- three
   # numbers, which cannot make a box. So this block reads the posterior values
@@ -374,8 +349,8 @@ if(1==2){
   # are directly comparable as risk differences even though the denominators
   # differ.
   #
-  # COLUMN 1 IS NOT THE SUM OF COLUMNS 2 AND 3: heterosexual men have no panel
-  # of their own, so MSM + women falls short of the total in every row.
+  # ROW 3 RIGHT DOES NOT SUM TO ROW 3 LEFT: heterosexual men are omitted from
+  # the by-group panels, so MSM + women is less than the total.
   # ****************************************************************************************************
   {
     # ---- 0. locate the calculated arrays inside `results` -----------------------
@@ -385,7 +360,7 @@ if(1==2){
     .arr.sex <- Filter(function(a)  ("sex" %in% names(dimnames(a))) &&
                          .has.oc(a, "pct_incidence_averted"), results)
     if (!length(.arr.tot) || !length(.arr.sex))
-      stop("Figure 4 (impact) needs both the total-level and sex-level CALCULATED arrays ",
+      stop("Figure 5 needs both the total-level and sex-level CALCULATED arrays ",
            "in `results`. Found total: ", length(.arr.tot),
            ", sex: ", length(.arr.sex), ".")
     .arr.tot <- .arr.tot[[1]]; .arr.sex <- .arr.sex[[1]]
@@ -408,7 +383,7 @@ if(1==2){
       names(df)[1:2] <- c("location", "sim")
       df$location <- unname(.f5.lab[df$location])   # code -> city name
       if (anyNA(df$location))
-        stop("Figure 4 (impact): an MSA code in the array had no matching city label. ",
+        stop("Figure 5: an MSA code in the array had no matching city label. ",
              "Check that MSAS and the array's location dimnames agree.")
       df
     }
@@ -456,14 +431,14 @@ if(1==2){
     #
     # One colour per population, applied consistently down each column. No legend:
     # every panel holds a single series and its title names it.
-    F5.COLS <- c(Total = PAL.TOTAL, MSM = PAL.MSM, Women = PAL.WOMEN)  # SHIELD FIGURE PALETTE
+    F5.COLS <- c(Total = "#4D4D4D", MSM = "#2166AC", Women = "#B2182B")   # CVD-checked
     
     .f5.panel <- function(met, pop, ttl, ylab, log.y = FALSE, fix.pct = FALSE) {
       d <- f5.box %>% filter(metric == met, population == pop)
       p <- ggplot(d, aes(x = location, ymin = ymin, lower = lower, middle = middle,
                          upper = upper, ymax = ymax)) +
         geom_boxplot(stat = "identity", width = 0.6, linewidth = 0.35,
-                     colour = PAL.LINE, fill = unname(F5.COLS[pop])) +
+                     colour = "grey25", fill = unname(F5.COLS[pop])) +
         labs(title = ttl, x = NULL, y = ylab) +
         theme_minimal(base_size = 9) +
         theme(panel.grid.major.x = element_blank(),
@@ -473,7 +448,7 @@ if(1==2){
               legend.position    = "none")
       if (met == "rel")
         p <- p + geom_hline(yintercept = 50, linetype = "dashed",
-                            colour = PAL.FIT, linewidth = 0.3)
+                            colour = "grey55", linewidth = 0.3)
       if (fix.pct)     p <- p + scale_y_continuous(limits = c(0, 100),
                                                    breaks = seq(0, 100, 25))
       else if (log.y)  p <- p + scale_y_log10(labels = scales::comma)
@@ -496,8 +471,7 @@ if(1==2){
                       "Averted per 100,000 MSM")
     p5.F <- .f5.panel("abs","Women","F. Absolute reduction, women",
                       "Averted per 100,000 women")
-    # row 3 -- cumulative counts on a LINEAR scale (log.y = FALSE below). Switch
-    #          log.y = TRUE if the largest MSAs compress the smaller ones flat.
+    # row 3 -- cumulative counts, log scale (they span more than an order of magnitude)
     p5.G <- .f5.panel("cum","Total","G. Cumulative infections averted, total population",
                       paste0("Infections averted, 2022-", .yr), log.y = F)
     p5.H <- .f5.panel("cum","MSM",  "H. Cumulative infections averted, MSM",
@@ -512,29 +486,83 @@ if(1==2){
     ggsave(file.path(FIG.DIR, "fig5_impact_boxplots.png"), fig.impact,
            width = 14, height = 12, dpi = 300, bg = "white")
     
-    cat("\n=== FIGURE 4: impact at", CCRIT.MS, "in", EVAL.YEAR, "===\n")
+    cat("\n=== FIGURE 5: impact at", CCRIT.MS, "in", EVAL.YEAR, "===\n")
     cat("    Box = IQR, midline = median, whiskers = 2.5th-97.5th percentile\n")
     cat("    (the 95% credible interval), across", length(unique(f5.raw$sim)),
         "posterior simulations.\n")
     cat("    No outliers drawn: every simulation is a valid draw.\n")
-    cat("    City order (all nine panels), by total-population relative reduction:\n      ",
+    cat("    City order (all six panels), by total-population relative reduction:\n      ",
         paste(F5.ORDER, collapse = " > "), "\n")
   }
 }
+# FIGURE 5 -- SPILLOVER AGAINST FOUR CANDIDATE DRIVERS ----
+# ****************************************************************************************************
+{
+  .panel <- function(xvar, xlab, ttl) {
+    d <- table4 %>% select(location, spillover, x = all_of(xvar)) %>%
+      filter(!is.na(x), !is.na(spillover))
+    rho <- cor(d$x, d$spillover, method = "spearman")
+    ggplot(d, aes(x = x, y = spillover)) +
+      geom_smooth(method = "lm", formula = y ~ x, se = FALSE,
+                  linetype = "dashed", colour = "grey50", linewidth = 0.6) +
+      geom_point(size = 3, colour = "#2166AC") +
+      .label_layer() +
+      scale_x_continuous(expand = expansion(mult = c(0.10, 0.20))) +
+      labs(x = xlab, y = "Spillover Ratio", #(% averted in women / % averted in MSM)
+           title = ttl,
+           subtitle = paste0("Spearman rho = ", round(rho, 2) )) +
+      theme_minimal(base_size = 11) +
+      theme(plot.title = element_text(face = "bold", size = 11))
+  }
+  
+  # Panels are grouped by WHICH SIDE OF THE EPIDEMIC they describe:
+  #   top row    - the MSM side (A) and the female side (B)
+  #   bottom row - the two composites: the rate ratio (C) and the growth
+  #                divergence (D), each combining both sides into one number
+  #
+  # Note when reading C: the MSM : female rate ratio is dominated by its
+  # DENOMINATOR. The MSM rate on its own is essentially unassociated with
+  # spillover, so C is close to a rescaling of B rather than independent
+  # evidence. Panels B and C should be read as one finding, not two.
+  p.spill.A <- .panel("inc_rate_female",
+                      paste0("Female incidence rate (per 100,000 women), ", BASE.YEAR),
+                      "A: How established the female epidemic already was")
+  p.spill.B <- .panel(paste0("msm_share_", BASE.YEAR),
+                      paste0("MSM share of incident infections, ", BASE.YEAR, " (%)"),
+                      "B: How much of the epidemic MSM drove at the start")
+  p.spill.C <- .panel("msm_to_female_rate",
+                      paste0("MSM : female incidence rate ratio, ", BASE.YEAR),
+                      "C: Where the force of infection sat")
+  p.spill.D <- .panel("divergence",
+                      paste0("Het-MSM divergence factor, ",
+                             BASE.YEAR, "-", EVAL.YEAR, ", no intervention"),
+                      "D: How far the heterosexual epidemic ran ahead")
+  
+  .no.y.spill <- theme(axis.title.y = element_blank())
+  
+  fig.spillover <- (p.spill.A | p.spill.B + .no.y.spill) /
+    (p.spill.C | p.spill.D + .no.y.spill) ;fig.spillover
+  # plot_annotation(
+  #     caption = paste0("Spillover = % incidence averted in women / % averted ",
+  #                      "in MSM, at ", CCRIT.MS, " in ", EVAL.YEAR,
+  #                      ". Drivers measured at ", BASE.YEAR,
+  #                      " under no intervention; growth is the fold-change in ",
+  #                      "incident counts. Ten MSAs; descriptive, no inference."));
+  fig.spillover
+  
+  ggsave(file.path(FIG.DIR, "fig4_spillover_drivers.png"), fig.spillover,
+         width = 11, height = 10, dpi = 300, bg = "white")
+  
+  cat("\n\nWrote:\n",
+      " ", file.path(TABLE.DIR, paste0("3-efficiency-cov", .ccrit, ".csv")), "\n",
+      " ", file.path(TABLE.DIR, paste0("4-spillover-cov", .ccrit, ".csv")), "\n",
+      " ", file.path(FIG.DIR, "fig4_spillover_drivers.png"), "\n")
+}
+
 
 # ****************************************************************************************************
-# TABLE S1 -- DOXY-PEP IMPACT AT A SINGLE COVERAGE LEVEL, BY POPULATION ----
+# TABLE S1 -- DOXY IMPACT: SINGLE COVERAGE: TOTAL ---- 
 # ****************************************************************************************************
-# WHAT   One row per MSA x population (Total / MSM / women / heterosexual men):
-#        incident counts and incidence rates in BASE.YEAR and EVAL.YEAR under
-#        `noint` and under CCRIT.MS, then the three impact metrics at EVAL.YEAR.
-#        The numeric backing for Figure 4.
-# INPUT  results, MSAS; medians only -- this is a supporting table, no CrI.
-# OUTPUT tables/S1-impact-cov<c>-<yr>.csv  (object `final2`)
-# WARNING col.labels.t2 is assigned POSITIONALLY, over names(tbl2)[-3]. Add or
-#        reorder anything in t2.outcomes1 / t2.outcomes2 and every label shifts
-#        silently -- check the CSV header row after any change here.
-
 {
   # Doxy-PEP impact across the ten MSAs at a single coverage level, for the total 
   
@@ -584,8 +612,6 @@ if(1==2){
   )
   
   # column names come back as <outcome>_<intervention>_<year>
-  # .t2sfx is used only by the commented-out column reorder further down; it is
-  # kept so that line still works if you re-enable it.
   .t2sfx <- paste0("_", CCRIT.MS, "_", EVAL.YEAR)
   .t2cov <- sub("doxy\\.cov\\.", "", CCRIT.MS)
   
@@ -633,17 +659,8 @@ if(1==2){
 }
 
 # ****************************************************************************************************
-# TABLE S2 -- SPILLOVER AND ITS CANDIDATE DRIVERS ----
+# TABLE S2 -- SPILLOVER AND ITS DRIVERS ----
 # ****************************************************************************************************
-# WHAT   One row per MSA: % incidence averted in each population at CCRIT.MS in
-#        EVAL.YEAR, the spillover ratio (women / MSM), and seven candidate
-#        city-level drivers, all measured at BASE.YEAR under NO intervention so
-#        they describe the epidemic Doxy-PEP is dropped into, not its effects.
-# INPUT  results, MSAS. Percentages pulled at digits = 3 (header, item 2).
-# OUTPUT tables/S2-spillover-cov<c>.csv  (object `final4`)
-# BUILDS `table4`, plus t4.share / t4.impact / av. Table S2a, Figure 5 and
-#        Check 1 all read those, so THIS SECTION MUST RUN BEFORE ALL THREE.
-
 {
   t4.impact <- table_to_long(make_multi_location_table(
   data = results, locations = MSAS, outcomes = "pct_incidence_averted",
@@ -800,17 +817,8 @@ print(as.data.frame(table4[, T4.COLS]), digits = 3, row.names = FALSE)
 }
 
 # ****************************************************************************************************
-# TABLE S2a -- ASSOCIATIONS BETWEEN SPILLOVER AND THE CANDIDATE DRIVERS ----
+# TABLE S2a: CANDIDATE DRIVERS OF THE SPILLOVER (DESCRIPTIVE) -----
 # ****************************************************************************************************
-# WHAT   Spearman rho between the spillover ratio and each candidate driver,
-#        with the mechanism that would produce that sign. Then three
-#        console-only diagnostics: collinearity among the candidates, whether
-#        the city ranking survives to 2035, and what the counts-vs-sum-of-rates
-#        fix changed (header, item 1).
-# INPUT  `table4` from TABLE S2 above -- this block fails without it.
-# OUTPUT tables/5-spillover-associations-cov<c>.csv  (object `final5`; filename
-#        keeps the old numbering -- see NAMING in the file header).
-
 {
 # One row per MSA, so ten points per association. This is CANDIDATE
 # IDENTIFICATION, not inference: it asks which city-level features move
@@ -958,155 +966,9 @@ cat("   largest per-MSA change in divergence:",
     signif(max(abs(.old$divergence - .old$divergence.old), na.rm = TRUE), 3), "\n")
 
 }
-
 # ****************************************************************************************************
-# FIGURE 5 -- SPILLOVER AGAINST FOUR CANDIDATE DRIVERS ----
+# CHECKS
 # ****************************************************************************************************
-# WHAT   Four scatterplots, one point per MSA, spillover ratio on y, with a
-#        Spearman rho in each subtitle and a dashed OLS line for the eye only.
-# INPUT  `table4` from TABLE S2 above -- THIS BLOCK FAILS IF TABLE S2 HAS NOT
-#        RUN, which is why it sits below the tables rather than with Figure 4.
-# OUTPUT figures/fig4_spillover_drivers.png  (object `fig.spillover`; the
-#        filename keeps the old numbering -- see NAMING in the file header).
-# COLOUR PAL.POINT / PAL.FIT, from the SHIELD FIGURE PALETTE.
-# OPTION SPILL.SIZE.BY encodes a third variable as point AREA -- see the block
-#        immediately below. NULL (the default) reproduces the figure as published.
-
-{
-  # ---- OPTION: scale the points by a third variable --------------------------
-  # SPILL.SIZE.BY
-  #   NULL      every point the same size. The default, and what the paper used.
-  #   "<col>"   any numeric column of table4. "av_msm" is the % incidence
-  #             averted among MSM at CCRIT.MS in EVAL.YEAR, i.e. the projected
-  #             reduction among MSM by 2030.
-  #
-  # AREA, NOT RADIUS. scale_size_area() maps the value to point AREA and pins
-  # zero to zero area. ggplot's default scale_size() maps to RADIUS, which
-  # squares the visual weight of large values and reliably misleads. Limits are
-  # pinned to the full column range so all four panels share one legend.
-  #
-  # READ THIS BEFORE SIZING BY av_msm. The y axis is
-  #     spillover = av_female / av_msm
-  # so av_msm is the DENOMINATOR of the quantity already being plotted. Point
-  # size is then a component of y, NOT an independent covariate: a small point
-  # sits high partly for an arithmetic reason. That is precisely why it is worth
-  # showing -- it separates cities that reach a high spillover through a strong
-  # female effect from those that reach it through a weak MSM effect -- but it
-  # must be described that way, never as a third variable that "explains" the
-  # pattern. Sizing by a driver that is NOT inside the ratio (inc_rate_female,
-  # ps_detect_msm, msm_pop_share_male) carries no such caveat.
-  SPILL.SIZE.BY   <- NULL                  # e.g. "av_msm"
-  SPILL.SIZE.LAB  <- paste0("Incidence averted,\nMSM (%), ", EVAL.YEAR)
-  SPILL.SIZE.MAX  <- 9                     # area of the largest point
-
-  .panel <- function(xvar, xlab, ttl, size.by = SPILL.SIZE.BY) {
-    d <- table4 %>% select(location, spillover, x = all_of(xvar)) %>%
-      filter(!is.na(x), !is.na(spillover))
-    rho <- cor(d$x, d$spillover, method = "spearman")
-
-    if (!is.null(size.by)) {
-      if (!size.by %in% names(table4))
-        stop("SPILL.SIZE.BY = '", size.by, "' is not a column of table4. ",
-             "Available: ", paste(names(table4), collapse = ", "), ".")
-      d$size.var <- table4[[size.by]][match(d$location, table4$location)]
-    }
-
-    p <- ggplot(d, aes(x = x, y = spillover)) +
-      geom_smooth(method = "lm", formula = y ~ x, se = FALSE,
-                  linetype = "dashed", colour = PAL.FIT, linewidth = 0.6)
-
-    # the size aesthetic is confined to geom_point, so the MSA labels added by
-    # .label_layer() do not inherit it and stay a constant size
-    p <- p + if (is.null(size.by))
-               geom_point(size = 3, colour = PAL.POINT)
-             else
-               geom_point(aes(size = size.var), colour = PAL.POINT, alpha = 0.85)
-
-    if (!is.null(size.by))
-      p <- p + scale_size_area(
-                 name     = SPILL.SIZE.LAB,
-                 max_size = SPILL.SIZE.MAX,
-                 # identical limits on every panel, or patchwork cannot merge
-                 # the four legends into one
-                 limits   = c(0, max(table4[[size.by]], na.rm = TRUE)))
-
-    p +
-      .label_layer() +
-      scale_x_continuous(expand = expansion(mult = c(0.10, 0.20))) +
-      labs(x = xlab, y = "Spillover Ratio", #(% averted in women / % averted in MSM)
-           title = ttl,
-           subtitle = paste0("Spearman rho = ", round(rho, 2) )) +
-      theme_minimal(base_size = 11) +
-      theme(plot.title = element_text(face = "bold", size = 11))
-  }
-  
-  # Panels are grouped by WHICH SIDE OF THE EPIDEMIC they describe:
-  #   top row    - the female side (A) and the MSM side (B)
-  #   bottom row - the two composites: the rate ratio (C) and the growth
-  #                divergence (D), each combining both sides into one number
-  #
-  # Note when reading C: msm_to_female_rate is MSM rate / FEMALE rate, and it is
-  # dominated by its DENOMINATOR -- which is exactly what panel A plots. The MSM
-  # rate on its own is essentially unassociated with spillover, so C is close to
-  # a rescaling of A rather than independent evidence. Read A and C as ONE
-  # finding, not two.
-  p.spill.A <- .panel("inc_rate_female",
-                      paste0("Female incidence rate (per 100,000 women), ", BASE.YEAR),
-                      "A: How established the female epidemic already was")
-  p.spill.B <- .panel(paste0("msm_share_", BASE.YEAR),
-                      paste0("MSM share of incident infections, ", BASE.YEAR, " (%)"),
-                      "B: How much of the epidemic MSM drove at the start")
-  p.spill.C <- .panel("msm_to_female_rate",
-                      paste0("MSM : female incidence rate ratio, ", BASE.YEAR),
-                      "C: Where the force of infection sat")
-  p.spill.D <- .panel("divergence",
-                      paste0("Het-MSM divergence factor, ",
-                             BASE.YEAR, "-", EVAL.YEAR, ", no intervention"),
-                      "D: How far the heterosexual epidemic ran ahead")
-  
-  .no.y.spill <- theme(axis.title.y = element_blank())
-  
-  fig.spillover <- (p.spill.A | p.spill.B + .no.y.spill) /
-    (p.spill.C | p.spill.D + .no.y.spill)
-
-  # with SPILL.SIZE.BY on, all four panels carry the same size legend; collect
-  # them into one strip along the bottom instead of repeating it four times
-  if (!is.null(SPILL.SIZE.BY))
-    fig.spillover <- fig.spillover + plot_layout(guides = "collect") &
-      theme(legend.position = "bottom")
-  fig.spillover
-  # plot_annotation(
-  #     caption = paste0("Spillover = % incidence averted in women / % averted ",
-  #                      "in MSM, at ", CCRIT.MS, " in ", EVAL.YEAR,
-  #                      ". Drivers measured at ", BASE.YEAR,
-  #                      " under no intervention; growth is the fold-change in ",
-  #                      "incident counts. Ten MSAs; descriptive, no inference."));
-  fig.spillover
-  
-  ggsave(file.path(FIG.DIR, "fig4_spillover_drivers.png"), fig.spillover,
-         width = 11, height = 10, dpi = 300, bg = "white")
-  
-  cat("\nWrote: ", file.path(FIG.DIR, "fig4_spillover_drivers.png"), "\n")
-}
-
-# ****************************************************************************************************
-# CHECK 1 -- DOES THE DECOMPOSITION HOLD? ----
-# ****************************************************************************************************
-# WHAT   The share-weighted sum of the subgroup effects must reproduce the
-#        model's own total-population effect, with shares taken from the same
-#        no-intervention year. This is what licenses the entire "spillover
-#        explains the spread" argument, so it RUNS EVERY TIME rather than being
-#        trusted -- a check that does not run is not a check, and it is free.
-# INPUT  t4.share, t4.impact and av, all from TABLE S2. Console output only.
-# PASS   a few tenths of a percentage point is rounding. Several points means
-#        the decomposition does not hold and the Table S2 argument needs
-#        re-examining before anything is written up.
-#
-# REMOVED: the two efficiency checks that used to live here (Table 3 against the
-# model's own rate_cum_incidence_averted_ppy_doxy, and the Table 3 / Table S2
-# spillover multiplier). Both read `table3`, which is built in
-# table_efficiency.R and not in this file, so both were dead code that would
-# error on a clean run. They belong with the table they check.
 
 cat("\n\n=== CHECK 1: decomposition -- do the strata reproduce the total? ===\n")
 cat("   The share-weighted sum of the subgroup effects must equal the model's\n")
@@ -1129,8 +991,55 @@ print(as.data.frame(chk1), digits = 4, row.names = FALSE)
 cat("   largest absolute discrepancy:",
     signif(max(abs(chk1$difference), na.rm = TRUE), 3), "percentage points\n")
 cat("   (a few tenths is rounding; several points means the decomposition\n")
-cat("    does not hold and the Table S2 argument needs re-examining)\n")
+cat("    does not hold and the Table 4 argument needs re-examining)\n")
 
-# ****************************************************************************************************
-# END OF MANUSCRIPT OUTPUTS
+cat("\n=== CHECK 2: Table 3 reconciles with the model's own efficiency outcome ===\n")
+# `table3` is LONG (one row per location x year x coverage x subgroup), so
+# both checks filter to the comparator scenario rather than reading a wide
+# column. .ref must be pulled at the SAME year and coverage as the rows it is
+# joined to, or the join silently yields NA and the check passes vacuously.
+.ref <- table_to_long(make_multi_location_table(
+  data = results, locations = MSAS,
+  outcomes = "rate_cum_incidence_averted_ppy_doxy",
+  interventions = CCRIT.MS, years = EVAL.YEAR, stat.type = "median")) %>%
+  filter(subgroup == "Total") %>%
+  transmute(location, year, within_sim_py_per_case = 1e5 / .pos(value))
+
+chk2 <- table3 %>%
+  filter(subgroup == "Total", coverage == .ccrit) %>%
+  select(location, year, ratio_of_medians = py_per_infection_cum) %>%
+  left_join(.ref, by = c("location", "year")) %>%
+  mutate(pct_diff = 100 * (ratio_of_medians / within_sim_py_per_case - 1))
+
+if (nrow(chk2) == 0 || all(is.na(chk2$pct_diff)))
+  stop("CHECK 2 matched no rows. table3 and .ref disagree on year or ",
+       "coverage, so this check would have passed without testing anything.")
+
+cat("   Table 3 divides medians; the array outcome divides within sim.\n")
+cat("   compared at", CCRIT.MS, "in", EVAL.YEAR, "on", nrow(chk2), "MSAs\n")
+cat("   median |difference|:", signif(stats::median(abs(chk2$pct_diff), na.rm = TRUE), 3), "%\n")
+cat("   largest |difference|:", signif(max(abs(chk2$pct_diff), na.rm = TRUE), 3), "%\n")
+
+cat("\n=== CHECK 3: Tables 3 and 4 must agree on the spillover multiplier ===\n")
+cat("   py_per_infection(MSM) / py_per_infection(Total) is the multiplier by\n")
+cat("   which counting spillover improves antibiotic efficiency. It should\n")
+cat("   track av_Total/av_msm from Table 4 in RANK, not in level -- one is\n")
+cat("   cumulative and count-based, the other single-year and percentage-based.\n")
+chk3 <- table3 %>%
+  filter(year == as.integer(EVAL.YEAR), coverage == .ccrit,
+         subgroup %in% c("msm", "Total")) %>%
+  select(location, subgroup, py_per_infection_cum) %>%
+  pivot_wider(names_from = subgroup, values_from = py_per_infection_cum) %>%
+  transmute(location, t3_multiplier = msm / .pos(Total)) %>%
+  left_join(table4 %>% transmute(location, t4_ratio = av_Total / .pos(av_msm)),
+            by = "location")
+
+if (nrow(chk3) == 0 || all(is.na(chk3$t3_multiplier)))
+  stop("CHECK 3 matched no rows -- check the coverage/year filters.")
+cat("   Spearman(rank agreement):",
+    round(cor(chk3$t3_multiplier, chk3$t4_ratio, method = "spearman",
+              use = "complete.obs"), 3), "\n")
+print(as.data.frame(chk3), digits = 4, row.names = FALSE)
+
+
 # ****************************************************************************************************

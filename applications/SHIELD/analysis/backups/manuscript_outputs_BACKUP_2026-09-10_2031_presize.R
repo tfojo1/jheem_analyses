@@ -969,68 +969,16 @@ cat("   largest per-MSA change in divergence:",
 # OUTPUT figures/fig4_spillover_drivers.png  (object `fig.spillover`; the
 #        filename keeps the old numbering -- see NAMING in the file header).
 # COLOUR PAL.POINT / PAL.FIT, from the SHIELD FIGURE PALETTE.
-# OPTION SPILL.SIZE.BY encodes a third variable as point AREA -- see the block
-#        immediately below. NULL (the default) reproduces the figure as published.
 
 {
-  # ---- OPTION: scale the points by a third variable --------------------------
-  # SPILL.SIZE.BY
-  #   NULL      every point the same size. The default, and what the paper used.
-  #   "<col>"   any numeric column of table4. "av_msm" is the % incidence
-  #             averted among MSM at CCRIT.MS in EVAL.YEAR, i.e. the projected
-  #             reduction among MSM by 2030.
-  #
-  # AREA, NOT RADIUS. scale_size_area() maps the value to point AREA and pins
-  # zero to zero area. ggplot's default scale_size() maps to RADIUS, which
-  # squares the visual weight of large values and reliably misleads. Limits are
-  # pinned to the full column range so all four panels share one legend.
-  #
-  # READ THIS BEFORE SIZING BY av_msm. The y axis is
-  #     spillover = av_female / av_msm
-  # so av_msm is the DENOMINATOR of the quantity already being plotted. Point
-  # size is then a component of y, NOT an independent covariate: a small point
-  # sits high partly for an arithmetic reason. That is precisely why it is worth
-  # showing -- it separates cities that reach a high spillover through a strong
-  # female effect from those that reach it through a weak MSM effect -- but it
-  # must be described that way, never as a third variable that "explains" the
-  # pattern. Sizing by a driver that is NOT inside the ratio (inc_rate_female,
-  # ps_detect_msm, msm_pop_share_male) carries no such caveat.
-  SPILL.SIZE.BY   <- NULL                  # e.g. "av_msm"
-  SPILL.SIZE.LAB  <- paste0("Incidence averted,\nMSM (%), ", EVAL.YEAR)
-  SPILL.SIZE.MAX  <- 9                     # area of the largest point
-
-  .panel <- function(xvar, xlab, ttl, size.by = SPILL.SIZE.BY) {
+  .panel <- function(xvar, xlab, ttl) {
     d <- table4 %>% select(location, spillover, x = all_of(xvar)) %>%
       filter(!is.na(x), !is.na(spillover))
     rho <- cor(d$x, d$spillover, method = "spearman")
-
-    if (!is.null(size.by)) {
-      if (!size.by %in% names(table4))
-        stop("SPILL.SIZE.BY = '", size.by, "' is not a column of table4. ",
-             "Available: ", paste(names(table4), collapse = ", "), ".")
-      d$size.var <- table4[[size.by]][match(d$location, table4$location)]
-    }
-
-    p <- ggplot(d, aes(x = x, y = spillover)) +
+    ggplot(d, aes(x = x, y = spillover)) +
       geom_smooth(method = "lm", formula = y ~ x, se = FALSE,
-                  linetype = "dashed", colour = PAL.FIT, linewidth = 0.6)
-
-    # the size aesthetic is confined to geom_point, so the MSA labels added by
-    # .label_layer() do not inherit it and stay a constant size
-    p <- p + if (is.null(size.by))
-               geom_point(size = 3, colour = PAL.POINT)
-             else
-               geom_point(aes(size = size.var), colour = PAL.POINT, alpha = 0.85)
-
-    if (!is.null(size.by))
-      p <- p + scale_size_area(
-                 name     = SPILL.SIZE.LAB,
-                 max_size = SPILL.SIZE.MAX,
-                 # identical limits on every panel, or patchwork cannot merge
-                 # the four legends into one
-                 limits   = c(0, max(table4[[size.by]], na.rm = TRUE)))
-
-    p +
+                  linetype = "dashed", colour = PAL.FIT, linewidth = 0.6) +
+      geom_point(size = 3, colour = PAL.POINT) +
       .label_layer() +
       scale_x_continuous(expand = expansion(mult = c(0.10, 0.20))) +
       labs(x = xlab, y = "Spillover Ratio", #(% averted in women / % averted in MSM)
@@ -1067,14 +1015,7 @@ cat("   largest per-MSA change in divergence:",
   .no.y.spill <- theme(axis.title.y = element_blank())
   
   fig.spillover <- (p.spill.A | p.spill.B + .no.y.spill) /
-    (p.spill.C | p.spill.D + .no.y.spill)
-
-  # with SPILL.SIZE.BY on, all four panels carry the same size legend; collect
-  # them into one strip along the bottom instead of repeating it four times
-  if (!is.null(SPILL.SIZE.BY))
-    fig.spillover <- fig.spillover + plot_layout(guides = "collect") &
-      theme(legend.position = "bottom")
-  fig.spillover
+    (p.spill.C | p.spill.D + .no.y.spill) ;fig.spillover
   # plot_annotation(
   #     caption = paste0("Spillover = % incidence averted in women / % averted ",
   #                      "in MSM, at ", CCRIT.MS, " in ", EVAL.YEAR,

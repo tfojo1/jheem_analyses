@@ -2,7 +2,7 @@
 #
 # USAGE
 #   Launch over SSH (survives logout):
-#       nohup bash applications/SHIELD/launch_sequential_stages.sh > applications/SHIELD/logs/launcher.out 2>&1 &
+#       nohup bash applications/SHIELD/launch_interventions.sh > applications/SHIELD/logs/launcher.out 2>&1 &
 #   Kill Runs:
 #       pkill -u pkasaie1 -x R
 #       pkill -u pkasaie1 -f "Rscript"
@@ -15,19 +15,19 @@
 #       tail -f applications/SHIELD/logs/launcher.out
 #
 #   Check a specific city+calibration log:
-#       tail -f applications/SHIELD/logs/C.19100_calib.5.7.stage0.pk.out
+#       tail -f applications/SHIELD/logs/C.19100_calib.5.6.stage3.2.p2.out
 #
 # HOW IT WORKS
-#   Each city gets its own subshell that runs all calibration codes sequentially.
-#   The outer loop keeps at most MAX_CITIES subshells alive at once.
+#   Each city+calibration code combination gets its own subshell.
+#   The outer loop keeps at most MAX_JOBS subshells alive at once.
 #   When a city finishes (or fails early), its slot is freed and the
-#   next city launches. No city ever starts a calibration code before its own
-#   prior one completes. Memory is fully released between calibration codes
+#   next city launches. Memory is fully released between calibration codes
 #   because each is a separate Rscript process.
+#   the order of calibration code is not guaranteed: if CALIBRATION_CODES had >1 entry, multiple codes for the same city could run concurrently
 #
 # ON FAILURE
 #   The failed city prints to stderr and releases its slot.
-#   All other cities keep running_cities untouched.
+#   All other cities keep running_jobs untouched.
 #   Check logs/<loc>_<calibration_code>.out for the R-level error message.
 
 
@@ -62,64 +62,65 @@ all_except_ten_cities=(
     C.26900 C.17140 C.18140 C.12940 C.40900 C.17460
 )
 
+all_ten_except_chicago=(
+    C.12060 C.12580 C.26420 C.31080
+    C.33100 C.35620 C.37980 C.38060 C.42660
+)
+
 # ── set active cities and calibration codes here ───────────────────────────────
 CITIES=("${ten_cities[@]}")
 
-# Calibration codes run sequentially per city — each is a separate Rscript process
-# so the OS fully reclaims memory between them
 CALIBRATION_CODES=(
-    calib.7.10.stage0.pk
-    calib.7.10.stage1.pk
+    calib.8.10.stage3.v1
+
 )
 
-SCRIPT="$SCRIPT_DIR/shield_calib_setup_and_run.R"
-MAX_CITIES=20
+N_SIM=400
+FIRST_YEAR=2000
+LAST_YEAR=2040
 
+SCRIPT="$SCRIPT_DIR/intervention/intervention_run.R"
+MAX_JOBS=20
 
-# ── per-city pipeline ──────────────────────────────────────────────────────────
-# Arguments: $1 = city code, $2..$N = calibration code names
-# Runs all calibration codes in sequence for one city.
-# If any calibration code fails, logs the error and skips remaining ones for that city.
-run_city() {
+# ── preflight ──────────────────────────────────────────────────────────────────
+if [[ ! -f "$SCRIPT" ]]; then
+    echo "Error: R script not found at $SCRIPT" >&2
+    exit 1
+fi
+
+# ── per city+calibration code runner ──────────────────────────────────────────
+run_calib_code() {
     local loc="$1"
-    shift   # drop city arg so "$@" contains only calibration codes
-
-    for calib_code in "$@"; do
-
-        echo "[$(date '+%F %T')] START   $loc :: $calib_code"
-
-        Rscript "$SCRIPT" "$loc" "$calib_code" \
-            > "$LOG_DIR/${loc}_${calib_code}.out" 2>&1
-        local rc=$?
-
-        if (( rc != 0 )); then
-            echo "[$(date '+%F %T')] FAILED  $loc :: $calib_code (exit $rc) — skipping remaining calibration codes" >&2
-            return 1
-        fi
-
-        echo "[$(date '+%F %T')] DONE    $loc :: $calib_code"
-
-    done
-
-    echo "[$(date '+%F %T')] COMPLETE $loc (all calibration codes)"
+    local calib_code="$2"
+    echo "[$(date '+%F %T')] START   INTERV $loc :: $calib_code"
+    Rscript "$SCRIPT" "$loc" "$calib_code" "$N_SIM" "$FIRST_YEAR" "$LAST_YEAR" \
+        > "$LOG_DIR/interventions_${loc}_${calib_code}.out" 2>&1
+    local rc=$?
+    if (( rc != 0 )); then
+        echo "[$(date '+%F %T')] FAILED  INTERV $loc :: $calib_code (exit $rc)" >&2
+        return 1
+    fi
+    echo "[$(date '+%F %T')] DONE    INTERV $loc :: $calib_code"
 }
 
 
 # ── job-slot manager ───────────────────────────────────────────────────────────
-running_cities=0
+running_jobs=0
 
 for loc in "${CITIES[@]}"; do
+    for calib_code in "${CALIBRATION_CODES[@]}"; do
 
-    while (( running_cities >= MAX_CITIES )); do
-        wait -n -p done_pid
-        (( running_cities-- ))
-        echo "[$(date '+%F %T')] SLOT FREED (PID $done_pid, running_cities=$running_cities)"
+        while (( running_jobs >= MAX_JOBS )); do
+            wait -n -p done_pid
+            (( running_jobs-- ))
+            echo "[$(date '+%F %T')] SLOT FREED (PID $done_pid, running_jobs=$running_jobs)"
+        done
+
+        run_calib_code "$loc" "$calib_code" &
+        (( running_jobs++ ))
+        echo "[$(date '+%F %T')] LAUNCHED INTERV $loc :: $calib_code (PID $!, running_jobs=$running_jobs)"
+
     done
-
-    run_city "$loc" "${CALIBRATION_CODES[@]}" &
-    (( running_cities++ ))
-    echo "[$(date '+%F %T')] LAUNCHED $loc (PID $!, running_cities=$running_cities)"
-
 done
 
 wait

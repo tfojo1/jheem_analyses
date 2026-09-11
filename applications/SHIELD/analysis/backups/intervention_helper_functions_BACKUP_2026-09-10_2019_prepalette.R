@@ -63,71 +63,6 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 
-# ============================================================================
-# SHIELD FIGURE PALETTE
-# ============================================================================
-# One definition of colour for every SHIELD figure. It lives HERE rather than in
-# the analysis scripts because it is a project constant: figures across the
-# paper have to agree, and a colour changed in one script but not another is
-# exactly the drift this file exists to prevent.
-#
-# THE FAMILY is ColorBrewer RdBu -- two hues, red and blue, which stays legible
-# under every common colour-vision deficiency where red/green does not. Grey is
-# the neutral for anything that is not one side of the epidemic: totals,
-# individual MSAs, reference lines.
-#
-#   red   #B2182B   women; and, on the heat scale, harm (below zero)
-#   tint  #92C5DE   the light step: benefit that does not reach the target
-#   blue  #2166AC   MSM; and, on the heat scale, benefit that meets the target
-#   grey  #4D4D4D   total population, single MSAs, neutral marks
-#
-# To restyle every SHIELD figure at once, edit this block. To restyle ONE
-# script, reassign the derived constants at the top of that script -- the
-# plotting defaults below resolve them when they are CALLED, not when they are
-# defined, so a later reassignment wins.
-SHIELD.PAL <- c(red  = "#B2182B",
-                tint = "#D9D9D9",
-                blue = "#2166AC",
-                grey = "#4D4D4D",
-                fit  = "grey60",    # fitted and reference lines
-                line = "grey25",    # outlines: box borders, tile edges
-                off  = "grey95",    # inactive / "not reached" fills
-            cyan="#35978F")
-# ---- semantic aliases: use THESE in scripts, never the raw hexes ------------
-PAL.WOMEN <- unname(SHIELD.PAL["red"])
-PAL.MSM   <- unname(SHIELD.PAL["blue"])
-PAL.TOTAL <- unname(SHIELD.PAL["grey"])
-PAL.TINT  <- unname(SHIELD.PAL["tint"])   # light fills, secondary series
-PAL.BAR   <- PAL.MSM                      # bars where "reached" is the message
-PAL.POINT <- unname(SHIELD.PAL["cyan"])               # one point per MSA: neutral, not a group
-PAL.FIT   <- unname(SHIELD.PAL["fit"])
-PAL.LINE  <- unname(SHIELD.PAL["line"])   # outlines
-PAL.OFF   <- unname(SHIELD.PAL["off"])
-
-# ---- the ordered 3-band heat scale -----------------------------------------
-# These bands are ORDERED, not diverging: harm (< 0), benefit below the target,
-# target met. "rdbu" walks the family above, so the heatmaps and the categorical
-# figures are the same two hues. The alternatives are kept here so a palette can
-# be compared without editing any figure code:
-#     SHIELD.HEAT.COLS <- SHIELD.HEAT.PALETTES[["rdylbu"]]
-SHIELD.HEAT.PALETTES <- list(
-    rdbu   = unname(SHIELD.PAL[c("red", "tint", "blue")]),
-    rdylbu = c("#D73027", "#FEE090", "#4575B4"),  # warm mid; strongest 3-way split
-    teal   = c("#B2182B", "#D9D9D9", "#35978F"),  # neutral mid; CVD-safe vs red
-    legacy = c("#e34948", "#2a78d6", "#008300")   # pre-2026-09 red/blue/green
-)
-SHIELD.HEAT.PAL  <- "rdbu"
-SHIELD.HEAT.COLS <- SHIELD.HEAT.PALETTES[[SHIELD.HEAT.PAL]]
-
-# TRUE ramps pale -> saturated WITHIN each band, and the label colour is then
-# chosen per cell from that cell's own luminance. FALSE gives flat bands and a
-# 3-swatch legend, which reads more cleanly -- BUT the flat branch in
-# plot_coverage_heatmap() hardcodes WHITE labels, so it is legible only when all
-# three bands are dark. That is true of "legacy" and of nothing else here.
-SHIELD.HEAT.SHADE <- TRUE
-# ============================================================================
-
-
 
 # ============================================================================
 # 1. ARRAY HELPERS
@@ -1574,9 +1509,10 @@ plot_coverage_heatmap <- function(tbl,
                                   order.rows   = c("threshold", "max", "alpha", "none"),
                                   fill.style   = c("diverging", "banded"),
                                   band.breaks  = NULL,
-                                  # SHIELD FIGURE PALETTE, top of this file
-                                  band.colours = SHIELD.HEAT.COLS,
-                                  band.shade   = SHIELD.HEAT.SHADE,
+                                  band.colours = c("#e34948",   # below the first break
+                                                   "#2a78d6",   # between the breaks
+                                                   "#008300"),  # at/above the last break
+                                  band.shade   = TRUE,
                                   band.light   = 0.78,
                                   legend.dir   = c("vertical", "horizontal"),
                                   legend.breaks = NULL,
@@ -1748,9 +1684,7 @@ plot_coverage_heatmap <- function(tbl,
     }
 
     if (is.null(limits)) limits <- c(0, 100)
-    # RdBu, not red/green: same family as the banded scale above, and legible
-    # under colour-vision deficiency. PAL.WOMEN/PAL.MSM are the same two hexes.
-    pal <- if (higher.is.better) c(PAL.WOMEN, PAL.MSM) else c(PAL.MSM, PAL.WOMEN)
+    pal <- if (higher.is.better) c("#B2182B", "#1A9850") else c("#1A9850", "#B2182B")
 
     if (is.null(fill.lab)) fill.lab <- paste(unique(long$outcome), collapse = " / ")
 
@@ -1815,20 +1749,15 @@ plot_coverage_heatmap <- function(tbl,
         if (!is.null(label.colour)) {
             # One colour for every cell. Mixed black/white labels are chosen
             # for contrast, but they read as if they encode something, so a
-            # single colour is often the better call -- CHECK IT AGAINST THE
-            # DARKEST FILL FIRST. The old "black is fine everywhere" note was
-            # measured against the legacy red/blue/green bands and does NOT
-            # carry over: on the rdbu bands, black over #2166AC is about 3.5:1.
-            # Pass label.colour = NULL for per-cell contrast instead.
+            # single colour is often the better call -- check it against the
+            # darkest fill before using it. For the default band colours,
+            # black clears 4.2:1 on all three saturated ends (red 5.3,
+            # blue 4.7, green 4.2), so it is legible throughout.
             p <- p + geom_text(val.lab, colour = label.colour, size = 3.4,
                                fontface = "bold", show.legend = FALSE)
         } else if (banded.flat) {
-            # NOTE white is hardcoded here, which assumes all three bands are
-            # dark. True of the legacy red/blue/green bands (3.9 / 4.4 / 4.9
-            # against white); NOT true of any palette with a pale middle band,
-            # including the rdbu default, whose #92C5DE mid-band would render
-            # white numbers essentially invisible. Use band.shade = TRUE with
-            # those, or pass an explicit label.colour.
+            # the three flat fills all clear 3:1 against white (red 3.9,
+            # blue 4.4, green 4.9), so bold white reads on every one
             p <- p + geom_text(val.lab, colour = "white", size = 3.4,
                                fontface = "bold", show.legend = FALSE)
         } else if (fill.style == "banded") {
@@ -1893,7 +1822,7 @@ plot_coverage_needed <- function(tbl,
                                  row.sep      = " — ",
                                  title        = NULL,
                                  x.lab        = "Coverage required (%)",
-                                 bar.fill     = PAL.BAR,   # SHIELD FIGURE PALETTE
+                                 bar.fill     = "#2166AC",
                                  unreached.lab = "not reached",
                                  save.dir     = .default_fig_dir(),
                                  filename     = NULL,
@@ -1942,7 +1871,7 @@ plot_coverage_needed <- function(tbl,
         geom_text(aes(label = lab, hjust = ifelse(reached, -0.15, 1.05),
                       color = reached),
                   size = 3.3, fontface = "bold", show.legend = FALSE) +
-        scale_fill_manual(values  = c(`TRUE` = bar.fill, `FALSE` = PAL.OFF)) +
+        scale_fill_manual(values  = c(`TRUE` = bar.fill, `FALSE` = "grey95")) +
         scale_color_manual(values = c(`TRUE` = bar.fill, `FALSE` = "grey45")) +
         scale_x_continuous(limits = c(0, max.cov * 1.25),
                            breaks = seq(0, max.cov, by = 20), expand = c(0, 0)) +

@@ -73,15 +73,21 @@ CALIBRATION_CODES=(
     calib.7.30.stage2.LA.PA
 )
 
-SCRIPT="$SCRIPT_DIR/shield_calib_setup_and_run.R"
+SCRIPT="$SCRIPT_DIR/shield_calib_setup_and_run_modular.R"
 MAX_JOBS=20
+
+# ── preflight ──────────────────────────────────────────────────────────────────
+if [[ ! -f "$SCRIPT" ]]; then
+    echo "Error: R script not found at $SCRIPT" >&2
+    exit 1
+fi
 
 # ── per city+calibration code runner ──────────────────────────────────────────
 run_calib_code() {
     local loc="$1"
     local calib_code="$2"
     echo "[$(date '+%F %T')] START   $loc :: $calib_code"
-    Rscript "$SCRIPT" "$loc" "$calib_code" \
+    Rscript "$SCRIPT" "$loc" "$calib_code" all \
         > "$LOG_DIR/${loc}_${calib_code}.out" 2>&1
     local rc=$?
     if (( rc != 0 )); then

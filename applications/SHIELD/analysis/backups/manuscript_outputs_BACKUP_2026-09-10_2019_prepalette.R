@@ -43,9 +43,7 @@
 # is not duplicated in the CSV, so read it when regenerating.
 #
 # PREREQUISITES. `results` (the four arrays), SHIELD.TEN.MSAS, and the helper
-# functions sourced in the guarded block below. TABLE.DIR / FIG.DIR are set
-# there. Colours come from SHIELD FIGURE PALETTE in
-# intervention_helper_functions.R -- not from this file.
+# functions sourced in the guarded block below. TABLE.DIR / FIG.DIR are set there.
 #
 # ----------------------------------------------------------------------------
 # TWO METHOD CHOICES THAT DIFFER FROM THE EXPLORATORY CODE IN doxy_figures.R
@@ -104,19 +102,44 @@ if(1==2){
   }
 
   # ---- FIGURE PALETTE ------------------------------------------------------
-  # Defined once for the whole project in intervention_helper_functions.R, under
-  # "SHIELD FIGURE PALETTE": SHIELD.PAL plus the PAL.* aliases (WOMEN / MSM /
-  # TOTAL / TINT / BAR / POINT / FIT / OFF), and SHIELD.HEAT.COLS +
-  # SHIELD.HEAT.SHADE for the ordered 3-band heat scale. The plotting helpers
-  # already default to those, so the figures below need no colour arguments.
+  # Every colour used in this file is named here, so the figures harmonise and a
+  # change is made in ONE place. The anchors are ColorBrewer RdBu -- #B2182B and
+  # #2166AC -- which the box plots and the Figure 3a bars already used.
   #
-  # To try a different heat palette for THIS run only, uncomment one line -- the
-  # defaults are resolved at call time, so this wins over the helper:
-  # SHIELD.HEAT.COLS <- SHIELD.HEAT.PALETTES[["rdylbu"]]   # or "teal" / "legacy"
+  # The three heat bands are ORDERED, not diverging: harm (< 0), benefit but
+  # below the target, target met (>= HEAT.MIDPOINT). To compare palettes, change
+  # HEAT.PAL and re-run the FIGURE 3 and FIGURE 3a sections. Nothing else moves.
+  HEAT.PALETTES <- list(
+    rdbu   = c("#B2182B", "#92C5DE", "#2166AC"),  # red harm -> blue deepens with benefit
+    rdylbu = c("#D73027", "#FEE090", "#4575B4"),  # warm mid band; separates the 3 states most
+    teal   = c("#B2182B", "#D9D9D9", "#35978F"),  # neutral mid; teal is CVD-safe against red
+    legacy = c("#e34948", "#2a78d6", "#008300")   # what this file used before
+  )
+  HEAT.PAL      <- "rdbu"          # <- switch to "rdylbu" / "teal" / "legacy" to compare
+  HEAT.MIDPOINT <- 49              # policy target; also the upper band break
+  HEAT.COLS     <- HEAT.PALETTES[[HEAT.PAL]]
 
-  HEAT.MIDPOINT <- 49      # policy target; also the upper break between bands
-  HEAT.LABEL    <- NULL    # NULL = per-cell contrast, which shaded bands need
+  # HEAT.SHADE = TRUE ramps pale -> saturated WITHIN each band, and the helper
+  # then picks each cell's label colour from that cell's own luminance.
+  # HEAT.SHADE = FALSE gives flat bands and a 3-swatch legend, which reads more
+  # cleanly -- BUT plot_coverage_heatmap() hardcodes WHITE labels in flat mode,
+  # so it is legible only when all three bands are dark. That is true of
+  # "legacy" and of nothing else here: every alternative has a pale middle band.
+  # Leave TRUE unless you are on "legacy".
+  HEAT.SHADE <- TRUE
+  # NULL = per-cell contrast, which is what shaded bands need. A colour string
+  # forces one label colour everywhere; "black" was the old setting and was
+  # tuned to the "legacy" band colours only.
+  HEAT.LABEL <- NULL
 
+  PAL.TOTAL <- "#4D4D4D"   # neutral grey: total population
+  PAL.MSM   <- "#2166AC"   # RdBu blue
+  PAL.WOMEN <- "#B2182B"   # RdBu red
+  PAL.BAR   <- PAL.MSM     # Figure 3a bars, target reached
+  # Figure 5 points are MSAs, not a population, so they are deliberately neutral
+  # -- that keeps blue meaning MSM everywhere. Set to PAL.MSM for the old look.
+  PAL.POINT <- PAL.TOTAL
+  PAL.FIT   <- "grey60"    # fitted lines and reference lines
   MSAS <- names(SHIELD.TEN.MSAS)
   PRINT.VERSION = T #
 }
@@ -225,8 +248,7 @@ if(1==2){
 #          C  MSM   vs no intervention, 2030    D  Total vs no intervention, 2030
 # INPUT  tbl.cov.vs2022 and tbl.cov.vs.noint from SHARED INPUTS above.
 # OUTPUT figures/fig3_heatmaps.png  (object `fig.heatmap`)
-# COLOUR SHIELD.HEAT.COLS / SHIELD.HEAT.SHADE, from the helper's SHIELD
-#        FIGURE PALETTE; HEAT.MIDPOINT / HEAT.LABEL from CONFIGURATION here.
+# COLOUR HEAT.COLS / HEAT.SHADE / HEAT.LABEL, from the FIGURE PALETTE block.
 # NOTE   fixed limits c(-100, 100) plus squish.marks = "always" keep the legend
 #        byte-identical on all four panels, which is what lets patchwork's
 #        guides = "collect" merge them into one bar instead of four.
@@ -240,6 +262,8 @@ if(1==2){
       locations = MSAS,
       subgroup     = strat,
       midpoint     = HEAT.MIDPOINT,
+      band.colours = HEAT.COLS,
+      band.shade   = HEAT.SHADE,
       fill.style   = "banded",
       limits       = c(-100, 100),
       order.rows   = "alpha",
@@ -317,6 +341,7 @@ if(1==2){
       subgroup  = strat,
       target    = 50,
       order.by  = "alpha",      # common row order across all four panels
+      bar.fill  = PAL.BAR,
       title     = ttl,
       filename  = NULL)
   
@@ -352,7 +377,7 @@ if(1==2){
 #        WHY SIM-LEVEL below). Independent of every other section.
 # OUTPUT figures/fig5_impact_boxplots.png  (object `fig.impact`; the filename
 #        keeps the old numbering -- see NAMING in the file header).
-# COLOUR PAL.TOTAL / PAL.MSM / PAL.WOMEN, from the SHIELD FIGURE PALETTE.
+# COLOUR PAL.TOTAL / PAL.MSM / PAL.WOMEN, from the FIGURE PALETTE block.
 
 {
   # WHY THIS NEEDS SIM-LEVEL VALUES. A box plot is a summary of a DISTRIBUTION.
@@ -456,14 +481,14 @@ if(1==2){
     #
     # One colour per population, applied consistently down each column. No legend:
     # every panel holds a single series and its title names it.
-    F5.COLS <- c(Total = PAL.TOTAL, MSM = PAL.MSM, Women = PAL.WOMEN)  # SHIELD FIGURE PALETTE
+    F5.COLS <- c(Total = PAL.TOTAL, MSM = PAL.MSM, Women = PAL.WOMEN)  # FIGURE PALETTE
     
     .f5.panel <- function(met, pop, ttl, ylab, log.y = FALSE, fix.pct = FALSE) {
       d <- f5.box %>% filter(metric == met, population == pop)
       p <- ggplot(d, aes(x = location, ymin = ymin, lower = lower, middle = middle,
                          upper = upper, ymax = ymax)) +
         geom_boxplot(stat = "identity", width = 0.6, linewidth = 0.35,
-                     colour = PAL.LINE, fill = unname(F5.COLS[pop])) +
+                     colour = "grey25", fill = unname(F5.COLS[pop])) +
         labs(title = ttl, x = NULL, y = ylab) +
         theme_minimal(base_size = 9) +
         theme(panel.grid.major.x = element_blank(),
@@ -968,69 +993,17 @@ cat("   largest per-MSA change in divergence:",
 #        RUN, which is why it sits below the tables rather than with Figure 4.
 # OUTPUT figures/fig4_spillover_drivers.png  (object `fig.spillover`; the
 #        filename keeps the old numbering -- see NAMING in the file header).
-# COLOUR PAL.POINT / PAL.FIT, from the SHIELD FIGURE PALETTE.
-# OPTION SPILL.SIZE.BY encodes a third variable as point AREA -- see the block
-#        immediately below. NULL (the default) reproduces the figure as published.
+# COLOUR PAL.POINT / PAL.FIT, from the FIGURE PALETTE block.
 
 {
-  # ---- OPTION: scale the points by a third variable --------------------------
-  # SPILL.SIZE.BY
-  #   NULL      every point the same size. The default, and what the paper used.
-  #   "<col>"   any numeric column of table4. "av_msm" is the % incidence
-  #             averted among MSM at CCRIT.MS in EVAL.YEAR, i.e. the projected
-  #             reduction among MSM by 2030.
-  #
-  # AREA, NOT RADIUS. scale_size_area() maps the value to point AREA and pins
-  # zero to zero area. ggplot's default scale_size() maps to RADIUS, which
-  # squares the visual weight of large values and reliably misleads. Limits are
-  # pinned to the full column range so all four panels share one legend.
-  #
-  # READ THIS BEFORE SIZING BY av_msm. The y axis is
-  #     spillover = av_female / av_msm
-  # so av_msm is the DENOMINATOR of the quantity already being plotted. Point
-  # size is then a component of y, NOT an independent covariate: a small point
-  # sits high partly for an arithmetic reason. That is precisely why it is worth
-  # showing -- it separates cities that reach a high spillover through a strong
-  # female effect from those that reach it through a weak MSM effect -- but it
-  # must be described that way, never as a third variable that "explains" the
-  # pattern. Sizing by a driver that is NOT inside the ratio (inc_rate_female,
-  # ps_detect_msm, msm_pop_share_male) carries no such caveat.
-  SPILL.SIZE.BY   <- NULL                  # e.g. "av_msm"
-  SPILL.SIZE.LAB  <- paste0("Incidence averted,\nMSM (%), ", EVAL.YEAR)
-  SPILL.SIZE.MAX  <- 9                     # area of the largest point
-
-  .panel <- function(xvar, xlab, ttl, size.by = SPILL.SIZE.BY) {
+  .panel <- function(xvar, xlab, ttl) {
     d <- table4 %>% select(location, spillover, x = all_of(xvar)) %>%
       filter(!is.na(x), !is.na(spillover))
     rho <- cor(d$x, d$spillover, method = "spearman")
-
-    if (!is.null(size.by)) {
-      if (!size.by %in% names(table4))
-        stop("SPILL.SIZE.BY = '", size.by, "' is not a column of table4. ",
-             "Available: ", paste(names(table4), collapse = ", "), ".")
-      d$size.var <- table4[[size.by]][match(d$location, table4$location)]
-    }
-
-    p <- ggplot(d, aes(x = x, y = spillover)) +
+    ggplot(d, aes(x = x, y = spillover)) +
       geom_smooth(method = "lm", formula = y ~ x, se = FALSE,
-                  linetype = "dashed", colour = PAL.FIT, linewidth = 0.6)
-
-    # the size aesthetic is confined to geom_point, so the MSA labels added by
-    # .label_layer() do not inherit it and stay a constant size
-    p <- p + if (is.null(size.by))
-               geom_point(size = 3, colour = PAL.POINT)
-             else
-               geom_point(aes(size = size.var), colour = PAL.POINT, alpha = 0.85)
-
-    if (!is.null(size.by))
-      p <- p + scale_size_area(
-                 name     = SPILL.SIZE.LAB,
-                 max_size = SPILL.SIZE.MAX,
-                 # identical limits on every panel, or patchwork cannot merge
-                 # the four legends into one
-                 limits   = c(0, max(table4[[size.by]], na.rm = TRUE)))
-
-    p +
+                  linetype = "dashed", colour = PAL.FIT, linewidth = 0.6) +
+      geom_point(size = 3, colour = PAL.POINT) +
       .label_layer() +
       scale_x_continuous(expand = expansion(mult = c(0.10, 0.20))) +
       labs(x = xlab, y = "Spillover Ratio", #(% averted in women / % averted in MSM)
@@ -1067,14 +1040,7 @@ cat("   largest per-MSA change in divergence:",
   .no.y.spill <- theme(axis.title.y = element_blank())
   
   fig.spillover <- (p.spill.A | p.spill.B + .no.y.spill) /
-    (p.spill.C | p.spill.D + .no.y.spill)
-
-  # with SPILL.SIZE.BY on, all four panels carry the same size legend; collect
-  # them into one strip along the bottom instead of repeating it four times
-  if (!is.null(SPILL.SIZE.BY))
-    fig.spillover <- fig.spillover + plot_layout(guides = "collect") &
-      theme(legend.position = "bottom")
-  fig.spillover
+    (p.spill.C | p.spill.D + .no.y.spill) ;fig.spillover
   # plot_annotation(
   #     caption = paste0("Spillover = % incidence averted in women / % averted ",
   #                      "in MSM, at ", CCRIT.MS, " in ", EVAL.YEAR,

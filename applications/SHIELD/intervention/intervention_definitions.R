@@ -1,36 +1,28 @@
 # inputs and sources are: ~/jheem/code/jheem_analyses/applications/SHIELD/inputs/input_doxy_pep_parameters.R
+source("../jheem_analyses/applications/SHIELD/intervention/doxy_effectiveness.R")
 
-# Single target population for all MSM
-WHOLE.POPULATION = create.target.population(name = 'Whole Population') #MSM?
+# the population is defined as the whole population here, but in the code it only applies to MSM
+WHOLE.POPULATION = create.target.population(name = 'Whole Population') 
 
-# DOXY-PEP EFFICATY (Studies report: RR: Rate Ratio of incident syphilis cases in doxy vs no-doxy arms per person-time)
-# we have pooled estiamtes from clinical trials to estimate the meanlog and sdlog
-# Draw RR samples from the final lognormal distribution to use in the model
-# log(HR) ~ Normal(mean,sd) >>> HR=lognormal(meanlog,sdlog)
-draw_rr_lnorm <- function(n, 
-                          rr_meanlog,rr_sdlog, # mean and sd log for a lognormal dist
-                          cap_at_one = TRUE) {
-    rr_samples <- rlnorm(n, meanlog = rr_meanlog, sdlog = rr_sdlog) 
-    #
-    if (cap_at_one) rr_samples <- pmin(rr_samples, 1)
-    rr_samples
-}
+# Generate 1,000 simulated relative risk values
+doxy_rr_draws <- draw_rr_lognorm(
+    n          = 1000,
+    rr_mean    = 0.20,
+    rr_lo      = 0.08,
+    rr_hi      = 0.48,
+    cap_at_one = TRUE
+)
+# Convert RR to doxy-PEP efficacy
+doxy_effectiveness_1000 <- 1 - doxy_rr_draws
 
-# generate 1000 values of Doxy effectiveness
-rr_samples <- draw_rr_lnorm(n = 1000, rr_meanlog = -1.540424,rr_sdlog =0.2510223,cap_at_one = T )
-effectiveness_samples=1-rr_samples
-
-DOXY.PARAMS <- matrix(effectiveness_samples,
+DOXY.PARAMS <- matrix(doxy_effectiveness_1000,
                       nrow = 1,
                       dimnames = list("doxy.effectiveness", NULL))
 
-
 # INTERVENTION ----
-# intervnetion controls the uptake among eligible population >>> 10% from 2022-2030
-# we know C=U/(1+r) > in the model, we will calculate the coverage
-# r is discontinuation rate
-# U is the proportion of eligible population filling a prescription for doxy (regardless app having been on Doxy before)
-# C is the proportion of eligible population receiving doxyPep by the end of the year?
+# intervnetion controls the coverage among eligible population directly
+# this doesn't require us to know what proportion of population is truly eligible; and
+# at the same time doesn't allow us to calculate how many people are receiving Doxy
 
 clear.interventions() 
 
