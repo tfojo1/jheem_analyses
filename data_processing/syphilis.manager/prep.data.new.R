@@ -355,7 +355,10 @@ data.list.prep.age = lapply(data.list.prep, function(file){
 ###Note race is not available at the county level###
 ################################################################################
 
-data.list.prep.state = data.list.prep[14:26] #Subset to just have state level data#
+#Subset to just have state level data#
+data.list.prep.state <- data.list.prep[
+    sapply(data.list.prep, function(x) grepl("state", x$filename, ignore.case = TRUE))
+]
 
 data.list.prep.race = lapply(data.list.prep.state, function(file){
     
