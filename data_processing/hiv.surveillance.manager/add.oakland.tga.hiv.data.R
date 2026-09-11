@@ -19,9 +19,9 @@ oakland <- c('TGA.OAKLAND')
 # census.manager = load.data.manager("../../cached/census.manager.rdata")
 # 
 #source('data_processing/aggregate_county_to_msa_new.R') #Not using this - because of the relative contribution outcome not enough data is aggregated.  This aggregates county level data to other locations
-source('data_processing/put_msa_data_as_new_source_script.R') #This aggregates county level data to other locations
-source('../jheem2/R/HELPERS_array_helpers.R')
-source('commoncode/locations_of_interest.R') #Source locations of interest to create MSA vectors
+# source('data_processing/put_msa_data_as_new_source_script.R') #This aggregates county level data to other locations
+# source('../jheem2/R/HELPERS_array_helpers.R')
+# source('commoncode/locations_of_interest.R') #Source locations of interest to create MSA vectors
 
 
 ###############################################################################
@@ -70,166 +70,352 @@ source('commoncode/locations_of_interest.R') #Source locations of interest to cr
 
 ###############################################################################
 
-put.msa.data.as.new.source(outcome = 'adult.population',
-                           from.source.name = 'census.population',
-                           to.source.name = 'census.aggregated.adult.population',
-                           to.locations =  oakland,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'TGA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
+put.msa.data.as.new.source.NEW(outcome = 'adult.population',
+                               from.source.name = 'census.population',
+                               to.source.name = 'census.aggregated.adult.population',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census')
+
+put.msa.data.as.new.source.NEW(outcome = 'adult.population',
+                               from.source.name = 'census.population',
+                               to.source.name = 'census.aggregated.adult.population',
+                               to.locations =  MSAS.OF.INTEREST, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'CBSA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census.grouped.age')
 
 
-put.msa.data.as.new.source(outcome = 'adult.population',
-                           from.source.name = 'census.population',
-                           to.source.name = 'census.aggregated.adult.population',
-                           to.locations =  oakland,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'TGA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
+put.msa.data.as.new.source.NEW(outcome = 'diagnoses',
+                               from.source.name = 'cdc.hiv',
+                               to.source.name = 'cdc.aggregated.county',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census')
 
-put.msa.data.as.new.source(outcome = 'diagnoses',
-                           from.source.name = 'cdc.hiv',
-                           to.source.name = 'cdc.aggregated.county',
-                           to.locations =  oakland,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'TGA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
+put.msa.data.as.new.source.NEW(outcome = 'diagnoses',
+                               from.source.name = 'cdc.hiv',
+                               to.source.name = 'cdc.aggregated.county',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census.grouped.age')
 
-put.msa.data.as.new.source(outcome = 'diagnosed.prevalence',
-                           from.source.name = 'cdc.hiv',
-                           to.source.name = 'cdc.aggregated.county',
-                           to.locations =  oakland,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'TGA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
+put.msa.data.as.new.source.NEW(outcome = 'diagnosed.prevalence',
+                               from.source.name = 'cdc.hiv',
+                               to.source.name = 'cdc.aggregated.county',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census')
 
-put.msa.data.as.new.source(outcome = 'suppression',
-                           from.source.name = 'cdc.hiv',
-                           to.source.name = 'cdc.aggregated.proportion',
-                           to.locations =  oakland,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'TGA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager,
-                           source.for.denominator= 'cdc.hiv',
-                           ontology.for.denominator= 'cdc')
+put.msa.data.as.new.source.NEW(outcome = 'diagnosed.prevalence',
+                               from.source.name = 'cdc.hiv',
+                               to.source.name = 'cdc.aggregated.county',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census.grouped.age')
 
-put.msa.data.as.new.source(outcome = 'prep',
-                           from.source.name = 'aidsvu',
-                           to.source.name = 'prep.aidsvu.aggregated.county',
-                           to.locations =  oakland,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'TGA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
+put.msa.data.as.new.source.NEW(outcome = 'suppression',
+                               from.source.name = 'cdc.hiv',
+                               to.source.name = 'cdc.aggregated.proportion',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census',
+                               source.for.denominator='cdc.hiv',
+                               ontology.for.denominator='cdc')
 
-put.msa.data.as.new.source(outcome = 'prep',
-                           from.source.name = 'cdc.prep',
-                           to.source.name = 'prep.cdc.aggregated.county',
-                           to.locations =  oakland,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'TGA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
+put.msa.data.as.new.source.NEW(outcome = 'suppression',
+                               from.source.name = 'cdc.hiv',
+                               to.source.name = 'cdc.aggregated.proportion',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census.grouped.age',
+                               source.for.denominator='cdc.hiv',
+                               ontology.for.denominator='cdc')
 
-put.msa.data.as.new.source(outcome = 'prep.indications',
-                           from.source.name = 'cdc.prep.indications',
-                           to.source.name = 'prep.indications.aggregated.county',
-                           to.locations =  oakland,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'TGA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
+put.msa.data.as.new.source.NEW(outcome = 'prep',
+                               from.source.name = 'aidsvu',
+                               to.source.name = 'prep.aidsvu.aggregated.county',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census')
 
-put.msa.data.as.new.source(outcome = 'linkage_1mo',
-                           from.source.name = 'cdc.hiv',
-                           to.source.name = 'cdc.aggregated.county',
-                           to.locations =  oakland,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'TGA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager,
-                           source.for.denominator= 'cdc.hiv',
-                           ontology.for.denominator= 'cdc')
+put.msa.data.as.new.source.NEW(outcome = 'prep',
+                               from.source.name = 'aidsvu',
+                               to.source.name = 'prep.aidsvu.aggregated.county',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census.grouped.age')
 
-put.msa.data.as.new.source(outcome = 'engagement',
-                           from.source.name = 'cdc.hiv',
-                           to.source.name = 'cdc.aggregated.county',
-                           to.locations =  oakland,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'TGA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager,
-                           source.for.denominator= 'cdc.hiv',
-                           ontology.for.denominator= 'cdc')
+put.msa.data.as.new.source.NEW(outcome = 'prep',
+                               from.source.name = 'cdc.prep',
+                               to.source.name = 'prep.cdc.aggregated.county',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census')
 
-put.msa.data.as.new.source(outcome = 'gonorrhea',
-                           from.source.name = 'cdc.sti',
-                           to.source.name = 'cdc.aggregated.county',
-                           to.locations =  oakland,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'TGA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
+put.msa.data.as.new.source.NEW(outcome = 'prep',
+                               from.source.name = 'cdc.prep',
+                               to.source.name = 'prep.cdc.aggregated.county',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census.grouped.age')
 
-put.msa.data.as.new.source(outcome = 'ps.syphilis',
-                           from.source.name = 'cdc.sti',
-                           to.source.name = 'cdc.aggregated.county',
-                           to.locations =  oakland,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'TGA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
+put.msa.data.as.new.source.NEW(outcome = 'prep.indications',
+                               from.source.name = 'cdc.prep.indications',
+                               to.source.name = 'prep.indications.aggregated.county',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census')
 
-put.msa.data.as.new.source(outcome = 'early.syphilis',
-                           from.source.name = 'cdc.sti',
-                           to.source.name = 'cdc.aggregated.county',
-                           to.locations =  oakland,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'TGA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
+put.msa.data.as.new.source.NEW(outcome = 'prep.indications',
+                               from.source.name = 'cdc.prep.indications',
+                               to.source.name = 'prep.indications.aggregated.county',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census.grouped.age')
+
+put.msa.data.as.new.source.NEW(outcome = 'linkage_1mo',
+                               from.source.name = 'cdc.hiv',
+                               to.source.name = 'cdc.aggregated.county',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census')
+
+put.msa.data.as.new.source.NEW(outcome = 'linkage_1mo',
+                               from.source.name = 'cdc.hiv',
+                               to.source.name = 'cdc.aggregated.county',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census.grouped.age')
+
+put.msa.data.as.new.source.NEW(outcome = 'engagement',
+                               from.source.name = 'cdc.hiv',
+                               to.source.name = 'cdc.aggregated.county',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census')
+
+put.msa.data.as.new.source.NEW(outcome = 'engagement',
+                               from.source.name = 'cdc.hiv',
+                               to.source.name = 'cdc.aggregated.county',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census.grouped.age')
+
+put.msa.data.as.new.source.NEW(outcome = 'gonorrhea',
+                               from.source.name = 'cdc.sti',
+                               to.source.name = 'cdc.aggregated.county',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census')
+
+put.msa.data.as.new.source.NEW(outcome = 'gonorrhea',
+                               from.source.name = 'cdc.sti',
+                               to.source.name = 'cdc.aggregated.county',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census.grouped.age')
+
+put.msa.data.as.new.source.NEW(outcome = 'ps.syphilis',
+                               from.source.name = 'cdc.sti',
+                               to.source.name = 'cdc.aggregated.county',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census')
+
+put.msa.data.as.new.source.NEW(outcome = 'ps.syphilis',
+                               from.source.name = 'cdc.sti',
+                               to.source.name = 'cdc.aggregated.county',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census.grouped.age')
+
+put.msa.data.as.new.source.NEW(outcome = 'early.syphilis',
+                               from.source.name = 'cdc.sti',
+                               to.source.name = 'cdc.aggregated.county',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census')
+
+put.msa.data.as.new.source.NEW(outcome = 'early.syphilis',
+                               from.source.name = 'cdc.sti',
+                               to.source.name = 'cdc.aggregated.county',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census.grouped.age')
 
 
 # Aggregate proportion.msm to MSA ---------------------------------------
     
-    counties.in.the.tga = locations::get.contained.locations("TGA.OAKLAND", "COUNTY")
+put.msa.data.as.new.source.NEW(outcome = 'proportion.msm',
+                               from.source.name = 'emory',
+                               to.source.name = 'emory.aggregated',
+                               to.locations =  oakland,
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census.grouped.age',
+                               source.for.denominator='census.population',
+                               ontology.for.denominator='census.grouped.age',
+                               details.for.new.data= "aggregated from 2013 Emory estimates")
 
-    counties.we.have.data.for = counties.in.the.tga[counties.in.the.tga %in% dimnames(surveillance.manager$data$proportion.msm$estimate$emory$emory$year__location__sex)$location] #only pull what we have data for
-    
-    aggregated.data <- surveillance.manager$pull('proportion.msm',
-                                                 sources='emory',
-                                                 keep.dimensions = c('year', 'sex'),
-                                                 dimension.values=list(location=counties.we.have.data.for))
-    
-    aggregated.data <- as.data.frame(apply(aggregated.data, c('year', 'sex'), function(x) {x}))
-    
-    
-    oakland.prop.msm <- aggregated.data %>%
-        pivot_longer(
-            cols = c(female, male),
-            names_to = "sex",
-            values_to = "value"
-        ) %>%
-        mutate(
-            location = "TGA.OAKLAND",
-            outcome = "proportion.msm",
-            year = "2013")%>%
-        filter( sex == "male")
-    
-    oakland.prop.msm = as.data.frame(oakland.prop.msm)
-
-    surveillance.manager$put.long.form(
-            data = oakland.prop.msm,
-            ontology.name = 'emory',
-            source = 'emory.aggregated',
-            metric = 'estimate',
-            dimension.values = list(),
-            url = 'https://prismhealth.emory.edu/estimating-the-population-sizes-of-men-who-have-sex-with-men-in-us-states-and-counties-using-data-from-the-american-community-survey/',
-            details='Emory University MSM Research from American Community Survey')
-    
-    
+put.msa.data.as.new.source.NEW(outcome = 'proportion.msm',
+                               from.source.name = 'emory',
+                               to.source.name = 'emory.aggregated',
+                               to.locations =  oakland,
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census.grouped.age',
+                               source.for.denominator='census.population',
+                               ontology.for.denominator='census.grouped.age',
+                               details.for.new.data = "aggregated from 2013 Emory estimates")

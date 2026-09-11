@@ -35,6 +35,8 @@ SHIELD.DUMMY.PARTITIONING.FUNCTION <- function(arr, version = 'shield', location
 }
 proportion.tested.bias.estimates = get.cached.object.for.version(name = "proportion.tested.bias.estimates", 
                                                                  version = 'shield')
+prop_male_diag_among_msm_bias_estimates = get.cached.object.for.version(name = "prop_male_diag_among_msm_bias_estimates", 
+                                                                 version = 'shield')
 SHIELD.PARTITIONING.FUNCTION <- function(arr, version, location)
 {
     # We only do anything if:
@@ -588,14 +590,15 @@ proportion.male.diagnosis.among.msm.nested.likelihood.instructions <-
                                                      denominator.outcome.for.data = "denominator.for.prop.male.ps.diag.among.msm",
                                                      outcome.for.n.multipliers = "ps.syphilis.diagnoses", # Have to set this to something with county-level data.
                                                      #
+                                                     from.year = 2000,
                                                      location.types = c('STATE','CBSA'),
                                                      minimum.geographic.resolution.type = "COUNTY",
                                                      levels.of.stratification = 0,
                                                      #
                                                      p.bias.inside.location = 0,
-                                                     p.bias.outside.location = 0,
+                                                     p.bias.outside.location = prop_male_diag_among_msm_bias_estimates$out.mean, # from SHIELD/inputs/
                                                      p.bias.sd.inside.location = 0.05, #'@PK: I need to find a couple of locations (NY, CA?) that report the MSM number and derive these estimates
-                                                     p.bias.sd.outside.location = 0.05,
+                                                     p.bias.sd.outside.location = prop_male_diag_among_msm_bias_estimates$out.sd,
                                                      #
                                                      within.location.p.error.correlation = 0.5, #Default: correlation from one year to other in the bias in the city and outside the city
                                                      within.location.n.error.correlation = 0.5, #Default: ratio of tests outside MSA to those inside MSA (for MSA we usually dont have fully stratified numbers)
@@ -895,7 +898,7 @@ proportion.tested.total.by.age.race.sex.nested.likelihood.instructions <-
 #-- LIKELIHOODS --# ----
 ## *** STAGE 0 *** ##: All Demog likelihoods + total PS diag ----
 # 2022: using all data to 2022 ----
-lik.inst.stage0 =join.likelihood.instructions(
+lik.inst.stage0.2022 =join.likelihood.instructions(
     population.likelihood.instructions,
     deaths.likelihood.instructions, 
     fertility.likelihood.instructions,
@@ -914,7 +917,7 @@ lik.inst.stage0.2021 =join.likelihood.instructions(
     immigration.likelihood.instructions,
     emigration.likelihood.instructions,
     #
-    ps.diagnosis.stage0.total.likelihood.instructions.2021, #'@Andrew:this one already has a weight of 4, why?
+    ps.diagnosis.stage0.total.likelihood.instructions.2021, #'@Andrew:this one already has a weight of 4, why? #@Parastu: we upweighted it to make sure it had some influence to get diagnoses in the right ballpark; otherwise, there was no point to having it and demographics would completely dominate. 
     #
     additional.weights = STAGE.0.WEIGHT
 )

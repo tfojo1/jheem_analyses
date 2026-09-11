@@ -138,6 +138,21 @@ data.list.brfss.msa.clean = lapply(brfss_file_msa_list, function(file){
     data$age = data$`_AGEG5YR`
     data$ever.tested = data$HIVTST7
   }
+  if(grepl("2023", filename)) {
+      data$year = as.numeric("2023")
+      data$sex = as.character(data$`_SEX`)
+      data$race = data$`_RACE`
+      data$age = data$`_AGEG5YR`
+      data$ever.tested = data$HIVTST7
+  }
+  
+  if(grepl("2024", filename)) {
+      data$year = as.numeric("2024")
+      data$sex = as.character(data$`_SEX`)
+      data$race = data$`_RACE`
+      data$age = data$`_AGEG5YR`
+      data$ever.tested = data$HIVTST7
+  }
   
   #Create outcome#
   data$outcome = "proportion.tested.for.hiv"  

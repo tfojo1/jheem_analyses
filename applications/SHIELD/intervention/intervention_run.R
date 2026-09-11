@@ -14,7 +14,7 @@ LAST.YEAR <- as.numeric(args[5])
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 source("../jheem_analyses/applications/SHIELD/intervention/intervention_definitions.R")
-source("../jheem_analyses/applications/SHIELD/intervention/intervention_helper_functions.R")
+# source("../jheem_analyses/applications/SHIELD/intervention/intervention_helper_functions.R")
 
 # =============================================================================
 # SECTION 1: Configuration
@@ -32,12 +32,16 @@ BASE.PATH <- paste0(ROOT.DIR,"/simulations/shield")
 
 INTERVENTION.LABELS <- c(
     noint        = "No Doxy-PEP Intervention",
-    doxy.u.100.p.100   = "Uptake 100% Persistence 100%",
-    doxy.u.50.p.100   = "Uptake 50% Persistence 100%",
-    doxy.u.100.p.50   = "Uptake 100% Persistence 50%",
-    doxy.u.50.p.50   = "Uptake 50% Persistence 50%",
-    doxy.kingCounty="Uptake 15%, 40% and then 100%"
-    
+    doxy.cov.10   = "coverage 10%",
+    doxy.cov.20   = "coverage 20%",
+    doxy.cov.30   = "coverage 30%",
+    doxy.cov.40   = "coverage 40%",
+    doxy.cov.50   = "coverage 50%",
+    doxy.cov.60   = "coverage 60%",
+    doxy.cov.70   = "coverage 70%",
+    doxy.cov.80   = "coverage 80%",
+    doxy.cov.90   = "coverage 90%",
+    doxy.cov.100  = "coverage 100%"
 )
 INTERVENTION.CODES <- names(INTERVENTION.LABELS)
 

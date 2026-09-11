@@ -2,7 +2,7 @@
 #
 # USAGE
 #   Launch over SSH (survives logout):
-#       nohup bash applications/SHIELD/launch_interventions.sh > applications/SHIELD/logs/launcher.out 2>&1 &
+#       nohup bash applications/SHIELD/launch_parallel_stages.sh > applications/SHIELD/logs/launcher.out 2>&1 &
 #   Kill Runs:
 #       pkill -u pkasaie1 -x R
 #       pkill -u pkasaie1 -f "Rscript"
@@ -62,36 +62,37 @@ all_except_ten_cities=(
     C.26900 C.17140 C.18140 C.12940 C.40900 C.17460
 )
 
-all_ten_except_chicago=(
-    C.12060 C.12580 C.26420 C.31080
-    C.33100 C.35620 C.37980 C.38060 C.42660
-)
 
+two_cities=(
+    C.37980
+)
 # ── set active cities and calibration codes here ───────────────────────────────
-CITIES=("${ten_cities[@]}")
+CITIES=("${two_cities[@]}")
 
 CALIBRATION_CODES=(
-    calib.7.16.stage3.az
+    calib.7.30.stage2.LA.PA
 )
 
-N_SIM=400
-FIRST_YEAR=2000
-LAST_YEAR=2040
-
-SCRIPT="$SCRIPT_DIR/intervention/intervention_run.R"
+SCRIPT="$SCRIPT_DIR/shield_calib_setup_and_run_modular.R"
 MAX_JOBS=20
+
+# ── preflight ──────────────────────────────────────────────────────────────────
+if [[ ! -f "$SCRIPT" ]]; then
+    echo "Error: R script not found at $SCRIPT" >&2
+    exit 1
+fi
 
 # ── per city+calibration code runner ──────────────────────────────────────────
 run_calib_code() {
     local loc="$1"
     local calib_code="$2"
     echo "[$(date '+%F %T')] START   $loc :: $calib_code"
-    Rscript "$SCRIPT" "$loc" "$calib_code" "$N_SIM" "$FIRST_YEAR" "$LAST_YEAR" \
-    > "$LOG_DIR/interventions_${loc}_${calib_code}.out" 2>&1
+    Rscript "$SCRIPT" "$loc" "$calib_code" all \
+        > "$LOG_DIR/${loc}_${calib_code}.out" 2>&1
     local rc=$?
-        if (( rc != 0 )); then
-    echo "[$(date '+%F %T')] FAILED  $loc :: $calib_code (exit $rc)" >&2
-    return 1
+    if (( rc != 0 )); then
+        echo "[$(date '+%F %T')] FAILED  $loc :: $calib_code (exit $rc)" >&2
+        return 1
     fi
     echo "[$(date '+%F %T')] DONE    $loc :: $calib_code"
 }
@@ -101,19 +102,19 @@ run_calib_code() {
 running_jobs=0
 
 for loc in "${CITIES[@]}"; do
-for calib_code in "${CALIBRATION_CODES[@]}"; do
+    for calib_code in "${CALIBRATION_CODES[@]}"; do
 
-while (( running_jobs >= MAX_JOBS )); do
-wait -n -p done_pid
-(( running_jobs-- ))
-echo "[$(date '+%F %T')] SLOT FREED (PID $done_pid, running_jobs=$running_jobs)"
-done
+        while (( running_jobs >= MAX_JOBS )); do
+            wait -n -p done_pid
+            (( running_jobs-- ))
+            echo "[$(date '+%F %T')] SLOT FREED (PID $done_pid, running_jobs=$running_jobs)"
+        done
 
-run_calib_code "$loc" "$calib_code" &
-    (( running_jobs++ ))
-echo "[$(date '+%F %T')] LAUNCHED INTERVENTIONS FOR $loc :: $calib_code (PID $!, running_jobs=$running_jobs)"
+        run_calib_code "$loc" "$calib_code" &
+        (( running_jobs++ ))
+        echo "[$(date '+%F %T')] LAUNCHED $loc :: $calib_code (PID $!, running_jobs=$running_jobs)"
 
-done
+    done
 done
 
 wait

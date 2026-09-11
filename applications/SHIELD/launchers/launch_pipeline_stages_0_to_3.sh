@@ -79,7 +79,7 @@ CITIES=("${ten_cities[@]}")
 
 # Phase 1: sequential, single-chain stages (one Rscript process per stage,
 # so the OS fully reclaims memory between them).
-SEQ_SCRIPT="$SCRIPT_DIR/shield_calib_setup_and_run.R"
+SEQ_SCRIPT="$SCRIPT_DIR/shield_calib_setup_and_run_modular.R"
 SEQ_CALIBRATION_CODES=(
     calib.7.5.stage2.az
 )
@@ -94,6 +94,14 @@ N_CHAINS=4
 # Peak core usage = PAR_MAX_CITIES x N_CHAINS (e.g. 5 x 4 = 20)
 PAR_MAX_CITIES=5
 
+# ── preflight ──────────────────────────────────────────────────────────────────
+for s in "$SEQ_SCRIPT" "$PAR_SCRIPT"; do
+    if [[ ! -f "$s" ]]; then
+        echo "Error: R script not found at $s" >&2
+        exit 1
+    fi
+done
+
 
 # ── PHASE 1: per-city sequential pipeline (stages 0-2) ─────────────────────────
 # Arguments: $1 = city code, $2..$N = calibration code names
@@ -105,7 +113,7 @@ run_city_sequential() {
     
     echo "[$(date '+%F %T')] START   $loc :: $calib_code"
     
-    Rscript "$SEQ_SCRIPT" "$loc" "$calib_code" \
+    Rscript "$SEQ_SCRIPT" "$loc" "$calib_code" all \
     > "$LOG_DIR/${loc}_${calib_code}.out" 2>&1
     local rc=$?
         

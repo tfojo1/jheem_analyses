@@ -997,7 +997,6 @@ register.model.quantity(ADAP.SPECIFICATION,
                         value = expression(adap.covers.copay * adap.covers.deductible * proportion.Cs.clients.with.Cp.if.allowed + 
                                                (1-adap.covers.deductible)*adap.covers.copay))
 
-# melissa and todd circle back to this section: 
 
 ##----------------------------------------------##
 ##-- INPUTS: P ADAP SERVICE TYPE GIVEN INCOME --##
@@ -1515,13 +1514,13 @@ register.model.quantity(ADAP.SPECIFICATION,
 #   5) uninsured
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.income.with.medicare.without.medicaid.among.adap', # baseline.p.of.adap.by.income.with.medicare.without.medicaid
+                        name = 'baseline.p.of.income.with.medicare.without.medicaid.among.adap', 
                         value = expression(baseline.p.of.income.with.medicare.and.ssi.among.adap + 
                                                baseline.p.of.income.with.medicare.without.ssi.among.adap -
                                                baseline.p.of.income.with.medicare.and.medicaid.among.adap))
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.income.without.medicare.or.medicaid.among.adap', # baseline.p.of.adap.by.income.without.medicare.or.medicaid
+                        name = 'baseline.p.of.income.without.medicare.or.medicaid.among.adap', 
                         value = expression(baseline.p.of.income.with.ssi.among.adap + 
                                                baseline.p.of.income.without.ssi.among.adap -
                                                baseline.p.of.income.with.medicare.and.medicaid.among.adap -
@@ -1549,7 +1548,7 @@ register.model.quantity(ADAP.SPECIFICATION,
                         value = expression(baseline.p.of.income.without.medicare.or.medicaid.among.adap * p.uninsured.given.income.and.no.public.insurance))
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.income.private.among.adap', # baseline.p.of.adap.by.income.private.insurance
+                        name = 'baseline.p.of.income.private.among.adap', 
                         value = expression(baseline.p.of.income.without.medicare.or.medicaid.among.adap - baseline.p.of.income.uninsured.among.adap))
 
 
@@ -1607,6 +1606,7 @@ register.model.quantity(ADAP.SPECIFICATION,
     # F, P, Cs, 
     # FP, FCs, PCs
     # FPCs
+
 
 # INPUTS - these are our priors, we will use them below; calculated from the 4 parameters of the logistic functions (defined in INPUTS: P ADAP SERVICE TYPE GIVEN INCOME)
 # P1 
@@ -1718,7 +1718,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 #       (using math from PCs, just 1-p6 instead of p6 [probability of cost-share]): 
 # (P/all) = (1-p6) * p5 * (1-p1 - ((1-p1)*p2))
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.P.income.medicaid.among.adap',
+                        name = 'baseline.p.of.P.only.income.medicaid.among.adap',
                         value = expression(baseline.p.of.income.medicaid.among.adap * # always have to include "among adap"
                                                (1-baseline.p.of.Cs.among.P.income.medicaid) * # (1-p6) 
                                                baseline.p.of.P.among.no.F.income.medicaid * # p5 
@@ -1740,7 +1740,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 
 # OUTPUT 7: Cs only 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.Cs.income.medicaid.among.adap', 
+                        name = 'baseline.p.of.Cs.only.income.medicaid.among.adap', 
                         value = expression(baseline.p.of.income.medicaid.among.adap -  
                                                (baseline.p.of.F.only.income.medicaid.among.adap + # F only 
                                                     baseline.p.of.P.only.income.medicaid.among.adap + # P only 
@@ -1842,7 +1842,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 
 # OUTPUT 5: P only
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.P.income.medicare.among.adap',
+                        name = 'baseline.p.of.P.only.income.medicare.among.adap',
                         value = expression(baseline.p.of.income.medicare.among.adap * 
                                                (1-baseline.p.of.Cs.among.P.income.medicare) * # (1-p6) 
                                                baseline.p.of.P.among.no.F.income.medicare * # p5 
@@ -1861,7 +1861,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 
 # OUTPUT 7: Cs only 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.Cs.income.medicare.among.adap', 
+                        name = 'baseline.p.of.Cs.only.income.medicare.among.adap', 
                         value = expression(baseline.p.of.income.medicare.among.adap -  
                                                (baseline.p.of.F.only.income.medicare.among.adap + # F only 
                                                     baseline.p.of.P.only.income.medicare.among.adap + # P only 
@@ -1961,7 +1961,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 
 # OUTPUT 5: P only
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.P.income.medicare.and.medicaid.among.adap',
+                        name = 'baseline.p.of.P.only.income.medicare.and.medicaid.among.adap',
                         value = expression(baseline.p.of.income.medicare.and.medicaid.among.adap * 
                                                (1-baseline.p.of.Cs.among.P.income.medicare.and.medicaid) * # (1-p6) 
                                                baseline.p.of.P.among.no.F.income.medicare.and.medicaid * # p5 
@@ -1980,7 +1980,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 
 # OUTPUT 7: Cs only 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.Cs.income.medicare.and.medicaid.among.adap', 
+                        name = 'baseline.p.of.Cs.only.income.medicare.and.medicaid.among.adap', 
                         value = expression(baseline.p.of.income.medicare.and.medicaid.among.adap -  
                                                (baseline.p.of.F.only.income.medicare.and.medicaid.among.adap + # F only 
                                                     baseline.p.of.P.only.income.medicare.and.medicaid.among.adap + # P only 
@@ -2080,7 +2080,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 
 # OUTPUT 5: P only
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.P.income.private.among.adap',
+                        name = 'baseline.p.of.P.only.income.private.among.adap',
                         value = expression(baseline.p.of.income.private.among.adap * 
                                                (1-baseline.p.of.Cs.among.P.income.private) * # (1-p6) 
                                                baseline.p.of.P.among.no.F.income.private * # p5 
@@ -2099,7 +2099,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 
 # OUTPUT 7: Cs only 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.Cs.income.private.among.adap', 
+                        name = 'baseline.p.of.Cs.only.income.private.among.adap', 
                         value = expression(baseline.p.of.income.private.among.adap -  
                                                (baseline.p.of.F.only.income.private.among.adap + # F only 
                                                     baseline.p.of.P.only.income.private.among.adap + # P only 
@@ -2137,7 +2137,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 
 # OUTPUT 5: P only
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.P.income.uninsured.among.adap',
+                        name = 'baseline.p.of.P.only.income.uninsured.among.adap',
                         value = 0)
 
 # OUTPUT 6: FCs 
@@ -2147,153 +2147,90 @@ register.model.quantity(ADAP.SPECIFICATION,
 
 # OUTPUT 7: Cs only 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.Cs.income.uninsured.among.adap', 
+                        name = 'baseline.p.of.Cs.only.income.uninsured.among.adap', 
                         value = 0) 
 
 
 
+# Sum over insurance types to get proportion in each service category by income, among ADAP 
+# 1: F only
+# 2: FP  
+# 3: FPCs
+# 4: PCs
+# 5: P only
+# 6: FCs 
+# 7: Cs only 
 
+# 1: F only
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'baseline.p.of.F.only.income.among.adap', 
+                       value = expression(baseline.p.of.F.only.income.medicaid.among.adap*baseline.p.of.income.with.medicaid.without.medicare.among.adap + # Medicaid (proportion F only Medicaid * proportion Medicaid)
+                                              baseline.p.of.F.only.income.medicare.among.adap*baseline.p.of.income.with.medicare.without.medicaid.among.adap + # Medicare
+                                              baseline.p.of.F.only.income.medicare.and.medicaid.among.adap*baseline.p.of.income.with.medicare.and.medicaid.among.adap + # Medicare + Medicaid 
+                                              baseline.p.of.F.only.income.private.among.adap*baseline.p.of.income.private.among.adap + # Private
+                                              baseline.p.of.F.only.income.uninsured.among.adap*baseline.p.of.income.uninsured.among.adap # Uninsured
+                       ))
 
+# 2: FP 
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'baseline.p.of.FP.income.among.adap', 
+                       value = expression(baseline.p.of.FP.income.medicaid.among.adap*baseline.p.of.income.with.medicaid.without.medicare.among.adap + # Medicaid
+                                              baseline.p.of.FP.income.medicare.among.adap*baseline.p.of.income.with.medicare.without.medicaid.among.adap + # Medicare
+                                              baseline.p.of.FP.income.medicare.and.medicaid.among.adap*baseline.p.of.income.with.medicare.and.medicaid.among.adap + # Medicare + Medicaid 
+                                              baseline.p.of.FP.income.private.among.adap*baseline.p.of.income.private.among.adap + # Private
+                                              baseline.p.of.FP.income.uninsured.among.adap*baseline.p.of.income.uninsured.among.adap # Uninsured
+                       ))
 
-## Melissa: UP TO HERE
+# 3: FPCs
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'baseline.p.of.FPCs.income.among.adap', 
+                       value = expression(baseline.p.of.FPCs.income.medicaid.among.adap*baseline.p.of.income.with.medicaid.without.medicare.among.adap + # Medicaid
+                                              baseline.p.of.FPCs.income.medicare.among.adap*baseline.p.of.income.with.medicare.without.medicaid.among.adap + # Medicare
+                                              baseline.p.of.FPCs.income.medicare.and.medicaid.among.adap*baseline.p.of.income.with.medicare.and.medicaid.among.adap + # Medicare + Medicaid 
+                                              baseline.p.of.FPCs.income.private.among.adap*baseline.p.of.income.private.among.adap + # Private
+                                              baseline.p.of.FPCs.income.uninsured.among.adap*baseline.p.of.income.uninsured.among.adap # Uninsured
+                       ))
 
-# Also need to add:
-#   income.
+# 4: PCs
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'baseline.p.of.PCs.income.among.adap', 
+                       value = expression(baseline.p.of.PCs.income.medicaid.among.adap*baseline.p.of.income.with.medicaid.without.medicare.among.adap + # Medicaid
+                                              baseline.p.of.PCs.income.medicare.among.adap*baseline.p.of.income.with.medicare.without.medicaid.among.adap + # Medicare
+                                              baseline.p.of.PCs.income.medicare.and.medicaid.among.adap*baseline.p.of.income.with.medicare.and.medicaid.among.adap + # Medicare + Medicaid 
+                                              baseline.p.of.PCs.income.private.among.adap*baseline.p.of.income.private.among.adap + # Private
+                                              baseline.p.of.PCs.income.uninsured.among.adap*baseline.p.of.income.uninsured.among.adap # Uninsured
+                       ))
 
-# going to need to define
-# rr.full.pay.with.medicaid.only
-# rr.full.pay.with.medicare.only
-# rr.full.pay.with.medicare.and.medicaid
+# 5: P only
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'baseline.p.of.P.only.income.among.adap', 
+                       value = expression(baseline.p.of.P.only.income.medicaid.among.adap*baseline.p.of.income.with.medicaid.without.medicare.among.adap + # Medicaid
+                                              baseline.p.of.P.only.income.medicare.among.adap*baseline.p.of.income.with.medicare.without.medicaid.among.adap + # Medicare
+                                              baseline.p.of.P.only.income.medicare.and.medicaid.among.adap*baseline.p.of.income.with.medicare.and.medicaid.among.adap + # Medicare + Medicaid 
+                                              baseline.p.of.P.only.income.private.among.adap*baseline.p.of.income.private.among.adap + # Private
+                                              baseline.p.of.P.only.income.uninsured.among.adap*baseline.p.of.income.uninsured.among.adap # Uninsured
+                       ))
 
-##-- Distribute by Income across service categories --##
+# 6: FCs
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'baseline.p.of.FCs.income.among.adap', 
+                       value = expression(baseline.p.of.FCs.income.medicaid.among.adap*baseline.p.of.income.with.medicaid.without.medicare.among.adap + # Medicaid
+                                              baseline.p.of.FCs.income.medicare.among.adap*baseline.p.of.income.with.medicare.without.medicaid.among.adap + # Medicare
+                                              baseline.p.of.FCs.income.medicare.and.medicaid.among.adap*baseline.p.of.income.with.medicare.and.medicaid.among.adap + # Medicare + Medicaid 
+                                              baseline.p.of.FCs.income.private.among.adap*baseline.p.of.income.private.among.adap + # Private
+                                              baseline.p.of.FCs.income.uninsured.among.adap*baseline.p.of.income.uninsured.among.adap # Uninsured
+                       ))
 
+# 7: Cs only
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'baseline.p.of.Cs.only.income.among.adap', 
+                       value = expression(baseline.p.of.Cs.only.income.medicaid.among.adap*baseline.p.of.income.with.medicaid.without.medicare.among.adap + # Medicaid
+                                              baseline.p.of.Cs.only.income.medicare.among.adap*baseline.p.of.income.with.medicare.without.medicaid.among.adap + # Medicare
+                                              baseline.p.of.Cs.only.income.medicare.and.medicaid.among.adap*baseline.p.of.income.with.medicare.and.medicaid.among.adap + # Medicare + Medicaid 
+                                              baseline.p.of.Cs.only.income.private.among.adap*baseline.p.of.income.private.among.adap + # Private
+                                              baseline.p.of.Cs.only.income.uninsured.among.adap*baseline.p.of.income.uninsured.among.adap # Uninsured
+                       ))
 
-#-- Full Pay Only --##
-calculate.p.full.pay.only.by.income <- function(p.full.pay.only.if.adap.midpoint,
-                                                p.full.pay.only.if.adap.logistic.slope,
-                                                p.full.pay.only.if.adap.min,
-                                                p.full.pay.only.if.adap.max,
-                                                max.baseline.adap.income)
-{
-    calculate.logistic.p(logistic.midpoint = p.full.pay.only.if.adap.midpoint,
-                         logistic.slope = p.full.pay.only.if.adap.logistic.slope,
-                         min.p = p.full.pay.only.if.adap.min,
-                         max.p = p.full.pay.only.if.adap.max,
-                         max.baseline.adap.income = max.baseline.adap.income)
-}
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.full.pay.only.by.income',
-                        value = calculate.p.full.pay.by.income)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.full.pay.only.by.income.and.uninsured',
-                        value = expression(baseline.p.of.income.uninsured.among.adap * baseline.p.full.pay.only.by.income))
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.full.pay.only.by.income.and.private.insurance',
-                        value = expression(baseline.p.of.income.private.insurance.among.adap * baseline.p.full.pay.only.by.income * rr.full.pay.only.if.private.insurance))
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.full.pay.only.by.income.with.medicare.without.medicaid',
-                        value = expression(baseline.p.full.pay.only.by.income * baseline.p.of.income.with.medicare.without.medicaid.among.adap * rr.full.pay.with.medicare.only))
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.full.pay.only.by.income.with.medicaid.without.medicare',
-                        value = expression(baseline.p.full.pay.only.by.income * baseline.p.of.income.with.medicaid.without.medicare.among.adap * rr.full.pay.with.medicaid.only))
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.full.pay.only.by.income.with.medicare.and.medicaid',
-                        value = expression(baseline.p.full.pay.only.by.income * baseline.p.of.income.with.medicare.and.medicaid.among.adap * rr.full.pay.with.medicare.and.medicaid))
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.full.pay.only.by.income',
-                        value = expression(p.of.adap.with.full.pay.only.by.income.without.medicare.or.medicaid +
-                                               p.of.adap.with.full.pay.only.by.income.with.medicare.without.medicaid +
-                                               p.of.adap.with.full.pay.only.by.income.with.medicaid.without.medicare +
-                                               p.of.adap.with.full.pay.only.by.income.with.medicare.and.medicaid))
-
-
-#-- Any Premium Assistance --#
-calculate.p.premium.if.not.full.pay.only.by.income <- function(p.premium.if.not.full.pay.only.if.adap.midpoint,
-                                                               p.premium.if.not.full.pay.only.if.adap.logistic.slope,
-                                                               p.premium.if.not.full.pay.only.if.adap.min,
-                                                               p.premium.if.not.full.pay.only.if.adap.max,
-                                                               max.baseline.adap.income)
-{
-    calculate.logistic.p(logistic.midpoint = p.premium.if.not.full.pay.only.if.adap.midpoint,
-                         logistic.slope = p.premium.if.not.full.pay.only.if.adap.logistic.slope,
-                         min.p = p.premium.if.not.full.pay.only.if.adap.min,
-                         max.p = p.premium.if.not.full.pay.only.if.adap.max,
-                         max.baseline.adap.income = max.baseline.adap.income)
-}
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.premium.if.not.full.pay.only.by.income',
-                        value = calculate.p.premium.if.not.full.pay.only.by.income)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.premium.if.not.full.pay.only.by.income.without.medicare.or.medicaid',
-                        value = expression(baseline.p.premium.if.not.full.pay.only.by.income * 
-                                               (baseline.p.of.income.without.medicare.or.medicaid.among.adap - p.of.adap.with.full.pay.only.by.income.without.medicare.or.medicaid)))
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.premium.if.not.full.pay.only.by.income.with.medicare.without.medicaid',
-                        value = expression(baseline.p.premium.if.not.full.pay.only.by.income * rr.premium.with.medicare.only *
-                                               (baseline.p.of.income.with.medicare.without.medicaid.among.adap - baseline.p.of.adap.with.full.pay.only.by.income.with.medicare.without.medicaid)))
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.premium.if.not.full.pay.only.by.income.with.medicaid.without.medicare',
-                        value = expression(baseline.p.premium.if.not.full.pay.only.by.income * rr.full.pay.with.medicaid.only *
-                                               (baseline.p.of.income.with.medicaid.without.medicare.among.adap - baseline.p.of.adap.with.full.pay.only.by.income.with.medicaid.without.medicare)))e
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.premium.if.not.full.pay.only.by.income.with.medicare.and.medicaid',
-                        value = expression(baseline.p.premium.if.not.full.pay.only.by.income * baseline.p.of.income.with.medicare.and.medicaid.among.adap * rr.full.pay.with.medicare.and.medicaid))
-
-
-
-## <-- UP TO HERE --> ##
-#-- Full Pay Plus --#
-calculate.p.full.pay.plus.if.not.full.pay.only.by.income <- function(p.full.pay.plus.if.not.full.pay.only.midpoint,
-                                                p.full.pay.plus.only.if.adap.logistic.slope,
-                                                p.full.pay.plus.only.if.adap.min,
-                                                p.full.pay.plus.only.if.adap.max,
-                                                max.baseline.adap.income)
-{
-    calculate.logistic.p(logistic.midpoint = p.full.pay.plus.only.if.adap.midpoint,
-                         logistic.slope = p.full.pay.plus.only.if.adap.logistic.slope,
-                         min.p = p.full.pay.plus.only.if.adap.min,
-                         max.p = p.full.pay.plus.only.if.adap.max,
-                         max.baseline.adap.income = max.baseline.adap.income)
-}
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'p.full.pay.plus.if.not.full.pay.only.by.income',
-                        value = calculate.p.full.pay.plus.if.not.full.pay.only.by.income)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'p.of.adap.with.full.pay.plus.by.income',
-                        value = expression(p.full.pay.plus.if.not.full.pay.only.by.income * (
-                            baseline.p.of.income.without.medicare.or.medicaid.among.adap +
-                                baseline.p.of.income.with.medicaid.without.medicare.among.adap * rr.full.pay.with.medicaid.only +
-                                baseline.p.of.income.with.medicare.without.medicaid.among.adap * rr.full.pay.with.medicare.only +
-                                baseline.p.of.income.with.medicare.and.medicaid.among.adap * rr.full.pay.with.medicare.and.medicaid
-                        )))
-
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'p.of.adap.with.premium.without.cost.sharing.by.income',
-                        value = 0.5)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'p.of.adap.with.premium.and.cost.sharing.by.income',
-                        value = 0.5)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'p.of.adap.with.cost.sharing.without.premium.by.income',
-                        value = 0.5)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'p.of.adap.with.full.pay.and.premium.without.cost.sharing.by.income',
-                        value = 0.5)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'p.of.adap.with.full.pay.and.premium.and.cost.sharing.by.income',
-                        value = 0.5)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'p.of.adap.with.full.pay.and.cost.sharing.without.premium.by.income',
-                        value = 0.5)
 
 
 ##--------------------------------------------------------------##
@@ -2308,57 +2245,73 @@ sum.p.across.income <- function(income.distribution)
     apply(income.distribution, non.income.dimensions, sum)
 }
 
-# Full-Pay Only
-calculate.baseline.p.of.adap.with.full.pay.only <- function(p.of.adap.with.full.pay.only.by.income) {
-    sum.p.across.income(p.of.adap.with.full.pay.only.by.income)
-}
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.full.pay.only',
-                        value = calculate.baseline.p.of.adap.with.full.pay.only)
+# 1: F only
+# 2: FP  
+# 3: FPCs
+# 4: PCs
+# 5: P only
+# 6: FCs 
+# 7: Cs only 
 
-# Full-Pay Plus another service
-calculate.baseline.p.of.adap.with.full.pay.and.premium.without.cost.sharing <- function(p.of.adap.with.full.pay.only.by.income) {
-    sum.p.across.income(p.of.adap.with.full.pay.only.by.income)
-}
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.full.pay.and.premium.without.cost.sharing',
-                        value = calculate.baseline.p.of.adap.with.full.pay.and.premium.without.cost.sharing)
 
-calculate.baseline.p.of.adap.with.full.pay.and.premium.and.cost.sharing <- function(p.of.adap.with.full.pay.only.by.income) {
-    sum.p.across.income(p.of.adap.with.full.pay.only.by.income)
+# 1: F only
+calculate.baseline.p.of.F.only.among.adap <- function(baseline.p.of.F.only.income.among.adap) { 
+    sum.p.across.income(baseline.p.of.F.only.income.among.adap)
 }
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.full.pay.and.premium.and.cost.sharing',
-                        value = calculate.baseline.p.of.adap.with.full.pay.and.premium.and.cost.sharing)
+                        name = 'baseline.p.of.F.only.among.adap',
+                        value = calculate.baseline.p.of.F.only.among.adap)
 
-calculate.baseline.p.of.adap.with.full.pay.and.cost.sharing.without.premium <- function(p.of.adap.with.full.pay.only.by.income) {
-    sum.p.across.income(p.of.adap.with.full.pay.only.by.income)
+# 2: FP  
+calculate.baseline.p.of.FP.among.adap <- function(baseline.p.of.FP.income.among.adap) { 
+    sum.p.across.income(baseline.p.of.FP.income.among.adap)
 }
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.full.pay.and.cost.sharing.without.premium',
-                        value = calculate.baseline.p.of.adap.with.full.pay.and.cost.sharing.without.premium)
+                        name = 'baseline.p.of.FP.among.adap',
+                        value = calculate.baseline.p.of.FP.among.adap)
 
-# No full-pay
-calculate.baseline.p.of.adap.with.premium.without.cost.sharing <- function(p.of.adap.with.full.pay.only.by.income) {
-    sum.p.across.income(p.of.adap.with.full.pay.only.by.income)
+# 3: FPCs
+calculate.baseline.p.of.FPCs.among.adap <- function(baseline.p.of.FPCs.income.among.adap) { 
+    sum.p.across.income(baseline.p.of.FPCs.income.among.adap)
 }
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.premium.without.cost.sharing',
-                        value = calculate.baseline.p.of.adap.with.premium.without.cost.sharing)
+                        name = 'baseline.p.of.FPCs.among.adap',
+                        value = calculate.baseline.p.of.FPCs.among.adap)
 
-calculate.baseline.p.of.adap.with.premium.and.cost.sharing <- function(p.of.adap.with.full.pay.only.by.income) {
-    sum.p.across.income(p.of.adap.with.full.pay.only.by.income)
+# 4: PCs
+calculate.baseline.p.of.PCs.among.adap <- function(baseline.p.of.PCs.income.among.adap) { 
+    sum.p.across.income(baseline.p.of.PCs.income.among.adap)
 }
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.premium.and.cost.sharing',
-                        value = calculate.baseline.p.of.adap.with.premium.and.cost.sharing)
+                        name = 'baseline.p.of.PCs.among.adap',
+                        value = calculate.baseline.p.of.PCs.among.adap)
 
-calculate.baseline.p.of.adap.with.cost.sharing.without.premium <- function(p.of.adap.with.full.pay.only.by.income) {
-    sum.p.across.income(p.of.adap.with.full.pay.only.by.income)
+# 5: P only
+calculate.baseline.p.of.P.only.among.adap <- function(baseline.p.of.P.only.income.among.adap) { 
+    sum.p.across.income(baseline.p.of.P.only.income.among.adap)
 }
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.adap.with.cost.sharing.without.premium',
-                        value = calculate.baseline.p.of.adap.with.cost.sharing.without.premium)
+                        name = 'baseline.p.of.P.only.among.adap',
+                        value = calculate.baseline.p.of.P.only.among.adap)
+
+# 6: FCs 
+calculate.baseline.p.of.FCs.among.adap <- function(baseline.p.of.FCs.income.among.adap) { 
+    sum.p.across.income(baseline.p.of.FCs.income.among.adap)
+}
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.FCs.among.adap',
+                        value = calculate.baseline.p.of.FCs.among.adap)
+
+# 7: Cs only 
+calculate.baseline.p.of.Cs.only.among.adap <- function(baseline.p.of.Cs.only.income.among.adap) { 
+    sum.p.across.income(baseline.p.of.Cs.only.income.among.adap)
+}
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'baseline.p.of.Cs.only.among.adap',
+                        value = calculate.baseline.p.of.Cs.only.among.adap)
+
+
+
 
 ##---------------------------------------------------------------------##
 ##-- CALCULATED: PROPORTION ADAP CLIENTS WHO LOSE or CHANGE SERVICES --##
@@ -2387,223 +2340,370 @@ calculate.p.between.thresholds <- function(income.distribution,
 }
 
 
-#-- From full-pay only --#
-calculate.proportion.adap.full.pay.only.who.lose.eligibility < - function(p.of.adap.with.full.pay.only.by.income, 
-                                                                          adap.full.pay.fpl.threshold) 
+# Ways people can change based on income threshold: 
+
+# 1: F only
+#   1a: Lose
+#   1b: Keep 
+
+# 2: FP
+#   2a: Lose both
+#   2b: Lose premium (F only)
+#   2c: Lose full-pay (P only)
+#   2d: Keep both 
+
+# 3: FPCs
+#   3a: Lose all
+#   3b: Lose F (--> PCs)
+#   3c: Lose Cs (--> FP)
+#   3d: Lose PCs (--> F)
+#   3e: Lose FCs (--> P)
+#   3f: Keep all 
+#   No way to lose premium only (and keep cost-sharing); if you lose premium, presumably lost insurance so lose cost-sharing as well 
+
+# 4: PCs
+#   4a: Lose both 
+#   4b: Lose Cs (--> P)
+#   4c: Lose both, but gain full-pay (above premium but below full-pay )
+#   4d: Keep both 
+
+# 5: P only
+#   5a: Lose
+#   5b: Lose, but gain full-pay (above premium but below full-pay)
+#   5c: Keep 
+
+# 6: FCs 
+#   6a: Lose both 
+#   6b: Lose F (--> Cs) 
+#   6c: Lose Cs (--> F)
+#   6d: Keep both 
+
+# 7: Cs only 
+#   7a: Lose 
+#   7b: Keep 
+
+# Whatever they lose --> lower threshold; keep --> upper threshold
+
+
+#-- 1: F only --#
+# 1a: Lose
+calculate.proportion.F.only.lose.F <- function(baseline.p.of.F.only.income.among.adap, 
+                                               adap.full.pay.fpl.threshold)
 {
-    calculate.p.between.thresholds(income.distribution = p.of.adap.with.full.pay.only.by.income, 
+    calculate.p.between.thresholds(income.distribution = baseline.p.of.F.only.income.among.adap, 
                                    lower.threshold = adap.full.pay.fpl.threshold,
                                    upper.threshold = Inf)
+    
 }
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.adap.full.pay.only.who.lose.eligibility',
-                        value = calculate.proportion.adap.full.pay.only.who.lose.eligibility)
+                        name = 'proportion.F.only.lose.F', 
+                        value = calculate.proportion.F.only.lose.F)
 
-#-- From full-pay + premium without cost-sharing --#
-calculate.proportion.adap.full.pay.and.premium.without.cost.sharing.who.lose.full.pay.eligibility < - function(p.of.adap.with.full.pay.and.premium.without.cost.sharing.by.income, 
-                                                                                                               adap.full.pay.fpl.threshold) 
+# 1b: Keep (don't need to calculate; will be (1 - lose)) 
+
+
+#-- 2: FP --#
+# 2a: Lose both
+calculate.proportion.FP.lose.FP <- function(baseline.p.of.FP.income.among.adap, 
+                                            adap.full.pay.fpl.threshold,
+                                            adap.premium.fpl.threshold)
 {
-    calculate.p.between.thresholds(income.distribution = p.of.adap.with.full.pay.and.premium.without.cost.sharing.by.income, 
-                                   lower.threshold = adap.full.pay.fpl.threshold,
+    calculate.p.between.thresholds(income.distribution = baseline.p.of.FP.income.among.adap, 
+                                   lower.threshold = max(adap.full.pay.fpl.threshold,adap.premium.fpl.threshold),
                                    upper.threshold = Inf)
 }
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.adap.full.pay.and.premium.without.cost.sharing.who.lose.full.pay.eligibility',
-                        value = calculate.proportion.adap.full.pay.and.premium.without.cost.sharing.who.lose.full.pay.eligibility)
+                        name = 'proportion.FP.lose.FP', 
+                        value = calculate.proportion.FP.lose.FP)
 
-calculate.proportion.adap.full.pay.and.premium.without.cost.sharing.who.lose.premium.eligibility < - function(p.of.adap.with.full.pay.and.premium.without.cost.sharing.by.income, 
-                                                                                                              adap.full.pay.fpl.threshold, 
-                                                                                                              adap.premium.fpl.threshold) 
+# 2b: Lose premium (F only)
+calculate.proportion.FP.lose.P <- function(baseline.p.of.FP.income.among.adap, 
+                                           adap.full.pay.fpl.threshold,
+                                           adap.premium.fpl.threshold)
 {
-    calculate.p.between.thresholds(income.distribution = p.of.adap.with.full.pay.and.premium.without.cost.sharing.by.income, 
-                                   lower.threshold = max(adap.full.pay.fpl.threshold, adap.premium.fpl.threshold),
-                                   upper.threshold = Inf)
-}
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.adap.full.pay.and.premium.without.cost.sharing.who.lose.premium.eligibility',
-                        value = calculate.proportion.adap.full.pay.and.premium.without.cost.sharing.who.lose.premium.eligibility)
-
-calculate.proportion.adap.full.pay.and.premium.without.cost.sharing.who.change.eligibility.to.full.pay < - function(p.of.adap.with.full.pay.and.premium.without.cost.sharing.by.income, 
-                                                                                                                    adap.full.pay.fpl.threshold, 
-                                                                                                                    adap.premium.fpl.threshold) 
-{
-    calculate.p.between.thresholds(income.distribution = p.of.adap.with.full.pay.and.premium.without.cost.sharing.by.income, 
+    calculate.p.between.thresholds(income.distribution = baseline.p.of.FP.income.among.adap, 
                                    lower.threshold = adap.premium.fpl.threshold,
-                                   upper.threshold = adap.full.pay.fpl.threshold)
+                                   upper.threshold = adap.full.pay.fpl.threshold) 
 }
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.adap.full.pay.and.premium.without.cost.sharing.who.change.eligibility.to.full.pay',
-                        value = calculate.proportion.adap.full.pay.and.premium.without.cost.sharing.who.change.eligibility.to.full.pay)
+                        name = 'proportion.FP.lose.P', 
+                        # proportion.adap.full.pay.and.premium.without.cost.sharing.who.change.eligibility.to.full.pay, OR 
+                        # proportion.adap.full.pay.and.premium.without.cost.sharing.who.lose.premium.eligibility ? both are used in formulas below 
+                        value = calculate.proportion.FP.lose.P)
 
 
-
-
-#-- From full-pay + premium and cost-sharing --#
-calculate.proportion.adap.full.pay.and.premium.and.cost.sharing.who.lose.full.pay.eligibility < - function(p.of.adap.with.full.pay.and.premium.and.cost.sharing.by.income, 
-                                                                                                           adap.full.pay.fpl.threshold) 
+# 2c: Lose full-pay (P only)
+calculate.proportion.FP.lose.F <- function(baseline.p.of.FP.income.among.adap, 
+                                            adap.full.pay.fpl.threshold,
+                                            adap.premium.fpl.threshold)
 {
-    calculate.p.between.thresholds(income.distribution = p.of.adap.with.full.pay.and.premium.and.cost.sharing.by.income, 
+    calculate.p.between.thresholds(income.distribution = baseline.p.of.FP.income.among.adap, 
                                    lower.threshold = adap.full.pay.fpl.threshold,
-                                   upper.threshold = Inf)
+                                   upper.threshold = adap.premium.fpl.threshold) 
 }
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.adap.full.pay.and.premium.and.cost.sharing.who.lose.full.pay.eligibility',
-                        value = calculate.proportion.adap.full.pay.and.premium.and.cost.sharing.who.lose.full.pay.eligibility)
+                        name = 'proportion.FP.lose.F', 
+                        value = calculate.proportion.FP.lose.F)
 
-calculate.proportion.adap.full.pay.and.premium.and.cost.sharing.who.lose.premium.and.cost.sharing.eligibility < - function(p.of.adap.with.full.pay.and.premium.and.cost.sharing.by.income, 
-                                                                                                           adap.full.pay.fpl.threshold,
-                                                                                                           adap.premium.fpl.threshold,
-                                                                                                           adap.cost.sharing.fpl.threshold) 
+# 2d: Keep both 
+# (1- the rest?)
+
+
+#-- 3: FPCs --#
+# 3a: Lose all
+calculate.proportion.FPCs.lose.FPCs <- function(baseline.p.of.FPCs.income.among.adap, 
+                                           adap.full.pay.fpl.threshold,
+                                           adap.premium.fpl.threshold,
+                                           adap.cost.sharing.fpl.threshold)
 {
-    calculate.p.between.thresholds(income.distribution = p.of.adap.with.full.pay.and.premium.and.cost.sharing.by.income, 
+    calculate.p.between.thresholds(income.distribution = baseline.p.of.FPCs.income.among.adap, 
                                    lower.threshold = max(adap.full.pay.fpl.threshold, max(adap.premium.fpl.threshold, adap.cost.sharing.fpl.threshold)),
+                                   upper.threshold = Inf) 
+}
+
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'proportion.FPCs.lose.FPCs', 
+                        value = calculate.proportion.FPCs.lose.FPCs)
+
+# 3b: Lose F (--> PCs)
+calculate.proportion.FPCs.lose.F <- function(baseline.p.of.FPCs.income.among.adap, 
+                                                adap.full.pay.fpl.threshold,
+                                             adap.premium.fpl.threshold,
+                                             adap.cost.sharing.fpl.threshold)
+{
+    calculate.p.between.thresholds(income.distribution = baseline.p.of.FPCs.income.among.adap, 
+                                   lower.threshold = adap.full.pay.fpl.threshold,
+                                   upper.threshold = min(adap.premium.fpl.threshold,adap.cost.sharing.fpl.threshold)) 
+}
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'proportion.FPCs.lose.F', 
+                        value = calculate.proportion.FPCs.lose.F)
+
+# 3c: Lose Cs (--> FP)
+calculate.proportion.FPCs.lose.Cs <- function(baseline.p.of.FPCs.income.among.adap, 
+                                              adap.cost.sharing.fpl.threshold,
+                                              adap.premium.fpl.threshold,
+                                              adap.full.pay.fpl.threshold)
+{
+    calculate.p.between.thresholds(income.distribution = baseline.p.of.FPCs.income.among.adap, 
+                                   lower.threshold = adap.cost.sharing.fpl.threshold,
+                                   upper.threshold = min(adap.premium.fpl.threshold,adap.full.pay.fpl.threshold)) 
+}
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'proportion.FPCs.lose.Cs', # this never existed 
+                        value = calculate.proportion.FPCs.lose.Cs)
+
+# 3d: Lose PCs (--> F)
+calculate.proportion.FPCs.lose.PCs <- function(baseline.p.of.FPCs.income.among.adap, 
+                                             adap.full.pay.fpl.threshold,
+                                             adap.premium.fpl.threshold,
+                                             adap.cost.sharing.fpl.threshold)
+{
+    calculate.p.between.thresholds(income.distribution = baseline.p.of.FPCs.income.among.adap, 
+                                   lower.threshold = adap.premium.fpl.threshold, # just premium here because you can't lose only premium (if they are above premium but below cost-sharing, they'll lose cost-sharing)
+                                   upper.threshold = adap.full.pay.fpl.threshold) # but below full-pay threshold (keep it)
+}
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'proportion.FPCs.lose.PCs', 
+                        # proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.full.pay, OR 
+                        # proportion.adap.full.pay.and.premium.and.cost.sharing.who.lose.premium.and.cost.sharing.eligibility? both are used in formulas below 
+                        value = calculate.proportion.FPCs.lose.PCs)
+
+
+# 3e: Lose FCs (--> P)
+calculate.proportion.FPCs.lose.FCs <- function(baseline.p.of.FPCs.income.among.adap, 
+                                               adap.full.pay.fpl.threshold,
+                                               adap.premium.fpl.threshold,
+                                               adap.cost.sharing.fpl.threshold)
+{
+    calculate.p.between.thresholds(income.distribution = baseline.p.of.FPCs.income.among.adap, 
+                                   lower.threshold = max(adap.full.pay.fpl.threshold,adap.cost.sharing.fpl.threshold), 
+                                   upper.threshold = adap.premium.fpl.threshold) 
+}
+
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'proportion.FPCs.lose.FCs', 
+                        value = calculate.proportion.FPCs.lose.FCs)
+
+
+# 3f: Keep all 
+# (1- the rest?)
+
+
+#-- 4: PCs --#
+# 4a: Lose both 
+calculate.proportion.PCs.lose.PCs <- function(baseline.p.of.PCs.income.among.adap, 
+                                              adap.premium.fpl.threshold,
+                                              adap.cost.sharing.fpl.threshold,
+                                              adap.full.pay.fpl.threshold)
+{
+    calculate.p.between.thresholds(income.distribution = baseline.p.of.PCs.income.among.adap, 
+                                   lower.threshold = max(adap.premium.fpl.threshold,adap.full.pay.fpl.threshold), # no Cs here because you can't lose only premium (if above premium but below cost-sharing, they'll lose cost-sharing)
+                                                        # also, full-pay included because you have to be above both to fully lose coverage (if you are in between, as in 4c, switch to full-pay)
                                    upper.threshold = Inf)
 }
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.adap.full.pay.and.premium.and.cost.sharing.who.lose.premium.and.cost.sharing.eligibility',
-                        value = calculate.proportion.adap.full.pay.and.premium.and.cost.sharing.who.lose.premium.and.cost.sharing.eligibility)
+                        name = 'proportion.PCs.lose.PCs', 
+                        value = calculate.proportion.PCs.lose.PCs)
 
-
-calculate.proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.full.pay < - function(p.of.adap.with.full.pay.and.premium.and.cost.sharing.by.income, 
-                                                                                                                                    adap.full.pay.fpl.threshold,
-                                                                                                                                    adap.premium.fpl.threshold,
-                                                                                                                                    adap.cost.sharing.fpl.threshold) 
+# 4b: Lose Cs (--> P)
+calculate.proportion.PCs.lose.Cs <- function(baseline.p.of.PCs.income.among.adap, 
+                                              adap.premium.fpl.threshold,
+                                              adap.cost.sharing.fpl.threshold)
 {
-    calculate.p.between.thresholds(income.distribution = p.of.adap.with.full.pay.and.premium.and.cost.sharing.by.income, 
-                                   lower.threshold = max(adap.premium.fpl.threshold, adap.cost.sharing.fpl.threshold),
-                                   upper.threshold = adap.full.pay.fpl.threshold)
-}
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.full.pay',
-                        value = calculate.proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.full.pay)
-
-calculate.proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.premium.without.cost.sharing < - function(p.of.adap.with.full.pay.and.premium.and.cost.sharing.by.income, 
-                                                                                                                                      adap.full.pay.fpl.threshold,
-                                                                                                                                      adap.premium.fpl.threshold,
-                                                                                                                                      adap.cost.sharing.fpl.threshold) 
-{
-    calculate.p.between.thresholds(income.distribution = p.of.adap.with.full.pay.and.premium.and.cost.sharing.by.income, 
+    calculate.p.between.thresholds(income.distribution = baseline.p.of.PCs.income.among.adap, 
                                    lower.threshold = adap.cost.sharing.fpl.threshold,
                                    upper.threshold = adap.premium.fpl.threshold)
 }
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.premium.without.cost.sharing',
-                        value = calculate.proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.premium.without.cost.sharing)
+                        name = 'proportion.PCs.lose.Cs', 
+                        value = calculate.proportion.PCs.lose.Cs)
 
-
-#-- From full-pay + cost-sharing without premium --#
-calculate.proportion.adap.full.pay.and.cost.sharing.without.premium.who.lose.full.pay.eligibility < - function(p.of.adap.with.full.pay.and.cost.sharing.without.premium.by.income, 
-                                                                                                               adap.full.pay.fpl.threshold) 
+# 4c: Lose both, but gain full-pay 
+calculate.proportion.PCs.lose.PCs.gain.F <- function(baseline.p.of.PCs.income.among.adap, 
+                                              adap.premium.fpl.threshold,
+                                              adap.cost.sharing.fpl.threshold,
+                                              adap.full.pay.fpl.threshold)
 {
-    calculate.p.between.thresholds(income.distribution = p.of.adap.with.full.pay.only.by.income, 
-                                   lower.threshold = adap.full.pay.fpl.threshold,
+    calculate.p.between.thresholds(income.distribution = baseline.p.of.PCs.income.among.adap, 
+                                   lower.threshold = adap.premium.fpl.threshold, # no Cs here because you can't lose only premium (if above premium but below cost-sharing, they'll lose cost-sharing)
+                                   upper.threshold = adap.full.pay.fpl.threshold) # if you are below full-pay threshold, gain full-pay 
+}
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'proportion.PCs.lose.PCs.gain.F', 
+                        value = calculate.proportion.PCs.lose.PCs.gain.F)
+
+# 4d: Keep both 
+# (1- the rest?)
+
+
+#-- 5: P only --#
+# 5a: Lose
+calculate.proportion.P.only.lose.P <- function(baseline.p.of.P.only.income.among.adap, 
+                                               adap.premium.fpl.threshold,
+                                               adap.full.pay.fpl.threshold)
+{
+    calculate.p.between.thresholds(income.distribution = baseline.p.of.P.only.income.among.adap, 
+                                   lower.threshold = max(adap.premium.fpl.threshold, adap.full.pay.fpl.threshold), # because you have to be above both to fully lose it (if you are in between, as in 5b, switch to F)
+                                   upper.threshold = Inf)
+    
+}
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'proportion.P.only.lose.P', 
+                        value = calculate.proportion.P.only.lose.P)
+
+# 5b: Lose but gain full-pay 
+calculate.proportion.P.only.lose.P.gain.F <- function(baseline.p.of.P.only.income.among.adap, 
+                                                      adap.premium.fpl.threshold,
+                                                      adap.full.pay.fpl.threshold)
+{
+    calculate.p.between.thresholds(income.distribution = baseline.p.of.P.only.income.among.adap, 
+                                   lower.threshold = adap.premium.fpl.threshold, 
+                                   upper.threshold = adap.full.pay.fpl.threshold) # if you are below full-pay threshold, gain full-pay 
+    
+}
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'proportion.P.only.lose.P.gain.F', 
+                        value = calculate.proportion.P.only.lose.P.gain.F)
+
+
+# 5c: Keep 
+# (1- rest)
+
+
+#-- 6: FCs --#
+# 6a: Lose both 
+calculate.proportion.FCs.lose.FCs <- function(baseline.p.of.FCs.income.among.adap, 
+                                              adap.full.pay.fpl.threshold,
+                                              adap.cost.sharing.fpl.threshold)
+{
+    calculate.p.between.thresholds(income.distribution = baseline.p.of.FCs.income.among.adap, 
+                                   lower.threshold = max(adap.full.pay.fpl.threshold,adap.cost.sharing.fpl.threshold), 
                                    upper.threshold = Inf)
 }
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.adap.full.pay.and.cost.sharing.without.premium.who.lose.full.pay.eligibility',
-                        value = calculate.proportion.adap.full.pay.and.cost.sharing.without.premium.who.lose.full.pay.eligibility)
+                        name = 'proportion.FCs.lose.FCs', # this one didn't exist?
+                        value = calculate.proportion.FCs.lose.FCs)
 
-calculate.proportion.adap.full.pay.and.cost.sharing.without.premium.who.lose.cost.sharing.eligibility < - function(p.of.adap.with.full.pay.and.cost.sharing.without.premium.by.income, 
-                                                                                                                   adap.cost.sharing.threshold) 
+# 6b: Lose F (--> Cs) 
+calculate.proportion.FCs.lose.F <- function(baseline.p.of.FCs.income.among.adap, 
+                                              adap.full.pay.fpl.threshold,
+                                              adap.cost.sharing.fpl.threshold)
 {
-    calculate.p.between.thresholds(income.distribution = p.of.adap.with.full.pay.only.by.income, 
-                                   lower.threshold = adap.cost.sharing.threshold,
+    calculate.p.between.thresholds(income.distribution = baseline.p.of.FCs.income.among.adap, 
+                                   lower.threshold = adap.full.pay.fpl.threshold, 
+                                   upper.threshold = adap.cost.sharing.fpl.threshold) 
+}
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'proportion.FCs.lose.F', 
+                        value = calculate.proportion.FCs.lose.F)
+
+
+# 6c: Lose Cs (--> F)
+calculate.proportion.FCs.lose.Cs <- function(baseline.p.of.FCs.income.among.adap, 
+                                            adap.full.pay.fpl.threshold,
+                                            adap.cost.sharing.fpl.threshold)
+{
+    calculate.p.between.thresholds(income.distribution = baseline.p.of.FCs.income.among.adap, 
+                                   lower.threshold = adap.cost.sharing.fpl.threshold, 
+                                   upper.threshold = adap.full.pay.fpl.threshold) 
+}
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'proportion.FCs.lose.Cs', 
+                        value = calculate.proportion.FCs.lose.Cs)
+
+# 6d: Keep both 
+# (1- the rest?)
+
+
+#-- 7: Cs only --#
+# 7a: Lose 
+calculate.proportion.Cs.only.lose.Cs <- function(baseline.p.of.Cs.only.income.among.adap, 
+                                                 adap.cost.sharing.fpl.threshold)
+{
+    calculate.p.between.thresholds(income.distribution = baseline.p.of.Cs.only.income.among.adap, 
+                                   lower.threshold = adap.cost.sharing.fpl.threshold, 
                                    upper.threshold = Inf)
+    
 }
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.adap.full.pay.and.cost.sharing.without.premium.who.lose.cost.sharing.eligibility',
-                        value = calculate.proportion.adap.full.pay.and.cost.sharing.without.premium.who.lose.cost.sharing.eligibility)
+                        name = 'proportion.Cs.only.lose.Cs', 
+                        value = calculate.proportion.Cs.only.lose.Cs)
+
+# 7b: Keep 
+# (1 - lose)
 
 
-#-- From premium without cost-sharing --#
-calculate.proportion.adap.premium.without.cost.sharing.who.lose.eligibility < - function(p.of.adap.with.premium.without.cost.sharing.by.income, 
-                                                                                         adap.full.pay.fpl.threshold, 
-                                                                                         adap.premium.fpl.threshold) 
-{
-    calculate.p.between.thresholds(income.distribution = p.of.adap.with.premium.without.cost.sharing.by.income, 
-                                   lower.threshold = max(adap.full.pay.fpl.threshold, adap.premium.fpl.threshold),
-                                   upper.threshold = Inf)
-}
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.adap.premium.without.cost.sharing.who.lose.eligibility',
-                        value = calculate.proportion.adap.premium.without.cost.sharing.who.lose.eligibility)
-
-calculate.proportion.adap.premium.without.cost.sharing.who.change.eligibility.to.full.pay < - function(p.of.adap.with.premium.without.cost.sharing.by.income, 
-                                                                                                       adap.full.pay.fpl.threshold, 
-                                                                                                       adap.premium.fpl.threshold) 
-{
-    calculate.p.between.thresholds(income.distribution = p.of.adap.with.premium.without.cost.sharing.by.income, 
-                                   lower.threshold = adap.premium.fpl.threshold,
-                                   upper.threshold = adap.full.pay.fpl.threshold)
-}
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.adap.premium.without.cost.sharing.who.change.eligibility.to.full.pay',
-                        value = calculate.proportion.adap.premium.without.cost.sharing.who.change.eligibility.to.full.pay)
-
-
-
-#-- From premium and cost-sharing --#
-
-
-proportion.adap.premium.and.cost.sharing.who.change.eligibility.to.premium.without.cost.sharing
-
-calculate.proportion.adap.premium.and.cost.sharing.who.lose.eligibility < - function(p.of.adap.with.premium.and.cost.sharing.by.income, 
-                                                                                     adap.full.pay.fpl.threshold,
-                                                                                     adap.premium.fpl.threshold,
-                                                                                     adap.cost.sharing.fpl.threshold) 
-{
-    calculate.p.between.thresholds(income.distribution = calculate.proportion.adap.premium.and.cost.sharing.who.lose.eligibility, 
-                                   lower.threshold = max(adap.full.pay.fpl.threshold, max(adap.premium.fpl.threshold, adap.cost.sharing.fpl.threshold)),
-                                   upper.threshold = Inf)
-}
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.adap.premium.and.cost.sharing.who.lose.eligibility',
-                        value = calculate.proportion.adap.premium.and.cost.sharing.who.lose.eligibility)
-
-
-calculate.proportion.adap.premium.and.cost.sharing.who.change.eligibility.to.full.pay < - function(calculate.proportion.adap.premium.and.cost.sharing.who.lose.eligibility, 
-                                                                                                   adap.full.pay.fpl.threshold,
-                                                                                                   adap.premium.fpl.threshold,
-                                                                                                   adap.cost.sharing.fpl.threshold) 
-{
-    calculate.p.between.thresholds(income.distribution = calculate.proportion.adap.premium.and.cost.sharing.who.lose.eligibility, 
-                                   lower.threshold = max(adap.premium.fpl.threshold, adap.cost.sharing.fpl.threshold),
-                                   upper.threshold = adap.full.pay.fpl.threshold)
-}
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.adap.premium.and.cost.sharing.who.change.eligibility.to.full.pay',
-                        value = calculate.proportion.adap.premium.and.cost.sharing.who.change.eligibility.to.full.pay)
-
-calculate.proportion.adap.premium.and.cost.sharing.who.change.eligibility.to.premium.without.cost.sharing < - function(calculate.proportion.adap.premium.and.cost.sharing.who.lose.eligibility, 
-                                                                                                                                    adap.full.pay.fpl.threshold,
-                                                                                                                                    adap.premium.fpl.threshold,
-                                                                                                                                    adap.cost.sharing.fpl.threshold) 
-{
-    calculate.p.between.thresholds(income.distribution = calculate.proportion.adap.premium.and.cost.sharing.who.lose.eligibility, 
-                                   lower.threshold = adap.cost.sharing.fpl.threshold,
-                                   upper.threshold = adap.premium.fpl.threshold)
-}
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.adap.premium.and.cost.sharing.who.change.eligibility.to.premium.without.cost.sharing',
-                        value = calculate.proportion.adap.premium.and.cost.sharing.who.change.eligibility.to.premium.without.cost.sharing)
-
-
-
-#-- From cost-sharing without premium --#
-calculate.proportion.adap.cost.sharing.without.premium.who.lose.eligibility < - function(p.of.adap.with.cost.sharing.without.premium.by.income, 
-                                                                                         adap.cost.sharing.fpl.threshold) 
-{
-    calculate.p.between.thresholds(income.distribution = p.of.adap.with.cost.sharing.without.premium.by.income, 
-                                   lower.threshold = adap.cost.sharing.fpl.threshold,
-                                   upper.threshold = Inf)
-}
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.adap.cost.sharing.without.premium.who.lose.eligibility',
-                        value = calculate.proportion.adap.cost.sharing.without.premium.who.lose.eligibility)
 
 ##-----------------------------##
 ##-- CALCULATED: SUPPRESSION --##
 ##-----------------------------##
+
+# Ways people can change (or not change): 
+
+# ADAP Unchanged: 
+# F
+# P
+# PCs
+# Cs
+
+# Lose ADAP: 
+# lose F 
+# lose P
+# lose PCs
+# lose Cs 
+
+# Change ADAP: 
+# P to F
+# PCs to F 
+# PCs to P 
+
+# Formulary change: 
+# keep F, change formulary 
+# keep PCp, change formulary 
+# keep Cp, change formulary 
+# P to F, change formulary 
+# PCs to F, change formulary 
 
 ##-- TIE-IN TO MAIN SUPPRESSION --##
 register.model.quantity(ADAP.SPECIFICATION,
@@ -2644,13 +2744,13 @@ register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.and.lose.adap.full.pay',
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.only *
-                                                    proportion.adap.full.pay.only.who.lose.eligibility +
+                                                    proportion.F.only.lose.F +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.and.premium.without.cost.sharing *
-                                                    proportion.adap.full.pay.and.premium.without.cost.sharing.who.lose.full.pay.eligibility +
+                                                    proportion.FP.lose.F +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.and.premium.and.cost.sharing *
-                                                    proportion.adap.full.pay.and.premium.and.cost.sharing.who.lose.full.pay.eligibility  *
+                                                    proportion.FPCs.lose.F  *
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.and.cost.sharing.without.premium *
-                                                    proportion.adap.full.pay.and.cost.sharing.without.premium.who.lose.full.pay.eligibility
+                                                    proportion.FCs.lose.F
                                                 ))
 )
 
@@ -2658,13 +2758,13 @@ register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.and.keep.adap.full.pay',
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.only *
-                                                    (1-proportion.adap.full.pay.only.who.lose.eligibility) +
+                                                    (1-proportion.F.only.lose.F) +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.and.premium.without.cost.sharing *
-                                                    (1-proportion.adap.full.pay.and.premium.without.cost.sharing.who.lose.full.pay.eligibility) +
+                                                    (1-proportion.FP.lose.F) +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.and.premium.and.cost.sharing *
-                                                    (1-proportion.adap.full.pay.and.premium.and.cost.sharing.who.lose.full.pay.eligibility) *
+                                                    (1-proportion.FPCs.lose.F) *
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.and.cost.sharing.without.premium *
-                                                    (1-proportion.adap.full.pay.and.cost.sharing.without.premium.who.lose.full.pay.eligibility)
+                                                    (1-proportion.FCs.lose.F)
                                                ))
 )
 
@@ -2717,7 +2817,7 @@ register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.and.lose.adap.premium.without.cost.sharing',
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.without.full.pay *
-                                                    proportion.adap.premium.without.cost.sharing.who.lose.eligibility +
+                                                    proportion.P.only.lose.P +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.with.full.pay *
                                                     proportion.adap.full.pay.and.premium.without.cost.sharing.who.lose.premium.eligibility
                                                ))
@@ -2728,7 +2828,7 @@ register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.and.change.adap.premium.without.cost.sharing.to.full.pay.without.formulary.change',
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.without.full.pay *
-                                                    proportion.adap.premium.without.cost.sharing.who.change.eligibility.to.full.pay *
+                                                    proportion.P.only.lose.P.gain.F *
                                                     (1-proportion.change.to.F.with.formulary.change) +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.with.full.pay *
                                                     proportion.adap.full.pay.and.premium.without.cost.sharing.who.change.eligibility.to.full.pay *
@@ -2740,7 +2840,7 @@ register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.and.change.adap.premium.without.copay.to.full.pay.and.change.formulary',
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.without.full.pay *
-                                                    proportion.adap.premium.without.cost.sharing.who.change.eligibility.to.full.pay *
+                                                    proportion.P.only.lose.P.gain.F *
                                                     proportion.change.to.F.with.formulary.change +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.with.full.pay *
                                                     proportion.adap.full.pay.and.premium.without.cost.sharing.who.change.eligibility.to.full.pay *
@@ -2752,7 +2852,7 @@ register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.with.adap.premium.without.cost.sharing.unchanged',
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.without.full.pay *
-                                                    (1-proportion.adap.premium.without.cost.sharing.who.lose.eligibility-proportion.adap.premium.without.cost.sharing.who.change.eligibility.to.full.pay) +
+                                                    (1-proportion.P.only.lose.P-proportion.P.only.lose.P.gain.F) +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.with.full.pay *
                                                     (1-proportion.adap.full.pay.and.premium.without.cost.sharing.who.lose.premium.eligibility-proportion.adap.full.pay.and.premium.without.cost.sharing.who.change.eligibility.to.full.pay)
                                                ))
@@ -2782,7 +2882,7 @@ register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.and.lose.adap.premium.and.cost.sharing',
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.without.full.pay *
-                                                    proportion.adap.premium.and.cost.sharing.who.lose.eligibility +
+                                                    proportion.PCs.lose.PCs +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.with.full.pay *
                                                     proportion.adap.full.pay.and.premium.and.cost.sharing.who.lose.premium.and.cost.sharing.eligibility
                                                ))
@@ -2792,7 +2892,7 @@ register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.and.change.adap.premium.and.cost.sharing.to.full.pay.and.change.formulary',
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.without.full.pay *
-                                                    proportion.adap.premium.and.cost.sharing.who.change.eligibility.to.full.pay *
+                                                    proportion.PCs.lose.PCs.gain.F *
                                                     proportion.change.to.F.with.formulary.change +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.with.full.pay *
                                                     proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.full.pay *
@@ -2804,7 +2904,7 @@ register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.and.change.adap.premium.and.cost.sharing.to.full.pay.without.formulary.change',
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.without.full.pay *
-                                                    proportion.adap.premium.and.cost.sharing.who.change.eligibility.to.full.pay *
+                                                    proportion.PCs.lose.PCs.gain.F *
                                                     (1 - proportion.change.to.F.with.formulary.change) +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.with.full.pay *
                                                     proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.full.pay *
@@ -2816,9 +2916,9 @@ register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.and.change.adap.premium.and.cost.sharing.to.premium.without.cost.sharing',
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.without.full.pay *
-                                                    proportion.adap.premium.and.cost.sharing.who.change.eligibility.to.premium.without.cost.sharing +
+                                                    proportion.PCs.lose.Cs +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.with.full.pay *
-                                                    proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.premium.without.cost.sharing
+                                                    proportion.FPCs.lose.FCs
                                                ))
 )
 
@@ -2826,15 +2926,15 @@ register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.and.keep.adap.premium.and.copay.but.change.formulary',
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.without.full.pay *
-                                                    (1 - proportion.adap.premium.and.cost.sharing.who.lose.eligibility -
-                                                         proportion.adap.premium.and.cost.sharing.who.change.eligibility.to.full.pay -
-                                                         proportion.adap.premium.and.cost.sharing.who.change.eligibility.to.premium.without.cost.sharing) *
+                                                    (1 - proportion.PCs.lose.PCs -
+                                                         proportion.PCs.lose.PCs.gain.F -
+                                                         proportion.PCs.lose.Cs) *
                                                     proportion.PCs.clients.with.Cp *
                                                     proportion.PCp.clients.with.formulary.change +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.with.full.pay *
                                                     (1 - proportion.adap.full.pay.and.premium.and.cost.sharing.who.lose.premium.and.cost.sharing.eligibility -
                                                          proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.full.pay -
-                                                         proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.premium.without.cost.sharing) *
+                                                         proportion.FPCs.lose.FCs) *
                                                     proportion.FPCs.clients.with.Cp *
                                                     proportion.PCp.clients.with.formulary.change
                                                ))
@@ -2845,13 +2945,13 @@ register.model.quantity(ADAP.SPECIFICATION,
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.without.full.pay *
                                                     (1 - proportion.adap.full.pay.and.premium.and.cost.sharing.who.lose.eligibility -
-                                                         proportion.adap.premium.and.cost.sharing.who.change.eligibility.to.full.pay -
-                                                         proportion.adap.premium.and.cost.sharing.who.change.eligibility.to.premium.without.cost.sharing) *
+                                                         proportion.PCs.lose.PCs.gain.F -
+                                                         proportion.PCs.lose.Cs) *
                                                     (1 - proportion.PCs.clients.with.Cp * proportion.PCp.clients.with.formulary.change) +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.with.full.pay *
                                                     (1 - proportion.adap.full.pay.and.premium.and.cost.sharing.who.lose.premium.and.cost.sharing.eligibility -
                                                          proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.full.pay -
-                                                         proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.premium.without.cost.sharing) *
+                                                         proportion.FPCs.lose.FCs) *
                                                     (1 - proportion.FPCs.clients.with.Cp * proportion.PCp.clients.with.formulary.change)
                                                ))
 )
@@ -2883,9 +2983,9 @@ register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.and.lose.adap.cost.sharing.without.premium',
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.cost.sharing.without.premium.from.without.full.pay *
-                                                    proportion.adap.cost.sharing.without.premium.who.lose.eligibility +
+                                                    proportion.Cs.only.lose.Cs +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.cost.sharing.without.premium.from.with.full.pay *
-                                                    proportion.adap.full.pay.and.cost.sharing.without.premium.who.lose.cost.sharing.eligibility
+                                                    proportion.FCs.lose.Cs
                                                ))
 )
 
@@ -2893,11 +2993,11 @@ register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.and.keep.adap.copay.without.premium.but.change.formulary',
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.cost.sharing.without.premium.from.without.full.pay *
-                                                    (1-proportion.adap.cost.sharing.without.premium.who.lose.eligibility) *
+                                                    (1-proportion.Cs.only.lose.Cs) *
                                                     proportion.Cs.clients.with.Cp *
                                                     proportion.Cp.clients.with.formulary.change +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.cost.sharing.without.premium.from.with.full.pay *
-                                                    (1-proportion.adap.full.pay.and.cost.sharing.without.premium.who.lose.cost.sharing.eligibility) *
+                                                    (1-proportion.FCs.lose.Cs) *
                                                     proportion.FPCs.clients.with.Cp *
                                                     proportion.adap.copay.and.premium.clients.with.formulary.change
                                                ))
@@ -2907,10 +3007,10 @@ register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.and.keep.adap.cost.sharing.without.premium.unchanged',
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.with.baseline.adap.cost.sharing.without.premium.from.without.full.pay *
-                                                    (1-proportion.adap.cost.sharing.without.premium.who.lose.eligibility) *
+                                                    (1-proportion.Cs.only.lose.Cs) *
                                                     (1 - proportion.Cs.clients.with.Cp * proportion.Cp.clients.with.formulary.change) +
                                                 proportion.of.adap.who.are.suppressed.with.baseline.adap.cost.sharing.without.premium.from.with.full.pay *
-                                                    (1-proportion.adap.full.pay.and.cost.sharing.without.premium.who.lose.cost.sharing.eligibility) *
+                                                    (1-proportion.FCs.lose.Cs) *
                                                     (1 - proportion.FPCs.clients.with.Cp * proportion.adap.copay.and.premium.clients.with.formulary.change)
                                                ))
 )

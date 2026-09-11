@@ -11,7 +11,7 @@ diagnoses.stratified.sex <- run.outlier.process(outcome= 'diagnoses',
                                          theta = 0.06,
                                          max.year = 2019,
                                          locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")))
-diagnoses.stratified.sex$adjudication <- c(T, T, T, T, T, T, F, T, T, T, T, T)
+diagnoses.stratified.sex$adjudication <- c(T)
 run.outlier.process(outcome= 'diagnoses',
                     stratifications= list('sex'),
                     data.manager= surveillance.manager,
@@ -46,9 +46,7 @@ diagnoses.stratified.race <- run.outlier.process(outcome= 'diagnoses',
                                                 max.year = 2019,
                                                 locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")))
 
-diagnoses.stratified.race$adjudication <- c (F, T, T, T, T, F, T, T, T,
-                                             T, T, T, T, T, T, T, T, T, T,
-                                             T, T, T, F, T, T, F, T)
+diagnoses.stratified.race$adjudication <- c (T)
 run.outlier.process(outcome= 'diagnoses',
                     stratifications= list('race'),
                     data.manager= surveillance.manager,
@@ -66,10 +64,7 @@ diagnoses.stratified.risk <- run.outlier.process(outcome= 'diagnoses',
                                                 theta = 0.06,
                                                 max.year = 2019,
                                                 locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")))
-diagnoses.stratified.risk$adjudication <- c(T, T, T, T, T, T, T, T, T,
-                                            T, T, T, T, T, T, T, T, T,
-                                            T, T, T, T, F, F, F,
-                                            F, F, F, T, T, T, T, T)
+diagnoses.stratified.risk$adjudication <- c(T)
 run.outlier.process(outcome= 'diagnoses',
                     stratifications= list('risk'),
                     data.manager= surveillance.manager,

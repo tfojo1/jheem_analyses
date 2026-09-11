@@ -1,12 +1,12 @@
 CDC.PREP.INTERVENTION.SUFFIX = ".26"
 
 
-CDC.PREP.START.YEAR = 2026 + 9/12 #October 2026 start 
+CDC.PREP.START.YEAR = 2026 + 11/12 #October 2026 start 
 
 CDC.PREP.LOSS.LAG = 0.25
 CDC.PREP.RETURN.LAG = 1 
 CDC.PREP.LATE.END.YEAR = 2029  #reconsider for prolonged 
-CDC.PREP.END.YEAR = 2027.75
+CDC.PREP.END.YEAR = 2027 + 11/12
 
 set.seed(1234)
 proportion.tested.regardless.values = rbeta(1000, shape1 = 4.84, shape2 = 4.84)
@@ -83,7 +83,6 @@ cdc.contact.tracing.cesation.effect = create.intervention.effect(quantity.name =
 
 cdc.cessation.testing = create.intervention(WHOLE.POPULATION,
                                             cdc.testing.cessation.effect,
-                                            proportion.tested.regardless.effect,
                                             code = paste0("cdcp.end.testing", CDC.PREP.INTERVENTION.SUFFIX),
                                             parameters = c(proportion.tested.regardless.values,proportion.prep.regardless.values,proportion.contact.tracing.regardless.values) )
 
@@ -99,7 +98,6 @@ cdc.cessation.prep = create.intervention(WHOLE.POPULATION,
 
 cdc.cessation = create.intervention(WHOLE.POPULATION,
                                     cdc.testing.cessation.effect,
-                                    proportion.tested.regardless.effect,
                                     cdc.contact.tracing.cesation.effect,
                                     cdc.prep.cessation.effect,
                                     code = paste0("cdcp.end", CDC.PREP.INTERVENTION.SUFFIX),

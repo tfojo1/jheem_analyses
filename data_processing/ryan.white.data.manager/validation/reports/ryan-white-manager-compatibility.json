@@ -1,0 +1,2314 @@
+{
+  "schema_version": "jheem-manager-compatibility/v1",
+  "comparison_id": "ryan-white-web-2025-04-08_to_full-2026-03-16",
+  "generator": "data_processing/ryan.white.data.manager/validation/compare_managers.R",
+  "baseline": {
+    "role": "historical_display",
+    "file_name": "ryan.white.web.data.manager.rdata",
+    "sha256": "4f1b5063ae6f6e9ffa4b254d4cad71fdf088903295339fb59a17e71819f99989",
+    "size_bytes": 2611896,
+    "serialized_object": "data.manager",
+    "manager_name": "Ryan White Web Data Manager",
+    "manager_description": "Ryan White Web Data Manager",
+    "manager_creation_date": "2025-04-08 16:21:06 CDT",
+    "manager_last_modified_date": "2025-04-08 16:25:53 CDT",
+    "manager_code_iteration": 3,
+    "outcome_count": 14,
+    "source_count": 13
+  },
+  "candidate": {
+    "role": "current_full_candidate",
+    "file_name": "ryan.white.data.manager.2026-03-16.rdata",
+    "sha256": "cc227cb9bdf43d9948f97db54d9c2652f034c4b780a8515cb57c99ea6f735188",
+    "size_bytes": 2218355,
+    "serialized_object": "data.manager",
+    "manager_name": "ryan.white.data.manager",
+    "manager_description": "ryan.white.data.manager",
+    "manager_creation_date": "2026-03-16 11:42:34 CDT",
+    "manager_last_modified_date": "2026-03-16 11:46:08 CDT",
+    "manager_code_iteration": 3,
+    "outcome_count": 11,
+    "source_count": 3
+  },
+  "comparison": {
+    "tolerance": 0,
+    "summary": [
+      {
+        "outcome": "adap.clients",
+        "status": "candidate_only",
+        "baseline_path_count": 0,
+        "candidate_path_count": 6,
+        "common_path_count": 0,
+        "shared_cells": 0,
+        "changed_shared_values": 0,
+        "candidate_fills": 0,
+        "candidate_gaps": 0
+      },
+      {
+        "outcome": "adap.clients.service.distribution",
+        "status": "candidate_only",
+        "baseline_path_count": 0,
+        "candidate_path_count": 1,
+        "common_path_count": 0,
+        "shared_cells": 0,
+        "changed_shared_values": 0,
+        "candidate_fills": 0,
+        "candidate_gaps": 0
+      },
+      {
+        "outcome": "adap.income.distribution",
+        "status": "candidate_only",
+        "baseline_path_count": 0,
+        "candidate_path_count": 2,
+        "common_path_count": 0,
+        "shared_cells": 0,
+        "changed_shared_values": 0,
+        "candidate_fills": 0,
+        "candidate_gaps": 0
+      },
+      {
+        "outcome": "adap.proportion",
+        "status": "identical",
+        "baseline_path_count": 5,
+        "candidate_path_count": 5,
+        "common_path_count": 5,
+        "shared_cells": 3060,
+        "changed_shared_values": 0,
+        "candidate_fills": 0,
+        "candidate_gaps": 0
+      },
+      {
+        "outcome": "adap.proportion.of.diagnosed",
+        "status": "candidate_only",
+        "baseline_path_count": 0,
+        "candidate_path_count": 4,
+        "common_path_count": 0,
+        "shared_cells": 0,
+        "changed_shared_values": 0,
+        "candidate_fills": 0,
+        "candidate_gaps": 0
+      },
+      {
+        "outcome": "adap.suppressed.proportion.of.diagnosed",
+        "status": "candidate_only",
+        "baseline_path_count": 0,
+        "candidate_path_count": 1,
+        "common_path_count": 0,
+        "shared_cells": 0,
+        "changed_shared_values": 0,
+        "candidate_fills": 0,
+        "candidate_gaps": 0
+      },
+      {
+        "outcome": "adap.suppression",
+        "status": "additive",
+        "baseline_path_count": 1,
+        "candidate_path_count": 2,
+        "common_path_count": 1,
+        "shared_cells": 208,
+        "changed_shared_values": 0,
+        "candidate_fills": 0,
+        "candidate_gaps": 0
+      },
+      {
+        "outcome": "awareness",
+        "status": "baseline_only",
+        "baseline_path_count": 2,
+        "candidate_path_count": 0,
+        "common_path_count": 0,
+        "shared_cells": 0,
+        "changed_shared_values": 0,
+        "candidate_fills": 0,
+        "candidate_gaps": 0
+      },
+      {
+        "outcome": "diagnosed.prevalence",
+        "status": "compatible_on_overlap",
+        "baseline_path_count": 40,
+        "candidate_path_count": 16,
+        "common_path_count": 16,
+        "shared_cells": 754936,
+        "changed_shared_values": 0,
+        "candidate_fills": 2998,
+        "candidate_gaps": 0
+      },
+      {
+        "outcome": "diagnoses",
+        "status": "baseline_only",
+        "baseline_path_count": 40,
+        "candidate_path_count": 0,
+        "common_path_count": 0,
+        "shared_cells": 0,
+        "changed_shared_values": 0,
+        "candidate_fills": 0,
+        "candidate_gaps": 0
+      },
+      {
+        "outcome": "non.adap.clients",
+        "status": "identical",
+        "baseline_path_count": 6,
+        "candidate_path_count": 6,
+        "common_path_count": 6,
+        "shared_cells": 19902,
+        "changed_shared_values": 0,
+        "candidate_fills": 0,
+        "candidate_gaps": 0
+      },
+      {
+        "outcome": "oahs.clients",
+        "status": "identical",
+        "baseline_path_count": 3,
+        "candidate_path_count": 3,
+        "common_path_count": 3,
+        "shared_cells": 7719,
+        "changed_shared_values": 0,
+        "candidate_fills": 0,
+        "candidate_gaps": 0
+      },
+      {
+        "outcome": "oahs.suppression",
+        "status": "identical",
+        "baseline_path_count": 3,
+        "candidate_path_count": 3,
+        "common_path_count": 3,
+        "shared_cells": 7719,
+        "changed_shared_values": 0,
+        "candidate_fills": 0,
+        "candidate_gaps": 0
+      },
+      {
+        "outcome": "prep",
+        "status": "baseline_only",
+        "baseline_path_count": 14,
+        "candidate_path_count": 0,
+        "common_path_count": 0,
+        "shared_cells": 0,
+        "changed_shared_values": 0,
+        "candidate_fills": 0,
+        "candidate_gaps": 0
+      },
+      {
+        "outcome": "proportion.tested",
+        "status": "baseline_only",
+        "baseline_path_count": 5,
+        "candidate_path_count": 0,
+        "common_path_count": 0,
+        "shared_cells": 0,
+        "changed_shared_values": 0,
+        "candidate_fills": 0,
+        "candidate_gaps": 0
+      },
+      {
+        "outcome": "proportion.tested.n",
+        "status": "baseline_only",
+        "baseline_path_count": 5,
+        "candidate_path_count": 0,
+        "common_path_count": 0,
+        "shared_cells": 0,
+        "changed_shared_values": 0,
+        "candidate_fills": 0,
+        "candidate_gaps": 0
+      },
+      {
+        "outcome": "suppression",
+        "status": "baseline_only",
+        "baseline_path_count": 27,
+        "candidate_path_count": 0,
+        "common_path_count": 0,
+        "shared_cells": 0,
+        "changed_shared_values": 0,
+        "candidate_fills": 0,
+        "candidate_gaps": 0
+      },
+      {
+        "outcome": "total.prevalence",
+        "status": "baseline_only",
+        "baseline_path_count": 2,
+        "candidate_path_count": 0,
+        "common_path_count": 0,
+        "shared_cells": 0,
+        "changed_shared_values": 0,
+        "candidate_fills": 0,
+        "candidate_gaps": 0
+      }
+    ],
+    "outcomes": {
+      "adap.clients": {
+        "status": "candidate_only",
+        "baseline_path_count": 0,
+        "candidate_path_count": 6,
+        "common_path_count": 0,
+        "baseline_only_paths": [],
+        "candidate_only_paths": ["adap.clients/ryan.white.program/ryan.white.pdfs/year__location", "adap.clients/ryan.white.program/ryan.white.pdfs/year__location__age", "adap.clients/ryan.white.program/ryan.white.pdfs/year__location__fpl", "adap.clients/ryan.white.program/ryan.white.pdfs/year__location__race", "adap.clients/ryan.white.program/ryan.white.pdfs/year__location__service.received", "adap.clients/ryan.white.program/ryan.white.pdfs/year__location__sex"],
+        "paths": []
+      },
+      "adap.clients.service.distribution": {
+        "status": "candidate_only",
+        "baseline_path_count": 0,
+        "candidate_path_count": 1,
+        "common_path_count": 0,
+        "baseline_only_paths": [],
+        "candidate_only_paths": "adap.clients.service.distribution/nastad.adap/nastad.fpl.2/year__location__service.type",
+        "paths": []
+      },
+      "adap.income.distribution": {
+        "status": "candidate_only",
+        "baseline_path_count": 0,
+        "candidate_path_count": 2,
+        "common_path_count": 0,
+        "baseline_only_paths": [],
+        "candidate_only_paths": ["adap.income.distribution/nastad.adap/nastad.fpl.1/year__location__fpl", "adap.income.distribution/nastad.adap/nastad.fpl.2/year__location__fpl"],
+        "paths": []
+      },
+      "adap.proportion": {
+        "status": "identical",
+        "baseline_path_count": 5,
+        "candidate_path_count": 5,
+        "common_path_count": 5,
+        "baseline_only_paths": [],
+        "candidate_only_paths": [],
+        "paths": {
+          "adap.proportion/ryan.white.program/ryan.white.pdfs/year__location": {
+            "status": "identical",
+            "shared_cells": 153,
+            "shared_nonmissing_cells": 151,
+            "changed_shared_values": 0,
+            "candidate_fills": 0,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 3,
+                "candidate_size": 3,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 51,
+                "candidate_size": 51,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "adap.proportion/ryan.white.program/ryan.white.pdfs/year__location__age": {
+            "status": "identical",
+            "shared_cells": 918,
+            "shared_nonmissing_cells": 906,
+            "changed_shared_values": 0,
+            "candidate_fills": 0,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 3,
+                "candidate_size": 3,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 51,
+                "candidate_size": 51,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "age": {
+                "baseline_size": 6,
+                "candidate_size": 6,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "adap.proportion/ryan.white.program/ryan.white.pdfs/year__location__fpl": {
+            "status": "identical",
+            "shared_cells": 765,
+            "shared_nonmissing_cells": 750,
+            "changed_shared_values": 0,
+            "candidate_fills": 0,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 3,
+                "candidate_size": 3,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 51,
+                "candidate_size": 51,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "fpl": {
+                "baseline_size": 5,
+                "candidate_size": 5,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "adap.proportion/ryan.white.program/ryan.white.pdfs/year__location__race": {
+            "status": "identical",
+            "shared_cells": 918,
+            "shared_nonmissing_cells": 874,
+            "changed_shared_values": 0,
+            "candidate_fills": 0,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 3,
+                "candidate_size": 3,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 51,
+                "candidate_size": 51,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "race": {
+                "baseline_size": 6,
+                "candidate_size": 6,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "adap.proportion/ryan.white.program/ryan.white.pdfs/year__location__sex": {
+            "status": "identical",
+            "shared_cells": 306,
+            "shared_nonmissing_cells": 300,
+            "changed_shared_values": 0,
+            "candidate_fills": 0,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 3,
+                "candidate_size": 3,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 51,
+                "candidate_size": 51,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "sex": {
+                "baseline_size": 2,
+                "candidate_size": 2,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          }
+        }
+      },
+      "adap.proportion.of.diagnosed": {
+        "status": "candidate_only",
+        "baseline_path_count": 0,
+        "candidate_path_count": 4,
+        "common_path_count": 0,
+        "baseline_only_paths": [],
+        "candidate_only_paths": ["adap.proportion.of.diagnosed/ryan.white.program/cdc/year__location__age", "adap.proportion.of.diagnosed/ryan.white.program/ryan.white.pdfs/year__location", "adap.proportion.of.diagnosed/ryan.white.program/ryan.white.pdfs/year__location__race", "adap.proportion.of.diagnosed/ryan.white.program/ryan.white.pdfs/year__location__sex"],
+        "paths": []
+      },
+      "adap.suppressed.proportion.of.diagnosed": {
+        "status": "candidate_only",
+        "baseline_path_count": 0,
+        "candidate_path_count": 1,
+        "common_path_count": 0,
+        "baseline_only_paths": [],
+        "candidate_only_paths": "adap.suppressed.proportion.of.diagnosed/ryan.white.program/ryan.white.pdfs/year__location",
+        "paths": []
+      },
+      "adap.suppression": {
+        "status": "additive",
+        "baseline_path_count": 1,
+        "candidate_path_count": 2,
+        "common_path_count": 1,
+        "baseline_only_paths": [],
+        "candidate_only_paths": "adap.suppression/nastad.adap/nastad.fpl.2/year__location__service.type",
+        "paths": {
+          "adap.suppression/nastad.adap/ryan.white.pdfs/year__location": {
+            "status": "identical",
+            "shared_cells": 208,
+            "shared_nonmissing_cells": 180,
+            "changed_shared_values": 0,
+            "candidate_fills": 0,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 4,
+                "candidate_size": 4,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 52,
+                "candidate_size": 52,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          }
+        }
+      },
+      "awareness": {
+        "status": "baseline_only",
+        "baseline_path_count": 2,
+        "candidate_path_count": 0,
+        "common_path_count": 0,
+        "baseline_only_paths": ["awareness/cdc.aggregated.proportion/cdc/year__location", "awareness/cdc.hiv/cdc/year__location"],
+        "candidate_only_paths": [],
+        "paths": []
+      },
+      "diagnosed.prevalence": {
+        "status": "compatible_on_overlap",
+        "baseline_path_count": 40,
+        "candidate_path_count": 16,
+        "common_path_count": 16,
+        "baseline_only_paths": ["diagnosed.prevalence/cdc.aggregated.county/cdc/year__location", "diagnosed.prevalence/cdc.aggregated.county/cdc/year__location__age", "diagnosed.prevalence/cdc.aggregated.county/cdc/year__location__age__race", "diagnosed.prevalence/cdc.aggregated.county/cdc/year__location__age__race__risk", "diagnosed.prevalence/cdc.aggregated.county/cdc/year__location__age__race__sex", "diagnosed.prevalence/cdc.aggregated.county/cdc/year__location__age__risk", "diagnosed.prevalence/cdc.aggregated.county/cdc/year__location__age__sex", "diagnosed.prevalence/cdc.aggregated.county/cdc/year__location__age__sex__risk", "diagnosed.prevalence/cdc.aggregated.county/cdc/year__location__race", "diagnosed.prevalence/cdc.aggregated.county/cdc/year__location__race__risk", "diagnosed.prevalence/cdc.aggregated.county/cdc/year__location__race__sex", "diagnosed.prevalence/cdc.aggregated.county/cdc/year__location__race__sex__risk", "diagnosed.prevalence/cdc.aggregated.county/cdc/year__location__risk", "diagnosed.prevalence/cdc.aggregated.county/cdc/year__location__sex", "diagnosed.prevalence/cdc.aggregated.county/cdc/year__location__sex__risk", "diagnosed.prevalence/cdc.surveillance.reports/cdc.msa.reports/year__location", "diagnosed.prevalence/cdc.surveillance.reports/cdc.msa.reports/year__location__age", "diagnosed.prevalence/cdc.surveillance.reports/cdc.msa.reports/year__location__age__sex", "diagnosed.prevalence/cdc.surveillance.reports/cdc.msa.reports/year__location__race", "diagnosed.prevalence/cdc.surveillance.reports/cdc.msa.reports/year__location__race__risk", "diagnosed.prevalence/cdc.surveillance.reports/cdc.msa.reports/year__location__race__sex", "diagnosed.prevalence/cdc.surveillance.reports/cdc.msa.reports/year__location__risk", "diagnosed.prevalence/cdc.surveillance.reports/cdc.msa.reports/year__location__sex", "diagnosed.prevalence/cdc.surveillance.reports/cdc.msa.reports/year__location__sex__risk"],
+        "candidate_only_paths": [],
+        "paths": {
+          "diagnosed.prevalence/cdc.hiv/cdc/year__location": {
+            "status": "additive",
+            "shared_cells": 2296,
+            "shared_nonmissing_cells": 1048,
+            "changed_shared_values": 0,
+            "candidate_fills": 1,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 14,
+                "candidate_size": 14,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 164,
+                "candidate_size": 3386,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 3222,
+                  "examples": ["01001", "01003", "01005", "01007", "01009", "01011", "01013", "01015", "01017", "01019", "01021", "01023", "01025", "01027", "01029", "01031", "01033", "01035", "01037", "01039"]
+                }
+              }
+            }
+          },
+          "diagnosed.prevalence/cdc.hiv/cdc/year__location__age": {
+            "status": "additive",
+            "shared_cells": 11480,
+            "shared_nonmissing_cells": 5234,
+            "changed_shared_values": 0,
+            "candidate_fills": 11,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 14,
+                "candidate_size": 14,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 164,
+                "candidate_size": 3386,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 3222,
+                  "examples": ["01001", "01003", "01005", "01007", "01009", "01011", "01013", "01015", "01017", "01019", "01021", "01023", "01025", "01027", "01029", "01031", "01033", "01035", "01037", "01039"]
+                }
+              },
+              "age": {
+                "baseline_size": 5,
+                "candidate_size": 5,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "diagnosed.prevalence/cdc.hiv/cdc/year__location__age__race": {
+            "status": "additive",
+            "shared_cells": 68880,
+            "shared_nonmissing_cells": 29580,
+            "changed_shared_values": 0,
+            "candidate_fills": 105,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 14,
+                "candidate_size": 14,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 164,
+                "candidate_size": 214,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 50,
+                  "examples": ["04013", "06001", "06037", "06059", "06065", "06067", "06071", "06073", "06075", "11001", "12011", "12031", "12057", "12086", "12095", "12099", "12103", "13067", "13089", "13121"]
+                }
+              },
+              "age": {
+                "baseline_size": 5,
+                "candidate_size": 5,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "race": {
+                "baseline_size": 6,
+                "candidate_size": 6,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "diagnosed.prevalence/cdc.hiv/cdc/year__location__age__race__risk": {
+            "status": "compatible_on_overlap",
+            "shared_cells": 107100,
+            "shared_nonmissing_cells": 89471,
+            "changed_shared_values": 0,
+            "candidate_fills": 829,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 14,
+                "candidate_size": 14,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 52,
+                "candidate_size": 101,
+                "baseline_values_missing_from_candidate": {
+                  "count": 1,
+                  "examples": "C.26420"
+                },
+                "candidate_values_added": {
+                  "count": 50,
+                  "examples": ["04013", "06001", "06037", "06059", "06065", "06067", "06071", "06073", "06075", "11001", "12011", "12031", "12057", "12086", "12095", "12099", "12103", "13067", "13089", "13121"]
+                }
+              },
+              "age": {
+                "baseline_size": 5,
+                "candidate_size": 5,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "race": {
+                "baseline_size": 6,
+                "candidate_size": 6,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "risk": {
+                "baseline_size": 5,
+                "candidate_size": 5,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "diagnosed.prevalence/cdc.hiv/cdc/year__location__age__race__sex": {
+            "status": "compatible_on_overlap",
+            "shared_cells": 42840,
+            "shared_nonmissing_cells": 34708,
+            "changed_shared_values": 0,
+            "candidate_fills": 155,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 14,
+                "candidate_size": 14,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 52,
+                "candidate_size": 101,
+                "baseline_values_missing_from_candidate": {
+                  "count": 1,
+                  "examples": "C.26420"
+                },
+                "candidate_values_added": {
+                  "count": 50,
+                  "examples": ["04013", "06001", "06037", "06059", "06065", "06067", "06071", "06073", "06075", "11001", "12011", "12031", "12057", "12086", "12095", "12099", "12103", "13067", "13089", "13121"]
+                }
+              },
+              "age": {
+                "baseline_size": 5,
+                "candidate_size": 5,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "race": {
+                "baseline_size": 6,
+                "candidate_size": 6,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "sex": {
+                "baseline_size": 2,
+                "candidate_size": 2,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "diagnosed.prevalence/cdc.hiv/cdc/year__location__age__race__sex__risk": {
+            "status": "compatible_on_overlap",
+            "shared_cells": 214200,
+            "shared_nonmissing_cells": 123032,
+            "changed_shared_values": 0,
+            "candidate_fills": 1288,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 14,
+                "candidate_size": 14,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 52,
+                "candidate_size": 51,
+                "baseline_values_missing_from_candidate": {
+                  "count": 1,
+                  "examples": "C.26420"
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "age": {
+                "baseline_size": 5,
+                "candidate_size": 5,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "race": {
+                "baseline_size": 6,
+                "candidate_size": 6,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "sex": {
+                "baseline_size": 2,
+                "candidate_size": 2,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "risk": {
+                "baseline_size": 5,
+                "candidate_size": 5,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "diagnosed.prevalence/cdc.hiv/cdc/year__location__age__risk": {
+            "status": "additive",
+            "shared_cells": 57400,
+            "shared_nonmissing_cells": 22913,
+            "changed_shared_values": 0,
+            "candidate_fills": 137,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 14,
+                "candidate_size": 14,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 164,
+                "candidate_size": 214,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 50,
+                  "examples": ["04013", "06001", "06037", "06059", "06065", "06067", "06071", "06073", "06075", "11001", "12011", "12031", "12057", "12086", "12095", "12099", "12103", "13067", "13089", "13121"]
+                }
+              },
+              "age": {
+                "baseline_size": 5,
+                "candidate_size": 5,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "risk": {
+                "baseline_size": 5,
+                "candidate_size": 5,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "diagnosed.prevalence/cdc.hiv/cdc/year__location__age__sex": {
+            "status": "additive",
+            "shared_cells": 22960,
+            "shared_nonmissing_cells": 10326,
+            "changed_shared_values": 0,
+            "candidate_fills": 24,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 14,
+                "candidate_size": 14,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 164,
+                "candidate_size": 214,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 50,
+                  "examples": ["04013", "06001", "06037", "06059", "06065", "06067", "06071", "06073", "06075", "11001", "12011", "12031", "12057", "12086", "12095", "12099", "12103", "13067", "13089", "13121"]
+                }
+              },
+              "age": {
+                "baseline_size": 5,
+                "candidate_size": 5,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "sex": {
+                "baseline_size": 2,
+                "candidate_size": 2,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "diagnosed.prevalence/cdc.hiv/cdc/year__location__age__sex__risk": {
+            "status": "compatible_on_overlap",
+            "shared_cells": 35700,
+            "shared_nonmissing_cells": 23925,
+            "changed_shared_values": 0,
+            "candidate_fills": 155,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 14,
+                "candidate_size": 14,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 52,
+                "candidate_size": 101,
+                "baseline_values_missing_from_candidate": {
+                  "count": 1,
+                  "examples": "C.26420"
+                },
+                "candidate_values_added": {
+                  "count": 50,
+                  "examples": ["04013", "06001", "06037", "06059", "06065", "06067", "06071", "06073", "06075", "11001", "12011", "12031", "12057", "12086", "12095", "12099", "12103", "13067", "13089", "13121"]
+                }
+              },
+              "age": {
+                "baseline_size": 5,
+                "candidate_size": 5,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "sex": {
+                "baseline_size": 2,
+                "candidate_size": 2,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "risk": {
+                "baseline_size": 5,
+                "candidate_size": 5,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "diagnosed.prevalence/cdc.hiv/cdc/year__location__race": {
+            "status": "additive",
+            "shared_cells": 13776,
+            "shared_nonmissing_cells": 6273,
+            "changed_shared_values": 0,
+            "candidate_fills": 12,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 14,
+                "candidate_size": 14,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 164,
+                "candidate_size": 3386,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 3222,
+                  "examples": ["01001", "01003", "01005", "01007", "01009", "01011", "01013", "01015", "01017", "01019", "01021", "01023", "01025", "01027", "01029", "01031", "01033", "01035", "01037", "01039"]
+                }
+              },
+              "race": {
+                "baseline_size": 6,
+                "candidate_size": 6,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "diagnosed.prevalence/cdc.hiv/cdc/year__location__race__risk": {
+            "status": "additive",
+            "shared_cells": 68880,
+            "shared_nonmissing_cells": 27470,
+            "changed_shared_values": 0,
+            "candidate_fills": 119,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 14,
+                "candidate_size": 14,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 164,
+                "candidate_size": 214,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 50,
+                  "examples": ["04013", "06001", "06037", "06059", "06065", "06067", "06071", "06073", "06075", "11001", "12011", "12031", "12057", "12086", "12095", "12099", "12103", "13067", "13089", "13121"]
+                }
+              },
+              "race": {
+                "baseline_size": 6,
+                "candidate_size": 6,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "risk": {
+                "baseline_size": 5,
+                "candidate_size": 5,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "diagnosed.prevalence/cdc.hiv/cdc/year__location__race__sex": {
+            "status": "additive",
+            "shared_cells": 27552,
+            "shared_nonmissing_cells": 12278,
+            "changed_shared_values": 0,
+            "candidate_fills": 24,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 14,
+                "candidate_size": 14,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 164,
+                "candidate_size": 214,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 50,
+                  "examples": ["04013", "06001", "06037", "06059", "06065", "06067", "06071", "06073", "06075", "11001", "12011", "12031", "12057", "12086", "12095", "12099", "12103", "13067", "13089", "13121"]
+                }
+              },
+              "race": {
+                "baseline_size": 6,
+                "candidate_size": 6,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "sex": {
+                "baseline_size": 2,
+                "candidate_size": 2,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "diagnosed.prevalence/cdc.hiv/cdc/year__location__race__sex__risk": {
+            "status": "compatible_on_overlap",
+            "shared_cells": 42840,
+            "shared_nonmissing_cells": 28790,
+            "changed_shared_values": 0,
+            "candidate_fills": 106,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 14,
+                "candidate_size": 14,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 52,
+                "candidate_size": 101,
+                "baseline_values_missing_from_candidate": {
+                  "count": 1,
+                  "examples": "C.26420"
+                },
+                "candidate_values_added": {
+                  "count": 50,
+                  "examples": ["04013", "06001", "06037", "06059", "06065", "06067", "06071", "06073", "06075", "11001", "12011", "12031", "12057", "12086", "12095", "12099", "12103", "13067", "13089", "13121"]
+                }
+              },
+              "race": {
+                "baseline_size": 6,
+                "candidate_size": 6,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "sex": {
+                "baseline_size": 2,
+                "candidate_size": 2,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "risk": {
+                "baseline_size": 5,
+                "candidate_size": 5,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "diagnosed.prevalence/cdc.hiv/cdc/year__location__risk": {
+            "status": "additive",
+            "shared_cells": 11480,
+            "shared_nonmissing_cells": 4667,
+            "changed_shared_values": 0,
+            "candidate_fills": 13,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 14,
+                "candidate_size": 14,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 164,
+                "candidate_size": 3386,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 3222,
+                  "examples": ["01001", "01003", "01005", "01007", "01009", "01011", "01013", "01015", "01017", "01019", "01021", "01023", "01025", "01027", "01029", "01031", "01033", "01035", "01037", "01039"]
+                }
+              },
+              "risk": {
+                "baseline_size": 5,
+                "candidate_size": 5,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "diagnosed.prevalence/cdc.hiv/cdc/year__location__sex": {
+            "status": "additive",
+            "shared_cells": 4592,
+            "shared_nonmissing_cells": 2096,
+            "changed_shared_values": 0,
+            "candidate_fills": 2,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 14,
+                "candidate_size": 14,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 164,
+                "candidate_size": 3386,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 3222,
+                  "examples": ["01001", "01003", "01005", "01007", "01009", "01011", "01013", "01015", "01017", "01019", "01021", "01023", "01025", "01027", "01029", "01031", "01033", "01035", "01037", "01039"]
+                }
+              },
+              "sex": {
+                "baseline_size": 2,
+                "candidate_size": 2,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "diagnosed.prevalence/cdc.hiv/cdc/year__location__sex__risk": {
+            "status": "additive",
+            "shared_cells": 22960,
+            "shared_nonmissing_cells": 7359,
+            "changed_shared_values": 0,
+            "candidate_fills": 17,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 14,
+                "candidate_size": 14,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 164,
+                "candidate_size": 214,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 50,
+                  "examples": ["04013", "06001", "06037", "06059", "06065", "06067", "06071", "06073", "06075", "11001", "12011", "12031", "12057", "12086", "12095", "12099", "12103", "13067", "13089", "13121"]
+                }
+              },
+              "sex": {
+                "baseline_size": 2,
+                "candidate_size": 2,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "risk": {
+                "baseline_size": 5,
+                "candidate_size": 5,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          }
+        }
+      },
+      "diagnoses": {
+        "status": "baseline_only",
+        "baseline_path_count": 40,
+        "candidate_path_count": 0,
+        "common_path_count": 0,
+        "baseline_only_paths": ["diagnoses/cdc.aggregated.county/cdc/year__location", "diagnoses/cdc.aggregated.county/cdc/year__location__age", "diagnoses/cdc.aggregated.county/cdc/year__location__age__race", "diagnoses/cdc.aggregated.county/cdc/year__location__age__race__risk", "diagnoses/cdc.aggregated.county/cdc/year__location__age__race__sex", "diagnoses/cdc.aggregated.county/cdc/year__location__age__risk", "diagnoses/cdc.aggregated.county/cdc/year__location__age__sex", "diagnoses/cdc.aggregated.county/cdc/year__location__age__sex__risk", "diagnoses/cdc.aggregated.county/cdc/year__location__race", "diagnoses/cdc.aggregated.county/cdc/year__location__race__risk", "diagnoses/cdc.aggregated.county/cdc/year__location__race__sex", "diagnoses/cdc.aggregated.county/cdc/year__location__race__sex__risk", "diagnoses/cdc.aggregated.county/cdc/year__location__risk", "diagnoses/cdc.aggregated.county/cdc/year__location__sex", "diagnoses/cdc.aggregated.county/cdc/year__location__sex__risk", "diagnoses/cdc.hiv/cdc/year__location", "diagnoses/cdc.hiv/cdc/year__location__age", "diagnoses/cdc.hiv/cdc/year__location__age__race", "diagnoses/cdc.hiv/cdc/year__location__age__race__risk", "diagnoses/cdc.hiv/cdc/year__location__age__race__sex", "diagnoses/cdc.hiv/cdc/year__location__age__race__sex__risk", "diagnoses/cdc.hiv/cdc/year__location__age__risk", "diagnoses/cdc.hiv/cdc/year__location__age__sex", "diagnoses/cdc.hiv/cdc/year__location__age__sex__risk", "diagnoses/cdc.hiv/cdc/year__location__race", "diagnoses/cdc.hiv/cdc/year__location__race__risk", "diagnoses/cdc.hiv/cdc/year__location__race__sex", "diagnoses/cdc.hiv/cdc/year__location__race__sex__risk", "diagnoses/cdc.hiv/cdc/year__location__risk", "diagnoses/cdc.hiv/cdc/year__location__sex", "diagnoses/cdc.hiv/cdc/year__location__sex__risk", "diagnoses/cdc.surveillance.reports/cdc.msa.reports/year__location", "diagnoses/cdc.surveillance.reports/cdc.msa.reports/year__location__age", "diagnoses/cdc.surveillance.reports/cdc.msa.reports/year__location__age__sex", "diagnoses/cdc.surveillance.reports/cdc.msa.reports/year__location__race", "diagnoses/cdc.surveillance.reports/cdc.msa.reports/year__location__race__risk", "diagnoses/cdc.surveillance.reports/cdc.msa.reports/year__location__race__sex", "diagnoses/cdc.surveillance.reports/cdc.msa.reports/year__location__risk", "diagnoses/cdc.surveillance.reports/cdc.msa.reports/year__location__sex", "diagnoses/cdc.surveillance.reports/cdc.msa.reports/year__location__sex__risk"],
+        "candidate_only_paths": [],
+        "paths": []
+      },
+      "non.adap.clients": {
+        "status": "identical",
+        "baseline_path_count": 6,
+        "candidate_path_count": 6,
+        "common_path_count": 6,
+        "baseline_only_paths": [],
+        "candidate_only_paths": [],
+        "paths": {
+          "non.adap.clients/ryan.white.program/ryan.white.pdfs/year__location": {
+            "status": "identical",
+            "shared_cells": 1023,
+            "shared_nonmissing_cells": 1022,
+            "changed_shared_values": 0,
+            "candidate_fills": 0,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 11,
+                "candidate_size": 11,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 93,
+                "candidate_size": 93,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "non.adap.clients/ryan.white.program/ryan.white.pdfs/year__location__age": {
+            "status": "identical",
+            "shared_cells": 3906,
+            "shared_nonmissing_cells": 3900,
+            "changed_shared_values": 0,
+            "candidate_fills": 0,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 7,
+                "candidate_size": 7,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 93,
+                "candidate_size": 93,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "age": {
+                "baseline_size": 6,
+                "candidate_size": 6,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "non.adap.clients/ryan.white.program/ryan.white.pdfs/year__location__fpl": {
+            "status": "identical",
+            "shared_cells": 3255,
+            "shared_nonmissing_cells": 3250,
+            "changed_shared_values": 0,
+            "candidate_fills": 0,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 7,
+                "candidate_size": 7,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 93,
+                "candidate_size": 93,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "fpl": {
+                "baseline_size": 5,
+                "candidate_size": 5,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "non.adap.clients/ryan.white.program/ryan.white.pdfs/year__location__race": {
+            "status": "identical",
+            "shared_cells": 3906,
+            "shared_nonmissing_cells": 3685,
+            "changed_shared_values": 0,
+            "candidate_fills": 0,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 7,
+                "candidate_size": 7,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 93,
+                "candidate_size": 93,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "race": {
+                "baseline_size": 6,
+                "candidate_size": 6,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "non.adap.clients/ryan.white.program/ryan.white.pdfs/year__location__sex": {
+            "status": "identical",
+            "shared_cells": 1302,
+            "shared_nonmissing_cells": 1300,
+            "changed_shared_values": 0,
+            "candidate_fills": 0,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 7,
+                "candidate_size": 7,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 93,
+                "candidate_size": 93,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "sex": {
+                "baseline_size": 2,
+                "candidate_size": 2,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "non.adap.clients/ryan.white.program/ryan.white.pdfs/year__location__sex__risk": {
+            "status": "identical",
+            "shared_cells": 6510,
+            "shared_nonmissing_cells": 5194,
+            "changed_shared_values": 0,
+            "candidate_fills": 0,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 7,
+                "candidate_size": 7,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 93,
+                "candidate_size": 93,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "sex": {
+                "baseline_size": 2,
+                "candidate_size": 2,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "risk": {
+                "baseline_size": 5,
+                "candidate_size": 5,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          }
+        }
+      },
+      "oahs.clients": {
+        "status": "identical",
+        "baseline_path_count": 3,
+        "candidate_path_count": 3,
+        "common_path_count": 3,
+        "baseline_only_paths": [],
+        "candidate_only_paths": [],
+        "paths": {
+          "oahs.clients/ryan.white.program/ryan.white.pdfs/year__location": {
+            "status": "identical",
+            "shared_cells": 1023,
+            "shared_nonmissing_cells": 1022,
+            "changed_shared_values": 0,
+            "candidate_fills": 0,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 11,
+                "candidate_size": 11,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 93,
+                "candidate_size": 93,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "oahs.clients/ryan.white.program/ryan.white.pdfs/year__location__age": {
+            "status": "identical",
+            "shared_cells": 3348,
+            "shared_nonmissing_cells": 3348,
+            "changed_shared_values": 0,
+            "candidate_fills": 0,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 6,
+                "candidate_size": 6,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 93,
+                "candidate_size": 93,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "age": {
+                "baseline_size": 6,
+                "candidate_size": 6,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "oahs.clients/ryan.white.program/ryan.white.pdfs/year__location__race": {
+            "status": "identical",
+            "shared_cells": 3348,
+            "shared_nonmissing_cells": 3342,
+            "changed_shared_values": 0,
+            "candidate_fills": 0,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 6,
+                "candidate_size": 6,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 93,
+                "candidate_size": 93,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "race": {
+                "baseline_size": 6,
+                "candidate_size": 6,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          }
+        }
+      },
+      "oahs.suppression": {
+        "status": "identical",
+        "baseline_path_count": 3,
+        "candidate_path_count": 3,
+        "common_path_count": 3,
+        "baseline_only_paths": [],
+        "candidate_only_paths": [],
+        "paths": {
+          "oahs.suppression/ryan.white.program/ryan.white.pdfs/year__location": {
+            "status": "identical",
+            "shared_cells": 1023,
+            "shared_nonmissing_cells": 1022,
+            "changed_shared_values": 0,
+            "candidate_fills": 0,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 11,
+                "candidate_size": 11,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 93,
+                "candidate_size": 93,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "oahs.suppression/ryan.white.program/ryan.white.pdfs/year__location__age": {
+            "status": "identical",
+            "shared_cells": 3348,
+            "shared_nonmissing_cells": 3341,
+            "changed_shared_values": 0,
+            "candidate_fills": 0,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 6,
+                "candidate_size": 6,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 93,
+                "candidate_size": 93,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "age": {
+                "baseline_size": 6,
+                "candidate_size": 6,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          },
+          "oahs.suppression/ryan.white.program/ryan.white.pdfs/year__location__race": {
+            "status": "identical",
+            "shared_cells": 3348,
+            "shared_nonmissing_cells": 3027,
+            "changed_shared_values": 0,
+            "candidate_fills": 0,
+            "candidate_gaps": 0,
+            "maximum_absolute_difference": 0,
+            "dimensions": {
+              "year": {
+                "baseline_size": 6,
+                "candidate_size": 6,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "location": {
+                "baseline_size": 93,
+                "candidate_size": 93,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              },
+              "race": {
+                "baseline_size": 6,
+                "candidate_size": 6,
+                "baseline_values_missing_from_candidate": {
+                  "count": 0,
+                  "examples": []
+                },
+                "candidate_values_added": {
+                  "count": 0,
+                  "examples": []
+                }
+              }
+            }
+          }
+        }
+      },
+      "prep": {
+        "status": "baseline_only",
+        "baseline_path_count": 14,
+        "candidate_path_count": 0,
+        "common_path_count": 0,
+        "baseline_only_paths": ["prep/aidsvu/aidsvu/year__location", "prep/aidsvu/aidsvu/year__location__age", "prep/aidsvu/aidsvu/year__location__race", "prep/aidsvu/aidsvu/year__location__sex", "prep/cdc.prep/cdc/year__location", "prep/cdc.prep/cdc/year__location__age", "prep/cdc.prep/cdc/year__location__age__sex", "prep/cdc.prep/cdc/year__location__sex", "prep/prep.aidsvu.aggregated.county/aidsvu/year__location", "prep/prep.aidsvu.aggregated.county/aidsvu/year__location__age", "prep/prep.aidsvu.aggregated.county/aidsvu/year__location__sex", "prep/prep.cdc.aggregated.county/cdc/year__location", "prep/prep.cdc.aggregated.county/cdc/year__location__age", "prep/prep.cdc.aggregated.county/cdc/year__location__sex"],
+        "candidate_only_paths": [],
+        "paths": []
+      },
+      "proportion.tested": {
+        "status": "baseline_only",
+        "baseline_path_count": 5,
+        "candidate_path_count": 0,
+        "common_path_count": 0,
+        "baseline_only_paths": ["proportion.tested/brfss/brfss/year__location", "proportion.tested/brfss/brfss/year__location__age", "proportion.tested/brfss/brfss/year__location__race", "proportion.tested/brfss/brfss/year__location__risk", "proportion.tested/brfss/brfss/year__location__sex"],
+        "candidate_only_paths": [],
+        "paths": []
+      },
+      "proportion.tested.n": {
+        "status": "baseline_only",
+        "baseline_path_count": 5,
+        "candidate_path_count": 0,
+        "common_path_count": 0,
+        "baseline_only_paths": ["proportion.tested.n/brfss/brfss/year__location", "proportion.tested.n/brfss/brfss/year__location__age", "proportion.tested.n/brfss/brfss/year__location__race", "proportion.tested.n/brfss/brfss/year__location__risk", "proportion.tested.n/brfss/brfss/year__location__sex"],
+        "candidate_only_paths": [],
+        "paths": []
+      },
+      "suppression": {
+        "status": "baseline_only",
+        "baseline_path_count": 27,
+        "candidate_path_count": 0,
+        "common_path_count": 0,
+        "baseline_only_paths": ["suppression/cdc.aggregated.proportion/cdc/year__location", "suppression/cdc.aggregated.proportion/cdc/year__location__age", "suppression/cdc.aggregated.proportion/cdc/year__location__age__race", "suppression/cdc.aggregated.proportion/cdc/year__location__age__risk", "suppression/cdc.aggregated.proportion/cdc/year__location__age__sex", "suppression/cdc.aggregated.proportion/cdc/year__location__race", "suppression/cdc.aggregated.proportion/cdc/year__location__race__risk", "suppression/cdc.aggregated.proportion/cdc/year__location__race__sex", "suppression/cdc.aggregated.proportion/cdc/year__location__risk", "suppression/cdc.aggregated.proportion/cdc/year__location__sex", "suppression/cdc.aggregated.proportion/cdc/year__location__sex__risk", "suppression/cdc.hiv/cdc/year__location", "suppression/cdc.hiv/cdc/year__location__age", "suppression/cdc.hiv/cdc/year__location__age__race", "suppression/cdc.hiv/cdc/year__location__age__risk", "suppression/cdc.hiv/cdc/year__location__age__sex", "suppression/cdc.hiv/cdc/year__location__race", "suppression/cdc.hiv/cdc/year__location__race__risk", "suppression/cdc.hiv/cdc/year__location__race__sex", "suppression/cdc.hiv/cdc/year__location__risk", "suppression/cdc.hiv/cdc/year__location__sex", "suppression/cdc.hiv/cdc/year__location__sex__risk", "suppression/lhd/lhd/year__location", "suppression/lhd/lhd/year__location__age", "suppression/lhd/lhd/year__location__race", "suppression/lhd/lhd/year__location__risk", "suppression/lhd/lhd/year__location__sex"],
+        "candidate_only_paths": [],
+        "paths": []
+      },
+      "total.prevalence": {
+        "status": "baseline_only",
+        "baseline_path_count": 2,
+        "candidate_path_count": 0,
+        "common_path_count": 0,
+        "baseline_only_paths": ["total.prevalence/cdc.aggregated.county/cdc/year__location", "total.prevalence/cdc.hiv/cdc/year__location"],
+        "candidate_only_paths": [],
+        "paths": []
+      }
+    }
+  },
+  "required_outcome_checks": [
+    {
+      "outcome": "non.adap.clients",
+      "status": "passed",
+      "actual": "identical",
+      "allowed": "identical"
+    },
+    {
+      "outcome": "oahs.clients",
+      "status": "passed",
+      "actual": "identical",
+      "allowed": "identical"
+    },
+    {
+      "outcome": "oahs.suppression",
+      "status": "passed",
+      "actual": "identical",
+      "allowed": "identical"
+    },
+    {
+      "outcome": "adap.proportion",
+      "status": "passed",
+      "actual": "identical",
+      "allowed": "identical"
+    },
+    {
+      "outcome": "adap.suppression",
+      "status": "passed",
+      "actual": "additive",
+      "allowed": ["identical", "additive"]
+    },
+    {
+      "outcome": "diagnosed.prevalence",
+      "status": "passed",
+      "actual": "compatible_on_overlap",
+      "allowed": ["identical", "additive", "compatible_on_overlap"]
+    }
+  ],
+  "candidate_derived_target_checks": [
+    {
+      "id": "adap_proportion_of_diagnosed_total",
+      "status": "passed",
+      "tolerance": 1e-12,
+      "aligned_cells": 306,
+      "comparable_cells": 305,
+      "mismatches": 0,
+      "numeric_mismatches": 0,
+      "output_missing_when_expected_present": 0,
+      "output_present_when_expected_missing": 0,
+      "maximum_absolute_difference": 0,
+      "dimensions": {
+        "year": {
+          "count": 6,
+          "examples": ["2016", "2017", "2018", "2019", "2020", "2021"]
+        },
+        "location": {
+          "count": 51,
+          "examples": ["AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DC", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA"]
+        }
+      }
+    },
+    {
+      "id": "adap_proportion_of_diagnosed_by_sex",
+      "status": "passed",
+      "tolerance": 1e-12,
+      "aligned_cells": 204,
+      "comparable_cells": 200,
+      "mismatches": 0,
+      "numeric_mismatches": 0,
+      "output_missing_when_expected_present": 0,
+      "output_present_when_expected_missing": 0,
+      "maximum_absolute_difference": 0,
+      "dimensions": {
+        "year": {
+          "count": 2,
+          "examples": ["2020", "2021"]
+        },
+        "location": {
+          "count": 51,
+          "examples": ["AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DC", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA"]
+        },
+        "sex": {
+          "count": 2,
+          "examples": ["female", "male"]
+        }
+      }
+    },
+    {
+      "id": "adap_proportion_of_diagnosed_by_age",
+      "status": "passed",
+      "tolerance": 1e-12,
+      "aligned_cells": 510,
+      "comparable_cells": 505,
+      "mismatches": 0,
+      "numeric_mismatches": 0,
+      "output_missing_when_expected_present": 0,
+      "output_present_when_expected_missing": 0,
+      "maximum_absolute_difference": 0,
+      "dimensions": {
+        "year": {
+          "count": 2,
+          "examples": ["2020", "2021"]
+        },
+        "location": {
+          "count": 51,
+          "examples": ["AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DC", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA"]
+        },
+        "age": {
+          "count": 5,
+          "examples": ["13-24 years", "25-34 years", "35-44 years", "45-54 years", "55+ years"]
+        }
+      }
+    },
+    {
+      "id": "adap_proportion_of_diagnosed_by_race",
+      "status": "passed",
+      "tolerance": 1e-12,
+      "aligned_cells": 612,
+      "comparable_cells": 548,
+      "mismatches": 0,
+      "numeric_mismatches": 0,
+      "output_missing_when_expected_present": 0,
+      "output_present_when_expected_missing": 0,
+      "maximum_absolute_difference": 0,
+      "dimensions": {
+        "year": {
+          "count": 2,
+          "examples": ["2020", "2021"]
+        },
+        "location": {
+          "count": 51,
+          "examples": ["AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DC", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA"]
+        },
+        "race": {
+          "count": 6,
+          "examples": ["american indian alaska native", "asian", "black", "hispanic", "native hawaiian pacific islander", "white"]
+        }
+      }
+    },
+    {
+      "id": "adap_suppressed_proportion_of_diagnosed_total",
+      "status": "passed",
+      "tolerance": 1e-12,
+      "aligned_cells": 153,
+      "comparable_cells": 127,
+      "mismatches": 0,
+      "numeric_mismatches": 0,
+      "output_missing_when_expected_present": 0,
+      "output_present_when_expected_missing": 0,
+      "maximum_absolute_difference": 0,
+      "dimensions": {
+        "year": {
+          "count": 3,
+          "examples": ["2019", "2020", "2021"]
+        },
+        "location": {
+          "count": 51,
+          "examples": ["AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DC", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA"]
+        }
+      }
+    }
+  ],
+  "scope_statement": "This is a selective target-compatibility report, not a whole-manager compatibility or interchangeability claim.",
+  "provenance_statement": "Compatibility on shared target cells does not establish that the candidate manager was used to fit the historical posterior.",
+  "candidate_only_statement": "Candidate-only outcomes, including adap.clients, have no historical numeric compatibility evidence in the baseline display manager.",
+  "derived_check_statement": "Derived-target checks establish formula consistency within the candidate manager; they do not establish historical identity of the inputs or derived values."
+}

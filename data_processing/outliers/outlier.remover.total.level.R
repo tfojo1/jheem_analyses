@@ -54,7 +54,7 @@ total.prev.adjusted<- run.outlier.process(outcome= 'total.prevalence',
 #Decided to do this prior to removing other outliers for this outcome
 
 x = surveillance.manager$data$diagnosed.prevalence$estimate$cdc.aggregated.county$cdc$year__location
-delta = (x[as.character(2010:2013), ] - x[as.character(2009:2012), ])/(x[as.character(2009:2012), ]) #identify % change
+delta = (x[as.character(2011:2014), ] - x[as.character(2010:2013), ])/(x[as.character(2010:2013), ]) #identify % change
 delta< (-0.02) #want to know which is true
 to.remove.mask = apply(delta < (-0.02), MARGIN = 'location', FUN= any, na.rm=T) #if any of those years has a less than 2% decrease from the previous year, for each col is any of these values true.  #could replace margin = 2 with margin = 'location'
 to.remove.codes = names(to.remove.mask)[to.remove.mask] #gives you names - for these you remove all the 4 years

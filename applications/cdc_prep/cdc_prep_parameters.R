@@ -138,7 +138,8 @@ CDC.PREP.PARAMETERS.PRIOR = join.distributions(
     # prep.referred.age4.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
     # prep.referred.age5.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
 
-    fraction.cdc.tests.unique = Beta.Distribution(7.2,7.2)
+    fraction.cdc.tests.unique = Beta.Distribution(7.2,7.2),
+    p.prep.uptake.from.referral = Beta.Distribution(4.2,15.8)
     
     #rr.fraction.index.diagnoses.that.yield.a.positive.contact = Lognormal.Distribution(0, log(2)/2)
     
@@ -772,13 +773,13 @@ CDC.PREP.PARAMETER.SAMPLING.BLOCKS = c(
             "prep.cdc.msm.or","prep.cdc.msm.idu.or","prep.cdc.idu.male.or",
             "prep.cdc.idu.female.or","prep.cdc.heterosexual.male.or","prep.cdc.heterosexual.female.or"
         ),
-        prep.cdc.by.rage = c(
+        prep.cdc.by.age = c(
             "prep.cdc.age1.or","prep.cdc.age2.or","prep.cdc.age3.or",
             "prep.cdc.age4.or","prep.cdc.age5.or"
         ),
         prep.cdc = c("prep.cdc.or"),
         prep.unique.total = "fraction.cdc.tests.unique",
-        # rr.positive.contact = "rr.fraction.index.diagnoses.that.yield.a.positive.contact",
+        prep.uptake.referral = "p.prep.uptake.from.referral",
         prep.partner. = c("prep.partner.or"),
         prep.partner.by.race = c(
             "prep.partner.black.or","prep.partner.hispanic.or","prep.partner.other.or"

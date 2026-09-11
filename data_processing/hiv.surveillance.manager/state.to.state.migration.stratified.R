@@ -21,8 +21,24 @@ state.stratified.migration.data.clean = lapply(state.stratified.migration.data, 
   data=file[["data"]]
   filename = file[["filename"]]
   
+  # data <- data %>%
+  #   mutate(across(-c(Label), as.numeric))
+  
   data <- data %>%
-    mutate(across(-c(Label), as.numeric))
+      mutate(across(
+          -Label,
+          ~ {
+              x <- as.character(.x)
+              x <- trimws(x)
+              x <- gsub(",", "", x)
+              x <- gsub("±", "", x)
+              
+              # Keep only actual numeric values
+              x[!grepl("^[+-]?[0-9]*\\.?[0-9]+([eE][+-]?[0-9]+)?$", x)] <- NA
+              
+              as.numeric(x)
+          }
+      ))
   
 data <- data %>%
   rename(strata = `Label`)%>%

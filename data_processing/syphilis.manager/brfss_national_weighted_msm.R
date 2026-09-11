@@ -70,9 +70,6 @@ data <- data %>%
 
   data<- data[!duplicated(data), ]
 
-  #Need to add sex column in for put statment dimensions
-  data$sex = "male"
-
   data= as.data.frame(data)
   list(filename, data)
 })
@@ -149,9 +146,7 @@ data.list.brfss.national.msm.race = lapply(data.list.race.male.denom, function(f
   data$value = round(data$value, digits=2)
   
   data<- data[!duplicated(data), ]
-  
-  #Need to add sex column in for put statment dimensions
-  data$sex = "male"
+ 
   
   data= as.data.frame(data)
   list(filename, data) 
@@ -192,9 +187,7 @@ data.list.brfss.national.msm.age = lapply(data.list.age.male.denom, function(fil
   data$value = round(data$value, digits=2)
   
   data<- data[!duplicated(data), ]
-  
-  #Need to add sex column in for put statment dimensions
-  data$sex = "male"
+ 
   
   data= as.data.frame(data)
   list(filename, data) 
@@ -211,7 +204,6 @@ for (data in msm.state.total) {
     data = data,
     ontology.name = 'brfss.msm',
     source = 'brfss',
-    dimension.values = list(sex = "male"),
     url = 'https://www.cdc.gov/brfss/index.html',
     details = 'Behavioral Risk Factor Surveillance System')
 }
@@ -225,7 +217,6 @@ for (data in msm.state.race) {
     data = data,
     ontology.name = 'brfss.msm',
     source = 'brfss',
-    dimension.values = list(sex = "male"),
     url = 'https://www.cdc.gov/brfss/index.html',
     details = 'Behavioral Risk Factor Surveillance System')
 }
@@ -239,7 +230,6 @@ for (data in msm.state.age) {
     data = data,
     ontology.name = 'brfss.msm',
     source = 'brfss',
-    dimension.values = list(sex = "male"),
     url = 'https://www.cdc.gov/brfss/index.html',
     details = 'Behavioral Risk Factor Surveillance System')
 }
