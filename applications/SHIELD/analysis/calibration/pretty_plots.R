@@ -19,7 +19,8 @@ calib.simsets <- load.calib.simsets(
 )
 
 # PLOT CALIBRATIONS----
-CITIES<- c("Atlanta","Chicago")
+{
+    CITIES<- c("Atlanta","Houston")
 
 p1<-shield.plot(calib.simsets, "diagnosis.ps", locations = CITIES,overlay.locations = F,
                 log.y = TRUE,
@@ -33,11 +34,11 @@ p2<-shield.plot(calib.simsets, "diagnosis.ps", locations = CITIES,split.by = "se
                 titles = c(Atlanta = "C. Atlanta–Sandy Springs",
                            Chicago = "D. Chicago–Naperville"));p2
 p3<-shield.plot(calib.simsets, "prop.male.ps.diag.among.msm", locations = CITIES, 
-                log.y = TRUE, show.sources = T, 
-                shape.by = "both",
+                log.y = TRUE, show.sources = F, 
+                shape.by = "both",show.data = F,
                 title = "E. Proportion of Male Diagnosis among MSM");p3
 p4<-shield.plot(calib.simsets, "incidence", locations = CITIES,
-                log.y = TRUE,show.sources = T, 
+                log.y = TRUE,show.sources = F, 
                 title = "F. Syphilis Incidence");p4
 
 
@@ -45,5 +46,6 @@ p4<-shield.plot(calib.simsets, "incidence", locations = CITIES,
 plt<- (p1 /p2)/(p3+p4) ;plt
 # +plot_layout(guides = "collect") & theme(legend.position = "bottom");plt
 
-ggsave(file.path(FIG.DIR, "fig2-Epi_impact.png"), plt,
+ggsave(file.path(FIG.DIR, "fig2-Epi_impact1.png"), plt,
        width = 12, height = 9, dpi = 300, bg = "white")
+}
