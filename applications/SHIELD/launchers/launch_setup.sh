@@ -6,7 +6,7 @@
 #   calibration cache directories before moving on to launch_run_chains.sh.
 #
 # USAGE
-#   nohup bash applications/SHIELD/launch_setup.sh > applications/SHIELD/logs/launcher_setup.out 2>&1 &
+#   nohup bash applications/SHIELD/launchers/launch_setup.sh > applications/SHIELD/logs/launcher_setup.out 2>&1 &
 #
 # Kill:
 #   pkill -u pkasaie1 -x R
@@ -18,7 +18,8 @@
 
 # ── resolve paths relative to this script's location ──────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LOG_DIR="$SCRIPT_DIR/logs"
+PARENT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"   # launchers live in a subfolder; R scripts + logs are one level up
+LOG_DIR="$PARENT_DIR/logs"
 mkdir -p "$LOG_DIR"
 
 # ── thread settings ────────────────────────────────────────────────────────────
@@ -26,7 +27,7 @@ export OPENBLAS_NUM_THREADS=1
 export OMP_NUM_THREADS=1
 export MKL_NUM_THREADS=1
 
-# ── config ─────────────────────────────────────────────────────────────────────
+# ── config: EDIT THESE for each run ────────────────────────────────────────────
 allLocs=(
     C.35620 C.33100 C.31080 C.12060 C.26420 C.19100 C.16980 C.47900
     C.37980 C.36740 C.41860 C.38060 C.45300 C.40140 C.19820 C.12580
@@ -39,20 +40,18 @@ ten_cities=(
     C.33100 C.35620 C.37980 C.38060 C.42660
 )
 
-
 shield2_cities=(
     C.12060 C.12580 C.16980 C.26420 C.31080
 )
 shield1_cities=(
-    C.33100 C.35620 C.37980 
+    C.33100 C.35620 C.37980
 )
 shield3_cities=(
     C.38060 C.42660
 )
-# ── set active cities and calibration codes here ───────────────────────────────
-CITIES=("${shield2_cities[@]}")
 
-# ── config: EDIT THESE for each run ────────────────────────────────────────────
+# ── set active cities here ─────────────────────────────────────────────────────
+CITIES=("${shield2_cities[@]}")
 
 CALIBRATION_CODES=(
     calib.9.10.stage3.az
@@ -60,7 +59,7 @@ CALIBRATION_CODES=(
 
 MAX_JOBS=20 #Depends on the machine
 
-SCRIPT="$SCRIPT_DIR/shield_calib_setup_and_run_modular.R"
+SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
 
 # ── preflight ──────────────────────────────────────────────────────────────────
 if [[ ! -f "$SCRIPT" ]]; then
