@@ -1577,14 +1577,6 @@ plot_coverage_heatmap <- function(tbl,
                                   # SHIELD FIGURE PALETTE, top of this file
                                   band.colours = SHIELD.HEAT.COLS,
                                   band.shade   = SHIELD.HEAT.SHADE,
-                                  # Which bands run dark -> pale (extreme end
-                                  # DARKEST) instead of pale -> dark. Band 1 by
-                                  # default: it is the harm band and its extreme
-                                  # sits at the LOW end of the scale. On a
-                                  # flipped scale, where two bands lie below the
-                                  # neutral value, pass c(1, 2) -- otherwise the
-                                  # middle band saturates towards "no effect".
-                                  band.reverse = 1L,
                                   band.light   = 0.78,
                                   legend.dir   = c("vertical", "horizontal"),
                                   legend.breaks = NULL,
@@ -1690,16 +1682,14 @@ plot_coverage_heatmap <- function(tbl,
         if (band.shade) {
             # A piecewise ramp: the hue changes abruptly at every break, and
             # within a band the colour runs pale -> saturated so magnitude is
-            # still readable. The bands named in `band.reverse` run the other
-            # way (darkest at their LOW end), so that on both sides of the
-            # neutral value "more extreme" reads as "more intense".
+            # still readable. Band 1 is reversed (darkest at the LOW end), so
+            # "more negative" and "more positive" both read as more intense.
             edges    <- c(limits[1], band.breaks, limits[2])
             stop.pos <- numeric(0); stop.col <- character(0)
             for (k in seq_along(band.colours)) {
                 base <- unname(band.colours[k])
                 pale <- .lighten(base, band.light)
-                stop.col <- c(stop.col, if (k %in% band.reverse) c(base, pale)
-                                        else                     c(pale, base))
+                stop.col <- c(stop.col, if (k == 1) c(base, pale) else c(pale, base))
                 stop.pos <- c(stop.pos, edges[k], edges[k + 1])
             }
             stop.pos <- scales::rescale(stop.pos, from = limits)

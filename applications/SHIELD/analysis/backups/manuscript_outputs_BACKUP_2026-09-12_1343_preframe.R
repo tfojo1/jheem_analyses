@@ -219,12 +219,11 @@ if(1==2){
 # FIGURE 2 <NOT BUILT HERE -- see the calibration / pretty-plot script> ----
 # FIGURE 3 -- IMPACT HEATMAPS ----
 # ****************************************************************************************************
-# WHAT   MSA x coverage heatmaps in EVAL.YEAR, 2 x 2:
+# WHAT   MSA x coverage heatmaps of the median % incidence reduction in
+#        EVAL.YEAR, 2 x 2:
 #          A  MSM   vs the 2022 baseline        B  Total vs the 2022 baseline
 #          C  MSM   vs no intervention, 2030    D  Total vs no intervention, 2030
 # INPUT  tbl.cov.vs2022 and tbl.cov.vs.noint from SHARED INPUTS above.
-# OPTION HEAT.FRAME picks what a cell MEANS -- % reduction or % change. See the
-#        block below; it must agree with the panel titles.
 # OUTPUT figures/fig3_heatmaps.png  (object `fig.heatmap`)
 # COLOUR SHIELD.HEAT.COLS / SHIELD.HEAT.SHADE, from the helper's SHIELD
 #        FIGURE PALETTE; HEAT.MIDPOINT / HEAT.LABEL from CONFIGURATION here.
@@ -233,99 +232,29 @@ if(1==2){
 #        guides = "collect" merge them into one bar instead of four.
 
 {
-  # ---- OPTION: what does a cell MEAN? ----------------------------------------
-  # HEAT.FRAME
-  #   "reduction"  cell = % REDUCTION in incidence. Positive = incidence FELL.
-  #                This is the scale the model outcomes are computed on, so
-  #                nothing is transformed.
-  #   "change"     cell = % CHANGE in incidence. Positive = incidence ROSE.
-  #                Every value is negated, and the band breaks and their colours
-  #                are flipped with it, so blue still means "target met" and red
-  #                still means "worse off". Only the sign convention changes --
-  #                no cell changes which band it falls in.
-  #
-  # THE PANEL TITLES ARE NOT DERIVED FROM THIS. They are written out below, so
-  # if you change HEAT.FRAME you must change them to match, or the figure will
-  # say one thing and mean the other.
-  #
-  # SCOPE: this flips the FIGURE only. tbl.cov.vs2022 / tbl.cov.vs.noint are
-  # left on the reduction scale, because FIGURE 3a searches those same tables
-  # for "value >= 50" and would find nothing on a flipped copy.
-  #
-  # EDGE CASE, only if you ever set SHIELD.HEAT.SHADE = FALSE: the flat-band
-  # path assigns bands with cut(right = FALSE), so a value sitting EXACTLY on a
-  # break lands on the upper side either way, which is the opposite band once
-  # the sign is flipped. Shaded mode never calls cut() -- the colour comes from
-  # a gradient whose hue steps at the break -- so it is unaffected.
-  HEAT.FRAME <- "change"          # "change" or "reduction"
-
-  # Negate every value column, leaving the identifier columns alone. Value
-  # columns are the ones matching the builder's <outcome>_<intervention>_<year>
-  # pattern -- the same pattern plot_coverage_heatmap() uses to find them.
-  .flip.values <- function(tbl, pattern = "^(.*)_doxy\\.cov\\.(\\d+)_(\\d+)$") {
-    hit <- grepl(pattern, names(tbl))
-    if (!any(hit))
-      stop("HEAT.FRAME = 'change': no column matched '", pattern, "', so ",
-           "nothing would be flipped and the figure would silently stay on the ",
-           "reduction scale. Has col.pattern changed?")
-    tbl[hit] <- lapply(tbl[hit], function(v) {
-      num <- suppressWarnings(as.numeric(v))
-      if (all(is.na(num)) && !all(is.na(v)))
-        stop("HEAT.FRAME = 'change': a value column is not numeric and cannot ",
-             "be sign-flipped. A median.ci table carries '[lower-upper]' ",
-             "strings -- use stat.type = 'median' for this figure.")
-      -num
-    })
-    tbl
-  }
-
-  # Everything that has to move together when the sign convention flips. Under
-  # "change" the breaks become c(-49, 0) and the colours reverse, so the band
-  # MEANINGS are unchanged: blue = target met, tint = benefit short of target,
-  # red = worse off. band.reverse = c(1, 2) because BOTH lower bands now sit
-  # below the neutral value and must darken towards their extreme.
-  .hf <- if (HEAT.FRAME == "change")
-    list(breaks   = c(-HEAT.MIDPOINT, 0),
-         colours  = rev(SHIELD.HEAT.COLS),
-         reverse  = c(1L, 2L),
-         midpoint = -HEAT.MIDPOINT,
-         better   = FALSE,
-         lab      = "% Change in Incidence")
-  else if (HEAT.FRAME == "reduction")
-    list(breaks   = c(0, HEAT.MIDPOINT),
-         colours  = SHIELD.HEAT.COLS,
-         reverse  = 1L,
-         midpoint = HEAT.MIDPOINT,
-         better   = TRUE,
-         lab      = "% Reduction in Incidence")
-  else stop("HEAT.FRAME must be 'change' or 'reduction', not '", HEAT.FRAME, "'.")
 
   # helper code to build the heatmap from each table
   .mk.heat <- function(tbl, strat, ttl){
     plot_coverage_heatmap(
-      if (HEAT.FRAME == "change") .flip.values(tbl) else tbl,
-      locations    = MSAS,
+      tbl, 
+      locations = MSAS,
       subgroup     = strat,
-      midpoint     = .hf$midpoint,
-      band.breaks  = .hf$breaks,
-      band.colours = .hf$colours,
-      band.reverse = .hf$reverse,
-      higher.is.better = .hf$better,
+      midpoint     = HEAT.MIDPOINT,
       fill.style   = "banded",
       limits       = c(-100, 100),
       order.rows   = "alpha",
       label.colour = HEAT.LABEL,
       squish.marks = "always",        # <- identical labels on every panel
       title        = ttl,
-      fill.lab     = .hf$lab,
+      fill.lab     = "%Reduction In Incidence",
       legend.dir   = "horizontal",
       fixed.aspect = FALSE)
   }
   
-  p.heat.A <- .mk.heat(tbl.cov.vs2022, "msm",   "A: Projected Incidence Change among MSM \n2022–2030 (%)")
-  p.heat.B <- .mk.heat(tbl.cov.vs2022, "Total", "B: Projected Incidence Change among Total Population \n2022–2030 (%))")
-  p.heat.C <- .mk.heat(tbl.cov.vs.noint,          "msm",   "C: Projected Incidence Change among MSM \n2030 with- vs. without- Doxy-PEP (%)")
-  p.heat.D <- .mk.heat(tbl.cov.vs.noint,          "Total", "D: Projected Incidence Change among Total Population \n2030 with- vs. without- Doxy-PEP (%)")
+  p.heat.A <- .mk.heat(tbl.cov.vs2022, "msm",   "A: Projected %Change among MSM \n(Incidence in 2030 vs. 2022)")
+  p.heat.B <- .mk.heat(tbl.cov.vs2022, "Total", "B: Projected %Change among Total Population \n(Incidence in 2030 vs. 2022)")
+  p.heat.C <- .mk.heat(tbl.cov.vs.noint,          "msm",   "C: Projected %Change among MSM \n(Incidence in 2030, with DoxyPEP vs. No Intervention)")
+  p.heat.D <- .mk.heat(tbl.cov.vs.noint,          "Total", "D: Projected %Change among Total Population \n(Incidence 2030, with DoxyPEP vs. No Intervention)")
   
   .no.y.heat <- theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
   .no.x.heat <- theme(axis.title.x = element_blank(), axis.text.x = element_blank())

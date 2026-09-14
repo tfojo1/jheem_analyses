@@ -12,7 +12,20 @@
 
 cat("*** Running Shield_source_code.R ***\n")
 
-SYPHILIS.MANAGER.RELEASE.TAG <- "syphilis-manager-v2026.07.27"
+# WHICH SURVEILLANCE MANAGER SHOULD WE USE?
+# The version can be any of the dated syphilis managers from this page 
+# (I believe the 2026.07.27 version would have been the most recent before August 21): https://github.com/tfojo1/jheem_analyses/releases
+# If the version is not set, it keeps using the latest version.
+# SYPHILIS.MANAGER.RELEASE.TAG <- "syphilis-manager-v2026.07.27”
+if (!is.null(SYPHILIS.MANAGER.RELEASE.TAG)) { print(paste("!!! 1-Using a potentiall old Surveillance Manager :",SYPHILIS.MANAGER.RELEASE.TAG))
+  }else{print("1-Using the most up to date Surveillance manager")}
+
+
+#Should turn this off for parallel runs; simoultanous calls to git will shut down the runs 
+FETCH.JHEEM2.UPDATES<-T
+if (FETCH.JHEEM2.UPDATES) { print(paste("2-Fetching the updates for JHEEM2"))
+}else{print("!!!2-Skiping the Fetch updates for JHEEM2")}
+
 
 ## =============================================================================
 ## 0. CONFIGURATION
@@ -56,7 +69,7 @@ library(distributions)
 sync.repo.to.branch <- function(repo.path, branch, force = TRUE)
 {
   if (nchar(Sys.which("git")) == 0)
-    stop("git executable not found on PATH")
+    stop("Git executable not found on PATH")
   if (!dir.exists(file.path(repo.path, ".git")))
     stop("Not a git repository: ", repo.path)
   
@@ -99,7 +112,7 @@ sync.repo.to.branch <- function(repo.path, branch, force = TRUE)
 ## =============================================================================
 
 ## --- jheem_analyses: plain pull on whatever branch is checked out ------------
-cat("Checking JHEEM_ANALYSES repository status....\n")
+cat("3-Checking JHEEM_ANALYSES repository status....\n")
 if (dir.exists(JHEEM.ANALYSES.PATH)) {
   system2("git", c("-C", shQuote(normalizePath(JHEEM.ANALYSES.PATH)), "pull"))
 } else {
@@ -113,10 +126,10 @@ source(file.path(JHEEM.ANALYSES.PATH, "use_jheem2_package_setting.R"))
 ## =============================================================================
 ## 4. LOAD JHEEM2
 ## =============================================================================
-
+cat("4-Checking JHEEM2 repository status....\n")
 if (USE.JHEEM2.PACKAGE) {
   ## --- option 1: installed package ----------------------------------------
-  cat("Using JHEEM2 package ...\n")
+  cat("--Using JHEEM2 package: \n")
   update.jheem2.package()          # checks version and reinstalls as needed
   library(jheem2)
   print(check.jheem2.version())
@@ -124,10 +137,9 @@ if (USE.JHEEM2.PACKAGE) {
 } else {
   ## --- option 2: source directly from the local clone ----------------------
   ## devtools::install_github('tfojo1/jheem2', ref = JHEEM2.BRANCH)
-  cat("Using JHEEM2 source code ...\n")
-  cat("Checking JHEEM2 repository status....\n")
-  
-  sync.repo.to.branch(JHEEM2.PATH, branch = JHEEM2.BRANCH, force = TRUE)
+  cat("--Using JHEEM2 source code: \n")
+
+  if (FETCH.JHEEM2.UPDATES) sync.repo.to.branch(JHEEM2.PATH, branch = JHEEM2.BRANCH, force = TRUE)
   source(file.path(JHEEM2.PATH, "R/tests/source_jheem2_package.R"))
 }
 
@@ -136,7 +148,7 @@ if (USE.JHEEM2.PACKAGE) {
 ## =============================================================================
 ## cache_manager.R is sourced after JHEEM2 so its definitions can rely on the
 ## package being available.
-
+cat("5-Sourcing Commoncodes...\n")
 source(file.path(JHEEM.ANALYSES.PATH, "commoncode/cache_manager.R"))
 clear.all.managers()
 
@@ -148,7 +160,7 @@ source(file.path(JHEEM.ANALYSES.PATH, "commoncode/file_paths.R"))   # defines RO
 source(file.path(JHEEM.ANALYSES.PATH, "commoncode/locations_of_interest.R"))
 
 set.jheem.root.directory(ROOT.DIR)
-
+cat(paste0("The root director is set to ",ROOT.DIR))
 ## =============================================================================
 ## 6. CACHED DATA
 ## =============================================================================
@@ -159,7 +171,7 @@ load(file.path(JHEEM.CACHE.DIR, "google_mobility_data.Rdata"))
 ## --- Census manager ----------------------------------------------------------
 ## Large; only needed to generate the initial population. Not set as default.
 if (!exists("CENSUS.MANAGER")) {
-  cat("Reading census manager ...\n")
+  cat("6-Reading census manager ...\n")
   CENSUS.MANAGER <- load.data.manager.from.cache("census.manager.rdata",
                                                  set.as.default = FALSE)
   cat("Census manager read\n")
@@ -169,7 +181,7 @@ if (!exists("CENSUS.MANAGER")) {
 ## All calibration and plotting data, at county / MSA / national aggregation.
 ## Set as default so plotting functions pull outcomes from it.
 if (!exists("SURVEILLANCE.MANAGER")) {
-  cat("Reading syphilis surveillance manager ...\n")
+  cat("7-Reading syphilis surveillance manager ...\n")
   SURVEILLANCE.MANAGER <- load.data.manager.from.cache("syphilis.manager.rdata",
                                                        set.as.default = TRUE,
                                                        release.tag = SYPHILIS.MANAGER.RELEASE.TAG)
@@ -178,10 +190,11 @@ if (!exists("SURVEILLANCE.MANAGER")) {
   warning("SYPHILIS.MANAGER.RELEASE.TAG was ignored because SURVEILLANCE.MANAGER was already loaded")
 }
 
+
 ## =============================================================================
 ## 7. SHIELD-SPECIFIC CODE
 ## =============================================================================
-
+cat("8-Sourcig SHIELD helpers...\n")
 SHIELD.DIR <- file.path(JHEEM.ANALYSES.PATH, "applications/SHIELD")
 
 for (f in c("shield_calib_parameters.R",
