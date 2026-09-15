@@ -16,7 +16,8 @@ cat("*** Running Shield_source_code.R ***\n")
 # The version can be any of the dated syphilis managers from this page 
 # (I believe the 2026.07.27 version would have been the most recent before August 21): https://github.com/tfojo1/jheem_analyses/releases
 # If the version is not set, it keeps using the latest version.
-# SYPHILIS.MANAGER.RELEASE.TAG <- "syphilis-manager-v2026.07.27”
+SYPHILIS.MANAGER.RELEASE.TAG <- "syphilis-manager-v2026.07.27"
+
 if (!is.null(SYPHILIS.MANAGER.RELEASE.TAG)) { print(paste("!!! 1-Using a potentiall old Surveillance Manager :",SYPHILIS.MANAGER.RELEASE.TAG))
   }else{print("1-Using the most up to date Surveillance manager")}
 
