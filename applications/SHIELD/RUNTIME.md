@@ -37,6 +37,8 @@ but automation and containers must set them explicitly.
 | Variable | Default | Contract |
 | --- | --- | --- |
 | `JHEEM2_MODE` | `source` | `source` loads `JHEEM2_PATH` with `pkgload`; `package` uses the already installed package |
+| `JHEEM_ANALYSES_REF` | unset | Full baked `jheem_analyses` commit declared by an immutable image when no Git metadata is included |
+| `JHEEM2_REF` | unset | Full baked `jheem2` commit declared by an immutable image when no Git metadata is included |
 | `SHIELD_RUN_MODE` | `resume` | `fresh` clears matching prior state; `resume` requires a checkpoint |
 | `SHIELD_INPUT_OFFLINE` | `true` | Prevent input-manager network refresh during the run |
 | `SHIELD_REQUIRE_IMMUTABLE_INPUTS` | `false` | When true, an exact syphilis-manager tag is mandatory |
@@ -104,7 +106,10 @@ preserved.
 
 For a result intended to be retained, compared, or published:
 
-1. Use exact source commits and a prebuilt dependency environment.
+1. Use exact source commits and a prebuilt dependency environment. A recorded
+   image without embedded Git metadata must declare full `JHEEM_ANALYSES_REF`
+   and `JHEEM2_REF` commits; provenance reports a mismatch if a declared ref
+   disagrees with an available worktree.
 2. Set `SHIELD_INPUT_OFFLINE=true`.
 3. Set `SHIELD_REQUIRE_IMMUTABLE_INPUTS=true` and provide an exact
    `JHEEM_SYPHILIS_MANAGER_TAG` available in `JHEEM_CACHE_DIR`.

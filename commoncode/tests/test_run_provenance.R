@@ -20,6 +20,29 @@ stopifnot(identical(
     "git@example.org:team/repo.git"
 ))
 
+declared.commit <- paste(rep("a", 40), collapse = "")
+copied.source <- tempfile("copied-source-")
+dir.create(copied.source)
+declared.identity <- collect.git.repository.identity(
+    "jheem_analyses", copied.source, declared.ref = declared.commit
+)
+stopifnot(
+    identical(declared.identity$identity, "exact"),
+    identical(declared.identity$commit, declared.commit),
+    identical(declared.identity$identity_source, "immutable_image_declaration")
+)
+invalid.declaration <- collect.git.repository.identity(
+    "jheem_analyses", copied.source, declared.ref = "main"
+)
+stopifnot(
+    identical(invalid.declaration$identity, "unknown"),
+    identical(invalid.declaration$declared_ref, "main")
+)
+worktree.with.wrong.declaration <- collect.git.repository.identity(
+    "jheem_analyses", repository.root, declared.ref = declared.commit
+)
+stopifnot(identical(worktree.with.wrong.declaration$identity, "mismatch"))
+
 set.seed(20260909)
 random.seed.before <- .Random.seed
 
@@ -50,6 +73,7 @@ context <- collect.jheem.run.context(
         jheem_analyses = repository.root,
         missing = file.path(repository.root, "does-not-exist")
     ),
+    repository.refs = list(),
     packages = c("base", "package.that.does.not.exist"),
     managers = list(exact = exact.manager, floating = floating.manager)
 )

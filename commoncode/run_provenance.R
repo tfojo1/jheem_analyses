@@ -31,24 +31,43 @@ sanitize.git.remote.url <- function(value) {
     sub("^([A-Za-z][A-Za-z0-9+.-]*://)[^/@]+@", "\\1", value, perl = TRUE)
 }
 
-collect.git.repository.identity <- function(name, path) {
-    if (is.null(path) || length(path) != 1 || is.na(path) || !dir.exists(path)) {
+is.full.git.commit <- function(value) {
+    !is.null(value) && length(value) == 1 && !is.na(value) &&
+        grepl("^[0-9a-fA-F]{40}$", value)
+}
+
+declared.repository.identity <- function(name, path, declared.ref, reason) {
+    if (!is.full.git.commit(declared.ref)) {
         return(list(
             name = name,
             identity = "unknown",
-            reason = "repository path is unavailable",
-            path = provenance.value.or.null(path)
+            reason = reason,
+            path = provenance.value.or.null(path),
+            declared_ref = provenance.value.or.null(declared.ref)
+        ))
+    }
+    list(
+        name = name,
+        identity = "exact",
+        commit = tolower(declared.ref),
+        dirty = FALSE,
+        identity_source = "immutable_image_declaration",
+        path = provenance.value.or.null(path)
+    )
+}
+
+collect.git.repository.identity <- function(name, path, declared.ref = NULL) {
+    if (is.null(path) || length(path) != 1 || is.na(path) || !dir.exists(path)) {
+        return(declared.repository.identity(
+            name, path, declared.ref, "repository path is unavailable"
         ))
     }
 
     normalized.path <- normalizePath(path, mustWork = TRUE)
     inside <- run.git.command(normalized.path, c("rev-parse", "--is-inside-work-tree"))
     if (inside$status != 0L || !identical(inside$output[[1]], "true")) {
-        return(list(
-            name = name,
-            identity = "unknown",
-            reason = "path is not a Git worktree",
-            path = normalized.path
+        return(declared.repository.identity(
+            name, normalized.path, declared.ref, "path is not a Git worktree"
         ))
     }
 
@@ -58,19 +77,23 @@ collect.git.repository.identity <- function(name, path) {
     remote <- run.git.command(normalized.path, c("remote", "get-url", "origin"))
 
     if (head$status != 0L || length(head$output) != 1) {
-        return(list(
-            name = name,
-            identity = "unknown",
-            reason = "Git HEAD could not be read",
-            path = normalized.path
+        return(declared.repository.identity(
+            name, normalized.path, declared.ref, "Git HEAD could not be read"
         ))
     }
 
     dirty.entries <- if (status$status == 0L) status$output[nzchar(status$output)] else character()
+    normalized.head <- tolower(head$output[[1]])
+    normalized.declared <- if (is.full.git.commit(declared.ref)) tolower(declared.ref) else NULL
+    declaration.mismatch <- !is.null(normalized.declared) &&
+        !identical(normalized.head, normalized.declared)
     list(
         name = name,
-        identity = if (length(dirty.entries) == 0) "exact" else "modified",
-        commit = head$output[[1]],
+        identity = if (declaration.mismatch) "mismatch"
+            else if (length(dirty.entries) == 0) "exact" else "modified",
+        commit = normalized.head,
+        declared_ref = normalized.declared,
+        identity_source = "git_worktree",
         branch = if (branch$status == 0L) branch$output[[1]] else NULL,
         dirty = length(dirty.entries) > 0,
         dirty_entry_count = length(dirty.entries),
@@ -176,6 +199,13 @@ default.jheem.repository.paths <- function() {
     list(jheem_analyses = analyses.path, jheem2 = jheem2.path)
 }
 
+default.jheem.repository.refs <- function() {
+    list(
+        jheem_analyses = provenance.value.or.null(Sys.getenv("JHEEM_ANALYSES_REF", "")),
+        jheem2 = provenance.value.or.null(Sys.getenv("JHEEM2_REF", ""))
+    )
+}
+
 detect.jheem2.execution.mode <- function() {
     global <- globalenv()
     if (exists("USE.JHEEM2.PACKAGE", envir = global, inherits = FALSE)) {
@@ -199,6 +229,9 @@ detect.jheem2.execution.mode <- function() {
 #' @param calibration.code Registered calibration code.
 #' @param root.dir Resolved JHEEM output root.
 #' @param repositories Named repository paths.
+#' @param repository.refs Named exact commits declared by an immutable image.
+#'   A declaration is used only when a copied source tree has no Git metadata;
+#'   when Git metadata exists, a disagreement is reported as a mismatch.
 #' @param packages Installed packages whose identities should be reported.
 #' @param managers Named list of loaded data-manager objects.
 collect.jheem.run.context <- function(application = NULL,
@@ -208,6 +241,7 @@ collect.jheem.run.context <- function(application = NULL,
                                       calibration.code = NULL,
                                       root.dir = NULL,
                                       repositories = default.jheem.repository.paths(),
+                                      repository.refs = default.jheem.repository.refs(),
                                       packages = c("jheem2", "bayesian.simulations",
                                                    "distributions", "locations"),
                                       managers = list()) {
@@ -239,7 +273,11 @@ collect.jheem.run.context <- function(application = NULL,
             root_directory = if (is.null(root.dir)) NULL else normalizePath(root.dir, mustWork = FALSE)
         ),
         repositories = lapply(names(repositories), function(name) {
-            collect.git.repository.identity(name, repositories[[name]])
+            collect.git.repository.identity(
+                name,
+                repositories[[name]],
+                declared.ref = repository.refs[[name]]
+            )
         }),
         packages = lapply(packages, collect.installed.package.identity),
         data_managers = lapply(names(managers), function(name) {
