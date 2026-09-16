@@ -14,7 +14,9 @@ register.calibration.info(
         "global.transmission.rate.msm",
         "global.transmission.rate.het"
     ),
-    n.iter = 6,
+    # Two chunks are the minimum that can prove interruption after one durable
+    # checkpoint and continuation through a distinct resumed iteration.
+    n.iter = 2,
     n.burn = 0,
     thin = 1,
     n.chains = 1,
