@@ -15,6 +15,12 @@ cat("Calibration stage:", CALIBRATION.NAME, "\n")
 source(file.path(JHEEM.ANALYSES.PATH, "applications/SHIELD/shield_specification.R"))
 source(file.path(JHEEM.ANALYSES.PATH, "applications/SHIELD/shield_likelihoods.R"))
 source(file.path(JHEEM.ANALYSES.PATH, "applications/SHIELD/shield_calib_register.R"))
+if (shield.env.flag("SHIELD_ENABLE_CONTAINER_SMOKE", FALSE)) {
+    source(file.path(
+        JHEEM.ANALYSES.PATH,
+        "applications/SHIELD/shield_calib_register_container_smoke.R"
+    ))
+}
 source(file.path(JHEEM.ANALYSES.PATH, "commoncode/locations_of_interest.R"))
 
 VERSION <- "shield"

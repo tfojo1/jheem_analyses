@@ -22,6 +22,17 @@ make.getenv <- function(values) {
     }
 }
 
+stopifnot(!shield.env.flag(
+    "SHIELD_ENABLE_CONTAINER_SMOKE",
+    FALSE,
+    getenv = make.getenv(character())
+))
+stopifnot(shield.env.flag(
+    "SHIELD_ENABLE_CONTAINER_SMOKE",
+    FALSE,
+    getenv = make.getenv(c(SHIELD_ENABLE_CONTAINER_SMOKE = "true"))
+))
+
 fixture <- tempfile("shield-runtime-")
 dir.create(fixture)
 on.exit(unlink(fixture, recursive = TRUE), add = TRUE)
