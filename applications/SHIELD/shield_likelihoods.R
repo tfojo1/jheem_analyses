@@ -535,11 +535,11 @@ penalty.ps.diag.growth.likelihood.instructions =
             
             # 10-year ratio
             ratio <- c(
-                total_vals[as.character(end_year)] / total_vals[as.character(start_year)],
-                race_vals[as.character(end_year),] / race_vals[as.character(start_year),],
-                sex_vals[as.character(end_year),] / sex_vals[as.character(start_year),]
+                total_vals[as.character(end_year)] / (total_vals[as.character(start_year)] + 1),
+                race_vals[as.character(end_year),] / (race_vals[as.character(start_year),] + 1),
+                sex_vals[as.character(end_year),] / (sex_vals[as.character(start_year),] + 1)
             )
-            
+
             # If we considered correlation... but I don't think there's an easily available lognormal form of mvtnorm::dmvnorm
             # correlation_different_strata <- 0.5
             # 
