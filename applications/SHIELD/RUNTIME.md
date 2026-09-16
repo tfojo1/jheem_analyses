@@ -41,7 +41,8 @@ but automation and containers must set them explicitly.
 | `JHEEM2_REF` | unset | Full baked `jheem2` commit declared by an immutable image when no Git metadata is included |
 | `SHIELD_RUN_MODE` | `resume` | `fresh` clears matching prior state; `resume` requires a checkpoint |
 | `SHIELD_INPUT_OFFLINE` | `true` | Prevent input-manager network refresh during the run |
-| `SHIELD_REQUIRE_IMMUTABLE_INPUTS` | `false` | When true, an exact syphilis-manager tag is mandatory |
+| `SHIELD_REQUIRE_IMMUTABLE_INPUTS` | `false` | When true, exact census- and syphilis-manager tags are mandatory |
+| `JHEEM_CENSUS_MANAGER_TAG` | unset | Exact version tag for the census input manager |
 | `JHEEM_SYPHILIS_MANAGER_TAG` | unset | Exact version tag for the syphilis input manager |
 | `SHIELD_ALLOW_INCOMPLETE` | `false` | Permit assembly from incomplete chains only when explicitly true |
 | `SHIELD_MAX_ATTEMPTS` | `1` | Total attempts, including the first attempt |
@@ -111,8 +112,9 @@ For a result intended to be retained, compared, or published:
    and `JHEEM2_REF` commits; provenance reports a mismatch if a declared ref
    disagrees with an available worktree.
 2. Set `SHIELD_INPUT_OFFLINE=true`.
-3. Set `SHIELD_REQUIRE_IMMUTABLE_INPUTS=true` and provide an exact
-   `JHEEM_SYPHILIS_MANAGER_TAG` available in `JHEEM_CACHE_DIR`.
+3. Set `SHIELD_REQUIRE_IMMUTABLE_INPUTS=true` and provide exact
+   `JHEEM_CENSUS_MANAGER_TAG` and `JHEEM_SYPHILIS_MANAGER_TAG` releases
+   available in `JHEEM_CACHE_DIR`.
 4. Give the run a durable, unique `SHIELD_RUN_ID` and output directory.
 5. Preserve the output directory, including its provenance receipt and logs.
 6. Treat an incomplete run as failed; do not set `SHIELD_ALLOW_INCOMPLETE=true`

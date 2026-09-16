@@ -26,6 +26,7 @@ JHEEM.ANALYSES.PATH <- SHIELD.RUNTIME.CONFIG$analyses_path
 JHEEM2.PATH         <- SHIELD.RUNTIME.CONFIG$jheem2_path
 ROOT.DIR            <- SHIELD.RUNTIME.CONFIG$root_dir
 JHEEM.CACHE.DIR     <- SHIELD.RUNTIME.CONFIG$cache_dir
+CENSUS.MANAGER.RELEASE.TAG <- SHIELD.RUNTIME.CONFIG$census_manager_tag
 SYPHILIS.MANAGER.RELEASE.TAG <- SHIELD.RUNTIME.CONFIG$syphilis_manager_tag
 rm(configured.analyses.path)
 
@@ -86,17 +87,17 @@ set.jheem.root.directory(ROOT.DIR)
 ## 4. CACHED DATA
 ## =============================================================================
 
-## --- Google mobility (COVID-era contact adjustment) --------------------------
-load(file.path(JHEEM.CACHE.DIR, "google_mobility_data.Rdata"))
-
 ## --- Census manager ----------------------------------------------------------
 ## Large; only needed to generate the initial population. Not set as default.
 if (!exists("CENSUS.MANAGER")) {
   cat("Reading census manager ...\n")
   CENSUS.MANAGER <- load.data.manager.from.cache("census.manager.rdata",
                                                  set.as.default = FALSE,
-                                                 offline = SHIELD.RUNTIME.CONFIG$input_offline)
+                                                 offline = SHIELD.RUNTIME.CONFIG$input_offline,
+                                                 release.tag = CENSUS.MANAGER.RELEASE.TAG)
   cat("Census manager read\n")
+} else if (!is.null(CENSUS.MANAGER.RELEASE.TAG)) {
+  warning("CENSUS.MANAGER.RELEASE.TAG was ignored because CENSUS.MANAGER was already loaded")
 }
 
 ## --- Syphilis surveillance manager -------------------------------------------

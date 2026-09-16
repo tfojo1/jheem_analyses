@@ -48,12 +48,16 @@ resolve.shield.runtime.config <- function(getenv = Sys.getenv) {
     require.immutable.inputs <- shield.env.flag(
         "SHIELD_REQUIRE_IMMUTABLE_INPUTS", FALSE, getenv
     )
+    census.manager.tag <- shield.env.value(
+        "JHEEM_CENSUS_MANAGER_TAG", NULL, getenv = getenv
+    )
     syphilis.manager.tag <- shield.env.value(
         "JHEEM_SYPHILIS_MANAGER_TAG", NULL, getenv = getenv
     )
-    if (require.immutable.inputs && is.null(syphilis.manager.tag)) {
+    if (require.immutable.inputs &&
+        (is.null(census.manager.tag) || is.null(syphilis.manager.tag))) {
         stop(
-            "JHEEM_SYPHILIS_MANAGER_TAG is required when ",
+            "JHEEM_CENSUS_MANAGER_TAG and JHEEM_SYPHILIS_MANAGER_TAG are required when ",
             "SHIELD_REQUIRE_IMMUTABLE_INPUTS=true",
             call. = FALSE
         )
@@ -96,6 +100,7 @@ resolve.shield.runtime.config <- function(getenv = Sys.getenv) {
         run_mode = run.mode,
         input_offline = input.offline,
         require_immutable_inputs = require.immutable.inputs,
+        census_manager_tag = census.manager.tag,
         syphilis_manager_tag = syphilis.manager.tag,
         allow_incomplete = shield.env.flag("SHIELD_ALLOW_INCOMPLETE", FALSE, getenv),
         max_attempts = shield.env.integer("SHIELD_MAX_ATTEMPTS", 1L, 1L, getenv),

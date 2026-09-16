@@ -16,6 +16,14 @@ test.environment$JHEEM.ANALYSES.PATH <- repository.root
 test.environment$JHEEM.CACHE.DIR <- tempdir()
 sys.source("commoncode/cache_manager.R", envir = test.environment)
 
+manager.sources <- jsonlite::fromJSON("commoncode/data_manager_sources.json")
+stopifnot(
+    identical(manager.sources[["census.manager.rdata"]]$latest_tag,
+              "data-managers-latest"),
+    identical(manager.sources[["syphilis.manager.rdata"]]$latest_tag,
+              "syphilis-manager-latest")
+)
+
 assert.error <- function(expression, pattern = NULL) {
     error <- tryCatch({
         force(expression)

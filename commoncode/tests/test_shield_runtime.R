@@ -40,6 +40,7 @@ stopifnot(
     identical(config$jheem2_mode, "source"),
     identical(config$input_offline, TRUE),
     identical(config$require_immutable_inputs, FALSE),
+    is.null(config$census_manager_tag),
     is.null(config$syphilis_manager_tag),
     identical(config$max_attempts, 1L),
     identical(config$seed, 0L),
@@ -79,16 +80,29 @@ assert.error(
 assert.error(
     resolve.shield.runtime.config(make.getenv(c(
         base.values,
-        SHIELD_REQUIRE_IMMUTABLE_INPUTS = "true"
+        SHIELD_REQUIRE_IMMUTABLE_INPUTS = "true",
+        JHEEM_CENSUS_MANAGER_TAG = "data-managers-v1"
     ))),
-    "JHEEM_SYPHILIS_MANAGER_TAG"
+    "JHEEM_CENSUS_MANAGER_TAG and JHEEM_SYPHILIS_MANAGER_TAG"
+)
+assert.error(
+    resolve.shield.runtime.config(make.getenv(c(
+        base.values,
+        SHIELD_REQUIRE_IMMUTABLE_INPUTS = "true",
+        JHEEM_SYPHILIS_MANAGER_TAG = "syphilis-manager-v1"
+    ))),
+    "JHEEM_CENSUS_MANAGER_TAG and JHEEM_SYPHILIS_MANAGER_TAG"
 )
 immutable.config <- resolve.shield.runtime.config(make.getenv(c(
     base.values,
     SHIELD_REQUIRE_IMMUTABLE_INPUTS = "true",
+    JHEEM_CENSUS_MANAGER_TAG = "data-managers-v1",
     JHEEM_SYPHILIS_MANAGER_TAG = "syphilis-manager-v1"
 )))
-stopifnot(identical(immutable.config$syphilis_manager_tag, "syphilis-manager-v1"))
+stopifnot(
+    identical(immutable.config$census_manager_tag, "data-managers-v1"),
+    identical(immutable.config$syphilis_manager_tag, "syphilis-manager-v1")
+)
 
 ## Deterministic failures are never retried, even if max.attempts is larger.
 deterministic.attempts <- 0L
@@ -157,6 +171,7 @@ cache.code <- paste(readLines(
 ), collapse = "\n")
 stopifnot(
     !grepl("git[[:space:]]+(pull|fetch|reset|checkout)", source.code, ignore.case = TRUE),
+    !grepl("google_mobility_data", source.code, fixed = TRUE),
     !grepl("install\\.packages\\(", cache.code)
 )
 
