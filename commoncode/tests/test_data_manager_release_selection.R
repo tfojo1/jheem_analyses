@@ -147,6 +147,18 @@ offline.path <- test.environment$materialize.github.release.asset(
     offline.resolution, offline = TRUE, error.prefix = "test: "
 )
 stopifnot(identical(cached.path, offline.path))
+
+## Verified offline inputs must remain usable from a read-only mount. No lock
+## file or other mutation is permitted on this path.
+cached.directory <- dirname(cached.path)
+Sys.chmod(c(cached.path, file.path(cached.directory, "resolution.json")), "0444")
+Sys.chmod(cached.directory, "0555")
+read.only.path <- test.environment$materialize.github.release.asset(
+    offline.resolution, offline = TRUE, error.prefix = "test: "
+)
+stopifnot(identical(cached.path, read.only.path))
+Sys.chmod(cached.directory, "0755")
+Sys.chmod(c(cached.path, file.path(cached.directory, "resolution.json")), "0644")
 assert.error(
     test.environment$get.cached.github.release.resolution(
         "fixture.rdata", source.configuration, "manager-latest", "test: "

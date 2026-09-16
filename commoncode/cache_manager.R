@@ -445,6 +445,17 @@ download.github.release.asset <- function(resolution, destination, error.prefix)
 
 materialize.github.release.asset <- function(resolution, offline, error.prefix) {
     paths <- data.manager.release.paths(resolution, error.prefix)
+
+    ## A verified offline artifact is immutable and needs no writer lock. This
+    ## fast path is what permits recorded runs to mount their input cache
+    ## read-only. Online materialization still serializes download/repair below.
+    if (cached.release.is.valid(paths, resolution)) return(paths$artifact)
+    if (offline) {
+        stop(paste0(error.prefix, "The cached copy of '", resolution$manager,
+                    "' for release '", resolution$resolved_tag,
+                    "' is missing or failed digest verification, and 'offline' is TRUE"))
+    }
+
     dir.create(paths$directory, recursive = TRUE, showWarnings = FALSE)
     lock <- filelock::lock(paths$lock, timeout = 300000)
     if (is.null(lock)) {
@@ -454,11 +465,6 @@ materialize.github.release.asset <- function(resolution, offline, error.prefix) 
     on.exit(filelock::unlock(lock), add = TRUE)
 
     if (cached.release.is.valid(paths, resolution)) return(paths$artifact)
-    if (offline) {
-        stop(paste0(error.prefix, "The cached copy of '", resolution$manager,
-                    "' for release '", resolution$resolved_tag,
-                    "' is missing or failed digest verification, and 'offline' is TRUE"))
-    }
 
     temporary.artifact <- paste0(paths$artifact, ".download.", Sys.getpid())
     temporary.metadata <- paste0(paths$metadata, ".write.", Sys.getpid())
