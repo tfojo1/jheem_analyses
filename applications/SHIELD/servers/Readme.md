@@ -212,6 +212,12 @@ Populate this `~/jheem/code/jheem_analyses/cached/` directory with the required 
 
 **R Environment:** R and common JHEEM-related R packages are installed globally on the server. You generally do not need to install these for standard model runs.
 
+The authoritative environment variables, fresh/resume behavior, retry policy,
+and recorded-run requirements are defined in
+[`applications/SHIELD/RUNTIME.md`](../RUNTIME.md). Read that contract before
+starting or resuming a calibration. The examples below focus on server access
+and process management and do not replace it.
+
 You can run R scripts from the command line or use RStudio Server.
 
 ### From the Command Line
@@ -223,7 +229,8 @@ cd ~/jheem/code/jheem_analyses/
 
 Run the script using Rscript:
 ```bash
-Rscript applications/SHIELD/shield_calib_setup_and_run.R
+Rscript applications/SHIELD/shield_calib_setup_and_run.R \
+  C.12580 shield_calibration_stage
 ```
 
 ## Managing Long-Running `Rscript` Jobs from the Terminal
@@ -240,7 +247,8 @@ If you simply run `Rscript my_model.R` and then your SSH connection (e.g., throu
 
 **To run a script and save output to a file:**
 ```bash
-nohup Rscript applications/SHIELD/shield_calib_setup_and_run.R > shield_run_output.txt 2>&1 &
+nohup Rscript applications/SHIELD/shield_calib_setup_and_run.R \
+  C.12580 shield_calibration_stage > shield_run_output.txt 2>&1 &
 ```
 
 - `nohup`: Runs the command immune to hangups.
@@ -267,7 +275,8 @@ nohup Rscript applications/SHIELD/shield_calib_setup_and_run.R > shield_run_outp
 1. Start a new screen session: `screen -S my_r_job`
 2. You'll get a new terminal prompt inside the screen session. Run your R script normally:
    ```bash
-   Rscript applications/SHIELD/shield_calib_setup_and_run.R
+   Rscript applications/SHIELD/shield_calib_setup_and_run.R \
+     C.12580 shield_calibration_stage
    ```
    (You can still redirect output to a file here if you want a permanent log: `Rscript ... > output.txt 2>&1`)
 3. **Detach from the screen session:** Press `Ctrl+A` then `d`. You'll be back in your original terminal, but `my_r_job` and the R script are still running inside the detached screen.

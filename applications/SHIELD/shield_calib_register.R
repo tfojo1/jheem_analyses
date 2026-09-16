@@ -1,6 +1,6 @@
 cat("*** Registering SHIELD calibration ***\n")
 #
-source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
+source(file.path(JHEEM.ANALYSES.PATH, "applications/SHIELD/shield_likelihoods.R"))
 #
 # this lets us tune the transmission multipliers for MSM and het in each timepoint together 
 # par.aliases.transmission = list(

@@ -12,6 +12,8 @@ original.working.directory <- setwd(repository.root)
 on.exit(setwd(original.working.directory), add = TRUE)
 
 test.environment <- new.env(parent = globalenv())
+test.environment$JHEEM.ANALYSES.PATH <- repository.root
+test.environment$JHEEM.CACHE.DIR <- tempdir()
 sys.source("commoncode/cache_manager.R", envir = test.environment)
 
 assert.error <- function(expression, pattern = NULL) {

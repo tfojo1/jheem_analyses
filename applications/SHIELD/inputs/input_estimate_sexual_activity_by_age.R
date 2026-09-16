@@ -13,11 +13,11 @@ if (1==2){
     
     ## Load data from GSS survey (https://gss.norc.org/)
     #for % of population sexually active
-    GSS_bysex_sexfreq <- read_csv("../jheem_analyses/applications/SHIELD/data_files/sexual_activity_by_age/GSS_bysex_sexfreq.csv")
+    GSS_bysex_sexfreq <- read_csv(file.path(JHEEM.ANALYSES.PATH, "applications/SHIELD/data_files/sexual_activity_by_age/GSS_bysex_sexfreq.csv"))
     # View(GSS_bysex_sexfreq)
     
     #for average number of sexual partners by age
-    GSS_n_sexpartners <- read_csv("../jheem_analyses/applications/SHIELD/data_files/sexual_activity_by_age/GSS_n_sexpartners.csv")
+    GSS_n_sexpartners <- read_csv(file.path(JHEEM.ANALYSES.PATH, "applications/SHIELD/data_files/sexual_activity_by_age/GSS_n_sexpartners.csv"))
     # View(GSS_n_sexpartners)
     #what is the total column here? 
     
@@ -261,4 +261,3 @@ if (1==2){
 
 het_sexualActivity_means <- c(0.67344578, 1.0, 0.93856869, 0.89449681, 0.82901671, 0.78709287, 0.69855360, 0.56671692, 0.35979200, 0.09428752)
 msm_sexualActivity_means <- c(0.78225996, 1.0, 0.95998551, 0.85426289,0.80110115, 0.74182871, 0.66807753, 0.59361831, 0.52443517, 0.24827982)
-

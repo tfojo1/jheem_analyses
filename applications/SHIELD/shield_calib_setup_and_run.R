@@ -1,41 +1,41 @@
-# Get location and calibration stage from command-line arguments
+# Run one SHIELD calibration chain from setup through assembly.
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) < 2) stop("Usage: Rscript script.R <location> <calibration.stage>")
+if (length(args) != 2) {
+    stop("Usage: Rscript shield_calib_setup_and_run.R <location> <calibration.stage>")
+}
 
-LOCATION         <- as.character(args[1])
-CALIBRATION.NAME <- as.character(args[2])
+LOCATION <- as.character(args[[1]])
+CALIBRATION.NAME <- as.character(args[[2]])
+JHEEM.ANALYSES.PATH <- trimws(Sys.getenv("JHEEM_ANALYSES_PATH"))
+if (!nzchar(JHEEM.ANALYSES.PATH)) JHEEM.ANALYSES.PATH <- "../jheem_analyses"
 
 cat("Location:", LOCATION, "\n")
 cat("Calibration stage:", CALIBRATION.NAME, "\n")
-##----
-source('../jheem_analyses/applications/SHIELD/shield_specification.R')
-source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
-source('../jheem_analyses/applications/SHIELD/shield_calib_register.R')
-source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases for locations C.12580=Blatimore MSA
 
-VERSION<- 'shield'
-START_FROM_SCRATCH <- TRUE
-set.seed(00000)
-CACHE.FREQ= 500 # how often should write the results to disk (Default: 100)
-UPDATE.FREQ= 50 # how often to print messages (Default: 50)
-RUN.ROOT.DIR <- get.jheem.root.directory()
+source(file.path(JHEEM.ANALYSES.PATH, "applications/SHIELD/shield_specification.R"))
+source(file.path(JHEEM.ANALYSES.PATH, "applications/SHIELD/shield_likelihoods.R"))
+source(file.path(JHEEM.ANALYSES.PATH, "applications/SHIELD/shield_calib_register.R"))
+source(file.path(JHEEM.ANALYSES.PATH, "commoncode/locations_of_interest.R"))
 
-#SECTION1: SETUP
-if (START_FROM_SCRATCH) {
-    print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
-    #
-    clear.calibration.cache(version=VERSION,
-                            location=LOCATION,
-                            calibration.code = CALIBRATION.NAME,
-                            root.dir = RUN.ROOT.DIR,
-                            allow.remove.incomplete = T)
-    print("Cache is cleared")
-    #
-    set.up.calibration(version=VERSION,
-                       location=LOCATION,
-                       calibration.code = CALIBRATION.NAME,
-                       cache.frequency = CACHE.FREQ, #100 #how often write the results to disk
-                       root.dir = RUN.ROOT.DIR
+VERSION <- "shield"
+RUN.ROOT.DIR <- SHIELD.RUNTIME.CONFIG$root_dir
+set.seed(SHIELD.RUNTIME.CONFIG$seed)
+
+if (identical(SHIELD.RUNTIME.CONFIG$run_mode, "fresh")) {
+    message("Fresh mode requested; removing prior calibration state for this location and code")
+    clear.calibration.cache(
+        version = VERSION,
+        location = LOCATION,
+        calibration.code = CALIBRATION.NAME,
+        root.dir = RUN.ROOT.DIR,
+        allow.remove.incomplete = TRUE
+    )
+    set.up.calibration(
+        version = VERSION,
+        location = LOCATION,
+        calibration.code = CALIBRATION.NAME,
+        cache.frequency = SHIELD.RUNTIME.CONFIG$cache_frequency,
+        root.dir = RUN.ROOT.DIR
     )
     capture.jheem.provenance.safely(
         start.calibration.provenance(
@@ -44,92 +44,63 @@ if (START_FROM_SCRATCH) {
             calibration.code = CALIBRATION.NAME,
             root.dir = RUN.ROOT.DIR,
             application = "SHIELD",
-            managers = list(
-                census = CENSUS.MANAGER,
-                syphilis = SURVEILLANCE.MANAGER
-            )
+            managers = list(census = CENSUS.MANAGER, syphilis = SURVEILLANCE.MANAGER)
         )
     )
-    print(paste0("Calibration is set up for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
+} else {
+    assert.shield.resume.state(VERSION, LOCATION, CALIBRATION.NAME, RUN.ROOT.DIR)
+    message("Resume mode verified an existing calibration checkpoint")
 }
 
-#SECTION2: RUN
 start.time <- Sys.time()
-print(paste0("STARTING MCMC RUN OF ", LOCATION, " (", locations::get.location.name(LOCATION), ") AT ", Sys.time()))
+message("Starting MCMC chain 1 at ", start.time)
 
-# Wrap this in a loop that will re-try it if a write step ever gets interrupted
-attempts <- 1
-while (attempts < 100) {
-    finished <- F
+record.attempt <- function(status, attempt, error = NULL) {
+    details <- list(run_id = SHIELD.RUNTIME.CONFIG$run_id)
+    if (!is.null(error)) details$error <- conditionMessage(error)
     capture.jheem.provenance.safely(
         record.calibration.provenance.event(
             version = VERSION,
             location = LOCATION,
             calibration.code = CALIBRATION.NAME,
             root.dir = RUN.ROOT.DIR,
-            status = "attempt_started",
+            status = status,
             chain = 1,
-            attempt = attempts
+            attempt = attempt,
+            details = details
         )
     )
-    tryCatch({
-        mcmc <- run.calibration(version = VERSION,
-                                location = LOCATION,
-                                calibration.code = CALIBRATION.NAME,
-                                root.dir = RUN.ROOT.DIR,
-                                chains = 1,
-                                update.frequency = UPDATE.FREQ,
-                                update.detail = 'med')
-        finished <- T
-        capture.jheem.provenance.safely(
-            record.calibration.provenance.event(
-                version = VERSION,
-                location = LOCATION,
-                calibration.code = CALIBRATION.NAME,
-                root.dir = RUN.ROOT.DIR,
-                status = "attempt_completed",
-                chain = 1,
-                attempt = attempts
-            )
-        )
-    },
-    error = function(e) {
-        capture.jheem.provenance.safely(
-            record.calibration.provenance.event(
-                version = VERSION,
-                location = LOCATION,
-                calibration.code = CALIBRATION.NAME,
-                root.dir = RUN.ROOT.DIR,
-                status = "attempt_failed",
-                chain = 1,
-                attempt = attempts,
-                details = list(error = conditionMessage(e))
-            )
-        )
-        print("MCMC was probably interrupted during write step. Sleeping 5 minutes before retrying...")
-        Sys.sleep(60 * 5)
-    })
-    if (finished) break
-    attempts <- attempts + 1
-    print(paste0("Retrying (attempt #", attempts, ")..."))
 }
 
-end.time <- Sys.time()
-run.time <- as.numeric(end.time) - as.numeric(start.time)
+mcmc <- run.shield.with.retry(
+    operation = function() run.calibration(
+        version = VERSION,
+        location = LOCATION,
+        calibration.code = CALIBRATION.NAME,
+        root.dir = RUN.ROOT.DIR,
+        chains = 1,
+        update.frequency = SHIELD.RUNTIME.CONFIG$update_frequency,
+        update.detail = "med"
+    ),
+    max.attempts = SHIELD.RUNTIME.CONFIG$max_attempts,
+    retry.delay.seconds = SHIELD.RUNTIME.CONFIG$retry_delay_seconds,
+    on.event = record.attempt
+)
 
-#SECTION3: ASSEMBLE
-print(paste0("DONE RUNNING MCMC: Took ",
-             round(run.time/60, 0), " minutes to run "))
+message(
+    "MCMC chain 1 completed in ",
+    round(as.numeric(difftime(Sys.time(), start.time, units = "mins")), 1),
+    " minutes"
+)
 
-
-# Save simset
-simset <- assemble.simulations.from.calibration(version = VERSION,
-                                                location = LOCATION,
-                                                calibration.code = CALIBRATION.NAME,
-                                                root.dir = RUN.ROOT.DIR,
-                                                allow.incomplete = T)
+simset <- assemble.simulations.from.calibration(
+    version = VERSION,
+    location = LOCATION,
+    calibration.code = CALIBRATION.NAME,
+    root.dir = RUN.ROOT.DIR,
+    allow.incomplete = SHIELD.RUNTIME.CONFIG$allow_incomplete
+)
 save.simulation.set(simset, root.dir = RUN.ROOT.DIR)
 capture.jheem.provenance.safely(
     finalize.calibration.provenance(simset, root.dir = RUN.ROOT.DIR)
 )
-

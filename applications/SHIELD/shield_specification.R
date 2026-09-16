@@ -7,9 +7,12 @@
 
 cat('*** Running shield_specification.R ***\n')
 
-# Working directory is set to the main JHEEM_Analysis folder:
-source('../jheem_analyses/applications/SHIELD/shield_source_code.R')
-source('../jheem_analyses/applications/SHIELD/R/shield_locations_of_interest.R')
+# Source paths are explicit for containers and may retain the historical sibling
+# layout for local development.
+JHEEM.ANALYSES.PATH <- trimws(Sys.getenv("JHEEM_ANALYSES_PATH"))
+if (!nzchar(JHEEM.ANALYSES.PATH)) JHEEM.ANALYSES.PATH <- "../jheem_analyses"
+source(file.path(JHEEM.ANALYSES.PATH, "applications/SHIELD/shield_source_code.R"))
+source(file.path(JHEEM.ANALYSES.PATH, "applications/SHIELD/R/shield_locations_of_interest.R"))
 
 
 # Caching required objects: 
@@ -2499,4 +2502,4 @@ cat('*** Shield_specification.R completed! ***\n')
 #'
 #'
 #'@PK: check parameterization: prop immediate diagnosis
-#'@PK: check parameterization: prop symptomatic women 
+#'@PK: check parameterization: prop symptomatic women

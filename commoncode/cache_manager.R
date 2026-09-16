@@ -1,27 +1,44 @@
-# A lot of people have done the "first time setup" already, so they need to install this new dependency
-if (nchar(system.file(package = "httr2")) == 0) {
-    install.packages("httr2")
+required.cache.packages <- c("httr2", "jsonlite", "filelock", "openssl")
+missing.cache.packages <- required.cache.packages[
+    !vapply(required.cache.packages, requireNamespace, logical(1), quietly = TRUE)
+]
+if (length(missing.cache.packages) > 0) {
+    stop(
+        "Missing cache-manager dependencies: ",
+        paste(missing.cache.packages, collapse = ", "),
+        ". Install dependencies before starting JHEEM; runtime installation is disabled."
+    )
 }
-if (nchar(system.file(package = "jsonlite")) == 0) {
-    install.packages("jsonlite")
+rm(required.cache.packages, missing.cache.packages)
+
+if (!exists("JHEEM.CACHE.DIR", inherits = FALSE) || is.null(JHEEM.CACHE.DIR)) {
+    configured.cache.dir <- trimws(Sys.getenv("JHEEM_CACHE_DIR"))
+    if (nzchar(configured.cache.dir)) {
+        JHEEM.CACHE.DIR <- configured.cache.dir
+    } else {
+        if (dir.exists("../../cached")) {
+            JHEEM.CACHE.DIR <- "../../cached"
+        }
+        if (dir.exists("../jheem_analyses/cached")) {
+            JHEEM.CACHE.DIR <- "../jheem_analyses/cached"
+        }
+    }
+    rm(configured.cache.dir)
 }
-if (nchar(system.file(package = "filelock")) == 0) {
-    install.packages("filelock")
-}
-if (nchar(system.file(package = "openssl")) == 0) {
-    install.packages("openssl")
+if (!exists("JHEEM.CACHE.DIR", inherits = FALSE)) JHEEM.CACHE.DIR <- NULL
+if (!exists("JHEEM.ANALYSES.PATH", inherits = FALSE)) {
+    JHEEM.ANALYSES.PATH <- "../jheem_analyses"
 }
 
-JHEEM.CACHE.DIR <- NULL
-if (dir.exists("../../cached")) {
-    JHEEM.CACHE.DIR <- "../../cached"
-}
-if (dir.exists("../jheem_analyses/cached")) {
-    JHEEM.CACHE.DIR <- "../jheem_analyses/cached"
-}
-DATA.MANAGER.CACHE.METADATA.FILE <- "../jheem_analyses/commoncode/data_manager_cache_metadata.Rdata"
-DATA.MANAGER.SOURCES.FILE <- "../jheem_analyses/commoncode/data_manager_sources.json"
-PACKAGE.VERSION.CACHE.FILE <- "../jheem_analyses/commoncode/package_version_cache.Rdata"
+DATA.MANAGER.CACHE.METADATA.FILE <- file.path(
+    JHEEM.ANALYSES.PATH, "commoncode/data_manager_cache_metadata.Rdata"
+)
+DATA.MANAGER.SOURCES.FILE <- file.path(
+    JHEEM.ANALYSES.PATH, "commoncode/data_manager_sources.json"
+)
+PACKAGE.VERSION.CACHE.FILE <- file.path(
+    JHEEM.ANALYSES.PATH, "commoncode/package_version_cache.Rdata"
+)
 
 if (is.null(JHEEM.CACHE.DIR)) {
     stop("No 'cached' directory exists - you need to get this from Todd's One-Drive")
