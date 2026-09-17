@@ -16,17 +16,11 @@
 #   tail -f applications/SHIELD/logs/launcher_setup.out
 #   tail -f applications/SHIELD/logs/<loc>_<calib_code>_setup.out
 
-# ── shell options ──────────────────────────────────────────────────────────────
-set -uo pipefail   # `set -e` deliberately omitted: one failed city must not abort the launcher
-
 # ── resolve paths relative to this script's location ──────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PARENT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"   # launchers live in a subfolder; R scripts + logs are one level up
 LOG_DIR="$PARENT_DIR/logs"
 mkdir -p "$LOG_DIR"
-
-# ── shared helpers ─────────────────────────────────────────────────────────────
-source "$SCRIPT_DIR/_shield_slots.sh"
 
 # ── thread settings ────────────────────────────────────────────────────────────
 export OPENBLAS_NUM_THREADS=1
@@ -63,7 +57,6 @@ CALIBRATION_CODES=(
     calib.9.10.stage3.az
 )
 
-# MAX_JOBS = max concurrent Rscript processes on this machine (1 core each).
 MAX_JOBS=20 #Depends on the machine
 
 SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
@@ -71,17 +64,6 @@ SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
 # ── preflight ──────────────────────────────────────────────────────────────────
 if [[ ! -f "$SCRIPT" ]]; then
     echo "Error: R script not found at $SCRIPT" >&2
-    exit 1
-fi
-
-# non-empty config guard: `set -u` does NOT catch a typo'd array name
-# (an undefined array expands to empty), so check explicitly.
-if (( ${#CITIES[@]} == 0 )); then
-    echo "Error: CITIES is empty — check the array name in the config block above" >&2
-    exit 1
-fi
-if (( ${#CALIBRATION_CODES[@]} == 0 )); then
-    echo "Error: CALIBRATION_CODES is empty — check the array name in the config block above" >&2
     exit 1
 fi
 
@@ -101,13 +83,20 @@ run_setup() {
 }
 
 # ── job-slot manager ───────────────────────────────────────────────────────────
+running_jobs=0
+
 for loc in "${CITIES[@]}"; do
     for calib_code in "${CALIBRATION_CODES[@]}"; do
 
-        wait_for_slot "$MAX_JOBS" jobs
+        while (( running_jobs >= MAX_JOBS )); do
+            wait -n -p done_pid
+            (( running_jobs-- ))
+            echo "[$(date '+%F %T')] SLOT FREED (PID $done_pid, running_jobs=$running_jobs)"
+        done
 
         run_setup "$loc" "$calib_code" &
-        echo "[$(date '+%F %T')] LAUNCHED SETUP $loc :: $calib_code (PID $!, running_jobs=$(running_slots))"
+        (( running_jobs++ ))
+        echo "[$(date '+%F %T')] LAUNCHED SETUP $loc :: $calib_code (PID $!, running_jobs=$running_jobs)"
 
     done
 done

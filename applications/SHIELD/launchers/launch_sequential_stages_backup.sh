@@ -2,7 +2,7 @@
 #
 # USAGE
 #   Launch over SSH (survives logout):
-#       nohup bash applications/SHIELD/launchers/launch_sequential_stages.sh > applications/SHIELD/logs/launcher.out 2>&1 &
+#       nohup bash applications/SHIELD/launch_sequential_stages.sh > applications/SHIELD/logs/launcher.out 2>&1 &
 #   Kill Runs:
 #       pkill -u pkasaie1 -x R
 #       pkill -u pkasaie1 -f "Rscript"
@@ -27,25 +27,21 @@
 #
 # ON FAILURE
 #   The failed city prints to stderr and releases its slot.
-#   All other cities keep running.
+#   All other cities keep running_cities untouched.
 #   Check logs/<loc>_<calibration_code>.out for the R-level error message.
 
-# ── shell options ──────────────────────────────────────────────────────────────
-set -uo pipefail   # `set -e` deliberately omitted: one failed city must not abort the launcher
 
 # ── resolve paths relative to this script's location ──────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PARENT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"   # launchers live in a subfolder; R scripts + logs are one level up
-LOG_DIR="$PARENT_DIR/logs"
+LOG_DIR="$SCRIPT_DIR/logs"
 mkdir -p "$LOG_DIR"
 
-# ── shared helpers ─────────────────────────────────────────────────────────────
-source "$SCRIPT_DIR/_shield_slots.sh"
 
 # ── thread settings ────────────────────────────────────────────────────────────
 export OPENBLAS_NUM_THREADS=1
 export OMP_NUM_THREADS=1
 export MKL_NUM_THREADS=1
+
 
 # ── config ─────────────────────────────────────────────────────────────────────
 allLocs=(
@@ -76,26 +72,12 @@ CALIBRATION_CODES=(
     calib.7.10.stage1.pk
 )
 
-SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
-
-# MAX_CITIES = max cities in flight at once. Each city runs its calibration codes
-# sequentially (1 core each), so peak cores = MAX_CITIES.
+SCRIPT="$SCRIPT_DIR/shield_calib_setup_and_run_modular.R"
 MAX_CITIES=20
 
 # ── preflight ──────────────────────────────────────────────────────────────────
 if [[ ! -f "$SCRIPT" ]]; then
     echo "Error: R script not found at $SCRIPT" >&2
-    exit 1
-fi
-
-# non-empty config guard: `set -u` does NOT catch a typo'd array name
-# (an undefined array expands to empty), so check explicitly.
-if (( ${#CITIES[@]} == 0 )); then
-    echo "Error: CITIES is empty — check the array name in the config block above" >&2
-    exit 1
-fi
-if (( ${#CALIBRATION_CODES[@]} == 0 )); then
-    echo "Error: CALIBRATION_CODES is empty — check the array name in the config block above" >&2
     exit 1
 fi
 
@@ -130,12 +112,19 @@ run_city() {
 
 
 # ── job-slot manager ───────────────────────────────────────────────────────────
+running_cities=0
+
 for loc in "${CITIES[@]}"; do
 
-    wait_for_slot "$MAX_CITIES" cities
+    while (( running_cities >= MAX_CITIES )); do
+        wait -n -p done_pid
+        (( running_cities-- ))
+        echo "[$(date '+%F %T')] SLOT FREED (PID $done_pid, running_cities=$running_cities)"
+    done
 
     run_city "$loc" "${CALIBRATION_CODES[@]}" &
-    echo "[$(date '+%F %T')] LAUNCHED $loc (PID $!, running_cities=$(running_slots))"
+    (( running_cities++ ))
+    echo "[$(date '+%F %T')] LAUNCHED $loc (PID $!, running_cities=$running_cities)"
 
 done
 

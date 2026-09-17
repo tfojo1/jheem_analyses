@@ -2,7 +2,7 @@
 #
 # USAGE
 #   Launch over SSH (survives logout):
-#       nohup bash applications/SHIELD/launchers/launch_parallel_stages.sh > applications/SHIELD/logs/launcher.out 2>&1 &
+#       nohup bash applications/SHIELD/launch_interventions.sh > applications/SHIELD/logs/launcher.out 2>&1 &
 #   Kill Runs:
 #       pkill -u pkasaie1 -x R
 #       pkill -u pkasaie1 -f "Rscript"
@@ -27,25 +27,21 @@
 #
 # ON FAILURE
 #   The failed city prints to stderr and releases its slot.
-#   All other cities keep running.
+#   All other cities keep running_jobs untouched.
 #   Check logs/<loc>_<calibration_code>.out for the R-level error message.
 
-# ── shell options ──────────────────────────────────────────────────────────────
-set -uo pipefail   # `set -e` deliberately omitted: one failed city must not abort the launcher
 
 # ── resolve paths relative to this script's location ──────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PARENT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"   # launchers live in a subfolder; R scripts + logs are one level up
-LOG_DIR="$PARENT_DIR/logs"
+LOG_DIR="$SCRIPT_DIR/logs"
 mkdir -p "$LOG_DIR"
 
-# ── shared helpers ─────────────────────────────────────────────────────────────
-source "$SCRIPT_DIR/_shield_slots.sh"
 
 # ── thread settings ────────────────────────────────────────────────────────────
 export OPENBLAS_NUM_THREADS=1
 export OMP_NUM_THREADS=1
 export MKL_NUM_THREADS=1
+
 
 # ── config ─────────────────────────────────────────────────────────────────────
 allLocs=(
@@ -66,20 +62,24 @@ all_except_ten_cities=(
     C.26900 C.17140 C.18140 C.12940 C.40900 C.17460
 )
 
-
-two_cities=(
-    C.37980
+all_ten_except_chicago=(
+    C.12060 C.12580 C.26420 C.31080
+    C.33100 C.35620 C.37980 C.38060 C.42660
 )
+
 # ── set active cities and calibration codes here ───────────────────────────────
-CITIES=("${two_cities[@]}")
+CITIES=("${ten_cities[@]}")
 
 CALIBRATION_CODES=(
-    calib.7.30.stage2.LA.PA
+    calib.8.10.stage3.v1
+
 )
 
-SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
+N_SIM=400
+FIRST_YEAR=2000
+LAST_YEAR=2040
 
-# MAX_JOBS = max concurrent Rscript processes on this machine (1 core each).
+SCRIPT="$SCRIPT_DIR/intervention/intervention_run.R"
 MAX_JOBS=20
 
 # ── preflight ──────────────────────────────────────────────────────────────────
@@ -88,40 +88,37 @@ if [[ ! -f "$SCRIPT" ]]; then
     exit 1
 fi
 
-# non-empty config guard: `set -u` does NOT catch a typo'd array name
-# (an undefined array expands to empty), so check explicitly.
-if (( ${#CITIES[@]} == 0 )); then
-    echo "Error: CITIES is empty — check the array name in the config block above" >&2
-    exit 1
-fi
-if (( ${#CALIBRATION_CODES[@]} == 0 )); then
-    echo "Error: CALIBRATION_CODES is empty — check the array name in the config block above" >&2
-    exit 1
-fi
-
 # ── per city+calibration code runner ──────────────────────────────────────────
 run_calib_code() {
     local loc="$1"
     local calib_code="$2"
-    echo "[$(date '+%F %T')] START   $loc :: $calib_code"
-    Rscript "$SCRIPT" "$loc" "$calib_code" all \
-        > "$LOG_DIR/${loc}_${calib_code}.out" 2>&1
+    echo "[$(date '+%F %T')] START   INTERV $loc :: $calib_code"
+    Rscript "$SCRIPT" "$loc" "$calib_code" "$N_SIM" "$FIRST_YEAR" "$LAST_YEAR" \
+        > "$LOG_DIR/interventions_${loc}_${calib_code}.out" 2>&1
     local rc=$?
     if (( rc != 0 )); then
-        echo "[$(date '+%F %T')] FAILED  $loc :: $calib_code (exit $rc)" >&2
+        echo "[$(date '+%F %T')] FAILED  INTERV $loc :: $calib_code (exit $rc)" >&2
         return 1
     fi
-    echo "[$(date '+%F %T')] DONE    $loc :: $calib_code"
+    echo "[$(date '+%F %T')] DONE    INTERV $loc :: $calib_code"
 }
 
+
 # ── job-slot manager ───────────────────────────────────────────────────────────
+running_jobs=0
+
 for loc in "${CITIES[@]}"; do
     for calib_code in "${CALIBRATION_CODES[@]}"; do
 
-        wait_for_slot "$MAX_JOBS" jobs
+        while (( running_jobs >= MAX_JOBS )); do
+            wait -n -p done_pid
+            (( running_jobs-- ))
+            echo "[$(date '+%F %T')] SLOT FREED (PID $done_pid, running_jobs=$running_jobs)"
+        done
 
         run_calib_code "$loc" "$calib_code" &
-        echo "[$(date '+%F %T')] LAUNCHED $loc :: $calib_code (PID $!, running_jobs=$(running_slots))"
+        (( running_jobs++ ))
+        echo "[$(date '+%F %T')] LAUNCHED INTERV $loc :: $calib_code (PID $!, running_jobs=$running_jobs)"
 
     done
 done

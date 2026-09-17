@@ -19,26 +19,20 @@
 #   tail -f applications/SHIELD/logs/launcher_assemble.out
 #   tail -f applications/SHIELD/logs/<loc>_<calib_code>_assemble.out
 
-# ── shell options ──────────────────────────────────────────────────────────────
-set -uo pipefail   # `set -e` deliberately omitted: one failed city must not abort the launcher
-
-# ── resolve paths relative to this script's location ──────────────────────────
+# -- resolve paths relative to this script's location --------------------------
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PARENT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"   # launchers live in a subfolder; R scripts + logs are one level up
 LOG_DIR="$PARENT_DIR/logs"
 mkdir -p "$LOG_DIR"
 
-# ── shared helpers ─────────────────────────────────────────────────────────────
-source "$SCRIPT_DIR/_shield_slots.sh"
-
 SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
 
-# ── thread settings ────────────────────────────────────────────────────────────
+# -- thread settings -----------------------------------------------------------
 export OPENBLAS_NUM_THREADS=1
 export OMP_NUM_THREADS=1
 export MKL_NUM_THREADS=1
 
-# ── config: EDIT THESE for each run ────────────────────────────────────────────
+# -- config: EDIT THESE for each run -------------------------------------------
 allLocs=(
     C.35620 C.33100 C.31080 C.12060 C.26420 C.19100 C.16980 C.47900
     C.37980 C.36740 C.41860 C.38060 C.45300 C.40140 C.19820 C.12580
@@ -68,27 +62,15 @@ CALIBRATION_CODES=(
     calib.7.30.stage2.LA.PA
 )
 
-# MAX_JOBS = max concurrent Rscript processes on this machine (1 core each).
 MAX_JOBS=20
 
-# ── preflight ──────────────────────────────────────────────────────────────────
+# -- preflight -----------------------------------------------------------------
 if [[ ! -f "$SCRIPT" ]]; then
     echo "Error: R script not found at $SCRIPT" >&2
     exit 1
 fi
 
-# non-empty config guard: `set -u` does NOT catch a typo'd array name
-# (an undefined array expands to empty), so check explicitly.
-if (( ${#CITIES[@]} == 0 )); then
-    echo "Error: CITIES is empty — check the array name in the config block above" >&2
-    exit 1
-fi
-if (( ${#CALIBRATION_CODES[@]} == 0 )); then
-    echo "Error: CALIBRATION_CODES is empty — check the array name in the config block above" >&2
-    exit 1
-fi
-
-# ── per city+calibration code assemble job ─────────────────────────────────────
+# -- per city+calibration code assemble job ------------------------------------
 run_assemble() {
     local loc="$1"
     local calib_code="$2"
@@ -103,14 +85,21 @@ run_assemble() {
     echo "[$(date '+%F %T')] DONE    ASSEMBLE $loc :: $calib_code"
 }
 
-# ── job-slot manager ───────────────────────────────────────────────────────────
+# -- job-slot manager ----------------------------------------------------------
+running_jobs=0
+
 for loc in "${CITIES[@]}"; do
     for calib_code in "${CALIBRATION_CODES[@]}"; do
 
-        wait_for_slot "$MAX_JOBS" jobs
+        while (( running_jobs >= MAX_JOBS )); do
+            wait -n -p done_pid
+            (( running_jobs-- ))
+            echo "[$(date '+%F %T')] SLOT FREED (PID $done_pid, running_jobs=$running_jobs)"
+        done
 
         run_assemble "$loc" "$calib_code" &
-        echo "[$(date '+%F %T')] LAUNCHED ASSEMBLE $loc :: $calib_code (PID $!, running_jobs=$(running_slots))"
+        (( running_jobs++ ))
+        echo "[$(date '+%F %T')] LAUNCHED ASSEMBLE $loc :: $calib_code (PID $!, running_jobs=$running_jobs)"
 
     done
 done
