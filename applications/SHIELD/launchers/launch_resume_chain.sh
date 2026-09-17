@@ -38,7 +38,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 mkdir -p "$SCRIPT_DIR/../logs"
 LOG_DIR="$(cd "$SCRIPT_DIR/../logs" && pwd)"
 
-SCRIPT="$SCRIPT_DIR/shield_calib_setup_and_run_modular.R"
+SCRIPT="$SCRIPT_DIR/../shield_calib_setup_and_run_modular.R"
 
 # -- args ----------------------------------------------------------------------
 if (( $# != 3 )); then
