@@ -50,7 +50,7 @@ if (RUN.STAGE == 'run'| RUN.STAGE == 'all') {
     #
     # Wrap this in a loop that will re-try it if a write step ever gets interrupted
     attempts <- 1
-    while (attempts < 100) {
+    while (attempts < 10) {
         finished <- F
         tryCatch({
             mcmc <- run.calibration(version = VERSION,
@@ -63,7 +63,7 @@ if (RUN.STAGE == 'run'| RUN.STAGE == 'all') {
         },
         error = function(e) {
             print(paste0("MCMC chain ", CHAIN, " was probably interrupted during write step. Sleeping 5 minutes before retrying..."))
-            Sys.sleep(60 * 5)
+            Sys.sleep(15)
         })
         if (finished) break
         attempts <- attempts + 1
