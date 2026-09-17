@@ -8,13 +8,13 @@
 #   stage never clears the cache), so this resumes rather than restarting.
 #
 # USAGE
-#   bash applications/SHIELD/launch_resume_chain.sh <city> <calib_code> <chain>
+#   bash applications/SHIELD/launchers/launch_resume_chain.sh <city> <calib_code> <chain>
 #
 #   Example:
-#       bash applications/SHIELD/launch_resume_chain.sh C.37980 calib.7.30.stage2.LA.PA 3
+#       bash applications/SHIELD/launchers/launch_resume_chain.sh C.37980 calib.7.30.stage2.LA.PA 3
 #
 #   To survive logout:
-#       nohup bash applications/SHIELD/launch_resume_chain.sh C.37980 calib.7.30.stage2.LA.PA 3 \
+#       nohup bash applications/SHIELD/launchers/launch_resume_chain.sh C.37980 calib.7.30.stage2.LA.PA 3 \
 #           > applications/SHIELD/logs/launcher_resume.out 2>&1 &
 #
 # Kill:
@@ -31,8 +31,12 @@
 
 # -- resolve paths relative to this script's location --------------------------
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LOG_DIR="$SCRIPT_DIR/logs"
-mkdir -p "$LOG_DIR"
+
+# logs live in SHIELD/logs, one level up from SHIELD/launchers (where this
+# script lives) -- create it first so the subsequent cd/pwd normalization
+# below has something to resolve
+mkdir -p "$SCRIPT_DIR/../logs"
+LOG_DIR="$(cd "$SCRIPT_DIR/../logs" && pwd)"
 
 SCRIPT="$SCRIPT_DIR/shield_calib_setup_and_run_modular.R"
 
