@@ -1094,7 +1094,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 # Tertiary state is always symptomatic and care seeking happens after the first month (duration = 1month)
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'duration.tertiary',
-                       scale = 'non.negative.number',
+                       scale = 'time',
                        value =SHIELD_BASE_PARAMETER_VALUES['duration.tertiary'] )
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'rate.symptomatic.testing',
@@ -1102,7 +1102,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                value =expression(1/duration.tertiary))
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'duration.cns',
-                       scale = 'rate',
+                       scale = 'time',
                        value =SHIELD_BASE_PARAMETER_VALUES['duration.cns'] )
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'rate.symptomatic.testing',
