@@ -594,7 +594,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        resolve.dimension.values.against.model = F,
                        scale='non.negative.number')
 
-# pulls propotion of population of people in each age bucket that are sexually available
+# pulls proportion of population of people in each age bucket that are sexually available
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'single.year.age.sexual.availability',
                        value = get.sexual.availability(),

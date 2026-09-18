@@ -863,12 +863,14 @@ get.msm.single.year.age.counts <- function(location, specification.metadata,
 #' @param specification.metadata specification.metadata
 #' @param population.years population.years
 #' @return returns the number of heterosexual males in single year ages
-get.heterosexual_male.single.year.age.counts <- function(location, specification.metadata,
+get.heterosexual_male.single.year.age.counts <- function(location, 
+                                                         specification.metadata,
                                                          population.years=DEFAULT.POPULATION.YEARS)
 {
-  get.male.single.year.age.counts(location = location, population.years = population.years)
-  get.msm.single.year.age.counts(location=location, specification.metadata=specification.metadata,
-                                 population.years=population.years)
+  get.male.single.year.age.counts(location = location, 
+                                  specification.metadata=specification.metadata,
+                                  population.years = population.years)
+  
 }
 
 
