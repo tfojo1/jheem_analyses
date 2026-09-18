@@ -238,9 +238,9 @@ make.mv.spline.prior <- function(parameters,
     if (length(past.times) > 0) {
         for (i in seq_along(past.times)) {
             # The i-th past time (chronological, furthest first) accumulates its own delta
-            +            # plus every delta between it and the baseline year.
-                +            # Column 1 (baseline) is already set by M[,1] <- 1 above.
-                +            M[i, (i + 1):(length(past.times) + 1)] <- 1
+                        # plus every delta between it and the baseline year.
+                            # Column 1 (baseline) is already set by M[,1] <- 1 above.
+                            M[i, (i + 1):(length(past.times) + 1)] <- 1
         }
     }
     
