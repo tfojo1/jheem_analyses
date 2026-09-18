@@ -41,6 +41,6 @@ max_ratio_hist <- max(hist_df$ratio, na.rm = T)
 min_ratio_hist <- min(hist_df$ratio, na.rm = T) 
 sdlog_hist        <- sd(hist_df$log_ratio, na.rm = T) 
 
-return(list("max_ratio_hist"=max_ratio_hist,
-         "min_ratio_hist"=min_ratio_hist,
-         "sdlog_hist"=sdlog_hist))
+# return(list("max_ratio_hist"=max_ratio_hist,
+#          "min_ratio_hist"=min_ratio_hist,
+#          "sdlog_hist"=sdlog_hist))
