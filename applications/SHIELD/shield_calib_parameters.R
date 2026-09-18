@@ -142,7 +142,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     # we assume a certain ratio of undiagnosed to diagnosed cases in 1970
     # we also assume a certain proportion of infections were made among MSM, and the rest are divided among heterosexual men and women
     ratio.of.undiagnosed.to.diagnosed.1970 = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)), #CI=[1.5, 5.9]
-    prp.infections.among.msm.1970 = Logitnormal.Distribution(meanlogit = log(.5), sdlogit = log(2)), #CI=[0.13 0.66] larger SD because of uncertainty
+    prp.infections.among.msm.1970 = Logitnormal.Distribution(meanlogit = logit(.5), sdlogit = log(2)), #CI=[0.13 0.66] larger SD because of uncertainty
     
     ## Global transmission ----
     # Moved back down to 2.2 from 3.1 when raised msm logmean baseline back to log(3) from log(1)
