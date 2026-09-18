@@ -1314,7 +1314,6 @@ get_doxy_coverage_functional_form<-function(specification.metadata) {
                                                                             min = 0,
                                                                             anchor.year = 2022, 
                                                                             parameters.are.on.logit.scale = F)
-    create.natural.spline.functional.form()
     #this assumes that future coverage grows linearly 
     doxy_coverage_functional_form
 }
