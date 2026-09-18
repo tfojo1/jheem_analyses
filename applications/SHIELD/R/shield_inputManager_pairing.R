@@ -138,8 +138,8 @@ create.pairing.manager <- function(dir)
   #---- SEXUAL PAIRINGS by AGE --## ----
   #From Chow 2016
   #http://www.publish.csiro.au/sh/Fulltext/SH16055
-  raw.heterosexual.by.age = read.csv(paste0(dir, '/heterosexual_age.csv'))
-  raw.msm.by.age = read.csv(paste0(dir, '/msm_age.csv'))
+  raw.heterosexual.by.age = read.csv(paste0(dir, '/heterosexual_age.csv'),header = F)
+  raw.msm.by.age = read.csv(paste0(dir, '/msm_age.csv'),header = F)
 
   fit.female.with.male = fit.age.model(raw.heterosexual.by.age[,1], raw.heterosexual.by.age[,2])
   fit.male.with.female = fit.age.model(raw.heterosexual.by.age[,2], raw.heterosexual.by.age[,1])
