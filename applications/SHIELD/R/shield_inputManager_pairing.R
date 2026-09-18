@@ -29,7 +29,7 @@ create.pairing.manager <- function(dir)
   #From https://link.springer.com/article/10.1007%2Fs10461-014-0955-0
   msm.sex.with.female.2 = (39+5+3+16) / (39+5+3+16 + 394+190+112+71)
   rv$msm.sex.with.female.estimates = c(msm.sex.with.female.1, msm.sex.with.female.2)
-  rv$fraction.msm.pairings.with.female= mean(msm.sex.with.female.1, msm.sex.with.female.2)
+  rv$fraction.msm.pairings.with.female= mean(c(msm.sex.with.female.1, msm.sex.with.female.2))
 
   # PK REVISION:
   # From https://pmc.ncbi.nlm.nih.gov/articles/PMC7836745/ Risk Behaviors Among MSMO and MSMW, NHBS, 2011 and 2014
