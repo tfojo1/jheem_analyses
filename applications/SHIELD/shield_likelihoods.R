@@ -91,6 +91,7 @@ SHIELD.PARTITIONING.FUNCTION <- function(arr, version, location)
 
 #** POPULATION SIZES ** ---- 
 #'# Error variance for population data <From EHE model>
+# deaths.likelihood.instructions and fertility.likelihood.instructions both reuse it as-is for their error.variance.term
 population.error.sd.shield = function(data, details=attr(data, 'details'), version, location)
 {
     melted.data = reshape2::melt(data)
