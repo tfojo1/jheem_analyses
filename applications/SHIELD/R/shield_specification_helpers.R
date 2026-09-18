@@ -1296,27 +1296,7 @@ get.fraction.over.age <- function(location,
   
   rv
 }
-
-
-
-
-
-
-
-#-- DOXY --#
-# the idea is to model doxy coverage as a parameter varied in calibration and find the best configuration that feeds the diagnosis data in 2023 and 2024
-# how can we model doxy starting in year 2022  # we need to define a function that sets coverage to 0 for years prior to 2022 and then slowly scale up
-get_doxy_coverage_functional_form<-function(specification.metadata) {
-    doxy_coverage_functional_form <- create.logistic.linear.functional.form(intercept = 0, #starts from 0 and then go up?
-                                                                            slope = 1, # to be varied in calibration?
-                                                                            max = 1,
-                                                                            min = 0,
-                                                                            anchor.year = 2022, 
-                                                                            parameters.are.on.logit.scale = F)
-    #this assumes that future coverage grows linearly 
-    doxy_coverage_functional_form
-}
-
+ 
 
 # logit(x) = log(x/1-x) = α + βt
 # x = 1 / (1 + exp(-(α + βt)))
