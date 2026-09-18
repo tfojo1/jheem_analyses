@@ -18,6 +18,7 @@ cat("*** Running Shield_source_code.R ***\n")
 # If the version is not set, it keeps using the latest version.
 # SYPHILIS.MANAGER.RELEASE.TAG <- "syphilis-manager-v2026.07.27"
 SYPHILIS.MANAGER.RELEASE.TAG <- NULL
+
 if (!is.null(SYPHILIS.MANAGER.RELEASE.TAG)) { print(paste("!!! 1-Using a potentiall old Surveillance Manager :",SYPHILIS.MANAGER.RELEASE.TAG))
   }else{print("1-Using the most up to date Surveillance manager")}
 

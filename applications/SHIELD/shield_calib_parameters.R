@@ -313,8 +313,8 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
     
     ## Misclassification Error ----
     # see inputs/input_syphilis_misclassification_error.R
-    fraction.el.misclassified.ll =Logitnormal.Distribution(meanlogit = logit(0.096), sdlog =  log(2)) , #CI=[0.025 0.27]
-    fraction.ll.misclassified.el =Logitnormal.Distribution(meanlogit = logit(0.27), sdlog =  log(2)) #CI=[0.064 0.51]
+    fraction.el.misclassified.ll =Logitnormal.Distribution(meanlogit = logit(0.096), sdlogit =  log(2)) , #CI=[0.025 0.27]
+    fraction.ll.misclassified.el =Logitnormal.Distribution(meanlogit = logit(0.27), sdlogit =  log(2)) #CI=[0.064 0.51]
 )
 
 ## TRANS.BY.AGE.SAMPLING.PRIOR ----
