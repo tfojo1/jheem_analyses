@@ -419,21 +419,11 @@ register.model.element(SHIELD.SPECIFICATION,
                        value = 1 ) #tuned in calib_parameters
 
 # rate of contact between infected and uninfected
-register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'sexual.contact',
-                        expression(global.transmission.rate.het *
-                                       rate.sexual.transmission *
-                                       sexual.contact.matrix)
-)
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sexual.contact',
-                               applies.to = list(sex.from="msm"),
-                               value = expression(global.transmission.rate.msm *
-                                                      rate.sexual.transmission *
+                               value = expression(rate.sexual.transmission *
                                                       sexual.contact.matrix)
 )
-
-
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'sexual.contact.matrix',
                         value = expression(sexual.contact.by.age*
@@ -446,21 +436,26 @@ register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.sexual.transmission',
                         value = 0)
 # "rate.sexual.transmission" has 4 dimensions: sex.from, sex.to, age.to, race.to (last two are built into "transmission.rate.msm" etc. through multiplication steps)
+# msm-het_male is men to men behavior
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'rate.sexual.transmission',
                                applies.to = list(sex.from=c('heterosexual_male','msm'),
                                                  sex.to=c('heterosexual_male','msm')),
-                               value = 'transmission.rate.msm') #we can add msm.peak.multiplier later if needed
+                               value = expression(global.transmission.rate.msm* transmission.rate.msm) 
+                               )
+
+# anys ex between men and women is considered heterosexual:                               
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'rate.sexual.transmission',
                                applies.to = list(sex.from=c('heterosexual_male','msm'),
                                                  sex.to=c('female')),
-                               value = 'transmission.rate.heterosexual')
+                               value = expression(global.transmission.rate.het* transmission.rate.heterosexual))
+                               
 register.model.quantity.subset(SHIELD.SPECIFICATION, #right now it's assuming that female to male is the same as male to female
                                name = 'rate.sexual.transmission',
                                applies.to = list(sex.from=c('female'),
                                                  sex.to=c('heterosexual_male','msm')),
-                               value = 'transmission.rate.heterosexual')
+                               value =expression(global.transmission.rate.het *transmission.rate.heterosexual))
 
 # # To track transmission rates as outcome, we need to flatten (such as, to the "sex.to" dimension)
 # register.model.quantity(SHIELD.SPECIFICATION,
