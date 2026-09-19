@@ -72,8 +72,9 @@ CITIES=("${ten_cities[@]}")
 # Calibration codes run sequentially per city — each is a separate Rscript process
 # so the OS fully reclaims memory between them
 CALIBRATION_CODES=(
-    calib.7.10.stage0.pk
-    calib.7.10.stage1.pk
+    calib.9.19.stage0
+    calib.9.19.stage1
+    calib.9.19.stage2
 )
 
 SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"

@@ -20,9 +20,9 @@ sim = engine$run(params)
 # 
 # simLast<-extract.last.simulation.from.calibration(VERSION, LOCATION,'calib.8.21.stage3.az',allow.incomplete = T )
 # parameLast<-simLast$get.params()
-simManual = engine$run(parameLast)
+# simManual = engine$run(parameLast)
 simplot(simLast,simManual, "diagnosis.ps")
-simplot(simManual, "transmission.rate")
+# simplot(simManual, "transmission.rate")
 
 if (1==2) {
 

@@ -331,6 +331,11 @@ shield.test.stage("has.shield.helpers", {
     assign("DEFAULT.PRENATAL.CARE.START.YEAR", 1980, envir = globalenv())
     assign("DEFAULT.TRANSMISSION.START.YEAR",  1980, envir = globalenv())
     assign("DEFAULT.HIV.TESTING.START.YEAR",   2010, envir = globalenv())
+
+    ## Read by get.sexual.availability() and by get.age.mixing.proportions(),
+    ## which floors every partner-age bracket at the debut age. Without it the
+    ## specification does not build and the whole integration tier skips.
+    assign("DEFAULT.SEXUAL.DEBUT.AGE",         13,   envir = globalenv())
 })
 
 ## =============================================================================
