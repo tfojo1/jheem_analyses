@@ -419,7 +419,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        value = 1 ) #tuned in calib_parameters
 
 # rate of contact between infected and uninfected
-register.model.quantity.subset(SHIELD.SPECIFICATION,
+register.model.quantity(SHIELD.SPECIFICATION,
                                name = 'sexual.contact',
                                value = expression(rate.sexual.transmission *
                                                       sexual.contact.matrix)
