@@ -457,24 +457,6 @@ register.model.quantity.subset(SHIELD.SPECIFICATION, #right now it's assuming th
                                                  sex.to=c('heterosexual_male','msm')),
                                value =expression(global.transmission.rate.het *transmission.rate.heterosexual))
 
-# # To track transmission rates as outcome, we need to flatten (such as, to the "sex.to" dimension)
-# register.model.quantity(SHIELD.SPECIFICATION,
-#                         name = "rate.sexual.transmission.flattened",
-#                         value = 0,
-#                         ) # one dimension "sex", plug in values for the 3 sexes
-# # Okay, but how does it do the flattening?
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name = "rate.sexual.transmission.flattened",
-#                                value = "rate.sexual.transmission",
-#                                applies.to = list(sex.to = "msm"))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name = "rate.sexual.transmission.flattened",
-#                                value = "rate.sexual.transmission",
-#                                applies.to = list(sex.to = "heterosexual_male"))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name = "rate.sexual.transmission.flattened",
-#                                value = "rate.sexual.transmission",
-#                                applies.to = list(sex.to = "female"))
 
 #spline models can project negative values - we should truncate to 0
 # use the log scale: exponentiate the values # log scale for the knots,
@@ -766,6 +748,37 @@ register.model.element(SHIELD.SPECIFICATION,
                        get.value.function = get.race.population.counts)
 
 
+##--**-- flattened transmission risk ----
+# # To track transmission rates as outcome, we need to flatten (such as, to the "sex.to" dimension)
+# register.model.quantity(SHIELD.SPECIFICATION,
+#                         name = "rate.sexual.transmission.flattened",
+#                         value = 0,
+#                         ) # one dimension "sex", plug in values for the 3 sexes
+# # Okay, but how does it do the flattening?
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                                name = "rate.sexual.transmission.flattened",
+#                                value = "rate.sexual.transmission",
+#                                applies.to = list(sex.to = "msm"))
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                                name = "rate.sexual.transmission.flattened",
+#                                value = "rate.sexual.transmission",
+#                                applies.to = list(sex.to = "heterosexual_male"))
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                                name = "rate.sexual.transmission.flattened",
+#                                value = "rate.sexual.transmission",
+#                                applies.to = list(sex.to = "female"))
+
+# register.model.quantity(SHIELD.SPECIFICATION,
+#                         name = 'rate.sexual.transmission.flattened',
+#                         value = 0)
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                                name = 'rate.sexual.transmission.flattened',
+#                                applies.to = list(sex.to='msm'),
+#                                value = expression(global.transmission.rate.msm * transmission.rate.msm))
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                                name = 'rate.sexual.transmission.flattened',
+#                                applies.to = list(sex.to=c('female','heterosexual_male')),
+#                                value = expression(global.transmission.rate.het * transmission.rate.heterosexual))
 
 ##---- DOXY PEP ----
 #option1: 
@@ -1569,19 +1582,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          subset.dimension.values = list(sex="msm"),
                          keep.dimensions = c('location')
                          )
-# track.integrated.outcome(SHIELD.SPECIFICATION,
-#                          name="population.msm",
-#                          outcome.metadata = create.outcome.metadata(display.name = 'Population of MSM',
-#                                                                     description = 'Population size among MSM',
-#                                                                     scale = 'non.negative.number',
-#                                                                     axis.name = 'Persons',
-#                                                                     units = 'persons',
-#                                                                     singular.unit = 'person'),
-#                          value.to.integrate = 'point.population',
-#                          corresponding.data.outcome = 'estimated.count.msm',
-#                          subset.dimension.values = list(sex="msm"),
-#                          keep.dimensions = c('location'))
-
+ 
 
 ##---- Fertility Rate ----
 track.cumulative.outcome(SHIELD.SPECIFICATION,
@@ -1682,7 +1683,24 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
 #                                                                     singular.unit = 'person'),
 #                          value.to.integrate = "rate.sexual.transmission.flattened",
 #                          denominator.outcome = "population",
+#                          dimension.alias.suffix = 'to',
 #                          keep.dimensions = c('location','age','race','sex'))
+
+# track.integrated.outcome(EHE.SPECIFICATION,
+#                          name = 'sexual.transmission.rates',
+#                          corresponding.data.outcome = c('gonorrhea.ratio'), #,'ps.syphilis.ratio'),
+#                          outcome.metadata = create.outcome.metadata(display.name = 'Sexual Transmission Rates',
+#                                                                     description = "Estimated rates of sexual transmission",
+#                                                                     scale = 'rate',
+#                                                                     axis.name = 'Rate',
+#                                                                     units = '/y',
+#                                                                     singular.unit = '/y'),
+#                          value.to.integrate = 'flattened.sexual.transmission.rates',
+#                          multiply.by = 'sexual.susceptibility.covid.multiplier',
+#                          denominator.outcome = 'prep.indications.with.risk',
+#                          dimension.alias.suffix = 'to',
+#                          keep.dimensions = c('location','age','race','sex')
+# )
 ##---- STI screening -----
 track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,
                                       name = 'sti.screening',

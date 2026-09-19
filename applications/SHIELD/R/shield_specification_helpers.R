@@ -720,7 +720,8 @@ get.female.sexual.age.contact.proportions <- function(location,
                                                       single.year.age.sexual.availability,#what proportions sexually active
                                                       specification.metadata)
 {
-  do.get.age.contact.proportions.for.model(specification.metadata=specification.metadata,
+ # browser()
+   do.get.age.contact.proportions.for.model(specification.metadata=specification.metadata,
                                            location=location,
                                            age.mixing.sd.mult = age.mixing.sd.mult,
                                            age.model = PAIRING.INPUT.MANAGER$sex.age.models$female,
@@ -884,7 +885,7 @@ get.sexual.availability <- function()
   names(rv) = CENSUS.AGES
   
   # Assume no sex under 13
-  rv[as.character(0:12)] = 0
+  rv[as.character(0: (DEFAULT.SEXUAL.DEBUT.AGE-1))] = 0
   
   # From Abma 2017
   availability.13.19 = c('13'=.076, #from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6547075/

@@ -17,11 +17,12 @@ engine = create.jheem.engine( VERSION,  LOCATION, end.year = 2030)
 specification.metadata=get.specification.metadata(VERSION,LOCATION)
 params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
 sim = engine$run(params)
-
-# sim<-extract.last.simulation.from.calibration(VERSION, LOCATION,'calib.8.21.stage3.az',allow.incomplete = T )
-# parameLast<-sim$get.params()
-# simManual = engine$run(parameLast)
-# simplot(sim,simManual, "diagnosis.ps")
+# 
+# simLast<-extract.last.simulation.from.calibration(VERSION, LOCATION,'calib.8.21.stage3.az',allow.incomplete = T )
+# parameLast<-simLast$get.params()
+simManual = engine$run(parameLast)
+simplot(simLast,simManual, "diagnosis.ps")
+simplot(simManual, "transmission.rate")
 
 if (1==2) {
 
