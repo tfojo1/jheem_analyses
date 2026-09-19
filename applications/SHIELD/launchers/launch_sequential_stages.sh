@@ -39,6 +39,14 @@ PARENT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"   # launchers live in a subfolder; R 
 LOG_DIR="$PARENT_DIR/logs"
 mkdir -p "$LOG_DIR"
 
+# ── where runs are written ─────────────────────────────────────────────────────
+# mcmc_runs/ and simulations/ are written into the log folder, on local disk,
+# rather than onto the NAS. Export JHEEM_ROOT_DIR before launching to send a run
+# somewhere else - e.g. JHEEM_ROOT_DIR=/mnt/jheem_nas_share puts it back on the
+# NAS. Every stage of a pipeline must use the same value; a run cannot find the
+# output of a setup step that wrote elsewhere.
+export JHEEM_ROOT_DIR="${JHEEM_ROOT_DIR:-$LOG_DIR}"
+
 # ── shared helpers ─────────────────────────────────────────────────────────────
 source "$SCRIPT_DIR/_shield_slots.sh"
 

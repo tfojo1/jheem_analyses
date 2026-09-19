@@ -35,3 +35,49 @@ if (IS_JHU_SERVER) {
     ROOT.DIR = JHU_SERVER_NAS_MOUNT_PATH
 }
 
+
+# =============================================================================
+# LOCAL OVERRIDE
+# =============================================================================
+# 1. WHAT IT DOES
+#    If the environment variable JHEEM_ROOT_DIR is set, it wins over every
+#    choice made above. Everything jheem2 writes - mcmc_runs/ and simulations/ -
+#    goes there instead of the NAS.
+#
+# 2. WHY YOU WOULD USE IT
+#    The NAS share fills up, or you want a run to not depend on the network.
+#    Nothing else moves: data managers still come from JHEEM.CACHE.DIR, which
+#    is repo-relative, so reads are unaffected.
+#
+# 3. HOW TO USE IT
+#    Export it before launching, in the same shell that starts the jobs:
+#      export JHEEM_ROOT_DIR=/data/user/jheem
+#    Every stage of a pipeline must see the same value. A run cannot find the
+#    output of a setup step that wrote somewhere else.
+#
+# 4. UNSET IT TO GO BACK
+#    With JHEEM_ROOT_DIR unset the logic above is untouched and runs return to
+#    the NAS.
+#
+JHEEM.ROOT.DIR.OVERRIDE = Sys.getenv("JHEEM_ROOT_DIR", unset = "")
+
+if (nzchar(JHEEM.ROOT.DIR.OVERRIDE)) {
+    ROOT.DIR = path.expand(JHEEM.ROOT.DIR.OVERRIDE)
+    
+    # Create it on first use. mcmc_runs/ and simulations/ are made here rather
+    # than left to jheem2, because the RUNNING.ON.* checks above test for
+    # mcmc_runs/ and a bare directory would look like an unconfigured root.
+    for (d in c(ROOT.DIR,
+                file.path(ROOT.DIR, "mcmc_runs"),
+                file.path(ROOT.DIR, "simulations"))) {
+        if (!dir.exists(d))
+            dir.create(d, recursive = TRUE, showWarnings = FALSE)
+    }
+    
+    if (!dir.exists(ROOT.DIR))
+        stop(paste0("JHEEM_ROOT_DIR is set to '", JHEEM.ROOT.DIR.OVERRIDE,
+                    "' but that directory could not be created."))
+    
+    cat(paste0("JHEEM_ROOT_DIR override in effect: ", ROOT.DIR, "\n"))
+}
+
