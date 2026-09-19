@@ -12,40 +12,27 @@ create.pairing.manager <- function(dir)
 {
   rv = list()
   #-- SEXUAL PAIRINGS by SEX --# ---
-  # -
   #1- proportion of msm who are msmw (have sex with men and women) ----
-  # rv$oe.female.pairings.with.msm= 0.3# 0.0895 #citation='Pathela 2006' #https://www.acpjournals.org/doi/epdf/10.7326/0003-4819-145-6-200609190-00005
-  
+  # original value in EHE: rv$oe.female.pairings.with.msm = 0.0895 #citation='Pathela 2006' #https://www.acpjournals.org/doi/epdf/10.7326/0003-4819-145-6-200609190-00005
   # >> NHBS estimates is higher at 12% https://pmc.ncbi.nlm.nih.gov/articles/PMC7836745/
-  # PK REVISION:   rv$oe.female.pairings.with.msm = 0.3
-  
+  #!<calibrated parameter>
+  # we set the prior to 0.3 based on XXX
   
   #2- fraction of heterosexual_men's sexual contacts that are with MSM partners 
-  rv$fraction.heterosexual_male.pairings.with.male= 0.004 #JHEEM assumption
+  # rv$fraction.heterosexual_male.pairings.with.male= 0.004 #JHEEM assumption
+  #!<calibrated parameter>
   
   #3- fraction of msm's sexual contacts that are with female partners 
   #from CDC NHBS: https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-22.pdf
-  msm.sex.with.female.1 = (885+353)/(885+353+6422)
-  #From https://link.springer.com/article/10.1007%2Fs10461-014-0955-0
-  msm.sex.with.female.2 = (39+5+3+16) / (39+5+3+16 + 394+190+112+71)
-  rv$msm.sex.with.female.estimates = c(msm.sex.with.female.1, msm.sex.with.female.2)
-  rv$fraction.msm.pairings.with.female= mean(c(msm.sex.with.female.1, msm.sex.with.female.2))
+  # msm.sex.with.female.1 = (885+353)/(885+353+6422)
+  # #From https://link.springer.com/article/10.1007%2Fs10461-014-0955-0
+  # msm.sex.with.female.2 = (39+5+3+16) / (39+5+3+16 + 394+190+112+71)
+  # rv$msm.sex.with.female.estimates = c(msm.sex.with.female.1, msm.sex.with.female.2)
+  # rv$fraction.msm.pairings.with.female= mean(c(msm.sex.with.female.1, msm.sex.with.female.2))
+  #!<calibrated parameter> 
+  
 
-  # PK REVISION:
-  # From https://pmc.ncbi.nlm.nih.gov/articles/PMC7836745/ Risk Behaviors Among MSMO and MSMW, NHBS, 2011 and 2014
-  # msm.sex.with.female.pk= 0.1 #1- ((0.88*3+0.12*3)/(0.88*3 + 0.12 *6)) 
-  # rv$fraction.msm.pairings.with.female= msm.sex.with.female.pk
-  
-  ## ---- SEXUAL CONTACT BY RACE ---- ## ----
-  #base sexual contact oes by race for the same race (black-black, hispanic-hispanic, other-other)
-  #these are average values from 4 different studies that are included in the pairing_input_manager
-  rv$oe.sexual.byrace.bb=  3.76 #'JHEEMassumption' 
-  rv$oe.sexual.byrace.hh= 2.19 #'JHEEMassumption' 
-  rv$oe.sexual.byrace.oo= 1.55 #'JHEEMassumption' 
-  
   #-- SEXUAL PAIRINGS by RACE --## ----
-  
-  
   # we have 4 studies to inform this:
   msm.sex.by.race.1 = msm.sex.by.race.2 = msm.sex.by.race.3 = msm.sex.by.race.4 =
     array(0, dim=c(race.from=3, race.to=3),
@@ -105,20 +92,14 @@ create.pairing.manager <- function(dir)
       msm.sex.by.race.4[raw.to.race.strata[r1], raw.to.race.strata[r2]] = msm.sex.by.race.4[raw.to.race.strata[r1], raw.to.race.strata[r2]] +
         raw.msm.sex.by.race[r1,r2]
   }
-
-  rv$msm.sex.by.race.oe = list(calculate.oe.ratios(msm.sex.by.race.1),
-                               calculate.oe.ratios(msm.sex.by.race.2),
-                               calculate.oe.ratios(msm.sex.by.race.3),
-                               calculate.oe.ratios(msm.sex.by.race.4))
-
-  # TODD: how did you use these 4 matrices to deriver the final values?
-  # Convert the list to an array
-  # array_matrices <- simplify2array(rv$msm.sex.by.race.oe)
-  #
-  # # Calculate the mean across all matrices (along the third dimension)
-  # mean_matrix <- apply(array_matrices, c(1, 2), mean)
-  # mean_matrix
-
+  oes = list(calculate.oe.ratios(msm.sex.by.race.1),
+       calculate.oe.ratios(msm.sex.by.race.2),
+       calculate.oe.ratios(msm.sex.by.race.3),
+       calculate.oe.ratios(msm.sex.by.race.4))
+  
+  # add all four studies to input manager:
+  rv$msm.sex.by.race.oe = oes
+  
   #-- Young Heterosexuals - Hamilton 2015 --# ----
   # https://www.sciencedirect.com/science/article/pii/S1755436515000080?via%3Dihub
   het.sex.by.race.1 = array(0, dim=c(race.from=3, race.to=3),
@@ -134,7 +115,23 @@ create.pairing.manager <- function(dir)
   het.sex.by.race.1['other','other'] = 3656 * (.79 + .82) / 2
   rv$het.sex.by.race.oe = list(calculate.oe.ratios(het.sex.by.race.1))
 
-
+  
+  # Now take the mean accross all studies for each race-race to use as prior
+  diag.oes <- sapply(rv$msm.sex.by.race.oe, diag)
+  diag.oes<- cbind(diag.oes , sapply(rv$het.sex.by.race.oe, diag))
+  rownames(diag.oes) <- c('black', 'hispanic', 'other')
+  colnames(diag.oes) <- c('Bohl2011', 'Mustanski2014', 'Fujimoto2015', 'Raymond2009','haminton2015')
+  
+  
+  # spread on the natural and log scales
+  # t(apply(diag.oes, 1, function(x)
+  # c(mean = mean(x), sd = sd(x), geo.mean = exp(mean(log(x))), sdlog = sd(log(x)))))
+  
+  #base sexual contact oes by race for the same race (black-black, hispanic-hispanic, other-other)
+  #these are average values from 4 different studies that are included in the pairing_input_manager
+  rv[c('oe.sexual.byrace.bb','oe.sexual.byrace.hh','oe.sexual.byrace.oo')] = t(apply(diag.oes, 1, function(x) mean(x)))
+  
+  
   #---- SEXUAL PAIRINGS by AGE --## ----
   #From Chow 2016
   #http://www.publish.csiro.au/sh/Fulltext/SH16055
@@ -329,4 +326,19 @@ fit.age.model <- function(age.of.reference, age.of.partner)
   rv
 }
 
-
+# 
+# 
+# oes <- PAIRING.INPUT.MANAGER$msm.sex.by.race.oe
+# 
+# # 3 x 4 matrix: one row per race, one column per study
+# diag.oes <- sapply(oes, diag)
+# rownames(diag.oes) <- c('black', 'hispanic', 'other')
+# colnames(diag.oes) <- c('Bohl2011', 'Mustanski2014', 'Fujimoto2015', 'Raymond2009')
+# diag.oes
+# 
+# # spread on the natural and log scales
+# t(apply(diag.oes, 1, function(x)
+#   c(mean = mean(x), sd = sd(x), geo.mean = exp(mean(log(x))), sdlog = sd(log(x)))))
+# 
+# # add the heterosexual study if you want it in the pool
+# diag(PAIRING.INPUT.MANAGER$het.sex.by.race.oe[[1]])

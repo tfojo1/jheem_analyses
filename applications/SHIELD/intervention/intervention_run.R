@@ -11,9 +11,30 @@ LAST.YEAR <- as.numeric(args[5])
 # ============================================================================
 # DoxyPEP Intervention Analysis
 # ============================================================================
-source('../jheem_analyses/applications/SHIELD/shield_specification.R')
-source('../jheem_analyses/commoncode/locations_of_interest.R')
-source("../jheem_analyses/applications/SHIELD/intervention/intervention_definitions.R")
+# Locate the repo ----
+# Resolved from this script's own path, so the run depends on neither the
+# working directory nor the checkout being named "jheem_analyses".
+if (!exists("JHEEM.ANALYSES.PATH")) {
+    .arg   <- grep("^--file=", commandArgs(trailingOnly = FALSE), value = TRUE)
+    .ofile <- tryCatch(sys.frame(1)$ofile, error = function(e) NULL)
+    .d <- if (length(.arg))          dirname(normalizePath(sub("^--file=", "", .arg[1])))
+          else if (!is.null(.ofile)) dirname(normalizePath(.ofile))
+          else                       normalizePath(getwd())
+    while (!dir.exists(file.path(.d, "commoncode")) ||
+           !dir.exists(file.path(.d, "applications", "SHIELD"))) {
+        if (identical(dirname(.d), .d))
+            stop("Could not locate the jheem_analyses repo root above ", .d)
+        .d <- dirname(.d)
+    }
+    JHEEM.ANALYSES.PATH <- .d
+    rm(.arg, .ofile, .d)
+}
+SHIELD.DIR <- file.path(JHEEM.ANALYSES.PATH, "applications", "SHIELD")
+cat("Repo root:", JHEEM.ANALYSES.PATH, "\n")
+
+source(file.path(SHIELD.DIR, "shield_specification.R"))
+source(file.path(JHEEM.ANALYSES.PATH, "commoncode", "locations_of_interest.R"))
+source(file.path(SHIELD.DIR, "intervention", "intervention_definitions.R"))
 # source("../jheem_analyses/applications/SHIELD/intervention/intervention_helper_functions.R")
 
 # =============================================================================

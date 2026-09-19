@@ -3,14 +3,48 @@
 ## that let each tier degrade gracefully when its inputs are missing.
 
 if (!exists("SHIELD.TEST.ENV")) {
-    ## testthat runs with the test directory as wd; the bootstrap relocates to
-    ## the repo root and leaves it there.
-    source(file.path(dirname(dirname(normalizePath("."))), "tests",
-                     "shield_test_bootstrap.R"))
+    ## testthat may start in the test directory, in tests/, or at the repo root.
+    ## Walk up until the bootstrap turns up. The bootstrap then relocates the
+    ## working directory to the repo root and leaves it there.
+    local({
+        d <- normalizePath(".", mustWork = TRUE)
+        repeat {
+            candidate <- file.path(d, "applications", "SHIELD", "tests",
+                                   "shield_test_bootstrap.R")
+            if (file.exists(candidate)) {
+                source(candidate, local = FALSE)
+                return(invisible(NULL))
+            }
+            candidate <- file.path(d, "shield_test_bootstrap.R")
+            if (file.exists(candidate)) {
+                source(candidate, local = FALSE)
+                return(invisible(NULL))
+            }
+            parent <- dirname(d)
+            if (identical(parent, d)) stop("Cannot locate shield_test_bootstrap.R")
+            d <- parent
+        }
+    })
 }
 
 SHIELD.DIR  <- SHIELD.TEST.ENV$shield.dir
 REPO.ROOT   <- SHIELD.TEST.ENV$repo.root
+
+## --- working directory --------------------------------------------------------
+
+## The model only runs from the repo root. commoncode/cache_object_for_version_functions.R
+## resolves its cache with the literal path "../jheem_analyses/commoncode/..." ,
+## and 40-odd SHIELD files use the same "../jheem_analyses/" prefix, so anything
+## that touches the specification must run with the repo root as the working
+## directory.
+##
+## testthat resets the working directory to the test directory before EVERY test
+## file, so setting it once in this helper is not enough. Call use_repo_root()
+## as the first line of any test that builds a specification, an engine, or a
+## likelihood; it is scoped to that test and restored afterwards.
+use_repo_root <- function(env = parent.frame()) {
+    withr::local_dir(REPO.ROOT, .local_envir = env)
+}
 
 ## --- skip helpers -------------------------------------------------------------
 
@@ -76,6 +110,7 @@ SHIELD.TEST.VERSION  <- "shield"
 
 ## Engine + median-parameter simulation, built once and memoised across files.
 shield_test_sim <- function() {
+    use_repo_root()
     if (is.null(SHIELD.TEST.ENV$cached.sim)) {
         spec <- shield.test.specification()
         if (is.null(spec)) return(NULL)
@@ -90,6 +125,22 @@ shield_test_sim <- function() {
         })
     }
     if (identical(SHIELD.TEST.ENV$cached.sim, NA)) NULL else SHIELD.TEST.ENV$cached.sim
+}
+
+## shield_likelihoods.R needs the specification, the surveillance manager, and a
+## jheem2 that accepts every argument it passes. Sourcing it is memoised by the
+## bootstrap; this reports why it is unavailable rather than erroring.
+skip_unless_likelihoods <- function() {
+    skip_unless_stage("has.shield.helpers")
+    use_repo_root()
+    if (!shield.test.likelihoods()) {
+        testthat::skip(paste0(
+            "shield_likelihoods.R could not be sourced: ",
+            SHIELD.TEST.ENV$has.likelihoods.message,
+            " (jheem2 in use: ", SHIELD.TEST.ENV$jheem2.source, " ",
+            SHIELD.TEST.ENV$jheem2.version, ")"))
+    }
+    invisible(TRUE)
 }
 
 skip_unless_sim <- function() {

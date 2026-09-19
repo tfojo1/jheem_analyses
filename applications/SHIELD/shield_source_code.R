@@ -1,7 +1,7 @@
 ## =============================================================================
 ## Shield_source_code.R
 ## -----------------------------------------------------------------------------
-##   1. syncs the jheem_analyses and jheem2 repositories
+##   1. checks jheem2 is on the dev branch; pulls both repos (interactive only)
 ##   2. loads JHEEM2 (installed package OR sourced from local clone)
 ##   3. sources common JHEEM code and SHIELD-specific code
 ##   4. loads cached data managers (census, syphilis surveillance)
@@ -13,42 +13,44 @@
 cat("*** Running Shield_source_code.R ***\n")
 
 # WHICH SURVEILLANCE MANAGER SHOULD WE USE?
-# The version can be any of the dated syphilis managers from this page 
-# (I believe the 2026.07.27 version would have been the most recent before August 21): https://github.com/tfojo1/jheem_analyses/releases
-# If the version is not set, it keeps using the latest version.
-# SYPHILIS.MANAGER.RELEASE.TAG <- "syphilis-manager-v2026.07.27"
-SYPHILIS.MANAGER.RELEASE.TAG <- NULL
+# Any of the dated syphilis managers from https://github.com/tfojo1/jheem_analyses/releases
+# NULL = whichever manager is promoted now. To pin an older one, put its tag
+# here instead (the commented line is an example).
+# SYPHILIS.MANAGER.RELEASE.TAG <- NULL
+SYPHILIS.MANAGER.RELEASE.TAG <- "syphilis-manager-v2026.07.27"
 
-if (!is.null(SYPHILIS.MANAGER.RELEASE.TAG)) { print(paste("!!! 1-Using a potentiall old Surveillance Manager :",SYPHILIS.MANAGER.RELEASE.TAG))
+if (!is.null(SYPHILIS.MANAGER.RELEASE.TAG)) { print(paste("!!! 1-Using a potentially old Surveillance Manager :",SYPHILIS.MANAGER.RELEASE.TAG))
   }else{print("1-Using the most up to date Surveillance manager")}
 
 
-#Should turn this off for parallel runs; simoultanous calls to git will shut down the runs 
-FETCH.JHEEM2.UPDATES<-T
-if (FETCH.JHEEM2.UPDATES) { print(paste("2-Fetching the updates for JHEEM2"))
-}else{print("!!!2-Skiping the Fetch updates for JHEEM2")}
+# SHOULD WE PULL GIT UPDATES?
+# Only in an interactive session. `git pull` writes to the index, the refs and
+# the working tree, so parallel chains pulling one clone collide ("Unable to
+# create index.lock"); a mid-batch pull would also split a batch across two
+# jheem2 commits. Chains verify the branch and log the SHA instead.
+# Launching straight from the terminal? Sync once by hand first:
+#   git -C ../jheem2 pull --ff-only origin dev
+PULL.GIT.UPDATES <- interactive()
+if (PULL.GIT.UPDATES) { print("2-Pulling git updates")
+}else{print("!!!2-Skipping git pulls (branch check still enforced)")}
 
 
 ## =============================================================================
 ## 0. CONFIGURATION
 ## =============================================================================
 
-JHEEM.ANALYSES.PATH <- "../jheem_analyses"
-JHEEM2.PATH         <- "../jheem2"
-JHEEM2.BRANCH       <- "dev"      # branch required for all SHIELD work
+## Set by the entry point, which resolves it from its own file path. The
+## literal below is the fallback for callers that have not been converted yet;
+## it only resolves when the working directory is the repo root AND the
+## checkout is named "jheem_analyses".
+if (!exists("JHEEM.ANALYSES.PATH")) JHEEM.ANALYSES.PATH <- "../jheem_analyses"
 
-## Leave NULL to use the current promoted syphilis manager. Set an immutable
-## release tag here before sourcing this file, or via the environment variable,
-## to reproduce or temporarily continue a run with an earlier manager.
-if (!exists("SYPHILIS.MANAGER.RELEASE.TAG", inherits = FALSE)) {
-  configured.manager.tag <- trimws(Sys.getenv("JHEEM_SYPHILIS_MANAGER_TAG"))
-  SYPHILIS.MANAGER.RELEASE.TAG <- if (nzchar(configured.manager.tag)) {
-    configured.manager.tag
-  } else {
-    NULL
-  }
-  rm(configured.manager.tag)
-}
+## jheem2 is a sibling of the analyses repo. Derive it rather than hardcoding
+## "../jheem2": this path feeds require.repo.branch(), which checks the branch
+## and may pull, so it must point at the sibling of the clone we are actually
+## running from. Identical to "../jheem2" in the fallback case.
+JHEEM2.PATH         <- file.path(dirname(JHEEM.ANALYSES.PATH), "jheem2")
+JHEEM2.BRANCH       <- "dev"      # branch required for all SHIELD work
 
 ## =============================================================================
 ## 1. PACKAGES
@@ -65,47 +67,63 @@ library(distributions)
 ## 2. GIT HELPER
 ## =============================================================================
 
-## Sync a local clone to origin/<branch>.
-##   force = TRUE  -> discards local edits to TRACKED files (untracked left alone)
-## Returns invisibly; stops on any unrecoverable git failure.
-sync.repo.to.branch <- function(repo.path, branch, force = TRUE)
+## Check that a local clone is on the required branch, then optionally pull.
+##
+## The branch check is read-only (`git rev-parse`): no network, no git locks,
+## so it is safe to run from many parallel processes at once. The pull is NOT
+## parallel-safe - gate it with PULL.GIT.UPDATES.
+##
+## Nothing here ever discards local work: no reset, no checkout, no -f. On the
+## wrong branch we stop and tell you how to fix it by hand.
+require.repo.branch <- function(repo.path, branch, pull = TRUE)
 {
   if (nchar(Sys.which("git")) == 0)
     stop("Git executable not found on PATH")
   if (!dir.exists(file.path(repo.path, ".git")))
     stop("Not a git repository: ", repo.path)
-  
-  repo <- shQuote(normalizePath(repo.path, mustWork = TRUE))
+
+  repo <- normalizePath(repo.path, mustWork = TRUE)
   git  <- function(..., capture = FALSE) {
-    args <- c("-C", repo, ...)                              # NULL args drop out
-    if (capture) system2("git", args, stdout = TRUE, stderr = TRUE)
+    args <- c("-C", shQuote(repo), ...)
+    if (capture) suppressWarnings(system2("git", args, stdout = TRUE, stderr = TRUE))
     else         system2("git", args)                       # returns exit status
   }
-  
-  ## refresh remote refs first so origin/<branch> exists for the checkout
-  if (git("fetch", "--prune", "origin") != 0L)
-    stop("git fetch failed for ", repo.path)
-  
+
+  ## --- 1. branch check: read-only, parallel-safe ----------------------------
   current <- git("rev-parse", "--abbrev-ref", "HEAD", capture = TRUE)[1]
-  cat("  currently on '", current, "'\n", sep = "")
-  
-  if (force) git("reset", "--hard", "HEAD")                   # drop tracked edits
-  
-  if (!identical(current, branch)) {
-    cat("  switching to '", branch, "'\n", sep = "")
-    if (git("checkout", if (force) "-f", branch) != 0L)
-      stop("could not checkout '", branch, "' in ", repo.path)
-  }
-  
-  ## fast-forward only; fall back to a hard reset if local history diverged
-  if (git("pull", "--ff-only", "origin", branch) != 0L) {
-    cat("  fast-forward failed - resetting to origin/", branch, "\n", sep = "")
-    if (git("reset", "--hard", paste0("origin/", branch)) != 0L)
-      stop("could not sync ", repo.path, " to origin/", branch)
-  }
-  
-  cat("  synced to ", branch, " @ ",
+
+  if (identical(current, "HEAD"))
+    stop("\n", repo, " is in a DETACHED HEAD state.\n",
+         "SHIELD requires branch '", branch, "'. Nothing was changed.\n",
+         "Fix it by hand, then re-run:\n",
+         "    cd ", repo, "\n",
+         "    git checkout ", branch, "\n")
+
+  if (!identical(current, branch))
+    stop("\n", repo, " is on branch '", current, "'.\n",
+         "SHIELD requires branch '", branch, "'.\n",
+         "Nothing was changed - any uncommitted work on '", current, "' is untouched.\n",
+         "Check that your work is safe, then re-run:\n",
+         "    cd ", repo, "\n",
+         "    git status\n",
+         "    git checkout ", branch, "\n")
+
+  cat("  on '", current, "' @ ",
       git("rev-parse", "--short", "HEAD", capture = TRUE)[1], "\n", sep = "")
+
+  ## --- 2. pull: only when asked ---------------------------------------------
+  if (pull) {
+    cat("  pulling origin/", branch, " ...\n", sep = "")
+    if (git("pull", "--ff-only", "origin", branch) != 0L)
+      stop("\n'git pull --ff-only' failed in ", repo, " (branch '", branch, "').\n",
+           "This usually means local commits have diverged from origin/", branch,
+           ", or that uncommitted changes would be overwritten.\n",
+           "Nothing was changed. Resolve it by hand, then re-run.\n")
+    cat("  now at ", git("rev-parse", "--short", "HEAD", capture = TRUE)[1], "\n", sep = "")
+  } else {
+    cat("  pull skipped\n")
+  }
+
   invisible(TRUE)
 }
 
@@ -116,7 +134,10 @@ sync.repo.to.branch <- function(repo.path, branch, force = TRUE)
 ## --- jheem_analyses: plain pull on whatever branch is checked out ------------
 cat("3-Checking JHEEM_ANALYSES repository status....\n")
 if (dir.exists(JHEEM.ANALYSES.PATH)) {
-  system2("git", c("-C", shQuote(normalizePath(JHEEM.ANALYSES.PATH)), "pull"))
+  if (PULL.GIT.UPDATES)
+    system2("git", c("-C", shQuote(normalizePath(JHEEM.ANALYSES.PATH)), "pull"))
+  else
+    cat("  pull skipped\n")
 } else {
   cat("Cannot pull from JHEEM_ANALYSES: ", JHEEM.ANALYSES.PATH, "\n", sep = "")
 }
@@ -141,7 +162,7 @@ if (USE.JHEEM2.PACKAGE) {
   ## devtools::install_github('tfojo1/jheem2', ref = JHEEM2.BRANCH)
   cat("--Using JHEEM2 source code: \n")
 
-  if (FETCH.JHEEM2.UPDATES) sync.repo.to.branch(JHEEM2.PATH, branch = JHEEM2.BRANCH, force = TRUE)
+  require.repo.branch(JHEEM2.PATH, branch = JHEEM2.BRANCH, pull = PULL.GIT.UPDATES)
   source(file.path(JHEEM2.PATH, "R/tests/source_jheem2_package.R"))
 }
 
@@ -197,7 +218,7 @@ if (!exists("SURVEILLANCE.MANAGER")) {
 ## 7. SHIELD-SPECIFIC CODE
 ## =============================================================================
 cat("8-Sourcig SHIELD helpers...\n")
-SHIELD.DIR <- file.path(JHEEM.ANALYSES.PATH, "applications/SHIELD")
+if (!exists("SHIELD.DIR")) SHIELD.DIR <- file.path(JHEEM.ANALYSES.PATH, "applications/SHIELD")
 
 for (f in c("shield_calib_parameters.R",
             "shield_base_parameters.R",

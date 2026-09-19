@@ -196,15 +196,17 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     
     ## Sexual Mixing by Race ----
     #this is multiplied in the race mixing matrix
-    black.black.sexual.multi = Lognormal.Distribution(meanlog = log(4), sdlog = log(2)), #Mu and SD are chosen empirically 
-    hispanic.hispanic.sexual.multi = Lognormal.Distribution(meanlog =  log(4), sdlog = log(2)),  
-    other.other.sexual.multi = Lognormal.Distribution(meanlog =  log(4), sdlog = log(2)),
+    # the sdlog accross the 4 studies is 0.3-0.4; we use log(2)=0.69 as double of that sd to incorporate additional uncertainty
+    # mu is set to 2 so that the interval covers [0.5140697 7.7810453 ] 
+    black.black.sexual.multi = Lognormal.Distribution(meanlog = log(2), sdlog = log(2)), 
+    hispanic.hispanic.sexual.multi = Lognormal.Distribution(meanlog =  log(2), sdlog = log(2)),  
+    other.other.sexual.multi = Lognormal.Distribution(meanlog =  log(2), sdlog = log(2)),
     
     ## Sexual Mixing by Risk ----
-    # see shield_inputManager_pairing.R
+    # see shield_inputManager_pairing.R for references 
     oe.female.pairings.with.msm = Lognormal.Distribution(meanlog = log(.3), sdlog = log(2)/2), #range [pathela 0.12 -dodge 0.6]
     fraction.heterosexual_male.pairings.with.male = Logitnormal.Distribution(meanlogit = logit(0.004), sdlogit = log(2)), 
-    fraction.msm.pairings.with.female = Logitnormal.Distribution(meanlogit = logit(0.1187612), sdlogit = log(2)),
+    fraction.msm.pairings.with.female = Logitnormal.Distribution(meanlogit = logit(0.1187612), sdlogit = log(2)), 
     
     # Proportion MSM ----
     black.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.125*log(2)), #reduced SD to limit deviation from mean (since we are not formally calibrating this)

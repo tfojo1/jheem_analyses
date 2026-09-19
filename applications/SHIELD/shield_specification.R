@@ -7,8 +7,14 @@
 
 cat('*** Running shield_specification.R ***\n')
 
-# Working directory is set to the main JHEEM_Analysis folder:
-source('../jheem_analyses/applications/SHIELD/shield_source_code.R')
+## SHIELD.DIR is normally set by the entry point, which resolves it from its
+## own file path. Fall back to the old repo-root-relative literal so callers
+## that have not been converted yet keep working unchanged.
+if (!exists("SHIELD.DIR")) {
+    if (!exists("JHEEM.ANALYSES.PATH")) JHEEM.ANALYSES.PATH <- "../jheem_analyses"
+    SHIELD.DIR <- file.path(JHEEM.ANALYSES.PATH, "applications/SHIELD")
+}
+source(file.path(SHIELD.DIR, "shield_source_code.R"))
 
 
 
@@ -607,19 +613,19 @@ register.model.element(SHIELD.SPECIFICATION,
 # prp of MSM who are MSMW (have sex with both men and women)
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'oe.female.pairings.with.msm',
-                       value = 0, #calib_param
+                       value = 0,#<calibrated parameter>
                        scale = 'ratio')
 
 #prop of Het_male's sexual contacts that are with other men
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'fraction.heterosexual_male.pairings.with.male',
-                       value = PAIRING.INPUT.MANAGER$fraction.heterosexual_male.pairings.with.male,
+                       value = 0,#<calibrated parameter>
                        scale = 'ratio')
 
 #prop of msm's sexual contacts that are with women
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'fraction.msm.pairings.with.female',
-                       value = PAIRING.INPUT.MANAGER$fraction.msm.pairings.with.female,
+                       value = 0,#<calibrated parameter>
                        scale = 'ratio')
 ###
 register.model.quantity(SHIELD.SPECIFICATION,

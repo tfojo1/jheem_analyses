@@ -4,8 +4,8 @@
 ## Loads a SHIELD environment for the test suite.
 ##
 ## This deliberately does NOT reuse shield_source_code.R, because that file
-##   * runs `git pull` on jheem_analyses,
-##   * runs `git reset --hard` + `git checkout -f dev` on ../jheem2, and
+##   * runs `git pull` on jheem_analyses and ../jheem2 (interactive sessions),
+##   * stops if ../jheem2 is not on the dev branch, and
 ##   * downloads the surveillance manager over the network.
 ## None of that is acceptable inside a test run: a test must not mutate the
 ## developer's working tree, and it must be reproducible offline.
@@ -104,20 +104,68 @@ shield.test.stage("has.packages", {
 ## package is absent - and source it as-is, without touching git.
 ## =============================================================================
 
+## Honour the repo's own switch, exactly as shield_source_code.R does. This
+## matters: the two sources are NOT interchangeable. The installed jheem2
+## 1.12.0 has create.custom.likelihood.instructions(name, compute.function,
+## get.data.function, verbose) while the dev clone adds `weights`, and
+## shield_likelihoods.R passes `weights`. Testing against the package would fail
+## to source the likelihoods at all, for a reason that has nothing to do with
+## SHIELD.
 shield.test.stage("has.jheem2", {
-    if (requireNamespace("jheem2", quietly = TRUE)) {
+    use.package <- tryCatch({
+        source("use_jheem2_package_setting.R", local = TRUE)
+        isTRUE(USE.JHEEM2.PACKAGE)
+    }, error = function(e) NA)
+
+    clone.entry <- file.path(SHIELD.TEST.ENV$jheem2.dir,
+                             "R/tests/source_jheem2_package.R")
+    have.clone <- file.exists(clone.entry)
+    have.package <- requireNamespace("jheem2", quietly = TRUE)
+
+    ## The repo setting wins when it can be satisfied; otherwise take whatever
+    ## is available and record which, so a failure can be attributed.
+    use.clone <- if (isTRUE(use.package)) !have.package else have.clone
+
+    ## Sourcing the clone compiles its C++ with Rcpp::sourceCpp(), which needs a
+    ## working toolchain. If that fails, fall back to the installed package and
+    ## record why - test-integration-jheem2-api.R then reports the consequence
+    ## (some SHIELD code calls arguments only the dev clone has) instead of
+    ## letting it surface as an unrelated error.
+    clone.ok <- FALSE
+    if (use.clone && have.clone) {
+        ## A failed clone source leaves a half-populated global environment
+        ## behind - enough definitions to shadow the package but not enough to
+        ## work. Snapshot the globals first so the failure can be undone.
+        before <- ls(globalenv(), all.names = TRUE)
+        clone.ok <- tryCatch({
+            source(clone.entry)
+            TRUE
+        }, error = function(e) {
+            SHIELD.TEST.ENV$jheem2.clone.error <- conditionMessage(e)
+            FALSE
+        })
+        if (!clone.ok) {
+            added <- setdiff(ls(globalenv(), all.names = TRUE), before)
+            if (length(added)) rm(list = added, envir = globalenv())
+        }
+    }
+
+    if (clone.ok) {
+        SHIELD.TEST.ENV$jheem2.source <- "clone"
+        SHIELD.TEST.ENV$jheem2.version <- tryCatch(
+            system2("git", c("-C", shQuote(SHIELD.TEST.ENV$jheem2.dir),
+                             "rev-parse", "--short", "HEAD"),
+                    stdout = TRUE, stderr = FALSE)[1],
+            error = function(e) NA_character_)
+    } else if (have.package) {
         suppressMessages(library(jheem2))
         SHIELD.TEST.ENV$jheem2.source <- "package"
         SHIELD.TEST.ENV$jheem2.version <- as.character(utils::packageVersion("jheem2"))
     } else {
-        source.file <- file.path(SHIELD.TEST.ENV$jheem2.dir, "R/tests/source_jheem2_package.R")
-        if (!file.exists(source.file)) {
-            stop("jheem2 is neither installed nor present at ", SHIELD.TEST.ENV$jheem2.dir)
-        }
-        source(source.file)
-        SHIELD.TEST.ENV$jheem2.source <- "clone"
-        SHIELD.TEST.ENV$jheem2.version <- NA_character_
+        stop("jheem2 is neither installed nor present as a clone at ",
+             SHIELD.TEST.ENV$jheem2.dir)
     }
+    SHIELD.TEST.ENV$use.jheem2.package.setting <- use.package
 })
 
 ## =============================================================================
@@ -158,7 +206,28 @@ shield.test.stage("has.commoncode", {
     source("commoncode/logitnorm_helpers.R")
     source("commoncode/file_paths.R")
     source("commoncode/locations_of_interest.R")
-    set.jheem.root.directory(ROOT.DIR)
+
+    ## file_paths.R leaves ROOT.DIR as a RELATIVE path ("../../files") on a
+    ## laptop, so everything the jheem root points at moves whenever the working
+    ## directory does - and testthat runs with the test directory as its working
+    ## directory. Resolve it once, against the repo root, and fall back to a
+    ## session-scoped temp directory when the real archive is not present, so a
+    ## test run never writes simulation output somewhere unexpected.
+    resolved.root <- if (grepl("^(/|[A-Za-z]:)", ROOT.DIR)) {
+        ROOT.DIR
+    } else {
+        file.path(SHIELD.TEST.ENV$repo.root, ROOT.DIR)
+    }
+    if (!dir.exists(resolved.root)) {
+        resolved.root <- file.path(tempdir(), "shield-test-jheem-root")
+        dir.create(resolved.root, recursive = TRUE, showWarnings = FALSE)
+        SHIELD.TEST.ENV$root.dir.is.temporary <- TRUE
+    }
+    resolved.root <- normalizePath(resolved.root, mustWork = TRUE)
+    assign("ROOT.DIR", resolved.root, envir = globalenv())
+    SHIELD.TEST.ENV$root.dir <- resolved.root
+
+    set.jheem.root.directory(resolved.root)
 })
 
 shield.test.stage("has.mobility", {
@@ -289,6 +358,12 @@ shield.test.source.without.env.loader <- function(path) {
 }
 
 shield.test.specification <- function() {
+    ## The specification and everything it calls resolve files through the
+    ## literal prefix "../jheem_analyses/", so they only work from the repo
+    ## root. Guarantee that here rather than relying on every caller.
+    old.wd <- setwd(SHIELD.TEST.ENV$repo.root)
+    on.exit(setwd(old.wd), add = TRUE)
+
     if (!SHIELD.TEST.ENV$specification.attempted) {
         SHIELD.TEST.ENV$specification.attempted <- TRUE
         shield.test.stage("has.specification", {
@@ -304,6 +379,30 @@ shield.test.specification <- function() {
     } else {
         NULL
     }
+}
+
+## =============================================================================
+## Tier 7: the likelihoods
+## -----------------------------------------------------------------------------
+## Also lazy: sourcing shield_likelihoods.R fits error terms and reads the
+## national series, so it is not free.
+## =============================================================================
+
+SHIELD.TEST.ENV$likelihoods.attempted <- FALSE
+
+shield.test.likelihoods <- function() {
+    old.wd <- setwd(SHIELD.TEST.ENV$repo.root)
+    on.exit(setwd(old.wd), add = TRUE)
+
+    if (!SHIELD.TEST.ENV$likelihoods.attempted) {
+        SHIELD.TEST.ENV$likelihoods.attempted <- TRUE
+        shield.test.stage("has.likelihoods", {
+            if (is.null(shield.test.specification()))
+                stop("the specification is not available")
+            source(file.path(SHIELD.TEST.ENV$shield.dir, "shield_likelihoods.R"))
+        })
+    }
+    isTRUE(SHIELD.TEST.ENV$has.likelihoods)
 }
 
 ## =============================================================================
