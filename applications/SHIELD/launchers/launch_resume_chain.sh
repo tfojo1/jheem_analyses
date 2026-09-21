@@ -8,13 +8,13 @@
 #   stage never clears the cache), so this resumes rather than restarting.
 #
 # USAGE
-#   bash applications/SHIELD/launch_resume_chain.sh <city> <calib_code> <chain>
+#   bash applications/SHIELD/launchers/launch_resume_chain.sh <city> <calib_code> <chain>
 #
 #   Example:
-#       bash applications/SHIELD/launch_resume_chain.sh C.37980 calib.7.30.stage2.LA.PA 3
+#       bash applications/SHIELD/launchers/launch_resume_chain.sh C.37980 calib.7.30.stage2.LA.PA 3
 #
 #   To survive logout:
-#       nohup bash applications/SHIELD/launch_resume_chain.sh C.37980 calib.7.30.stage2.LA.PA 3 \
+#       nohup bash applications/SHIELD/launchers/launch_resume_chain.sh C.37980 calib.7.30.stage2.LA.PA 3 \
 #           > applications/SHIELD/logs/launcher_resume.out 2>&1 &
 #
 # Kill:
@@ -29,14 +29,18 @@
 #   full history (original failure + resume) stays in one place. Change ">>" to
 #   ">" below if you'd rather start a clean log per resume attempt.
 
-# -- resolve paths relative to this script's location --------------------------
+# ── shell options ──────────────────────────────────────────────────────────────
+set -uo pipefail   # `set -e` deliberately omitted: the exit code is handled explicitly below
+
+# ── resolve paths relative to this script's location ──────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LOG_DIR="$SCRIPT_DIR/logs"
+PARENT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"   # launchers live in a subfolder; R scripts + logs are one level up
+LOG_DIR="$PARENT_DIR/logs"
 mkdir -p "$LOG_DIR"
 
-SCRIPT="$SCRIPT_DIR/shield_calib_setup_and_run_modular.R"
+SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
 
-# -- args ----------------------------------------------------------------------
+# ── args ───────────────────────────────────────────────────────────────────────
 if (( $# != 3 )); then
     echo "Usage: bash $(basename "$0") <city> <calib_code> <chain>" >&2
     echo "  e.g. bash $(basename "$0") C.37980 calib.7.30.stage2.az 3" >&2
@@ -59,12 +63,12 @@ if [[ ! -f "$SCRIPT" ]]; then
     exit 1
 fi
 
-# -- thread settings -----------------------------------------------------------
+# ── thread settings ────────────────────────────────────────────────────────────
 export OPENBLAS_NUM_THREADS=1
 export OMP_NUM_THREADS=1
 export MKL_NUM_THREADS=1
 
-# -- run -----------------------------------------------------------------------
+# ── run ────────────────────────────────────────────────────────────────────────
 LOG_FILE="$LOG_DIR/${LOC}_${CALIB_CODE}_chain${CHAIN}.out"
 
 echo "[$(date '+%F %T')] START   RESUME $LOC :: $CALIB_CODE :: chain $CHAIN"

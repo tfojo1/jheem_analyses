@@ -4,7 +4,6 @@
 # we can have more national level estimates if we can pull them directly 
 # in the surveillance manager, we only need to have MSA level and national level data
 # we should bound agegroups at 85+
-source("applications/SHIELD/inputs/input_historical_likelihood_penalty_helper.R")
 # source("applications/SHIELD/inputs/input_future_change_ten_year_ratio_likelihood_penalty.R")
 
 #estiamting cv for ps diagnosis from 2 available sources:
@@ -92,6 +91,7 @@ SHIELD.PARTITIONING.FUNCTION <- function(arr, version, location)
 
 #** POPULATION SIZES ** ---- 
 #'# Error variance for population data <From EHE model>
+# deaths.likelihood.instructions and fertility.likelihood.instructions both reuse it as-is for their error.variance.term
 population.error.sd.shield = function(data, details=attr(data, 'details'), version, location)
 {
     melted.data = reshape2::melt(data)
@@ -206,14 +206,20 @@ emigration.likelihood.instructions =
 #** SYPHILIS DIAGNOSIS ** ----
 ## Total DIAGNOSIS ----
 ##---- Historical Penalty ----
-# the model starts in 170 but we dont have any local data from 1970 to 1990
-# to inform the general range of diagnosis data in this period, we approxiate the general trend in diagnosis at the national level and apply it to locall projections
+# the model starts in 170 but we don't have any local data from 1970 to 1990
+# to inform the general range of diagnosis data in this period, we approximate the general trend in diagnosis at the national level and apply it to local projections
 # this helps us avoid models that project very large or very small number of new diagnosis between 1970-1990 before calibration begins
 # >> using national level data on total diagnosis, we estimated the min and max value of the ratio between annual diagnosis relative to the peak in 1990
 # for each year between 1970-1990 in the model, we calculate a similar ratio and bound the values to fall within this min/max threshold (to align with national trend)
 # if the values fall below min, we penalize the likelihood by dlnorm. 
 # if they fall between min and max, they likelihood is 1
 # if the value falls over max, we penalize it by dlnorm
+
+NATIONAL_TOTAL_DIAGNOSIS_DATA <- tryCatch(
+    {SURVEILLANCE.MANAGER$data$total.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location[as.character(1970:1993), "US"]},
+    error = function(e) {"National data used for historical diagnosis likelihood instructions not found"})
+NATIONAL_TOTAL_DIAGNOSIS_RATIO <- NATIONAL_TOTAL_DIAGNOSIS_DATA / NATIONAL_TOTAL_DIAGNOSIS_DATA["1990"]
+
 historical.diagnosis.likelihood.instructions <-
     create.custom.likelihood.instructions(
         name = "historical.diagnosis.likelihood",
@@ -225,11 +231,12 @@ historical.diagnosis.likelihood.instructions <-
             peak_1990 <- vals[idx1990]
             ratio <- vals[1:(idx1990-1)]/peak_1990
             #
-            # unpack two nationa thresholds:
+            # unpack two national thresholds:
             min_r   <-  data$min.ratio
             max_r   <-  data$max.ratio  
-            σ_low   <- log(2)/2      # tune: how sharply to punish below 1/2 1990 val
-            σ_high  <- log(2)/2      # tune: how sharply to punish too-spiky
+            # Find sd directly here as sd(log(ratio)) and delete input file
+            σ_low   <- data$sdlog      # tune: how sharply to punish below 1/2 1990 val
+            σ_high  <- data$sdlog      # tune: how sharply to punish too-spiky
             #
             # piecewise penalty
             logp_annual = 0 #by default
@@ -266,11 +273,10 @@ historical.diagnosis.likelihood.instructions <-
             # supply the historical vectors and computed params
             list(
                 get.instr       = get.instr,
-                years           = hist_df$year,
-                national.values = hist_df$value,
-                max.ratio    = max_ratio_hist,
-                min.ratio   = min_ratio_hist,
-                sdlog           = sdlog_hist
+                years           = 1970:1990,
+                max.ratio       = max(NATIONAL_TOTAL_DIAGNOSIS_RATIO, na.rm=T),
+                min.ratio       = min(NATIONAL_TOTAL_DIAGNOSIS_RATIO, na.rm=T),
+                sdlog           = sd(log(NATIONAL_TOTAL_DIAGNOSIS_RATIO), na.rm=T)
             )
         },
         weights = 1
@@ -535,11 +541,11 @@ penalty.ps.diag.growth.likelihood.instructions =
             
             # 10-year ratio
             ratio <- c(
-                total_vals[as.character(end_year)] / total_vals[as.character(start_year)],
-                race_vals[as.character(end_year),] / race_vals[as.character(start_year),],
-                sex_vals[as.character(end_year),] / sex_vals[as.character(start_year),]
+                total_vals[as.character(end_year)] / (total_vals[as.character(start_year)] + 1),
+                race_vals[as.character(end_year),] / (race_vals[as.character(start_year),] + 1),
+                sex_vals[as.character(end_year),] / (sex_vals[as.character(start_year),] + 1)
             )
-            
+
             # If we considered correlation... but I don't think there's an easily available lognormal form of mvtnorm::dmvnorm
             # correlation_different_strata <- 0.5
             # 
@@ -685,7 +691,7 @@ early.diagnosis.total.likelihood.instructions.2021 =
 early.diagnosis.by.strata.stage1.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
                                          outcome.for.data = "early.syphilis.diagnoses", 
-                                         dimensions = c("race","sex","age"),
+                                         dimensions = c("sex","race","age"),
                                          levels.of.stratification = c(1),
                                          from.year = 2019,
                                          to.year = 2022,
@@ -703,7 +709,7 @@ early.diagnosis.by.strata.stage1.likelihood.instructions =
 early.diagnosis.by.strata.stage1.likelihood.instructions.2021 =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
                                          outcome.for.data = "early.syphilis.diagnoses", 
-                                         dimensions = c("race","sex","age"),
+                                         dimensions = c("sex","race","age"),
                                          levels.of.stratification = c(1),
                                          from.year = 2019,
                                          to.year = 2021,
@@ -721,7 +727,7 @@ early.diagnosis.by.strata.stage1.likelihood.instructions.2021 =
 early.diagnosis.by.strata.stage2.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
                                          outcome.for.data = "early.syphilis.diagnoses", 
-                                         dimensions = c("race","sex","age"),
+                                         dimensions = c("sex","race","age"),
                                          levels.of.stratification = c(1,2),
                                          from.year = 2019,
                                          to.year = 2022,
@@ -738,7 +744,7 @@ early.diagnosis.by.strata.stage2.likelihood.instructions =
 early.diagnosis.by.strata.stage2.likelihood.instructions.2021 =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
                                          outcome.for.data = "early.syphilis.diagnoses", 
-                                         dimensions = c("race","sex","age"),
+                                         dimensions = c("sex","race","age"),
                                          levels.of.stratification = c(1,2),
                                          from.year = 2019,
                                          to.year = 2021,
@@ -796,7 +802,7 @@ late.diagnosis.total.likelihood.instructions.2021 =
 late.diagnosis.by.strata.stage1.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
                                          outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
-                                         dimensions = c("race","sex","age"),
+                                         dimensions = c("sex","race","age"),
                                          levels.of.stratification = c(1),
                                          from.year = 2019,
                                          to.year = 2022,
@@ -813,7 +819,7 @@ late.diagnosis.by.strata.stage1.likelihood.instructions =
 late.diagnosis.by.strata.stage1.likelihood.instructions.2021 =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
                                          outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
-                                         dimensions = c("race","sex","age"),
+                                         dimensions = c("sex","race","age"),
                                          levels.of.stratification = c(1),
                                          from.year = 2019,
                                          to.year = 2021,
@@ -830,7 +836,7 @@ late.diagnosis.by.strata.stage1.likelihood.instructions.2021 =
 late.diagnosis.by.strata.stage2.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
                                          outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
-                                         dimensions = c("race","sex","age"),
+                                         dimensions = c("sex","race","age"),
                                          levels.of.stratification = c(1,2),
                                          from.year = 2019,
                                          to.year = 2022,
@@ -847,7 +853,7 @@ late.diagnosis.by.strata.stage2.likelihood.instructions =
 late.diagnosis.by.strata.stage2.likelihood.instructions.2021 =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
                                          outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
-                                         dimensions = c("race","sex","age"),
+                                         dimensions = c("sex","race","age"),
                                          levels.of.stratification = c(1,2),
                                          from.year = 2019,
                                          to.year = 2021,

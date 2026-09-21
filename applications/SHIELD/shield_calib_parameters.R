@@ -142,7 +142,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     # we assume a certain ratio of undiagnosed to diagnosed cases in 1970
     # we also assume a certain proportion of infections were made among MSM, and the rest are divided among heterosexual men and women
     ratio.of.undiagnosed.to.diagnosed.1970 = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)), #CI=[1.5, 5.9]
-    prp.infections.among.msm.1970 = Logitnormal.Distribution(meanlogit = log(.5), sdlogit = log(2)), #CI=[0.13 0.66] larger SD because of uncertainty
+    prp.infections.among.msm.1970 = Logitnormal.Distribution(meanlogit = logit(.5), sdlogit = log(2)), #CI=[0.2 0.79] larger SD because of uncertainty
     
     ## Global transmission ----
     # Moved back down to 2.2 from 3.1 when raised msm logmean baseline back to log(3) from log(1)
@@ -157,7 +157,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     # The two groups are correlated at the same spline points through the correlation parameter.
     # we assume that trate can change by 1.5 over 10 years :logsd(Delta10)=log(1.5)
     # this means that over 5 years, trate can change by sqrt(1.5) and by 20 years, it can change by 1.5^2
-    make.joint.mv.spline.prior(
+    transmission.rate.multipliers.by.sex=make.joint.mv.spline.prior(
         parameters = paste0("transmission.rate.multiplier.", c("msm", "heterosexual")),
         logmean.baseline = c(log(3), #msm
                              log(1)), #het
@@ -196,15 +196,17 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     
     ## Sexual Mixing by Race ----
     #this is multiplied in the race mixing matrix
-    black.black.sexual.multi = Lognormal.Distribution(meanlog = log(4), sdlog = log(2)), #Mu and SD are chosen empirically 
-    hispanic.hispanic.sexual.multi = Lognormal.Distribution(meanlog =  log(4), sdlog = log(2)),  
-    other.other.sexual.multi = Lognormal.Distribution(meanlog =  log(4), sdlog = log(2)),
+    # the sdlog accross the 4 studies is 0.3-0.4; we use log(2)=0.69 as double of that sd to incorporate additional uncertainty
+    # mu is set to 2 so that the interval covers [0.5140697 7.7810453 ] 
+    black.black.sexual.multi = Lognormal.Distribution(meanlog = log(2), sdlog = log(2)), 
+    hispanic.hispanic.sexual.multi = Lognormal.Distribution(meanlog =  log(2), sdlog = log(2)),  
+    other.other.sexual.multi = Lognormal.Distribution(meanlog =  log(2), sdlog = log(2)),
     
     ## Sexual Mixing by Risk ----
-    # see shield_inputManager_pairing.R
+    # see shield_inputManager_pairing.R for references 
     oe.female.pairings.with.msm = Lognormal.Distribution(meanlog = log(.3), sdlog = log(2)/2), #range [pathela 0.12 -dodge 0.6]
     fraction.heterosexual_male.pairings.with.male = Logitnormal.Distribution(meanlogit = logit(0.004), sdlogit = log(2)), 
-    fraction.msm.pairings.with.female = Logitnormal.Distribution(meanlogit = logit(0.1187612), sdlogit = log(2)),
+    fraction.msm.pairings.with.female = Logitnormal.Distribution(meanlogit = logit(0.1187612), sdlogit = log(2)), 
     
     # Proportion MSM ----
     black.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.125*log(2)), #reduced SD to limit deviation from mean (since we are not formally calibrating this)
@@ -313,8 +315,8 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
     
     ## Misclassification Error ----
     # see inputs/input_syphilis_misclassification_error.R
-    fraction.el.misclassified.ll =Logitnormal.Distribution(meanlogit = logit(0.096), sdlog =  log(2)) , #CI=[0.025 0.27]
-    fraction.ll.misclassified.el =Logitnormal.Distribution(meanlogit = logit(0.27), sdlog =  log(2)) #CI=[0.064 0.51]
+    fraction.el.misclassified.ll =Logitnormal.Distribution(meanlogit = logit(0.096), sdlogit =  log(2)) , #CI=[0.025 0.27]
+    fraction.ll.misclassified.el =Logitnormal.Distribution(meanlogit = logit(0.27), sdlogit =  log(2)) #CI=[0.064 0.51]
 )
 
 ## TRANS.BY.AGE.SAMPLING.PRIOR ----

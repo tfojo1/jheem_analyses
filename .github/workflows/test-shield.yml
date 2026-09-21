@@ -1,0 +1,229 @@
+name: Test SHIELD Model
+
+# The three existing workflows build and validate the syphilis data manager.
+# None of them runs the model. This one does.
+#
+#   static  - parses every SHIELD file, checks cross-file wiring and source
+#             hygiene. No data, no jheem2, under a minute. Runs on every push.
+#   unit    - numerical contracts of the self-contained functions. Needs jheem2.
+#   model   - builds the specification, runs the engine, scores the likelihoods
+#             and runs an intervention against a pinned surveillance manager.
+
+on:
+  push:
+    branches: [master, main, dev]
+    paths:
+      - 'applications/SHIELD/**'
+      - 'commoncode/**'
+      - 'input_managers/**'
+      - '.github/workflows/test-shield.yml'
+  pull_request:
+    paths:
+      - 'applications/SHIELD/**'
+      - 'commoncode/**'
+      - 'input_managers/**'
+      - '.github/workflows/test-shield.yml'
+  workflow_dispatch:
+    inputs:
+      jheem2_ref:
+        description: 'jheem2 branch or tag to test against'
+        required: false
+        default: 'dev'
+        type: string
+      manager_release_tag:
+        description: 'Syphilis manager release tag ("latest" follows the promoted manager)'
+        required: false
+        default: 'syphilis-manager-v2026.07.27'
+        type: string
+      run_model_tests:
+        description: 'Run the integration tier (downloads the ~100 MB manager)'
+        required: false
+        default: true
+        type: boolean
+
+concurrency:
+  group: test-shield-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Tier 1. Nothing to install, nothing to download. This is the gate that would
+  # have caught the unparseable files, the diff markers pasted into the spline
+  # prior, the dead source() paths and the launcher/register drift.
+  # ---------------------------------------------------------------------------
+  static:
+    name: Static checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # the suite inspects git history for deleted-but-tracked files
+          fetch-depth: 0
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+
+      - name: Install testthat
+        run: install.packages(c("testthat", "withr"))
+        shell: Rscript {0}
+
+      # SHIELD code resolves paths as "../jheem_analyses/...", so the checkout
+      # must be reachable under that name. Mirrors what build-syphilis-manager.yml
+      # does for jheem2.
+      - name: Make the checkout reachable as ../jheem_analyses
+        run: ln -sfn "$GITHUB_WORKSPACE" "$GITHUB_WORKSPACE/../jheem_analyses"
+
+      - name: Run static tier
+        run: Rscript applications/SHIELD/tests/run_tests.R static
+
+  # ---------------------------------------------------------------------------
+  # Tier 2. Needs jheem2 but no data managers.
+  # ---------------------------------------------------------------------------
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: static
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout jheem2
+        uses: actions/checkout@v4
+        with:
+          repository: tfojo1/jheem2
+          ref: ${{ inputs.jheem2_ref || 'dev' }}
+          path: _jheem2
+
+      - name: Symlink the sibling repositories
+        run: |
+          ln -sfn "$GITHUB_WORKSPACE/_jheem2" "$GITHUB_WORKSPACE/../jheem2"
+          ln -sfn "$GITHUB_WORKSPACE" "$GITHUB_WORKSPACE/../jheem_analyses"
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
+
+      - name: Cache R packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: shield-r-${{ hashFiles('.github/workflows/test-shield.yml') }}
+          restore-keys: shield-r-
+
+      - name: Install R dependencies
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          install.packages(c("remotes", "testthat", "withr", "jsonlite",
+                             "ggplot2", "reshape2", "logitnorm", "filelock"))
+          remotes::install_github("tfojo1/locations")
+          remotes::install_github("tfojo1/distributions")
+          remotes::install_local("_jheem2", upgrade = "never")
+        shell: Rscript {0}
+
+      - name: Run unit tier
+        run: Rscript applications/SHIELD/tests/run_tests.R unit
+
+  # ---------------------------------------------------------------------------
+  # Tier 3. The tier that actually runs the model. Downloads the pinned
+  # surveillance manager, builds the specification, runs the engine.
+  # ---------------------------------------------------------------------------
+  model:
+    name: Model integration tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: unit
+    if: github.event_name != 'workflow_dispatch' || inputs.run_model_tests
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout jheem2
+        uses: actions/checkout@v4
+        with:
+          repository: tfojo1/jheem2
+          ref: ${{ inputs.jheem2_ref || 'dev' }}
+          path: _jheem2
+
+      - name: Symlink the sibling repositories
+        run: |
+          ln -sfn "$GITHUB_WORKSPACE/_jheem2" "$GITHUB_WORKSPACE/../jheem2"
+          ln -sfn "$GITHUB_WORKSPACE" "$GITHUB_WORKSPACE/../jheem_analyses"
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
+
+      - name: Cache R packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: shield-r-${{ hashFiles('.github/workflows/test-shield.yml') }}
+          restore-keys: shield-r-
+
+      - name: Install R dependencies
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          install.packages(c("remotes", "testthat", "withr", "jsonlite",
+                             "ggplot2", "reshape2", "logitnorm", "filelock",
+                             "deSolve", "Rcpp", "RcppArmadillo", "mvtnorm",
+                             "tmvtnorm", "plotly"))
+          remotes::install_github("tfojo1/locations")
+          remotes::install_github("tfojo1/distributions")
+          remotes::install_local("_jheem2", upgrade = "never")
+        shell: Rscript {0}
+
+      # The data managers are large, so cache them across runs keyed on the tag.
+      - name: Cache data managers
+        id: manager-cache
+        uses: actions/cache@v4
+        with:
+          path: cached
+          key: shield-managers-${{ inputs.manager_release_tag || 'syphilis-manager-v2026.07.27' }}
+
+      - name: Download data managers
+        if: steps.manager-cache.outputs.cache-hit != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MANAGER_TAG: ${{ inputs.manager_release_tag || 'syphilis-manager-v2026.07.27' }}
+        run: |
+          mkdir -p "cached/data-managers/syphilis.manager.rdata/$MANAGER_TAG"
+          gh release download "$MANAGER_TAG" \
+            --dir "cached/data-managers/syphilis.manager.rdata/$MANAGER_TAG" \
+            --pattern "syphilis.manager.rdata"
+          gh release download "data-managers-latest" \
+            --dir cached \
+            --pattern "census.manager.rdata"
+          gh release download "data-managers-latest" \
+            --dir cached \
+            --pattern "google_mobility_data.Rdata" || \
+            echo "google_mobility_data.Rdata not published; the mobility stage will skip"
+          ls -lh cached cached/data-managers/syphilis.manager.rdata/"$MANAGER_TAG"
+
+      - name: Run the full suite
+        env:
+          JHEEM_SYPHILIS_MANAGER_TAG: ${{ inputs.manager_release_tag || 'syphilis-manager-v2026.07.27' }}
+        run: Rscript applications/SHIELD/tests/run_tests.R integration
+
+      - name: Upload test log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shield-test-log
+          path: applications/SHIELD/tests/*.log
+          if-no-files-found: ignore

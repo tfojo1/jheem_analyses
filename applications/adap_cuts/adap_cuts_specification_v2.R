@@ -961,6 +961,11 @@ register.model.element(ADAP.SPECIFICATION,
 ##-- INPUTS: PROPORTION OF COST-SHARING CLIENTS WHO RECEIVE COPAY SERVICES --##
 ##---------------------------------------------------------------------------##
 
+# Melissa: we will eventually fill this in 
+get.proportion.Cs.clients.with.Cp.functional.form = function(){
+    
+}
+
 register.model.element(ADAP.SPECIFICATION,
                        name = "proportion.Cs.clients.with.Cp.if.allowed", 
                        functional.form = get.proportion.Cs.clients.with.Cp.functional.form(), 
@@ -968,12 +973,17 @@ register.model.element(ADAP.SPECIFICATION,
 
 register.model.element(ADAP.SPECIFICATION,
                        name = "proportion.PCs.clients.with.Cp.if.allowed", 
-                       functional.form = get.proportion.PCs.clients.with.Cp.functional.form(), 
+                       functional.form = get.proportion.Cs.clients.with.Cp.functional.form(), # we are PURPOSEFULLY repeating the same function here (assuming same proportion with Cp regardless of F/P)
+                       scale = 'proportion')
+
+register.model.element(ADAP.SPECIFICATION,
+                       name = "proportion.FCs.clients.with.Cp.if.allowed", 
+                       functional.form = get.proportion.Cs.clients.with.Cp.functional.form(), # we are PURPOSEFULLY repeating the same function here
                        scale = 'proportion')
 
 register.model.element(ADAP.SPECIFICATION,
                        name = "proportion.FPCs.clients.with.Cp.if.allowed", 
-                       functional.form = get.proportion.FPCs.clients.with.Cp.functional.form(), 
+                       functional.form = get.proportion.Cs.clients.with.Cp.functional.form(), # we are PURPOSEFULLY repeating the same function here
                        scale = 'proportion')
 
 
@@ -995,6 +1005,11 @@ register.model.quantity(ADAP.SPECIFICATION,
 register.model.quantity(ADAP.SPECIFICATION,
                         name = "proportion.Cs.clients.with.Cp", 
                         value = expression(adap.covers.copay * adap.covers.deductible * proportion.Cs.clients.with.Cp.if.allowed + 
+                                               (1-adap.covers.deductible)*adap.covers.copay))
+
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = "proportion.FCs.clients.with.Cp", 
+                        value = expression(adap.covers.copay * adap.covers.deductible * proportion.FCs.clients.with.Cp.if.allowed + 
                                                (1-adap.covers.deductible)*adap.covers.copay))
 
 
@@ -2259,7 +2274,7 @@ calculate.baseline.p.of.F.only.among.adap <- function(baseline.p.of.F.only.incom
     sum.p.across.income(baseline.p.of.F.only.income.among.adap)
 }
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.F.only.among.adap',
+                        name = 'baseline.p.of.F.only.among.adap', 
                         value = calculate.baseline.p.of.F.only.among.adap)
 
 # 2: FP  
@@ -2267,7 +2282,7 @@ calculate.baseline.p.of.FP.among.adap <- function(baseline.p.of.FP.income.among.
     sum.p.across.income(baseline.p.of.FP.income.among.adap)
 }
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.FP.among.adap',
+                        name = 'baseline.p.of.FP.among.adap', 
                         value = calculate.baseline.p.of.FP.among.adap)
 
 # 3: FPCs
@@ -2283,7 +2298,7 @@ calculate.baseline.p.of.PCs.among.adap <- function(baseline.p.of.PCs.income.amon
     sum.p.across.income(baseline.p.of.PCs.income.among.adap)
 }
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.PCs.among.adap',
+                        name = 'baseline.p.of.PCs.among.adap', 
                         value = calculate.baseline.p.of.PCs.among.adap)
 
 # 5: P only
@@ -2291,7 +2306,7 @@ calculate.baseline.p.of.P.only.among.adap <- function(baseline.p.of.P.only.incom
     sum.p.across.income(baseline.p.of.P.only.income.among.adap)
 }
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.P.only.among.adap',
+                        name = 'baseline.p.of.P.only.among.adap', 
                         value = calculate.baseline.p.of.P.only.among.adap)
 
 # 6: FCs 
@@ -2307,7 +2322,7 @@ calculate.baseline.p.of.Cs.only.among.adap <- function(baseline.p.of.Cs.only.inc
     sum.p.across.income(baseline.p.of.Cs.only.income.among.adap)
 }
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.Cs.only.among.adap',
+                        name = 'baseline.p.of.Cs.only.among.adap', 
                         value = calculate.baseline.p.of.Cs.only.among.adap)
 
 
@@ -2427,8 +2442,6 @@ calculate.proportion.FP.lose.P <- function(baseline.p.of.FP.income.among.adap,
 }
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.FP.lose.P', 
-                        # proportion.adap.full.pay.and.premium.without.cost.sharing.who.change.eligibility.to.full.pay, OR 
-                        # proportion.adap.full.pay.and.premium.without.cost.sharing.who.lose.premium.eligibility ? both are used in formulas below 
                         value = calculate.proportion.FP.lose.P)
 
 
@@ -2446,7 +2459,7 @@ register.model.quantity(ADAP.SPECIFICATION,
                         value = calculate.proportion.FP.lose.F)
 
 # 2d: Keep both 
-# (1- the rest?)
+# (1- the rest)
 
 
 #-- 3: FPCs --#
@@ -2490,7 +2503,7 @@ calculate.proportion.FPCs.lose.Cs <- function(baseline.p.of.FPCs.income.among.ad
                                    upper.threshold = min(adap.premium.fpl.threshold,adap.full.pay.fpl.threshold)) 
 }
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.FPCs.lose.Cs', # this never existed 
+                        name = 'proportion.FPCs.lose.Cs', 
                         value = calculate.proportion.FPCs.lose.Cs)
 
 # 3d: Lose PCs (--> F)
@@ -2505,8 +2518,6 @@ calculate.proportion.FPCs.lose.PCs <- function(baseline.p.of.FPCs.income.among.a
 }
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.FPCs.lose.PCs', 
-                        # proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.full.pay, OR 
-                        # proportion.adap.full.pay.and.premium.and.cost.sharing.who.lose.premium.and.cost.sharing.eligibility? both are used in formulas below 
                         value = calculate.proportion.FPCs.lose.PCs)
 
 
@@ -2527,7 +2538,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 
 
 # 3f: Keep all 
-# (1- the rest?)
+# (1- the rest)
 
 
 #-- 4: PCs --#
@@ -2574,7 +2585,7 @@ register.model.quantity(ADAP.SPECIFICATION,
                         value = calculate.proportion.PCs.lose.PCs.gain.F)
 
 # 4d: Keep both 
-# (1- the rest?)
+# (1- the rest)
 
 
 #-- 5: P only --#
@@ -2608,7 +2619,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 
 
 # 5c: Keep 
-# (1- rest)
+# (1- the rest)
 
 
 #-- 6: FCs --#
@@ -2653,7 +2664,7 @@ register.model.quantity(ADAP.SPECIFICATION,
                         value = calculate.proportion.FCs.lose.Cs)
 
 # 6d: Keep both 
-# (1- the rest?)
+# (1- the rest)
 
 
 #-- 7: Cs only --#
@@ -2697,6 +2708,8 @@ register.model.quantity(ADAP.SPECIFICATION,
 # P to F
 # PCs to F 
 # PCs to P 
+# There is no world where you can go from full pay to premiums only (because ADAP is last resort; if you could have been getting premium support before, never should have been getting full-pay)
+# Can't lose just premium (so can't go from PCs to Cs) - if you lose your insurance, lose both
 
 # Formulary change: 
 # keep F, change formulary 
@@ -2704,6 +2717,11 @@ register.model.quantity(ADAP.SPECIFICATION,
 # keep Cp, change formulary 
 # P to F, change formulary 
 # PCs to F, change formulary 
+# Only full pay and Cp are affected by formulary changes (i.e., premium support and deductible assistance aren't impacted by formularly restrictions)
+
+
+# This is for a single point in time (i.e., can't have full pay and premium at the same time)
+# These are all proportions WHO ARE SUPPRESSED (up to now, we've calculated proportions who have the services - will have to multiply in suppression among each group)
 
 ##-- TIE-IN TO MAIN SUPPRESSION --##
 register.model.quantity(ADAP.SPECIFICATION,
@@ -2713,99 +2731,122 @@ register.model.quantity(ADAP.SPECIFICATION,
                                 proportion.pwh.who.are.suppressed.without.adap +
                                 
                                 # ADAP Unchanged
-                                proportion.pwh.who.are.suppressed.with.adap.full.pay.unchanged +
-                                proportion.pwh.who.are.suppressed.with.adap.premium.without.cost.sharing.unchanged +
-                                proportion.pwh.who.are.suppressed.with.adap.premium.and.cost.sharing.unchanged +
-                                proportion.pwh.who.are.suppressed.with.adap.cost.sharing.without.premium.unchanged +
+                                proportion.pwh.who.are.suppressed.F.unchanged + 
+                                proportion.pwh.who.are.suppressed.P.unchanged + 
+                                proportion.pwh.who.are.suppressed.PCs.unchanged + 
+                                proportion.pwh.who.are.suppressed.Cs.unchanged + 
                                 
                                 # Lose ADAP
-                                proportion.pwh.who.are.suppressed.and.lose.adap.full.pay * lose.F.suppression.rr +
-                                proportion.pwh.who.are.suppressed.and.lose.adap.premium.without.cost.sharing * lose.P.suppression.rr +
-                                proportion.pwh.who.are.suppressed.and.lose.adap.premium.and.cost.sharing * lose.PCs.suppression.rr +
-                                proportion.pwh.who.are.suppressed.and.lose.adap.cost.sharing.without.premium * lose.Cs.suppression.rr +
+                                proportion.pwh.who.are.suppressed.lose.F * lose.F.suppression.rr + 
+                                proportion.pwh.who.are.suppressed.lose.P * lose.P.suppression.rr + 
+                                proportion.pwh.who.are.suppressed.lose.PCs * lose.PCs.suppression.rr + 
+                                proportion.pwh.who.are.suppressed.lose.Cs * lose.Cs.suppression.rr + 
 
                                 # Change ADAP Service
-                                proportion.pwh.who.are.suppressed.and.change.adap.premium.without.cost.sharing.to.full.pay.without.formulary.change * change.P.to.F.suppression.rr +
-                                proportion.pwh.who.are.suppressed.and.change.adap.premium.and.cost.sharing.to.full.pay.without.formulary.change * change.PCs.to.F.suppression.rr +
-                                proportion.pwh.who.are.suppressed.and.change.adap.premium.and.cost.sharing.to.premium.without.cost.sharing * change.PCs.to.P.suppression.rr +
+                                proportion.pwh.who.are.suppressed.change.P.to.F * change.P.to.F.suppression.rr + 
+                                proportion.pwh.who.are.suppressed.change.PCs.to.F * change.PCs.to.F.suppression.rr + 
+                                proportion.pwh.who.are.suppressed.change.PCs.to.P * change.PCs.to.P.suppression.rr + 
                                                                     
                                 # Formulary Change
-                                proportion.pwh.who.are.suppressed.and.keep.adap.full.pay.but.change.formulary * change.F.formulary.suppression.rr +
-                                proportion.pwh.who.are.suppressed.and.keep.adap.premium.and.copay.but.change.formulary * change.PCp.formulary.suppression.rr +
-                                proportion.pwh.who.are.suppressed.and.keep.adap.copay.without.premium.but.change.formulary * change.Cp.formulary.suppression.rr +
+                                proportion.pwh.who.are.suppressed.F.change.formulary * change.F.formulary.suppression.rr + 
+                                proportion.pwh.who.are.suppressed.PCp.change.formulary * change.PCp.formulary.suppression.rr + 
+                                proportion.pwh.who.are.suppressed.Cp.change.formulary * change.Cp.formulary.suppression.rr + 
                                 
-                                proportion.pwh.who.are.suppressed.and.change.adap.premium.without.copay.to.full.pay.and.change.formulary * change.F.formulary.suppression.rr + 
-                                proportion.pwh.who.are.suppressed.and.change.adap.premium.and.cost.sharing.to.full.pay.and.change.formulary * change.F.formulary.suppression.rr 
+                                proportion.pwh.who.are.suppressed.change.P.to.F.change.formulary * change.F.formulary.suppression.rr + # using the same RR as above: practically, these formulary suppression RRs are probably all going to be the same 
+                                proportion.pwh.who.are.suppressed.change.PCs.to.F.change.formulary * change.F.formulary.suppression.rr 
                                 )
 )
 
+# Each section does two things: (1) folding in suppression; (2) parsing out from "over the course of the year," to "at a single point in time" (e.g., from FP to F vs P)
+
 #-- Suppression Among Full Pay (F) --#
+# 3 things they can do: 
+# F1: Lose F
+# F2: Keep F with formulary change
+# F3: Keep F without formulary change
+
+# F1: Lose F (from F only, from FP, from FPCs, or from FCs)
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.and.lose.adap.full.pay',
+                        name = 'proportion.pwh.who.are.suppressed.lose.F',
                         value = expression(baseline.proportion.pwh.with.adap * 
-                                               (proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.only *
-                                                    proportion.F.only.lose.F +
-                                                proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.and.premium.without.cost.sharing *
-                                                    proportion.FP.lose.F +
-                                                proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.and.premium.and.cost.sharing *
-                                                    proportion.FPCs.lose.F  *
-                                                proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.and.cost.sharing.without.premium *
-                                                    proportion.FCs.lose.F
-                                                ))
+                                               (
+                                                   # over the course of the year, only ever had F 
+                                                   proportion.of.adap.who.are.suppressed.F.only * 
+                                                       proportion.F.only.lose.F +
+                                                       
+                                                       # over the course of the year, they have FP, but at this point in time, how many have F and are suppressed
+                                                       proportion.of.adap.who.are.suppressed.F.among.FP * 
+                                                       proportion.FP.lose.F +
+                                                       
+                                                       # over the course of the year, they have FPCs, but at this point in time, how many have F and are suppressed
+                                                       proportion.of.adap.who.are.suppressed.F.among.FPCs * 
+                                                       proportion.FPCs.lose.F  *
+                                                       
+                                                       # over the course of the year, they have FCs, but at this point in time, how many have F and are suppressed
+                                                       proportion.of.adap.who.are.suppressed.F.among.FCs * 
+                                                       proportion.FCs.lose.F
+                                               ))
 )
 
+# intermediary step
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.and.keep.adap.full.pay',
+                        name = 'proportion.pwh.who.are.suppressed.keep.F', 
                         value = expression(baseline.proportion.pwh.with.adap * 
-                                               (proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.only *
+                                               (proportion.of.adap.who.are.suppressed.F.only *
                                                     (1-proportion.F.only.lose.F) +
-                                                proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.and.premium.without.cost.sharing *
+                                                proportion.of.adap.who.are.suppressed.F.among.FP *
                                                     (1-proportion.FP.lose.F) +
-                                                proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.and.premium.and.cost.sharing *
+                                                proportion.of.adap.who.are.suppressed.F.among.FPCs *
                                                     (1-proportion.FPCs.lose.F) *
-                                                proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.and.cost.sharing.without.premium *
+                                                proportion.of.adap.who.are.suppressed.F.among.FCs *
                                                     (1-proportion.FCs.lose.F)
                                                ))
 )
 
+# F2: Keep F with formulary change 
 register.model.quantity(ADAP.SPECIFICATION,
-                       name = 'proportion.pwh.who.are.suppressed.and.keep.adap.full.pay.but.change.formulary',
-                       value = expression(.who.are.suppressed.and.keep.adap.full.pay * 
+                       name = 'proportion.pwh.who.are.suppressed.F.change.formulary',
+                       value = expression(proportion.pwh.who.are.suppressed.keep.F * 
                                               proportion.F.clients.with.formulary.change)
 )
 
+# F3: Keep F without formulary change
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.and.keep.adap.full.pay.unchanged',
-                        value = expression(.who.are.suppressed.and.keep.adap.full.pay * 
+                        name = 'proportion.pwh.who.are.suppressed.F.unchanged', 
+                        value = expression(proportion.pwh.who.are.suppressed.keep.F * 
                                                (1-proportion.F.clients.with.formulary.change))
 )
 
 
 # Full-pay (F) suppression components
+# F only suppression 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.only',
-                        value = expression(baseline.p.of.adap.with.full.pay.only * 
+                        name = 'proportion.of.adap.who.are.suppressed.F.only',
+                        value = expression(baseline.p.of.F.only.among.adap * 
                                                fraction.time.covered.among.F * 
                                                proportion.F.only.suppressed
                         ))
 
+# F among FP suppression
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.and.premium.without.cost.sharing',
-                        value = expression(baseline.p.of.adap.with.full.pay.and.premium.without.cost.sharing *
+                        name = 'proportion.of.adap.who.are.suppressed.F.among.FP',
+                        value = expression(baseline.p.of.FP.among.adap *
                                                fraction.time.F.among.FP *
                                                proportion.FP.suppressed
                         ))
 
+# F among FPCs suppression
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.and.premium.and.cost.sharing',
-                        value = expression(baseline.p.of.adap.with.full.pay.and.premium.and.cost.sharing *
+                        name = 'proportion.of.adap.who.are.suppressed.F.among.FPCs',
+                        value = expression(baseline.p.of.FPCs.among.adap * 
                                                fraction.time.F.among.FPCs *
                                                proportion.FPCs.suppressed
                         ))
 
+# F among FCs suppression
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.full.pay.from.full.pay.and.cost.sharing.without.premium',
-                        value = expression(baseline.p.of.adap.with.full.pay.and.cost.sharing.without.premium *
+                        name = 'proportion.of.adap.who.are.suppressed.F.among.FCs',
+                        value = expression(baseline.p.of.FCs.among.adap * 
                                                fraction.time.F.among.FCs *
                                                proportion.FCs.suppressed
                         ))
@@ -2813,165 +2854,212 @@ register.model.quantity(ADAP.SPECIFICATION,
 
 
 #-- Suppression Among Premium (P) --#
+# 4 things they can do: 
+# P1: Lose P
+# P2: Change to F with formulary change
+# P3: Change to F without formulary change
+# P4: Keep P 
+
+# P1: Lose P (either from P only or from FP)
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.and.lose.adap.premium.without.cost.sharing',
+                        name = 'proportion.pwh.who.are.suppressed.lose.P',
                         value = expression(baseline.proportion.pwh.with.adap * 
-                                               (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.without.full.pay *
-                                                    proportion.P.only.lose.P +
-                                                proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.with.full.pay *
-                                                    proportion.adap.full.pay.and.premium.without.cost.sharing.who.lose.premium.eligibility
+                                               (
+                                                   # over the course of the year, only ever had P
+                                                   proportion.of.adap.who.are.suppressed.P.only * 
+                                                       proportion.P.only.lose.P +
+                                                       
+                                                       # over the course of the year, they have FP, but at this point in time, how many have P and are suppressed 
+                                                       # (implicitly lose F - if they didn't lose F, they'd switch to F)
+                                                       proportion.of.adap.who.are.suppressed.P.among.FP *
+                                                       proportion.FP.lose.FP 
                                                ))
 )
 
-
+# P2: Change P to F, WITH formulary change (either from P only or from FP)
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.and.change.adap.premium.without.cost.sharing.to.full.pay.without.formulary.change',
+                        name = 'proportion.pwh.who.are.suppressed.change.P.to.F.change.formulary', 
                         value = expression(baseline.proportion.pwh.with.adap * 
-                                               (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.without.full.pay *
-                                                    proportion.P.only.lose.P.gain.F *
-                                                    (1-proportion.change.to.F.with.formulary.change) +
-                                                proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.with.full.pay *
-                                                    proportion.adap.full.pay.and.premium.without.cost.sharing.who.change.eligibility.to.full.pay *
-                                                    (1-proportion.change.to.F.with.formulary.change)
-                                               ))
-)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.and.change.adap.premium.without.copay.to.full.pay.and.change.formulary',
-                        value = expression(baseline.proportion.pwh.with.adap * 
-                                               (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.without.full.pay *
+                                               (proportion.of.adap.who.are.suppressed.P.only * # P only: lose P, gain F, formulary change 
                                                     proportion.P.only.lose.P.gain.F *
                                                     proportion.change.to.F.with.formulary.change +
-                                                proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.with.full.pay *
-                                                    proportion.adap.full.pay.and.premium.without.cost.sharing.who.change.eligibility.to.full.pay *
+                                                    
+                                                    proportion.of.adap.who.are.suppressed.P.among.FP * # P among FP: lose P, formulary change 
+                                                    proportion.FP.lose.P *
                                                     proportion.change.to.F.with.formulary.change
                                                ))
 )
 
+# P3: Change P to F, WITHOUT formulary change (either from P only or from FP)
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.with.adap.premium.without.cost.sharing.unchanged',
+                        name = 'proportion.pwh.who.are.suppressed.change.P.to.F', # (no formulary change)
                         value = expression(baseline.proportion.pwh.with.adap * 
-                                               (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.without.full.pay *
+                                               (proportion.of.adap.who.are.suppressed.P.only * # P only: lose P, gain F
+                                                    proportion.P.only.lose.P.gain.F *
+                                                    (1-proportion.change.to.F.with.formulary.change) +
+                                                    
+                                                proportion.of.adap.who.are.suppressed.P.among.FP * # P among FP: lose P 
+                                                    proportion.FP.lose.P * 
+                                                    (1-proportion.change.to.F.with.formulary.change)
+                                               ))
+)
+
+# P4: Keep P 
+register.model.quantity(ADAP.SPECIFICATION,
+                        name = 'proportion.pwh.who.are.suppressed.P.unchanged',
+                        value = expression(baseline.proportion.pwh.with.adap * 
+                                               (proportion.of.adap.who.are.suppressed.P.only * # P only: unchanged 
                                                     (1-proportion.P.only.lose.P-proportion.P.only.lose.P.gain.F) +
-                                                proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.with.full.pay *
-                                                    (1-proportion.adap.full.pay.and.premium.without.cost.sharing.who.lose.premium.eligibility-proportion.adap.full.pay.and.premium.without.cost.sharing.who.change.eligibility.to.full.pay)
+                                                    
+                                                proportion.of.adap.who.are.suppressed.P.among.FP * # P among FP: unchanged 
+                                                    (1-proportion.FP.lose.P-proportion.FP.lose.P)
                                                ))
 )
 
 
 
 # Premium (P) suppression components
+# P only suppression 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.without.full.pay',
-                        value = expression(baseline.p.of.adap.with.premium.without.cost.sharing *
+                        name = 'proportion.of.adap.who.are.suppressed.P.only',
+                        value = expression(baseline.p.of.P.only.among.adap * 
                                                fraction.time.covered.among.P *
                                                proportion.P.only.suppressed
                         ))
 
+# P among FP suppression
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.without.cost.sharing.from.with.full.pay',
-                        value = expression(baseline.p.of.adap.with.full.pay.and.premium.without.cost.sharing *
+                        name = 'proportion.of.adap.who.are.suppressed.P.among.FP',
+                        value = expression(baseline.p.of.FP.among.adap *
                                                fraction.time.P.among.FP *
                                                proportion.FP.suppressed
                         ))
 
 
 
+
 #-- Suppression Among Premium AND Cost-Sharing (PCs) --#
+# 6 things they can do: 
+# PCs1: Lose PCs
+# PCs2: Change to F with formulary change
+# PCs3: Change to F without formulary change
+# PCs4: Lose Cs 
+# PCs5: Keep PCs with formulary change (only applies to Cp)
+# PCs6: Keep PCs without formulary change  (only applies to Cp)
+
+# PCs1: Lose PCs (either from PCs or from FPCs)
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.and.lose.adap.premium.and.cost.sharing',
+                        name = 'proportion.pwh.who.are.suppressed.lose.PCs',
                         value = expression(baseline.proportion.pwh.with.adap * 
-                                               (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.without.full.pay *
+                                               
+                                               # over the course of the year, only ever had PCs
+                                               (proportion.of.adap.who.are.suppressed.PCs * 
                                                     proportion.PCs.lose.PCs +
-                                                proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.with.full.pay *
-                                                    proportion.adap.full.pay.and.premium.and.cost.sharing.who.lose.premium.and.cost.sharing.eligibility
+                                               
+                                                    # over the course of the year, they have FPCs, but at this point in time, how many have PCs and are suppressed 
+                                                    # (implicitly lose F - if they didn't lose F, they'd switch to F)
+                                                    proportion.of.adap.who.are.suppressed.PCs.among.FPCs * 
+                                                    proportion.FPCs.lose.FPCs 
                                                ))
 )
 
+# PCs2: Change to F with formulary change (either from PCs or from FPCs)
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.and.change.adap.premium.and.cost.sharing.to.full.pay.and.change.formulary',
+                        name = 'proportion.pwh.who.are.suppressed.change.PCs.to.F.change.formulary',
                         value = expression(baseline.proportion.pwh.with.adap * 
-                                               (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.without.full.pay *
+                                               (proportion.of.adap.who.are.suppressed.PCs * # PCs: lose PCs, gain F, formulary change
                                                     proportion.PCs.lose.PCs.gain.F *
                                                     proportion.change.to.F.with.formulary.change +
-                                                proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.with.full.pay *
-                                                    proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.full.pay *
+                                                    
+                                                proportion.of.adap.who.are.suppressed.PCs.among.FPCs * # PCs among FPCs: lose PCs, formulary change 
+                                                    proportion.FPCs.lose.PCs * 
                                                     proportion.change.to.F.with.formulary.change
                                                ))
 )
 
+# PCs3: Change to F without formulary change (either from PCs or from FPCs)
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.and.change.adap.premium.and.cost.sharing.to.full.pay.without.formulary.change',
+                        name = 'proportion.pwh.who.are.suppressed.change.PCs.to.F',
                         value = expression(baseline.proportion.pwh.with.adap * 
-                                               (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.without.full.pay *
+                                               (proportion.of.adap.who.are.suppressed.PCs * # PCs: lose PCs, gain F
                                                     proportion.PCs.lose.PCs.gain.F *
                                                     (1 - proportion.change.to.F.with.formulary.change) +
-                                                proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.with.full.pay *
-                                                    proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.full.pay *
+                                                    
+                                                proportion.of.adap.who.are.suppressed.PCs.among.FPCs * # PCs among FPCs: lose PCs
+                                                    proportion.FPCs.lose.PCs * 
                                                     (1 - proportion.change.to.F.with.formulary.change)
                                                ))
 )
 
+# PCs4: Lose Cs (PCs --> P, FPCs --> FP, FPCs --> P)
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.and.change.adap.premium.and.cost.sharing.to.premium.without.cost.sharing',
+                        name = 'proportion.pwh.who.are.suppressed.change.PCs.to.P',
                         value = expression(baseline.proportion.pwh.with.adap * 
-                                               (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.without.full.pay *
+                                               (proportion.of.adap.who.are.suppressed.PCs * # PCs: lose Cs
                                                     proportion.PCs.lose.Cs +
-                                                proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.with.full.pay *
+                                                    
+                                                proportion.of.adap.who.are.suppressed.PCs.among.FPCs * # PCs among FPCs: lose Cs 
+                                                    proportion.FPCs.lose.Cs + 
+                                                
+                                                proportion.of.adap.who.are.suppressed.PCs.among.FPCs * # PCs among FPCs: lose FCs 
                                                     proportion.FPCs.lose.FCs
                                                ))
 )
 
+# PCs5: Keep PCs with formulary change; only applies to Cp (either from PCs or from FPCs)
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.and.keep.adap.premium.and.copay.but.change.formulary',
+                        name = 'proportion.pwh.who.are.suppressed.PCp.change.formulary', # formulary only impacts if they're cost-sharing is specifically copay
                         value = expression(baseline.proportion.pwh.with.adap * 
-                                               (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.without.full.pay *
+                                               (proportion.of.adap.who.are.suppressed.PCs * # PCs: keep PCs, formulary 
                                                     (1 - proportion.PCs.lose.PCs -
                                                          proportion.PCs.lose.PCs.gain.F -
                                                          proportion.PCs.lose.Cs) *
-                                                    proportion.PCs.clients.with.Cp *
+                                                    proportion.PCs.clients.with.Cp * # only applies to copay - need to multiply in this proportion 
                                                     proportion.PCp.clients.with.formulary.change +
-                                                proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.with.full.pay *
-                                                    (1 - proportion.adap.full.pay.and.premium.and.cost.sharing.who.lose.premium.and.cost.sharing.eligibility -
-                                                         proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.full.pay -
-                                                         proportion.FPCs.lose.FCs) *
+                                                    
+                                                proportion.of.adap.who.are.suppressed.PCs.among.FPCs * # PCs among FPCs: keep PCs, formulary 
+                                                    (1 - proportion.FPCs.lose.FPCs  - 
+                                                         proportion.FPCs.lose.PCs -
+                                                         proportion.FPCs.lose.FCs - 
+                                                         proportion.FPCs.lose.Cs) *
                                                     proportion.FPCs.clients.with.Cp *
                                                     proportion.PCp.clients.with.formulary.change
                                                ))
 )
-
+# PCs6: Keep PCs without formulary change; only applies to Cp (either from PCs or from FPCs)
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.and.keep.adap.premium.and.cost.sharing.unchanged',
+                        name = 'proportion.pwh.who.are.suppressed.PCs.unchanged',
                         value = expression(baseline.proportion.pwh.with.adap * 
-                                               (proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.without.full.pay *
+                                               (proportion.of.adap.who.are.suppressed.PCs * # PCs: keep PCs (unchanged) 
                                                     (1 - proportion.adap.full.pay.and.premium.and.cost.sharing.who.lose.eligibility -
                                                          proportion.PCs.lose.PCs.gain.F -
                                                          proportion.PCs.lose.Cs) *
                                                     (1 - proportion.PCs.clients.with.Cp * proportion.PCp.clients.with.formulary.change) +
-                                                proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.with.full.pay *
-                                                    (1 - proportion.adap.full.pay.and.premium.and.cost.sharing.who.lose.premium.and.cost.sharing.eligibility -
-                                                         proportion.adap.full.pay.and.premium.and.cost.sharing.who.change.eligibility.to.full.pay -
-                                                         proportion.FPCs.lose.FCs) *
+                                                    
+                                                proportion.of.adap.who.are.suppressed.PCs.among.FPCs * # PCs among FPCs: keep PCs (unchanged) 
+                                                    (1 - proportion.FPCs.lose.FPCs  - 
+                                                         proportion.FPCs.lose.PCs - 
+                                                         proportion.FPCs.lose.FCs- 
+                                                         proportion.FPCs.lose.Cs) *
                                                     (1 - proportion.FPCs.clients.with.Cp * proportion.PCp.clients.with.formulary.change)
                                                ))
 )
 
 
 
- 
-
-
 # Premium and cost-sharing (PCs) suppression components
+# PCs suppression
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.without.full.pay',
-                        value = expression(baseline.p.of.adap.with.premium.and.cost.sharing *
+                        name = 'proportion.of.adap.who.are.suppressed.PCs',
+                        value = expression(baseline.p.of.PCs.among.adap * 
                                                fraction.time.covered.among.PCs *
                                                proportion.PCs.suppressed
                         ))
 
+# PCs among FPCs suppression
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.premium.and.cost.sharing.from.with.full.pay',
-                        value = expression(baseline.p.of.adap.with.full.pay.and.premium.and.cost.sharing *
+                        name = 'proportion.of.adap.who.are.suppressed.PCs.among.FPCs',
+                        value = expression(baseline.p.of.FPCs.among.adap *
                                                fraction.time.PCs.among.FPCs *
                                                proportion.FPCs.suppressed
                         ))
@@ -2979,54 +3067,71 @@ register.model.quantity(ADAP.SPECIFICATION,
 
 
 #-- Suppression Among Cost-Sharing (Cs) --#
+# 3 things they can do: 
+# Cs1: Lose Cs
+# Cs2: Keep Cs with formulary change
+# Cs3: Keep Cs without formulary change
+
+# Cs1: Lose Cs (either from Cs only or from FCs)
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.and.lose.adap.cost.sharing.without.premium',
+                        name = 'proportion.pwh.who.are.suppressed.lose.Cs',
                         value = expression(baseline.proportion.pwh.with.adap * 
-                                               (proportion.of.adap.who.are.suppressed.with.baseline.adap.cost.sharing.without.premium.from.without.full.pay *
+                                               
+                                               # over the course of the year, only ever had Cs 
+                                               (proportion.of.adap.who.are.suppressed.Cs.only *
                                                     proportion.Cs.only.lose.Cs +
-                                                proportion.of.adap.who.are.suppressed.with.baseline.adap.cost.sharing.without.premium.from.with.full.pay *
+                                                    
+                                                    # over the course of the year, they had FCs, but at this point in time, how many have Cs and are suppressed
+                                                    proportion.of.adap.who.are.suppressed.Cs.among.FCs *
                                                     proportion.FCs.lose.Cs
                                                ))
 )
 
+# Cs2: Keep Cs with formulary change (either from Cs or from FCs)
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.and.keep.adap.copay.without.premium.but.change.formulary',
+                        name = 'proportion.pwh.who.are.suppressed.Cp.change.formulary',
                         value = expression(baseline.proportion.pwh.with.adap * 
-                                               (proportion.of.adap.who.are.suppressed.with.baseline.adap.cost.sharing.without.premium.from.without.full.pay *
+                                               (proportion.of.adap.who.are.suppressed.Cs.only * # Cs only: formulary 
                                                     (1-proportion.Cs.only.lose.Cs) *
-                                                    proportion.Cs.clients.with.Cp *
+                                                    proportion.Cs.clients.with.Cp * # among co-pay only 
                                                     proportion.Cp.clients.with.formulary.change +
-                                                proportion.of.adap.who.are.suppressed.with.baseline.adap.cost.sharing.without.premium.from.with.full.pay *
+                                                    
+                                                proportion.of.adap.who.are.suppressed.Cs.among.FCs * # Cs among FCs: formulary 
                                                     (1-proportion.FCs.lose.Cs) *
-                                                    proportion.FPCs.clients.with.Cp *
-                                                    proportion.adap.copay.and.premium.clients.with.formulary.change
+                                                    proportion.FCs.clients.with.Cp * # among co-pay only 
+                                                    proportion.Cp.clients.with.formulary.change # for now, assuming that the proportion with formulary change is the same for all Cp (not factoring in the F component here)
                                                ))
 )
 
+#Cs3: Keep Cs without formulary change (either from Cs or from FCs)
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.and.keep.adap.cost.sharing.without.premium.unchanged',
+                        name = 'proportion.pwh.who.are.suppressed.Cs.unchanged', 
                         value = expression(baseline.proportion.pwh.with.adap * 
-                                               (proportion.of.adap.who.are.suppressed.with.baseline.adap.cost.sharing.without.premium.from.without.full.pay *
+                                               (proportion.of.adap.who.are.suppressed.Cs.only *
                                                     (1-proportion.Cs.only.lose.Cs) *
-                                                    (1 - proportion.Cs.clients.with.Cp * proportion.Cp.clients.with.formulary.change) +
-                                                proportion.of.adap.who.are.suppressed.with.baseline.adap.cost.sharing.without.premium.from.with.full.pay *
+                                                    (1 - proportion.Cs.clients.with.Cp * 
+                                                         proportion.Cp.clients.with.formulary.change) +
+                                                proportion.of.adap.who.are.suppressed.Cs.among.FCs *
                                                     (1-proportion.FCs.lose.Cs) *
-                                                    (1 - proportion.FPCs.clients.with.Cp * proportion.adap.copay.and.premium.clients.with.formulary.change)
+                                                    (1 - proportion.FCs.clients.with.Cp * 
+                                                         proportion.Cp.clients.with.formulary.change) # for now, assuming that the proportion with formulary change is the same for all Cp (not factoring in the F component here)
                                                ))
 )
 
 
 # Cost-sharing (Cs) suppression components
+# Cs suppression 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.cost.sharing.without.premium.from.without.full.pay',
-                        value = expression(baseline.p.of.adap.with.cost.sharing.without.premium *
+                        name = 'proportion.of.adap.who.are.suppressed.Cs.only',
+                        value = expression(baseline.p.of.Cs.only.among.adap * 
                                                fraction.time.covered.among.Cs *
                                                proportion.Cs.only.suppressed
                         ))
 
+# Cs among FCs suppression 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.of.adap.who.are.suppressed.with.baseline.adap.cost.sharing.without.premium.from.with.full.pay',
-                        value = expression(baseline.p.of.adap.with.full.pay.and.cost.sharing.without.premium *
+                        name = 'proportion.of.adap.who.are.suppressed.Cs.among.FCs',
+                        value = expression(baseline.p.of.FCs.among.adap *
                                                fraction.time.Cs.among.FCs *
                                                proportion.FCs.suppressed
                         ))
@@ -3036,32 +3141,33 @@ register.model.quantity(ADAP.SPECIFICATION,
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.without.adap',
                         value = expression(
-                                super.suppression.of.diagnosed - 
+                            super.suppression.of.diagnosed - 
                                 
-                                proportion.pwh.who.are.suppressed.with.adap.full.pay.unchanged -
-                                proportion.pwh.who.are.suppressed.with.adap.premium.without.cost.sharing.unchanged -
-                                proportion.pwh.who.are.suppressed.with.adap.premium.and.cost.sharing.unchanged -
-                                proportion.pwh.who.are.suppressed.with.adap.cost.sharing.without.premium.unchanged -
+                                # ADAP Unchanged
+                                proportion.pwh.who.are.suppressed.F.unchanged -
+                                proportion.pwh.who.are.suppressed.P.unchanged -
+                                proportion.pwh.who.are.suppressed.PCs.unchanged -
+                                proportion.pwh.who.are.suppressed.Cs.unchanged -
                                 
                                 # Lose ADAP
-                                proportion.pwh.who.are.suppressed.and.lose.adap.full.pay -
-                                proportion.pwh.who.are.suppressed.and.lose.adap.premium.without.cost.sharing -
-                                proportion.pwh.who.are.suppressed.and.lose.adap.premium.and.cost.sharing - 
-                                proportion.pwh.who.are.suppressed.and.lose.adap.cost.sharing.without.premium -
-
+                                proportion.pwh.who.are.suppressed.lose.F -
+                                proportion.pwh.who.are.suppressed.lose.P -
+                                proportion.pwh.who.are.suppressed.lose.PCs - 
+                                proportion.pwh.who.are.suppressed.lose.Cs -
+                                
                                 # Change ADAP
-                                proportion.pwh.who.are.suppressed.and.change.adap.premium.without.cost.sharing.to.full.pay.without.formulary.change -
-                                proportion.pwh.who.are.suppressed.and.change.adap.premium.and.cost.sharing.to.full.pay.without.formulary.change -
-                                proportion.pwh.who.are.suppressed.and.change.adap.premium.and.cost.sharing.to.premium.without.cost.sharing -
-
+                                proportion.pwh.who.are.suppressed.change.P.to.F -
+                                proportion.pwh.who.are.suppressed.change.PCs.to.F -
+                                proportion.pwh.who.are.suppressed.change.PCs.to.P -
+                                
                                 # Formulary Change
-                                proportion.pwh.who.are.suppressed.and.keep.adap.full.pay.but.change.formulary -
-                                proportion.pwh.who.are.suppressed.and.keep.adap.premium.and.copay.but.change.formulary - 
-                                proportion.pwh.who.are.suppressed.and.keep.adap.copay.without.premium.but.change.formulary -
+                                proportion.pwh.who.are.suppressed.F.change.formulary -
+                                proportion.pwh.who.are.suppressed.PCp.change.formulary - 
+                                proportion.pwh.who.are.suppressed.Cp.change.formulary -
                                 
-                                proportion.pwh.who.are.suppressed.and.change.adap.premium.without.copay.to.full.pay.and.change.formulary -
-                                proportion.pwh.who.are.suppressed.and.change.adap.premium.and.cost.sharing.to.full.pay.and.change.formulary
-                                
+                                proportion.pwh.who.are.suppressed.change.P.to.F.change.formulary -
+                                proportion.pwh.who.are.suppressed.change.PCs.to.F.change.formulary
+                            
                         ))
 
 
@@ -3230,7 +3336,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 ##-- ADAP SUPPRESSION CALCULATED QUANTITIES --##
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.with.adap.full.pay.unchanged',
+                        name = 'proportion.pwh.who.are.suppressed.F.unchanged',
                         value = expression(proportion.pwh.with.adap.full.pay * # This is calculated as baseline.proportion.pwh.with.adap.full.pay * (1-proportion.adap.full.pay.clients.above.new.fpl.threshold)
                                                (1-proportion.adap.full.pay.or.copay.assistance.clients.with.formulary.change) * 
                                                proportion.adap.full.pay.suppressed))
@@ -3242,7 +3348,7 @@ register.model.quantity(ADAP.SPECIFICATION,
                                                proportion.adap.insurance.suppressed))
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.and.lose.adap.full.pay',
+                        name = 'proportion.pwh.who.are.suppressed.lose.F',
                         value = expression(baseline.proportion.pwh.with.adap.full.pay * proportion.adap.full.pay.clients.above.new.fpl.threshold),
                         scale = 'proportion')
 
@@ -3262,10 +3368,10 @@ register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.without.adap',
                         value = expression(super.suppression.of.diagnosed - 
                                                
-                                               proportion.pwh.who.are.suppressed.with.adap.full.pay.unchanged -
+                                               proportion.pwh.who.are.suppressed.F.unchanged -
                                                proportion.pwh.who.are.suppressed.with.adap.insurance.unchanged -
                                                
-                                               proportion.pwh.who.are.suppressed.and.lose.adap.full.pay - 
+                                               proportion.pwh.who.are.suppressed.lose.F - 
                                                proportion.pwh.who.are.suppressed.and.lose.adap.insurance - 
                                                
                                                proportion.pwh.who.are.suppressed.and.keep.adap.but.change.formulary

@@ -59,8 +59,10 @@ load.calibration.simsets <- function(locations,
                                      force.reload        = FALSE,
                                      append              = TRUE,
                                      verbose             = TRUE,
-                                     version             = "shield") {
-    
+                                     version             = "shield",
+                                     root.dir            = NULL
+                                     ) {
+    if (is.null(root.dir)) root.dir <- get.jheem.root.directory()
     # Extract names and codes from named vector
     location.codes <- unname(locations)
     location.names <- names(locations)
@@ -165,7 +167,7 @@ load.calibration.simsets <- function(locations,
         
         calib.progress <- tryCatch(
             get.calibration.progress(version = version, locations = locs.for.code,
-                                     calibration.code = calib.code),
+                                     calibration.code = calib.code,root.dir = root.dir),
             error = function(e) NULL
         )
         
@@ -200,19 +202,18 @@ load.calibration.simsets <- function(locations,
             if (verbose) message("  Loading: ", simset.key, load.label)
             
             full.simset <- if (pct < 100) {
-                tryCatch(
-                    assemble.simulations.from.calibration(
+                tryCatch(assemble.simulations.from.calibration(
                         version = version, location = loc.code,
-                        calibration.code = calib.code, allow.incomplete = TRUE
-                    ),
+                        calibration.code = calib.code, allow.incomplete = TRUE,
+                        root.dir = root.dir),
                     error = function(e) { warning("Error assembling '", simset.key, "': ", e$message); NULL }
                 )
             } else {
-                tryCatch(
-                    retrieve.simulation.set(
+                tryCatch(retrieve.simulation.set(
                         version = version, location = loc.code,
-                        calibration.code = calib.code, n.sim = n.sim
-                    ),
+                        calibration.code = calib.code, n.sim = n.sim,
+                        root.dir = root.dir
+                        ),
                     error = function(e) { warning("Error retrieving '", simset.key, "': ", e$message); NULL }
                 )
             }
@@ -319,7 +320,10 @@ create_plots_for_calibration <- function(calibration.code,
                                          calibration.simsets = NULL,
                                          style.manager       = NULL,
                                          create.dirs         = TRUE,
-                                         use.full.simset     = FALSE) {
+                                         use.full.simset     = FALSE,
+                                         root.dir            = NULL) {
+    
+    if (is.null(root.dir)) root.dir <- get.jheem.root.directory()
     
     calibration.simsets <- .resolve.calibration.simsets(calibration.simsets,
                                                         "create_plots_for_calibration")
@@ -359,7 +363,7 @@ create_plots_for_calibration <- function(calibration.code,
         }
         
         title_suffix <- entry$title_suffix
-        plotting_path <- file.path(get.jheem.root.directory(), "shield", "calibrationPlots",
+        plotting_path <- file.path(root.dir, "shield", "calibrationPlots",
                                    calibration.code, loc.code, "")
         
         tryCatch(ensure.plot.dir(plotting_path, create.dirs),
@@ -445,7 +449,10 @@ create_multipanel_comparison <- function(calibration.codes,
                                          style.manager       = NULL,
                                          summary.type        = "median.and.interval",
                                          plot.which          = "sim.and.data",
-                                         verbose             = TRUE) {
+                                         verbose             = TRUE,
+                                         root.dir            = NULL) {
+    
+    if (is.null(root.dir)) root.dir <- get.jheem.root.directory()
     
     separate.by <- match.arg(separate.by)
     
@@ -600,7 +607,7 @@ create_multipanel_comparison <- function(calibration.codes,
     calib_label <- if (length(calibration.codes) == 1) calibration.codes[1] else
         paste0(calibration.codes[1], "_vs_", length(calibration.codes) - 1, "_others")
     
-    root_dir <- file.path(get.jheem.root.directory(), "shield", "calibrationPlots",
+    root_dir <- file.path(root.dir, "shield", "calibrationPlots",
                           "comparison", sanitize(calib_label), paste0("by_", separate.by), "")
     
     tryCatch(ensure.plot.dir(root_dir, create.dirs),

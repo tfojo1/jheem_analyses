@@ -2,7 +2,7 @@
 #
 # USAGE
 #   Launch over SSH (survives logout):
-#       nohup bash applications/SHIELD/launch_sequential_stages.sh > applications/SHIELD/logs/launcher.out 2>&1 &
+#       nohup bash applications/SHIELD/launchers/launch_sequential_stages.sh > applications/SHIELD/logs/launcher.out 2>&1 &
 #   Kill Runs:
 #       pkill -u pkasaie1 -x R
 #       pkill -u pkasaie1 -f "Rscript"
@@ -27,21 +27,33 @@
 #
 # ON FAILURE
 #   The failed city prints to stderr and releases its slot.
-#   All other cities keep running_cities untouched.
+#   All other cities keep running.
 #   Check logs/<loc>_<calibration_code>.out for the R-level error message.
 
+# ── shell options ──────────────────────────────────────────────────────────────
+set -uo pipefail   # `set -e` deliberately omitted: one failed city must not abort the launcher
 
 # ── resolve paths relative to this script's location ──────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LOG_DIR="$SCRIPT_DIR/logs"
+PARENT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"   # launchers live in a subfolder; R scripts + logs are one level up
+LOG_DIR="$PARENT_DIR/logs"
 mkdir -p "$LOG_DIR"
 
+# ── where runs are written ─────────────────────────────────────────────────────
+# mcmc_runs/ and simulations/ are written into the log folder, on local disk,
+# rather than onto the NAS. Export JHEEM_ROOT_DIR before launching to send a run
+# somewhere else - e.g. JHEEM_ROOT_DIR=/mnt/jheem_nas_share puts it back on the
+# NAS. Every stage of a pipeline must use the same value; a run cannot find the
+# output of a setup step that wrote elsewhere.
+export JHEEM_ROOT_DIR="${JHEEM_ROOT_DIR:-$LOG_DIR}"
+
+# ── shared helpers ─────────────────────────────────────────────────────────────
+source "$SCRIPT_DIR/_shield_slots.sh"
 
 # ── thread settings ────────────────────────────────────────────────────────────
 export OPENBLAS_NUM_THREADS=1
 export OMP_NUM_THREADS=1
 export MKL_NUM_THREADS=1
-
 
 # ── config ─────────────────────────────────────────────────────────────────────
 allLocs=(
@@ -68,16 +80,31 @@ CITIES=("${ten_cities[@]}")
 # Calibration codes run sequentially per city — each is a separate Rscript process
 # so the OS fully reclaims memory between them
 CALIBRATION_CODES=(
-    calib.7.10.stage0.pk
-    calib.7.10.stage1.pk
+    calib.9.19.stage0
+    calib.9.19.stage1
+    calib.9.19.stage2
 )
 
-SCRIPT="$SCRIPT_DIR/shield_calib_setup_and_run_modular.R"
+SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
+
+# MAX_CITIES = max cities in flight at once. Each city runs its calibration codes
+# sequentially (1 core each), so peak cores = MAX_CITIES.
 MAX_CITIES=20
 
 # ── preflight ──────────────────────────────────────────────────────────────────
 if [[ ! -f "$SCRIPT" ]]; then
     echo "Error: R script not found at $SCRIPT" >&2
+    exit 1
+fi
+
+# non-empty config guard: `set -u` does NOT catch a typo'd array name
+# (an undefined array expands to empty), so check explicitly.
+if (( ${#CITIES[@]} == 0 )); then
+    echo "Error: CITIES is empty — check the array name in the config block above" >&2
+    exit 1
+fi
+if (( ${#CALIBRATION_CODES[@]} == 0 )); then
+    echo "Error: CALIBRATION_CODES is empty — check the array name in the config block above" >&2
     exit 1
 fi
 
@@ -112,19 +139,12 @@ run_city() {
 
 
 # ── job-slot manager ───────────────────────────────────────────────────────────
-running_cities=0
-
 for loc in "${CITIES[@]}"; do
 
-    while (( running_cities >= MAX_CITIES )); do
-        wait -n -p done_pid
-        (( running_cities-- ))
-        echo "[$(date '+%F %T')] SLOT FREED (PID $done_pid, running_cities=$running_cities)"
-    done
+    wait_for_slot "$MAX_CITIES" cities
 
     run_city "$loc" "${CALIBRATION_CODES[@]}" &
-    (( running_cities++ ))
-    echo "[$(date '+%F %T')] LAUNCHED $loc (PID $!, running_cities=$running_cities)"
+    echo "[$(date '+%F %T')] LAUNCHED $loc (PID $!, running_cities=$(running_slots))"
 
 done
 

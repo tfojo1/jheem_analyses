@@ -8,7 +8,7 @@
 source('applications/SHIELD/shield_specification.R')
 
 VERSION='shield'
-LOCATION='C.12580' #Baltimore MSA
+LOCATION='C.35620' #Baltimore MSA
 # LOCATION='C.35620'#NYC 
 
 
@@ -17,8 +17,18 @@ engine = create.jheem.engine( VERSION,  LOCATION, end.year = 2030)
 specification.metadata=get.specification.metadata(VERSION,LOCATION)
 params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
 sim = engine$run(params)
+# 
+# simLast<-extract.last.simulation.from.calibration(VERSION, LOCATION,'calib.8.21.stage3.az',allow.incomplete = T )
+# parameLast<-simLast$get.params()
+# simManual = engine$run(parameLast)
+simplot(sim, "diagnosis.ps",split.by="sex",plot.which = "sim.only")
+
+simplot(calibration.simsets$`NYC – calib.9.19.stage0`$full_simset$last.sim(), "diagnosis.ps",split.by="sex",plot.which = "sim.only")
+calibration.simsets$`NYC – calib.9.19.stage0`$full_simset$get.mcmc.mixing.statistic()
 
 
+
+# simplot(simManual, "transmission.rate")
 
 if (1==2) {
 

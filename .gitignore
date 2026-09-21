@@ -24,3 +24,6 @@ Rplots.pdf
 jheem_analyses.Rproj
 .RData
 .positai
+
+# testthat scratch output from the SHIELD suite
+applications/SHIELD/tests/testthat/_snaps/

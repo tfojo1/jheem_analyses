@@ -2,7 +2,7 @@
 #
 # USAGE
 #   Launch over SSH (survives logout):
-#       nohup bash applications/SHIELD/launch_parallel_stages.sh > applications/SHIELD/logs/launcher.out 2>&1 &
+#       nohup bash applications/SHIELD/launchers/launch_parallel_stages.sh > applications/SHIELD/logs/launcher.out 2>&1 &
 #   Kill Runs:
 #       pkill -u pkasaie1 -x R
 #       pkill -u pkasaie1 -f "Rscript"
@@ -27,21 +27,25 @@
 #
 # ON FAILURE
 #   The failed city prints to stderr and releases its slot.
-#   All other cities keep running_jobs untouched.
+#   All other cities keep running.
 #   Check logs/<loc>_<calibration_code>.out for the R-level error message.
 
+# ── shell options ──────────────────────────────────────────────────────────────
+set -uo pipefail   # `set -e` deliberately omitted: one failed city must not abort the launcher
 
 # ── resolve paths relative to this script's location ──────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LOG_DIR="$SCRIPT_DIR/logs"
+PARENT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"   # launchers live in a subfolder; R scripts + logs are one level up
+LOG_DIR="$PARENT_DIR/logs"
 mkdir -p "$LOG_DIR"
 
+# ── shared helpers ─────────────────────────────────────────────────────────────
+source "$SCRIPT_DIR/_shield_slots.sh"
 
 # ── thread settings ────────────────────────────────────────────────────────────
 export OPENBLAS_NUM_THREADS=1
 export OMP_NUM_THREADS=1
 export MKL_NUM_THREADS=1
-
 
 # ── config ─────────────────────────────────────────────────────────────────────
 allLocs=(
@@ -73,12 +77,25 @@ CALIBRATION_CODES=(
     calib.7.30.stage2.LA.PA
 )
 
-SCRIPT="$SCRIPT_DIR/shield_calib_setup_and_run_modular.R"
+SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
+
+# MAX_JOBS = max concurrent Rscript processes on this machine (1 core each).
 MAX_JOBS=20
 
 # ── preflight ──────────────────────────────────────────────────────────────────
 if [[ ! -f "$SCRIPT" ]]; then
     echo "Error: R script not found at $SCRIPT" >&2
+    exit 1
+fi
+
+# non-empty config guard: `set -u` does NOT catch a typo'd array name
+# (an undefined array expands to empty), so check explicitly.
+if (( ${#CITIES[@]} == 0 )); then
+    echo "Error: CITIES is empty — check the array name in the config block above" >&2
+    exit 1
+fi
+if (( ${#CALIBRATION_CODES[@]} == 0 )); then
+    echo "Error: CALIBRATION_CODES is empty — check the array name in the config block above" >&2
     exit 1
 fi
 
@@ -97,22 +114,14 @@ run_calib_code() {
     echo "[$(date '+%F %T')] DONE    $loc :: $calib_code"
 }
 
-
 # ── job-slot manager ───────────────────────────────────────────────────────────
-running_jobs=0
-
 for loc in "${CITIES[@]}"; do
     for calib_code in "${CALIBRATION_CODES[@]}"; do
 
-        while (( running_jobs >= MAX_JOBS )); do
-            wait -n -p done_pid
-            (( running_jobs-- ))
-            echo "[$(date '+%F %T')] SLOT FREED (PID $done_pid, running_jobs=$running_jobs)"
-        done
+        wait_for_slot "$MAX_JOBS" jobs
 
         run_calib_code "$loc" "$calib_code" &
-        (( running_jobs++ ))
-        echo "[$(date '+%F %T')] LAUNCHED $loc :: $calib_code (PID $!, running_jobs=$running_jobs)"
+        echo "[$(date '+%F %T')] LAUNCHED $loc :: $calib_code (PID $!, running_jobs=$(running_slots))"
 
     done
 done

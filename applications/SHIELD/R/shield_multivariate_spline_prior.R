@@ -27,13 +27,13 @@
 #' @return A Multivariate.Lognormal.Distribution object for the parameter
 #' values at the six spline years.
 make.mv.spline.prior.five.points <- function(parameter,
-                                 logmean00,
-                                 logsd00,
-                                 logsd.delta95,
-                                 logsd.delta90,
-                                 logsd.delta70,
-                                 logsd.delta10,
-                                 logsd.delta17) {
+                                             logmean00,
+                                             logsd00,
+                                             logsd.delta95,
+                                             logsd.delta90,
+                                             logsd.delta70,
+                                             logsd.delta10,
+                                             logsd.delta17) {
     
     # Latent variables: (deltas are calculated between adjacent spline points)
     # x1 = log transmission rate at 2000: log(t2000)
@@ -217,7 +217,7 @@ make.mv.spline.prior <- function(parameters,
     )
     
     untransformed.sigma <- diag(latent_sds^2)
-
+    
     # ----------------------------
     # Build transformation matrix for one parameter
     # ----------------------------
@@ -237,8 +237,10 @@ make.mv.spline.prior <- function(parameters,
     # Fill past years
     if (length(past.times) > 0) {
         for (i in seq_along(past.times)) {
-            # The i-th past time uses baseline plus all deltas from baseline back to that time
-            M[i, 1:(i + 1)] <- 1
+            # The i-th past time (chronological, furthest first) accumulates its own delta
+                        # plus every delta between it and the baseline year.
+                            # Column 1 (baseline) is already set by M[,1] <- 1 above.
+                            M[i, (i + 1):(length(past.times) + 1)] <- 1
         }
     }
     
@@ -253,7 +255,7 @@ make.mv.spline.prior <- function(parameters,
             }
         }
     }
-     # ----------------------------
+    # ----------------------------
     # Transform mean and covariance
     # ----------------------------
     mu <- M %*% untransformed.mu
@@ -270,13 +272,13 @@ make.mv.spline.prior <- function(parameters,
     return(dist)
 }
 if (1==2){
-xx=make.mv.spline.prior(parameters = "transmission.msm",
-                        logmean.baseline = 2,
-                        logsd.baseline = 0.5*log(2),
-                        logsd.deltas =  c("1970"=log(2),"1990"=log(2),"2000"=log(2),"2010"=log(2),"2020"=log(2)),
-                        spline.times = c("1970","1990","2000","2010","2020"),
-                        baseline.year = "2000" )
-
+    xx=make.mv.spline.prior(parameters = "transmission.msm",
+                            logmean.baseline = 2,
+                            logsd.baseline = 0.5*log(2),
+                            logsd.deltas =  c("1970"=log(2),"1990"=log(2),"2000"=log(2),"2010"=log(2),"2020"=log(2)),
+                            spline.times = c("1970","1990","2000","2010","2020"),
+                            baseline.year = "2000" )
+    
 }
 # **************************************************************************************************************************************************************************
 # make.joint.mv.spline.prior----
@@ -382,7 +384,6 @@ make.joint.mv.spline.prior <- function(parameters,
         rep((1:n_col) * n_col - n_col, each=block_size) +
         rep(1:(n_col / block_size) * block_size - block_size, each = block_size^2)
     
-    #'@Andrew!!!
     # the baseline block is treated differently from the delta blocks
     # the code assumes baseline parameters are independent across parameters and they are always stacked
     untransformed_sigma[diagonal_block_idx] <- rep(c(
@@ -437,15 +438,15 @@ make.joint.mv.spline.prior <- function(parameters,
     # Each past year has 1s in the columns for itself and later years
     # E.g. 1990 might have 1s for 1990 and 1995 (along with the 2000 baseline)
     for (i in seq_len(num_past_years)) {
-        M[i,
-                        2 + 0 : (num_past_years - i)] <- 1
+        # M[i, 2 + 0 : (num_past_years - i)] <- 1
+        M[i, (i + 1):(num_past_years + 1)] <- 1
     }
     
     # Each future year has 1s in the columns for itself and earlier years
     # E.g. 2017 might have 1s for 2017 and 2010 (along with the 2000 baseline)
     for (i in seq_len(num_future_years)) {
         M[i + 1 + num_past_years,
-                        1 + num_past_years + 1:i] <- 1
+          1 + num_past_years + 1:i] <- 1
     }
     
     # Now expand it to consider all the parameters, as described above
@@ -466,18 +467,29 @@ make.joint.mv.spline.prior <- function(parameters,
 }
 # example ----
 if(1==2){
-xx=make.joint.mv.spline.prior(
-    parameters = paste0("transmission.rate.multiplier.", c("msm", "heterosexual")),
-    # parameters = c("A", "B"), # shorter names are easier for debugging the output array
-    logmean.baseline = c(log(3), 0),
-    logsd.baseline = c(log(2), log(2)),
-    logsd.deltas.past = c("1970" = log(1.5^2)/2,
-                          "1990" = log(sqrt(1.5))/2,
-                          "1995" = log(sqrt(1.5))/2),
-    logsd.deltas.future = c("2010" = log(1.5)/2,
-                            "2017" = log(1.5)/2),
-    spline.times = c("1970", "1990", "1995", "2000", "2010", "2017"),
-    correlation = 0.5)
+    xx=make.joint.mv.spline.prior(
+        parameters = paste0("transmission.rate.multiplier.", c("msm", "heterosexual")),
+        # parameters = c("A", "B"), # shorter names are easier for debugging the output array
+        logmean.baseline = c(log(3), 0),
+        logsd.baseline = c(log(2), log(2)),
+        logsd.deltas.past = c("1970" = log(1.5^2)/2,
+                              "1990" = log(sqrt(1.5))/2,
+                              "1995" = log(sqrt(1.5))/2),
+        logsd.deltas.future = c("2010" = log(1.5)/2,
+                                "2017" = log(1.5)/2),
+        spline.times = c("1970", "1990", "1995", "2000", "2010", "2017"),
+        correlation = 0.5)
+    
+    # Claude's test
+    source("R/shield_multivariate_spline_prior.R")
+    d <- make.joint.mv.spline.prior(
+        parameters = "X", logmean.baseline = 0, logsd.baseline = log(2)*2,
+        logsd.deltas.past   = c("1970"=10, "1990"=1, "1995"=0.1),   # exaggerated to make it obvious
+        logsd.deltas.future = c("2010"=1,  "2022"=0.1),
+        spline.times = c("1970","1990","1995","2000","2010","2022"), correlation = 0.7)
+    sqrt(diag(d@sigma))
+    # BUG:     1995 and 1990 both come back ~10  (they inherited 1970's huge delta)
+    # CORRECT: 1995 ~1.39, 1990 ~1.39, 1970 ~10.1
 }
 
 # finding a good p ----

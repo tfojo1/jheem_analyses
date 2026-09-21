@@ -10,21 +10,18 @@ source('../jheem_analyses/applications/SHIELD/analysis/calibration/calibration_h
 # source("../jheem_analyses/applications/SHIELD/shield_calib_register.R")
 
 
+
+
 # ---- SETUP ----
-# for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.7.30.stage2.LA.PA"))} #LA completed. PA stuck
-for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.8.21.stage3.az"))} 
+LOGS <- normalizePath("~/jheem/code/jheem_analyses/applications/SHIELD/logs/")
+for (x in SHIELD.TEN.MSAS) {
+    print(get.calibration.progress("shield",x,"calib.9.19.stage2",
+                                   root.dir = LOGS))
+    } 
 
 calibration.codes <- c(
-    # Version 7.16 #calibrating prp of male diagnosis among msm
-    # "calib.7.16.stage2.az", #all except PA complete. LA was repeated with a diff seed
-    # "calib.7.16.stage3.az" # completed for 8 cities except for LA/PA
-    
-    #Version 7.30 #calibrating diag rate among men
-    # ,"calib.7.30.stage2.az" #all cities complete. LA was repeated with a diff seed
-    # "calib.7.30.stage3.az"   # completed for 10 cities
-    
-    "calib.8.21.stage3.az"   # completed for 10 cities
-    
+    # "calib.8.21.stage3.az"   # completed for 10 cities
+    "calib.8.21.stage2"
 )
 
 # for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.16.stage2.az"))}
@@ -33,7 +30,9 @@ calibration.codes <- c(
 calib.simsets <- load.calib.simsets(
     locations         =  SHIELD.TEN.MSAS,
     calibration.codes = calibration.codes,
-    n.sim = 400
+    n.sim = 300,
+    # n.sim = 400,
+    ROOT.DIR
 )
 
 # Inspect mixing statistics -----

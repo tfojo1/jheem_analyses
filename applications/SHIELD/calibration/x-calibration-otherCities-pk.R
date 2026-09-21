@@ -14,6 +14,42 @@ for(x in SHIELD.TEN.MSAS  ){
     status<-get.calibration.progress('shield', locations = x, calibration.code = "calib.5.5.stage1.pk") #new stage1+30% msm.female.partnership
     print(status)
 }
+
+calibration.simsets$`NYC – calib.9.19.stage0`$full_simset$subset(1:10)$traceplot("transmission.rate.mu*.msm1970")
+calibration.simsets$`NYC – calib.9.19.stage0`$full_simset$traceplot("*.het")
+
+sim1=calibration.simsets$`NYC – calib.9.19.stage0`$full_simset$subset(1)
+
+sim6=calibration.simsets$`NYC – calib.9.19.stage0`$full_simset$subset(6)
+x<-c(sim6$get.params("transmission.rate.*.1970"),
+     sim6$get.params("transmission.rate.*.1990"),
+     sim6$get.params("transmission.rate.*.1995"),
+     sim6$get.params("transmission.rate.*.2000"),
+     sim6$get.params("transmission.rate.*.2010"),
+     sim6$get.params("transmission.rate.*.2022"))
+mu=TRANSMISSION.PARAMETERS.PRIOR@subdistributions$transmission.rate.multipliers.by.sex@mu
+sigma=TRANSMISSION.PARAMETERS.PRIOR@subdistributions$transmission.rate.multipliers.by.sex@sigma
+mvtnorm::dmvnorm(x,mean = mu,sigma = sigma,log = T)
+
+lik0<-instantiate.likelihood(lik.inst.stage0.2021,version = "shield","C.35620")
+lik0$compare.sims(sim1,sim6,piecewise = T,log = T)
+
+simplot(
+    calibration.simsets$`NYC – calib.9.19.stage1`$full_simset$subset(1),split.by = "sex",plot.which = "sim.only",
+    # sim6,
+    "diagnosis.ps",dimension.values = list(year=c(1990:2022)))
+
+
+
+head(calibration.simsets$`Atlanta – calib.9.19.stage2`$full_simset$get.mcmc.mixing.statistic())
+simsetA=calibration.simsets$`Atlanta – calib.9.19.stage2`$full_simset
+simsetA$parameters['transmission.rate.future.change.mult',]
+dimnames(simsetA$parameters)
+
+simplot(simsetA$subset(300),"diagnosis.ps")
+
+
+
 # 
 # # Reads completed runs
 # assign_simset_vars(SHIELD.TEN.MSAS[10],calibration.codes = "calib.5.4.stage1.az",n.sim = 300,sim.id = 1)
