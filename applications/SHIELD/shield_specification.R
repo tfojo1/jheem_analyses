@@ -754,7 +754,7 @@ register.model.element(SHIELD.SPECIFICATION,
 #                         name = "rate.sexual.transmission.flattened",
 #                         value = 0,
 #                         ) # one dimension "sex", plug in values for the 3 sexes
-# # Okay, but how does it do the flattening?
+# Okay, but how does it do the flattening?
 # register.model.quantity.subset(SHIELD.SPECIFICATION,
 #                                name = "rate.sexual.transmission.flattened",
 #                                value = "rate.sexual.transmission",
@@ -774,7 +774,14 @@ register.model.element(SHIELD.SPECIFICATION,
 # register.model.quantity.subset(SHIELD.SPECIFICATION,
 #                                name = 'rate.sexual.transmission.flattened',
 #                                applies.to = list(sex.to='msm'),
-#                                value = expression(global.transmission.rate.msm * transmission.rate.msm))
+#                                value = expression(global.transmission.rate.msm *transmission.rate.msm *
+#                                                       (
+#                                         (1-fraction.msm.pairings.with.female) *fraction.male.male.that.are.with.msm + #msm-to-msm
+#                                        (1-fraction.msm.pairings.with.female) * (1-fraction.male.male.that.are.with.msm) #msm-het           
+#                                        
+#                                        ))
+
+
 # register.model.quantity.subset(SHIELD.SPECIFICATION,
 #                                name = 'rate.sexual.transmission.flattened',
 #                                applies.to = list(sex.to=c('female','heterosexual_male')),
@@ -1677,8 +1684,8 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
 #                          name = "transmission.rates",
 #                          outcome.metadata = create.outcome.metadata(display.name = 'Transmission Rates',
 #                                                                     description = 'Transmission rates with respect to recipient',
-#                                                                     scale = 'non.negative.number',
-#                                                                     axis.name = 'Persons Infected per Encounter?',
+#                                                                     scale = 'rate',
+#                                                                     axis.name = 'rate',
 #                                                                     units = 'persons',
 #                                                                     singular.unit = 'person'),
 #                          value.to.integrate = "rate.sexual.transmission.flattened",
