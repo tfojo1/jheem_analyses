@@ -320,7 +320,10 @@ create_plots_for_calibration <- function(calibration.code,
                                          calibration.simsets = NULL,
                                          style.manager       = NULL,
                                          create.dirs         = TRUE,
-                                         use.full.simset     = FALSE) {
+                                         use.full.simset     = FALSE,
+                                         root.dir            = NULL) {
+    
+    if (is.null(root.dir)) root.dir <- get.jheem.root.directory()
     
     calibration.simsets <- .resolve.calibration.simsets(calibration.simsets,
                                                         "create_plots_for_calibration")
@@ -360,7 +363,7 @@ create_plots_for_calibration <- function(calibration.code,
         }
         
         title_suffix <- entry$title_suffix
-        plotting_path <- file.path(get.jheem.root.directory(), "shield", "calibrationPlots",
+        plotting_path <- file.path(root.dir, "shield", "calibrationPlots",
                                    calibration.code, loc.code, "")
         
         tryCatch(ensure.plot.dir(plotting_path, create.dirs),
@@ -446,7 +449,10 @@ create_multipanel_comparison <- function(calibration.codes,
                                          style.manager       = NULL,
                                          summary.type        = "median.and.interval",
                                          plot.which          = "sim.and.data",
-                                         verbose             = TRUE) {
+                                         verbose             = TRUE,
+                                         root.dir            = NULL) {
+    
+    if (is.null(root.dir)) root.dir <- get.jheem.root.directory()
     
     separate.by <- match.arg(separate.by)
     
@@ -601,7 +607,7 @@ create_multipanel_comparison <- function(calibration.codes,
     calib_label <- if (length(calibration.codes) == 1) calibration.codes[1] else
         paste0(calibration.codes[1], "_vs_", length(calibration.codes) - 1, "_others")
     
-    root_dir <- file.path(get.jheem.root.directory(), "shield", "calibrationPlots",
+    root_dir <- file.path(root.dir, "shield", "calibrationPlots",
                           "comparison", sanitize(calib_label), paste0("by_", separate.by), "")
     
     tryCatch(ensure.plot.dir(root_dir, create.dirs),
