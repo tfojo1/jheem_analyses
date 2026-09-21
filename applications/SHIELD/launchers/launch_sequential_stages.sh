@@ -45,7 +45,7 @@ mkdir -p "$LOG_DIR"
 # somewhere else - e.g. JHEEM_ROOT_DIR=/mnt/jheem_nas_share puts it back on the
 # NAS. Every stage of a pipeline must use the same value; a run cannot find the
 # output of a setup step that wrote elsewhere.
-export JHEEM_ROOT_DIR="${JHEEM_ROOT_DIR:-$LOG_DIR}"
+# export JHEEM_ROOT_DIR="${JHEEM_ROOT_DIR:-$LOG_DIR}"
 
 # ── shared helpers ─────────────────────────────────────────────────────────────
 source "$SCRIPT_DIR/_shield_slots.sh"
