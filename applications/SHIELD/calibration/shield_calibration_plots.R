@@ -35,13 +35,16 @@ stratum.style.manager  <- create.style.manager(color.data.by = "stratum")
 # read the data
 if (1==2)
 {
-    calibname <- "calib.5.19.stage2.pk"
+    calibname <- "calib.9.19.stage0"
     calibration.simsets <- load.calibration.simsets(
         locations           = SHIELD.TEN.MSAS,
         calibration.codes   = calibname,
-        assemble.incomplete = FALSE
+        assemble.incomplete = FALSE,
+        force.reload = T,
+        root.dir = "../jheem_analyses/applications/SHIELD/logs"
     )
-}
+
+    }
 # --- Per-city stage plots (all loaded locations) ---
 if (1 == 2) {
     stage     <- 2

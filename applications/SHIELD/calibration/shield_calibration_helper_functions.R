@@ -59,8 +59,10 @@ load.calibration.simsets <- function(locations,
                                      force.reload        = FALSE,
                                      append              = TRUE,
                                      verbose             = TRUE,
-                                     version             = "shield") {
-    
+                                     version             = "shield",
+                                     root.dir            = NULL
+                                     ) {
+    if (is.null(root.dir)) root.dir <- get.jheem.root.directory()
     # Extract names and codes from named vector
     location.codes <- unname(locations)
     location.names <- names(locations)
@@ -165,7 +167,7 @@ load.calibration.simsets <- function(locations,
         
         calib.progress <- tryCatch(
             get.calibration.progress(version = version, locations = locs.for.code,
-                                     calibration.code = calib.code),
+                                     calibration.code = calib.code,root.dir = root.dir),
             error = function(e) NULL
         )
         
@@ -200,19 +202,18 @@ load.calibration.simsets <- function(locations,
             if (verbose) message("  Loading: ", simset.key, load.label)
             
             full.simset <- if (pct < 100) {
-                tryCatch(
-                    assemble.simulations.from.calibration(
+                tryCatch(assemble.simulations.from.calibration(
                         version = version, location = loc.code,
-                        calibration.code = calib.code, allow.incomplete = TRUE
-                    ),
+                        calibration.code = calib.code, allow.incomplete = TRUE,
+                        root.dir = root.dir),
                     error = function(e) { warning("Error assembling '", simset.key, "': ", e$message); NULL }
                 )
             } else {
-                tryCatch(
-                    retrieve.simulation.set(
+                tryCatch(retrieve.simulation.set(
                         version = version, location = loc.code,
-                        calibration.code = calib.code, n.sim = n.sim
-                    ),
+                        calibration.code = calib.code, n.sim = n.sim,
+                        root.dir = root.dir
+                        ),
                     error = function(e) { warning("Error retrieving '", simset.key, "': ", e$message); NULL }
                 )
             }
