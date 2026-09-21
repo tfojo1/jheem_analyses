@@ -30,107 +30,170 @@ stratum.style.manager  <- create.style.manager(color.data.by = "stratum")
 
 
 # ****************************************************************************************************
-# USAGE EXAMPLES ----
+# READ DATA ----
 # ****************************************************************************************************
-# read the data
-if (1==2)
+if (1==1)
 {
-    calibname <- "calib.9.19.stage0"
+    calibname <- "calib.9.19.stage2"
+    LOGS <- normalizePath("~/jheem/code/jheem_analyses/applications/SHIELD/logs/")
+        #
     calibration.simsets <- load.calibration.simsets(
         locations           = SHIELD.TEN.MSAS,
         calibration.codes   = calibname,
         assemble.incomplete = FALSE,
-        force.reload = T,
-        root.dir = "../jheem_analyses/applications/SHIELD/logs"
+        # force.reload = T,
+        root.dir = LOGS
     )
-
-    }
+}
+# ****************************************************************************************************
+# FULL SET OF PLOTS ----
+# ****************************************************************************************************
 # --- Per-city stage plots (all loaded locations) ---
 if (1 == 2) {
     stage     <- 2
-    
+    calibname <- "calib.9.19.stage2"
+    SHARED.DRIVE <- normalizePath("~/../../home/jheem-shared/")
     # Plot ALL loaded locations
     create_plots_for_calibration(
         calibration.code = calibname,
         stage            = stage,
         create.dirs      = TRUE,
-    )
-    # Plot only Houston and Baltimore
-    create_plots_for_calibration(
-        calibration.code = calibname,
-        stage            = stage,
-        locations        = SHIELD.TEN.MSAS[c("Houston", "Baltimore")],
-        create.dirs      = TRUE
+        root.dir = SHARED.DRIVE
     )
 }
 
-
-# --- Multi-panel comparison by outcome ---
-if (1 == 2) {
+SHARED.DRIVE <- normalizePath("~/../../home/jheem-shared/")
+# # --- Multi-panel comparison by outcome ---
+if (1 == 1) {
+    calibname <- "calib.9.19.stage2"
     outcomes <- c("diagnosis.total", "diagnosis.ps",
                   "diagnosis.el.misclassified", "diagnosis.late.misclassified",
                   "hiv.testing")
-    
+
     # One file per outcome, panels = locations
-    create_multipanel_comparison(
-        calibration.codes = calibname,
-        locations         = SHIELD.TEN.MSAS,  # or NULL for all available
-        outcomes          = outcomes,
-        separate.by       = "outcome",
-        create.dirs       = TRUE
-    )
+    # create_multipanel_comparison(
+    #     calibration.codes = calibname,
+    #     locations         = "C.12060",  # or NULL for all available
+    #     outcomes          = outcomes,
+    #     separate.by       = "outcome",
+    #     create.dirs       = TRUE,
+    #     years = 1970:2030,
+    #     root.dir = SHARED.DRIVE
+    # )
     # One file per location, panels = outcomes
     create_multipanel_comparison(
         calibration.codes = calibname,
-        locations         = SHIELD.TEN.MSAS,
+        locations         = SHIELD.TEN.MSAS[1],
         outcomes          = outcomes,
         separate.by       = "location",
-        create.dirs       = TRUE
+        create.dirs       = TRUE,
+        years = 1970:2030,
+        root.dir = SHARED.DRIVE
+    )
+    create_multipanel_comparison(
+        calibration.codes = calibname,
+        split.by = "sex",
+        locations         = SHIELD.TEN.MSAS[1],
+        outcomes          = outcomes,
+        separate.by       = "location",
+        create.dirs       = TRUE,
+        years = 1970:2030,
+        root.dir = SHARED.DRIVE
+    )
+    create_multipanel_comparison(
+        calibration.codes = calibname,
+        split.by = "race",
+        locations         = SHIELD.TEN.MSAS[1],
+        outcomes          = outcomes,
+        separate.by       = "location",
+        create.dirs       = TRUE,
+        years = 1970:2030,
+        root.dir = SHARED.DRIVE
+    )
+    create_multipanel_comparison(
+        calibration.codes = calibname,
+        split.by = "sex", plot.which = "sim.only",
+        locations         = SHIELD.TEN.MSAS[1],
+        outcomes          = outcomes,
+        separate.by       = "location",
+        create.dirs       = TRUE,
+        years = 1970:2030,
+        root.dir = SHARED.DRIVE
+    )
+    create_multipanel_comparison(
+        calibration.codes = calibname,
+        split.by = "sex", facet.by = "race",
+        locations         = SHIELD.TEN.MSAS[1],
+        outcomes          = outcomes,
+        separate.by       = "location",
+        create.dirs       = TRUE,
+        years = 1970:2030,
+        root.dir = SHARED.DRIVE
     )
 }
 
 # --- Compare two calibration codes ---
+
+# calibration.simsets$`NYC – calib.9.19.stage0`$full_simset$get.mcmc.mixing.statistic()
+
 if (1 == 1) {
-    calibname1 <- "calib.5.12.stage2.pk"
-    calibname2 <- "calib.4.24.stage2.az"
-    
-    calibration.simsets <- load.calibration.simsets(
-        locations           = SHIELD.TEN.MSAS,
-        calibration.codes   = c(calibname1, calibname2),
-        assemble.incomplete = FALSE
-    )
-    
+    calibname <- c("calib.8.21.stage2.az","calib.9.19.stage2")
+    years = 1970:2030
+    # READ the outputs:
+    # calibration.simsets <- load.calibration.simsets(
+    #     locations           = SHIELD.TEN.MSAS,
+    #     calibration.codes   = "calib.8.21.stage2.az",
+    #     assemble.incomplete = FALSE
+    # )
+    # 
     outcomes <- c("diagnosis.total", "diagnosis.ps",
                   "diagnosis.el.misclassified", "diagnosis.late.misclassified",
                   "hiv.testing")
     
     # Each panel overlays both calibrations
     create_multipanel_comparison(
-        calibration.codes = c(calibname1, calibname2),
+        calibration.codes = calibname,
         locations         = SHIELD.TEN.MSAS,
         outcomes          = outcomes,
+        years = years,
         separate.by       = "outcome",
-        create.dirs       = TRUE
+        create.dirs       = TRUE,
+        root.dir = SHARED.DRIVE
     )
     
     # ... -split.by sex
     create_multipanel_comparison(
-        calibration.codes = c(calibname1, calibname2),
+        calibration.codes = calibname,
         locations         = SHIELD.TEN.MSAS,
         outcomes          = outcomes,
         separate.by       = "outcome",
         split.by = "sex",
-        create.dirs       = TRUE
+        years = years,
+        create.dirs       = TRUE,
+        root.dir = SHARED.DRIVE
+    )
+    # ... -split.by sex
+    create_multipanel_comparison(
+        calibration.codes = calibname,
+        locations         = SHIELD.TEN.MSAS,
+        outcomes          = outcomes,
+        separate.by       = "outcome",
+        split.by = "race",
+        years = years,
+        create.dirs       = TRUE,
+        root.dir = SHARED.DRIVE
     )
     # .. plot.which to check MSM
     create_multipanel_comparison(
-        calibration.codes = c(calibname1, calibname2),
+        calibration.codes = calibname,
         locations         = SHIELD.TEN.MSAS,
         outcomes          = outcomes,
         separate.by       = "outcome",
         split.by = "sex",
+        years = years,
         plot.which = "sim.only",
-        create.dirs       = TRUE
+        create.dirs       = TRUE,
+        root.dir = SHARED.DRIVE
     )
 }
 

@@ -157,7 +157,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     # The two groups are correlated at the same spline points through the correlation parameter.
     # we assume that trate can change by 1.5 over 10 years :logsd(Delta10)=log(1.5)
     # this means that over 5 years, trate can change by sqrt(1.5) and by 20 years, it can change by 1.5^2
-    make.joint.mv.spline.prior(
+    transmission.rate.multipliers.by.sex=make.joint.mv.spline.prior(
         parameters = paste0("transmission.rate.multiplier.", c("msm", "heterosexual")),
         logmean.baseline = c(log(3), #msm
                              log(1)), #het
