@@ -42,6 +42,7 @@ mkdir -p "$LOG_DIR"
 
 # ── shared helpers ─────────────────────────────────────────────────────────────
 source "$SCRIPT_DIR/_shield_slots.sh"
+SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
 
 # ── thread settings ────────────────────────────────────────────────────────────
 export OPENBLAS_NUM_THREADS=1
@@ -69,14 +70,18 @@ shield1_cities=(
     C.38060 C.42660
 )
 
+N_CHAINS=4
+
 # ── set active cities and calibration codes here ───────────────────────────────
-CITIES=("${shield3_cities[@]}")
+# MAX_CITIES = max cities in flight at once. Each city holds N_CHAINS cores, so
+# peak cores = MAX_CITIES x N_CHAINS (5 x 4 = 20), leaving headroom on a 24-core box.
+MAX_CITIES=7
+
+CITIES=("${shield1_cities[@]}")
 
 CALIBRATION_CODES=(
     calib.9.22.stage3
 )
-N_CHAINS=4
-SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
 
 # ── preflight ──────────────────────────────────────────────────────────────────
 if [[ ! -f "$SCRIPT" ]]; then
@@ -95,9 +100,7 @@ if (( ${#CALIBRATION_CODES[@]} == 0 )); then
     exit 1
 fi
 
-# MAX_CITIES = max cities in flight at once. Each city holds N_CHAINS cores, so
-# peak cores = MAX_CITIES x N_CHAINS (5 x 4 = 20), leaving headroom on a 24-core box.
-MAX_CITIES=7
+
 
 # ── per-city orchestration ─────────────────────────────────────────────────────
 run_city_calib_code() {

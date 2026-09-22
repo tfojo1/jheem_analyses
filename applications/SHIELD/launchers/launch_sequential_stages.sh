@@ -49,6 +49,7 @@ mkdir -p "$LOG_DIR"
 
 # ── shared helpers ─────────────────────────────────────────────────────────────
 source "$SCRIPT_DIR/_shield_slots.sh"
+SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
 
 # ── thread settings ────────────────────────────────────────────────────────────
 export OPENBLAS_NUM_THREADS=1
@@ -75,6 +76,10 @@ all_except_ten_cities=(
 )
 
 # ── set active cities and calibration codes here ───────────────────────────────
+# MAX_CITIES = max cities in flight at once. Each city runs its calibration codes
+# sequentially (1 core each), so peak cores = MAX_CITIES.
+MAX_CITIES=20 #20 on shield1&2, 32 on shield3
+
 CITIES=(C.35620)
 
 # Calibration codes run sequentially per city — each is a separate Rscript process
@@ -83,14 +88,9 @@ CALIBRATION_CODES=(
     calib.9.19.stage0
     calib.9.19.stage1
     calib.9.19.stage2
-    calib.9.19.stage3
+    calib.9.22.stage3
 )
 
-SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
-
-# MAX_CITIES = max cities in flight at once. Each city runs its calibration codes
-# sequentially (1 core each), so peak cores = MAX_CITIES.
-MAX_CITIES=20
 
 # ── preflight ──────────────────────────────────────────────────────────────────
 if [[ ! -f "$SCRIPT" ]]; then
