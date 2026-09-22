@@ -45,7 +45,7 @@ UPDATE.FREQ= 50 # how often to print messages (Default: 50)
 
 #SECTION1: SETUP ----
 if (RUN.STAGE == 'setup' | RUN.STAGE == 'all') {
-    set.seed(00001)
+    set.seed(00000)
     #
     print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
     #
