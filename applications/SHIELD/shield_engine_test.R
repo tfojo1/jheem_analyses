@@ -21,10 +21,10 @@ sim = engine$run(params)
 # simLast<-extract.last.simulation.from.calibration(VERSION, LOCATION,'calib.8.21.stage3.az',allow.incomplete = T )
 # parameLast<-simLast$get.params()
 # simManual = engine$run(parameLast)
-simplot(sim, "diagnosis.ps",split.by="sex",plot.which = "sim.only")
-
-simplot(calibration.simsets$`NYC – calib.9.19.stage0`$full_simset$last.sim(), "diagnosis.ps",split.by="sex",plot.which = "sim.only")
-calibration.simsets$`NYC – calib.9.19.stage0`$full_simset$get.mcmc.mixing.statistic()
+# simplot(sim, "diagnosis.ps",split.by="sex",plot.which = "sim.only")
+# 
+# simplot(calibration.simsets$`NYC – calib.9.19.stage0`$full_simset$last.sim(), "diagnosis.ps",split.by="sex",plot.which = "sim.only")
+# calibration.simsets$`NYC – calib.9.19.stage0`$full_simset$get.mcmc.mixing.statistic()
 
 
 

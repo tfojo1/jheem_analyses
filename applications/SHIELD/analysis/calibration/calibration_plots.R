@@ -10,18 +10,19 @@ source('../jheem_analyses/applications/SHIELD/analysis/calibration/calibration_h
 # source("../jheem_analyses/applications/SHIELD/shield_calib_register.R")
 
 
-
+get.jheem.root.directory()
 
 # ---- SETUP ----
-LOGS <- normalizePath("~/jheem/code/jheem_analyses/applications/SHIELD/logs/")
-for (x in SHIELD.TEN.MSAS) {
-    print(get.calibration.progress("shield",x,"calib.9.19.stage2",
-                                   root.dir = LOGS))
-    } 
+# LOGS <- normalizePath("~/jheem/code/jheem_analyses/applications/SHIELD/logs/")
+
+for (x in SHIELD.TEN.MSAS){
+    print(get.calibration.progress("shield", x, "calib.9.19.stage3"))
+}
 
 calibration.codes <- c(
     # "calib.8.21.stage3.az"   # completed for 10 cities
-    "calib.8.21.stage2"
+    # "calib.8.21.stage2"
+    "calib.9.19.stage2"
 )
 
 # for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.16.stage2.az"))}
@@ -30,9 +31,9 @@ calibration.codes <- c(
 calib.simsets <- load.calib.simsets(
     locations         =  SHIELD.TEN.MSAS,
     calibration.codes = calibration.codes,
-    n.sim = 300,
+    n.sim = 300
     # n.sim = 400,
-    ROOT.DIR
+    # ROOT.DIR
 )
 
 # Inspect mixing statistics -----

@@ -34,22 +34,20 @@
 #    outside CALIB_PATTERN are therefore never at risk.
 #
 # 4. HOW TO RUN
+#    See what's still in the old layout:
+#    ls -d /mnt/jheem_nas_share/mcmc_runs/shield/C.12060/calib.* 2>/dev/null
+
+#    Move to the folder (on SHIELD servers):
+#    cd ~/jheem/code/jheem_analyses/applications/SHIELD/analysis/calibration
+
 #    Dry run is the default and changes nothing:
-#        bash reorganize_mcmc_runs.sh
+#    CALIB_PATTERN='calib.8.21.*' bash reorganize_mcmc_runs.sh
+#    This will only tell you which files are found under onl calibraiton and will be moved, nothing is touched
+
+#    DRY_RUN=0 CALIB_PATTERN='calib.8.21.*' bash reorganize_mcmc_runs.sh
+#    this will make the changes 
 #
-#    Apply:
-#        DRY_RUN=0 bash reorganize_mcmc_runs.sh
-#
-#    Against a different root, for example a local logs folder:
-#        BASE=~/jheem/code/jheem_analyses/applications/SHIELD/logs/mcmc_runs/shield \
-#            DRY_RUN=0 bash reorganize_mcmc_runs.sh
-#
-# 5. BEFORE RUNNING ON THE SHARED DRIVE
-#    The NAS is shared. This walks every city directory under BASE, including
-#    calibrations belonging to other people. Check with the team before
-#    applying it to /mnt/jheem_nas_share.
-#
-# 6. VERIFY AFTERWARDS
+#   VERIFY AFTERWARDS
 #    In R, with no root.dir argument:
 #        for (x in SHIELD.TEN.MSAS)
 #            print(get.calibration.progress("shield", x, "calib.9.19.stage0"))

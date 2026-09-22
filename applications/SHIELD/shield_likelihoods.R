@@ -28,6 +28,10 @@ FUTURE.PENALTY.PS.DIAG.GROWTH.WEIGHT.STAGE1 = 1 / STAGE.1.WEIGHT
 FUTURE.PENALTY.PS.DIAG.GROWTH.WEIGHT.STAGE23 = 1 / STAGE.23.WEIGHT # representing the eight points we would have post 2022 (eight times as many points)
 # HIV.TESTING.BY.SEX.WEIGHT= 8 #increasing the weight for sex a specific HIV test testing rates because this is the only targets that's available among MSM
 
+# Now that we separate stage 2 and 3 likelihoods as of 9/22/2026
+STAGE.2.WEIGHT = STAGE.23.WEIGHT
+STAGE.3.WEIGHT = STAGE.23.WEIGHT * 1/2
+
 SHIELD.DUMMY.PARTITIONING.FUNCTION <- function(arr, version = 'shield', location) {
     # Intentionally do nothing:
     return(arr)
@@ -288,20 +292,6 @@ total.diagnosis.likelihood.instructions =
                                          outcome.for.data = "total.syphilis.diagnoses",  
                                          levels.of.stratification = c(0),
                                          from.year = 1993, #from cdc.pdf.report
-                                         to.year = 2022,
-                                         error.variance.type = c('cv', 'sd'),
-                                         error.variance.term = list(diagnosis_cv, 10),  #see inputs folder file input_diag_cv_estimates
-                                         # total variance = (cv=sigma/mu * observed_n)^2 + sd^2 : this ensures when mu is super small, our variance stays up (at least to sd^2)
-                                         #keep us from over penalizing years with small mu (early years)
-                                         #
-                                         observation.correlation.form = 'autoregressive.1', #long timeframe
-                                         equalize.weight.by.year = T
-    )
-total.diagnosis.likelihood.instructions.2021 =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.total",
-                                         outcome.for.data = "total.syphilis.diagnoses",  
-                                         levels.of.stratification = c(0),
-                                         from.year = 1993, #from cdc.pdf.report
                                          to.year = 2021,
                                          error.variance.type = c('cv', 'sd'),
                                          error.variance.term = list(diagnosis_cv, 10),  #see inputs folder file input_diag_cv_estimates
@@ -311,7 +301,7 @@ total.diagnosis.likelihood.instructions.2021 =
                                          observation.correlation.form = 'autoregressive.1', #long timeframe
                                          equalize.weight.by.year = T
     )
-##---- Strata Stage1 2019-2022 ---- 
+##---- Strata Stage1 2019-2021 ---- 
 #'@Zoe: can you check other sources to see if sex or race stratified data is reported for MSAs or states?
 total.diagnosis.by.strata.stage1.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.total",
@@ -319,23 +309,6 @@ total.diagnosis.by.strata.stage1.likelihood.instructions =
                                          levels.of.stratification = c(1),
                                          dimensions = c("sex","race","age"),
                                          from.year = 2019,
-                                         to.year = 2022,
-                                         #
-                                         error.variance.type = 'cv',
-                                         error.variance.term = diagnosis_cv,
-                                         correlation.different.strata = 0, #after adding age-specific targets in stage2, the model didnt fit to overall targets as well as before. 
-                                         #
-                                         observation.correlation.form = 'compound.symmetry',  #short time frame
-                                         #
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1 
-    )
-total.diagnosis.by.strata.stage1.likelihood.instructions.2021 =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.total",
-                                         outcome.for.data = "total.syphilis.diagnoses",  
-                                         levels.of.stratification = c(1),
-                                         dimensions = c("sex","race","age"),
-                                         from.year = 2019,
                                          to.year = 2021,
                                          #
                                          error.variance.type = 'cv',
@@ -347,26 +320,9 @@ total.diagnosis.by.strata.stage1.likelihood.instructions.2021 =
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1 
     )
-##---- Strata Stage2 2019-2022 ---- 
+##---- Strata Stage2 2019-2021 ---- 
 #'@Zoe: can you check other sources to see if sex or race stratified data is reported for MSAs or states?
 total.diagnosis.by.strata.stage2.likelihood.instructions =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.total",
-                                         outcome.for.data = "total.syphilis.diagnoses",  
-                                         levels.of.stratification = c(1,2),
-                                         dimensions = c("sex","race","age"),
-                                         from.year = 2019,
-                                         to.year = 2022,
-                                         #
-                                         error.variance.type = 'cv',
-                                         error.variance.term = diagnosis_cv,
-                                         correlation.different.strata = 0, #after adding age-specific targets in stage2, the model didnt fit to overall targets as well as before. 
-                                         #
-                                         observation.correlation.form = 'compound.symmetry',  #short time frame
-                                         #
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1 
-    )
-total.diagnosis.by.strata.stage2.likelihood.instructions.2021 =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.total",
                                          outcome.for.data = "total.syphilis.diagnoses",  
                                          levels.of.stratification = c(1,2),
@@ -385,23 +341,9 @@ total.diagnosis.by.strata.stage2.likelihood.instructions.2021 =
     )
 
 ## PS DIAGNOSIS ----
-##---- Overall 1993-2022 ----
+##---- Overall 1993-2021 ----
 # this is only used in stage 0 calibration (unique weight for stage 0)
 ps.diagnosis.stage0.total.likelihood.instructions =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
-                                         outcome.for.data = "ps.syphilis.diagnoses",  
-                                         levels.of.stratification = c(0), 
-                                         from.year = 1993,
-                                         to.year = 2022,
-                                         #
-                                         error.variance.type = c('cv', 'sd'),
-                                         error.variance.term = list(diagnosis_cv, 10),  
-                                         observation.correlation.form = 'autoregressive.1',
-                                         #
-                                         weights = 4, # set emperically to get stage0 going
-                                         equalize.weight.by.year = T
-    )
-ps.diagnosis.stage0.total.likelihood.instructions.2021 =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
                                          outcome.for.data = "ps.syphilis.diagnoses",  
                                          levels.of.stratification = c(0), 
@@ -422,20 +364,6 @@ ps.diagnosis.total.likelihood.instructions =
                                          outcome.for.data = "ps.syphilis.diagnoses",  
                                          levels.of.stratification = c(0), 
                                          from.year = 1993,
-                                         to.year = 2022,
-                                         #
-                                         error.variance.type = c('cv', 'sd'),
-                                         error.variance.term = list(diagnosis_cv, 10),  
-                                         observation.correlation.form = 'autoregressive.1',
-                                         #
-                                         equalize.weight.by.year = T 
-                                         # minimum.error.sd = 1 #redundant because we have sd in variance structure 
-    )
-ps.diagnosis.total.likelihood.instructions.2021 =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
-                                         outcome.for.data = "ps.syphilis.diagnoses",  
-                                         levels.of.stratification = c(0), 
-                                         from.year = 1993,
                                          to.year = 2021,
                                          #
                                          error.variance.type = c('cv', 'sd'),
@@ -446,25 +374,8 @@ ps.diagnosis.total.likelihood.instructions.2021 =
                                          # minimum.error.sd = 1 #redundant because we have sd in variance structure 
     )
 
-##---- Strata Stage1 2019-2022 ----
+##---- Strata Stage1 2019-2021 ----
 ps.diagnosis.by.strata.stage1.likelihood.instructions =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
-                                         outcome.for.data = "ps.syphilis.diagnoses",  
-                                         dimensions = c("sex","race","age"),
-                                         levels.of.stratification = c(1),
-                                         from.year = 2019,
-                                         to.year = 2022,
-                                         #
-                                         error.variance.type = c('cv'),
-                                         error.variance.term = list(diagnosis_cv),
-                                         correlation.different.strata = 0,#after adding age-specific targets in stage2, the model didnt fit to overall targets as well as before.
-                                         #
-                                         observation.correlation.form = 'compound.symmetry', #short timeframe
-                                         #
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1
-    )
-ps.diagnosis.by.strata.stage1.likelihood.instructions.2021 =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
                                          outcome.for.data = "ps.syphilis.diagnoses",  
                                          dimensions = c("sex","race","age"),
@@ -481,25 +392,8 @@ ps.diagnosis.by.strata.stage1.likelihood.instructions.2021 =
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
     )
-##---- Strata Stage2 2019-2022 ----
+##---- Strata Stage2 2019-2021 ----
 ps.diagnosis.by.strata.stage2.likelihood.instructions =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
-                                         outcome.for.data = "ps.syphilis.diagnoses",  
-                                         dimensions = c("sex","race","age"),
-                                         levels.of.stratification = c(1,2),
-                                         from.year = 2019,
-                                         to.year = 2022,
-                                         #
-                                         error.variance.type = c('cv'),
-                                         error.variance.term = list(diagnosis_cv),
-                                         correlation.different.strata = 0,#after adding age-specific targets in stage2, the model didnt fit to overall targets as well as before.
-                                         #
-                                         observation.correlation.form = 'compound.symmetry', #short timeframe
-                                         #
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1
-    )
-ps.diagnosis.by.strata.stage2.likelihood.instructions.2021 =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
                                          outcome.for.data = "ps.syphilis.diagnoses",  
                                          dimensions = c("sex","race","age"),
@@ -655,28 +549,13 @@ ps.diag.rate.among.msm.nested.likelihood.instructions <-
 # data from 1998-2023 for MSA level (cdc.sti) for MSA (total)
 # data from 2000-2023 for MSA level (cdc.sti) for MSA (total; sex; race; age group; age group+sex; race+sex; age group+race; age group+race+sex)
 #
-##---- Overall 1993-2022 ----
+##---- Overall 1993-2021 ----
 # we have modeled the misclassification of EL/LL diagnosis in the model and here we only fit to reported (biased) data
 early.diagnosis.total.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
                                          outcome.for.data = "early.syphilis.diagnoses", 
                                          levels.of.stratification = c(0),
                                          from.year = 1993,
-                                         to.year = 2022,
-                                         #
-                                         error.variance.type = c('cv', 'sd'),
-                                         error.variance.term = list(diagnosis_cv, 10),  
-                                         #
-                                         observation.correlation.form = 'autoregressive.1',
-                                         #  
-                                         equalize.weight.by.year = T 
-                                         # minimum.error.sd = 1 #redundant because we have sd in variance structure
-    )
-early.diagnosis.total.likelihood.instructions.2021 =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
-                                         outcome.for.data = "early.syphilis.diagnoses", 
-                                         levels.of.stratification = c(0),
-                                         from.year = 1993,
                                          to.year = 2021,
                                          #
                                          error.variance.type = c('cv', 'sd'),
@@ -687,31 +566,13 @@ early.diagnosis.total.likelihood.instructions.2021 =
                                          equalize.weight.by.year = T 
                                          # minimum.error.sd = 1 #redundant because we have sd in variance structure
     )
-##---- Strata Stage1 2019-2022 ----
+##---- Strata Stage1 2019-2021 ----
 early.diagnosis.by.strata.stage1.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
                                          outcome.for.data = "early.syphilis.diagnoses", 
                                          dimensions = c("sex","race","age"),
                                          levels.of.stratification = c(1),
                                          from.year = 2019,
-                                         to.year = 2022,
-                                         #
-                                         error.variance.type = 'cv',
-                                         error.variance.term = diagnosis_cv,
-                                         correlation.different.strata = 0,#after adding age-specific targets in stage2, the model didnt fit to overall targets as well as before.
-                                         #
-                                         observation.correlation.form = 'compound.symmetry',
-                                         #
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1
-    )
-##---- Strata Stage1 2019-2022 ----
-early.diagnosis.by.strata.stage1.likelihood.instructions.2021 =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
-                                         outcome.for.data = "early.syphilis.diagnoses", 
-                                         dimensions = c("sex","race","age"),
-                                         levels.of.stratification = c(1),
-                                         from.year = 2019,
                                          to.year = 2021,
                                          #
                                          error.variance.type = 'cv',
@@ -723,25 +584,8 @@ early.diagnosis.by.strata.stage1.likelihood.instructions.2021 =
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
     )
-##---- Strata Stage2 2019-2022 ----
+##---- Strata Stage2 2019-2021 ----
 early.diagnosis.by.strata.stage2.likelihood.instructions =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
-                                         outcome.for.data = "early.syphilis.diagnoses", 
-                                         dimensions = c("sex","race","age"),
-                                         levels.of.stratification = c(1,2),
-                                         from.year = 2019,
-                                         to.year = 2022,
-                                         #
-                                         error.variance.type = 'cv',
-                                         error.variance.term = diagnosis_cv,
-                                         correlation.different.strata = 0,#after adding age-specific targets in stage2, the model didnt fit to overall targets as well as before.
-                                         #
-                                         observation.correlation.form = 'compound.symmetry',
-                                         #
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1
-    )
-early.diagnosis.by.strata.stage2.likelihood.instructions.2021 =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
                                          outcome.for.data = "early.syphilis.diagnoses", 
                                          dimensions = c("sex","race","age"),
@@ -773,21 +617,6 @@ late.diagnosis.total.likelihood.instructions =
                                          outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
                                          levels.of.stratification = c(0),
                                          from.year = 1993,
-                                         to.year = 2022,
-                                         #
-                                         error.variance.type = c('cv', 'sd'),
-                                         error.variance.term = list(diagnosis_cv, 10),  
-                                         #
-                                         observation.correlation.form = 'autoregressive.1',
-                                         #
-                                         equalize.weight.by.year = T 
-                                         # minimum.error.sd = 1#redundant because we have sd in variance structure
-    )
-late.diagnosis.total.likelihood.instructions.2021 =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
-                                         outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
-                                         levels.of.stratification = c(0),
-                                         from.year = 1993,
                                          to.year = 2021,
                                          #
                                          error.variance.type = c('cv', 'sd'),
@@ -805,23 +634,6 @@ late.diagnosis.by.strata.stage1.likelihood.instructions =
                                          dimensions = c("sex","race","age"),
                                          levels.of.stratification = c(1),
                                          from.year = 2019,
-                                         to.year = 2022,
-                                         #
-                                         error.variance.type = 'cv',
-                                         error.variance.term = diagnosis_cv,
-                                         correlation.different.strata = 0,#after adding age-specific targets in stage2, the model didnt fit to overall targets as well as before.
-                                         #
-                                         observation.correlation.form = 'compound.symmetry',
-                                         #
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1
-    )
-late.diagnosis.by.strata.stage1.likelihood.instructions.2021 =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
-                                         outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
-                                         dimensions = c("sex","race","age"),
-                                         levels.of.stratification = c(1),
-                                         from.year = 2019,
                                          to.year = 2021,
                                          #
                                          error.variance.type = 'cv',
@@ -834,23 +646,6 @@ late.diagnosis.by.strata.stage1.likelihood.instructions.2021 =
                                          minimum.error.sd = 1
     )
 late.diagnosis.by.strata.stage2.likelihood.instructions =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
-                                         outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
-                                         dimensions = c("sex","race","age"),
-                                         levels.of.stratification = c(1,2),
-                                         from.year = 2019,
-                                         to.year = 2022,
-                                         #
-                                         error.variance.type = 'cv',
-                                         error.variance.term = diagnosis_cv,
-                                         correlation.different.strata = 0,#after adding age-specific targets in stage2, the model didnt fit to overall targets as well as before.
-                                         #
-                                         observation.correlation.form = 'compound.symmetry',
-                                         #
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1
-    )
-late.diagnosis.by.strata.stage2.likelihood.instructions.2021 =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
                                          outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
                                          dimensions = c("sex","race","age"),
@@ -903,28 +698,29 @@ proportion.tested.total.by.age.race.sex.nested.likelihood.instructions <-
     )
 #-- LIKELIHOODS --# ----
 ## *** STAGE 0 *** ##: All Demog likelihoods + total PS diag ----
-# 2022: using all data to 2022 ----
-lik.inst.stage0.2022 =join.likelihood.instructions(
+# 2021: using all data to 2021 ----
+lik.inst.stage0 =join.likelihood.instructions(
     population.likelihood.instructions,
     deaths.likelihood.instructions, 
     fertility.likelihood.instructions,
     immigration.likelihood.instructions,
     emigration.likelihood.instructions,
     #
-    ps.diagnosis.stage0.total.likelihood.instructions, 
+    ps.diagnosis.stage0.total.likelihood.instructions, #'@Andrew:this one already has a weight of 4, why? #@Parastu: we upweighted it to make sure it had some influence to get diagnoses in the right ballpark; otherwise, there was no point to having it and demographics would completely dominate. 
     #
     additional.weights = STAGE.0.WEIGHT
 )
-# 2021: using all data to 2021 ----
-lik.inst.stage0.2021 =join.likelihood.instructions(
+lik.inst.stage0.nyc =join.likelihood.instructions(
     population.likelihood.instructions,
     deaths.likelihood.instructions, 
     fertility.likelihood.instructions,
     immigration.likelihood.instructions,
     emigration.likelihood.instructions,
     #
-    ps.diagnosis.stage0.total.likelihood.instructions.2021, #'@Andrew:this one already has a weight of 4, why? #@Parastu: we upweighted it to make sure it had some influence to get diagnoses in the right ballpark; otherwise, there was no point to having it and demographics would completely dominate. 
+    ps.diagnosis.stage0.total.likelihood.instructions, #'@Andrew:this one already has a weight of 4, why? #@Parastu: we upweighted it to make sure it had some influence to get diagnoses in the right ballpark; otherwise, there was no point to having it and demographics would completely dominate. 
     #
+    historical.diagnosis.likelihood.instructions, ### ADDED to help NYC be less wild in 1970
+    
     additional.weights = STAGE.0.WEIGHT
 )
 
@@ -933,13 +729,13 @@ penalty.ps.diag.growth.stage1=join.likelihood.instructions(
     penalty.ps.diag.growth.likelihood.instructions,
     additional.weights = FUTURE.PENALTY.PS.DIAG.GROWTH.WEIGHT.STAGE1
 )
-# V1: Fitting to prop male ps diag among MSM ----
-ps.diag.target.msm.stage1.V1=join.likelihood.instructions(
+# Fitting to prop male ps diag among MSM ----
+ps.diag.target.msm.stage1=join.likelihood.instructions(
     proportion.male.diagnosis.among.msm.nested.likelihood.instructions,
     additional.weights = PS.DIAG.RATE.AMONG.MSM.WEIGHT.STAGE1
 )
-# stage1.2022.V1 ----
-lik.inst.stage1.2022.V1=join.likelihood.instructions(
+# stage1 ----
+lik.inst.stage1=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
     total.diagnosis.by.strata.stage1.likelihood.instructions,
     #
@@ -957,85 +753,10 @@ lik.inst.stage1.2022.V1=join.likelihood.instructions(
     historical.diagnosis.likelihood.instructions,
     penalty.ps.diag.growth.stage1, #this has a weight of 1/stage1.weight baked into it     
     #
-    ps.diag.target.msm.stage1.V1, #this has a weight of 1/stage1.weight baked into it     
+    ps.diag.target.msm.stage1, #this has a weight of 1/stage1.weight baked into it     
     #
     additional.weights = STAGE.1.WEIGHT
 )
-# stage1.2021.V1 ----
-lik.inst.stage1.2021.V1=join.likelihood.instructions(
-    total.diagnosis.likelihood.instructions.2021,
-    total.diagnosis.by.strata.stage1.likelihood.instructions.2021,
-    #
-    ps.diagnosis.total.likelihood.instructions.2021,
-    ps.diagnosis.by.strata.stage1.likelihood.instructions.2021,
-    #
-    early.diagnosis.total.likelihood.instructions.2021,
-    early.diagnosis.by.strata.stage1.likelihood.instructions.2021,
-    #
-    late.diagnosis.total.likelihood.instructions.2021,
-    late.diagnosis.by.strata.stage1.likelihood.instructions.2021,
-    #
-    proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
-    #
-    historical.diagnosis.likelihood.instructions,
-    penalty.ps.diag.growth.stage1, #this has a weight of 1/stage1.weight baked into it     
-    #
-    ps.diag.target.msm.stage1.V1, #this has a weight of 1/stage1.weight baked into it     
-    #
-    additional.weights = STAGE.1.WEIGHT
-)
-# V2: Fitting to ps diagnosis rate among MSM ----
-ps.diag.target.msm.stage1.V2=join.likelihood.instructions(
-    ps.diag.rate.among.msm.nested.likelihood.instructions,
-    additional.weights = PS.DIAG.RATE.AMONG.MSM.WEIGHT.STAGE1
-)
-# stage1.2022.V2 ----
-lik.inst.stage1.2022.V2=join.likelihood.instructions(
-    total.diagnosis.likelihood.instructions,
-    total.diagnosis.by.strata.stage1.likelihood.instructions,
-    #
-    ps.diagnosis.total.likelihood.instructions,
-    ps.diagnosis.by.strata.stage1.likelihood.instructions,
-    #
-    early.diagnosis.total.likelihood.instructions,
-    early.diagnosis.by.strata.stage1.likelihood.instructions,
-    #
-    late.diagnosis.total.likelihood.instructions,
-    late.diagnosis.by.strata.stage1.likelihood.instructions,
-    #
-    proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
-    #
-    historical.diagnosis.likelihood.instructions,
-    penalty.ps.diag.growth.stage1, #this has a weight of 1/stage1.weight baked into it     
-    #
-    ps.diag.target.msm.stage1.V2, #this has a weight of 1/stage1.weight baked into it     
-    #
-    additional.weights = STAGE.1.WEIGHT
-)
-# stage1.2021.V2 ----
-lik.inst.stage1.2021.V2=join.likelihood.instructions(
-    total.diagnosis.likelihood.instructions.2021,
-    total.diagnosis.by.strata.stage1.likelihood.instructions.2021,
-    #
-    ps.diagnosis.total.likelihood.instructions.2021,
-    ps.diagnosis.by.strata.stage1.likelihood.instructions.2021,
-    #
-    early.diagnosis.total.likelihood.instructions.2021,
-    early.diagnosis.by.strata.stage1.likelihood.instructions.2021,
-    #
-    late.diagnosis.total.likelihood.instructions.2021,
-    late.diagnosis.by.strata.stage1.likelihood.instructions.2021,
-    #
-    proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
-    #
-    historical.diagnosis.likelihood.instructions,
-    penalty.ps.diag.growth.stage1, #this has a weight of 1/stage1.weight baked into it     
-    #
-    ps.diag.target.msm.stage1.V2, #this has a weight of 1/stage1.weight baked into it     
-    #
-    additional.weights = STAGE.1.WEIGHT
-)
-
 ## *** STAGE 23 *** ## All likelihood combined ----
 lik.inst.demog.stage23=join.likelihood.instructions(
     population.likelihood.instructions,
@@ -1049,13 +770,13 @@ penalty.ps.diag.growth.stage23=join.likelihood.instructions(
     penalty.ps.diag.growth.likelihood.instructions,
     additional.weights = FUTURE.PENALTY.PS.DIAG.GROWTH.WEIGHT.STAGE23
 )
-# V1: Fitting to prop male ps diag among MSM ----
-ps.diag.target.msm.stage23.V1=join.likelihood.instructions(
+# Fitting to prop male ps diag among MSM ----
+ps.diag.target.msm.stage23=join.likelihood.instructions(
     proportion.male.diagnosis.among.msm.nested.likelihood.instructions,
     additional.weights = PS.DIAG.RATE.AMONG.MSM.WEIGHT.STAGE23
 )
-# stage23.2022.V1 ----
-lik.inst.stage23.2022.V1 = join.likelihood.instructions(
+# stage23 ----
+lik.inst.stage2 = join.likelihood.instructions(
     lik.inst.demog.stage23,
     #
     total.diagnosis.likelihood.instructions,
@@ -1075,42 +796,11 @@ lik.inst.stage23.2022.V1 = join.likelihood.instructions(
     historical.diagnosis.likelihood.instructions,
     penalty.ps.diag.growth.stage23, #this has a weight of 1/stage23.weight baked into it     
     #
-    ps.diag.target.msm.stage23.V1, #this has a weight of 1/stage23.weight baked into it  
+    ps.diag.target.msm.stage23, #this has a weight of 1/stage23.weight baked into it
     #
-    additional.weights = STAGE.23.WEIGHT
+    additional.weights = STAGE.2.WEIGHT
 )
-# stage23.2021.V1 ----
-lik.inst.stage23.2021.V1 = join.likelihood.instructions(
-    lik.inst.demog.stage23,
-    #
-    total.diagnosis.likelihood.instructions.2021,
-    total.diagnosis.by.strata.stage2.likelihood.instructions.2021,
-    #
-    ps.diagnosis.total.likelihood.instructions.2021,
-    ps.diagnosis.by.strata.stage2.likelihood.instructions.2021,
-    #
-    early.diagnosis.total.likelihood.instructions.2021,
-    early.diagnosis.by.strata.stage2.likelihood.instructions.2021,
-    #
-    late.diagnosis.total.likelihood.instructions.2021,
-    late.diagnosis.by.strata.stage2.likelihood.instructions.2021,
-    #
-    proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
-    #
-    historical.diagnosis.likelihood.instructions,
-    penalty.ps.diag.growth.stage23, #this has a weight of 1/stage23.weight baked into it     
-    #
-    ps.diag.target.msm.stage23.V1, #this has a weight of 1/stage23.weight baked into it
-    #
-    additional.weights = STAGE.23.WEIGHT
-)
-# V2: Fitting to ps diagnosis rate among MSM ----
-ps.diag.target.msm.stage23.V2=join.likelihood.instructions(
-    ps.diag.rate.among.msm.nested.likelihood.instructions,
-    additional.weights = PS.DIAG.RATE.AMONG.MSM.WEIGHT.STAGE23
-)
-# stage23.2022.V2 ----
-lik.inst.stage23.2022.V2 = join.likelihood.instructions(
+lik.inst.stage3 = join.likelihood.instructions(
     lik.inst.demog.stage23,
     #
     total.diagnosis.likelihood.instructions,
@@ -1130,154 +820,39 @@ lik.inst.stage23.2022.V2 = join.likelihood.instructions(
     historical.diagnosis.likelihood.instructions,
     penalty.ps.diag.growth.stage23, #this has a weight of 1/stage23.weight baked into it     
     #
-    ps.diag.target.msm.stage23.V2, #this has a weight of 1/stage23.weight baked into it  
+    ps.diag.target.msm.stage23, #this has a weight of 1/stage23.weight baked into it
     #
-    additional.weights = STAGE.23.WEIGHT
+    additional.weights = STAGE.3.WEIGHT
 )
-# stage23.2021.V2 ----
-lik.inst.stage23.2021.V2 = join.likelihood.instructions(
+
+
+## LEGACY still needed
+# Kept for legacy reasons; now we use separate 2 and 3 as of 9/22/2026
+lik.inst.stage23 = join.likelihood.instructions(
     lik.inst.demog.stage23,
     #
-    total.diagnosis.likelihood.instructions.2021,
-    total.diagnosis.by.strata.stage2.likelihood.instructions.2021,
+    total.diagnosis.likelihood.instructions,
+    total.diagnosis.by.strata.stage2.likelihood.instructions,
     #
-    ps.diagnosis.total.likelihood.instructions.2021,
-    ps.diagnosis.by.strata.stage2.likelihood.instructions.2021,
+    ps.diagnosis.total.likelihood.instructions,
+    ps.diagnosis.by.strata.stage2.likelihood.instructions,
     #
-    early.diagnosis.total.likelihood.instructions.2021,
-    early.diagnosis.by.strata.stage2.likelihood.instructions.2021,
+    early.diagnosis.total.likelihood.instructions,
+    early.diagnosis.by.strata.stage2.likelihood.instructions,
     #
-    late.diagnosis.total.likelihood.instructions.2021,
-    late.diagnosis.by.strata.stage2.likelihood.instructions.2021,
+    late.diagnosis.total.likelihood.instructions,
+    late.diagnosis.by.strata.stage2.likelihood.instructions,
     #
     proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
     #
     historical.diagnosis.likelihood.instructions,
     penalty.ps.diag.growth.stage23, #this has a weight of 1/stage23.weight baked into it     
     #
-    ps.diag.target.msm.stage23.V2, #this has a weight of 1/stage23.weight baked into it
+    ps.diag.target.msm.stage23, #this has a weight of 1/stage23.weight baked into it
     #
     additional.weights = STAGE.23.WEIGHT
 )
-# #### ************ #'@Andrew: we can remove the rest
 # 
-# 
-# lik.inst.stage1.plus.penalty=join.likelihood.instructions(
-#     total.diagnosis.likelihood.instructions,
-#     total.diagnosis.by.strata.likelihood.instructions,
-#     #
-#     ps.diagnosis.total.likelihood.instructions,
-#     ps.diagnosis.by.strata.likelihood.instructions,
-#     #
-#     early.diagnosis.total.likelihood.instructions,
-#     early.diagnosis.by.strata.likelihood.instructions,
-#     #
-#     late.diagnosis.total.likelihood.instructions,
-#     late.diagnosis.by.strata.likelihood.instructions,
-#     #
-#     # proportion.tested.total.by.age.race.nested.likelihood.instructions,
-#     # proportion.tested.by.sex.nested.likelihood.instructions,
-#     proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
-#     
-#     #
-#     historical.diagnosis.likelihood.instructions,
-#     penalty.msm.prop.of.ps.male.likelihood.instructions,
-#     penalty.diag.traject.msm.vs.het.male.likelihood.instructions,
-#     penalty.ps.diag.growth.likelihood.instructions,    # Future change penalty
-#     #
-#     additional.weights = STAGE.1.WEIGHT
-# )
-# 
-# ## STAGE 2 & 3 ----
-# # STAGE 3 now has demographics split into a separate group
-# # so that you can set different weights for them if you want.
-# lik.inst.demog.stage23=join.likelihood.instructions(
-#     population.likelihood.instructions,
-#     deaths.likelihood.instructions,
-#     fertility.likelihood.instructions,
-#     immigration.likelihood.instructions,
-#     emigration.likelihood.instructions,
-#     additional.weights = STAGE.23.POPULATION.WEIGHT
-# )
-# 
-# lik.inst.stg23.non.demog=join.likelihood.instructions(
-#     total.diagnosis.likelihood.instructions,
-#     total.diagnosis.by.strata.likelihood.instructions,
-#     #
-#     ps.diagnosis.total.likelihood.instructions,
-#     ps.diagnosis.by.strata.likelihood.instructions,
-#     #
-#     early.diagnosis.total.likelihood.instructions,
-#     early.diagnosis.by.strata.likelihood.instructions,
-#     #
-#     late.diagnosis.total.likelihood.instructions,
-#     late.diagnosis.by.strata.likelihood.instructions,
-#     #
-#     # proportion.tested.total.by.age.race.nested.likelihood.instructions,
-#     # proportion.tested.by.sex.nested.likelihood.instructions,
-#     proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
-#     #
-#     historical.diagnosis.likelihood.instructions,
-#     penalty.msm.prop.of.ps.male.likelihood.instructions,
-#     penalty.ps.diag.growth.likelihood.instructions    
-# )
-# 
-# # We use this one
-# lik.inst.stage23 = join.likelihood.instructions(
-#     lik.inst.demog.stage23,
-#     lik.inst.stg23.non.demog,
-#     additional.weights = STAGE.23.WEIGHT
-# )
-# lik.inst.stage23.fourth = join.likelihood.instructions(
-#     lik.inst.demog.stage23,
-#     lik.inst.stg23.non.demog,
-#     additional.weights = STAGE.23.WEIGHT * 1/2 # w=1/4
-# )
-# lik.inst.stage23.eight = join.likelihood.instructions(
-#     lik.inst.demog.stage23,
-#     lik.inst.stg23.non.demog,
-#     additional.weights = STAGE.23.WEIGHT * 1/4 # w=1/8
-# )
-# 
-# ## penalty
-# lik.inst.stg23.non.demog.plus.penalty=join.likelihood.instructions(
-#     total.diagnosis.likelihood.instructions,
-#     total.diagnosis.by.strata.likelihood.instructions,
-#     #
-#     ps.diagnosis.total.likelihood.instructions,
-#     ps.diagnosis.by.strata.likelihood.instructions,
-#     #
-#     early.diagnosis.total.likelihood.instructions,
-#     early.diagnosis.by.strata.likelihood.instructions,
-#     #
-#     late.diagnosis.total.likelihood.instructions,
-#     late.diagnosis.by.strata.likelihood.instructions,
-#     #
-#     # proportion.tested.total.by.age.race.nested.likelihood.instructions,
-#     # proportion.tested.by.sex.nested.likelihood.instructions,
-#     proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
-#     #
-#     historical.diagnosis.likelihood.instructions,
-#     penalty.msm.prop.of.ps.male.likelihood.instructions,
-#     penalty.ps.diag.growth.likelihood.instructions,    
-#     ##
-#     penalty.diag.traject.msm.vs.het.male.likelihood.instructions
-# )
-# lik.inst.stage23.plus.penalty = join.likelihood.instructions(
-#     lik.inst.demog.stage23,
-#     lik.inst.stg23.non.demog.plus.penalty,
-#     additional.weights = STAGE.23.WEIGHT 
-# )
-# lik.inst.stage23.plus.penalty.fourth = join.likelihood.instructions(
-#     lik.inst.demog.stage23,
-#     lik.inst.stg23.non.demog.plus.penalty,
-#     additional.weights = STAGE.23.WEIGHT * 1/2 # w=1/4
-# )
-# lik.inst.stage23.plus.penalty.eight = join.likelihood.instructions(
-#     lik.inst.demog.stage23,
-#     lik.inst.stg23.non.demog.plus.penalty,
-#     additional.weights = STAGE.23.WEIGHT * 1/4 # w=1/8
-# )
 # # Alternative weight versions ----
 # lik.inst.demog.stage23.2x=join.likelihood.instructions(
 #     population.likelihood.instructions,

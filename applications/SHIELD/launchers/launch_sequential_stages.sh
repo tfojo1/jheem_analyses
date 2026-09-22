@@ -45,7 +45,7 @@ mkdir -p "$LOG_DIR"
 # somewhere else - e.g. JHEEM_ROOT_DIR=/mnt/jheem_nas_share puts it back on the
 # NAS. Every stage of a pipeline must use the same value; a run cannot find the
 # output of a setup step that wrote elsewhere.
-export JHEEM_ROOT_DIR="${JHEEM_ROOT_DIR:-$LOG_DIR}"
+# export JHEEM_ROOT_DIR="${JHEEM_ROOT_DIR:-$LOG_DIR}"
 
 # ── shared helpers ─────────────────────────────────────────────────────────────
 source "$SCRIPT_DIR/_shield_slots.sh"
@@ -75,7 +75,7 @@ all_except_ten_cities=(
 )
 
 # ── set active cities and calibration codes here ───────────────────────────────
-CITIES=("${ten_cities[@]}")
+CITIES=(C.35620)
 
 # Calibration codes run sequentially per city — each is a separate Rscript process
 # so the OS fully reclaims memory between them
@@ -83,6 +83,7 @@ CALIBRATION_CODES=(
     calib.9.19.stage0
     calib.9.19.stage1
     calib.9.19.stage2
+    calib.9.19.stage3
 )
 
 SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
