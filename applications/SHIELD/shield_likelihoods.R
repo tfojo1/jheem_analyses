@@ -17,6 +17,8 @@ diagnosis_cv=PS_CV #we will use this error variance for all diagnosis categories
 # WEIGHTS: The weights are used to weaken the likelihoods for better mixing 
 #
 STAGE.0.WEIGHT= 1/32 # lowered by half on 3/13/2026 
+PS.DIAG.STAGE0.WEIGHT=4 # set emperically to get stage0 going
+
 STAGE.1.WEIGHT= 1/8
 STAGE.23.WEIGHT= 1/4
 STAGE.23.POPULATION.WEIGHT = 1/8
@@ -31,6 +33,7 @@ FUTURE.PENALTY.PS.DIAG.GROWTH.WEIGHT.STAGE23 = 1 / STAGE.23.WEIGHT # representin
 # Now that we separate stage 2 and 3 likelihoods as of 9/22/2026
 STAGE.2.WEIGHT = STAGE.23.WEIGHT
 STAGE.3.WEIGHT = STAGE.23.WEIGHT * 1/2
+ 
 
 SHIELD.DUMMY.PARTITIONING.FUNCTION <- function(arr, version = 'shield', location) {
     # Intentionally do nothing:
@@ -354,7 +357,7 @@ ps.diagnosis.stage0.total.likelihood.instructions =
                                          error.variance.term = list(diagnosis_cv, 10),  
                                          observation.correlation.form = 'autoregressive.1',
                                          #
-                                         weights = 4, # set emperically to get stage0 going
+                                         weights = PS.DIAG.STAGE0.WEIGHT, # set emperically to get stage0 going
                                          equalize.weight.by.year = T
     )
 
@@ -697,8 +700,9 @@ proportion.tested.total.by.age.race.sex.nested.likelihood.instructions <-
                                                      equalize.weight.by.year = T
     )
 #-- LIKELIHOODS --# ----
-## *** STAGE 0 *** ##: All Demog likelihoods + total PS diag ----
-# 2021: using all data to 2021 ----
+## *** STAGE 0 *** ## --- 
+# < All Demog likelihoods + total PS diag >
+# < Calibrating to data through 2021 >
 lik.inst.stage0 =join.likelihood.instructions(
     population.likelihood.instructions,
     deaths.likelihood.instructions, 
@@ -706,7 +710,7 @@ lik.inst.stage0 =join.likelihood.instructions(
     immigration.likelihood.instructions,
     emigration.likelihood.instructions,
     #
-    ps.diagnosis.stage0.total.likelihood.instructions, #'@Andrew:this one already has a weight of 4, why? #@Parastu: we upweighted it to make sure it had some influence to get diagnoses in the right ballpark; otherwise, there was no point to having it and demographics would completely dominate. 
+    ps.diagnosis.stage0.total.likelihood.instructions, 
     #
     additional.weights = STAGE.0.WEIGHT
 )
@@ -717,19 +721,22 @@ lik.inst.stage0.nyc =join.likelihood.instructions(
     immigration.likelihood.instructions,
     emigration.likelihood.instructions,
     #
-    ps.diagnosis.stage0.total.likelihood.instructions, #'@Andrew:this one already has a weight of 4, why? #@Parastu: we upweighted it to make sure it had some influence to get diagnoses in the right ballpark; otherwise, there was no point to having it and demographics would completely dominate. 
+    ps.diagnosis.stage0.total.likelihood.instructions, 
     #
-    historical.diagnosis.likelihood.instructions, ### ADDED to help NYC be less wild in 1970
+    historical.diagnosis.likelihood.instructions, ### Sep22: ADDED to help NYC be less wild in 1970
     
     additional.weights = STAGE.0.WEIGHT
 )
 
-## *** STAGE 1 *** ##: All Syphilis related likelihoods 1-way stratified ----
+## *** STAGE 1 *** ## ----
+# <All Syphilis related likelihoods 1-way stratified>
+# These two likelihoods are up-weighted
+# 1-penalizing future growth that are too fast 
 penalty.ps.diag.growth.stage1=join.likelihood.instructions(
     penalty.ps.diag.growth.likelihood.instructions,
     additional.weights = FUTURE.PENALTY.PS.DIAG.GROWTH.WEIGHT.STAGE1
 )
-# Fitting to prop male ps diag among MSM ----
+# 2-Prop male ps diagnosis among MSM 
 ps.diag.target.msm.stage1=join.likelihood.instructions(
     proportion.male.diagnosis.among.msm.nested.likelihood.instructions,
     additional.weights = PS.DIAG.RATE.AMONG.MSM.WEIGHT.STAGE1
@@ -757,7 +764,8 @@ lik.inst.stage1=join.likelihood.instructions(
     #
     additional.weights = STAGE.1.WEIGHT
 )
-## *** STAGE 23 *** ## All likelihood combined ----
+## *** STAGE 23 *** ## ----
+# < All likelihood combined >
 lik.inst.demog.stage23=join.likelihood.instructions(
     population.likelihood.instructions,
     deaths.likelihood.instructions,
@@ -775,7 +783,7 @@ ps.diag.target.msm.stage23=join.likelihood.instructions(
     proportion.male.diagnosis.among.msm.nested.likelihood.instructions,
     additional.weights = PS.DIAG.RATE.AMONG.MSM.WEIGHT.STAGE23
 )
-# stage23 ----
+# STAGE2 ----
 lik.inst.stage2 = join.likelihood.instructions(
     lik.inst.demog.stage23,
     #
@@ -800,6 +808,7 @@ lik.inst.stage2 = join.likelihood.instructions(
     #
     additional.weights = STAGE.2.WEIGHT
 )
+# STAGE3 ----
 lik.inst.stage3 = join.likelihood.instructions(
     lik.inst.demog.stage23,
     #

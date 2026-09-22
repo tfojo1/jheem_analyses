@@ -57,17 +57,17 @@ shield2_cities=(
     C.12060 C.12580 C.16980 C.26420 C.31080
 )
 shield1_cities=(
-    C.33100 C.35620 C.37980
+     C.33100 C.37980 C.38060 C.42660
 )
 shield3_cities=(
-    C.38060 C.42660
+    C.12060 C.12580 C.16980 C.26420 C.31080
 )
 
 # ── set active cities here ─────────────────────────────────────────────────────
-CITIES=("${shield2_cities[@]}")
+CITIES=("${shield1_cities[@]}")
 
 CALIBRATION_CODES=(
-    calib.9.10.stage3.az
+    calib.9.19.stage3
 )
 
 N_CHAINS=4   # chains 1..N_CHAINS will be launched for every city x calibration code
