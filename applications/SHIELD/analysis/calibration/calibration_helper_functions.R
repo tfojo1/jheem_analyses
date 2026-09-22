@@ -35,10 +35,27 @@ library(ggplot2)    # plotting primitives, themes, guides
 library(patchwork)  # panel layout with wrap_plots and plot_annotation
 
 
-# ****  PATH CONSTANTS  **** ----
+# ****  PATH HELPERS  **** ----
 # ****************************************************************************************************
-SHIELD.BASE.PATH <- file.path(get.jheem.root.directory(), "simulations", "shield")
-SHIELD.PLOT.PATH <- file.path(get.jheem.root.directory(), "shield")
+# Every function that reads simsets from disk or writes plots to disk takes a root.dir argument.
+#
+#   1. root.dir = NULL (the default) falls back to get.jheem.root.directory(), so all existing
+#      calls keep the behavior they had before.
+#   2. Pass an explicit root.dir to read simsets from, or write plots to, a location outside
+#      the JHEEM root -- for example a logs folder or a shared drive.
+#
+# These are functions rather than constants because a constant is frozen at the moment the file
+# is sourced, which leaves no way for a per-call root.dir to override it.
+
+.shield.base.path <- function(root.dir = NULL) {
+    if (is.null(root.dir)) root.dir <- get.jheem.root.directory()
+    file.path(root.dir, "simulations", "shield")
+}
+
+.shield.plot.path <- function(root.dir = NULL) {
+    if (is.null(root.dir)) root.dir <- get.jheem.root.directory()
+    file.path(root.dir, "shield")
+}
 
 
 # ****  SECTION 1: SHARED INTERNAL UTILITIES  **** ----
@@ -191,9 +208,10 @@ int.style.manager <- function(intervention.labels,
     )
 }
 
-.detect.n.sim <- function(calibration.code) {
-    if (!dir.exists(SHIELD.BASE.PATH)) return(NULL)
-    dirs    <- list.dirs(SHIELD.BASE.PATH, recursive = FALSE, full.names = FALSE)
+.detect.n.sim <- function(calibration.code, root.dir = NULL) {
+    base.path <- .shield.base.path(root.dir)
+    if (!dir.exists(base.path)) return(NULL)
+    dirs    <- list.dirs(base.path, recursive = FALSE, full.names = FALSE)
     escaped <- gsub("\\.", "\\\\.", calibration.code)
     matches <- grep(paste0("^", escaped, "-([0-9]+)$"), dirs, value = TRUE)
     if (length(matches) == 0) return(NULL)
@@ -301,7 +319,8 @@ load.calib.simsets <- function(locations,
                                force.reload        = FALSE,
                                append              = TRUE,
                                verbose             = TRUE,
-                               version             = "shield") {
+                               version             = "shield",
+                               root.dir            = NULL) {
     
     location.codes <- unname(locations)
     location.names <- if (!is.null(names(locations))) names(locations) else
@@ -354,7 +373,8 @@ load.calib.simsets <- function(locations,
             
             
             calib.progress <- tryCatch(
-                get.calibration.progress(version = version, locations = locs.for.code, calibration.code = cc),
+                get.calibration.progress(version = version, locations = locs.for.code, calibration.code = cc,
+                                         root.dir = root.dir),
                 error = function(e) NULL)
             
             if (is.null(calib.progress)) {
@@ -382,12 +402,14 @@ load.calib.simsets <- function(locations,
                 full.simset <- if (pct < 100) {
                     tryCatch(assemble.simulations.from.calibration(
                         version = version, location = loc.code,
-                        calibration.code = cc, allow.incomplete = TRUE),
+                        calibration.code = cc, allow.incomplete = TRUE,
+                        root.dir = root.dir),
                         error = function(e) { warning("Error assembling '", simset.key, "': ", e$message); NULL })
                 } else {
                     tryCatch(retrieve.simulation.set(
                         version = version, location = loc.code,
-                        calibration.code = cc, n.sim ),
+                        calibration.code = cc, n.sim = n.sim,
+                        root.dir = root.dir),
                         error = function(e) { warning("Error retrieving '", simset.key, "': ", e$message); NULL })
                 }
                 if (is.null(full.simset)) { n.skipped <- n.skipped + 1; next }
@@ -408,10 +430,11 @@ load.calib.simsets <- function(locations,
             
         } else {
             n.sim.use <- if (is.null(n.sim)) {
-                detected <- .detect.n.sim(cc)
+                detected <- .detect.n.sim(cc, root.dir = root.dir)
                 if (is.null(detected)) {
                     warning("Could not auto-detect n.sim for '", cc,
-                            "' — no directory matching '", cc, "-<number>' found in SHIELD.BASE.PATH.",
+                            "' — no directory matching '", cc, "-<number>' found in ",
+                            .shield.base.path(root.dir), ".",
                             "\nPass n.sim explicitly to load.calib.simsets().")
                     n.skipped <- n.skipped + length(keys.for.code); next
                 }
@@ -434,7 +457,7 @@ load.calib.simsets <- function(locations,
                 info     <- key.map[[simset.key]]
                 loc.code <- info$loc.code
                 run.tag  <- paste0(cc, "-", n.sim.use)
-                dir.path <- file.path(SHIELD.BASE.PATH, run.tag, loc.code)
+                dir.path <- file.path(.shield.base.path(root.dir), run.tag, loc.code)
                 
                 if (!dir.exists(dir.path)) {
                     warning("Directory not found, skipping: ", dir.path)
@@ -604,7 +627,8 @@ plot.calib.stages <- function(calib.simsets,
                               locations     = NULL,
                               style.manager = NULL,
                               create.dirs   = TRUE,
-                              verbose       = TRUE) {
+                              verbose       = TRUE,
+                              root.dir      = NULL) {
     if (is.null(style.manager))
         style.manager <- create.style.manager(shape.data.by = "source", color.data.by = "stratum")
     
@@ -630,7 +654,7 @@ plot.calib.stages <- function(calib.simsets,
         entry    <- calib.simsets[[.build.calib.key(loc.name, calibration.code)]]
         if (is.null(entry)) { if (verbose) message("  Skipping '", loc.name, "' — not found"); next }
         
-        out.path <- file.path(SHIELD.PLOT.PATH, "calibrationPlots",
+        out.path <- file.path(.shield.plot.path(root.dir), "calibrationPlots",
                               calibration.code, loc.code, "")
         tryCatch(ensure.plot.dir(out.path, create.dirs), error = function(e) stop(e$message))
         if (verbose) message(sprintf("  [%d/%d] '%s'", i, length(target), loc.name))
@@ -662,7 +686,8 @@ plot.single.calib.single.location <- function(calib.simsets,
                                               width             = 12,
                                               height            = 7,
                                               dpi               = 300,
-                                              create.dirs       = FALSE) {
+                                              create.dirs       = FALSE,
+                                              root.dir          = NULL) {
     
     if (length(location) > 1) {
         warning("Multiple locations provided; using only the first: '", location[1], "'")
@@ -689,7 +714,7 @@ plot.single.calib.single.location <- function(calib.simsets,
     p <- p + ggtitle(location)
     if (!save) return(p)
     
-    if (is.null(save.dir)) save.dir <- file.path(SHIELD.PLOT.PATH, "calibrationPlots",calibration.code, location)
+    if (is.null(save.dir)) save.dir <- file.path(.shield.plot.path(root.dir), "calibrationPlots",calibration.code, location)
     if (is.null(filename))  filename <- paste0(paste(.sanitize(outcomes), collapse = "_"),
                                                .build.file.suffix( split.by, facet.by,plot.which))
     .save.plot(p, save.dir, filename, width, height, dpi, create.dirs, verbose = TRUE)
@@ -720,7 +745,8 @@ plot.calib.comparison <- function(calib.simsets,
                                   height            = NULL,
                                   dpi               = 300,
                                   create.dirs       = TRUE,
-                                  verbose           = TRUE) {
+                                  verbose           = TRUE,
+                                  root.dir          = NULL) {
     
     if (!is.null(locations) && is.null(names(locations)))
         stop("Error: 'locations' must be a NAMED vector")
@@ -744,7 +770,7 @@ plot.calib.comparison <- function(calib.simsets,
     if (length(all.calibs)>2) {folder.name<-paste0(all.calibs[1],"_vs_others")} }
     
     if (is.null(save.dir)) {
-        save.dir <- file.path(SHIELD.PLOT.PATH, "calibrationPlots","comparison",folder.name,paste0("by_",separate.by))
+        save.dir <- file.path(.shield.plot.path(root.dir), "calibrationPlots","comparison",folder.name,paste0("by_",separate.by))
     }
     loc.panel <- function(loc, outs) {
         entries <- extract.calib.simsets(calib.simsets, location = loc)
@@ -830,7 +856,8 @@ load.int.simsets <- function(locations,
                              intervention.codes,
                              calibration.codes,
                              n.sim,
-                             base.path           = SHIELD.BASE.PATH,
+                             base.path           = NULL,
+                             root.dir            = NULL,
                              intervention.labels = NULL,
                              cache               = NULL,
                              cache.name          = "int.simsets",
@@ -839,6 +866,7 @@ load.int.simsets <- function(locations,
                              verbose             = TRUE,
                              debug               = FALSE) {
     if (debug) browser()
+    if (is.null(base.path)) base.path <- .shield.base.path(root.dir)
     city.names     <- if (!is.null(names(locations))) names(locations) else unname(locations)
     location.codes <- unname(locations)
     
@@ -990,6 +1018,7 @@ plot.int.location <- function(int.simsets,
                               height        = 7,
                               dpi           = 300,
                               create.dirs   = FALSE,
+                              root.dir      = NULL,
                               debug         = FALSE) {
     if (debug) browser()
     entries <- extract.int.simsets(int.simsets, location = location, calib.code = calib.code, exact = TRUE)
@@ -1010,7 +1039,7 @@ plot.int.location <- function(int.simsets,
     
     if (!save) return(p)
     
-    if (is.null(save.dir)) save.dir <- file.path(SHIELD.PLOT.PATH, "interventionPlots",
+    if (is.null(save.dir)) save.dir <- file.path(.shield.plot.path(root.dir), "interventionPlots",
                                                  calib.code, location)
     if (is.null(filename)) filename <- paste0(.sanitize(location), "_", .sanitize(calib.code), "_",
                                               paste(.sanitize(outcomes), collapse = "_"), .build.file.suffix( split.by, facet.by,plot.which))
@@ -1042,6 +1071,7 @@ plot.int.comparison <- function(int.simsets,
                                 dpi               = 300,
                                 create.dirs       = TRUE,
                                 verbose           = TRUE,
+                                root.dir          = NULL,
                                 debug             = FALSE) {
     
     if (debug) browser()
@@ -1072,7 +1102,7 @@ plot.int.comparison <- function(int.simsets,
             if (length(all.calibs) > 1)        "both" else "intervention"
     
     if (is.null(folder.name)) folder.name<-paste0(calibration.codes[1],".vs.others")
-    if (is.null(save.dir)) save.dir <- file.path(SHIELD.PLOT.PATH, "interventionPlots",
+    if (is.null(save.dir)) save.dir <- file.path(.shield.plot.path(root.dir), "interventionPlots",
                                                  "comparison",folder.name,
                                                  paste0("by_", separate.by))
     
@@ -1176,7 +1206,8 @@ verify_calibration <- function(calib.simsets,
                                style.manager = NULL,
                                verbose = TRUE,
                                mixing.threshold = 100000,
-                               unmixed.allowable = 2) {
+                               unmixed.allowable = 2,
+                               root.dir = NULL) {
     
     all.loc.names <- if (!is.null(locations)) {
         unique(names(.filter.to.requested.locations(locations,
@@ -1195,7 +1226,8 @@ verify_calibration <- function(calib.simsets,
                 separate.by = "location",
                 sim.subset = "last1",
                 style.manager = style.manager,
-                save.dir = file.path(SHIELD.PLOT.PATH, "verificationPlots", calib_code)
+                root.dir = root.dir,
+                save.dir = file.path(.shield.plot.path(root.dir), "verificationPlots", calib_code)
             )
         }
         

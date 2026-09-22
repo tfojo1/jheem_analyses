@@ -7,8 +7,10 @@
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 source("../jheem_analyses/applications/SHIELD/shield_specification.R")
 source('../jheem_analyses/applications/SHIELD/analysis/calibration/calibration_helper_functions.R')
-# source("../jheem_analyses/applications/SHIELD/shield_calib_register.R")
 
+#options: if the results are saved locally, we can change the root.dir
+# LOGS <- normalizePath("~/jheem/code/jheem_analyses/applications/SHIELD/logs/")
+# load.calib.simsets(..., root.dir=LOGS)
 
 get.jheem.root.directory()
 
@@ -20,9 +22,10 @@ for (x in SHIELD.TEN.MSAS){
 }
 
 calibration.codes <- c(
-    # "calib.8.21.stage3.az"   # completed for 10 cities
+    "calib.8.21.stage3.az",   # completed for 10 cities
     # "calib.8.21.stage2"
-    "calib.9.19.stage2"
+    "calib.9.19.stage3"
+    
 )
 
 # for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.16.stage2.az"))}
@@ -31,28 +34,31 @@ calibration.codes <- c(
 calib.simsets <- load.calib.simsets(
     locations         =  SHIELD.TEN.MSAS,
     calibration.codes = calibration.codes,
-    n.sim = 300
-    # n.sim = 400,
-    # ROOT.DIR
+    # n.sim = 300
+    n.sim = 400
 )
 
-# Inspect mixing statistics -----
+# ****************************************************************************************************
+# >> Inspect mixing statistics -----
+# ****************************************************************************************************
 inspect_mixing (
     calib.simsets = calib.simsets,
-    calibration.codes = calibration.codes,
+    # calibration.codes = calibration.codes[2],
+    calibration.codes = "calib.9.19.stage2",
     locations = SHIELD.TEN.MSAS,
     show.mixing = T,
     verbose = T
 )
 
 # ****************************************************************************************************
-# Save summary plots for a calibration version (compares the fit accross all cities)
+# >> Save summary plots for a calibration version (compares the fit accross all cities)
 # ****************************************************************************************************
-calib.name="calib.8.21.stage3.az"
+# calib.name="calib.8.21.stage3.az"
+calib.name="calib.9.19.stage3"
 
 if(1==1){
     # 1-compare accross various locations ----
-    save_summary_plots_by_outcome<-function(calibration.code,folder.name,sim.subset="last20"){
+    save_summary_plots_by_outcome<-function(calibration.code,folder.name,sim.subset="full"){
         plot.calib.comparison(calib.simsets = calib.simsets,
                               calibration.codes = calibration.code,
                               sim.subset = sim.subset,
@@ -162,12 +168,9 @@ if(1==1){
     save_summary_plots_by_outcome(calibration.code =calib.name,folder.name = paste0(calib.name,".summary"),sim.subset="full")
     save_summary_plots_by_location(calibration.code =calib.name,folder.name = paste0(calib.name,".summary"),sim.subset="full")
 }
-simplot(calib.simsets$`Baltimore – calib.8.21.stage3.az`$full_simset,outcomes = "diagnosis.ps",summary.type = "median.and.interval",omit.data.years = c(2020:2025))
-
-# get.default.style.manager()$shade.increment
 
 # **********************************************************************************************************************************************************
-# 3-compare_calibrations_by_outcome ----
+# >> compare_calibrations_by_outcome ----
 compare_calibrations_by_outcome<-function(calibration.codes,folder.name,sim.subset="last20"){
     plot.calib.comparison(calib.simsets = calib.simsets,
                           calibration.codes = calibration.codes,
@@ -177,7 +180,7 @@ compare_calibrations_by_outcome<-function(calibration.codes,folder.name,sim.subs
                           folder.name = folder.name,
                           outcomes = c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.late.misclassified",
                                        "hiv.testing","sti.screening", "prop.male.ps.diag.among.msm"
-                                       # ,"ps.diag.rate.among.msm"
+                                       ,"ps.diag.rate.among.msm"
                           ),
                           years = c(1970:2030),
                           ncol=5
@@ -248,12 +251,13 @@ compare_calibrations_by_outcome<-function(calibration.codes,folder.name,sim.subs
     )
 }
 
-compare_calibrations_by_outcome(calibration.codes=c("calib.7.16.stage3.az","calib.7.30.stage3.az"),
-                                folder.name = "calib.7.16.vs.30.stage3",
+compare_calibrations_by_outcome(calibration.codes=c("calib.8.21.stage3.az","calib.9.19.stage3"),
+                                folder.name = "calib.8.21.vs.9.19.stage3",
                                 sim.subset="full")
 
+
 # **********************************************************************************************************************************************************
-# 4- compute prp Male diag by MSM by race -----
+# >> compute prp Male diag by MSM by race -----
 
 sapply(calib.simsets,function(simCalib){
     # simCalib=calib.simsets$`Atlanta – calib.7.14.stage2.az`
@@ -351,7 +355,7 @@ outcomes.all <- c("diagnosis.total", "diagnosis.ps",
                   "diagnosis.el.misclassified", "diagnosis.late.misclassified","hiv.testing")
 
 # ****************************************************************************************************
-# 1. COMPARE BOTH CALIBRATIONS ACROSS ALL CITIES — SEPARATE BY OUTCOME ----
+# >> COMPARE BOTH CALIBRATIONS ACROSS ALL CITIES — SEPARATE BY OUTCOME ----
 # ****************************************************************************************************
 
 # Save all outcome plots to disk
