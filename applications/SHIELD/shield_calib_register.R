@@ -67,8 +67,8 @@ register.calibration.info("calib.9.19.stage3",
                           n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
 )
 
-# 9.22: redoing stage 3 downweighted by half
-register.calibration.info("calib.9.22.stage3",
+# 9.22: redoing stage 3 down-weighted by half
+register.calibration.info("calib.9.22.stage3",  
                           preceding.calibration.codes = 'calib.9.19.stage2',
                           likelihood.instructions = lik.inst.stage3,
                           data.manager = SURVEILLANCE.MANAGER,
@@ -76,7 +76,7 @@ register.calibration.info("calib.9.22.stage3",
                           parameter.names = c(
                               SHIELD.FULL.PARAMETERS.PRIOR@var.names
                           ),
-                          n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
+                          n.iter = 10000, thin = 50, n.burn = 0, is.preliminary = F,  n.chains = 4, max.run.time.seconds = 30, description = "NA"
 )
 
 # 8.21

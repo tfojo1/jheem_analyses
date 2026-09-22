@@ -46,25 +46,20 @@ ten_cities=(
     C.33100 C.35620 C.37980 C.38060 C.42660
 )
 
-shield2_cities=(
-     
-)
-shield1_cities=( 
-    C.33100 C.35620 C.37980 C.38060 C.42660
-)
-shield3_cities=( 
+nine_cities=(
     C.12060 C.12580 C.16980 C.26420 C.31080
+    C.33100 C.37980 C.38060 C.42660
 )
 
 # ── set active cities here ─────────────────────────────────────────────────────
-CITIES=("${ten_cities[@]}")
+CITIES=("${nine_cities[@]}")
 
 CALIBRATION_CODES=(
-    calib.9.19.stage3
+    calib.9.22.stage3
 )
 
 # MAX_JOBS = max concurrent Rscript processes on this machine (1 core each).
-MAX_JOBS=20 #Depends on the machine
+MAX_JOBS=30 #Depends on the machine
 
 SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
 
