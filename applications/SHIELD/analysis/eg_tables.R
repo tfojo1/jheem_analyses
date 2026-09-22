@@ -19,7 +19,7 @@ source("../jheem_analyses/applications/SHIELD/shield_calib_register.R")
 # ROOT.DIR # is set by the specification
 
 # the table and figure functions
-source('../jheem_analyses/applications/SHIELD/analysis/intervention_helper_functions.R')
+source('../jheem_analyses/applications/SHIELD/analysis/intervention/intervention_helper_functions.R')
 
 
 # ============================================================================

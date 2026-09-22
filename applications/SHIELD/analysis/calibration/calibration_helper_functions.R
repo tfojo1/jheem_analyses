@@ -1,90 +1,34 @@
 # ****************************************************************************************************
-# SHIELD SIMSET LIBRARY ----
+# SHIELD CALIBRATION SIMSET HELPERS ----
 # ****************************************************************************************************
-# Unified functions for loading, subsetting, and plotting calibration and intervention simsets.
+# Loading, subsetting and plotting of CALIBRATION simsets.
+# Intervention simsets are handled by analysis/intervention/int_simset_helper_functions.R.
 #
-# SIMSET TYPES:
-#   Calibration  — 2D: City × CalibrationCode
-#                  Key: "City – CalibCode"
-#                  Stores: full_simset, last20_sims, last_sim
+# SIMSET SHAPE
+#   2D: City x CalibrationCode. Key: "City – CalibCode".
+#   Each entry stores full_simset, last20_sims, last_sim.
 #
-#   Intervention — 3D: City × CalibrationCode × Intervention
-#                  Key: "City – CalibCode – InterventionLabel"
-#                  Stores: full_simset
+# LOCATION INPUT CONVENTION
+#   A NAMED character vector: names = display names, values = MSA codes.
+#     SHIELD.TEN.MSAS                all 10 cities
+#     SHIELD.TEN.MSAS["Baltimore"]   one city
+#     NULL                           all available
 #
-# LOCATION INPUT CONVENTION (all functions):
-#   Named character vector — names = display names, values = MSA codes
-#     SHIELD.TEN.MSAS                         → all 10 cities
-#     SHIELD.TEN.MSAS[1:3]                    → first 3 cities
-#     SHIELD.TEN.MSAS["Baltimore"]            → one city
-#     NULL                                    → all available
-#
-# PUBLIC API:
-#   SHARED:       ensure.plot.dir()
-#   CALIBRATION:  load.calib.simsets()  |  extract.calib.simsets()
-#                 plot.calib.stages()   |  plot.calib.location()  |  plot.calib.comparison()
-#   INTERVENTION: load.int.simsets()    |  extract.int.simsets()
-#                 plot.int.location()   |  plot.int.comparison()
-#
+# PUBLIC API
+#   load.calib.simsets()     read simsets from disk, with caching
+#   extract.calib.simsets()  filter a loaded set by location / calibration code
+#   plot.calib.stages()      per-city stage plots
+#   plot.calib.comparison()  multi-panel comparison across cities or codes
+#   inspect_mixing()         MCMC mixing statistics and threshold check
 # ****************************************************************************************************
 
 
-# ****  REQUIRED LIBRARIES  **** ----
-# ****************************************************************************************************
-library(ggplot2)    # plotting primitives, themes, guides
-library(patchwork)  # panel layout with wrap_plots and plot_annotation
+source('../jheem_analyses/applications/SHIELD/analysis/shield_plot_core.R')
 
-
-# ****  PATH HELPERS  **** ----
-# ****************************************************************************************************
-# Every function that reads simsets from disk or writes plots to disk takes a root.dir argument.
-#
-#   1. root.dir = NULL (the default) falls back to get.jheem.root.directory(), so all existing
-#      calls keep the behavior they had before.
-#   2. Pass an explicit root.dir to read simsets from, or write plots to, a location outside
-#      the JHEEM root -- for example a logs folder or a shared drive.
-#
-# These are functions rather than constants because a constant is frozen at the moment the file
-# is sourced, which leaves no way for a per-call root.dir to override it.
-
-.shield.base.path <- function(root.dir = NULL) {
-    if (is.null(root.dir)) root.dir <- get.jheem.root.directory()
-    file.path(root.dir, "simulations", "shield")
-}
-
-.shield.plot.path <- function(root.dir = NULL) {
-    if (is.null(root.dir)) root.dir <- get.jheem.root.directory()
-    file.path(root.dir, "shield")
-}
-
-
-# ****  SECTION 1: SHARED INTERNAL UTILITIES  **** ----
-# ****************************************************************************************************
 
 .build.calib.key <- function(loc.name, calib.code)
     paste0(loc.name, " \u2013 ", calib.code)
 
-.build.int.key <- function(loc.name, calib.code, int.label)
-    paste0(loc.name, " \u2013 ", calib.code, " \u2013 ", int.label)
-
-.resolve.cache <- function(cache, cache.name, force.reload, verbose) {
-    if (force.reload) {
-        if (verbose) message("[Cache] force.reload = TRUE — ignoring cache")
-        return(NULL)
-    }
-    if (!is.null(cache)) {
-        if (verbose) message("[Cache] Using provided cache (", length(cache), " simset(s))")
-        return(cache)
-    }
-    if (exists(cache.name, envir = globalenv(), inherits = FALSE)) {
-        cs <- get(cache.name, envir = globalenv())
-        if (verbose) message("[Cache] Found '", cache.name, "' in global environment (",
-                             length(cs), " simset(s))")
-        return(cs)
-    }
-    if (verbose) message("[Cache] No cache found — loading all from file")
-    NULL
-}
 
 .filter.to.requested.locations <- function(requested, available, caller = "unknown") {
     # browser()
@@ -100,6 +44,7 @@ library(patchwork)  # panel layout with wrap_plots and plot_annotation
     available[avail.names %in% req.names[matched]]
 }
 
+
 .get.plot.simset <- function(entry, sim.subset = "full") {
     
     if (sim.subset == "last20" && !is.null(entry$last20_sims)) return(entry$last20_sims)
@@ -107,32 +52,6 @@ library(patchwork)  # panel layout with wrap_plots and plot_annotation
     entry$full_simset
 }
 
-.auto.grid <- function(n, nrow = NULL, ncol = NULL) {
-    if (!is.null(nrow) && !is.null(ncol)) return(list(nrow = nrow, ncol = ncol))
-    if (!is.null(ncol)) return(list(nrow = ceiling(n / ncol), ncol = ncol))
-    if (!is.null(nrow)) return(list(nrow = nrow, ncol = ceiling(n / nrow)))
-    nc <- ceiling(sqrt(n * 1.5))
-    list(nrow = ceiling(n / nc), ncol = nc)
-}
-
-.build.file.suffix <- function(split.by, facet.by,plot.which) {
-    parts <- character(0)
-    if (!is.null(split.by)) parts <- c(parts, paste0("split-", paste(split.by, collapse = "-")))
-    if (!is.null(facet.by)) parts <- c(parts, paste0("facet-",  paste(facet.by, collapse = "-")))
-    if (!is.null(plot.which) && plot.which == "sim.only") parts <- c(parts, "simOnly")
-    if (length(parts) > 0) paste0("_", paste(parts, collapse = "_")) else ""
-}
-
-.sanitize <- function(x) gsub("[^A-Za-z0-9_-]", "_", gsub("\\.", "-", x))
-
-.auto.style.manager <- function(split.by, facet.by, n.simsets = NULL) {
-    if (!is.null(split.by)) {
-        create.style.manager(color.sim.by    = "stratum",
-                             linetype.sim.by = "simset")
-    } else {
-        create.style.manager(color.sim.by = "simset")
-    }
-}
 
 .extract.location.info <- function(location) {
     
@@ -155,58 +74,6 @@ library(patchwork)  # panel layout with wrap_plots and plot_annotation
     }
 }
 
-## int.style.manager ----
-## int.style.manager ----
-#
-# Builds a style manager for intervention comparisons where:
-#   Color    = calibration code (same color for same calibration across interventions)
-#   Linetype = intervention (solid for int 1, dashed for int 2, etc.)
-#
-# Simsets must be ordered: all interventions for calib1, then all for calib2, etc.
-#
-# Arguments:
-#   intervention.labels - Character vector of intervention display labels (in order)
-#   calibration.codes   - Character vector of calibration codes (in order)
-#   palette             - Base color function for calibrations (default: ggsci::pal_jama())
-#                         Must support at least length(calibration.codes) colors
-#   linewidth.slope     - Passed to create.style.manager()
-#
-# Returns:
-#   A style manager object from create.style.manager()
-#
-# Usage:
-#   plot.int.comparison(...,
-#       style.manager = int.style.manager(
-#           intervention.labels = c("baseline","int.1","int.2","int.3","int.4"),
-#           calibration.codes   = calibration.codes
-#       )
-#   )
-# ****************************************************************************************************
-int.style.manager <- function(intervention.labels,
-                              calibration.codes,
-                              palette         = ggsci::pal_jama(),
-                              linewidth.slope = 0) {
-    n.int   <- length(intervention.labels)
-    n.calib <- length(calibration.codes)
-    n.total <- n.int * n.calib
-    
-    # Each calibration gets one color applied to all its interventions
-    calib.colors <- palette(n.calib)
-    rep.colors   <- rep(calib.colors, each = n.int)
-    
-    # Each intervention gets one linetype repeated across calibrations
-    base.linetypes <- c("solid", "dashed", "dotted", "dotdash", "longdash", "twodash")
-    int.linetypes  <- base.linetypes[seq_len(n.int)]
-    rep.linetypes  <- rep(int.linetypes, times = n.calib)
-    
-    create.style.manager(
-        color.sim.by    = "simset",
-        linetype.sim.by = "simset",
-        sim.palette     = scales::manual_pal(values = rep.colors),
-        linetypes       = rep.linetypes,
-        linewidth.slope = linewidth.slope
-    )
-}
 
 .detect.n.sim <- function(calibration.code, root.dir = NULL) {
     base.path <- .shield.base.path(root.dir)
@@ -219,94 +86,6 @@ int.style.manager <- function(intervention.labels,
     max(n.sims)
 }
 
-# Core simplot call from a named list of simset objects + display labels
-.make.panel <- function(simset.list, labels, outcomes, split.by, facet.by,
-                        style.manager, summary.type, plot.which, years) {
-    # browser()
-    if (length(simset.list) == 0) return(NULL)
-    args <- list(outcomes = outcomes, dimension.values = list(year = years),
-                 style.manager = style.manager, summary.type = summary.type,
-                 plot.which = plot.which )
-    if (!is.null(split.by)) args$split.by <- split.by
-    if (!is.null(facet.by)) args$facet.by  <- facet.by
-    if (length(simset.list) >= 1 && !is.null(labels)) args$simset.names <- unname(labels)
-    
-    do.call(simplot, c(unname(simset.list), args))
-    
-}
-
-# Patchwork grid - each panel retains its own legend
-# Simply arranges panels in a grid without collecting/sharing legends
-# Patchwork grid with single shared legend on the right
-# Removes legends from individual panels and shows one collected legend
-.make.patchwork <- function(panels, title = NULL, subtitle = NULL,
-                            nrow = NULL, ncol = NULL) {
-    
-    panels <- Filter(Negate(is.null), panels)
-    if (length(panels) == 0) return(NULL)
-    grid <- .auto.grid(length(panels), nrow, ncol)
-    
-    # Theme for panels - ensure consistent appearance
-    panel.theme <- theme(
-        plot.background = element_rect(fill = "white", colour = NA),
-        plot.margin     = margin(t = 5, r = 5, b = 5, l = 5)
-    )
-    
-    panels.ready <- lapply(panels, function(p) p + panel.theme)
-    
-    # Wrap panels and collect guides to show single legend on right
-    p <- wrap_plots(panels.ready, nrow = grid$nrow, ncol = grid$ncol) +
-        plot_layout(guides = "collect") &
-        theme(
-            legend.position   = "right",
-            legend.direction  = "vertical",
-            legend.text       = element_text(size = 9),
-            legend.key.width  = unit(1.2, "cm"),
-            legend.key.height = unit(0.5, "cm"),
-            legend.background = element_rect(fill = "white", colour = NA)
-        )
-    
-    if (!is.null(title)) {
-        ann <- list(title = title,
-                    theme = theme(
-                        plot.title      = element_text(size = 14, hjust = 0.5, face = "bold"),
-                        plot.subtitle   = element_text(size = 11, hjust = 0.5),
-                        plot.background = element_rect(fill = "white", colour = NA)))
-        if (!is.null(subtitle)) ann$subtitle <- subtitle
-        p <- p + do.call(plot_annotation, ann)
-    }
-    p
-}
-
-# Save a combined plot to disk
-.save.plot <- function(combined, save.dir, filename, width, height, dpi, create.dirs, verbose) {
-    ensure.plot.dir(save.dir, create.dirs)
-    if (!grepl("\\.png$", filename)) filename <- paste0(filename, ".png")
-    fp <- file.path(save.dir, filename)
-    ggsave(fp, plot = combined, width = width, height = height, dpi = dpi)
-    if (verbose) message("  Saved: ", fp)
-    invisible(fp)
-}
-
-# Auto-scales figure height based on number of panel rows
-.auto.height <- function(n.panels, ncol, nrow = NULL, panel.height = 3.5) {
-    n.rows <- if (!is.null(nrow)) nrow else ceiling(n.panels / max(ncol, 1))
-    n.rows * panel.height
-}
-
-ensure.plot.dir <- function(path, create.dirs = FALSE) {
-    if (!dir.exists(path)) {
-        if (!create.dirs) stop("Directory does not exist: ", path,
-                               "\nSet create.dirs = TRUE to create it automatically.")
-        dir.create(path, recursive = TRUE, showWarnings = FALSE)
-        message("Created directory: ", path)
-    }
-    invisible(path)
-}
-
-
-# ****  SECTION 2: CALIBRATION — LOADING  **** ----
-# ****************************************************************************************************
 
 ## load.calib.simsets ----
 load.calib.simsets <- function(locations,
@@ -512,9 +291,6 @@ load.calib.simsets <- function(locations,
 }
 
 
-# ****  SECTION 3: CALIBRATION — SUBSETTING  **** ----
-# ****************************************************************************************************
-
 ## extract.calib.simsets ----
 extract.calib.simsets <- function(calib.simsets,
                                   location    = NULL,
@@ -544,9 +320,6 @@ extract.calib.simsets <- function(calib.simsets,
     }
 }
 
-
-# ****  SECTION 4: CALIBRATION — PLOTTING  **** ----
-# ****************************************************************************************************
 
 ## .make.stage.plots ----
 .make.stage.plots <- function(entry, stage, plotting.path, style.manager) {
@@ -668,60 +441,6 @@ plot.calib.stages <- function(calib.simsets,
 }
 
 
-## plot.calib.location ----
-plot.single.calib.single.location <- function(calib.simsets,
-                                              location,
-                                              calibration.code = NULL,
-                                              outcomes,
-                                              sim.subset        = "full",
-                                              split.by          = NULL,
-                                              facet.by          = NULL,
-                                              years             = 1970:2030,
-                                              plot.which        = "sim.and.data",
-                                              style.manager     = NULL,
-                                              summary.type      = "median.and.interval",
-                                              save              = TRUE,
-                                              save.dir          = NULL,
-                                              filename          = NULL,
-                                              width             = 12,
-                                              height            = 7,
-                                              dpi               = 300,
-                                              create.dirs       = FALSE,
-                                              root.dir          = NULL) {
-    
-    if (length(location) > 1) {
-        warning("Multiple locations provided; using only the first: '", location[1], "'")
-        location <- location[1]
-    }
-    
-    if (!is.null(calibration.code) && length(calibration.code) > 1) {
-        warning("Multiple calibration codes provided; using only the first: '", calibration.code[1], "'")
-        calibration.code <- calibration.code[1]
-    }
-    
-    simset.list <- extract.calib.simsets(calib.simsets,calibration.code =calibration.code,  location = location)
-    
-    
-    if (length(simset.list) == 0) stop("No simsets found for location: '", location, "'")
-    
-    if (is.null(style.manager)) style.manager <- .auto.style.manager(split.by, facet.by)
-    
-    simset <-  .get.plot.simset(simset.list, sim.subset)
-    labels      <- simset.list$calib.code
-    p           <- .make.panel(simset, labels, outcomes, split.by, facet.by,
-                               style.manager, summary.type, plot.which, years)
-    if (is.null(p)) stop("Failed to generate plot for '", location, "'")
-    p <- p + ggtitle(location)
-    if (!save) return(p)
-    
-    if (is.null(save.dir)) save.dir <- file.path(.shield.plot.path(root.dir), "calibrationPlots",calibration.code, location)
-    if (is.null(filename))  filename <- paste0(paste(.sanitize(outcomes), collapse = "_"),
-                                               .build.file.suffix( split.by, facet.by,plot.which))
-    .save.plot(p, save.dir, filename, width, height, dpi, create.dirs, verbose = TRUE)
-    invisible(p)
-}
-
-
 ## plot.calib.comparison ----
 plot.calib.comparison <- function(calib.simsets,
                                   calibration.codes = NULL,
@@ -840,418 +559,6 @@ plot.calib.comparison <- function(calib.simsets,
     if (save) invisible(output) else output
 }
 
-
-# ****  SECTION 5: INTERVENTION — LOADING  **** ----
-# ****************************************************************************************************
-
-.build.int.path <- function(base.path, calibration.code, n.sim, location.code, intervention.code) {
-    run.tag  <- paste0(calibration.code, "-", n.sim)
-    filename <- paste0("shield_", run.tag, "_", location.code, "_", intervention.code, ".Rdata")
-    file.path(base.path, run.tag, location.code, filename)
-}
-
-
-## load.int.simsets ----
-load.int.simsets <- function(locations,
-                             intervention.codes,
-                             calibration.codes,
-                             n.sim,
-                             base.path           = NULL,
-                             root.dir            = NULL,
-                             intervention.labels = NULL,
-                             cache               = NULL,
-                             cache.name          = "int.simsets",
-                             force.reload        = FALSE,
-                             append              = TRUE,
-                             verbose             = TRUE,
-                             debug               = FALSE) {
-    if (debug) browser()
-    if (is.null(base.path)) base.path <- .shield.base.path(root.dir)
-    city.names     <- if (!is.null(names(locations))) names(locations) else unname(locations)
-    location.codes <- unname(locations)
-    
-    if (is.null(intervention.labels))
-        intervention.labels <- setNames(intervention.codes, intervention.codes)
-    
-    resolved.cache <- .resolve.cache(cache, cache.name, force.reload, verbose)
-    
-    key.map <- list()
-    for (i in seq_along(location.codes))
-        for (cc in calibration.codes)
-            for (int.code in intervention.codes) {
-                int.label <- if (int.code %in% names(intervention.labels))
-                    intervention.labels[[int.code]] else int.code
-                key <- .build.int.key(city.names[i], cc, int.label)
-                key.map[[key]] <- list(loc.code  = location.codes[i], city.name = city.names[i],
-                                       calib.code = cc, int.code = int.code, int.label = int.label)
-            }
-    expected.keys <- names(key.map)
-    
-    if (!force.reload && !is.null(resolved.cache)) {
-        cached.keys  <- intersect(expected.keys, names(resolved.cache))
-        missing.keys <- setdiff(expected.keys, names(resolved.cache))
-        if (verbose) {
-            message("[Cache] ", if (append) length(resolved.cache) else length(cached.keys), " simset(s) served from cache")
-            message("[Cache] ", length(missing.keys), " simset(s) to load from file")
-        }
-    } else {
-        cached.keys  <- character(0)
-        missing.keys <- expected.keys
-    }
-    
-    all.simsets <- if (append && !is.null(resolved.cache)) {
-        if (verbose) message("[Append] Mode ON — preserving ", length(resolved.cache), " cached simset(s)")
-        resolved.cache
-    } else if (!is.null(resolved.cache)) {
-        if (verbose) message("[Append] Mode OFF — returning requested keys only")
-        resolved.cache[cached.keys]
-    } else { list() }
-    
-    
-    n.loaded <- n.skipped <- 0
-    
-    for (simset.key in missing.keys) {
-        info <- key.map[[simset.key]]
-        path <- .build.int.path(base.path, info$calib.code, n.sim, info$loc.code, info$int.code)
-        
-        if (!file.exists(path)) {
-            warning("File not found, skipping: ", path)
-            n.skipped <- n.skipped + 1; next
-        }
-        if (verbose) message("  Loading: ", simset.key)
-        
-        simset <- tryCatch(load.simulation.set(path),
-                           error = function(e) { warning("Error loading '", simset.key, "': ", e$message); NULL })
-        if (is.null(simset)) { n.skipped <- n.skipped + 1; next }
-        
-        all.simsets[[simset.key]] <- list(
-            full_simset   = simset,
-            location.name = info$city.name,
-            location.code = info$loc.code,
-            calib.code    = info$calib.code,
-            int.label     = info$int.label,
-            int.code      = info$int.code,
-            title.suffix  = paste0(": ", info$calib.code, " \u2013 ", info$int.label)
-        )
-        n.loaded <- n.loaded + 1
-    }
-    
-    if (verbose) {
-        n.preserved <- if (append && !is.null(resolved.cache)) length(setdiff(names(resolved.cache), expected.keys)) else 0
-        message("\n--- Intervention Load Summary ---")
-        message("  From cache   : ", length(cached.keys))
-        message("  Preserved    : ", n.preserved)
-        message("  Loaded       : ", n.loaded)
-        message("  Skipped      : ", n.skipped)
-        message("  Total        : ", length(all.simsets))
-    }
-    all.simsets
-}
-
-
-# ****  SECTION 6: INTERVENTION — SUBSETTING  **** ----
-# ****************************************************************************************************
-
-## extract.int.simsets ----
-extract.int.simsets <- function(int.simsets,
-                                location     = NULL,
-                                calib.code   = NULL,
-                                intervention = NULL,
-                                exact        = FALSE,
-                                debug        = FALSE) {
-    if (debug) browser()
-    if (is.null(location) && is.null(calib.code) && is.null(intervention))
-        stop("Provide at least one filter argument: location, calib.code, or intervention")
-    
-    result <- int.simsets
-    
-    if (!is.null(location)) {
-        if (exact) result <- result[sapply(result, function(e) e$location.name == location)]
-        else       result <- result[grepl(location, sapply(result, `[[`, "location.name"), fixed = TRUE)]
-    }
-    
-    if (length(result) == 0) stop("No intervention simsets match the specified criteria")
-    
-    if (!is.null(calib.code)) {
-        if (exact) result <- result[sapply(result, function(e) e$calib.code == calib.code)]
-        else       result <- result[grepl(calib.code, sapply(result, `[[`, "calib.code"), fixed = TRUE)]
-    }
-    
-    if (length(result) == 0) stop("No intervention simsets match the specified criteria")
-    
-    if (!is.null(intervention)) {
-        if (exact) result <- result[sapply(result, function(e)
-            e$int.label == intervention || e$int.code == intervention)]
-        else result <- result[sapply(result, function(e)
-            grepl(intervention, e$int.label, fixed = TRUE) ||
-                grepl(intervention, e$int.code,  fixed = TRUE))]
-    }
-    
-    if (length(result) == 0) stop("No intervention simsets match the specified criteria")
-    
-    if (!is.null(location) && !is.null(calib.code) && !is.null(intervention) && length(result) == 1)
-        return(result[[1]])
-    
-    result
-}
-
-
-# ****  SECTION 7: INTERVENTION — PLOTTING  **** ----
-# ****************************************************************************************************
-
-## plot.int.location ----
-plot.int.location <- function(int.simsets,
-                              location,
-                              calib.code,
-                              interventions = NULL,
-                              outcomes,
-                              split.by      = NULL,
-                              facet.by      = NULL,
-                              years         = 1970:2030,
-                              plot.which    = "sim.and.data",
-                              style.manager = NULL,
-                              summary.type  = "median.and.interval",
-                              save          = FALSE,
-                              save.dir      = NULL,
-                              filename      = NULL,
-                              width         = 12,
-                              height        = 7,
-                              dpi           = 300,
-                              create.dirs   = FALSE,
-                              root.dir      = NULL,
-                              debug         = FALSE) {
-    if (debug) browser()
-    entries <- extract.int.simsets(int.simsets, location = location, calib.code = calib.code, exact = TRUE)
-    
-    if (!is.null(interventions))
-        entries <- entries[sapply(entries, function(e)
-            e$int.label %in% interventions || e$int.code %in% interventions)]
-    if (length(entries) == 0) stop("No intervention simsets found for '", location, "' / '", calib.code, "'")
-    
-    if (is.null(style.manager)) style.manager <- .auto.style.manager(split.by, facet.by)
-    
-    simset.list <- lapply(entries, function(e) e$full_simset)
-    labels      <- sapply(entries, `[[`, "int.label")
-    p           <- .make.panel(simset.list, labels, outcomes, split.by, facet.by,
-                               style.manager, summary.type, plot.which, years)
-    if (is.null(p)) stop("Failed to generate plot for '", location, "' / '", calib.code, "'")
-    p <- p + ggtitle(paste0(location, " \u2013 ", calib.code))
-    
-    if (!save) return(p)
-    
-    if (is.null(save.dir)) save.dir <- file.path(.shield.plot.path(root.dir), "interventionPlots",
-                                                 calib.code, location)
-    if (is.null(filename)) filename <- paste0(.sanitize(location), "_", .sanitize(calib.code), "_",
-                                              paste(.sanitize(outcomes), collapse = "_"), .build.file.suffix( split.by, facet.by,plot.which))
-    .save.plot(p, save.dir, filename, width, height, dpi, create.dirs, verbose = TRUE)
-    invisible(p)
-}
-
-
-## plot.int.comparison ----
-plot.int.comparison <- function(int.simsets,
-                                calibration.codes = NULL,
-                                locations         = NULL,
-                                interventions     = NULL,
-                                outcomes,
-                                separate.by       = c("outcome", "location", "calibration", "intervention"),
-                                folder.name       = NULL,
-                                split.by          = NULL,
-                                facet.by          = NULL,
-                                years             = 1970:2030,
-                                nrow              = NULL,
-                                ncol              = NULL,
-                                plot.which        = "sim.and.data",
-                                style.manager     = NULL,
-                                summary.type      = "median.and.interval",
-                                save              = FALSE,
-                                save.dir          = NULL,
-                                width             = 20,
-                                height            = NULL,
-                                dpi               = 300,
-                                create.dirs       = TRUE,
-                                verbose           = TRUE,
-                                root.dir          = NULL,
-                                debug             = FALSE) {
-    
-    if (debug) browser()
-    separate.by <- match.arg(separate.by)
-    if (is.null(style.manager)) style.manager <- .auto.style.manager(split.by, facet.by)
-    suffix      <- .build.file.suffix( split.by, facet.by,plot.which)
-    
-    filtered <- int.simsets
-    if (!is.null(calibration.codes))
-        filtered <- filtered[sapply(filtered, function(e) e$calib.code  %in% calibration.codes)]
-    
-    if (length(filtered) == 0) stop("No intervention simsets match the specified filters")
-    if (!is.null(locations))
-        filtered <- filtered[sapply(filtered, function(e) e$location.name %in% locations)]
-    
-    if (length(filtered) == 0) stop("No intervention simsets match the specified filters")
-    if (!is.null(interventions))
-        filtered <- filtered[sapply(filtered, function(e)
-            e$int.label %in% interventions || e$int.code %in% interventions)]
-    if (length(filtered) == 0) stop("No intervention simsets match the specified filters")
-    
-    all.locs  <- unique(sapply(filtered, `[[`, "location.name"))
-    all.calibs <- unique(sapply(filtered, `[[`, "calib.code"))
-    all.ints  <- unique(sapply(filtered, `[[`, "int.label"))
-    
-    color.by <- if (separate.by == "intervention") "calibration" else
-        if (separate.by == "calibration")  "intervention" else
-            if (length(all.calibs) > 1)        "both" else "intervention"
-    
-    if (is.null(folder.name)) folder.name<-paste0(calibration.codes[1],".vs.others")
-    if (is.null(save.dir)) save.dir <- file.path(.shield.plot.path(root.dir), "interventionPlots",
-                                                 "comparison",folder.name,
-                                                 paste0("by_", separate.by))
-    
-    make.entries.panel <- function(entries, cur.outcomes = outcomes) {
-        if (length(entries) == 0) return(NULL)
-        simset.list <- lapply(entries, function(e) e$full_simset)
-        labels <- switch(color.by,
-                         intervention = sapply(entries, `[[`, "int.label"),
-                         calibration  = sapply(entries, `[[`, "calib.code"),
-                         both         = paste0(sapply(entries, `[[`, "calib.code"), " \u2013 ",
-                                               sapply(entries, `[[`, "int.label")))
-        .make.panel(simset.list, labels, cur.outcomes, split.by, facet.by,
-                    style.manager, summary.type, plot.which, years)
-    }
-    
-    filter.entries <- function(loc = NULL, cc = NULL, int = NULL) {
-        e <- filtered
-        if (!is.null(loc)) e <- e[sapply(e, function(x) x$location.name == loc)]
-        if (!is.null(cc))  e <- e[sapply(e, function(x) x$calib.code   == cc)]
-        if (!is.null(int)) e <- e[sapply(e, function(x) x$int.label    == int || x$int.code == int)]
-        e
-    }
-    
-    output <- list()
-    
-    if (separate.by == "outcome") {
-        for (oi in seq_along(outcomes)) {
-            outcome <- outcomes[oi]
-            if (verbose) message(sprintf("[%d/%d] Outcome: %s", oi, length(outcomes), outcome))
-            panels <- setNames(lapply(all.locs, function(loc) {
-                p <- make.entries.panel(filter.entries(loc = loc), cur.outcomes = outcome)
-                if (!is.null(p)) p + ggtitle(loc) else NULL
-            }), all.locs)
-            combined <- .make.patchwork(panels, title = paste0("Outcome: ", outcome), nrow = nrow, ncol = ncol)
-            if (is.null(combined)) next
-            output[[outcome]] <- combined
-            h <- if (is.null(height)) .auto.height(length(Filter(Negate(is.null), panels)), ncol = if (!is.null(ncol)) ncol else ceiling(sqrt(length(panels) * 1.5)), nrow = nrow) else height
-            if (save) .save.plot(combined, save.dir,
-                                 paste0("outcome_", .sanitize(outcome), "_by_location", suffix),
-                                 width, h, dpi, create.dirs, verbose)
-        }
-    }
-    
-    if (separate.by == "location") {
-        for (li in seq_along(all.locs)) {
-            loc <- all.locs[li]
-            if (verbose) message(sprintf("[%d/%d] Location: %s", li, length(all.locs), loc))
-            p <- make.entries.panel(filter.entries(loc = loc))
-            if (is.null(p)) next
-            p <- p + ggtitle(loc)
-            output[[loc]] <- p
-            h <- if (is.null(height)) .auto.height(1, ncol = 1, nrow = 1) else height
-            if (save) .save.plot(p, save.dir,
-                                 paste0("location_", .sanitize(loc), suffix),
-                                 width, h, dpi, create.dirs, verbose)
-        }
-    }
-    
-    if (separate.by == "calibration") {
-        for (cc in all.calibs) {
-            if (verbose) message("Calibration: ", cc)
-            panels <- setNames(lapply(all.locs, function(loc) {
-                p <- make.entries.panel(filter.entries(loc = loc, cc = cc))
-                if (!is.null(p)) p + ggtitle(loc) else NULL
-            }), all.locs)
-            combined <- .make.patchwork(panels, title = paste0("Calibration: ", cc), nrow = nrow, ncol = ncol)
-            if (is.null(combined)) next
-            output[[cc]] <- combined
-            h <- if (is.null(height)) .auto.height(length(Filter(Negate(is.null), panels)), ncol = if (!is.null(ncol)) ncol else ceiling(sqrt(length(panels) * 1.5)), nrow = nrow) else height
-            if (save) .save.plot(combined, save.dir, paste0("calib_", .sanitize(cc), suffix),
-                                 width, h, dpi, create.dirs, verbose)
-        }
-    }
-    
-    if (separate.by == "intervention") {
-        for (int in all.ints) {
-            if (verbose) message("Intervention: ", int)
-            panels <- setNames(lapply(all.locs, function(loc) {
-                p <- make.entries.panel(filter.entries(loc = loc, int = int))
-                if (!is.null(p)) p + ggtitle(loc) else NULL
-            }), all.locs)
-            combined <- .make.patchwork(panels, title = paste0("Intervention: ", int), nrow = nrow, ncol = ncol)
-            if (is.null(combined)) next
-            output[[int]] <- combined
-            h <- if (is.null(height)) .auto.height(length(Filter(Negate(is.null), panels)), ncol = if (!is.null(ncol)) ncol else ceiling(sqrt(length(panels) * 1.5)), nrow = nrow) else height
-            if (save) .save.plot(combined, save.dir, paste0("intervention_", .sanitize(int), suffix),
-                                 width, h, dpi, create.dirs, verbose)
-        }
-    }
-    
-    if (verbose && save) message("\nDone. Saved ", length(output), " file(s) to: ", save.dir)
-    if (save) invisible(output) else output
-}
-
-# **** SECTION 8: CALIBRATION VERIFICATION **** ----
-# ****************************************************************************************************
-verify_calibration <- function(calib.simsets,
-                               calibration.codes,
-                               generate.plots = TRUE,
-                               locations     = NULL,
-                               style.manager = NULL,
-                               verbose = TRUE,
-                               mixing.threshold = 100000,
-                               unmixed.allowable = 2,
-                               root.dir = NULL) {
-    
-    all.loc.names <- if (!is.null(locations)) {
-        unique(names(.filter.to.requested.locations(locations,
-                                                    setNames(sapply(calib.simsets, `[[`, "location.code"),
-                                                             sapply(calib.simsets, `[[`, "location.name")),
-                                                    "verify_calibration")))
-    } else unique(sapply(calib.simsets, `[[`, "location.name"))
-    
-    setNames(lapply(calibration.codes, function(calib_code) {
-        if (generate.plots) {
-            plot.calib.comparison(
-                calib.simsets,
-                calibration.codes = calib_code,
-                locations = locations,
-                outcomes = c("population", "deaths", "diagnosis.ps"),
-                separate.by = "location",
-                sim.subset = "last1",
-                style.manager = style.manager,
-                root.dir = root.dir,
-                save.dir = file.path(.shield.plot.path(root.dir), "verificationPlots", calib_code)
-            )
-        }
-        
-        # Check if 2 or more parameters have a mixing statistic over 100,000
-        rv <- !sapply(all.loc.names, function(loc) {
-            tryCatch(
-                {
-                    simset <- extract.calib.simsets(calib.simsets, location = loc, calibration.code = calib_code, exact = T)[[1]]$full_simset
-                    sum(simset$get.mcmc.mixing.statistic() > mixing.threshold) >= unmixed.allowable
-                },
-                error=function(e) {
-                    print(paste0("Couldn't extract simset for ", loc, " in '", calib_code, "': returning FALSE"))
-                    F
-                })
-        }, USE.NAMES = T)
-        
-        if (verbose && any(!rv)) {
-            print(paste0("The following locations didn't mix in '", calib_code, "': ", paste0(all.loc.names[!rv], collapse = ", ")))
-        }
-        
-        rv
-        
-    }), calibration.codes)
-}
 
 inspect_mixing <- function(calib.simsets,
                            calibration.codes,

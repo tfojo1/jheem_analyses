@@ -1,8 +1,15 @@
+# ---- DEPENDENCIES ----
+# These must run every time, not behind a toggle: this script calls load.calib.simsets()
+# from the calibration helper and shield.plot() from the pretty-plots helper.
+source('../jheem_analyses/commoncode/locations_of_interest.R')
+source("../jheem_analyses/applications/SHIELD/shield_specification.R")
+source('../jheem_analyses/applications/SHIELD/analysis/calibration/calibration_helper_functions.R')
+source('../jheem_analyses/applications/SHIELD/analysis/calibration/pretty_plots_helper_functions.R')
+
+# ---- OUTPUT PATHS ----
+# Still toggled off. FIG.DIR is used by the ggsave() at the bottom of this script, so that
+# call fails until you switch this to 1==1 (or set FIG.DIR yourself).
 if (1==2){
-    source('../jheem_analyses/commoncode/locations_of_interest.R')
-    source("../jheem_analyses/applications/SHIELD/shield_specification.R")
-    source('../jheem_analyses/applications/SHIELD/analysis/calibration/pretty_plots_helper_functions.R')
-    
     print(paste("Root directory is set to: ",ROOT.DIR))
     BASE.PATH <- paste0(ROOT.DIR,"/shield/outputs/calib.8.21.stage3.az")
     FIG.DIR <- if (exists("BASE.PATH")) paste0(BASE.PATH, "/figures/") else "figures/"

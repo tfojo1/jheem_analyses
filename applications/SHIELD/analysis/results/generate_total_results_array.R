@@ -1,5 +1,13 @@
 # extract the data from the interventions
 
+# ---- DEPENDENCIES ----
+# SHIELD.TEN.MSAS comes from locations_of_interest.R; the simset objects and the JHEEM root
+# directory come from shield_specification.R; load.int.simsets() and extract.int.simsets()
+# come from the intervention simset helper.
+source('../jheem_analyses/commoncode/locations_of_interest.R')
+source('../jheem_analyses/applications/SHIELD/shield_specification.R')
+source('../jheem_analyses/applications/SHIELD/analysis/intervention/int_simset_helper_functions.R')
+
 CALIB_CODE <- "calib.8.21.stage3.az"
 INTERVENTION.LABELS <- c(
     noint        = "No Doxy-PEP Intervention",

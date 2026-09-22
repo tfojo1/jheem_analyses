@@ -66,7 +66,7 @@
 if(1==2){
   source('../jheem_analyses/commoncode/locations_of_interest.R')
   source('../jheem_analyses/applications/SHIELD/shield_specification.R')
-  source('../jheem_analyses/applications/SHIELD/analysis/intervention_helper_functions.R')
+  source('../jheem_analyses/applications/SHIELD/analysis/intervention/intervention_helper_functions.R')
   
   print(paste("Root directory is set to: ",ROOT.DIR))
   BASE.PATH <- paste0(ROOT.DIR,"/shield/outputs/calib.8.21.stage3.az")
