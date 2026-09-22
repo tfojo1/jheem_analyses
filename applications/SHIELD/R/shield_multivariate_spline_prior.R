@@ -2,6 +2,8 @@
 # make.mv.spline.prior.five.points ----
 # (Ryan's initial version - only works with 5 points)
 # **************************************************************************************************************************************************************************
+
+## make.mv.spline.prior.five.points ----
 #' @title Make Multivariate Spline Prior
 #' @description
 #' Builds a single-parameter multivariate lognormal prior over values at
@@ -132,6 +134,8 @@ if (1==2){
 # make.mv.spline.prior ----
 # (geenral version works with any number of points)
 # **************************************************************************************************************************************************************************
+
+## make.mv.spline.prior ----
 #' @title Make Multivariate Spline Prior
 #' @description
 #' Constructs a joint multivariate lognormal prior for one or more parameters
@@ -293,6 +297,7 @@ if (1==2){
 # the delta values across parameters can also be correlated within the same year.
 # e.g., transmission multipliers for the MSM and heterosexual population. We allow these multipliers to have a joint distribution for each group and we also want them to have a similar direction of change overtime.
 
+## make.joint.mv.spline.prior ----
 #' @title Make Joint Multivariate Spline Prior
 #' @description This make can a multivariate joint distribution for any number of parameters and spline points.
 #' @param parameters Parameters for which spline point values will be correlated

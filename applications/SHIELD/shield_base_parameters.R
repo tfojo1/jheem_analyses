@@ -7,6 +7,7 @@
 # source(../jheem_analyses/applications/SHIELD/inputs/input_fraction_hiv_test_by_age.R)
 # source(../jheem_analyses/applications/SHIELD/inputs/input_syphilis_misclassification_error.R)
 
+## add.parameter ----
 # what are the citation numbers?
 add.parameter <- function(params, param.name,
                           value,

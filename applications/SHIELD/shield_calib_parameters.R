@@ -18,10 +18,13 @@ source("../jheem_analyses/applications/SHIELD/R/shield_multivariate_spline_prior
 # ************************************************************************************************************************
 # Helpul command: #get.intervals(variable name): Get intervals (confidence/credible intervals) for the variables in a distribution
 # HELPER FUNCTIONS ----
+
+## logit ----
 logit = function(p){
     log(p) - log(1-p)
 }
 
+## create.auto.regressive.covariance.matrix ----
 create.auto.regressive.covariance.matrix = function(correlation.coefficient,n,sd){
     delta = matrix(rep(1:n,n)-rep(1:n,each=n),nrow=n)
     corr.matrix = correlation.coefficient^abs(delta)
@@ -450,6 +453,8 @@ PRENATAL.PARAMETERS.PRIOR=join.distributions(
 # *********************************************************************************************************************************************************************
 #***** LINKING PARAMETERS TO FUNCTIONAL FORMS *****  -----
 # *********************************************************************************************************************************************************************
+
+## SHIELD.APPLY.PARAMETERS.FN ----
 SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){ 
     ages=model.settings$specification.metadata$dim.names$age
     sexes=model.settings$specification.metadata$dim.names$sex

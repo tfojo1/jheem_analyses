@@ -69,7 +69,7 @@ if (RUN.STAGE == 'run'| RUN.STAGE == 'all') {
     print(paste0("STARTING CHAIN ", CHAIN, " FROM ", CALIBRATION.NAME, " CODE FOR ", LOCATION,
                  " (", locations::get.location.name(LOCATION), ") AT ", Sys.time()))
     #
-    # =============================================================================
+    # *****************************************************************************
     # RUN THE CHAIN, RETRYING IF THE NAS DRIVE DROPS OUT
     #
     # The problem: the run writes to the NAS drive as it goes. If the drive drops
@@ -79,7 +79,7 @@ if (RUN.STAGE == 'run'| RUN.STAGE == 'all') {
     # So: if the drive is what broke, wait for it and try again (up to ~95 minutes).
     # If anything else broke, print the error and stop - retrying a real bug 20
     # times only hides it and makes the log impossible to read.
-    # =============================================================================
+    # *****************************************************************************
 
     # --- Settings -----------------------------------------------------------------
     MAX.ATTEMPTS        <- 20       # how many times to try the chain in total

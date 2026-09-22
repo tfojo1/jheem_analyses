@@ -120,6 +120,8 @@ tbl.rel.2030 = make_multi_location_table(
   stat.type     = "median",
   save          = F
 );
+
+## mk ----
 # helper code to build the heatmap from each table
 mk <- function(tbl, strat, ttl){
   plot_coverage_heatmap(
@@ -213,6 +215,7 @@ f3.rel.noint <- make_multi_location_table(
   save          = F
 )
 
+## mk3 ----
 # helper, mirroring `mk` in the Figure 2 block above.
 # filename = NULL so nothing is written per-panel; the composed figure is
 # saved once at the end.

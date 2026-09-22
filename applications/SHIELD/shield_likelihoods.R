@@ -28,6 +28,7 @@ FUTURE.PENALTY.PS.DIAG.GROWTH.WEIGHT.STAGE1 = 1 / STAGE.1.WEIGHT
 FUTURE.PENALTY.PS.DIAG.GROWTH.WEIGHT.STAGE23 = 1 / STAGE.23.WEIGHT # representing the eight points we would have post 2022 (eight times as many points)
 # HIV.TESTING.BY.SEX.WEIGHT= 8 #increasing the weight for sex a specific HIV test testing rates because this is the only targets that's available among MSM
 
+## SHIELD.DUMMY.PARTITIONING.FUNCTION ----
 SHIELD.DUMMY.PARTITIONING.FUNCTION <- function(arr, version = 'shield', location) {
     # Intentionally do nothing:
     return(arr)
@@ -36,6 +37,8 @@ proportion.tested.bias.estimates = get.cached.object.for.version(name = "proport
                                                                  version = 'shield')
 prop_male_diag_among_msm_bias_estimates = get.cached.object.for.version(name = "prop_male_diag_among_msm_bias_estimates", 
                                                                  version = 'shield')
+
+## SHIELD.PARTITIONING.FUNCTION ----
 SHIELD.PARTITIONING.FUNCTION <- function(arr, version, location)
 {
     # We only do anything if:
@@ -89,6 +92,7 @@ SHIELD.PARTITIONING.FUNCTION <- function(arr, version, location)
     arr
 }
 
+## population.error.sd.shield ----
 #** POPULATION SIZES ** ---- 
 #'# Error variance for population data <From EHE model>
 # deaths.likelihood.instructions and fertility.likelihood.instructions both reuse it as-is for their error.variance.term

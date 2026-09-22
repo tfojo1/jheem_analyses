@@ -22,6 +22,7 @@ local_edition(3)
 
 ## --- helpers ------------------------------------------------------------------
 
+## registered_calibration_codes ----
 ## Calibration codes that shield_calib_register.R actually registers (commented
 ## out registrations do not count - that is the whole point).
 registered_calibration_codes <- function() {
@@ -32,6 +33,7 @@ registered_calibration_codes <- function() {
     unique(gsub("^register\\.calibration\\.info\\(\\s*['\"]|['\"]$", "", m))
 }
 
+## launcher_calibration_codes ----
 ## Calibration codes referenced by the shell launchers, excluding comments and
 ## usage examples.
 launcher_calibration_codes <- function() {

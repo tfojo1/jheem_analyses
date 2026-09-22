@@ -899,6 +899,7 @@ print(as.data.frame(table4[, T4.COLS]), digits = 3, row.names = FALSE)
 # against. The model is the mechanism; where it disagrees with intuition, the
 # intuition is what needs revisiting.
 
+## .assoc ----
 .assoc <- function(nm, col, mech) {
   x  <- table4[[col]]
   ok <- !is.na(x) & !is.na(table4$spillover)

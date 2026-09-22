@@ -1,5 +1,6 @@
 ## ========= Base R helpers =========
 
+## sum_inc ----
 # Sum incidence for 2022–2030 per simulation (last dim = "sim")
 sum_inc <- function(arr, yr1 = 2022, yr2 = 2030){
     dn   <- dimnames(arr); nms <- names(dn)
@@ -25,6 +26,7 @@ sum_inc <- function(arr, yr1 = 2022, yr2 = 2030){
     apply(a, sim_margin, sum, na.rm = TRUE)
 }
 
+## qfmt ----
 # Quantile -> formatted string; pct=TRUE for percentages
 qfmt <- function(x, pct = FALSE){
     x <- x[is.finite(x) & !is.na(x)]
@@ -41,6 +43,7 @@ qfmt <- function(x, pct = FALSE){
     }
 }
 
+## build_city_row ----
 # One city row: baseline vs 10, 10(slow), 25, 25(slow)
 build_city_row <- function(city, base_obj, d10, d10slow, d25, d25slow){
     b <- sum_inc(base_obj$incidence)
@@ -98,6 +101,7 @@ b_all <- b_NYC + b_MIA + b_ATL + b_BLT
 qfmt(b_all)
 
 
+## build_total_row ----
 # ===== Combined (all four cities) row =====
 build_total_row <- function(label, bases, d10s, d10slows, d25s, d25slows){
     # Sum per-simulation baseline across cities

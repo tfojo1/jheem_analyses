@@ -203,6 +203,8 @@ print(round(c(
 
 
 ## Scatterplot Figures ----
+
+## .label_layer ----
 # ggrepel keeps the city labels from overlapping; fall back to plain text if
 # it is not installed rather than failing at the end of a long script.
 .label_layer <- function() {
@@ -315,7 +317,7 @@ p.diverge <- ggplot(tbl2, aes(x = divergence, y = spillover)) +
 tbl2
 
 # TRANSMISSION COUPLING: HOW FAR THE MSM EFFECT CARRIES INTO WOMEN
-# ============================================================================
+# ****************************************************************************
 #
 # The spillover ratio uses a single coverage level. This uses the whole
 # coverage gradient: within each city, regress the effect in women on the
@@ -335,7 +337,7 @@ tbl2
 # MSM coverage is, by construction, not sustained by the MSM network. It is an
 # upper bound rather than a point estimate, because Doxy-PEP does not fully
 # suppress MSM incidence even at 100% coverage.
-# ============================================================================
+# ****************************************************************************
 
 coupling.tbl <- make_multi_location_table(
     data          = results,
@@ -412,7 +414,7 @@ p.coupling
 
 
 # ADDITION 1 -- HOW LONG THE INDIRECT EFFECT TAKES TO ARRIVE
-# ============================================================================
+# ****************************************************************************
 # Everything above is evaluated at EVAL.YEAR (2030). Doxy-PEP is delivered to
 # MSM only, so the effect in women is second-order: it has to travel through
 # the transmission network before it appears. If it is still accruing in 2030
@@ -428,7 +430,7 @@ p.coupling
 # percentages is coarse. Where av_msm is below ~10%, read the slope in (b)
 # rather than the ratio in (a) -- it is fitted from ten points and is far less
 # sensitive to rounding.
-# ============================================================================
+# ****************************************************************************
 
 LAG.YEARS  <- c("2030", "2035")
 TRAJ.YEARS <- as.character(2023:2035)   # 2022 is the start year: % averted is 0
@@ -467,6 +469,7 @@ print(as.data.frame(spill.wide), digits = 3, row.names = FALSE)
 cat("  pct.change > 0 means the", .y1,
     "figure UNDERSTATES how much of the MSM benefit reaches women.\n")
 
+## .slope0 ----
 # ---- (b) coupling slope refit at each horizon ------------------------------
 # Through-origin slope of (% averted in women) on (% averted in MSM) across
 # the coverage gradient. Same estimator as the coupling block above, refit
@@ -511,6 +514,7 @@ cat("  a slope that rises from", .y1, "to", .y2,
 cat("  residual.het falling over the same window means the self-sustaining\n",
     " heterosexual fraction is smaller than the", .y1, "figure suggests.\n")
 
+## .time_to_frac ----
 # ---- (c) t90: when has each subgroup realised 90% of its 2035 effect? ------
 # Linear interpolation between the two bracketing years, so the answer is a
 # fractional year rather than a step function of the annual output grid.
@@ -599,9 +603,9 @@ p.t90
 .save_fig(p.t90, .default_fig_dir(), "lag_t90_msm_vs_women.png", 7.5, 5, 300)
 
 
-# ============================================================================
+# ****************************************************************************
 # ADDITION 2 -- EFFICIENCY: HOW MUCH DOXYCYCLINE PER CASE AVERTED
-# ============================================================================
+# ****************************************************************************
 # generate_custom_outcomes.R already builds the pieces, at the TOTAL level
 # only (they sit behind `if (is.null(STRATIFICATION_DIMENSIONS))`):
 #
@@ -623,7 +627,7 @@ p.t90
 # below prints the model's own within-sim rate beside the ratio of medians so
 # you can see the gap; if it is material, recompute at the array level before
 # the number goes into a manuscript.
-# ============================================================================
+# ****************************************************************************
 
 EFF.YEARS  <- LAG.YEARS
 .ccrit.cov <- as.integer(sub("doxy\\.cov\\.", "", CCRIT))
@@ -765,10 +769,11 @@ p.eff.marginal
 
 library(tidyverse)
 
-# ============================================================================
+# ****************************************************************************
 # HELPERS ----
-# ============================================================================
+# ****************************************************************************
 
+## parse_coverage_table ----
 #' Convert a wide locations x (outcome_coverage_year) table to long format
 #'
 #' Works with or without stratification columns. A table with no `subgroup`
@@ -859,6 +864,7 @@ parse_coverage_table <- function(tbl,
 }
 
 
+## .prep_long ----
 #' Internal: accept either a wide table or an already-long one
 .prep_long <- function(tbl, location.col, id.cols, subgroup, col.pattern, row.sep) {
     if (all(c("coverage", "value") %in% names(tbl))) {
@@ -879,6 +885,7 @@ parse_coverage_table <- function(tbl,
     parse_coverage_table(tbl, location.col, id.cols, subgroup, col.pattern, row.sep)
 }
 
+## .filter_locations ----
 #' Internal: filter locations by full label, base city name, or glob pattern
 .filter_locations <- function(long, locations, row.sep = " \u2014 ") {
     if (is.null(locations)) return(long)
@@ -899,11 +906,13 @@ parse_coverage_table <- function(tbl,
     long[keep, , drop = FALSE]
 }
 
+## .strat_suffix ----
 #' Internal: append the stratum to a title when exactly one was selected
 .strat_suffix <- function(subgroup)
     if (!is.null(subgroup) && length(subgroup) == 1) paste0(" (", subgroup, ")") else ""
 
 
+## .save_fig ----
 #' Internal: save a figure if a path was supplied
 .save_fig <- function(p, save.path, width, height, dpi) {
     if (!is.null(save.path)) {
@@ -915,9 +924,11 @@ parse_coverage_table <- function(tbl,
 }
 
 
-# ============================================================================
+# ****************************************************************************
 # FIGURE 1: Ranked bar -- coverage needed to reach the target ----
-# ============================================================================
+# ****************************************************************************
+
+## plot_coverage_needed ----
 #' Minimum coverage required to reach a target impact, ranked by city
 #'
 #' @param tbl Wide table, or the long output of parse_coverage_table().
@@ -992,9 +1003,11 @@ plot_coverage_needed <- function(tbl,
 }
 
 
-# ============================================================================
+# ****************************************************************************
 # FIGURE 2: Dose-response -- impact vs coverage ----
-# ============================================================================
+# ****************************************************************************
+
+## plot_dose_response ----
 #' Impact as a function of coverage, at a fixed year
 plot_dose_response <- function(tbl,
                                target       = 50,
@@ -1063,12 +1076,12 @@ plot_dose_response <- function(tbl,
 }
 
 
-# ============================================================================
+# ****************************************************************************
 # FIGURE 3: Impact over time -- x axis is year ----
 #   1. one city, one coverage      -> single trajectory
 #   2. one city, many coverages    -> fan of curves (color.by = "coverage")
 #   3. many cities, many coverages -> small multiples
-# ============================================================================
+# ****************************************************************************
 # .strat_labeller ----
 #' Build a labelling function for stratum display names
 #'
@@ -1679,6 +1692,7 @@ print(round(c(
 #     "  decomposition does not hold and something needs looking at.\n")
 
 
+## .label_layer ----
 # ---- figures ---------------------------------------------------------------
 # ggrepel keeps the city labels from overlapping; fall back to plain text if
 # it is not installed rather than failing at the end of a long script.
@@ -1790,9 +1804,9 @@ p.diverge
 .save_fig(p.diverge, .default_fig_dir(), "explain_spillover_vs_divergence.png", 8, 5.5, 300)
 
 
-# ============================================================================
+# ****************************************************************************
 # TRANSMISSION COUPLING: HOW FAR THE MSM EFFECT CARRIES INTO WOMEN
-# ============================================================================
+# ****************************************************************************
 #
 # The spillover ratio uses a single coverage level. This uses the whole
 # coverage gradient: within each city, regress the effect in women on the
@@ -1812,7 +1826,7 @@ p.diverge
 # MSM coverage is, by construction, not sustained by the MSM network. It is an
 # upper bound rather than a point estimate, because Doxy-PEP does not fully
 # suppress MSM incidence even at 100% coverage.
-# ============================================================================
+# ****************************************************************************
 
 coupling.tbl <- make_multi_location_table(
     data          = results,
@@ -1904,7 +1918,7 @@ p.coupling
 # percentages is coarse. Where av_msm is below ~10%, read the slope in (b)
 # rather than the ratio in (a) -- it is fitted from ten points and is far less
 # sensitive to rounding.
-# ============================================================================
+# ****************************************************************************
 
 LAG.YEARS  <- c("2030", "2035")
 TRAJ.YEARS <- as.character(2023:2035)   # 2022 is the start year: % averted is 0
@@ -1943,6 +1957,7 @@ print(as.data.frame(spill.wide), digits = 3, row.names = FALSE)
 cat("  pct.change > 0 means the", .y1,
     "figure UNDERSTATES how much of the MSM benefit reaches women.\n")
 
+## .slope0 ----
 # ---- (b) coupling slope refit at each horizon ------------------------------
 # Through-origin slope of (% averted in women) on (% averted in MSM) across
 # the coverage gradient. Same estimator as the coupling block above, refit
@@ -1987,6 +2002,7 @@ cat("  a slope that rises from", .y1, "to", .y2,
 cat("  residual.het falling over the same window means the self-sustaining\n",
     " heterosexual fraction is smaller than the", .y1, "figure suggests.\n")
 
+## .time_to_frac ----
 # ---- (c) t90: when has each subgroup realised 90% of its 2035 effect? ------
 # Linear interpolation between the two bracketing years, so the answer is a
 # fractional year rather than a step function of the annual output grid.
@@ -2075,9 +2091,9 @@ p.t90
 .save_fig(p.t90, .default_fig_dir(), "lag_t90_msm_vs_women.png", 7.5, 5, 300)
 
 
-# ============================================================================
+# ****************************************************************************
 # ADDITION 2 -- EFFICIENCY: HOW MUCH DOXYCYCLINE PER CASE AVERTED
-# ============================================================================
+# ****************************************************************************
 # generate_custom_outcomes.R already builds the pieces, at the TOTAL level
 # only (they sit behind `if (is.null(STRATIFICATION_DIMENSIONS))`):
 #
@@ -2099,7 +2115,7 @@ p.t90
 # below prints the model's own within-sim rate beside the ratio of medians so
 # you can see the gap; if it is material, recompute at the array level before
 # the number goes into a manuscript.
-# ============================================================================
+# ****************************************************************************
 
 EFF.YEARS  <- LAG.YEARS
 .ccrit.cov <- as.integer(sub("doxy\\.cov\\.", "", CCRIT))
@@ -2241,10 +2257,11 @@ p.eff.marginal
 
 library(tidyverse)
 
-# ============================================================================
+# ****************************************************************************
 # HELPERS ----
-# ============================================================================
+# ****************************************************************************
 
+## parse_coverage_table ----
 #' Convert a wide locations x (outcome_coverage_year) table to long format
 #'
 #' Works with or without stratification columns. A table with no `subgroup`
@@ -2335,6 +2352,7 @@ parse_coverage_table <- function(tbl,
 }
 
 
+## .prep_long ----
 #' Internal: accept either a wide table or an already-long one
 .prep_long <- function(tbl, location.col, id.cols, subgroup, col.pattern, row.sep) {
     if (all(c("coverage", "value") %in% names(tbl))) {
@@ -2355,6 +2373,7 @@ parse_coverage_table <- function(tbl,
     parse_coverage_table(tbl, location.col, id.cols, subgroup, col.pattern, row.sep)
 }
 
+## .filter_locations ----
 #' Internal: filter locations by full label, base city name, or glob pattern
 .filter_locations <- function(long, locations, row.sep = " \u2014 ") {
     if (is.null(locations)) return(long)
@@ -2375,11 +2394,13 @@ parse_coverage_table <- function(tbl,
     long[keep, , drop = FALSE]
 }
 
+## .strat_suffix ----
 #' Internal: append the stratum to a title when exactly one was selected
 .strat_suffix <- function(subgroup)
     if (!is.null(subgroup) && length(subgroup) == 1) paste0(" (", subgroup, ")") else ""
 
 
+## .save_fig ----
 #' Internal: save a figure if a path was supplied
 .save_fig <- function(p, save.path, width, height, dpi) {
     if (!is.null(save.path)) {
@@ -2391,9 +2412,11 @@ parse_coverage_table <- function(tbl,
 }
 
 
-# ============================================================================
+# ****************************************************************************
 # FIGURE 1: Ranked bar -- coverage needed to reach the target ----
-# ============================================================================
+# ****************************************************************************
+
+## plot_coverage_needed ----
 #' Minimum coverage required to reach a target impact, ranked by city
 #'
 #' @param tbl Wide table, or the long output of parse_coverage_table().
@@ -2468,9 +2491,11 @@ plot_coverage_needed <- function(tbl,
 }
 
 
-# ============================================================================
+# ****************************************************************************
 # FIGURE 2: Dose-response -- impact vs coverage ----
-# ============================================================================
+# ****************************************************************************
+
+## plot_dose_response ----
 #' Impact as a function of coverage, at a fixed year
 plot_dose_response <- function(tbl,
                                target       = 50,
@@ -2539,12 +2564,12 @@ plot_dose_response <- function(tbl,
 }
 
 
-# ============================================================================
+# ****************************************************************************
 # FIGURE 3: Impact over time -- x axis is year ----
 #   1. one city, one coverage      -> single trajectory
 #   2. one city, many coverages    -> fan of curves (color.by = "coverage")
 #   3. many cities, many coverages -> small multiples
-# ============================================================================
+# ****************************************************************************
 # .strat_labeller ----
 #' Build a labelling function for stratum display names
 #'

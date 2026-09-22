@@ -24,6 +24,7 @@ rep_mat <- SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.sti.surv
 # All location codes = union of both
 all_locs <- union(colnames(agg_mat), colnames(rep_mat))
 
+## extract_series ----
 # Helper to build the "best" series for ONE location
 extract_series <- function(loc){
     agg    <- if (loc %in% colnames(agg_mat)) agg_mat[, loc] else NULL
@@ -504,6 +505,7 @@ rep_mat <- SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.sti.surv
 # All location codes = union of both
 all_locs <- union(colnames(agg_mat), colnames(rep_mat))
 
+## extract_series ----
 # Helper to build the "best" series for ONE location
 extract_series <- function(loc){
     agg    <- if (loc %in% colnames(agg_mat)) agg_mat[, loc] else NULL
@@ -613,6 +615,7 @@ ggplot(pooled_dd, aes(x = double_delta)) +
     ) +
     theme_minimal()
 
+## plot_lognorm_dd ----
 plot_lognorm_dd <- function(df, title_prefix){
     df <- df %>% filter(is.finite(double_delta), double_delta > 0)
     logvals <- log(df$double_delta)

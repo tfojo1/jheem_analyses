@@ -1,6 +1,5 @@
-# ============================================================================
+
 # compare_calc_results() -- are two results arrays the same?
-# ============================================================================
 #
 # Why not just identical(a, b)?
 #
@@ -22,8 +21,9 @@
 #   compare_calc_results(total_calc_results, total_calc_results1)
 #
 # Returns (invisibly) a data frame with one row per shared outcome.
-# ============================================================================
+# ****************************************************************************
 
+## compare_calc_results ----
 compare_calc_results <- function(a, b,
                                  name.a = deparse(substitute(a)),
                                  name.b = deparse(substitute(b)),

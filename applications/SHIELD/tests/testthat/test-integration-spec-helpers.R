@@ -25,6 +25,7 @@ skip_unless_stage("has.shield.helpers")
 
 LOC <- SHIELD.TEST.LOCATION
 
+## spec_meta ----
 spec_meta <- function() {
     skip_if(is.null(shield.test.specification()))
     get.specification.metadata(SHIELD.TEST.VERSION, LOC)

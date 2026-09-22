@@ -91,6 +91,7 @@ test_that("pairing proportions reject non-conformable input", {
 
 ## --- get.age.mixing.proportions -----------------------------------------------
 
+## age_mixing_fixture ----
 age_mixing_fixture <- function(sd.multiplier = 1) {
     age.cutoffs <- c(15, 20, 25, 30, 35, 40, 45, 50, 55, 65)
     get.age.mixing.proportions(

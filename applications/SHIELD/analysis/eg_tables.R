@@ -1,6 +1,6 @@
-# ============================================================================
+# ****************************************************************************
 # SHIELD / Doxy-PEP -- driver for the manuscript tables
-# ============================================================================
+# ****************************************************************************
 #
 # This file used to carry its own copies of subset_array(), get_stats(),
 # make_single_location_table(), make_multi_location_table(), resolve_locations()
@@ -10,7 +10,7 @@
 # Everything below the `if (1 == 2)` guard is example calls, not code that
 # runs on source(). It used to be `if (1 == 1)`, so sourcing this file ran the
 # whole analysis and wrote CSVs as a side effect.
-# ============================================================================
+# ****************************************************************************
 
 library(tidyverse)
 source('../jheem_analyses/commoncode/locations_of_interest.R')
@@ -22,9 +22,9 @@ source("../jheem_analyses/applications/SHIELD/shield_calib_register.R")
 source('../jheem_analyses/applications/SHIELD/analysis/intervention/intervention_helper_functions.R')
 
 
-# ============================================================================
+# ****************************************************************************
 # LOAD RESULTS
-# ============================================================================
+# ****************************************************************************
 # Four arrays, two stratification levels x two kinds:
 #
 #                     raw outcomes            calculated outcomes
@@ -36,7 +36,7 @@ source('../jheem_analyses/applications/SHIELD/analysis/intervention/intervention
 # arrays at different levels become different rows. An outcome that exists at
 # one level but not the other -- num_cum_doxy_coverage is total-only -- comes
 # back as NA for the level that lacks it, and the function says so.
-# ============================================================================
+# ****************************************************************************
 
 BASE.PATH <- paste0(ROOT.DIR, "/shield/outputs/calib.8.21.stage3.az")
 
@@ -52,9 +52,9 @@ COVERAGE.LEVELS <- paste0("doxy.cov.", seq(10, 100, 10))
 TABLE.DIR       <- paste0(BASE.PATH, "/tables/")
 
 
-# ============================================================================
+# ****************************************************************************
 # EXAMPLES
-# ============================================================================
+# ****************************************************************************
 if (1 == 2) {
 
     # ---- one city, raw and calculated outcomes side by side ---------------

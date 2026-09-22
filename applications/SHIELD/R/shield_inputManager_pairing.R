@@ -3,6 +3,7 @@
 # the JHEEM focus is uninfected cases, so the matrices are estiamted such that sum of contacts to each group (columns) equals one
 # example: for person age 15-20, what proportion of contacts are coming from different age groups and what's the prevalence of HIV in each of those groups (to estimate risk of transmission)
 
+## create.pairing.manager ----
 #
 #' @title create.pairing.manager
 #' @description creating pairing inputs for the model; data is in .../data_files/pairing"
@@ -412,6 +413,7 @@ get.age.mixing.proportions <- function(age.delta.intercept.mean,
   rv
 }
 
+## calculate.oe.ratios ----
 # calculate.oe.ratios -----
 #' @title calculate.oe.ratios
 #' @description generates the oe ratios from observed pairing counts of partnerships

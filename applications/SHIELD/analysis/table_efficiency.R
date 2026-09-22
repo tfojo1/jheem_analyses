@@ -1,6 +1,6 @@
-# ============================================================================
+# ****************************************************************************
 # SHIELD / Doxy-PEP -- INCREMENTAL EFFICIENCY OF DOXY-PEP COVERAGE
-# ============================================================================
+# ****************************************************************************
 #
 # A cost-effectiveness style table with PERSON-YEARS OF DOXYCYCLINE as the
 # cost. For each MSA, horizon and coverage level:
@@ -45,7 +45,7 @@
 # WRITES to TABLE.DIR:
 #   table_efficiency_pooled.csv     main text, ten MSAs combined
 #   table_efficiency_by_msa.csv     supplement, one row per MSA x coverage
-# ============================================================================
+# ****************************************************************************
 
 library(dplyr)
 library(tidyr)
@@ -100,6 +100,7 @@ dat
 # are NA rather than Inf or a negative "cost per infection", which would be
 # nonsense on the page.
 
+## .pos ----
 .pos <- function(x) ifelse(!is.na(x) & x > 0, x, NA_real_)
 
 step <- dat %>%
@@ -118,7 +119,10 @@ step <- dat %>%
 
 # ---- 3. THE TWO TABLES -----------------------------------------------------
 
+## .n ----
 .n <- function(x) ifelse(is.na(x), "-", formatC(round(x), format = "d", big.mark = ","))
+
+## .r ----
 .r <- function(x) ifelse(is.na(x), "-", formatC(x, format = "f", digits = DIGITS.RATIO))
 
 COLS <- c("coverage", "cum_py", "cum_averted_msm", "cum_averted_tot", "vs",

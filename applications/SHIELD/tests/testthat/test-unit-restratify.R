@@ -32,6 +32,7 @@ local_edition(3)
 
 skip_unless_stage("has.packages", "has.jheem2", "has.standalone")
 
+## target_dim_names ----
 ## The model's own strata, small enough to reason about by hand.
 target_dim_names <- function() {
     list(age  = c("0-14 years", "15-19 years", "20-24 years", "25-29 years"),
@@ -39,6 +40,7 @@ target_dim_names <- function() {
          sex  = c("heterosexual_male", "msm", "female"))
 }
 
+## fixture_frame ----
 ## A long-format frame already in the model's own categories, so no ontology
 ## translation is needed and the arithmetic is the only thing under test.
 fixture_frame <- function(dim.names = target_dim_names(), value = 10) {
@@ -51,9 +53,11 @@ fixture_frame <- function(dim.names = target_dim_names(), value = 10) {
     grid
 }
 
+## total_mass ----
 ## The conserved quantity.
 total_mass <- function(result) sum(result$value * result$weight)
 
+## try_restratify ----
 ## Run restratification, returning NULL (not an error object) on failure, so
 ## skip_if() never has to evaluate conditionMessage() on a data frame.
 try_restratify <- function(...) {
@@ -71,6 +75,7 @@ try_restratify <- function(...) {
     }
 }
 
+## skip_if_restratify_failed ----
 skip_if_restratify_failed <- function(result, what) {
     if (is.null(result)) {
         testthat::skip(paste0("restratify.data.to.specification() errored on ",

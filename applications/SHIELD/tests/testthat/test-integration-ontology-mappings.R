@@ -23,6 +23,7 @@ local_edition(3)
 
 skip_unless_stage("has.shield.helpers")
 
+## registered_mappings ----
 ## Parse the mapping names and their from/to category lists straight out of the
 ## source, so the test describes the file as written rather than a copy of it.
 registered_mappings <- function() {
@@ -61,6 +62,7 @@ test_that("every registered mapping is retrievable by name", {
                               paste(missing, collapse = ", ")))
 })
 
+## shield_categories ----
 ## The model's own categories, which every "to shield" mapping must land inside.
 shield_categories <- function() {
     sm <- get.specification.metadata(SHIELD.TEST.VERSION, SHIELD.TEST.LOCATION)

@@ -2,6 +2,8 @@
 # ***************************************************************************************************
 # HELPER FUNCTIONS ----
 # ***************************************************************************************************
+
+## calculate.lhd.error.terms ----
 calculate.lhd.error.terms = function(data.type, 
                                      output=c('cv',
                                               'exponent.of.variance',
@@ -82,6 +84,7 @@ calculate.lhd.error.terms = function(data.type,
     do.calculate.variance.parameters(e=e, x=x, output=output, fixed.exp.of.var=fixed.exp.of.var, verbose=verbose)
 }
 
+## do.calculate.variance.parameters ----
 do.calculate.variance.parameters <- function(e, x, output, fixed.exp.of.var=NA, verbose=F)
 {
     mask = !is.na(e) & !is.na(x)
@@ -234,6 +237,7 @@ do.calculate.variance.parameters <- function(e, x, output, fixed.exp.of.var=NA, 
 }
 
 
+## calculate.error.terms ----
 calculate.error.terms = function(data.type,
                                  data.source.1,
                                  data.source.2,
@@ -366,6 +370,7 @@ calculate.error.terms = function(data.type,
 }
 
 
+## calculate.error.terms.pop ----
 calculate.error.terms.pop = function(stratification,
                                      is.cv){
     

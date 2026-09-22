@@ -1,18 +1,16 @@
 
 
-# ============================================================================
+# ****************************************************************************
 # DoxyPEP Intervention Analysis
-# ============================================================================
+# ****************************************************************************
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 source("../jheem_analyses/applications/SHIELD/intervention/intervention_definitions.R")
 # source("../jheem_analyses/applications/SHIELD/intervention/intervention_helper_functions.R")
 
-# =============================================================================
+# *****************************************************************************
 # SECTION 1: Configuration
-# =============================================================================
-BASE.PATH <- paste0(ROOT.DIR,"/simulations/shield")
-
+# *****************************************************************************
 LOCATION         <- "C.12580"
 CALIBRATION.CODE <- "calib.8.14.stage3.az"
 N.SIM <- 400
@@ -27,9 +25,9 @@ INTERVENTION.LABELS <- c(
 )
 INTERVENTION.CODES <- names(INTERVENTION.LABELS)
 
-# =============================================================================
+# *****************************************************************************
 # SECTION 2: Run Interventions
-# =============================================================================
+# *****************************************************************************
 # --- Create and Run Simulation Collection ---
 if (1==1){
     sim.collection <- create.simset.collection(

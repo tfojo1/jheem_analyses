@@ -21,6 +21,7 @@
 ## 5% tolerance.
 local_edition(3)
 
+## production_shield_files ----
 ## Extract the SHIELD-relative files that shield_source_code.R sources in its
 ## `for (f in c(...))` loop.
 production_shield_files <- function() {
@@ -33,6 +34,7 @@ production_shield_files <- function() {
         gsub(pattern = '"', replacement = "")
 }
 
+## production_commoncode_files ----
 ## Files sourced by shield_source_code.R from commoncode/.
 production_commoncode_files <- function() {
     f <- file.path(SHIELD.DIR, "shield_source_code.R")

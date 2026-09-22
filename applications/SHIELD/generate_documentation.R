@@ -4,6 +4,7 @@ JHEEM.DIR="~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/"
 SHIELD.DIR="~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/applications/SHIELD/"
 setwd(JHEEM.DIR)
 
+## generate_documentation ----
 #'@title Generate a PDF Manual Documenting Methods
 #'@param ... File paths of directories containing R files to be documented. These directories should only contain R files and those files should only define functions to be documented
 #'@param path.to.documentation.folder A file path to the shared documentation folder relative to the current working directory

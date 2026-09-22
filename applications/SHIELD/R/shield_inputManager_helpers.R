@@ -1,4 +1,5 @@
 
+## restratify.data.to.specification ----
 restratify.data.to.specification <- function(data, dim.names,
                                              covariate.names = setdiff(names(data), c('year','p','value','weight')),
                                              max.age = 85,
@@ -172,6 +173,7 @@ restratify.data.to.specification <- function(data, dim.names,
 }
 
 
+## OLD.restratify.data.to.specification ----
 OLD.restratify.data.to.specification <- function(data, dim.names,
                                                  covariate.names = setdiff(names(data), c('year','p','value','weight')),
                                                  max.age = 85)

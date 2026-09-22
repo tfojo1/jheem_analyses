@@ -8,9 +8,9 @@ N.SIM <- as.numeric(args[3])
 FIRST.YEAR <- as.numeric(args[4])
 LAST.YEAR <- as.numeric(args[5])
 
-# ============================================================================
+# ****************************************************************************
 # DoxyPEP Intervention Analysis
-# ============================================================================
+# ****************************************************************************
 # Locate the repo ----
 # Resolved from this script's own path, so the run depends on neither the
 # working directory nor the checkout being named "jheem_analyses".
@@ -37,9 +37,9 @@ source(file.path(JHEEM.ANALYSES.PATH, "commoncode", "locations_of_interest.R"))
 source(file.path(SHIELD.DIR, "intervention", "intervention_definitions.R"))
 # source("../jheem_analyses/applications/SHIELD/intervention/intervention_helper_functions.R")
 
-# =============================================================================
+# *****************************************************************************
 # SECTION 1: Configuration
-# =============================================================================
+# *****************************************************************************
 # LOCATIONS        <- SHIELD.TEN.MSAS    # Named vector: names = city, values = codes
 
 
@@ -47,9 +47,6 @@ source(file.path(SHIELD.DIR, "intervention", "intervention_definitions.R"))
 # N.SIM <- 300
 # FIRST.YEAR <- 2000
 # LAST.YEAR <- 2040
-
-BASE.PATH <- paste0(ROOT.DIR,"/simulations/shield")
-
 
 INTERVENTION.LABELS <- c(
     noint        = "No Doxy-PEP Intervention",
@@ -66,9 +63,9 @@ INTERVENTION.LABELS <- c(
 )
 INTERVENTION.CODES <- names(INTERVENTION.LABELS)
 
-# =============================================================================
+# *****************************************************************************
 # SECTION 2: Run Interventions
-# =============================================================================
+# *****************************************************************************
 # --- Create and Run Simulation Collection ---
 if (1==1){
     sim.collection <- create.simset.collection(

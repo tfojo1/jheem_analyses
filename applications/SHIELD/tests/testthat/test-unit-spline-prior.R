@@ -28,9 +28,11 @@ skip_unless_stage("has.packages", "has.jheem2", "has.standalone")
 
 ## --- shared expectations ------------------------------------------------------
 
+## log_sds ----
 ## Variance of the log-value at each spline year, in spline.times order.
 log_sds <- function(dist) sqrt(diag(dist@sigma))
 
+## expect_accumulating_uncertainty ----
 ## The defining property of a random-walk spline prior: uncertainty accumulates
 ## with distance from the baseline year, in BOTH directions. The baseline year
 ## itself carries only the baseline sd.
@@ -65,6 +67,7 @@ expect_accumulating_uncertainty <- function(dist, spline.times, baseline.year,
 
 ## --- make.joint.mv.spline.prior (the one the live calibration uses) -----------
 
+## joint_args ----
 joint_args <- function(parameters = "trate",
                        logsd.deltas.past = c("1970" = log(2), "1990" = log(1.5), "1995" = log(1.2)),
                        logsd.deltas.future = c("2010" = log(1.2), "2017" = log(1.5)),

@@ -31,18 +31,21 @@ library(patchwork)  # panel layout with wrap_plots and plot_annotation
 # These are functions rather than constants because a constant is frozen at the moment the file
 # is sourced, which leaves no way for a per-call root.dir to override it.
 
+## .shield.base.path ----
 .shield.base.path <- function(root.dir = NULL) {
     if (is.null(root.dir)) root.dir <- get.jheem.root.directory()
     file.path(root.dir, "simulations", "shield")
 }
 
 
+## .shield.plot.path ----
 .shield.plot.path <- function(root.dir = NULL) {
     if (is.null(root.dir)) root.dir <- get.jheem.root.directory()
     file.path(root.dir, "shield")
 }
 
 
+## ensure.plot.dir ----
 ensure.plot.dir <- function(path, create.dirs = FALSE) {
     if (!dir.exists(path)) {
         if (!create.dirs) stop("Directory does not exist: ", path,
@@ -54,6 +57,7 @@ ensure.plot.dir <- function(path, create.dirs = FALSE) {
 }
 
 
+## .resolve.cache ----
 .resolve.cache <- function(cache, cache.name, force.reload, verbose) {
     if (force.reload) {
         if (verbose) message("[Cache] force.reload = TRUE — ignoring cache")
@@ -74,9 +78,11 @@ ensure.plot.dir <- function(path, create.dirs = FALSE) {
 }
 
 
+## .sanitize ----
 .sanitize <- function(x) gsub("[^A-Za-z0-9_-]", "_", gsub("\\.", "-", x))
 
 
+## .build.file.suffix ----
 .build.file.suffix <- function(split.by, facet.by,plot.which) {
     parts <- character(0)
     if (!is.null(split.by)) parts <- c(parts, paste0("split-", paste(split.by, collapse = "-")))
@@ -86,6 +92,7 @@ ensure.plot.dir <- function(path, create.dirs = FALSE) {
 }
 
 
+## .auto.style.manager ----
 .auto.style.manager <- function(split.by, facet.by, n.simsets = NULL) {
     if (!is.null(split.by)) {
         create.style.manager(color.sim.by    = "stratum",
@@ -96,6 +103,7 @@ ensure.plot.dir <- function(path, create.dirs = FALSE) {
 }
 
 
+## .auto.grid ----
 .auto.grid <- function(n, nrow = NULL, ncol = NULL) {
     if (!is.null(nrow) && !is.null(ncol)) return(list(nrow = nrow, ncol = ncol))
     if (!is.null(ncol)) return(list(nrow = ceiling(n / ncol), ncol = ncol))
@@ -105,6 +113,7 @@ ensure.plot.dir <- function(path, create.dirs = FALSE) {
 }
 
 
+## .auto.height ----
 # Auto-scales figure height based on number of panel rows
 .auto.height <- function(n.panels, ncol, nrow = NULL, panel.height = 3.5) {
     n.rows <- if (!is.null(nrow)) nrow else ceiling(n.panels / max(ncol, 1))
@@ -112,6 +121,7 @@ ensure.plot.dir <- function(path, create.dirs = FALSE) {
 }
 
 
+## .make.panel ----
 # Core simplot call from a named list of simset objects + display labels
 .make.panel <- function(simset.list, labels, outcomes, split.by, facet.by,
                         style.manager, summary.type, plot.which, years) {
@@ -129,6 +139,7 @@ ensure.plot.dir <- function(path, create.dirs = FALSE) {
 }
 
 
+## .make.patchwork ----
 # Patchwork grid - each panel retains its own legend
 # Simply arranges panels in a grid without collecting/sharing legends
 # Patchwork grid with single shared legend on the right
@@ -173,6 +184,7 @@ ensure.plot.dir <- function(path, create.dirs = FALSE) {
 }
 
 
+## .save.plot ----
 # Save a combined plot to disk
 .save.plot <- function(combined, save.dir, filename, width, height, dpi, create.dirs, verbose) {
     ensure.plot.dir(save.dir, create.dirs)

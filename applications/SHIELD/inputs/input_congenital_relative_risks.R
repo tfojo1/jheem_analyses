@@ -5,6 +5,7 @@
 ### Returning xxxx
 ### called by SHIELD/shield_base_parameters.R
 
+## calculate_cs_relative_risks ----
 calculate_cs_relative_risks <- function() {
   # data from paper:  
   risk_congenital_syphilis_prenatal_care_first_trimester <- 0.104

@@ -67,6 +67,7 @@ library(distributions)
 ## 2. GIT HELPER
 ## =============================================================================
 
+## require.repo.branch ----
 ## Check that a local clone is on the required branch, then optionally pull.
 ##
 ## The branch check is read-only (`git rev-parse`): no network, no git locks,

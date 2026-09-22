@@ -15,6 +15,8 @@ congenital.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
                                                  # main.location.type.p.source = "cdc.aggregated.proportion", #specific source of data that should be used here
                                                  # main.location.type.n.source = "cdc.hiv"
 )
+
+## SHIELD.DUMMY.PARTITIONING.FUNCTION ----
 # 
 SHIELD.DUMMY.PARTITIONING.FUNCTION <- function(arr, version = 'shield', location) {
     return(arr)

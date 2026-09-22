@@ -7,6 +7,7 @@
 CALIB_CODE <- "calib.8.21.stage3.az"
 NOINT = "noint"
 
+## subset_array ----
 # Need to find a single home for this
 # Also change "dim_indices" to "dimension.values", because that's what it is
 subset_array <- function(arr, dim_indices, drop = FALSE) {
@@ -33,7 +34,7 @@ subset_array <- function(arr, dim_indices, drop = FALSE) {
     do.call(`[`, c(list(arr), args, list(drop = drop)))
 }
 
-# ============================================================================
+# ****************************************************************************
 # WHY THESE ARE WRITTEN WITH aperm() AND NOT apply()
 #
 # Every calculation below is a whole-array operation in disguise. `x[noint] - x`
@@ -48,8 +49,9 @@ subset_array <- function(arr, dim_indices, drop = FALSE) {
 # aperm() is also SAFER than the old array(apply(...), dn) pattern: it derives
 # the permutation from the dimension NAMES, so it cannot silently transpose the
 # result the way a mismatched hand-passed `dn.one.outcome` could.
-# ============================================================================
+# ****************************************************************************
 
+## .dims_last ----
 #' Move the named dimensions to the end, leaving the others in their order
 #' @noRd
 .dims_last <- function(arr, last.dims) {
@@ -57,6 +59,7 @@ subset_array <- function(arr, dim_indices, drop = FALSE) {
     aperm(arr, c(others, last.dims))
 }
 
+## .outcome_order ----
 #' The dimension order every custom outcome is returned in
 #' @noRd
 .outcome_order <- function(arr) {
@@ -65,6 +68,7 @@ subset_array <- function(arr, dim_indices, drop = FALSE) {
     c("year", strat, "sim", "intervention", "location")
 }
 
+## .as_array ----
 #' Rebuild an array from a bare vector, given the target dimnames
 #' @noRd
 .as_array <- function(v, dn) array(v, sapply(dn, length), dn)
@@ -93,6 +97,7 @@ subset_array <- function(arr, dim_indices, drop = FALSE) {
 #' differences -- the right summary, since the two arms are perfectly
 #' correlated across sims (same posterior parameter draw).
 
+## calculate_averted_count ----
 calculate_averted_count <- function(arr, dn.one.outcome = NULL, noint = NOINT) {
     # dn.one.outcome is no longer needed -- the order comes from the dimnames.
     # It is kept so the existing call sites do not have to change.
@@ -118,6 +123,7 @@ calculate_averted_count <- function(arr, dn.one.outcome = NULL, noint = NOINT) {
 #' applied to a rare stratum. Contrast calculate_ratio_of_outcomes() and
 #' calculate_ratio_versus_year(), which do guard their denominators.
 
+## calculate_averted_pct ----
 calculate_averted_pct <- function(arr, dn.one.outcome = NULL, noint = NOINT) {
     p  <- .dims_last(arr, "intervention")
     nv <- as.vector(subset_array(p, list(intervention = noint)))
@@ -145,6 +151,7 @@ calculate_averted_pct <- function(arr, dn.one.outcome = NULL, noint = NOINT) {
 #' reflects any population change the intervention causes. No zero-denominator
 #' guard: a population denominator cannot be zero here.
 
+## calculate_rate ----
 calculate_rate <- function(arr, num.outcome, denom.outcome, dn.one.outcome = NULL) {
     p   <- .dims_last(arr, "outcome")
     num <- as.vector(subset_array(p, list(outcome = num.outcome)))
@@ -153,6 +160,7 @@ calculate_rate <- function(arr, num.outcome, denom.outcome, dn.one.outcome = NUL
     aperm(.as_array(100000 * num / den, dn), .outcome_order(arr))
 }
 
+## calculate_ratio_of_outcomes ----
 #' Ratio of one outcome to another, in the same year
 #'
 #' Returns num/den on its own scale -- no multiplier, so the value is the
@@ -219,6 +227,7 @@ calculate_ratio_of_outcomes <- function(arr, num.outcome, denom.outcome,
 #'
 #' Same-year comparison against noint, computed within sim.
 
+## calculate_rate_averted ----
 calculate_rate_averted <- function(arr, num.outcome, denom.outcome,
                                    dn.one.outcome = NULL, noint = NOINT) {
     p   <- .dims_last(arr, c("intervention", "outcome"))
@@ -230,6 +239,7 @@ calculate_rate_averted <- function(arr, num.outcome, denom.outcome,
           .outcome_order(arr))
 }
 
+## calculate_strata_share ----
 #' Share of an outcome contributed by each stratum, as a percentage
 #'
 #' Collapses the stratification dimension to build a denominator, then divides
@@ -324,6 +334,7 @@ calculate_strata_share <- function(arr, denominator.strata = NULL) {
 #' and every other dimension is carried through untouched, so strata are
 #' accumulated separately without needing to be named.
 
+## calculate_cumulative ----
 calculate_cumulative <- function(arr, stratification.dimensions = NULL) {
     # Cumulative sum along `year`. Reshaping to a matrix with year down the
     # rows lets apply() walk plain columns instead of indexing four array
@@ -365,6 +376,7 @@ calculate_cumulative <- function(arr, stratification.dimensions = NULL) {
 #' references the no-intervention arm. It is kept only so existing call sites
 #' do not have to change.
 
+## calculate_pct_reduction_versus_year ----
 calculate_pct_reduction_versus_year <- function(arr, yr, dn.one.outcome = NULL,
                                                 noint = NOINT) {
     p  <- .dims_last(arr, "year")
@@ -373,6 +385,7 @@ calculate_pct_reduction_versus_year <- function(arr, yr, dn.one.outcome = NULL,
           .outcome_order(arr))
 }
 
+## calculate_ratio_versus_year ----
 #' Ratio of an outcome to its own value in a baseline year (fold-change)
 #'
 #' Returns x_year / x_baseline.year, computed WITHIN each sim / intervention /
@@ -443,6 +456,7 @@ calculate_ratio_versus_year <- function(arr, yr, dn.one.outcome = NULL) {
 #' @param baseline.year The year comparator (2) is measured against, and the
 #'   first year kept in the output.
 
+## calculate_custom_outcomes ----
 calculate_custom_outcomes <- function(raw_results, baseline.year, debug=F) {
     if (debug) browser()
     

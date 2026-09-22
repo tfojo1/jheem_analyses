@@ -23,10 +23,12 @@
 source('../jheem_analyses/applications/SHIELD/analysis/shield_plot_core.R')
 
 
+## .build.int.key ----
 .build.int.key <- function(loc.name, calib.code, int.label)
     paste0(loc.name, " \u2013 ", calib.code, " \u2013 ", int.label)
 
 
+## .build.int.path ----
 .build.int.path <- function(base.path, calibration.code, n.sim, location.code, intervention.code) {
     run.tag  <- paste0(calibration.code, "-", n.sim)
     filename <- paste0("shield_", run.tag, "_", location.code, "_", intervention.code, ".Rdata")
@@ -61,6 +63,8 @@ source('../jheem_analyses/applications/SHIELD/analysis/shield_plot_core.R')
 #       )
 #   )
 # ****************************************************************************************************
+
+## int.style.manager ----
 int.style.manager <- function(intervention.labels,
                               calibration.codes,
                               palette         = ggsci::pal_jama(),

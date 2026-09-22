@@ -25,6 +25,7 @@ local_edition(3)
 
 skip_unless_stage("has.shield.helpers")
 
+## load_interventions ----
 ## Source intervention_definitions.R into a private environment, with a fixed
 ## seed, so the test does not depend on (or disturb) the global interventions
 ## registry more than it must.
@@ -43,6 +44,7 @@ load_interventions <- function() {
     isTRUE(SHIELD.TEST.ENV$interventions)
 }
 
+## skip_unless_interventions ----
 skip_unless_interventions <- function() {
     skip_if(is.null(shield.test.specification()), "no specification")
     if (!load_interventions()) {

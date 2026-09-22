@@ -23,6 +23,7 @@
 ## 5% tolerance.
 local_edition(3)
 
+## likelihood_source ----
 likelihood_source <- function() {
     f <- file.path(SHIELD.DIR, "shield_likelihoods.R")
     skip_if_not(file.exists(f))

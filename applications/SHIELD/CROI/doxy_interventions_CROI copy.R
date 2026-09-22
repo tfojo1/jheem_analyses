@@ -18,6 +18,7 @@ DOXY.END.2   <- 2027 + 9/12      #  Oct 1, 2027
 
 # Doxy-pep Efficacy Distribution
 
+## fit_rr_lognorm_from_mean_ci ----
 fit_rr_lognorm_from_mean_ci <- function(rr_mean, rr_lo, rr_hi, p_lo=0.025, p_hi=0.975){
     if (any(c(rr_mean, rr_lo, rr_hi) <= 0)) stop("RR mean/CI must be > 0 for a lognormal.")
     zspan  <- qnorm(p_hi) - qnorm(p_lo)             
@@ -26,6 +27,7 @@ fit_rr_lognorm_from_mean_ci <- function(rr_mean, rr_lo, rr_hi, p_lo=0.025, p_hi=
     list(meanlog = meanlog, sdlog = sdlog)
 }
 
+## draw_rr_lognorm ----
 draw_rr_lognorm <- function(n, rr_mean, rr_lo, rr_hi, cap_at_one=TRUE){
     p <- fit_rr_lognorm_from_mean_ci(rr_mean, rr_lo, rr_hi)
     rr <- rlnorm(n, meanlog = p$meanlog, sdlog = p$sdlog)

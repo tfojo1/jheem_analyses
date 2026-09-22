@@ -14,8 +14,6 @@ LOCATIONS        <- SHIELD.TEN.MSAS    # Named vector: names = city, values = co
 CALIBRATION.CODE <- "calib.8.21.stage3.az"  
  
 N.SIM <- 400
-BASE.PATH <- paste0(ROOT.DIR,"/simulations/shield")
-
 
 INTERVENTION.LABELS <- c(
     noint        = "No Doxy-PEP Intervention",
@@ -32,7 +30,6 @@ int.simsets <- load.int.simsets(
     intervention.codes  = INTERVENTION.CODES,
     calibration.code    = CALIBRATION.CODE[1],
     n.sim               = N.SIM,
-    base.path           = BASE.PATH,
     intervention.labels = INTERVENTION.LABELS,
     append=T
 )

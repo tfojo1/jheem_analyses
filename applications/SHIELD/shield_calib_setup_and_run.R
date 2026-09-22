@@ -41,7 +41,7 @@ if (START_FROM_SCRATCH) {
 start.time <- Sys.time()
 print(paste0("STARTING MCMC RUN OF ", LOCATION, " (", locations::get.location.name(LOCATION), ") AT ", Sys.time()))
 
-# =============================================================================
+# *****************************************************************************
 # RUN THE CHAIN, RETRYING IF THE NAS DRIVE DROPS OUT
 #
 # The problem: the run writes to the NAS drive as it goes. If the drive drops
@@ -51,7 +51,7 @@ print(paste0("STARTING MCMC RUN OF ", LOCATION, " (", locations::get.location.na
 # So: if the drive is what broke, wait for it and try again (up to ~95 minutes).
 # If anything else broke, print the error and stop - retrying a real bug 20
 # times only hides it and makes the log impossible to read.
-# =============================================================================
+# *****************************************************************************
 
 # --- Settings -----------------------------------------------------------------
 MAX.ATTEMPTS        <- 20       # how many times to try the chain in total
@@ -85,6 +85,7 @@ TRANSIENT.ERROR.PATTERNS <- paste(c(
     "unexpected end of (file|input)"
 ), collapse = "|")
 
+## nas.is.reachable ----
 # --- Is the NAS drive working right now? --------------------------------------
 # We cannot just ask whether the folder exists, because a disconnected network
 # drive usually still looks like it is there. The only reliable test is to write

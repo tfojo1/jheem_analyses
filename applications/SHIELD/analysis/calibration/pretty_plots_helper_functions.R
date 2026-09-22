@@ -198,6 +198,7 @@ shield.colors <- function(dimension) {
            stop("No color registry for dimension '", dimension, "'"))
 }
 
+## shield.labels ----
 shield.labels <- function(dimension) {
     switch(dimension,
            sex      = SHIELD.LABELS.SEX,
@@ -248,6 +249,8 @@ darken <- function(color, amount = 60) {
 #   base.family font family. Leave "" for the device default; set once here so all
 #               figures in a paper share a typeface.
 # ****************************************************************************************************
+
+## theme.shield ----
 theme.shield <- function(base.size   = 11,
                          legend      = c("bottom", "none", "right"),
                          strips      = TRUE,
@@ -322,6 +325,8 @@ theme.shield <- function(base.size   = 11,
 #               posterior is wide or the chains are stuck.
 #   "single"    one thick line, for a single simulation (e.g. last_sim).
 # ****************************************************************************************************
+
+## shield.style ----
 shield.style <- function(mode       = c("interval", "spaghetti", "single"),
                          color.by   = c("simset", "stratum"),
                          linetype.by = NULL,
@@ -430,7 +435,10 @@ shield.outcome.info <- function(outcome) {
     as.list(SHIELD.OUTCOMES[i, ])
 }
 
+## shield.title ----
 shield.title <- function(outcome) shield.outcome.info(outcome)$title
+
+## shield.y.lab ----
 shield.y.lab <- function(outcome) shield.outcome.info(outcome)$y.lab
 
 ## shield.y.scale() ----
@@ -548,6 +556,8 @@ save.shield.fig <- function(plot, filename, dir,
 # SHIELD-ONLY ARGUMENTS (not simplot arguments)
 #   window mode base.size legend grid strips show.proj.line proj.label omit.data.years
 # ****************************************************************************************************
+
+## shield.trend.plot ----
 shield.trend.plot <- function(...,
                               outcomes        = NULL,
                               window          = SHIELD.DEFAULT.WINDOW,

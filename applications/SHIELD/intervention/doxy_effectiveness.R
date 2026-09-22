@@ -21,6 +21,8 @@
 # ------------------------------------------------------------------------------
 # Fit a lognormal distribution to the reported RR and 95% CI
 # ------------------------------------------------------------------------------
+
+## fit_rr_lognorm_from_mean_ci ----
 fit_rr_lognorm_from_mean_ci <- function(
         rr_mean,
         rr_lo,
@@ -55,6 +57,8 @@ fit_rr_lognorm_from_mean_ci <- function(
 # ------------------------------------------------------------------------------
 # Generate Monte Carlo samples of relative risk
 # ------------------------------------------------------------------------------
+
+## draw_rr_lognorm ----
 draw_rr_lognorm <- function(
         n,
         rr_mean,

@@ -25,6 +25,7 @@ local_edition(3)
 
 skip_unless_stage("has.packages", "has.jheem2")
 
+## error_terms_env ----
 ## The file's top level reads the surveillance manager, so source only the
 ## function definitions into a private environment.
 error_terms_env <- function() {
@@ -46,6 +47,7 @@ error_terms_env <- function() {
     SHIELD.TEST.ENV$error.terms.env
 }
 
+## do_calc ----
 do_calc <- function(...) {
     env <- error_terms_env()
     if (!exists("do.calculate.variance.parameters", envir = env)) {

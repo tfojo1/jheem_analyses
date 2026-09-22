@@ -17,6 +17,7 @@
 # "missed" in 2020 among PWH who acquired infection pre-2020 (i.e., the
 # deficit is attributable to testing disruption, not incidence decline).
 
+## get.covid.reduction.in.testing.by.sex.race ----
 # NOTE: Age stratification is NOT applied here; it is handled separately below
 get.covid.reduction.in.testing.by.sex.race = function(specification.metadata){
     dim.names = specification.metadata$dim.names[c('age','race','sex')]
@@ -70,6 +71,7 @@ get.covid.reduction.in.testing.by.sex.race = function(specification.metadata){
 # Data source: Patel et al. 2022 (PMID 36094476), JAIDS. Uses CDC-funded health
 # department testing data (NHM&E system), comparing 2019 and 2020 counts across
 
+## get.covid.reduction.in.testing.by.age ----
 # Constructs age-specific multipliers for the COVID testing reduction, expressed
 # relative to the overall (all-ages) reduction. These multipliers are then
 # combined with the race/sex multipliers from get.covid.reduction.in.testing.by.sex.race().

@@ -26,10 +26,12 @@
 source('../jheem_analyses/applications/SHIELD/analysis/shield_plot_core.R')
 
 
+## .build.calib.key ----
 .build.calib.key <- function(loc.name, calib.code)
     paste0(loc.name, " \u2013 ", calib.code)
 
 
+## .filter.to.requested.locations ----
 .filter.to.requested.locations <- function(requested, available, caller = "unknown") {
     # browser()
     if (is.null(requested)) return(available)
@@ -45,6 +47,7 @@ source('../jheem_analyses/applications/SHIELD/analysis/shield_plot_core.R')
 }
 
 
+## .get.plot.simset ----
 .get.plot.simset <- function(entry, sim.subset = "full") {
     
     if (sim.subset == "last20" && !is.null(entry$last20_sims)) return(entry$last20_sims)
@@ -53,6 +56,7 @@ source('../jheem_analyses/applications/SHIELD/analysis/shield_plot_core.R')
 }
 
 
+## .extract.location.info ----
 .extract.location.info <- function(location) {
     
     val <- unname(as.character(location))[1] #Takes whatever was passed in, strips off any name attribute (so a named vector like c(Atlanta = "C.12060") reduces to just "C.12060"), converts to character, and takes the first element. This normalizes all three possible input types into a single plain string val.
@@ -75,6 +79,7 @@ source('../jheem_analyses/applications/SHIELD/analysis/shield_plot_core.R')
 }
 
 
+## .detect.n.sim ----
 .detect.n.sim <- function(calibration.code, root.dir = NULL) {
     base.path <- .shield.base.path(root.dir)
     if (!dir.exists(base.path)) return(NULL)
@@ -560,6 +565,7 @@ plot.calib.comparison <- function(calib.simsets,
 }
 
 
+## inspect_mixing ----
 inspect_mixing <- function(calib.simsets,
                            calibration.codes,
                            locations          = NULL,

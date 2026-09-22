@@ -58,6 +58,8 @@ ggplot(df, aes(x = factor(year), y = fertility.rate)) +facet_wrap(~age*race)+  g
 #   theme_minimal()
 
 ### FITTING MODELS ### ----
+
+## fit.models ----
 # GLM: main effects and interactions 
 # quasibinomial is used when the dependent variable is a proportion (0 < fertility.rate < 1).
 # It assumes that the variance is proportional to the mean but does not require the data to follow the strict binomial variance assumption.
@@ -288,6 +290,7 @@ df.fitted=df;df.fitted$predicted_fertility <- predicted_values
 b=plot.fitted.values(df.fitted)
 print(b[[4]]);
 
+## expit ----
 # approach2:
 # how to estimate the fit for 15-19 black in 2007 manually:
 expit<-function(x){1/(1+exp(-x))} 

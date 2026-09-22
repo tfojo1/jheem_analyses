@@ -19,6 +19,8 @@ source("../jheem_analyses/applications/SHIELD/shield_specification.R")
 
 
 # Clean CDC Wonder data ----
+
+## reshapeData ----
 reshapeData<-function(q1,q2,q3,q0,denom){
   df=reshape2::melt(q1,value.name = "p1") #melt into a dataframe-row per category
   df$p2=as.numeric(q2)
@@ -39,6 +41,7 @@ reshapeData<-function(q1,q2,q3,q0,denom){
   return(df[,c('year','age','race1','p1','p2','p3','p0','w')])
 }
 
+## get.prenatal.cache ----
 #Fitting alternative models and returning intercepts/slopes -----
 get.prenatal.cache = function(df,  model ){
   library(splines)
@@ -101,6 +104,8 @@ df <- df %>%
 
 
 # CHECKING THE PERFORMANCE TO CHOOSE THE BEST MODEL ----
+
+## check.model.performance ----
 check.model.performance<-function(df,
                                   trimester,
                                   selected.model,
@@ -209,6 +214,7 @@ check.model.performance(df,trimester = "third.trimester", selected.model = "full
 check.model.performance(df,trimester = "third.trimester", selected.model = "two.way",filter.covid = T)
 }
 
+## cache.final.prior ----
 # CACHING THE FINAL PRIOR -----
 cache.final.prior<-function(df,
                             trimester,

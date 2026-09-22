@@ -9,6 +9,7 @@ library(ggplot2)
 
 source("../jheem_analyses/applications/SHIELD/shield_specification.R")
 
+## clean.brfss.data ----
 # CLEANING DATA -----
 clean.brfss.data <- function(specification.metadata) {
   load("../jheem_analyses/cached/brfss.subset.RData")
@@ -136,6 +137,8 @@ clean.brfss.data <- function(specification.metadata) {
 }
 
 # MODEL FITTING ----
+
+## get.testing.cache ----
 # get.testing.cache(...) function fits a logistic regression model to the data and returns 
 # a list containing two items: a multidimensional array of intercepts (the predicted log-odds when year = 0) 
 # and slopes (the change in log-odds per one unit change in year) for each combination of demographic strata.
@@ -202,6 +205,8 @@ get.testing.cache <- function(df,
 
 
 # CHECKING MODEL PERFORMANCE ----
+
+## checking.model.performance ----
 checking.model.performance<- function(df, specification.metadata, selected.model) {
   print(paste("checking model performance for ", selected.model, " model ...."))
   anchor.year= 2010

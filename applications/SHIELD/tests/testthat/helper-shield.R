@@ -32,6 +32,7 @@ REPO.ROOT   <- SHIELD.TEST.ENV$repo.root
 
 ## --- working directory --------------------------------------------------------
 
+## use_repo_root ----
 ## The model only runs from the repo root. commoncode/cache_object_for_version_functions.R
 ## resolves its cache with the literal path "../jheem_analyses/commoncode/..." ,
 ## and 40-odd SHIELD files use the same "../jheem_analyses/" prefix, so anything
@@ -48,6 +49,7 @@ use_repo_root <- function(env = parent.frame()) {
 
 ## --- skip helpers -------------------------------------------------------------
 
+## skip_unless_stage ----
 skip_unless_stage <- function(...) {
     for (stage in c(...)) {
         if (!isTRUE(SHIELD.TEST.ENV[[stage]])) {
@@ -58,6 +60,7 @@ skip_unless_stage <- function(...) {
     }
 }
 
+## skip_unless_slow ----
 skip_unless_slow <- function() {
     if (identical(tolower(Sys.getenv("SHIELD_TEST_SKIP_SLOW")), "true")) {
         testthat::skip("SHIELD_TEST_SKIP_SLOW=true")
@@ -78,6 +81,7 @@ SHIELD.SCRATCH.PATTERNS <- c(
     "/talks/"
 )
 
+## shield_r_files ----
 shield_r_files <- function(include.scratch = TRUE) {
     files <- list.files(SHIELD.DIR, pattern = "\\.[Rr]$", recursive = TRUE,
                         full.names = TRUE)
@@ -89,12 +93,14 @@ shield_r_files <- function(include.scratch = TRUE) {
     sort(files)
 }
 
+## shield_rel ----
 shield_rel <- function(paths) {
     sub(paste0("^", REPO.ROOT, "/"), "", paths)
 }
 
 ## --- fixtures -----------------------------------------------------------------
 
+## fixture_single_year_age_counts ----
 ## A small, fixed single-year age distribution for the pairing tests, so those
 ## tests do not depend on the census manager.
 fixture_single_year_age_counts <- function(ages = 0:85, per.year = 1000) {
@@ -108,6 +114,7 @@ fixture_single_year_age_counts <- function(ages = 0:85, per.year = 1000) {
 SHIELD.TEST.LOCATION <- "C.12580"
 SHIELD.TEST.VERSION  <- "shield"
 
+## shield_test_sim ----
 ## Engine + median-parameter simulation, built once and memoised across files.
 shield_test_sim <- function() {
     use_repo_root()
@@ -127,6 +134,7 @@ shield_test_sim <- function() {
     if (identical(SHIELD.TEST.ENV$cached.sim, NA)) NULL else SHIELD.TEST.ENV$cached.sim
 }
 
+## skip_unless_likelihoods ----
 ## shield_likelihoods.R needs the specification, the surveillance manager, and a
 ## jheem2 that accepts every argument it passes. Sourcing it is memoised by the
 ## bootstrap; this reports why it is unavailable rather than erroring.
@@ -143,6 +151,7 @@ skip_unless_likelihoods <- function() {
     invisible(TRUE)
 }
 
+## skip_unless_sim ----
 skip_unless_sim <- function() {
     skip_unless_stage("has.shield.helpers")
     skip_unless_slow()

@@ -167,6 +167,7 @@ test_that("every parameter name the apply function constructs exists in the prio
 
 ## --- the calibration register ------------------------------------------------
 
+## register_entries ----
 register_entries <- function() {
     f <- file.path(SHIELD.DIR, "shield_calib_register.R")
     lines <- readLines(f, warn = FALSE)

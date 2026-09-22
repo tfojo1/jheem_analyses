@@ -26,6 +26,7 @@ SHIELD.TEST.ENV <- new.env(parent = emptyenv())
 ## working directory must be a directory whose parent contains jheem_analyses.
 ## The repo root itself satisfies that, so we always run from there.
 
+## shield.test.find.repo.root ----
 shield.test.find.repo.root <- function(start = getwd()) {
     d <- normalizePath(start, mustWork = FALSE)
     while (TRUE) {
@@ -58,6 +59,7 @@ if (!dir.exists("../jheem_analyses")) {
 ## --- Stage helper -------------------------------------------------------------
 ## Run a stage, remember whether it worked, never abort the suite.
 
+## shield.test.stage ----
 shield.test.stage <- function(name, expr, quiet = TRUE) {
     ## Warnings are recorded, never treated as failures. They are muffled with
     ## withCallingHandlers, which resumes the stage, rather than tryCatch, which
@@ -346,6 +348,7 @@ shield.test.stage("has.shield.helpers", {
 
 SHIELD.TEST.ENV$specification.attempted <- FALSE
 
+## shield.test.source.without.env.loader ----
 ## shield_specification.R line 11 sources shield_source_code.R, which is the
 ## file that runs git. The bootstrap has already supplied everything that file
 ## provides, so we source the specification with that one line removed.
@@ -362,6 +365,7 @@ shield.test.source.without.env.loader <- function(path) {
     eval(parse(text = paste(lines, collapse = "\n")), envir = globalenv())
 }
 
+## shield.test.specification ----
 shield.test.specification <- function() {
     ## The specification and everything it calls resolve files through the
     ## literal prefix "../jheem_analyses/", so they only work from the repo
@@ -395,6 +399,7 @@ shield.test.specification <- function() {
 
 SHIELD.TEST.ENV$likelihoods.attempted <- FALSE
 
+## shield.test.likelihoods ----
 shield.test.likelihoods <- function() {
     old.wd <- setwd(SHIELD.TEST.ENV$repo.root)
     on.exit(setwd(old.wd), add = TRUE)
@@ -414,6 +419,7 @@ shield.test.likelihoods <- function() {
 ## Reporting
 ## =============================================================================
 
+## shield.test.tier.summary ----
 shield.test.tier.summary <- function() {
     stages <- c("has.packages", "has.jheem2", "has.standalone", "has.commoncode",
                 "has.mobility", "has.census.manager", "has.surveillance.manager",

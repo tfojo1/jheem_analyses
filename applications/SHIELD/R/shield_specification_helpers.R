@@ -11,6 +11,8 @@
 
 #-- INITIAL POPULATION SIZES --#  ----
 ## get initial populations sizes for different groups ----
+
+## get.n.initial.female.population ----
 #' @title get.n.initial.female.population
 #' @description Generates the size of the 'female' population for the given years by calling
 #' \code{get.n.initial.population.for.sex} for sex-specific population data.
@@ -29,6 +31,7 @@ get.n.initial.female.population <- function(location, specification.metadata, ye
                                      years = years)
 }
 
+## get.n.initial.male.population ----
 #'
 #' @title get.n.initial.male.population
 #' @description Generates the size of the 'male' population for the given years by calling
@@ -43,6 +46,7 @@ get.n.initial.male.population <- function(location, specification.metadata, year
                                      years = years)
 }
 
+## get.n.initial.population.for.sex ----
 #'
 #' @title get.n.initial.population.for.sex
 #' @description Generates the size of the population for the given years based on sex.
@@ -79,6 +83,8 @@ get.n.initial.population.for.sex <- function(location, specification.metadata, s
 }
 
 ## get msm popualtion proportion ----
+
+## get.proportion.msm.of.male.by.race.functional.form ----
 #'
 #' @title get.proportion.msm.of.male.by.race.functional.form
 #' @description Generates proportion of male who are msm by race
@@ -96,6 +102,8 @@ get.proportion.msm.of.male.by.race.functional.form <- function(location, specifi
                                   link = 'log',
                                   value.is.on.transformed.scale = F)
 }
+
+## get.best.guess.msm.proportions ----
 #'
 #' @title get.best.guess.msm.proportions
 #' @description generates proportion of male who are msm 
@@ -298,6 +306,7 @@ get.best.guess.msm.proportions <- function(location,
 
 
 
+## get.fertility.rate.functional.form ----
 #-- FERTILITY --# ----
 #' @title get.fertility.rate.functional.form
 #' @description generating a functional form for fertility rates based on census data (see inputs/estimate_fertility_rate.R)
@@ -359,6 +368,7 @@ get.fertility.rate.functional.form<-function(location, specification.metadata, p
     # qplot(2007:2040,sapply(ff$project(2007:2040),function(x){x[[12]]}))
 }
 
+## get.fertility.rates.from.census ----
 #' @title get.fertility.rates.from.census
 #' @description reading the fertility rates from the census manager
 #' @param location location
@@ -417,6 +427,7 @@ get.fertility.rates.from.census<-function(location, specification.metadata, popu
     return(mapped.fertility.rate)
 }
 
+## get.general.mortality.rates.functional.form ----
 #-- MORTALITY --# --#----
 #' @title get.general.mortality.rates.functional.form
 #' @description generating a functional form for mortality rates based on census data
@@ -434,6 +445,8 @@ get.general.mortality.rates.functional.form = function(location, specification.m
                                   link = "log",
                                   value.is.on.transformed.scale = F) # not giving the log rates; don't need to transform this value
 }
+
+## get.general.mortality.rates ----
 #' @title get.general.mortality.rates
 #' @description reading the mortality rates from the census manager (approximating them off state-level data)
 #' @param location location
@@ -544,6 +557,7 @@ get.general.mortality.rates <- function(location,
 ##-- CONTACT TRACING: RATE OF CONTACTS PER CASE --## ----
 ##-------------------------##
 
+## get.rate.of.contacts.per.case ----
 #' @title Get rate of contacts identified by contact tracing (as a rate per index case)
 #' @description  This is a function used to calculate a quantity value in the specification which is too complicated to be calculated by an expression. It takes the diagnosis rate for index cases ('index.case.diagnosis.rate'), and sums up, for each 'from contact' in the contact matrix, the proportion of to.contacts who could be connected multiplied by their index-case diagnosis rate
 #' @param index.case.diagnosis.rate The value of the model quantity representing the diagnosis rate among index cases
@@ -601,6 +615,7 @@ get.rate.of.contacts.per.case = function(index.case.diagnosis.rate,
 }
 
 
+## get.empiric.aging.rates ----
 #-- AGING --# ----
 #' #' @title get.empiric.aging.rates
 #' #' @description  creates a spline function for aging rates
@@ -620,6 +635,8 @@ get.empiric.aging.rates <- function(location, specification.metadata,
                                           link = 'log',
                                           knots.are.on.transformed.scale = F)
 }
+
+## do.get.empiric.aging.rates ----
 #' #' @title do.get.empiric.aging.rates
 #' #' @description  retrieves the data required for computing emperic aging rates
 #' #' @param location location
@@ -720,12 +737,15 @@ do.get.empiric.aging.rates <- function(location,
     names(aging.rates) = names(years)
     aging.rates
 }
+
+## functions.sexual.contact.model ----
 #-- SEXUAL CONTACT BY AGE --# ----
 #' @title functions.sexual.contact.model
 #' @description sexual contacts are charactrized via 4 components: 1)transmission probability, 2)age mixing, 3)sex mixing, and 4)race mixing
 #' @references \file{inst/docs/sexual_contacts.docx}
 functions.sexual.contact.model<-function(){}
 
+## get.female.sexual.age.contact.proportions ----
 #' @title get.female.sexual.age.contact.proportions
 #' @description returns a list of age contact proportions for females
 #' @param age.mixing.sd.mult multiplier of the standard deviation of the age mixing model (diff_ages_partners ~ Normal(mu,sd))
@@ -750,6 +770,7 @@ get.female.sexual.age.contact.proportions <- function(location,
                                              availability = single.year.age.sexual.availability)
 }
 
+## get.msm.sexual.age.contact.proportions ----
 #' @title get.msm.sexual.age.contact.proportions
 #' @description returns a list of age contact proportions for msm
 #' @inheritParams get.female.sexual.age.contact.proportions
@@ -768,6 +789,7 @@ get.msm.sexual.age.contact.proportions <- function(location,
                                              availability = single.year.age.sexual.availability)
 }
 
+## get.heterosexual_male.sexual.age.contact.proportions ----
 #' @title get.heterosexual_male.sexual.age.contact.proportions
 #' @description returns a list of age contact proportions for het male
 #' @inheritParams get.female.sexual.age.contact.proportions
@@ -787,6 +809,7 @@ get.heterosexual_male.sexual.age.contact.proportions <- function(location,
 }
 
 
+## do.get.age.contact.proportions.for.model ----
 #' @title do.get.age.contact.proportions.for.model
 #' @description returns a list of age contact proportions for designated group
 #' @param location location
@@ -817,6 +840,7 @@ do.get.age.contact.proportions.for.model <- function(specification.metadata,
                                sd.multiplier=age.mixing.sd.mult)
 }
 
+## get.female.single.year.age.counts ----
 #' @title get.female.single.year.age.counts
 #' @description return counts of female in a single year
 #' @param location location
@@ -838,6 +862,7 @@ get.female.single.year.age.counts <- function(location, population.years=DEFAULT
     array(apply(pop, 'age', sum), dim=c(age=length(CENSUS.AGES)), dimnames=list(age=CENSUS.AGES))
 }
 
+## get.male.single.year.age.counts ----
 #' @title get.male.single.year.age.counts
 #' @description return counts of male in a single year
 #' @inheritParams get.female.single.year.age.counts
@@ -858,6 +883,7 @@ get.male.single.year.age.counts <- function(location, population.years=DEFAULT.P
     array(apply(pop, 'age', sum), dim=c(age=length(CENSUS.AGES)), dimnames=list(age=CENSUS.AGES))
 }
 
+## get.msm.single.year.age.counts ----
 #' @title get.msm.single.year.age.counts
 #' @description return counts of msm in a single year
 #' @inheritParams get.female.single.year.age.counts
@@ -879,6 +905,7 @@ get.msm.single.year.age.counts <- function(location, specification.metadata,
     rv
 }
 
+## get.heterosexual_male.single.year.age.counts ----
 #' @title get.heterosexual_male.single.year.age.counts
 #' @description To determine the proportion of the population that falls into specific age buckets
 #' @param location location
@@ -895,6 +922,7 @@ get.heterosexual_male.single.year.age.counts <- function(location,
 }
 
 
+## get.sexual.availability ----
 #' @title 1-get.sexual.availability
 #' @description Determines the proportion of people in each age bucket that are sexually available
 #' @return 1D vector with proportion of people in each age bucket that are sexually available
@@ -927,6 +955,7 @@ get.sexual.availability <- function()
     array(rv, dim=c(age=length(rv)), dimnames=list(age=names(rv)))
 }
 
+## get.race.population.counts ----
 get.race.population.counts <- function(location,
                                        specification.metadata,
                                        years=DEFAULT.POPULATION.YEARS)
@@ -960,6 +989,8 @@ get.race.population.counts <- function(location,
 ##-------------##
 ##-- Pairing --##
 ##-------------##
+
+## get.geographically.aggregated.race.oes ----
 #' @title get.geographically.aggregated.race.oes
 #' @description within.county.race.oes[to,from] is how much more likely someone it is for a person of race to to have a partner of race from, relative to race from's population prevalence
 #' @param location location
@@ -1036,6 +1067,7 @@ get.geographically.aggregated.race.oes <- function(location,
         oes
 }
 
+## sexual.oes.to.contact.proportions ----
 #' @title sexual.oes.to.contact.proportions
 #' @description trasforming oe values to proportions of mixing with other races (sum to 1)
 #' calling code \code{oes.to.proportions}
@@ -1048,6 +1080,7 @@ sexual.oes.to.contact.proportions <- function(race.sexual.oes,
     oes.to.proportions(oes = race.sexual.oes, population = race.population.counts)
 }
 
+## oes.to.proportions ----
 #' @title oes.to.proportions
 #' @description trasforming oe values to proportions of mixing with other groups (sum to 1)
 #' @param oes oes betwen groups
@@ -1059,6 +1092,7 @@ oes.to.proportions <- function(oes, population)
     raw / rowSums(raw)
 }
 
+## get_prob_careseek_symptomatic_ps_functional_form ----
 #-- PROB CARESEEK SYMPTOMATIC P&S --# ----
 get_prob_careseek_symptomatic_ps_functional_form<-function(specification.metadata) {
     prob_careseek_symptomatic_ps_functional_form <- create.logistic.linear.functional.form(intercept = .75, #what prp of sym cases seek care? 
@@ -1076,6 +1110,7 @@ get_prob_careseek_symptomatic_ps_functional_form<-function(specification.metadat
 # The array from contains values in probability space (0, 1), representing the proportion of baseline
 # testing retained at the Q2 2020 nadir for each [age × race × sex] stratum.
 
+## get.max.covid.effect.sti.screening.reduction ----
 # The resulting object represents the maximum COVID reduction of testing
 # (the Q2 2020 nadir). It is passed into the model's time-varying testing rate parameter alongside a separate functional form
 # that governs how the effect ramps in and out across the full 2020–2022 COVID period (covid on).
@@ -1138,6 +1173,7 @@ get.max.covid.effect.sti.screening.reduction = function(specification.metadata){
 #     
 # }
 
+## get_sti_screening_functional_form_OPTION2 ----
 get_sti_screening_functional_form_OPTION2 <- function(specification.metadata) {
     hiv_testing_prior <- get.cached.object.for.version(name = "hiv.testing.prior",
                                                        version = specification.metadata$version)
@@ -1167,6 +1203,7 @@ get_sti_screening_functional_form_OPTION2 <- function(specification.metadata) {
     
 } 
 
+## get_syphilis_to_hiv_testing_ratio_functional_form ----
 #-- STI TO HIV TESTS RATIO --# ----
 get_syphilis_to_hiv_testing_ratio_functional_form <- function(specification.metadata) {
     # we use this to calculate hiv tests and fit them against BRFSS data
@@ -1178,6 +1215,7 @@ get_syphilis_to_hiv_testing_ratio_functional_form <- function(specification.meta
     syphilis_to_hiv_testing_ratio_functional_form
 }
 
+## get.prp.prenatal.care.functional.form ----
 #-- PRENTAL CARE BY TRIMESTER FUNCTIONAL FORM --# -----
 get.prp.prenatal.care.functional.form = function(specification.metadata,trimester){
     # cashed object from input_prenatal_prior_wonder
@@ -1193,16 +1231,22 @@ get.prp.prenatal.care.functional.form = function(specification.metadata,trimeste
     prenatal.care.functional.form
 }
 
+## get.prp.prenatal.care.functional.form.first.trimester ----
 get.prp.prenatal.care.functional.form.first.trimester<-function(specification.metadata){
     get.prp.prenatal.care.functional.form(specification.metadata,trimester = "first.trimester")
 }
+
+## get.prp.prenatal.care.functional.form.second.trimester.of.those.not.screened.first ----
 get.prp.prenatal.care.functional.form.second.trimester.of.those.not.screened.first<-function(specification.metadata){
     get.prp.prenatal.care.functional.form(specification.metadata,trimester = "second.trimester")
 }
+
+## get.prp.prenatal.care.functional.form.third.trimester.of.those.not.screened.first.second ----
 get.prp.prenatal.care.functional.form.third.trimester.of.those.not.screened.first.second<-function(specification.metadata){
     get.prp.prenatal.care.functional.form(specification.metadata,trimester = "third.trimester")
 }
 
+## get.immigration.rates.functional.form ----
 #'@:Todd: need to add an option for the national model ----
 #-- MIGRATION --# ----
 get.immigration.rates.functional.form <- function(location, specification.metadata ){
@@ -1219,6 +1263,7 @@ get.immigration.rates.functional.form <- function(location, specification.metada
                                           knots.are.on.transformed.scale = F)
 }
 
+## get.immigration.rates ----
 get.immigration.rates <- function(location, specification.metadata ){
     # this will be one top-level beta for the MSA, then we'll include alphas by strata (race and age only, not sex)? 
     # oneway stratification only for one timepoint  (2011-2015) breakdown by age, by race, by sex
@@ -1238,6 +1283,7 @@ get.immigration.rates <- function(location, specification.metadata ){
     c(immigration.rates)
 }
 
+## get.emigration.rates.functional.form ----
 get.emigration.rates.functional.form <- function(location, specification.metadata){
     
     rates = get.emigration.rates(location=location,
@@ -1253,6 +1299,7 @@ get.emigration.rates.functional.form <- function(location, specification.metadat
                                           knots.are.on.transformed.scale = F)
 }
 
+## get.emigration.rates ----
 get.emigration.rates <- function(location, specification.metadata ){
     # this will be one top-level beta for the MSA, then we'll include alphas by strata (race and age only, not sex)? 
     emigration.numbers = SURVEILLANCE.MANAGER$pull(outcome = "emigration",
@@ -1271,6 +1318,7 @@ get.emigration.rates <- function(location, specification.metadata ){
 
 
 
+## get.fraction.over.age ----
 #'@PK: to review 
 get.fraction.over.age <- function(location,
                                   specification.metadata,
@@ -1330,6 +1378,7 @@ get.fraction.over.age <- function(location,
 # plot(t, logit_x, type = "l", main = "logit(x) — linear")
 # plot(t, x,       type = "l", main = "x — S-shaped logistic")
 
+## get_popProp_primary_diag_1970 ----
 ## Initial population proportion of syphilis diagnosis 1970 -----
 # First, we need to estimate the POPULATION PROPORTION (RATE) of diagnosis in year 1970 as = "n diag/population size" 
 # Since diagnoses data is unavailable in 1970, we need to use another (later year) to approximate 1970
@@ -1344,17 +1393,23 @@ get_popProp_primary_diag_1970<-function(location){
         SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location["1993",location]
     popProp.ps.diag.1970
 }
+
+## get_popProp_secondary_diag_1970 ----
 get_popProp_secondary_diag_1970<-function(location){
     popProp.ps.diag.1970= 0.75 * 
         SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location["1993",location]/
         SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location["1993",location]
     popProp.ps.diag.1970
 }
+
+## get_popProp_el_diag_1970 ----
 get_popProp_el_diag_1970<-function(location){
     popProp.el.diag.1970= SURVEILLANCE.MANAGER$data$early.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location["1993",location]/
         SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location["1993",location]
     popProp.el.diag.1970
 }
+
+## get_popProp_lu_diag_1970 ----
 get_popProp_lu_diag_1970<-function(location){
     popProp.lu.diag.1970= SURVEILLANCE.MANAGER$data$unknown.duration.or.late.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location["1993",location]/
         SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location["1993",location]

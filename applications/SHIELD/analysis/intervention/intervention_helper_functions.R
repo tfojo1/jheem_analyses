@@ -1,6 +1,6 @@
-# ============================================================================
+# ****************************************************************************
 # SHIELD / Doxy-PEP -- tables and figures
-# ============================================================================
+# ****************************************************************************
 #
 # HOW THE PIECES FIT TOGETHER
 #
@@ -55,7 +55,7 @@
 # NOTE ON SOURCING. These same functions also exist in generate_table.R,
 #     doxy_figures.R and generate_heatmap.R. Those copies are now STALE.
 #     Source this file LAST so these definitions win.
-# ============================================================================
+# ****************************************************************************
 
 library(tidyverse)
 library(patchwork)
@@ -63,9 +63,9 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 
-# ============================================================================
+# ****************************************************************************
 # SHIELD FIGURE PALETTE
-# ============================================================================
+# ****************************************************************************
 # One definition of colour for every SHIELD figure. It lives HERE rather than in
 # the analysis scripts because it is a project constant: figures across the
 # paper have to agree, and a colour changed in one script but not another is
@@ -125,14 +125,15 @@ SHIELD.HEAT.COLS <- SHIELD.HEAT.PALETTES[[SHIELD.HEAT.PAL]]
 # plot_coverage_heatmap() hardcodes WHITE labels, so it is legible only when all
 # three bands are dark. That is true of "legacy" and of nothing else here.
 SHIELD.HEAT.SHADE <- TRUE
-# ============================================================================
+# ****************************************************************************
 
 
 
-# ============================================================================
+# ****************************************************************************
 # 1. ARRAY HELPERS
-# ============================================================================
+# ****************************************************************************
 
+## subset_array ----
 #' Subset an array by dimension NAME rather than position
 #'
 #' @param arr Array with named dimnames.
@@ -160,6 +161,7 @@ subset_array <- function(arr, dim_indices, drop = FALSE) {
 }
 
 
+## get_stats ----
 #' Collapse the simulation dimension into a point estimate (and optionally a CI)
 #'
 #' @param keep.dimensions Dimensions to keep. EVERYTHING NOT LISTED HERE IS
@@ -209,10 +211,11 @@ get_stats <- function(arr,
 }
 
 
-# ============================================================================
+# ****************************************************************************
 # 2. TABLE BUILDERS
-# ============================================================================
+# ****************************************************************************
 
+## resolve_locations ----
 #' Resolve location identifiers to codes and display labels
 #'
 #' Accepts either MSA codes ("C.12060") or city names ("Atlanta"), because the
@@ -233,7 +236,7 @@ resolve_locations <- function(arr, locations) {
 }
 
 
-# ============================================================================
+# ****************************************************************************
 # SAVING: ONE CONVENTION FOR TABLES AND FIGURES
 #
 #   save.dir   where the file goes. Defaults to the TABLE.DIR / FIG.DIR you
@@ -244,16 +247,19 @@ resolve_locations <- function(arr, locations) {
 #
 # So every table and figure function takes the same two arguments and behaves
 # the same way, and no function writes to disk unless you name a file.
-# ============================================================================
+# ****************************************************************************
 
+## .default_table_dir ----
 #' Default output directories, taken from the driver script if it set them
 #' @noRd
 .default_table_dir <- function() if (exists("TABLE.DIR")) get("TABLE.DIR") else "tables/"
 
+## .default_fig_dir ----
 #' @noRd
 .default_fig_dir <- function() if (exists("FIG.DIR")) get("FIG.DIR") else "figures/"
 
 
+## .resolve_out_path ----
 #' Build the output path, or NULL when nothing should be written
 #'
 #' @param ext Extension appended when `filename` does not already carry it.
@@ -280,6 +286,7 @@ resolve_locations <- function(arr, locations) {
 }
 
 
+## save_table_csv ----
 #' Write a table to CSV, creating the directory if needed
 #'
 #' NOTE: the column map (see .attach_col_map) does NOT survive a trip through
@@ -297,6 +304,7 @@ save_table_csv <- function(rv,
 }
 
 
+## .attach_col_map ----
 #' Attach the column map to a finished table
 #'
 #' The map records, for every value column, which outcome / intervention / year
@@ -313,6 +321,7 @@ save_table_csv <- function(rv,
 }
 
 
+## .build_col_map ----
 #' Build the column map for a given set of column variables
 #'
 #' pivot_wider() glues the values of `col_vars` together with "_" in the order
@@ -334,6 +343,7 @@ save_table_csv <- function(rv,
 }
 
 
+## .covers ----
 #' Does this array cover every requested year, intervention and the location?
 #' @noRd
 .covers <- function(arr, years, interventions, location.code) {
@@ -344,6 +354,7 @@ save_table_csv <- function(rv,
 }
 
 
+## .coverage_gap ----
 #' Say, in words, what an array is missing
 #' @noRd
 .coverage_gap <- function(arr, years, interventions, location.code) {
@@ -357,6 +368,7 @@ save_table_csv <- function(rv,
 }
 
 
+## .digits_for ----
 #' Melt one array's chosen outcomes into long form
 #'
 #' Returns one row per (stratum, outcome, intervention, year, stat), where
@@ -378,6 +390,7 @@ save_table_csv <- function(rv,
     d
 }
 
+## .melt_outcomes ----
 .melt_outcomes <- function(arr, outcomes, interventions, years, location.code,
                            stratification_cols, stat.type, point.col, show.ci,
                            id_cols, digits = 0) {
@@ -414,6 +427,7 @@ save_table_csv <- function(rv,
 }
 
 
+## .report_outcome_sources ----
 #' Say where each outcome came from, once per table
 #'
 #' Only speaks up when there is something to say: more than one array in a
@@ -441,6 +455,7 @@ save_table_csv <- function(rv,
 }
 
 
+## make_single_location_table ----
 #' Build a table for ONE location
 #'
 #' Normally you call make_multi_location_table() instead -- it works for one
@@ -721,6 +736,7 @@ make_single_location_table <- function(data,
 }
 
 
+## make_multi_location_table ----
 #' Compare one or more locations in one table
 #'
 #' This is the function to call. It works for a single location too -- pass a
@@ -813,10 +829,11 @@ make_multi_location_table <- function(data,
 }
 
 
-# ============================================================================
+# ****************************************************************************
 # 3. TABLE -> LONG (shared by every figure)
-# ============================================================================
+# ****************************************************************************
 
+## .value_columns ----
 #' Work out which columns hold values, and what each one means
 #'
 #' Two routes, in order of preference:
@@ -854,6 +871,7 @@ make_multi_location_table <- function(data,
 }
 
 
+## .split_ci_values ----
 #' Turn the "[lower-upper]" rows of a .ci table into numbers, or drop them (A3)
 #'
 #' CI cells are text, so they cannot be plotted as they stand. `keep.ci = FALSE`
@@ -899,6 +917,7 @@ make_multi_location_table <- function(data,
 }
 
 
+## .parse_ci ----
 #' Pull the two numbers out of a "[lower-upper]" string
 #'
 #' Written to survive negative bounds ("[-5-3]" is lower -5, upper 3), which a
@@ -915,6 +934,7 @@ make_multi_location_table <- function(data,
 }
 
 
+## .require_coverage ----
 #' Error helpfully when a figure needs a coverage level and the table has none
 #' @noRd
 .require_coverage <- function(long, cov.pattern) {
@@ -933,6 +953,7 @@ make_multi_location_table <- function(data,
 }
 
 
+## table_to_long ----
 #' Convert a wide table into the tidy long form every figure works from
 #'
 #' @param tbl A table from make_multi_location_table(), or one that is already
@@ -1051,6 +1072,7 @@ table_to_long <- function(tbl,
 }
 
 
+## parse_coverage_table ----
 #' Back-compatible alias for table_to_long()
 #' @noRd
 parse_coverage_table <- function(tbl, location.col = "location", ...) {
@@ -1058,6 +1080,7 @@ parse_coverage_table <- function(tbl, location.col = "location", ...) {
 }
 
 
+## .filter_locations ----
 #' Keep only the requested locations. Exact names or glob patterns ("Atl*").
 #' @noRd
 .filter_locations <- function(long, locations) {
@@ -1077,6 +1100,7 @@ parse_coverage_table <- function(tbl, location.col = "location", ...) {
 }
 
 
+## .filter_subgroup ----
 #' Keep only the requested strata.
 #' @noRd
 .filter_subgroup <- function(long, subgroup) {
@@ -1095,6 +1119,7 @@ parse_coverage_table <- function(tbl, location.col = "location", ...) {
 }
 
 
+## .location_order ----
 #' Same rule as .series_levels(), but returning location levels only
 #' @noRd
 .location_order <- function(present, locations, order.by, value.order) {
@@ -1112,6 +1137,7 @@ parse_coverage_table <- function(tbl, location.col = "location", ...) {
 }
 
 
+## .series_levels ----
 #' Decide the order of the rows / series of a figure
 #'
 #' ONE RULE FOR EVERY FIGURE, so panels can be compared side by side:
@@ -1152,6 +1178,7 @@ parse_coverage_table <- function(tbl, location.col = "location", ...) {
 }
 
 
+## .series_label ----
 #' Row / series label: the city on its own, or "City - stratum" when more than
 #' one stratum is on the plot.
 #' @noRd
@@ -1163,12 +1190,14 @@ parse_coverage_table <- function(tbl, location.col = "location", ...) {
 }
 
 
+## .strat_suffix ----
 #' Append the stratum to a title when exactly one was selected
 #' @noRd
 .strat_suffix <- function(subgroup)
     if (!is.null(subgroup) && length(subgroup) == 1) paste0(" (", subgroup, ")") else ""
 
 
+## .save_fig ----
 #' Write a figure if a filename was supplied -- same rule as save_table_csv()
 #' @noRd
 .save_fig <- function(p, save.dir, filename, width, height, dpi, save = NULL) {
@@ -1183,6 +1212,7 @@ parse_coverage_table <- function(tbl, location.col = "location", ...) {
 }
 
 
+## .strat_labeller ----
 #' Build a labelling function for stratum display names
 #'
 #' Returns identity when `map` is NULL or empty. Levels absent from `map` are
@@ -1198,6 +1228,7 @@ parse_coverage_table <- function(tbl, location.col = "location", ...) {
 }
 
 
+## .make_labeller ----
 #' Build a labelling function from a flexible spec
 #'
 #' Accepts NULL (identity), a function, a named character vector (value -> label
@@ -1217,6 +1248,7 @@ parse_coverage_table <- function(tbl, location.col = "location", ...) {
 }
 
 
+## .prep_long ----
 #' Shared front end for every figure: long form, then the two row filters.
 #' @noRd
 .prep_long <- function(tbl, location.col, locations, subgroup, col.pattern,
@@ -1249,6 +1281,7 @@ SHIELD.PALETTE.10 <- c("#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4",
                        "#008300", "#4a3aa7", "#e34948", "#8c564b", "#00a2c7")
 
 
+## plot_trend_by_location ----
 #' One panel, one line per location -- the comparative view
 #'
 #' The companion to plot_trend_with_ci(), which facets by location and answers
@@ -1498,6 +1531,7 @@ plot_trend_by_location <- function(tbl,
 
 
 
+## .filter_year ----
 #' Keep one year, with a helpful message when it isn't there
 #' @noRd
 .filter_year <- function(long, year) {
@@ -1510,13 +1544,15 @@ plot_trend_by_location <- function(tbl,
 }
 
 
-# ============================================================================
+# ****************************************************************************
 # 4. FIGURES
-# ============================================================================
+# ****************************************************************************
 
 # ----------------------------------------------------------------------------
 # HEAT MAP: locations (x strata) down the side, coverage across the top
 # ----------------------------------------------------------------------------
+
+## .lighten ----
 #' @param tbl Wide table from make_multi_location_table(), or a long one.
 #' @param locations,subgroup Optional row filters.
 #' @param year Optional year filter. NULL keeps every year in the table and
@@ -1540,6 +1576,7 @@ plot_trend_by_location <- function(tbl,
     grDevices::rgb(t(v + (1 - v) * amount))
 }
 
+## .rel_lum ----
 #' WCAG relative luminance of one or more colours
 #' @noRd
 .rel_lum <- function(hex) {
@@ -1548,6 +1585,7 @@ plot_trend_by_location <- function(tbl,
     as.numeric(0.2126 * lin[1, ] + 0.7152 * lin[2, ] + 0.0722 * lin[3, ])
 }
 
+## .text_on ----
 #' Pick white or near-black text for a given fill, by contrast ratio
 #'
 #' A shaded band runs from a pale end to a saturated one, so no single text
@@ -1559,6 +1597,7 @@ plot_trend_by_location <- function(tbl,
 }
 
 
+## plot_coverage_heatmap ----
 plot_coverage_heatmap <- function(tbl,
                                   location.col = "location",
                                   locations    = NULL,
@@ -1874,6 +1913,8 @@ plot_coverage_heatmap <- function(tbl,
 # ----------------------------------------------------------------------------
 # FIGURE 1: Ranked bar -- coverage needed to reach the target
 # ----------------------------------------------------------------------------
+
+## plot_coverage_needed ----
 #' Minimum coverage required to reach a target impact, ranked
 #'
 #' One bar per series, where a series is a location, or a location x subgroup
@@ -1971,6 +2012,8 @@ plot_coverage_needed <- function(tbl,
 # ----------------------------------------------------------------------------
 # FIGURE 2: Dose-response -- impact vs coverage, at a fixed year
 # ----------------------------------------------------------------------------
+
+## plot_dose_response ----
 #' One line per series (location, or location x subgroup when several strata
 #' are present), ordered by the impact reached at the highest coverage.
 #' @param save.dir,filename Where to write the figure and what to call it.
@@ -2057,6 +2100,8 @@ plot_dose_response <- function(tbl,
 # ----------------------------------------------------------------------------
 # FIGURE 3: Impact over time -- x axis is year
 # ----------------------------------------------------------------------------
+
+## plot_impact_over_time ----
 #' Trajectory plot of impact over time
 #'
 #' Draws one line per series, where a series is a location x coverage x stratum
@@ -2296,6 +2341,8 @@ plot_impact_over_time <- function(tbl,
 # ----------------------------------------------------------------------------
 # FIGURE 4: Trend over time with a shaded credible interval
 # ----------------------------------------------------------------------------
+
+## plot_trend_with_ci ----
 #' Median trajectory with a shaded credible interval, one panel per city
 #'
 #' The one figure that USES the CI rows instead of dropping them, so the table
@@ -2513,9 +2560,9 @@ plot_trend_with_ci <- function(tbl,
 }
 
 
-# ============================================================================
+# ****************************************************************************
 # EXAMPLES
-# ============================================================================
+# ****************************************************************************
 if (1 == 2) {
 
     FIG.DIR <- if (exists("BASE.PATH")) paste0(BASE.PATH, "/figures/") else "figures/"
@@ -2690,6 +2737,7 @@ if (1 == 2) {
     plot_coverage_needed(by.year.rows, subgroup = "msm", year = 2035)
 }
 
+## .remove.duplicate.rows ----
 .remove.duplicate.rows<-function(tbl){
     # REMOVE Duplicate Location and Population names
     #    Compute BOTH flags before overwriting either column, or the second

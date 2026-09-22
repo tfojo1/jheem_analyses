@@ -59,6 +59,7 @@ test_that("the manager exposes every outcome the model pulls", {
     )
 })
 
+## outcome_dimensions ----
 ## All stratification keys present anywhere under an outcome, e.g.
 ## "year__location__sex" -> c("year", "location", "sex").
 outcome_dimensions <- function(outcome) {

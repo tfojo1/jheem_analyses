@@ -69,6 +69,7 @@ test_that("the historical penalty's bounds bracket the national trajectory", {
     expect_true(is.finite(sharpness) && sharpness > 0)
 })
 
+## registered_instruction_names ----
 ## The joined instruction sets that shield_calib_register.R actually registers.
 registered_instruction_names <- function() {
     f <- file.path(SHIELD.DIR, "shield_calib_register.R")
