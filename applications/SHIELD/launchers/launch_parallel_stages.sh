@@ -41,6 +41,7 @@ mkdir -p "$LOG_DIR"
 
 # ── shared helpers ─────────────────────────────────────────────────────────────
 source "$SCRIPT_DIR/_shield_slots.sh"
+SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
 
 # ── thread settings ────────────────────────────────────────────────────────────
 export OPENBLAS_NUM_THREADS=1
@@ -71,16 +72,15 @@ two_cities=(
     C.37980
 )
 # ── set active cities and calibration codes here ───────────────────────────────
+# MAX_JOBS = max concurrent Rscript processes on this machine (1 core each).
+MAX_JOBS=20
+
 CITIES=("${two_cities[@]}")
 
 CALIBRATION_CODES=(
     calib.7.30.stage2.LA.PA
 )
 
-SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
-
-# MAX_JOBS = max concurrent Rscript processes on this machine (1 core each).
-MAX_JOBS=20
 
 # ── preflight ──────────────────────────────────────────────────────────────────
 if [[ ! -f "$SCRIPT" ]]; then

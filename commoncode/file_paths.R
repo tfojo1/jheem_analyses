@@ -5,6 +5,7 @@ MAC.ROOT.DIR = "/Volumes/jheem$"
 JHU_SERVER_NAS_MOUNT_PATH = "/mnt/jheem_nas_share"
 
 JHU_SERVER_HOSTNAMES = c(
+
     "shield1",
     "shield2",
     "shield3"
