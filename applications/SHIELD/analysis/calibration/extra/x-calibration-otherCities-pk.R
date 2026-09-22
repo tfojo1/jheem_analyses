@@ -3,7 +3,9 @@ library(plotly)
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
 source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
-source('../jheem_analyses/applications/SHIELD/calibration/shield_calibration_inspection_helpers.R')
+# NOTE: shield_calibration_inspection_helpers.R has never existed in this repo, so this
+# source() has always failed. Left commented rather than deleted so the intent is visible.
+# source('../jheem_analyses/applications/SHIELD/calibration/shield_calibration_inspection_helpers.R')
 # Set Plotting Styles ----
 location.style.manager = create.style.manager(color.data.by = "location.type")
 source.style.manager   = create.style.manager( shape.data.by = "source",color.data.by = "stratum")
