@@ -20,6 +20,17 @@
 #   plot.calib.stages()      per-city stage plots
 #   plot.calib.comparison()  multi-panel comparison across cities or codes
 #   inspect_mixing()         MCMC mixing statistics and threshold check
+#
+# EXTRA simplot() ARGUMENTS
+#   plot.calib.stages() and plot.calib.comparison() take '...' and pass it to simplot().
+#   Any simplot() argument that is not already an argument here works, with nothing to define:
+#     plot.calib.comparison(calib.simsets = calib.simsets,
+#                           outcomes = "diagnosis.ps",
+#                           omit.data.years = 2020:2021)
+#   dimension.values is merged with 'years', not replaced:
+#     years = 1970:2030 plus dimension.values = list(sex = "male")
+#     gives simplot list(year = 1970:2030, sex = "male").
+#   A misspelled name stops with the list of arguments simplot() accepts.
 # ****************************************************************************************************
 
 
@@ -327,16 +338,19 @@ extract.calib.simsets <- function(calib.simsets,
 
 
 ## .make.stage.plots ----
-.make.stage.plots <- function(entry, stage, plotting.path, style.manager) {
+.make.stage.plots <- function(entry, stage, plotting.path, style.manager,
+                              extra.args = list()) {
     last20   <- if (!is.null(entry$last20_sims)) entry$last20_sims else entry$full_simset
     last_sim <- entry$last_sim
     suffix   <- entry$title.suffix
     
     make_one <- function(outcome, facet.by =NULL, split.by = NULL,plot.which="sim.and.data") {
-        p <- simplot(last20, last_sim, outcomes = outcome, 
-                     facet.by = facet.by, split.by = split.by,plot.which=plot.which,
+        args <- list(outcomes = outcome,
+                     facet.by = facet.by, split.by = split.by, plot.which = plot.which,
                      style.manager = style.manager, title.suffix = suffix,
                      dimension.values = list(year = 1970:2030))
+        p <- do.call(simplot, c(list(last20, last_sim),
+                                .merge.simplot.args(args, extra.args)))
         # browser()
         filename <- paste0(paste(.sanitize(outcome), collapse = "_"),
                            .build.file.suffix(split.by, facet.by,plot.which))
@@ -406,7 +420,12 @@ plot.calib.stages <- function(calib.simsets,
                               style.manager = NULL,
                               create.dirs   = TRUE,
                               verbose       = TRUE,
-                              root.dir      = NULL) {
+                              root.dir      = NULL,
+                              ...) {
+    
+    # Anything else you pass goes straight to simplot(), e.g. omit.data.years = 2020:2021
+    extra.args <- .check.simplot.args(list(...), "plot.calib.stages")
+    
     if (is.null(style.manager))
         style.manager <- create.style.manager(shape.data.by = "source", color.data.by = "stratum")
     
@@ -437,7 +456,7 @@ plot.calib.stages <- function(calib.simsets,
         tryCatch(ensure.plot.dir(out.path, create.dirs), error = function(e) stop(e$message))
         if (verbose) message(sprintf("  [%d/%d] '%s'", i, length(target), loc.name))
         
-        tryCatch({ .make.stage.plots(entry, stage, out.path, style.manager); successful <- c(successful, loc.code) },
+        tryCatch({ .make.stage.plots(entry, stage, out.path, style.manager, extra.args); successful <- c(successful, loc.code) },
                  error = function(e) warning("Error for '", loc.name, "': ", e$message))
     }
     
@@ -470,7 +489,11 @@ plot.calib.comparison <- function(calib.simsets,
                                   dpi               = 300,
                                   create.dirs       = TRUE,
                                   verbose           = TRUE,
-                                  root.dir          = NULL) {
+                                  root.dir          = NULL,
+                                  ...) {
+    
+    # Anything else you pass goes straight to simplot(), e.g. omit.data.years = 2020:2021
+    extra.args <- .check.simplot.args(list(...), "plot.calib.comparison")
     
     if (!is.null(locations) && is.null(names(locations)))
         stop("Error: 'locations' must be a NAMED vector")
@@ -502,7 +525,7 @@ plot.calib.comparison <- function(calib.simsets,
         if (length(entries) == 0) return(NULL)
         simsets <- lapply(entries, function(e) .get.plot.simset(e, sim.subset))
         labels  <- sapply(entries, `[[`, "calib.code")
-        p <- .make.panel(simsets, labels, outs, split.by, facet.by, style.manager, summary.type, plot.which, years)
+        p <- .make.panel(simsets, labels, outs, split.by, facet.by, style.manager, summary.type, plot.which, years, extra.args)
         if (!is.null(p)) p + ggtitle(loc) else NULL
     }
     
@@ -548,7 +571,7 @@ plot.calib.comparison <- function(calib.simsets,
                 if (is.null(entry)) return(NULL)
                 simsets <- list(.get.plot.simset(entry, sim.subset))
                 p <- .make.panel(simsets, NULL, outcomes, split.by, facet.by,
-                                 style.manager, summary.type, plot.which, years)
+                                 style.manager, summary.type, plot.which, years, extra.args)
                 if (!is.null(p)) p + ggtitle(loc) else NULL
             }), all.loc.names)
             combined <- .make.patchwork(panels, title = paste0("Calibration: ", cc), nrow = nrow, ncol = ncol)

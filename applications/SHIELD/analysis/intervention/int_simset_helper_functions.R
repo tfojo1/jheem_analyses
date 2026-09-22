@@ -17,6 +17,15 @@
 #   plot.int.location()    one city, interventions overlaid
 #   plot.int.comparison()  multi-panel comparison
 #   int.style.manager()    style manager for intervention overlays
+#
+# EXTRA simplot() ARGUMENTS
+#   plot.int.location() and plot.int.comparison() take '...' and pass it to simplot().
+#   Any simplot() argument that is not already an argument here works, with nothing to define:
+#     plot.int.location(int.simsets = int.simsets, location = "Baltimore",
+#                       calib.code = "calib.9.19.stage3", outcomes = "diagnosis.ps",
+#                       omit.data.years = 2020:2021)
+#   dimension.values is merged with 'years', not replaced.
+#   A misspelled name stops with the list of arguments simplot() accepts.
 # ****************************************************************************************************
 
 
@@ -254,8 +263,13 @@ plot.int.location <- function(int.simsets,
                               dpi           = 300,
                               create.dirs   = FALSE,
                               root.dir      = NULL,
-                              debug         = FALSE) {
+                              debug         = FALSE,
+                              ...) {
     if (debug) browser()
+    
+    # Anything else you pass goes straight to simplot(), e.g. omit.data.years = 2020:2021
+    extra.args <- .check.simplot.args(list(...), "plot.int.location")
+    
     entries <- extract.int.simsets(int.simsets, location = location, calib.code = calib.code, exact = TRUE)
     
     if (!is.null(interventions))
@@ -268,7 +282,7 @@ plot.int.location <- function(int.simsets,
     simset.list <- lapply(entries, function(e) e$full_simset)
     labels      <- sapply(entries, `[[`, "int.label")
     p           <- .make.panel(simset.list, labels, outcomes, split.by, facet.by,
-                               style.manager, summary.type, plot.which, years)
+                               style.manager, summary.type, plot.which, years, extra.args)
     if (is.null(p)) stop("Failed to generate plot for '", location, "' / '", calib.code, "'")
     p <- p + ggtitle(paste0(location, " \u2013 ", calib.code))
     
@@ -307,9 +321,14 @@ plot.int.comparison <- function(int.simsets,
                                 create.dirs       = TRUE,
                                 verbose           = TRUE,
                                 root.dir          = NULL,
-                                debug             = FALSE) {
+                                debug             = FALSE,
+                                ...) {
     
     if (debug) browser()
+    
+    # Anything else you pass goes straight to simplot(), e.g. omit.data.years = 2020:2021
+    extra.args <- .check.simplot.args(list(...), "plot.int.comparison")
+    
     separate.by <- match.arg(separate.by)
     if (is.null(style.manager)) style.manager <- .auto.style.manager(split.by, facet.by)
     suffix      <- .build.file.suffix( split.by, facet.by,plot.which)
@@ -350,7 +369,7 @@ plot.int.comparison <- function(int.simsets,
                          both         = paste0(sapply(entries, `[[`, "calib.code"), " \u2013 ",
                                                sapply(entries, `[[`, "int.label")))
         .make.panel(simset.list, labels, cur.outcomes, split.by, facet.by,
-                    style.manager, summary.type, plot.which, years)
+                    style.manager, summary.type, plot.which, years, extra.args)
     }
     
     filter.entries <- function(loc = NULL, cc = NULL, int = NULL) {

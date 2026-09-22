@@ -121,10 +121,60 @@ ensure.plot.dir <- function(path, create.dirs = FALSE) {
 }
 
 
+## .check.simplot.args ----
+# Checks the extra arguments that the plotting functions collect in their '...'
+# and hand off to simplot().
+#
+# 1. Every extra argument must be named.
+# 2. The name must be a real simplot() argument.
+# 3. A few arguments are reserved because the plotting functions set them
+#    themselves while looping over outcomes and simsets.
+#
+# Without this check a typo does not fail here. It falls into simplot's own '...',
+# which only accepts simsets and outcomes, so 'omit.data.year = 2020' dies with
+# "arguments supplied in '...' must be jheem.simulation.set objects".
+.check.simplot.args <- function(extra.args, caller = "this function") {
+    
+    if (length(extra.args) == 0) return(list())
+    
+    nms <- names(extra.args)
+    if (is.null(nms) || any(nms == ""))
+        stop("Extra arguments to ", caller, "() must all be named simplot() arguments.")
+    
+    reserved <- c("outcomes", "simset.names")
+    bad.reserved <- intersect(nms, reserved)
+    if (length(bad.reserved) > 0)
+        stop(caller, "() sets ", paste0("'", bad.reserved, "'", collapse = ", "),
+             " itself. Use the function's own arguments instead.")
+    
+    allowed <- setdiff(names(formals(simplot)), c("...", reserved))
+    bad <- setdiff(nms, allowed)
+    if (length(bad) > 0)
+        stop("Unknown argument(s) passed to ", caller, "(): ",
+             paste0("'", bad, "'", collapse = ", "),
+             "\nExtra arguments are passed to simplot(), which accepts: ",
+             paste(allowed, collapse = ", "))
+    
+    extra.args
+}
+
+
 ## .make.panel ----
 # Core simplot call from a named list of simset objects + display labels
+#
+# extra.args is a named list of any other simplot() arguments, collected from the
+# calling function's '...' and already checked by .check.simplot.args().
+#
+# Two rules for extra.args:
+# 1. It wins over the defaults built here. Passing style.manager = my.style
+#    replaces the style manager the calling function picked.
+# 2. dimension.values is the exception. It is merged, not replaced. With
+#    years = 1970:2030 and dimension.values = list(sex = "male"), simplot gets
+#    list(year = 1970:2030, sex = "male"). Passing your own 'year' entry
+#    overrides 'years'.
 .make.panel <- function(simset.list, labels, outcomes, split.by, facet.by,
-                        style.manager, summary.type, plot.which, years) {
+                        style.manager, summary.type, plot.which, years,
+                        extra.args = list()) {
     # browser()
     if (length(simset.list) == 0) return(NULL)
     args <- list(outcomes = outcomes, dimension.values = list(year = years),
@@ -134,8 +184,25 @@ ensure.plot.dir <- function(path, create.dirs = FALSE) {
     if (!is.null(facet.by)) args$facet.by  <- facet.by
     if (length(simset.list) >= 1 && !is.null(labels)) args$simset.names <- unname(labels)
     
+    args <- .merge.simplot.args(args, extra.args)
+    
     do.call(simplot, c(unname(simset.list), args))
     
+}
+
+
+## .merge.simplot.args ----
+# Folds extra.args into the argument list built for simplot().
+# Used by .make.panel() and by .make.stage.plots(), which calls simplot() directly.
+.merge.simplot.args <- function(args, extra.args) {
+    
+    if (length(extra.args) == 0) return(args)
+    
+    if (!is.null(extra.args$dimension.values))
+        extra.args$dimension.values <- modifyList(args$dimension.values,
+                                                  extra.args$dimension.values)
+    
+    modifyList(args, extra.args)
 }
 
 

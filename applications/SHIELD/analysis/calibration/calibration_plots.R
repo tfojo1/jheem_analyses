@@ -22,9 +22,9 @@ for (x in SHIELD.TEN.MSAS){
 }
 
 calibration.codes <- c(
-    "calib.8.21.stage3.az",   # completed for 10 cities
-    # "calib.8.21.stage2"
-    "calib.9.19.stage3"
+    # "calib.8.21.stage3.az",   # completed for 10 cities
+    
+    "calib.9.19.stage3" #compelted for 9 cities (not nyc); houston not mixing well
     
 )
 
@@ -43,8 +43,8 @@ calib.simsets <- load.calib.simsets(
 # ****************************************************************************************************
 inspect_mixing (
     calib.simsets = calib.simsets,
-    # calibration.codes = calibration.codes[2],
-    calibration.codes = "calib.9.19.stage2",
+    calibration.codes = calibration.codes,
+    # calibration.codes = "calib.9.19.stage2",
     locations = SHIELD.TEN.MSAS,
     show.mixing = T,
     verbose = T
@@ -55,7 +55,7 @@ inspect_mixing (
 # ****************************************************************************************************
 # calib.name="calib.8.21.stage3.az"
 calib.name="calib.9.19.stage3"
-
+omit.data.years=2022:2024
 if(1==1){
     # 1-compare accross various locations ----
     save_summary_plots_by_outcome<-function(calibration.code,folder.name,sim.subset="full"){
@@ -70,6 +70,7 @@ if(1==1){
                                           ,"ps.diag.rate.among.msm"
                               ),
                               years = c(1970:2030),
+                              omit.data.years = omit.data.years,
                               ncol=5
         )
         # #
@@ -82,6 +83,7 @@ if(1==1){
                               outcomes = c("incidence","diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.late.misclassified",
                                            "hiv.testing","sti.screening"),
                               years = c(1970:2030),
+                              omit.data.years = omit.data.years,
                               split.by ="sex",
                               ncol = 5
         )
@@ -95,6 +97,7 @@ if(1==1){
                               outcomes = c("incidence","diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.late.misclassified",
                                            "hiv.testing","sti.screening" ),
                               years = c(1970:2030),
+                              omit.data.years = omit.data.years,
                               split.by = "race" ,
                               ncol = 5
         )
@@ -108,6 +111,7 @@ if(1==1){
                               folder.name = folder.name,
                               outcomes = c("incidence","diagnosis.ps","hiv.testing","sti.screening"),
                               years = c(1970:2030),
+                              omit.data.years = omit.data.years,
                               split.by = "sex" ,
                               ncol = 5,
                               plot.which = "sim.only"
@@ -121,6 +125,7 @@ if(1==1){
                               folder.name = folder.name,
                               outcomes = c("incidence","diagnosis.ps" ,"diagnosis.el.misclassified"),
                               years = c(1970:2030),
+                              omit.data.years = omit.data.years,
                               split.by = "race" , facet.by="sex",
                               ncol = 2
         )
@@ -132,6 +137,7 @@ if(1==1){
                               folder.name = folder.name,
                               outcomes = c("incidence","diagnosis.ps", "diagnosis.el.misclassified"),
                               years = c(1970:2030),
+                              omit.data.years = omit.data.years,
                               split.by = "race" , facet.by="sex",
                               ncol = 2, #2 cities in each row (6 columns)
                               plot.which = "sim.only"
@@ -150,7 +156,8 @@ if(1==1){
                                           "hiv.testing","sti.screening", "prop.male.ps.diag.among.msm"
                                           ,"ps.diag.rate.among.msm"
                               ),
-                              years = c(1970:2030)
+                              years = c(1970:2030),
+                              omit.data.years = omit.data.years,
         )
         plot.calib.comparison(calib.simsets = calib.simsets,
                               calibration.codes = calibration.code,
@@ -161,7 +168,8 @@ if(1==1){
                               outcomes =c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.late.misclassified",
                                           "hiv.testing","sti.screening"),
                               split.by = "sex",
-                              years = c(1970:2030)
+                              years = c(1970:2030),
+                              omit.data.years = omit.data.years,
         )
     }
     
@@ -183,6 +191,7 @@ compare_calibrations_by_outcome<-function(calibration.codes,folder.name,sim.subs
                                        ,"ps.diag.rate.among.msm"
                           ),
                           years = c(1970:2030),
+                          omit.data.years = omit.data.years,
                           ncol=5
     )
     plot.calib.comparison(calib.simsets = calib.simsets,
@@ -195,6 +204,7 @@ compare_calibrations_by_outcome<-function(calibration.codes,folder.name,sim.subs
                                        # "diagnosis.el.misclassified","diagnosis.late.misclassified","hiv.testing","sti.screening"
                           ),
                           years = c(1970:2030),
+                          omit.data.years = omit.data.years,
                           ncol=5,
                           split.by = "sex"
     )
@@ -209,6 +219,7 @@ compare_calibrations_by_outcome<-function(calibration.codes,folder.name,sim.subs
                                        # "diagnosis.el.misclassified","diagnosis.late.misclassified","hiv.testing","sti.screening"
                           ),
                           years = c(1970:2030),
+                          omit.data.years = omit.data.years,
                           ncol=5,
                           split.by = "race"
     )
@@ -222,6 +233,7 @@ compare_calibrations_by_outcome<-function(calibration.codes,folder.name,sim.subs
                                        # "diagnosis.el.misclassified","diagnosis.late.misclassified","hiv.testing","sti.screening"
                           ),
                           years = c(1970:2030),
+                          omit.data.years = omit.data.years,
                           facet.by = "sex" , split.by="race",
                           ncol = 2
     )
@@ -233,6 +245,7 @@ compare_calibrations_by_outcome<-function(calibration.codes,folder.name,sim.subs
                           folder.name = folder.name,
                           outcomes = c("diagnosis.total","diagnosis.ps"),
                           years = c(1970:2030),
+                          omit.data.years = omit.data.years,
                           facet.by = "sex" , split.by="race",
                           ncol = 2,
                           plot.which = "sim.only"
@@ -245,6 +258,7 @@ compare_calibrations_by_outcome<-function(calibration.codes,folder.name,sim.subs
                           folder.name = folder.name,
                           outcomes = c("diagnosis.total","diagnosis.ps"),
                           years = c(1970:2030),
+                          omit.data.years = omit.data.years,
                           ncol=5,
                           split.by = "sex",
                           plot.which = "sim.only"
