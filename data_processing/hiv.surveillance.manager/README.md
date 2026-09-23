@@ -22,13 +22,22 @@ writes. The caller must keep `CACHED_DIR` in an isolated workspace.
 The merge also needs the compatible installed R packages and a sibling `jheem2`
 source checkout. `locations` must support the `include.partial` argument used by
 current aggregation code. `Rscript data_processing/hiv.surveillance.manager/test_merge_paths.R`
-checks the path
-and shared-write contract without loading real manager files or running the
-scientific transformations.
+checks the path and shared-write contract without loading real manager files or
+running the scientific transformations.
 
-This is path isolation, not yet a hosted CI pipeline. A CI build must identify
-the five section files and auxiliary inputs by immutable artifact and digest,
-pin its source/runtime dependencies, validate a candidate against a reviewed
-baseline and active consumers, and publish a versioned candidate separately
-from promotion. It should not describe a section-to-final build as raw-to-final
-provenance.
+## Hosted trial
+
+`.github/workflows/trial-hiv-surveillance-manager.yml` is a manually dispatched
+section-to-final trial. It pins the five-section snapshot, the published movement
+archive and census manager by SHA-256, uses exact `jheem2` and `locations`
+commits with R 4.4.2, and extracts only the county-to-county movement inputs.
+The job builds in a temporary workspace, records Linux resource use and input
+identities, and uploads its candidate and reports as a 30-day Actions artifact.
+It does not write to shared storage or move a `latest` alias.
+
+`validate_candidate.R` compares the result structurally with the published
+August 26 surveillance-manager snapshot. That baseline predates the active
+August 31 manager, and additions require review. This first trial does not
+establish data-value suitability, active-model compatibility, raw-to-section
+provenance, or a durable candidate release. Those checks and a reviewed baseline
+must precede a production candidate/promotion workflow.

@@ -1,0 +1,131 @@
+name: Trial HIV Surveillance Manager Build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  section-to-final:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Checkout analyses
+        uses: actions/checkout@v4
+
+      - name: Checkout pinned jheem2
+        uses: actions/checkout@v4
+        with:
+          repository: CIPHER-Epi/jheem2
+          ref: 90b68ad500c12bdfe8f9dc6616e9a846fb4ae3d1
+          path: _jheem2
+
+      - name: Checkout pinned locations
+        uses: actions/checkout@v4
+        with:
+          repository: tfojo1/locations
+          ref: 2481fc440cf1d981bb1005dd903708a88a528d13
+          path: _locations
+
+      - name: Provide the sibling jheem2 path used by aggregation
+        run: ln -s "$GITHUB_WORKSPACE/_jheem2" "$GITHUB_WORKSPACE/../jheem2"
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.4.2'
+          use-public-rspm: true
+
+      - name: Install system and R dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev time
+          Rscript -e '
+            install.packages(c("remotes", "jsonlite", "readxl", "dplyr", "stringr", "tidyr"))
+            remotes::install_local("_locations", upgrade = "never")
+            remotes::install_local("_jheem2", upgrade = "never")
+          '
+
+      - name: Verify merge path contract
+        run: Rscript data_processing/hiv.surveillance.manager/test_merge_paths.R
+
+      - name: Download and verify exact released inputs
+        run: |
+          set -euo pipefail
+          mkdir -p _ci_inputs/sections _ci_inputs/raw _ci_inputs/deps _ci_outputs
+
+          gh release download hiv-sections-snapshot-2026.09.23 \
+            --repo tfojo1/jheem_analyses --dir _ci_inputs/sections
+          echo "173ac7e1bc57c0a5ccf909781919c4a14f54c3e8befc7985a81993f6befa3567  _ci_inputs/sections/SHA256SUMS.txt" | sha256sum -c -
+          (cd _ci_inputs/sections && sha256sum -c SHA256SUMS.txt)
+
+          gh release download data-raw-v2026.08.24 \
+            --repo tfojo1/jheem_analyses --pattern data-raw-movement.tar.gz \
+            --dir _ci_inputs/raw
+          echo "e5db3f70c21d95962a2d4a1725a8ee5e55aede975573ce3642fa36d8229acbfe  _ci_inputs/raw/data-raw-movement.tar.gz" | sha256sum -c -
+          tar -xzf _ci_inputs/raw/data-raw-movement.tar.gz -C _ci_inputs/raw \
+            --no-same-owner --no-same-permissions \
+            data_raw/movement/county.to.county
+
+          gh release download data-managers-v2026.08.26 \
+            --repo tfojo1/jheem_analyses \
+            --pattern census.manager.rdata --pattern surveillance.manager.rdata \
+            --dir _ci_inputs/deps
+          echo "f8c710684ccfdfb3a5c8e6f4b54caf0417ab67afb82b89ab3259c4b8151e1053  _ci_inputs/deps/census.manager.rdata" | sha256sum -c -
+          echo "82099b97f0150540be4e56011bc94587185a6699f4d52a22ba9f130140e8743f  _ci_inputs/deps/surveillance.manager.rdata" | sha256sum -c -
+
+          {
+            echo "analyses_commit=$(git rev-parse HEAD)"
+            echo "jheem2_commit=$(git -C _jheem2 rev-parse HEAD)"
+            echo "locations_commit=$(git -C _locations rev-parse HEAD)"
+            echo "sections_release=hiv-sections-snapshot-2026.09.23"
+            echo "movement_release=data-raw-v2026.08.24"
+            echo "managers_release=data-managers-v2026.08.26"
+            sha256sum _ci_inputs/sections/*.rdata _ci_inputs/raw/*.tar.gz _ci_inputs/deps/*.rdata
+          } > _ci_outputs/input_identity.txt
+          df -h . > _ci_outputs/disk_before.txt
+
+      - name: Build isolated candidate and measure Linux resources
+        run: |
+          set -euo pipefail
+          export SECTION_DIR="$GITHUB_WORKSPACE/_ci_inputs/sections"
+          export CACHED_DIR="$GITHUB_WORKSPACE/_ci_outputs"
+          export CENSUS_MANAGER_CACHE_FILE="$GITHUB_WORKSPACE/_ci_inputs/deps/census.manager.rdata"
+          export CENSUS_MANAGER_SHARED_FILE="$GITHUB_WORKSPACE/_ci_inputs/deps/census.manager.rdata"
+          export COUNTY_TO_COUNTY_DIR="$GITHUB_WORKSPACE/_ci_inputs/raw/data_raw/movement/county.to.county"
+          export WRITE_SHARED_OUTPUT=false
+          /usr/bin/time -v -o _ci_outputs/resource_metrics.txt Rscript -e '
+            library(jheem2)
+            library(locations)
+            library(dplyr)
+            library(readxl)
+            library(stringr)
+            library(tidyr)
+            source("data_processing/hiv.surveillance.manager/hiv.surveillance.processing.for.merging/hiv.surveillance.manager.merge.R")
+            writeLines(capture.output(sessionInfo()), "_ci_outputs/session_info.txt")
+          ' 2>&1 | tee _ci_outputs/build_log.txt
+          df -h . > _ci_outputs/disk_after.txt
+          sha256sum _ci_outputs/surveillance.manager.rdata > _ci_outputs/candidate_sha256.txt
+
+      - name: Compare with released structural baseline
+        run: |
+          set -euo pipefail
+          Rscript data_processing/hiv.surveillance.manager/validate_candidate.R \
+            _ci_inputs/deps/surveillance.manager.rdata \
+            _ci_outputs/surveillance.manager.rdata \
+            _ci_outputs/validation_report.json \
+            2>&1 | tee _ci_outputs/validation_summary.txt
+
+      - name: Upload candidate and evidence for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hiv-surveillance-hosted-trial
+          path: _ci_outputs/
+          if-no-files-found: warn
+          retention-days: 30
+          compression-level: 0
