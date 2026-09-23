@@ -4,30 +4,101 @@ if (length(args) < 2) stop("Usage: Rscript script.R <location> <calibration.stag
 
 LOCATION         <- as.character(args[1])
 CALIBRATION.NAME <- as.character(args[2])
+recorded.flag <- tolower(trimws(Sys.getenv("SHIELD_RECORDED_RUN", unset = "false")))
+if (!recorded.flag %in% c("true", "false")) {
+    stop("SHIELD_RECORDED_RUN must be true or false", call. = FALSE)
+}
+SHIELD.RECORDED.RUN <- identical(recorded.flag, "true")
+rm(recorded.flag)
+if (!SHIELD.RECORDED.RUN &&
+    (identical(tolower(Sys.getenv("SHIELD_CONTAINER_PROFILE")), "recorded") ||
+     identical(tolower(Sys.getenv("SHIELD_REQUIRE_IMMUTABLE_INPUTS")), "true"))) {
+    stop("Recorded SHIELD profile requires SHIELD_RECORDED_RUN=true; refusing the destructive ordinary path",
+         call. = FALSE)
+}
+
+if (SHIELD.RECORDED.RUN) {
+    recorded.analyses.path <- trimws(Sys.getenv("JHEEM_ANALYSES_PATH"))
+    if (!nzchar(recorded.analyses.path)) {
+        stop("Recorded SHIELD run requires JHEEM_ANALYSES_PATH", call. = FALSE)
+    }
+    recorded.source <- file.path(recorded.analyses.path,
+                                 "applications/SHIELD/R/shield_recorded_runtime.R")
+    source(recorded.source)
+    SHIELD.RECORDED.CONFIG <- shield.recorded.config()
+    shield.recorded.assert.checkout(SHIELD.RECORDED.CONFIG$analyses_path,
+                                    SHIELD.RECORDED.CONFIG$analyses_ref)
+    shield.recorded.assert.checkout(SHIELD.RECORDED.CONFIG$jheem2_path,
+                                    SHIELD.RECORDED.CONFIG$jheem2_ref)
+    shield.recorded.assert.state(SHIELD.RECORDED.CONFIG, LOCATION, CALIBRATION.NAME)
+    SHIELD.DIR <- file.path(SHIELD.RECORDED.CONFIG$analyses_path,
+                            "applications/SHIELD")
+    # The current specification and likelihood files still use repo-root
+    # relative sources. Make that assumption explicit for recorded runs.
+    setwd(SHIELD.RECORDED.CONFIG$analyses_path)
+    rm(recorded.source, recorded.analyses.path)
+}
 
 cat("Location:", LOCATION, "\n")
 cat("Calibration stage:", CALIBRATION.NAME, "\n")
 ##----
-source('../jheem_analyses/applications/SHIELD/shield_specification.R')
-source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
-source('../jheem_analyses/applications/SHIELD/shield_calib_register.R')
-source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases for locations C.12580=Blatimore MSA
+if (SHIELD.RECORDED.RUN) {
+    source(file.path(SHIELD.DIR, "shield_specification.R"))
+    source(file.path(SHIELD.DIR, "shield_likelihoods.R"))
+    source(file.path(SHIELD.DIR, "shield_calib_register.R"))
+    source(file.path(SHIELD.RECORDED.CONFIG$analyses_path,
+                     "commoncode/locations_of_interest.R"))
+} else {
+    source('../jheem_analyses/applications/SHIELD/shield_specification.R')
+    source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
+    source('../jheem_analyses/applications/SHIELD/shield_calib_register.R')
+    source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases for locations C.12580=Blatimore MSA
+}
 
 VERSION<- 'shield'
-START_FROM_SCRATCH <- TRUE
-set.seed(00000)
-CACHE.FREQ= 500 # how often should write the results to disk (Default: 100)
-UPDATE.FREQ= 50 # how often to print messages (Default: 50)
+START_FROM_SCRATCH <- if (SHIELD.RECORDED.RUN) {
+    identical(SHIELD.RECORDED.CONFIG$run_mode, "fresh")
+} else TRUE
+set.seed(if (SHIELD.RECORDED.RUN) SHIELD.RECORDED.CONFIG$random_seed else 00000)
+CACHE.FREQ <- if (SHIELD.RECORDED.RUN) SHIELD.RECORDED.CONFIG$cache_frequency else 500
+UPDATE.FREQ <- if (SHIELD.RECORDED.RUN) SHIELD.RECORDED.CONFIG$update_frequency else 50
+
+if (SHIELD.RECORDED.RUN) {
+    recorded.inputs <- shield.recorded.inputs(
+        SHIELD.RECORDED.CONFIG,
+        get.data.manager.resolution(CENSUS.MANAGER),
+        get.data.manager.resolution(SURVEILLANCE.MANAGER))
+    shield.recorded.check.receipt(SHIELD.RECORDED.CONFIG, LOCATION,
+                                  CALIBRATION.NAME, recorded.inputs)
+    if (!START_FROM_SCRATCH) {
+        progress <- get.calibration.progress(
+            version = VERSION, locations = LOCATION,
+            calibration.code = CALIBRATION.NAME,
+            root.dir = SHIELD.RECORDED.CONFIG$root_dir)
+        if (all(is.na(progress))) {
+            stop("Resume checkpoint could not be read as calibration progress",
+                 call. = FALSE)
+        }
+    }
+}
 
 #SECTION1: SETUP
 if (START_FROM_SCRATCH) {
     print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
     #
-    clear.calibration.cache(version=VERSION,
-                            location=LOCATION,
-                            calibration.code = CALIBRATION.NAME,
-                            allow.remove.incomplete = T)
-    print("Cache is cleared")
+    if (SHIELD.RECORDED.RUN) {
+        # The recorded path never clears pre-existing calibration state.
+        shield.recorded.assert.state(SHIELD.RECORDED.CONFIG, LOCATION,
+                                     CALIBRATION.NAME)
+        shield.recorded.write.receipt(SHIELD.RECORDED.CONFIG, LOCATION,
+                                      CALIBRATION.NAME, recorded.inputs)
+    } else {
+        clear.calibration.cache(version=VERSION,
+                                location=LOCATION,
+                                calibration.code = CALIBRATION.NAME,
+                                allow.remove.incomplete = T)
+        print("Cache is cleared")
+    }
     #
     set.up.calibration(version=VERSION,
                        location=LOCATION,
@@ -54,7 +125,7 @@ print(paste0("STARTING MCMC RUN OF ", LOCATION, " (", locations::get.location.na
 # *****************************************************************************
 
 # --- Settings -----------------------------------------------------------------
-MAX.ATTEMPTS        <- 20       # how many times to try the chain in total
+MAX.ATTEMPTS        <- if (SHIELD.RECORDED.RUN) 1L else 20L
 RETRY.SLEEP.SECONDS <- 60 * 5   # how long to wait between tries (20 tries = ~95 min)
 NAS.POLL.SECONDS    <- 15       # while waiting, how often to check if the drive is back
 RUN.LABEL           <- "the MCMC run"  # how to refer to this run in the log
@@ -199,6 +270,3 @@ simset <- assemble.simulations.from.calibration(version = VERSION,
                                                 calibration.code = CALIBRATION.NAME,
                                                 allow.incomplete = T)
 save.simulation.set(simset)
-
-
-
