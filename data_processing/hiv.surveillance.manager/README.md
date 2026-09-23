@@ -36,8 +36,13 @@ identities, and uploads its candidate and reports as a 30-day Actions artifact.
 It does not write to shared storage or move a `latest` alias.
 
 `validate_candidate.R` compares the result structurally with the published
-August 26 surveillance-manager snapshot. That baseline predates the active
-August 31 manager, and additions require review. This first trial does not
-establish data-value suitability, active-model compatibility, raw-to-section
+August 26 surveillance-manager snapshot and reports data differences in shared
+arrays. That baseline predates the active August 31 manager, and additions and
+changed values require review. The value-delta report is diagnostic: it does
+not alter the structural pass/fail result or judge scientific suitability. The
+first completed hosted trial found two structural warnings for NSDUH MSA
+additions; a separate comparison found changed adult-population values for
+three Massachusetts substate regions that the structural check cannot see.
+This trial does not establish active-model compatibility, raw-to-section
 provenance, or a durable candidate release. Those checks and a reviewed baseline
 must precede a production candidate/promotion workflow.

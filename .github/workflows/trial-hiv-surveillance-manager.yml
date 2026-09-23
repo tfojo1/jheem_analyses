@@ -56,7 +56,9 @@ jobs:
           '
 
       - name: Verify merge path contract
-        run: Rscript data_processing/hiv.surveillance.manager/test_merge_paths.R
+        run: |
+          Rscript data_processing/hiv.surveillance.manager/test_merge_paths.R
+          Rscript data_processing/hiv.surveillance.manager/test_manager_value_delta.R
 
       - name: Download and verify exact released inputs
         run: |
