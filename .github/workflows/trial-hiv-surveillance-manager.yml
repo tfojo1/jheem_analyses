@@ -45,9 +45,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev time
           Rscript -e '
-            install.packages(c("remotes", "jsonlite", "readxl", "dplyr", "stringr", "tidyr"))
+            install.packages(c("remotes", "jsonlite", "httr2", "readxl", "dplyr",
+                               "stringr", "tidyr", "purrr", "haven", "tidyverse"))
             remotes::install_local("_locations", upgrade = "never")
             remotes::install_local("_jheem2", upgrade = "never")
+            needed <- c("jheem2", "locations", "jsonlite", "httr2", "readxl",
+                        "dplyr", "stringr", "tidyr", "purrr", "haven", "tidyverse")
+            missing <- needed[!vapply(needed, requireNamespace, logical(1), quietly = TRUE)]
+            if (length(missing)) stop("Missing merge packages: ", paste(missing, collapse = ", "))
           '
 
       - name: Verify merge path contract
