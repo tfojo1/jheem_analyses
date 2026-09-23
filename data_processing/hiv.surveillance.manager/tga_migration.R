@@ -37,7 +37,8 @@ if (!requireNamespace("locations", quietly = TRUE) ||
        "TGA type). Update it and restart R.")
 
 # Raw-data location on the team NAS. Override `data.dir` to read from elsewhere.
-DATA.DIR.COUNTY.TO.COUNTY <- "Q:/data_raw/movement/county.to.county"
+DATA.DIR.COUNTY.TO.COUNTY <- Sys.getenv(
+  "COUNTY_TO_COUNTY_DIR", "Q:/data_raw/movement/county.to.county")
 
 # Column positions in the county-to-county flow files (data starts on row 5).
 #   1-2  destination (current residence) state / county code

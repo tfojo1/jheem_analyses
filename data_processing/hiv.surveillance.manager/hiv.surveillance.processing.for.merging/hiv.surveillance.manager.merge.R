@@ -9,12 +9,33 @@
 
 # MERGE -------------------------------------------------------------------
 
+# The shared-drive path remains the interactive default. Candidate builds can
+# provide isolated inputs and outputs without changing the data transformations.
+Q_ROOT <- Sys.getenv("Q_ROOT", "Q:")
+SECTION_DIR <- Sys.getenv("SECTION_DIR", file.path(Q_ROOT, "data_managers/data.manager.merge"))
+CACHED_DIR <- Sys.getenv("CACHED_DIR", "../../cached")
+SHARED_MANAGER_DIR <- Sys.getenv("SHARED_MANAGER_DIR", file.path(Q_ROOT, "data_managers"))
+ARCHIVE_DIR <- Sys.getenv("ARCHIVE_DIR", file.path(SHARED_MANAGER_DIR, "Archive"))
+write.shared <- tolower(Sys.getenv("WRITE_SHARED_OUTPUT", "true"))
+if (!(write.shared %in% c("true", "false")))
+    stop("WRITE_SHARED_OUTPUT must be 'true' or 'false'")
+write.shared <- identical(write.shared, "true")
+if (!write.shared) {
+    required.paths <- c(
+        "SECTION_DIR", "CACHED_DIR", "CENSUS_MANAGER_CACHE_FILE",
+        "CENSUS_MANAGER_SHARED_FILE", "COUNTY_TO_COUNTY_DIR"
+    )
+    missing.paths <- required.paths[!nzchar(Sys.getenv(required.paths, unset=""))]
+    if (length(missing.paths))
+        stop("Candidate merge requires explicit paths: ", paste(missing.paths, collapse=", "))
+}
+
 #LOAD the saved sections of the surevillance manager
-section1 = load.data.manager(name="surveillance.manager_section1", file="Q:/data_managers/data.manager.merge/surveillance.manager_section1.rdata")
-section2 = load.data.manager(name="surveillance.manager_section2", file="Q:/data_managers/data.manager.merge/surveillance.manager_section2.rdata")
-section3 = load.data.manager(name="surveillance.manager_section3", file="Q:/data_managers/data.manager.merge/surveillance.manager_section3.rdata")
-section4 = load.data.manager(name="surveillance.manager_section4", file="Q:/data_managers/data.manager.merge/surveillance.manager_section4.rdata")
-section5 = load.data.manager(name="surveillance.manager_section5", file="Q:/data_managers/data.manager.merge/surveillance.manager_section5.rdata")
+section1 = load.data.manager(name="surveillance.manager_section1", file=file.path(SECTION_DIR, "surveillance.manager_section1.rdata"))
+section2 = load.data.manager(name="surveillance.manager_section2", file=file.path(SECTION_DIR, "surveillance.manager_section2.rdata"))
+section3 = load.data.manager(name="surveillance.manager_section3", file=file.path(SECTION_DIR, "surveillance.manager_section3.rdata"))
+section4 = load.data.manager(name="surveillance.manager_section4", file=file.path(SECTION_DIR, "surveillance.manager_section4.rdata"))
+section5 = load.data.manager(name="surveillance.manager_section5", file=file.path(SECTION_DIR, "surveillance.manager_section5.rdata"))
 
 #MERGE
 section1$import.data(section2) #This order doesn't matter, do it this way: big.one$importdata(smaller.one)
@@ -37,7 +58,8 @@ source('data_processing/hiv.surveillance.manager/tests.per.population.R') # Sour
 source('data_processing/hiv.surveillance.manager/aggregating.proportion.msm.new.R')
 
 # Remove outliers --------------------------------------------------------------
-save(surveillance.manager, file="../../cached/surveillance.manager.before.outliers.rdata")
+dir.create(CACHED_DIR, recursive=TRUE, showWarnings=FALSE)
+save(surveillance.manager, file=file.path(CACHED_DIR, "surveillance.manager.before.outliers.rdata"))
 
 source('data_processing/outliers/outlier.remover.total.level.R')
 source('data_processing/outliers/outlier.remover.one.way.strata.R')
@@ -49,12 +71,15 @@ source('data_processing/hiv.surveillance.manager/add.oakland.tga.migration.value
 source('data_processing/hiv.surveillance.manager/add.oakland.tga.hiv.data.R')
 
 ###Save surveillance manager####
-save(surveillance.manager, file="../../cached/surveillance.manager.rdata")
+save(surveillance.manager, file=file.path(CACHED_DIR, "surveillance.manager.rdata"))
 
 #Also save to Q drive
-save(surveillance.manager, file="Q:/data_managers/surveillance.manager.rdata")
+if (write.shared)
+    save(surveillance.manager, file=file.path(SHARED_MANAGER_DIR, "surveillance.manager.rdata"))
 
 #Archive a version with the date to the Q Drive#
-timestamp <- Sys.Date()
-filename <- paste0("Q:/data_managers/Archive/surveillance.manager_", timestamp, ".rdata")
-save(surveillance.manager, file=filename)
+if (write.shared) {
+    timestamp <- Sys.Date()
+    filename <- file.path(ARCHIVE_DIR, paste0("surveillance.manager_", timestamp, ".rdata"))
+    save(surveillance.manager, file=filename)
+}

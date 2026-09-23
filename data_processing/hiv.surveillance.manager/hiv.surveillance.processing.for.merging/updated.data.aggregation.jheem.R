@@ -1,4 +1,4 @@
-census.manager = load.data.manager("../../cached/census.manager.rdata")
+census.manager = load.data.manager(Sys.getenv("CENSUS_MANAGER_CACHE_FILE", "../../cached/census.manager.rdata"))
 
 source('data_processing/aggregate_county_to_msa_new.R') #This aggregates county level data to other locations (updated 2026)
 
@@ -112,7 +112,7 @@ put.msa.data.as.new.source.NEW(outcome = 'adult.population',
                                ontology.for.relative.contribution = 'census.grouped.age')
 
 #Deaths county --> MSA
-census.manager = load.data.manager(name="census.manager", file="Q:/data_managers/census.manager.rdata")
+census.manager = load.data.manager(name="census.manager", file=Sys.getenv("CENSUS_MANAGER_SHARED_FILE", "Q:/data_managers/census.manager.rdata"))
 
 census.deaths.by.county <- as.data.frame.table(census.manager$data$deaths$estimate$census.deaths$census$year__location)%>%
     mutate(outcome = 'deaths',
@@ -540,4 +540,3 @@ surveillance.manager$put.long.form(
     dimension.values = list(),
     url = 'https://pdas.samhsa.gov/saes/substate',
     details = 'NSDUH Substate Estimates, aggregated from substate to MSA')
-
