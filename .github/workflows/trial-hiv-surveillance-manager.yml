@@ -1,7 +1,18 @@
-name: Trial HIV Surveillance Manager Build
+name: HIV Surveillance Manager Candidate
 
 on:
   workflow_dispatch:
+    inputs:
+      sections_release_tag:
+        description: 'Dated release containing all five rebuilt section files and SHA256SUMS.txt'
+        required: true
+        default: 'hiv-sections-snapshot-2026.09.23'
+        type: string
+      sections_manifest_sha256:
+        description: 'SHA-256 of the section release SHA256SUMS.txt (not a section file)'
+        required: true
+        default: '173ac7e1bc57c0a5ccf909781919c4a14f54c3e8befc7985a81993f6befa3567'
+        type: string
 
 permissions:
   contents: read
@@ -12,10 +23,21 @@ jobs:
     timeout-minutes: 120
     env:
       GH_TOKEN: ${{ github.token }}
+      SECTIONS_RELEASE: ${{ inputs.sections_release_tag }}
+      SECTIONS_MANIFEST_SHA256: ${{ inputs.sections_manifest_sha256 }}
 
     steps:
       - name: Checkout analyses
         uses: actions/checkout@v4
+
+      - name: Check section selection and baseline availability
+        run: |
+          set -euo pipefail
+          [[ "$SECTIONS_RELEASE" =~ ^hiv-sections-[a-zA-Z0-9._-]+$ ]]
+          [[ "$SECTIONS_RELEASE" != *latest* ]]
+          [[ "$SECTIONS_MANIFEST_SHA256" =~ ^[0-9a-f]{64}$ ]]
+          # This snapshot must be published before the workflow can be used.
+          gh release view hiv-surveillance-baseline-2026.08.31 --repo tfojo1/jheem_analyses
 
       - name: Checkout pinned jheem2
         uses: actions/checkout@v4
@@ -45,11 +67,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev time
           Rscript -e '
-            install.packages(c("remotes", "jsonlite", "httr2", "readxl", "dplyr",
+            install.packages(c("remotes", "jsonlite", "digest", "httr2", "readxl", "dplyr",
                                "stringr", "tidyr", "purrr", "haven", "tidyverse"))
             remotes::install_local("_locations", upgrade = "never")
             remotes::install_local("_jheem2", upgrade = "never")
-            needed <- c("jheem2", "locations", "jsonlite", "httr2", "readxl",
+            needed <- c("jheem2", "locations", "jsonlite", "digest", "httr2", "readxl",
                         "dplyr", "stringr", "tidyr", "purrr", "haven", "tidyverse")
             missing <- needed[!vapply(needed, requireNamespace, logical(1), quietly = TRUE)]
             if (length(missing)) stop("Missing merge packages: ", paste(missing, collapse = ", "))
@@ -59,15 +81,23 @@ jobs:
         run: |
           Rscript data_processing/hiv.surveillance.manager/test_merge_paths.R
           Rscript data_processing/hiv.surveillance.manager/test_manager_value_delta.R
+          Rscript data_processing/hiv.surveillance.manager/test_manager_reproduction.R
 
       - name: Download and verify exact released inputs
         run: |
           set -euo pipefail
-          mkdir -p _ci_inputs/sections _ci_inputs/raw _ci_inputs/deps _ci_outputs
+          mkdir -p _ci_inputs/sections _ci_inputs/raw _ci_inputs/deps _ci_inputs/active _ci_inputs/consumer _ci_outputs
 
-          gh release download hiv-sections-snapshot-2026.09.23 \
+          gh release download "$SECTIONS_RELEASE" \
             --repo tfojo1/jheem_analyses --dir _ci_inputs/sections
-          echo "173ac7e1bc57c0a5ccf909781919c4a14f54c3e8befc7985a81993f6befa3567  _ci_inputs/sections/SHA256SUMS.txt" | sha256sum -c -
+          echo "$SECTIONS_MANIFEST_SHA256  _ci_inputs/sections/SHA256SUMS.txt" | sha256sum -c -
+          # Require exactly the five intended input files, each with a digest.
+          Rscript -e '
+            lines <- readLines("_ci_inputs/sections/SHA256SUMS.txt")
+            stopifnot(length(lines) == 5L,
+                      all(grepl("^[0-9a-f]{64}  surveillance[.]manager_section[1-5][.]rdata$", lines)),
+                      !anyDuplicated(sub("^[0-9a-f]{64}  ", "", lines)))
+          '
           (cd _ci_inputs/sections && sha256sum -c SHA256SUMS.txt)
 
           gh release download data-raw-v2026.08.24 \
@@ -85,14 +115,27 @@ jobs:
           echo "f8c710684ccfdfb3a5c8e6f4b54caf0417ab67afb82b89ab3259c4b8151e1053  _ci_inputs/deps/census.manager.rdata" | sha256sum -c -
           echo "82099b97f0150540be4e56011bc94587185a6699f4d52a22ba9f130140e8743f  _ci_inputs/deps/surveillance.manager.rdata" | sha256sum -c -
 
+          gh release download hiv-surveillance-baseline-2026.08.31 \
+            --repo tfojo1/jheem_analyses --pattern surveillance.manager.rdata \
+            --dir _ci_inputs/active
+          echo "93756ce23467b10f593924145a0a648a87a935a48b5bfe016b129852fa7e6ab2  _ci_inputs/active/surveillance.manager.rdata" | sha256sum -c -
+
+          gh release download syphilis-manager-v2026.09.09 \
+            --repo tfojo1/jheem_analyses --pattern syphilis.manager.rdata \
+            --dir _ci_inputs/consumer
+          echo "c3e3c983d6b4e9c961f735f9c59d45483bd63cfa715cf75c1fae874da2d129e6  _ci_inputs/consumer/syphilis.manager.rdata" | sha256sum -c -
+
           {
             echo "analyses_commit=$(git rev-parse HEAD)"
             echo "jheem2_commit=$(git -C _jheem2 rev-parse HEAD)"
             echo "locations_commit=$(git -C _locations rev-parse HEAD)"
-            echo "sections_release=hiv-sections-snapshot-2026.09.23"
+            echo "sections_release=$SECTIONS_RELEASE"
+            echo "sections_manifest_sha256=$SECTIONS_MANIFEST_SHA256"
             echo "movement_release=data-raw-v2026.08.24"
             echo "managers_release=data-managers-v2026.08.26"
-            sha256sum _ci_inputs/sections/*.rdata _ci_inputs/raw/*.tar.gz _ci_inputs/deps/*.rdata
+            echo "active_baseline_release=hiv-surveillance-baseline-2026.08.31"
+            echo "syphilis_consumer_release=syphilis-manager-v2026.09.09"
+            sha256sum _ci_inputs/sections/*.rdata _ci_inputs/raw/*.tar.gz _ci_inputs/deps/*.rdata _ci_inputs/active/*.rdata _ci_inputs/consumer/*.rdata
           } > _ci_outputs/input_identity.txt
           df -h . > _ci_outputs/disk_before.txt
 
@@ -118,14 +161,41 @@ jobs:
           df -h . > _ci_outputs/disk_after.txt
           sha256sum _ci_outputs/surveillance.manager.rdata > _ci_outputs/candidate_sha256.txt
 
-      - name: Compare with released structural baseline
+      - name: Compare with active-manager regression baseline
+        run: |
+          set -euo pipefail
+          Rscript data_processing/hiv.surveillance.manager/validate_candidate.R \
+            _ci_inputs/active/surveillance.manager.rdata \
+            _ci_outputs/surveillance.manager.rdata \
+            _ci_outputs/active_baseline_report.json \
+            2>&1 | tee _ci_outputs/active_baseline_summary.txt
+
+      - name: Retain historical comparison for review
+        # Historical differences are evidence, not the active regression gate.
+        # The report below must still exist and parse for summary generation.
+        continue-on-error: true
         run: |
           set -euo pipefail
           Rscript data_processing/hiv.surveillance.manager/validate_candidate.R \
             _ci_inputs/deps/surveillance.manager.rdata \
             _ci_outputs/surveillance.manager.rdata \
-            _ci_outputs/validation_report.json \
-            2>&1 | tee _ci_outputs/validation_summary.txt
+            _ci_outputs/historical_baseline_report.json \
+            2>&1 | tee _ci_outputs/historical_baseline_summary.txt
+
+      - name: Exercise focused consumer boundaries
+        run: |
+          set -euo pipefail
+          Rscript data_processing/hiv.surveillance.manager/check_consumers.R \
+            _ci_outputs/surveillance.manager.rdata \
+            _ci_inputs/active/surveillance.manager.rdata \
+            _ci_inputs/consumer/syphilis.manager.rdata \
+            _ci_outputs/consumer_report.json \
+            2>&1 | tee _ci_outputs/consumer_summary.txt
+
+      - name: Summarize candidate for review
+        run: |
+          Rscript data_processing/hiv.surveillance.manager/summarize_candidate.R _ci_outputs
+          cat _ci_outputs/CANDIDATE.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload candidate and evidence for review
         if: always()
