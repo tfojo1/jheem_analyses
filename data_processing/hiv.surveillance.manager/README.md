@@ -27,11 +27,14 @@ running the scientific transformations.
 
 ## Candidate workflow
 
-**Activation status, 2026-09-23:** the original hosted merge trial completed.
-The active-baseline comparison and focused consumer checks below have passed
-locally against its downloaded output. This workflow revision still needs its
-fixed `hiv-surveillance-baseline-2026.08.31` input release published and a hosted
-verification run. It is not yet the default distribution path.
+**Verification status, 2026-09-24 UTC:**
+[run 35952637832](https://github.com/tfojo1/jheem_analyses/actions/runs/35952637832)
+passed at `c8c978cddb11a5a85d7b07f3ef284daf309d5cf6`, including the
+active-baseline comparison and ten focused consumer checks. The
+[unchanged baseline](https://github.com/tfojo1/jheem_analyses/releases/tag/hiv-surveillance-baseline-2026.08.31)
+and [verified candidate](https://github.com/tfojo1/jheem_analyses/releases/tag/hiv-surveillance-candidate-2026.09.24-r35952637832)
+are retained as releases. This workflow revision remains on the review branch;
+no active manager, default loader, or latest alias has changed.
 
 `.github/workflows/trial-hiv-surveillance-manager.yml` runs manually. It takes a
 dated five-section release tag and the SHA-256 of that release's
@@ -39,6 +42,8 @@ dated five-section release tag and the SHA-256 of that release's
 census, active-baseline, and syphilis-consumer snapshots are fixed by tag and
 digest in the workflow. R is 4.4.2; `jheem2` and `locations` use exact commits.
 Only the county-to-county movement inputs are extracted.
+Other R dependencies are installed without a lockfile; their observed versions
+are retained in `session_info.txt`, not frozen for future installations.
 
 The job builds in an isolated workspace and uploads a candidate and evidence as
 a **30-day Actions artifact**. It cannot publish releases, write to shared
@@ -92,11 +97,12 @@ partial artifacts: their presence is not a successful build verdict.
 - `input_identity.txt`, `session_info.txt`, build/resource logs, and the output
   digest identify the build and its inputs.
 
-The direct candidate/active comparison on September 23 found 603 structural
-checks passing, no differences in 408 shared data arrays, equivalent compared
-metadata, and all ten consumer checks passing. This local consumer run used
-installed `jheem2` 1.12.3.9000, not a freshly verified package-source checkout;
-the hosted workflow supplies an exact source pin.
+The verified hosted run found 603 structural checks passing, no differences in
+408 shared data arrays, equivalent compared metadata, and all ten consumer
+checks passing. The merge took 20:36 and used about 7.8 GiB peak resident memory.
+The serialized file digest differs from the active baseline; the equivalence
+check deliberately excludes build timestamps and runtime methods. Stored data
+and the compared descriptive metadata match.
 
 ### Retaining and selecting a candidate
 
@@ -108,12 +114,20 @@ package/session information, and SHA-256 manifest together. Target the recorded
 analyses build commit, not whatever happens to be current at publication time.
 Publishing this review candidate is not promotion to the active manager.
 
-For isolated inspection, download that specific release to a new directory,
-verify its published digest, and load the exact file:
+For isolated inspection, download the verified release into a new directory
+and verify its checksums:
+
+```sh
+gh release download hiv-surveillance-candidate-2026.09.24-r35952637832 \
+  --repo tfojo1/jheem_analyses --dir candidate-review
+(cd candidate-review && shasum -a 256 -c SHA256SUMS.txt)
+```
+
+Then load that exact file:
 
 ```r
 candidate <- jheem2::load.data.manager(
-  file = "path/to/selected-release/surveillance.manager.rdata"
+  file = "candidate-review/surveillance.manager.rdata"
 )
 ```
 
