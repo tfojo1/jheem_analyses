@@ -1,17 +1,16 @@
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
-
+source('applications/adap_cuts/adap_cuts_specification_helpers.R')
+source('applications/ryan_white/ryan_white_specification_helpers.R')
 
 INSURANCE.CATEGORIES = c('medicaid.only', 
                          'medicare.only', 
                          'dual.medicare.medicaid.only', 
-                         'private.only', # 
+                         'private.only', 
                          'uninsured.only',
                          'medicaid.and.uninsured',
                          'medicare.and.uninsured',
                          'dual.medicare.medicaid.and.uninsured',
                          'private.and.uninsured'
-                         #'dual.medicare.medicaid.and.medicaid',
-                         #'dual.medicare.medicaid.and.medicare'
                          )
 ADAP.SERVICE.CATEGORIES = c('full.pay.only', # F 
                             'premium.only', # P 
@@ -20,11 +19,11 @@ ADAP.SERVICE.CATEGORIES = c('full.pay.only', # F
                             'full.pay.and.premium', # FP 
                             'full.pay.and.premium.and.cost.sharing', # FPCs
                             'full.pay.and.cost.sharing' # FCs 
+                           
+                             # Cost-sharing subcategories: 
+                            # D: deductible
+                            # Cp: co-pay assistance 
 )
-
-# Cost-sharing subcategories: 
-# D: deductible
-# Cp: co-pay assistance 
 
 INCOME.BRACKETS = c('0-100', '101-138', '139-200', '201-250', '251-300','301-400','401-500','>500')
 
@@ -38,173 +37,6 @@ ADAP.SPECIFICATION = create.jheem.specification(version='adap',
                                                   service.type = ADAP.SERVICE.CATEGORIES)
                                               )
 
-####----------------------------------####
-####----------------------------------####
-####-- STATE-SPECIFIC INPUT HELPERS --####
-####----------------------------------####
-####----------------------------------####
-
-is.state.medicaid.expansion <- function(location)
-{
-    if (any(location==MEDICAID.NONEXPANSION.STATES))
-        0
-    else
-        1
-}
-
-get.state.medicaid.threshold <- function(location)
-{
-    if (is.state.medicaid.expansion(location))
-        139
-    else
-        0
-}
-
-state.adap.allows.medicaid.only <- function(location)
-{
-    # From https://nastad.org/sites/default/files/2026-02/2026-adap-report-table-10.pdf
-    # States with 0% on medicaid only
-    DISALLOW.MEDICAID.ONLY.STATES = c('AL','CA','CT','DC','IN','IA','MD','NJ','NM','NC','RI','SC','WA','WI')
-    
-    if (any(location==DISALLOW.MEDICAID.ONLY.STATES))
-        0
-    else
-        1
-}
-
-state.adap.allows.medicare.plus.medicaid <- function(location)
-{
-    # From https://nastad.org/sites/default/files/2026-02/2026-adap-report-table-10.pdf
-    # States with 0% on medicaid and medicare
-    DISALLOW.MEDICARE.MEDICAID.STATES = c('AL','AK', 'CT','GA',)
-    
-    if (any(location==DISALLOW.MEDICARE.MEDICAID.STATES))
-        0
-    else
-        1
-}
-
-get.state.ssi.benefit.fpl <- function(location)
-{
-    # @todo need to make state-specific
-    # for now this is just the federal ssi benefit / federal poverty level for single adult
-    995*12 / 15960
-}
-
-get.state.ssi.breakeven.fpl <- function(location)
-{
-    # @todo need to make state-specific
-    # for now this is just the federal ssi breakeven / federal poverty level for single adult
-    2073*12 / 15960
-}
-
-# is.state.209b <- function(location)
-# {
-#     STATES.209B = c('CT','HI','IL','MN','MO','NH','ND','OH','OK','VA')    
-#     if (any(location==STATES.209B))
-#         1
-#     else
-#         0
-# }
-
-# From https://nastad.org/sites/default/files/2026-02/2026-adap-report-table-2.pdf
-get.state.baseline.adap.full.pay.threshold <- function(location)
-{
-    STATE.ADAP.INCOME.THRESHOLD = c(
-        AL = 400,
-        AK = 400,
-        AZ = 400,
-        AR = 500,
-        CA = 500,
-        CO = 500,
-        CT = 500,
-        DE = 500,
-        DC = 500,
-        FL = 400,
-        GA = 400,
-        HI = 400,
-        ID = 500,
-        IL = 500,
-        IN = 300,
-        KS = 400,
-        KY = 500,
-        LA = 500,
-        ME = 500,
-        MD = 500,
-        MA = 500,
-        MI = 500,
-        MN = 500,
-        MS = 400,
-        MO = 400,
-        MT = 500,
-        NE = 500,
-        NV = 400,
-        NH = 500,
-        NJ = 500,
-        NM = 500,
-        NY = 500,
-        NC = 300,
-        ND = 500,
-        OH = 500,
-        OK = 500,
-        OR = 550,
-        PA = 500,
-        PR = 500,
-        RI = 500,
-        SC = 550,
-        SD = 300,
-        TN = 400,
-        TX = 200, 
-        UT = 250,
-        VT = 500,
-        VA = 500,
-        WA = 500,
-        WI = 400,
-        WY = 550
-    )
-    
-    rv = STATE.ADAP.INCOME.THRESHOLD[location]
-    
-    if (is.na(rv))
-        stop(paste0("We don't have a state ADAP threshold for '", location, "'"))
-    
-    rv
-    
-}
-
-get.state.baseline.adap.premium.assistance.threshold <- function(location)
-{
-    get.state.baseline.adap.full.pay.threshold(location)
-}
-
-get.state.baseline.adap.cost.sharing.threshold <- function(location)
-{
-    get.state.baseline.adap.full.pay.threshold(location)
-}
-
-state.has.adap.premium.assistance <- function(location)
-{
-    # @todo need to make state-specific
-    1
-}
-
-state.has.adap.cost.sharing <- function(location)
-{
-    # @todo need to make state-specific
-    1
-}
-
-state.adap.cost.sharing.covers.copays <- function(location)
-{
-    # @todo need to make state-specific
-    1
-}
-
-state.adap.cost.sharing.covers.deductibles <- function(location)
-{
-    # @todo need to make state-specific
-    1
-}
 
 
 ####-----------------------------####
@@ -221,12 +53,12 @@ register.model.quantity(ADAP.SPECIFICATION,
                         scale = 'non.negative.number')
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = "adap.premium.assistance.threshold",
-                        value = 'baseline.adap.premium.assistance.fpl.threshold',
+                        name = "adap.premium.fpl.threshold",
+                        value = 'baseline.adap.premium.fpl.threshold',
                         scale = 'non.negative.number')
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = "adap.cost.sharing.threshold",
+                        name = "adap.cost.sharing.fpl.threshold",
                         value = 'baseline.adap.cost.sharing.fpl.threshold',
                         scale = 'non.negative.number')
 
@@ -315,218 +147,6 @@ register.model.element(ADAP.SPECIFICATION,
 ####----------------------------------####
 ####----------------------------------####
 
-##-------------------##
-##-- INPUT HELPERS --##
-##-------------------##
-
-get.adap.full.pay.only.suppression.functional.form <- function()
-{
-    get.adjusted.oahs.functional.form(
-        adap.p.suppressed = 0.84 # 2023, from https://nastad.org/sites/default/files/2025-02/pdf-2025-adap-table-12.pdf
-    )
-}
-
-get.adap.insurance.assistance.only.functional.form <- function()
-{
-    get.adjusted.oahs.functional.form(
-        adap.p.suppressed = 0.89 # 2023, from https://nastad.org/sites/default/files/2025-02/pdf-2025-adap-table-12.pdf
-    )
-}
-
-get.adap.full.pay.and.insurance.assistance.functional.form <- function()
-{
-    get.adjusted.oahs.functional.form(
-        adap.p.suppressed = 0.92 # 2023, from https://nastad.org/sites/default/files/2025-02/pdf-2025-adap-table-12.pdf
-    ) 
-}
-
-get.adjusted.oahs.functional.form <- function(adap.p.suppressed,
-                                              oahs.p.suppressed = 0.906 #2023, from https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://ryanwhite.hrsa.gov/sites/default/files/ryanwhite/data/2023-ryan-white-annual-data-report.pdf&ved=2ahUKEwi7ptnkua2TAxUCKlkFHVcSJpQQFnoECBsQAQ&usg=AOvVaw33rl0vRWjxgb15zIJtsskb
-                                              )
-{
-    log.or.adap.to.oahs = log(adap.p.suppressed) - log(1-adap.p.suppressed) + log(1-oahs.p.suppressed) - log(oahs.p.suppressed)
-    
-    oahs.ff = get.cached.object.for.version(name = "p.suppression.oahs.functional.form", version = 'rw')
-    
-    create.logistic.linear.functional.form(
-        intercept = oahs.ff$betas$intercept + log.or.adap.to.oahs,
-        slope = oahs.ff$betas$slope,
-        anchor.year = oahs.ff$anchor.year,
-        parameters.are.on.logit.scale = T
-    )
-}
-
-
-#@todo - need to fold in race
-get.p.baseline.benefits.eligible.functional.form <- function()
-{
-    dim.names = list(
-        age = c('13-24 years',
-                '25-34 years',
-                '35-44 years',
-                '45-54 years',
-                '55+ years'),
-        race = c('black', 'hispanic','other'),
-        sex = c('heterosexual_male','msm','female'),
-        risk = c('never_IDU', 'active_IDU', 'IDU_in_remission')
-    )
-    
-    create.static.functional.form(
-        value = array(c('13-24 years' = 0.01,
-                        '25-34 years' = 0.10,
-                        '35-44 years' = 0.26,
-                        '45-54 years' = 0.64,
-                        '55+ years' = 0.80),
-                      dim = sapply(dim.names, length),
-                      dimnames = dim.names), # from jhhcc_code project, exploring_fpl.R
-        link = 'logit',
-        value.is.on.transformed.scale = F
-    )
-}
-
-
-#@todo - need to fold in race
-get.p.ssi.if.income.and.benefits.eligible.functional.form <- function()
-{
-    dim.names = list(
-        age = c('13-24 years',
-                '25-34 years',
-                '35-44 years',
-                '45-54 years',
-                '55+ years'),
-        race = c('black', 'hispanic','other'),
-        sex = c('heterosexual_male','msm','female'),
-        risk = c('never_IDU', 'active_IDU', 'IDU_in_remission')
-    )
-    
-    create.static.functional.form(
-        value = array(c('13-24 years' = 0.01,
-                        '25-34 years' = 0.10,
-                        '35-44 years' = 0.26,
-                        '45-54 years' = 0.64,
-                        '55+ years' = 0.80),
-                      dim = sapply(dim.names, length),
-                      dimnames = dim.names), # from jhhcc_code project, exploring_fpl.R
-        link = 'logit',
-        value.is.on.transformed.scale = F
-    )
-}
-
-#@todo
-get.p.medicaid.if.income.eligible.functional.form <- function()
-{
-    dim.names = list(
-        age = c('13-24 years',
-                '25-34 years',
-                '35-44 years',
-                '45-54 years',
-                '55+ years'),
-        race = c('black', 'hispanic','other'),
-        sex = c('heterosexual_male','msm','female'),
-        risk = c('never_IDU', 'active_IDU', 'IDU_in_remission')
-    )
-    
-    create.static.functional.form(
-        value = array(0.5,
-                      dim = sapply(dim.names, length),
-                      dimnames = dim.names), # from jhhcc_code project, exploring_fpl.R
-        link = 'logit',
-        value.is.on.transformed.scale = F
-    ) 
-}
-
-#@todo
-get.p.medicaid.if.not.by.income.or.ssi.functional.form <- function()
-{
-    dim.names = list(
-        age = c('13-24 years',
-                '25-34 years',
-                '35-44 years',
-                '45-54 years',
-                '55+ years'),
-        race = c('black', 'hispanic','other'),
-        sex = c('heterosexual_male','msm','female'),
-        risk = c('never_IDU', 'active_IDU', 'IDU_in_remission')
-    )
-    
-    create.static.functional.form(
-        value = array(0.5,
-                      dim = sapply(dim.names, length),
-                      dimnames = dim.names), # from jhhcc_code project, exploring_fpl.R
-        link = 'logit',
-        value.is.on.transformed.scale = F
-    ) 
-}
-
-#@todo
-get.p.medicare.by.age.eligibility.functional.form <- function()
-{
-    dim.names = list(
-        age = c('13-24 years',
-                '25-34 years',
-                '35-44 years',
-                '45-54 years',
-                '55+ years'),
-        race = c('black', 'hispanic','other'),
-        sex = c('heterosexual_male','msm','female'),
-        risk = c('never_IDU', 'active_IDU', 'IDU_in_remission')
-    )
-    
-    create.static.functional.form(
-        value = array(0.5,
-                      dim = sapply(dim.names, length),
-                      dimnames = dim.names), # from jhhcc_code project, exploring_fpl.R
-        link = 'logit',
-        value.is.on.transformed.scale = F
-    ) 
-}
-
-#@todo
-get.p.medicare.if.medicaid.eligible.not.by.income.or.ssi.functional.form <- function()
-{
-    dim.names = list(
-        age = c('13-24 years',
-                '25-34 years',
-                '35-44 years',
-                '45-54 years',
-                '55+ years'),
-        race = c('black', 'hispanic','other'),
-        sex = c('heterosexual_male','msm','female'),
-        risk = c('never_IDU', 'active_IDU', 'IDU_in_remission')
-    )
-    
-    create.static.functional.form(
-        value = array(0.5,
-                      dim = sapply(dim.names, length),
-                      dimnames = dim.names), # from jhhcc_code project, exploring_fpl.R
-        link = 'logit',
-        value.is.on.transformed.scale = F
-    ) 
-}
-
-#@todo
-get.p.medicare.if.not.medicaid.eligible.functional.form <- function()
-{
-    dim.names = list(
-        age = c('13-24 years',
-                '25-34 years',
-                '35-44 years',
-                '45-54 years',
-                '55+ years'),
-        race = c('black', 'hispanic','other'),
-        sex = c('heterosexual_male','msm','female'),
-        risk = c('never_IDU', 'active_IDU', 'IDU_in_remission')
-    )
-    
-    create.static.functional.form(
-        value = array(0.5,
-                      dim = sapply(dim.names, length),
-                      dimnames = dim.names), # from jhhcc_code project, exploring_fpl.R
-        link = 'logit',
-        value.is.on.transformed.scale = F
-    ) 
-}
-
 ##-----------------------------##
 ##-- INPUTS: ADAP THRESHOLDS --##
 ##-----------------------------##
@@ -538,7 +158,7 @@ register.model.element(ADAP.SPECIFICATION,
 
 register.model.element(ADAP.SPECIFICATION,
                        name = "baseline.adap.premium.fpl.threshold",
-                       get.value.function = get.state.baseline.adap.premium.assistance.threshold,
+                       get.value.function = get.state.baseline.adap.premium.threshold,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
@@ -566,8 +186,8 @@ register.model.element(ADAP.SPECIFICATION,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = "adap.allows.medicare.plus.medicaid",
-                       get.value.function = state.adap.allows.medicare.plus.medicaid,
+                       name = "adap.allows.medicare.and.medicaid",
+                       get.value.function = get.state.adap.allows.medicare.and.medicaid,
                        scale = 'non.negative.number')
 
 ##--------------------##
@@ -625,8 +245,8 @@ register.model.element(ADAP.SPECIFICATION,
 
 register.model.element(ADAP.SPECIFICATION,
                        name = 'medicaid.fpl.threshold',
-                       value = get.state.medicaid.threshold,
-                       sale = 'non.negative.number')
+                       get.value.function = get.state.medicaid.threshold,
+                       scale = 'non.negative.number')
 
 ##-- BASELINE ELIGIBILITY --##
 register.model.element(ADAP.SPECIFICATION,
@@ -673,21 +293,27 @@ register.model.quantity(ADAP.SPECIFICATION,
                         name = 'p.base.ssi.and.medicaid.eligible',
                         value = expression(p.baseline.benefits.eligible * rr.ssi.medicaid.if.benefits.eligible))
 
+register.model.element(ADAP.SPECIFICATION,
+                       name = 'p.ssi.without.medicaid',
+                       functional.form = get.p.ssi.without.medicaid(),
+                       scale = "proportion")
+
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'p.ssi.if.income.eligible', # probability that you have SSI if your income is below the threshold
                         value = expression(p.base.ssi.and.medicaid.eligible * p.ssi.if.income.and.benefits.eligible *
                                                (p.ssi.without.medicaid + (1-p.ssi.without.medicaid) * adap.allows.medicaid.only)))
 
 ##-- MEDICAID --##
-
-register.model.element(ADAP.SPECIFICATION, # given that you have medicare and do not have SSI/are not under the Medicaid income threshold, what is the probability you are on medicaid
+# Given that you have medicare and do not have SSI/are not under the Medicaid income threshold, what is the probability you are on medicaid
+register.model.element(ADAP.SPECIFICATION,
                        name = 'p.medicaid.not.by.income.or.ssi.if.medicare',
-                       get.functional.form.function = x, #@todo - need to fill in
+                       get.functional.form.function = get.p.medicaid.not.by.income.or.ssi.if.medicare.functional.form, #@todo - need to fill in
                        scale = 'proportion')
 
-register.model.element(ADAP.SPECIFICATION, # given that you do NOT have medicare and do not have SSI/are not under the Medicaid income threshold, what is the probability you are on medicaid
+# Given that you do NOT have medicare and do not have SSI/are not under the Medicaid income threshold, what is the probability you are on medicaid
+register.model.element(ADAP.SPECIFICATION, 
                        name = 'p.medicaid.not.by.income.or.ssi.if.no.medicare.and.benefits.eligible',
-                       get.functional.form.function = x,
+                       get.functional.form.function = get.p.medicaid.not.by.income.or.ssi.if.no.medicare.and.benefits.eligible.functional.form,
                        scale = 'proportion')
 
 #-- UNINSURED --#
@@ -700,7 +326,7 @@ register.model.element(ADAP.SPECIFICATION,
                        scale = 'non.negative.number')
 
 register.model.element(ADAP.SPECIFICATION,
-                       name = 'p.uninsured.given.income.and.no.public.insurance.logistic.slope',
+                       name = 'p.uninsured.given.income.and.no.public.insurance.slope',
                        value = 0.05,
                        scale = 'non.negative.number')
 
@@ -718,8 +344,6 @@ register.model.element(ADAP.SPECIFICATION,
 ##-----------------------##
 ##-- INPUTS: P on ADAP --##
 ##-----------------------##
-
-
 register.model.element(ADAP.SPECIFICATION,
                        name = 'baseline.proportion.pwh.with.adap',
                        scale = 'proportion',
@@ -932,6 +556,8 @@ register.model.quantity(ADAP.SPECIFICATION,
 # Over the course of a year, can have: 
 # unin/medicaid, unin/medicare, unin/medicare+medicaid, unin/private
 
+# Melissa - we will use these for outcome tracking 
+
 # 50/50 Medicaid/uninsured 
 register.model.element(ADAP.SPECIFICATION,
                        name = 'fraction.time.uninsured.among.uninsured.and.medicaid',  
@@ -960,11 +586,6 @@ register.model.element(ADAP.SPECIFICATION,
 ##---------------------------------------------------------------------------##
 ##-- INPUTS: PROPORTION OF COST-SHARING CLIENTS WHO RECEIVE COPAY SERVICES --##
 ##---------------------------------------------------------------------------##
-
-# Melissa: we will eventually fill this in 
-get.proportion.Cs.clients.with.Cp.functional.form = function(){
-    
-}
 
 register.model.element(ADAP.SPECIFICATION,
                        name = "proportion.Cs.clients.with.Cp.if.allowed", 
@@ -1056,22 +677,22 @@ register.model.element(ADAP.SPECIFICATION,
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.F.only.medicaid', 
                        value = log(0.1),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.F.only.medicare', 
                        value = log(0.1),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.F.only.medicare.and.medicaid', 
                        value = log(0.1),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.F.only.private', 
                        value = log(0.1),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 
 
@@ -1100,22 +721,22 @@ register.model.element(ADAP.SPECIFICATION,
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.Fplus.among.not.F.only.medicaid', 
                        value = log(0.2),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.Fplus.among.not.F.only.medicare', 
                        value = log(0.2),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.Fplus.among.not.F.only.medicare.and.medicaid', 
                        value = log(1),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.Fplus.among.not.F.only.private',
                        value = log(1),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 
 
@@ -1144,22 +765,22 @@ register.model.element(ADAP.SPECIFICATION,
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.P.among.Fplus.medicaid', 
                        value = log(0.1),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.P.among.Fplus.medicare', 
                        value = log(0.1),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.P.among.Fplus.medicare.and.medicaid', 
                        value = log(1),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.P.among.Fplus.private',
                        value = log(1),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 
 #--P4: Probability of receiving cost-sharing assistance if on full.pay and premium assistance (Cs.among.FP) --#
@@ -1187,22 +808,22 @@ register.model.element(ADAP.SPECIFICATION,
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.Cs.among.FP.medicaid',
                        value = log(1),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.Cs.among.FP.medicare',
                        value = log(1),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.Cs.among.FP.medicare.and.medicaid', 
                        value = log(1),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.Cs.among.FP.private', 
                        value = log(1),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 
 #-- P5: Probability of receiving premium assistance if not receiving any full pay services (P.among.no.F) --#
@@ -1230,22 +851,22 @@ register.model.element(ADAP.SPECIFICATION,
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.P.among.no.F.medicaid', 
                        value = log(0.1),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.P.among.no.F.medicare', 
                        value = log(0.1),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.P.among.no.F.medicare.and.medicaid', 
                        value = log(1),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.P.among.no.F.private', 
                        value = log(1),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 
 #-- P6: Probability of receiving cost-sharing assistance if on premium assistance but not full pay (Cs.among.P)--#
@@ -1273,22 +894,22 @@ register.model.element(ADAP.SPECIFICATION,
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.Cs.among.P.medicaid', 
                        value = log(1),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.Cs.among.P.medicare', 
                        value = log(1),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.Cs.among.P.medicare.and.medicaid', 
                        value = log(1),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 register.model.element(ADAP.SPECIFICATION,
                        name = 'log.OR.Cs.among.P.private', 
                        value = log(1),
-                       scale = 'ratio')
+                       scale = 'number') # ratio
 
 
 ####---------------------------####
@@ -1297,156 +918,8 @@ register.model.element(ADAP.SPECIFICATION,
 ####---------------------------####
 ####---------------------------####
 
-
 # need to make quantities for
 # - max.income
-
-##-------------------------##
-##-- CALCULATED: HELPERS --##
-##-------------------------##
-
-# Take the income distribution parameters plus SSI parameters
-# and project the probability of being in each single percentage-point multiple of FPL
-# calculate.adap.income.proportions.single.fpl <- function(adap.fpl.median,
-#                                                          adap.fpl.cv,
-#                                                          p.ssi.if.income.eligible,
-#                                                          ssi.benefit.fpl,
-#                                                          ssi.breakeven.fpl,
-#                                                          max.income)
-# {
-#     income = 0:max.income
-#     
-#     adap.fpl.sd = adap.fpl.median * adap.fpl.cv
-#     multiply.p.by = 1 / pnorm(max.income, adap.fpl.median, adap.fpl.sd)
-#         
-#     p = sapply(income, function(inc){
-#         
-#         if (inc >= ssi.breakeven.fpl)
-#             pnorm(inc, adap.fpl.median, adap.fpl.sd) * multiply.p.by
-#         else if (inc < ssi.benefit.fpl)
-#             (1-p.ssi.if.income.eligible) * pnorm(inc, adap.fpl.median, adap.fpl.sd) * multiply.p.by
-#         else
-#         {
-#             what.inc.would.be.without.ssi = (inc - ssi.benefit.fpl) * ssi.breakeven.fpl  / (ssi.breakeven.fpl - ssi.benefit.fpl)
-#             
-#             p.ssi.if.income.eligible * pnorm(what.inc.would.be.without.ssi, adap.fpl.median, adap.fpl.sd) * multiply.p.by +
-#             (1-p.ssi.if.income.eligible) * pnorm(inc, adap.fpl.median, adap.fpl.sd) * multiply.p.by
-#         }
-#         
-#     })
-#     dim(p) = c(length(p)/length(income), length(income))
-#         # dimensions of p are [stratum, income]
-#     
-#     p[,-1] = p[,-1] - p[,-dim(p)[2]]
-#     
-#     dim(p) = c(dim(adap.fpl.median), income=length(income))
-#     dimnames(p) = c(dimnames(adap.fpl.median), list(income = income))
-#     
-#     p
-# }
-
-calculate.baseline.p.of.income.with.ssi.among.adap <- function(adap.fpl.median,
-                                                            adap.fpl.cv,
-                                                            p.ssi.if.income.eligible,
-                                                            ssi.benefit.fpl,
-                                                            ssi.breakeven.fpl,
-                                                            max.baseline.adap.income)
-{
-    income = 0:max.baseline.adap.income
-
-    adap.fpl.sd = adap.fpl.median * adap.fpl.cv
-    multiply.p.by = 1 / pnorm(max.baseline.adap.income, adap.fpl.median, adap.fpl.sd)
-    zero = array(0, dim=dim(adap.fpl.median))
-    
-    p = sapply(income, function(inc){
-        
-        if (inc < ssi.breakeven.fpl & inc >= ssi.benefit.fpl)
-        {
-            what.inc.would.be.without.ssi = (inc - ssi.benefit.fpl) * ssi.breakeven.fpl  / (ssi.breakeven.fpl - ssi.benefit.fpl)
-            p.ssi.if.income.eligible * pnorm(what.inc.would.be.without.ssi, adap.fpl.median, adap.fpl.sd) * multiply.p.by
-        }
-        else
-            zero
-    })
-    dim(p) = c(length(p)/length(income), length(income))
-        # dimensions of p are [stratum, income]
-
-    p[,-1] = p[,-1] - p[,-dim(p)[2]]
-
-    dim(p) = c(dim(adap.fpl.median), income=length(income))
-    dimnames(p) = c(dimnames(adap.fpl.median), list(income = income))
-
-    p
-}
-
-calculate.baseline.p.of.income.without.ssi.among.adap <- function(adap.fpl.median,
-                                                               adap.fpl.cv,
-                                                               p.ssi.if.income.eligible,
-                                                               ssi.benefit.fpl,
-                                                               ssi.breakeven.fpl,
-                                                               max.baseline.adap.income)
-{
-    income = 0:max.baseline.adap.income
-    
-    adap.fpl.sd = adap.fpl.median * adap.fpl.cv
-    multiply.p.by = 1 / pnorm(max.baseline.adap.income, adap.fpl.median, adap.fpl.sd)
-    
-    p = sapply(income, function(inc){
-        
-        if (inc >= ssi.breakeven.fpl)
-            pnorm(inc, adap.fpl.median, adap.fpl.sd) * multiply.p.by
-        else
-            (1-p.ssi.if.income.eligible) * pnorm(inc, adap.fpl.median, adap.fpl.sd) * multiply.p.by
-        
-    })
-    dim(p) = c(length(p)/length(income), length(income))
-    # dimensions of p are [stratum, income]
-    
-    p[,-1] = p[,-1] - p[,-dim(p)[2]]
-    
-    dim(p) = c(dim(adap.fpl.median), income=length(income))
-    dimnames(p) = c(dimnames(adap.fpl.median), list(income = income))
-    
-    p
-}
-    
-calculate.max.baseline.adap.income <- function(baseline.adap.full.pay.fpl.threshold,
-                                               baseline.adap.premium.fpl.threshold,
-                                               baseline.adap.cost.sharing.fpl.threshold,
-                                               ssi.breakeven.fpl)
-{
-    max(baseline.adap.full.pay.fpl.threshold, 
-        baseline.adap.premium.fpl.threshold,
-        baseline.adap.cost.sharing.fpl.threshold,
-        ssi.breakeven.fpl)
-}
-    
-distribute.adap.incomes <- function(max.baseline.adap.income){
-    rv = array(0:max.baseline.adap.income,
-               dim = c(income = max.baseline.adap.income + 1),
-               dimnames = list(income = 0:max.baseline.adap.income))
-    
-    rv
-}
-
-
-# A helper to generate a set of logistic probabilities
-calculate.logistic.p <- function(logistic.midpoint,
-                                 logistic.slope,
-                                 min.p,
-                                 max.p,
-                                 max.baseline.adap.income,
-                                 additional.or = 1)
-{
-    income = 0:max.baseline.adap.income
-    p = min.p + (max.p - min.p) /
-        (1 + exp(logistic.slope * (income - logistic.midpoint) + log(additional.or)))
-    
-    dim(p) = c(income=length(income))
-    dimnames(p) = list(income=income)
-    p
-}
-
 
 ##-----------------------------------------------------##
 ##-- CALCULATED: INCOME DISTRIBUTION of ADAP CLIENTS --##
@@ -1455,7 +928,7 @@ calculate.logistic.p <- function(logistic.midpoint,
 # Max ADAP income threshold - just defined by the state - gives us the upper bound for how high we need to break up the % FPL 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'max.adap.baseline.income',
-                        value = calculate.max.baseline.adap.income)
+                        value = calculate.max.adap.baseline.income)
 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'adap.incomes',
@@ -1496,7 +969,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 
 # Fold in Medicaid
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'income.is.below.medicaid.threshold',
+                        name = 'income.is.below.medicaid.threshold', # needs dimension of income; either 0 or 1
                         value = calculate.income.is.below.medicaid.threshold)
 
 register.model.quantity(ADAP.SPECIFICATION,
@@ -1510,7 +983,7 @@ register.model.quantity(ADAP.SPECIFICATION,
                         )))
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.income.with.medicaid.without.medicare.among.adap', 
+                        name = 'baseline.p.of.income.with.medicaid.among.adap',
                         value = expression(adap.allows.medicaid.only * (
                             (baseline.p.of.income.with.ssi.among.adap - baseline.p.of.income.with.medicare.and.ssi.among.adap) +
                                 (baseline.p.of.income.without.ssi.among.adap - baseline.p.of.income.with.medicare.without.ssi.among.adap) *
@@ -1529,7 +1002,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 #   5) uninsured
 
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.p.of.income.with.medicare.without.medicaid.among.adap', 
+                        name = 'baseline.p.of.income.with.medicare.among.adap', 
                         value = expression(baseline.p.of.income.with.medicare.and.ssi.among.adap + 
                                                baseline.p.of.income.with.medicare.without.ssi.among.adap -
                                                baseline.p.of.income.with.medicare.and.medicaid.among.adap))
@@ -1539,21 +1012,9 @@ register.model.quantity(ADAP.SPECIFICATION,
                         value = expression(baseline.p.of.income.with.ssi.among.adap + 
                                                baseline.p.of.income.without.ssi.among.adap -
                                                baseline.p.of.income.with.medicare.and.medicaid.among.adap -
-                                               baseline.p.of.income.with.medicare.without.medicaid.among.adap -
-                                               baseline.p.of.income.with.medicaid.without.medicare.among.adap))
+                                               baseline.p.of.income.with.medicare.among.adap -
+                                               baseline.p.of.income.with.medicaid.among.adap))
 
-calculate.p.uninsured.given.income.and.no.public.insurance <- function(p.uninsured.given.income.and.no.public.insurance.midpoint,
-                                                                       p.uninsured.given.income.and.no.public.insurance.slope,
-                                                                       p.uninsured.given.income.and.no.public.insurance.min,
-                                                                       p.uninsured.given.income.and.no.public.insurance.max,
-                                                                       max.baseline.adap.income)
-{
-    calculate.logistic.p(logistic.midpoint = p.uninsured.given.income.and.no.public.insurance.midpoint,
-                         logistic.slope = p.uninsured.given.income.and.no.public.insurance.slope,
-                         min.p = p.uninsured.given.income.and.no.public.insurance.min,
-                         max.p = p.uninsured.given.income.and.no.public.insurance.max,
-                         max.baseline.adap.income = max.baseline.adap.income)
-}
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'p.uninsured.given.income.and.no.public.insurance',
                         value = calculate.p.uninsured.given.income.and.no.public.insurance)
@@ -1672,7 +1133,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 # Basically just set to input p1, but need to multiply in the "among adap" part 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.F.only.income.medicaid.among.adap', # probability of F, and a given income, and medicaid; denominator: all adap #
-                        value = expression(baseline.p.of.income.medicaid.among.adap * # just have to multiply in the "among adap" 
+                        value = expression(baseline.p.of.income.with.medicaid.among.adap * # just have to multiply in the "among adap" 
                                                baseline.p.of.F.only.income.medicaid)) 
 
 # OUTPUT 2: FP  
@@ -1686,7 +1147,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 # (FP)/all = (1-p4) * p3 * p2 * (1 - p1)
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.FP.income.medicaid.among.adap', # probability of FP, and a given income, and medicaid; denominator: all adap 
-                        value = expression(baseline.p.of.income.medicaid.among.adap * # always have to include "among adap"
+                        value = expression(baseline.p.of.income.with.medicaid.among.adap * # always have to include "among adap"
                                                (1-baseline.p.of.Cs.among.FP.income.medicaid) * # (1-p4)
                                                baseline.p.of.P.among.Fplus.income.medicaid * # p3
                                                baseline.p.of.Fplus.among.not.F.only.income.medicaid * # p2
@@ -1699,7 +1160,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 #           (See FP for Fx/all explanation)
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.FPCs.income.medicaid.among.adap', # probability of FPCs, and a given income, and medicaid; denominator: all adap 
-                        value = expression(baseline.p.of.income.medicaid.among.adap * # always have to include "among adap"
+                        value = expression(baseline.p.of.income.with.medicaid.among.adap * # always have to include "among adap"
                                                (baseline.p.of.Cs.among.FP.income.medicaid) * # p4
                                                baseline.p.of.P.among.Fplus.income.medicaid * # p3
                                                baseline.p.of.Fplus.among.not.F.only.income.medicaid * # p2
@@ -1721,7 +1182,7 @@ register.model.quantity(ADAP.SPECIFICATION,
     # this can be simplified more but leaving as is 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.PCs.income.medicaid.among.adap',
-                        value = expression(baseline.p.of.income.medicaid.among.adap * # always have to include "among adap"
+                        value = expression(baseline.p.of.income.with.medicaid.among.adap * # always have to include "among adap"
                                                baseline.p.of.Cs.among.P.income.medicaid * # p6 
                                                baseline.p.of.P.among.no.F.income.medicaid * # p5 
                                                (1-baseline.p.of.F.only.income.medicaid - # (1-p1 -
@@ -1734,7 +1195,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 # (P/all) = (1-p6) * p5 * (1-p1 - ((1-p1)*p2))
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.P.only.income.medicaid.among.adap',
-                        value = expression(baseline.p.of.income.medicaid.among.adap * # always have to include "among adap"
+                        value = expression(baseline.p.of.income.with.medicaid.among.adap * # always have to include "among adap"
                                                (1-baseline.p.of.Cs.among.P.income.medicaid) * # (1-p6) 
                                                baseline.p.of.P.among.no.F.income.medicaid * # p5 
                                                (1-baseline.p.of.F.only.income.medicaid - # (1-p1 -
@@ -1747,7 +1208,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 #           (See FP for Fx/all explanation)
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.FCs.income.medicaid.among.adap', 
-                        value = expression(baseline.p.of.income.medicaid.among.adap * # always have to include "among adap"
+                        value = expression(baseline.p.of.income.with.medicaid.among.adap * # always have to include "among adap"
                                                (1-baseline.p.of.P.among.Fplus.income.medicaid) * # (1-p3)
                                                baseline.p.of.Fplus.among.not.F.only.income.medicaid * # p2
                                                (1-baseline.p.of.F.only.income.medicaid) # (1-p1)
@@ -1756,7 +1217,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 # OUTPUT 7: Cs only 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Cs.only.income.medicaid.among.adap', 
-                        value = expression(baseline.p.of.income.medicaid.among.adap -  
+                        value = expression(baseline.p.of.income.with.medicaid.among.adap -  
                                                (baseline.p.of.F.only.income.medicaid.among.adap + # F only 
                                                     baseline.p.of.P.only.income.medicaid.among.adap + # P only 
                                                     baseline.p.of.FP.income.medicaid.among.adap + # FP 
@@ -1822,13 +1283,13 @@ register.model.quantity(ADAP.SPECIFICATION,
 # OUTPUT 1: F only
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.F.only.income.medicare.among.adap', 
-                        value = expression(baseline.p.of.income.medicare.among.adap * 
+                        value = expression(baseline.p.of.income.with.medicare.among.adap * 
                                                baseline.p.of.F.only.income.medicare)) 
 
 # OUTPUT 2: FP  
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.FP.income.medicare.among.adap', 
-                        value = expression(baseline.p.of.income.medicare.among.adap * 
+                        value = expression(baseline.p.of.income.with.medicare.among.adap * 
                                                (1-baseline.p.of.Cs.among.FP.income.medicare) * # (1-p4)
                                                baseline.p.of.P.among.Fplus.income.medicare * # p3
                                                baseline.p.of.Fplus.among.not.F.only.income.medicare * # p2
@@ -1838,7 +1299,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 # OUTPUT 3: FPCs
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.FPCs.income.medicare.among.adap', 
-                        value = expression(baseline.p.of.income.medicare.among.adap * 
+                        value = expression(baseline.p.of.income.with.medicare.among.adap * 
                                                (baseline.p.of.Cs.among.FP.income.medicare) * # p4
                                                baseline.p.of.P.among.Fplus.income.medicare * # p3
                                                baseline.p.of.Fplus.among.not.F.only.income.medicare * # p2
@@ -1848,7 +1309,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 # OUTPUT 4: PCs
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.PCs.income.medicare.among.adap',
-                        value = expression(baseline.p.of.income.medicare.among.adap * 
+                        value = expression(baseline.p.of.income.with.medicare.among.adap * 
                                                baseline.p.of.Cs.among.P.income.medicare * # p6 
                                                baseline.p.of.P.among.no.F.income.medicare * # p5 
                                                (1-baseline.p.of.F.only.income.medicare - # (1-p1 -
@@ -1858,7 +1319,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 # OUTPUT 5: P only
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.P.only.income.medicare.among.adap',
-                        value = expression(baseline.p.of.income.medicare.among.adap * 
+                        value = expression(baseline.p.of.income.with.medicare.among.adap * 
                                                (1-baseline.p.of.Cs.among.P.income.medicare) * # (1-p6) 
                                                baseline.p.of.P.among.no.F.income.medicare * # p5 
                                                (1-baseline.p.of.F.only.income.medicare - # (1-p1 -
@@ -1868,7 +1329,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 # OUTPUT 6: FCs 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.FCs.income.medicare.among.adap', 
-                        value = expression(baseline.p.of.income.medicare.among.adap * 
+                        value = expression(baseline.p.of.income.with.medicare.among.adap * 
                                                (1-baseline.p.of.P.among.Fplus.income.medicare) * # (1-p3)
                                                baseline.p.of.Fplus.among.not.F.only.income.medicare * # p2
                                                (1-baseline.p.of.F.only.income.medicare) # (1-p1)
@@ -1877,7 +1338,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 # OUTPUT 7: Cs only 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Cs.only.income.medicare.among.adap', 
-                        value = expression(baseline.p.of.income.medicare.among.adap -  
+                        value = expression(baseline.p.of.income.with.medicare.among.adap -  
                                                (baseline.p.of.F.only.income.medicare.among.adap + # F only 
                                                     baseline.p.of.P.only.income.medicare.among.adap + # P only 
                                                     baseline.p.of.FP.income.medicare.among.adap + # FP 
@@ -1941,13 +1402,13 @@ register.model.quantity(ADAP.SPECIFICATION,
 # OUTPUT 1: F only
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.F.only.income.medicare.and.medicaid.among.adap', 
-                        value = expression(baseline.p.of.income.medicare.and.medicaid.among.adap * 
+                        value = expression(baseline.p.of.income.with.medicare.and.medicaid.among.adap * 
                                                baseline.p.of.F.only.income.medicare.and.medicaid)) 
 
 # OUTPUT 2: FP  
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.FP.income.medicare.and.medicaid.among.adap', 
-                        value = expression(baseline.p.of.income.medicare.and.medicaid.among.adap * 
+                        value = expression(baseline.p.of.income.with.medicare.and.medicaid.among.adap * 
                                                (1-baseline.p.of.Cs.among.FP.income.medicare.and.medicaid) * # (1-p4)
                                                baseline.p.of.P.among.Fplus.income.medicare.and.medicaid * # p3
                                                baseline.p.of.Fplus.among.not.F.only.income.medicare.and.medicaid * # p2
@@ -1957,7 +1418,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 # OUTPUT 3: FPCs
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.FPCs.income.medicare.and.medicaid.among.adap', 
-                        value = expression(baseline.p.of.income.medicare.and.medicaid.among.adap * 
+                        value = expression(baseline.p.of.income.with.medicare.and.medicaid.among.adap * 
                                                (baseline.p.of.Cs.among.FP.income.medicare.and.medicaid) * # p4
                                                baseline.p.of.P.among.Fplus.income.medicare.and.medicaid * # p3
                                                baseline.p.of.Fplus.among.not.F.only.income.medicare.and.medicaid * # p2
@@ -1967,7 +1428,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 # OUTPUT 4: PCs
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.PCs.income.medicare.and.medicaid.among.adap',
-                        value = expression(baseline.p.of.income.medicare.and.medicaid.among.adap * 
+                        value = expression(baseline.p.of.income.with.medicare.and.medicaid.among.adap * 
                                                baseline.p.of.Cs.among.P.income.medicare.and.medicaid * # p6 
                                                baseline.p.of.P.among.no.F.income.medicare.and.medicaid * # p5 
                                                (1-baseline.p.of.F.only.income.medicare.and.medicaid - # (1-p1 -
@@ -1977,7 +1438,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 # OUTPUT 5: P only
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.P.only.income.medicare.and.medicaid.among.adap',
-                        value = expression(baseline.p.of.income.medicare.and.medicaid.among.adap * 
+                        value = expression(baseline.p.of.income.with.medicare.and.medicaid.among.adap * 
                                                (1-baseline.p.of.Cs.among.P.income.medicare.and.medicaid) * # (1-p6) 
                                                baseline.p.of.P.among.no.F.income.medicare.and.medicaid * # p5 
                                                (1-baseline.p.of.F.only.income.medicare.and.medicaid - # (1-p1 -
@@ -1987,7 +1448,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 # OUTPUT 6: FCs 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.FCs.income.medicare.and.medicaid.among.adap', 
-                        value = expression(baseline.p.of.income.medicare.and.medicaid.among.adap * 
+                        value = expression(baseline.p.of.income.with.medicare.and.medicaid.among.adap * 
                                                (1-baseline.p.of.P.among.Fplus.income.medicare.and.medicaid) * # (1-p3)
                                                baseline.p.of.Fplus.among.not.F.only.income.medicare.and.medicaid * # p2
                                                (1-baseline.p.of.F.only.income.medicare.and.medicaid) # (1-p1)
@@ -1996,7 +1457,7 @@ register.model.quantity(ADAP.SPECIFICATION,
 # OUTPUT 7: Cs only 
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Cs.only.income.medicare.and.medicaid.among.adap', 
-                        value = expression(baseline.p.of.income.medicare.and.medicaid.among.adap -  
+                        value = expression(baseline.p.of.income.with.medicare.and.medicaid.among.adap -  
                                                (baseline.p.of.F.only.income.medicare.and.medicaid.among.adap + # F only 
                                                     baseline.p.of.P.only.income.medicare.and.medicaid.among.adap + # P only 
                                                     baseline.p.of.FP.income.medicare.and.medicaid.among.adap + # FP 
@@ -2177,70 +1638,70 @@ register.model.quantity(ADAP.SPECIFICATION,
 # 7: Cs only 
 
 # 1: F only
-register.model.element(ADAP.SPECIFICATION,
+register.model.quantity(ADAP.SPECIFICATION,
                        name = 'baseline.p.of.F.only.income.among.adap', 
-                       value = expression(baseline.p.of.F.only.income.medicaid.among.adap*baseline.p.of.income.with.medicaid.without.medicare.among.adap + # Medicaid (proportion F only Medicaid * proportion Medicaid)
-                                              baseline.p.of.F.only.income.medicare.among.adap*baseline.p.of.income.with.medicare.without.medicaid.among.adap + # Medicare
+                       value = expression(baseline.p.of.F.only.income.medicaid.among.adap*baseline.p.of.income.with.medicaid.among.adap + # Medicaid (proportion F only Medicaid * proportion Medicaid)
+                                              baseline.p.of.F.only.income.medicare.among.adap*baseline.p.of.income.with.medicare.among.adap + # Medicare
                                               baseline.p.of.F.only.income.medicare.and.medicaid.among.adap*baseline.p.of.income.with.medicare.and.medicaid.among.adap + # Medicare + Medicaid 
                                               baseline.p.of.F.only.income.private.among.adap*baseline.p.of.income.private.among.adap + # Private
                                               baseline.p.of.F.only.income.uninsured.among.adap*baseline.p.of.income.uninsured.among.adap # Uninsured
                        ))
 
 # 2: FP 
-register.model.element(ADAP.SPECIFICATION,
+register.model.quantity(ADAP.SPECIFICATION,
                        name = 'baseline.p.of.FP.income.among.adap', 
-                       value = expression(baseline.p.of.FP.income.medicaid.among.adap*baseline.p.of.income.with.medicaid.without.medicare.among.adap + # Medicaid
-                                              baseline.p.of.FP.income.medicare.among.adap*baseline.p.of.income.with.medicare.without.medicaid.among.adap + # Medicare
+                       value = expression(baseline.p.of.FP.income.medicaid.among.adap*baseline.p.of.income.with.medicaid.among.adap + # Medicaid
+                                              baseline.p.of.FP.income.medicare.among.adap*baseline.p.of.income.with.medicare.among.adap + # Medicare
                                               baseline.p.of.FP.income.medicare.and.medicaid.among.adap*baseline.p.of.income.with.medicare.and.medicaid.among.adap + # Medicare + Medicaid 
                                               baseline.p.of.FP.income.private.among.adap*baseline.p.of.income.private.among.adap + # Private
                                               baseline.p.of.FP.income.uninsured.among.adap*baseline.p.of.income.uninsured.among.adap # Uninsured
                        ))
 
 # 3: FPCs
-register.model.element(ADAP.SPECIFICATION,
+register.model.quantity(ADAP.SPECIFICATION,
                        name = 'baseline.p.of.FPCs.income.among.adap', 
-                       value = expression(baseline.p.of.FPCs.income.medicaid.among.adap*baseline.p.of.income.with.medicaid.without.medicare.among.adap + # Medicaid
-                                              baseline.p.of.FPCs.income.medicare.among.adap*baseline.p.of.income.with.medicare.without.medicaid.among.adap + # Medicare
+                       value = expression(baseline.p.of.FPCs.income.medicaid.among.adap*baseline.p.of.income.with.medicaid.among.adap + # Medicaid
+                                              baseline.p.of.FPCs.income.medicare.among.adap*baseline.p.of.income.with.medicare.among.adap + # Medicare
                                               baseline.p.of.FPCs.income.medicare.and.medicaid.among.adap*baseline.p.of.income.with.medicare.and.medicaid.among.adap + # Medicare + Medicaid 
                                               baseline.p.of.FPCs.income.private.among.adap*baseline.p.of.income.private.among.adap + # Private
                                               baseline.p.of.FPCs.income.uninsured.among.adap*baseline.p.of.income.uninsured.among.adap # Uninsured
                        ))
 
 # 4: PCs
-register.model.element(ADAP.SPECIFICATION,
+register.model.quantity(ADAP.SPECIFICATION,
                        name = 'baseline.p.of.PCs.income.among.adap', 
-                       value = expression(baseline.p.of.PCs.income.medicaid.among.adap*baseline.p.of.income.with.medicaid.without.medicare.among.adap + # Medicaid
-                                              baseline.p.of.PCs.income.medicare.among.adap*baseline.p.of.income.with.medicare.without.medicaid.among.adap + # Medicare
+                       value = expression(baseline.p.of.PCs.income.medicaid.among.adap*baseline.p.of.income.with.medicaid.among.adap + # Medicaid
+                                              baseline.p.of.PCs.income.medicare.among.adap*baseline.p.of.income.with.medicare.among.adap + # Medicare
                                               baseline.p.of.PCs.income.medicare.and.medicaid.among.adap*baseline.p.of.income.with.medicare.and.medicaid.among.adap + # Medicare + Medicaid 
                                               baseline.p.of.PCs.income.private.among.adap*baseline.p.of.income.private.among.adap + # Private
                                               baseline.p.of.PCs.income.uninsured.among.adap*baseline.p.of.income.uninsured.among.adap # Uninsured
                        ))
 
 # 5: P only
-register.model.element(ADAP.SPECIFICATION,
+register.model.quantity(ADAP.SPECIFICATION,
                        name = 'baseline.p.of.P.only.income.among.adap', 
-                       value = expression(baseline.p.of.P.only.income.medicaid.among.adap*baseline.p.of.income.with.medicaid.without.medicare.among.adap + # Medicaid
-                                              baseline.p.of.P.only.income.medicare.among.adap*baseline.p.of.income.with.medicare.without.medicaid.among.adap + # Medicare
+                       value = expression(baseline.p.of.P.only.income.medicaid.among.adap*baseline.p.of.income.with.medicaid.among.adap + # Medicaid
+                                              baseline.p.of.P.only.income.medicare.among.adap*baseline.p.of.income.with.medicare.among.adap + # Medicare
                                               baseline.p.of.P.only.income.medicare.and.medicaid.among.adap*baseline.p.of.income.with.medicare.and.medicaid.among.adap + # Medicare + Medicaid 
                                               baseline.p.of.P.only.income.private.among.adap*baseline.p.of.income.private.among.adap + # Private
                                               baseline.p.of.P.only.income.uninsured.among.adap*baseline.p.of.income.uninsured.among.adap # Uninsured
                        ))
 
 # 6: FCs
-register.model.element(ADAP.SPECIFICATION,
+register.model.quantity(ADAP.SPECIFICATION,
                        name = 'baseline.p.of.FCs.income.among.adap', 
-                       value = expression(baseline.p.of.FCs.income.medicaid.among.adap*baseline.p.of.income.with.medicaid.without.medicare.among.adap + # Medicaid
-                                              baseline.p.of.FCs.income.medicare.among.adap*baseline.p.of.income.with.medicare.without.medicaid.among.adap + # Medicare
+                       value = expression(baseline.p.of.FCs.income.medicaid.among.adap*baseline.p.of.income.with.medicaid.among.adap + # Medicaid
+                                              baseline.p.of.FCs.income.medicare.among.adap*baseline.p.of.income.with.medicare.among.adap + # Medicare
                                               baseline.p.of.FCs.income.medicare.and.medicaid.among.adap*baseline.p.of.income.with.medicare.and.medicaid.among.adap + # Medicare + Medicaid 
                                               baseline.p.of.FCs.income.private.among.adap*baseline.p.of.income.private.among.adap + # Private
                                               baseline.p.of.FCs.income.uninsured.among.adap*baseline.p.of.income.uninsured.among.adap # Uninsured
                        ))
 
 # 7: Cs only
-register.model.element(ADAP.SPECIFICATION,
+register.model.quantity(ADAP.SPECIFICATION,
                        name = 'baseline.p.of.Cs.only.income.among.adap', 
-                       value = expression(baseline.p.of.Cs.only.income.medicaid.among.adap*baseline.p.of.income.with.medicaid.without.medicare.among.adap + # Medicaid
-                                              baseline.p.of.Cs.only.income.medicare.among.adap*baseline.p.of.income.with.medicare.without.medicaid.among.adap + # Medicare
+                       value = expression(baseline.p.of.Cs.only.income.medicaid.among.adap*baseline.p.of.income.with.medicaid.among.adap + # Medicaid
+                                              baseline.p.of.Cs.only.income.medicare.among.adap*baseline.p.of.income.with.medicare.among.adap + # Medicare
                                               baseline.p.of.Cs.only.income.medicare.and.medicaid.among.adap*baseline.p.of.income.with.medicare.and.medicaid.among.adap + # Medicare + Medicaid 
                                               baseline.p.of.Cs.only.income.private.among.adap*baseline.p.of.income.private.among.adap + # Private
                                               baseline.p.of.Cs.only.income.uninsured.among.adap*baseline.p.of.income.uninsured.among.adap # Uninsured
@@ -2253,107 +1714,47 @@ register.model.element(ADAP.SPECIFICATION,
 ##   Sum over income to get proportion in each service category ##
 ##--------------------------------------------------------------##
 
-#-- Helper Function --#
-sum.p.across.income <- function(income.distribution)
-{
-    non.income.dimensions = setdiff(names(dim(income.distribution)), 'income')
-    apply(income.distribution, non.income.dimensions, sum)
-}
+# Categories: F only, FP, FPCs, PCs, P only, FCs, Cs only 
 
 # 1: F only
-# 2: FP  
-# 3: FPCs
-# 4: PCs
-# 5: P only
-# 6: FCs 
-# 7: Cs only 
-
-
-# 1: F only
-calculate.baseline.p.of.F.only.among.adap <- function(baseline.p.of.F.only.income.among.adap) { 
-    sum.p.across.income(baseline.p.of.F.only.income.among.adap)
-}
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.F.only.among.adap', 
                         value = calculate.baseline.p.of.F.only.among.adap)
 
 # 2: FP  
-calculate.baseline.p.of.FP.among.adap <- function(baseline.p.of.FP.income.among.adap) { 
-    sum.p.across.income(baseline.p.of.FP.income.among.adap)
-}
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.FP.among.adap', 
                         value = calculate.baseline.p.of.FP.among.adap)
 
 # 3: FPCs
-calculate.baseline.p.of.FPCs.among.adap <- function(baseline.p.of.FPCs.income.among.adap) { 
-    sum.p.across.income(baseline.p.of.FPCs.income.among.adap)
-}
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.FPCs.among.adap',
                         value = calculate.baseline.p.of.FPCs.among.adap)
 
 # 4: PCs
-calculate.baseline.p.of.PCs.among.adap <- function(baseline.p.of.PCs.income.among.adap) { 
-    sum.p.across.income(baseline.p.of.PCs.income.among.adap)
-}
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.PCs.among.adap', 
                         value = calculate.baseline.p.of.PCs.among.adap)
 
 # 5: P only
-calculate.baseline.p.of.P.only.among.adap <- function(baseline.p.of.P.only.income.among.adap) { 
-    sum.p.across.income(baseline.p.of.P.only.income.among.adap)
-}
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.P.only.among.adap', 
                         value = calculate.baseline.p.of.P.only.among.adap)
 
 # 6: FCs 
-calculate.baseline.p.of.FCs.among.adap <- function(baseline.p.of.FCs.income.among.adap) { 
-    sum.p.across.income(baseline.p.of.FCs.income.among.adap)
-}
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.FCs.among.adap',
                         value = calculate.baseline.p.of.FCs.among.adap)
 
 # 7: Cs only 
-calculate.baseline.p.of.Cs.only.among.adap <- function(baseline.p.of.Cs.only.income.among.adap) { 
-    sum.p.across.income(baseline.p.of.Cs.only.income.among.adap)
-}
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'baseline.p.of.Cs.only.among.adap', 
                         value = calculate.baseline.p.of.Cs.only.among.adap)
 
 
-
-
 ##---------------------------------------------------------------------##
 ##-- CALCULATED: PROPORTION ADAP CLIENTS WHO LOSE or CHANGE SERVICES --##
 ##---------------------------------------------------------------------##
-
-#-- A helper --#
-calculate.p.between.thresholds <- function(income.distribution,
-                                           lower.threshold,
-                                           upper.threshold)
-{
-    if (lower.threshold>=upper.threshold)
-        income.indices = integer(0)
-    else
-    {
-        max.index = dim(income.distribution)['income']
-        lower.index = min(max.index, max(0, floor(lower.threshold)))
-        upper.index = min(max.index, max(0, ceiling(upper.threshold)))
-        income.indices = lower.index:upper.index
-    }
-    
-    non.income.dimensions = setdiff(names(dim(income.distribution)), 'income')
-    
-    apply(income.distribution, non.income.dimensions, function(inc){
-        sum(inc[income.indices]) / sum(inc)
-    })
-}
-
 
 # Ways people can change based on income threshold: 
 
@@ -2398,7 +1799,6 @@ calculate.p.between.thresholds <- function(income.distribution,
 #   7b: Keep 
 
 # Whatever they lose --> lower threshold; keep --> upper threshold
-
 
 #-- 1: F only --#
 # 1a: Lose
@@ -2633,7 +2033,7 @@ calculate.proportion.FCs.lose.FCs <- function(baseline.p.of.FCs.income.among.ada
                                    upper.threshold = Inf)
 }
 register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.FCs.lose.FCs', # this one didn't exist?
+                        name = 'proportion.FCs.lose.FCs', 
                         value = calculate.proportion.FCs.lose.FCs)
 
 # 6b: Lose F (--> Cs) 
@@ -2710,6 +2110,8 @@ register.model.quantity(ADAP.SPECIFICATION,
 # PCs to P 
 # There is no world where you can go from full pay to premiums only (because ADAP is last resort; if you could have been getting premium support before, never should have been getting full-pay)
 # Can't lose just premium (so can't go from PCs to Cs) - if you lose your insurance, lose both
+
+# No world you can change Cs to F; if you have Cs alone, you have insurance; if you have insurance, you shouldn't get full pay 
 
 # Formulary change: 
 # keep F, change formulary 
@@ -2909,10 +2311,12 @@ register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.P.unchanged',
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.P.only * # P only: unchanged 
-                                                    (1-proportion.P.only.lose.P-proportion.P.only.lose.P.gain.F) +
+                                                    (1-proportion.P.only.lose.P - 
+                                                         proportion.P.only.lose.P.gain.F) +
                                                     
                                                 proportion.of.adap.who.are.suppressed.P.among.FP * # P among FP: unchanged 
-                                                    (1-proportion.FP.lose.P-proportion.FP.lose.P)
+                                                    (1-proportion.FP.lose.P - 
+                                                         proportion.FP.lose.FP)
                                                ))
 )
 
@@ -3031,7 +2435,7 @@ register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.PCs.unchanged',
                         value = expression(baseline.proportion.pwh.with.adap * 
                                                (proportion.of.adap.who.are.suppressed.PCs * # PCs: keep PCs (unchanged) 
-                                                    (1 - proportion.adap.full.pay.and.premium.and.cost.sharing.who.lose.eligibility -
+                                                    (1 - proportion.PCs.lose.PCs -
                                                          proportion.PCs.lose.PCs.gain.F -
                                                          proportion.PCs.lose.Cs) *
                                                     (1 - proportion.PCs.clients.with.Cp * proportion.PCp.clients.with.formulary.change) +
@@ -3082,8 +2486,10 @@ register.model.quantity(ADAP.SPECIFICATION,
                                                     proportion.Cs.only.lose.Cs +
                                                     
                                                     # over the course of the year, they had FCs, but at this point in time, how many have Cs and are suppressed
+                                                    
                                                     proportion.of.adap.who.are.suppressed.Cs.among.FCs *
-                                                    proportion.FCs.lose.Cs
+                                                    (proportion.FCs.lose.FCs + # implicitly lose F 
+                                                         proportion.FCs.lose.Cs)  # truly only lost Cs - special case for Cs because you can't switch to F from Cs 
                                                ))
 )
 
@@ -3097,7 +2503,8 @@ register.model.quantity(ADAP.SPECIFICATION,
                                                     proportion.Cp.clients.with.formulary.change +
                                                     
                                                 proportion.of.adap.who.are.suppressed.Cs.among.FCs * # Cs among FCs: formulary 
-                                                    (1-proportion.FCs.lose.Cs) *
+                                                    (1-proportion.FCs.lose.FCs - # implicitly lose F 
+                                                         proportion.FCs.lose.Cs) * # truly only lost Cs - special case for Cs because you can't switch to F from Cs 
                                                     proportion.FCs.clients.with.Cp * # among co-pay only 
                                                     proportion.Cp.clients.with.formulary.change # for now, assuming that the proportion with formulary change is the same for all Cp (not factoring in the F component here)
                                                ))
@@ -3107,12 +2514,14 @@ register.model.quantity(ADAP.SPECIFICATION,
 register.model.quantity(ADAP.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.Cs.unchanged', 
                         value = expression(baseline.proportion.pwh.with.adap * 
-                                               (proportion.of.adap.who.are.suppressed.Cs.only *
+                                               (proportion.of.adap.who.are.suppressed.Cs.only * # Cs only
                                                     (1-proportion.Cs.only.lose.Cs) *
                                                     (1 - proportion.Cs.clients.with.Cp * 
                                                          proportion.Cp.clients.with.formulary.change) +
-                                                proportion.of.adap.who.are.suppressed.Cs.among.FCs *
-                                                    (1-proportion.FCs.lose.Cs) *
+                                                    
+                                                proportion.of.adap.who.are.suppressed.Cs.among.FCs * # Cs among FCs
+                                                    (1-proportion.FCs.lose.FCs - # implicitly lose F 
+                                                         proportion.FCs.lose.Cs) * # truly only lost Cs - special case for Cs because you can't switch to F from Cs 
                                                     (1 - proportion.FCs.clients.with.Cp * 
                                                          proportion.Cp.clients.with.formulary.change) # for now, assuming that the proportion with formulary change is the same for all Cp (not factoring in the F component here)
                                                ))
@@ -3174,420 +2583,6 @@ register.model.quantity(ADAP.SPECIFICATION,
 
 
 
-
-
-## UP TO HERE
-
-
-
-
-calculate.baseline.adap.full.pay.income.proportions.single.fpl <- function(adap.income.proportions.single.fpl,
-                                                                           p.full.pay.given.income.midpoint,
-                                                                           p.full.pay.given.income.logistic.slope,
-                                                                           p.full.pay.given.income.min,
-                                                                           p.full.pay.given.income.max,
-                                                                           baseline.adap.full.pay.fpl.threshold,
-                                                                           baseline.adap.insurance.fpl.threshold)
-{
-    max.income = max(baseline.adap.full.pay.fpl.threshold, baseline.adap.insurance.fpl.threshold)
-    income = 0:max.income
-    
-    logistic.p = p.full.pay.given.income.min + 
-        (p.full.pay.given.income.max - p.full.pay.given.income.min) /
-        (1 + exp(p.full.pay.given.income.logistic.slope * (income - p.full.pay.given.income.midpoint)))
-    
-    non.income.dimensions = setdiff(names(dim(adap.income.proportions.single.fpl)), 'income')
-    p = apply(adap.income.proportions.single.fpl, non.income.dimensions, function(prop){
-        prop * logistic.p
-    })
-    
-    dim(p) = dim(adap.income.proportions.single.fpl)
-    dimnames(p) = dimnames(adap.income.proportions.single.fpl)
-    
-    p
-}
-
-calculate.baseline.proportion.pwh.with.adap.full.pay <- function(baseline.proportion.pwh.with.adap,
-                                                                 adap.income.proportions.single.fpl)
-{
-    non.income.dimensions = setdiff(names(dim(adap.income.proportions.single.fpl)), 'income')
-    apply(adap.income.proportions.single.fpl, non.income.dimensions, sum) * baseline.proportion.pwh.with.adap
-}
-
-calculate.baseline.proportion.above.new.fpl.threshold <- function(baseline.income.proportions.single.fpl,
-                                                                  fpl.threshold)
-{
-    fpl.threshold = floor(fpl.threshold)
-    n.income.values = dim(baseline.income.proportions.single.fpl)['income']
-    
-    non.income.dimensions = setdiff(names(dim(baseline.income.proportions.single.fpl)), 'income')
-    if (fpl.threshold >= n.income.values)
-    {
-        array(1, dim=dim(baseline.income.proportions.single.fpl)[non.income.dimensions],
-              dimnames = dimnames(baseline.adap.full.pay.income.proportions.single.fpl)[non.income.dimensions])
-    }         
-    else
-    {
-        above.threshold.indices = (fpl.threshold+1):n.income.values
-        
-        rv = apply(baseline.income.proportions.single.fpl, non.income.dimensions, function(x){
-            sum(x[above.threshold.indices])
-        }) / apply(baseline.income.proportions.single.fpl, non.income.dimensions, sum)    
-    }
-}
-
-calculate.baseline.proportion.adap.full.pay.clients.above.new.fpl.threshold <- function(baseline.adap.full.pay.income.proportions.single.fpl,
-                                                                                        adap.full.pay.fpl.threshold)
-{
-    calculate.baseline.proportion.above.new.fpl.threshold(
-        baseline.income.proportions.single.fpl = baseline.adap.full.pay.income.proportions.single.fpl,
-        fpl.threshold = adap.full.pay.fpl.threshold)
-}
-
-calculate.baseline.proportion.adap.insurance.clients.above.new.fpl.threshold <- function(baseline.adap.insurance.income.proportions.single.fpl,
-                                                                                         adap.insurance.fpl.threshold)
-{
-    calculate.baseline.proportion.above.new.fpl.threshold(
-        baseline.income.proportions.single.fpl = baseline.adap.insurance.income.proportions.single.fpl,
-        fpl.threshold = adap.insurance.fpl.threshold)
-}
-
-##---------------------------##
-##-- CALCULATED: P on ADAP --##
-##---------------------------##
-
-#-- Get proportions of ADAP clients in each stratum of FPL (single percentage point) and full pay vs insurance
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'adap.income.proportions.single.fpl',
-                        value = calculate.adap.income.proportions.single.fpl)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.adap.full.pay.income.proportions.single.fpl',
-                        value = calculate.baseline.adap.full.pay.income.proportions.single.fpl)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.adap.insurance.income.proportions.single.fpl',
-                        value = expression(adap.income.proportions.single.fpl - baseline.adap.full.pay.income.proportions.single.fpl))
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.adap.copay.assistance.income.proportions.single.fpl',
-                        value = 0.5) #@todo
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.adap.insurance.income.proportions.single.fpl',
-                        value = expression(baseline.adap.insurance.income.proportions.single.fpl - baseline.adap.copay.assistance.income.proportions.single.fpl))
-
-
-#-- Get the above proportions, but of all PWH --#
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.proportion.pwh.with.adap.full.pay',
-                        value = calculate.baseline.proportion.pwh.with.adap.full.pay)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'baseline.proportion.pwh.with.adap.insurance',
-                        value = expression(baseline.proportion.pwh.with.adap - baseline.proportion.pwh.with.adap.full.pay))
-
-#-- Figure out what proportion of adap clients are above new threshold --#
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.adap.full.pay.clients.above.new.fpl.threshold',
-                        value = calculate.baseline.proportion.adap.full.pay.clients.above.new.fpl.threshold)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.adap.insurance.clients.above.new.fpl.threshold',
-                        value = calculate.baseline.proportion.adap.insurance.clients.above.new.fpl.threshold)
-
-
-
-#-- Apply to calculate the time-updates proportion on adap full pay --#
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.with.adap.full.pay',
-                        value = expression(baseline.proportion.pwh.with.adap.full.pay * (1-proportion.adap.full.pay.clients.above.new.fpl.threshold)),
-                        scale = 'proportion')
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.with.adap.insurance',
-                        value = expression(baseline.proportion.pwh.with.adap.insurance * (1-proportion.adap.insurance.clients.above.new.fpl.threshold)),
-                        scale = 'proportion')
-
-#-- The proportion with copay --#
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.adap.insurance.clients.with.copay.assistance',
-                        value = 'p.copay.assistance.given.adap.insurance', # for now, this is a 1:1 mapping of the parameter. But we may want to change this to be a function of income
-                        scale = 'proportion') 
-
-
-
-##-- PARTITION OUT ADAP --##
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-##-- ADAP SUPPRESSION CALCULATED QUANTITIES --##
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.F.unchanged',
-                        value = expression(proportion.pwh.with.adap.full.pay * # This is calculated as baseline.proportion.pwh.with.adap.full.pay * (1-proportion.adap.full.pay.clients.above.new.fpl.threshold)
-                                               (1-proportion.adap.full.pay.or.copay.assistance.clients.with.formulary.change) * 
-                                               proportion.adap.full.pay.suppressed))
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.with.adap.insurance.unchanged',
-                        value = expression(proportion.pwh.with.adap.insurance * # This is calculated as baseline.proportion.pwh.with.adap.insurance * (1-proportion.adap.insurance.clients.above.new.fpl.threshold)
-                                               (1 - proportion.adap.insurance.clients.with.copay.assistance * proportion.adap.full.pay.or.copay.assistance.clients.with.formulary.change) * 
-                                               proportion.adap.insurance.suppressed))
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.lose.F',
-                        value = expression(baseline.proportion.pwh.with.adap.full.pay * proportion.adap.full.pay.clients.above.new.fpl.threshold),
-                        scale = 'proportion')
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.and.lose.adap.insurance',
-                        value = expression(baseline.proportion.pwh.with.adap.insurance * proportion.adap.insurance.clients.above.new.fpl.threshold),
-                        scale = 'proportion')
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.and.keep.adap.but.change.formulary',
-                        value = expression(proportion.adap.full.pay.or.copay.assistance.clients.with.formulary.change *
-                                               (proportion.pwh.with.adap.full.pay * proportion.adap.full.pay.suppressed +
-                                                    proportion.pwh.with.adap.insurance * proportion.adap.insurance.clients.with.copay.assistance * proportion.adap.insurance.suppressed)),
-                        scale = 'proportion')
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.who.are.suppressed.without.adap',
-                        value = expression(super.suppression.of.diagnosed - 
-                                               
-                                               proportion.pwh.who.are.suppressed.F.unchanged -
-                                               proportion.pwh.who.are.suppressed.with.adap.insurance.unchanged -
-                                               
-                                               proportion.pwh.who.are.suppressed.lose.F - 
-                                               proportion.pwh.who.are.suppressed.and.lose.adap.insurance - 
-                                               
-                                               proportion.pwh.who.are.suppressed.and.keep.adap.but.change.formulary
-                        ))
-
-
-##-------------------------------------------##
-##-- CALCULATED: TO SUPPORT INCOME OUTPUTS --##
-##-------------------------------------------##
-
-calculate.adap.full.pay.income.distribution <- function(baseline.adap.full.pay.income.proportions.single.fpl,
-                                                        adap.full.pay.fpl.threshold,
-                                                        cutpoints = c(0, 100, 138, 200, 250, 300, 400, 500, Inf))
-{
-    calculate.income.distribution(income.proportions.single.fpl = baseline.adap.full.pay.income.proportions.single.fpl,
-                                  cutpoints = cutpoints,
-                                  fpl.threshold = adap.full.pay.fpl.threshold)
-}
-
-calculate.income.distribution <- function(income.proportions.single.fpl,
-                                          fpl.threshold,
-                                          cutpoints = c(0, 100, 138, 200, 250, 300, 400, 500, Inf))
-{
-    n.incomes = dim(income.proportions.single.fpl)['income']
-    fpl.threshold = floor(fpl.threshold)
-    fpl.threshold.index = min(fpl.threshold+1, n.incomes)
-    non.income.dimensions = setdiff(names(dim(income.proportions.single.fpl)), 'income')
-    
-    lower.indices = cutpoints[-length(cutpoints)] + 1
-    lower.indices[-1] = lower.indices[-1]+1
-    lower.indices = pmin(fpl.threshold.index, lower.indices)
-    
-    upper.indices = pmin(fpl.threshold.index, cutpoints[-1]+1)
-    
-    rv = apply(income.proportions.single.fpl, non.income.dimensions, function(income.proportions){
-        
-        total.below.threshold = sum(income.proportions[1:fpl.threshold.index])
-        
-        sapply(1:length(lower.indices), function(i){
-            
-            if (lower.indices[i]==upper.indices[i])
-                0
-            else
-                sum(income.proportions[lower.indices[i]:upper.indices[i]]) / total.below.threshold
-        })
-    })
-    
-    income.names = paste0(lower.indices-1, "-", upper.indices-1)
-    if (cutpoints[length(cutpoints)]==Inf)
-        income.names[length(income.names)] = paste0(">", lower.indices[length(lower.indices)]-1)
-    
-    dim.names = c(
-        list(income=income.names),
-        dimnames(income.proportions.single.fpl)[non.income.dimensions])
-    
-    dim(rv) = vapply(dim.names, length, FUN.VALUE=integer(1))
-    dimnames(rv) = dim.names
-    
-    rv
-}
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'general.fpl.median',
-                        value = expression(adap.fpl.median * general.over.adap.fpl.median.multiplier), 
-                        scale = 'non.negative.number')
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'general.fpl.cv',
-                        value = expression(adap.fpl.cv * general.over.adap.fpl.cv.multiplier), 
-                        scale = 'non.negative.number')
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'adap.income.and.service.type.distribution',
-                        value = 0)
-
-register.model.quantity.subset(ADAP.SPECIFICATION,
-                               name = 'adap.income.and.service.type.distribution',
-                               applies.to = list(service.type='any.full.pay'),
-                               value = 0.5) #@todo
-
-
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'adap.full.pay.income.distribution',
-                        value = calculate.adap.full.pay.income.distribution)
-
-register.model.quantity(ADAP.SPECIFICATION,
-                        name = 'proportion.pwh.with.adap.full.pay.by.income',
-                        value = expression(adap.full.pay.income.distribution * proportion.pwh.with.adap.full.pay))
-
-
-##--------------##
-##--------------##
-##-- OUTCOMES --##
-##--------------##
-##--------------##
-
-
-# to calibrate:
-# adap clients
-#   - by demographics
-#   - by income
-# adap income distribution
-#   - total
-# adap suppression
-#   - total
-#   - by service type
-
-##-------------------##
-##-- ADAP OUTCOMES --##
-##-------------------##
-
-track.integrated.outcome(ADAP.SPECIFICATION,
-                         name = 'adap.clients',
-                         outcome.metadata = create.outcome.metadata(display.name = 'ADAP Clients',
-                                                                    description = "Number of Individuals Receiving ADAP Services",
-                                                                    scale = 'non.negative.number',
-                                                                    axis.name = 'Clients',
-                                                                    units = 'people',
-                                                                    singular.unit = 'person'),
-                         value.to.integrate = 'infected',
-                         multiply.by = 'proportion.pwh.with.adap.by.service.and.income',
-                         subset.dimension.values = list(continuum='diagnosed.states'),
-                         allow.expand.dimensions = c('income','service.type'),
-                         keep.dimensions = c('location','age','race','sex','risk','service.type','income'),
-                         corresponding.data.outcome = 'adap.full.pay.clients',
-                         save = T)
-
-
-track.cumulative.outcome(ADAP.SPECIFICATION,
-                         name = 'adap.clients.all.incomes',
-                         outcome.metadata = NULL,
-                         scale = 'non.negative.number',
-                         value = 'adap.clients',
-                         exclude.dimensions = 'income',
-                         save = F)
-
-track.cumulative.outcome(ADAP.SPECIFICATION,
-                         name = 'adap.income.distribution',
-                         outcome.metadata = create.outcome.metadata(display.name = 'ADAP Income Distribution',
-                                                                    description = "Proportions of ADAP Clients by Income",
-                                                                    scale = 'proportion',
-                                                                    axis.name = 'Proportion',
-                                                                    units = '%',
-                                                                    singular.unit = '%'),
-                         value = 'adap.clients',
-                         value.is.numerator = T,
-                         denominator.outcome = 'adap.clients.all.incomes',
-                         allow.expand.denominator.dimensions = 'income',
-                         keep.dimensions = c('location','age','race','sex','risk','service.type','income'),
-                         corresponding.data.outcome = 'adap.income.distribution',
-                         save = T)
-
-track.integrated.outcome(ADAP.SPECIFICATION,
-                         name = 'adap.suppression',
-                         outcome.metadata = create.outcome.metadata(display.name = 'Suppression Among ADAP Clients',
-                                                                    description = "Proportion of ADAP Clients who are Virally Suppressed",
-                                                                    scale = 'proportion',
-                                                                    axis.name = 'Proportion',
-                                                                    units = '%',
-                                                                    singular.unit = '%'),
-                         value.to.integrate = 'infected',
-                         multiply.by = 'proportion.pwh.who.are.suppressed.with.adap.insurance.unchanged.by.service',
-                         denominator.outcome = 'adap.insurance.clients',
-                         value.is.numerator = T,
-                         subset.dimension.values = list(continuum='diagnosed.states'),
-                         keep.dimensions = c('location','age','race','sex','risk','service.type'),
-                         corresponding.data.outcome = 'adap.suppression',
-                         save = T)
-
-
-
-##-- INCOME OUTCOMES --##
-
-# track.point.outcome(ADAP.SPECIFICATION,
-#                     name = 'point.general.fpl.100', 
-#                     value = expression(plnorm(100, general.fpl.log.mean, general.fpl.log.sd)), 
-#                     outcome.metadata = NULL,
-#                     save = F,
-#                     scale = 'non.negative.number',
-#                     keep.dimensions = c('location','age','race','sex'))
-# 
-# 
-# track.integrated.outcome(ADAP.SPECIFICATION,
-#                          name = 'general.fpl.100',
-#                          outcome.metadata = create.outcome.metadata(display.name = 'Proportion Population <100% FPL',
-#                                                                     description = "Proportion of the General Population Living Under 100% of Federal Poverty Level",
-#                                                                     scale = 'proportion',
-#                                                                     axis.name = 'Proportion <100% FPL',
-#                                                                     units = '%',
-#                                                                     singular.unit = '%'),
-#                          value.to.integrate = 'point.general.fpl.100', 
-#                          denominator.outcome = 'population',
-#                          keep.dimensions = c('location','age','race','sex'))
-# 
-# 
-# track.point.outcome(ADAP.SPECIFICATION,
-#                     name = 'point.adap.fpl.100', 
-#                     value = expression(plnorm(100, adap.fpl.log.mean, adap.fpl.log.sd)), 
-#                     outcome.metadata = NULL,
-#                     save = F,
-#                     scale = 'non.negative.number',
-#                     keep.dimensions = c('location','age','race','sex'))
-# 
-# 
-# track.integrated.outcome(ADAP.SPECIFICATION,
-#                          name = 'adap.fpl.100',
-#                          outcome.metadata = create.outcome.metadata(display.name = 'Proportion of ADAP Clients <100% FPL',
-#                                                                     description = "Proportion of ADAP Clients Living Under 100% of Federal Poverty Level",
-#                                                                     scale = 'proportion',
-#                                                                     axis.name = 'Proportion <100% FPL',
-#                                                                     units = '%',
-#                                                                     singular.unit = '%'),
-#                          value.to.integrate = 'point.adap.fpl.100', 
-#                          denominator.outcome = 'adap.clients',
-#                          keep.dimensions = c('location','age','race','sex'))
 
 ##--------------##
 ##-- REGISTER --##

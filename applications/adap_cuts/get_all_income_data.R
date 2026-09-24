@@ -1,10 +1,10 @@
 
 ## PULL INCOME DISTRIBUTION DATA ## 
+source("applications/adap_cuts/process_adap_data.R")
 # pulls income data by age, race, total sex from RW ADAP reports (applications/ryan_white/ryan_white_data/adap_clients)
 # pulls income data by MSM/het/IDU from MMP reports (manually entered) for 2021-2022 (applications/ryan_white/ryan_white_data/raw_ryan_white_pdf_reports)
 # fits tobit normal distributions by each stratum (total, black, hisp, etc.)
 # get betas and CVs by race, age, etc. by dividing individual stratum distribution means by total mean
-source("applications/adap_cuts/process_adap_data.R")
 
 
 ## SET UP MEDIAN INCOME ARRAY ##
@@ -19,7 +19,7 @@ median.income.array = array(log(params.total.all.years$mean),
                             dimnames = dim.names) # ; dim(median.income.array)
 
 
-## MULTIPLY MEDIAN INCOME ARRAY BY BETAS ## 
+## Multiply median income array by betas ## 
 
 # Age, race, IDU, and female - straightforward 
 # MSM and het male will use combination of ADAP (all male, relative to total) and MMP multipliers (MSM and het male, relative to all male)
