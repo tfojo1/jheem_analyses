@@ -8,21 +8,23 @@
 #   stage never clears the cache), so this resumes rather than restarting.
 #
 # USAGE
-#   bash applications/SHIELD/launchers/launch_resume_chain.sh <city> <calib_code> <chain>
+#   nohup bash applications/SHIELD/launchers/launch_resume_chain.sh <city> <calib_code> <chain> \
+#       > /dev/null 2>&1 &
 #
 #   Example:
-#       bash applications/SHIELD/launchers/launch_resume_chain.sh C.37980 calib.7.30.stage2.LA.PA 3
-#
-#   To survive logout:
 #       nohup bash applications/SHIELD/launchers/launch_resume_chain.sh C.37980 calib.7.30.stage2.LA.PA 3 \
-#           > applications/SHIELD/logs/launcher_resume.out 2>&1 &
+#           > /dev/null 2>&1 &
+#
+#   nohup is what lets the run survive logout. To watch it on your terminal
+#   instead, drop the nohup and the redirect - but then it dies with your
+#   session, and a resumed chain can take hours.
 #
 # Kill:
 #   pkill -u pkasaie1 -x R
 #   pkill -u pkasaie1 -f "Rscript"
 #
 # Monitor:
-#   tail -f applications/SHIELD/logs/<city>_<calib_code>_chain<chain>.out
+#   tail -f /home/jheem-shared/logs/<city>_<calib_code>_chain<chain>.out
 #
 # NOTE ON LOGGING
 #   This appends (>>) to the same log file the original chain run used, so the
@@ -35,8 +37,29 @@ set -uo pipefail   # `set -e` deliberately omitted: the exit code is handled exp
 # ── resolve paths relative to this script's location ──────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PARENT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"   # launchers live in a subfolder; R scripts + logs are one level up
-LOG_DIR="$PARENT_DIR/logs"
+# ── where the logs go ─────────────────────────────────────────────────────────
+# Logs are written to the shared folder on this machine, so any member logged
+# into this server can follow the runs without going through the repo.
+#   1. The folder is shared per machine; it is not shared across machines,
+#      so log names from different servers never collide.
+#   2. Set JHEEM_LOG_DIR before launching to send one run's logs elsewhere.
+#   3. TO REVERT: comment the shared line and uncomment the repo line above it.
+# LOG_DIR="$PARENT_DIR/logs"          # previous setup: logs/ inside the repo
+LOG_DIR="${JHEEM_LOG_DIR:-/home/jheem-shared/logs}"
 mkdir -p "$LOG_DIR"
+umask 002   # new log files stay group-readable for the other members
+
+# ── master log ──────────────────────────────────────────────────────────────
+# Everything this launcher prints goes to one file inside LOG_DIR, so the launch
+# command carries no path of its own and cannot drift away from LOG_DIR.
+#   1. Launch with:  nohup bash <this script> > /dev/null 2>&1 &
+#      The > /dev/null only stops nohup from creating an empty nohup.out.
+#   2. Watch with:   tail -f $LOG_DIR/launcher_resume_<user>.out
+#   3. Run in the foreground and the output stays on your screen instead; the
+#      guard below only redirects when stdout is not a terminal.
+#   4. TO REVERT: comment the exec line and put the redirect back on the launch
+#      command:  nohup bash <this script> > applications/SHIELD/logs/launcher.out 2>&1 &
+[[ -t 1 ]] || exec > "$LOG_DIR/launcher_resume_${USER:-$(id -un)}.out" 2>&1
 
 SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
 

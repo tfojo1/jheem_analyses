@@ -64,7 +64,16 @@ register.calibration.info("calib.9.23.stage3",
                           ),
                           n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
 )
-
+register.calibration.info("calib.9.23.stage3.pk",
+                          preceding.calibration.codes = 'calib.9.23.stage2',
+                          likelihood.instructions = lik.inst.stage3,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              SHIELD.FULL.PARAMETERS.PRIOR@var.names
+                          ),
+                          n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
+)
 # 9.19
 register.calibration.info("calib.9.19.stage0",
                           likelihood.instructions = lik.inst.stage0,

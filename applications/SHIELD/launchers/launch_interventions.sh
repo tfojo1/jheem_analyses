@@ -2,7 +2,7 @@
 #
 # USAGE
 #   Launch over SSH (survives logout):
-#       nohup bash applications/SHIELD/launchers/launch_interventions.sh > applications/SHIELD/logs/launcher.out 2>&1 &
+#       nohup bash applications/SHIELD/launchers/launch_interventions.sh > /dev/null 2>&1 &
 #   Kill Runs:
 #       pkill -u pkasaie1 -x R
 #       pkill -u pkasaie1 -f "Rscript"
@@ -12,10 +12,10 @@
 #       ssh username@10.253.170.89  (SHIELD2)
 #
 #   Monitor overall progress:
-#       tail -f applications/SHIELD/logs/launcher.out
+#       tail -f /home/jheem-shared/logs/launcher_interventions_<user>.out
 #
 #   Check a specific city+calibration log:
-#       tail -f applications/SHIELD/logs/<loc>_<calib_code>_interventions.out
+#       tail -f /home/jheem-shared/logs/<loc>_<calib_code>_interventions.out
 #
 # HOW IT WORKS
 #   Each city+calibration code combination gets its own subshell.
@@ -28,7 +28,7 @@
 # ON FAILURE
 #   The failed city prints to stderr and releases its slot.
 #   All other cities keep running.
-#   Check logs/<loc>_<calibration_code>_interventions.out for the R-level error message.
+#   Check /home/jheem-shared/logs/<loc>_<calibration_code>_interventions.out for the R-level error message.
 
 # ── shell options ──────────────────────────────────────────────────────────────
 set -uo pipefail   # `set -e` deliberately omitted: one failed city must not abort the launcher
@@ -36,8 +36,29 @@ set -uo pipefail   # `set -e` deliberately omitted: one failed city must not abo
 # ── resolve paths relative to this script's location ──────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PARENT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"   # launchers live in a subfolder; R scripts + logs are one level up
-LOG_DIR="$PARENT_DIR/logs"
+# ── where the logs go ─────────────────────────────────────────────────────────
+# Logs are written to the shared folder on this machine, so any member logged
+# into this server can follow the runs without going through the repo.
+#   1. The folder is shared per machine; it is not shared across machines,
+#      so log names from different servers never collide.
+#   2. Set JHEEM_LOG_DIR before launching to send one run's logs elsewhere.
+#   3. TO REVERT: comment the shared line and uncomment the repo line above it.
+# LOG_DIR="$PARENT_DIR/logs"          # previous setup: logs/ inside the repo
+LOG_DIR="${JHEEM_LOG_DIR:-/home/jheem-shared/logs}"
 mkdir -p "$LOG_DIR"
+umask 002   # new log files stay group-readable for the other members
+
+# ── master log ──────────────────────────────────────────────────────────────
+# Everything this launcher prints goes to one file inside LOG_DIR, so the launch
+# command carries no path of its own and cannot drift away from LOG_DIR.
+#   1. Launch with:  nohup bash <this script> > /dev/null 2>&1 &
+#      The > /dev/null only stops nohup from creating an empty nohup.out.
+#   2. Watch with:   tail -f $LOG_DIR/launcher_interventions_<user>.out
+#   3. Run in the foreground and the output stays on your screen instead; the
+#      guard below only redirects when stdout is not a terminal.
+#   4. TO REVERT: comment the exec line and put the redirect back on the launch
+#      command:  nohup bash <this script> > applications/SHIELD/logs/launcher.out 2>&1 &
+[[ -t 1 ]] || exec > "$LOG_DIR/launcher_interventions_${USER:-$(id -un)}.out" 2>&1
 
 # ── shared helpers ─────────────────────────────────────────────────────────────
 source "$SCRIPT_DIR/_shield_slots.sh"

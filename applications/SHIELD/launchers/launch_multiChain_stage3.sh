@@ -2,7 +2,7 @@
 #
 # USAGE
 #   Launch over SSH (survives logout):
-#       nohup bash applications/SHIELD/launchers/launch_multiChain_stage3.sh > applications/SHIELD/logs/launcher.out 2>&1 &
+#       nohup bash applications/SHIELD/launchers/launch_multiChain_stage3.sh > /dev/null 2>&1 &
 #   Kill Runs:
 #       pkill -u pkasaie1 -x R
 #       pkill -u pkasaie1 -f "Rscript"
@@ -12,12 +12,12 @@
 #       ssh username@10.253.170.89  (SHIELD2)
 #
 #   Monitor overall progress:
-#       tail -f applications/SHIELD/logs/launcher.out
+#       tail -f /home/jheem-shared/logs/launcher_multiChain_<user>.out
 #
 #   Check a specific city+calibration code log:
-#       tail -f applications/SHIELD/logs/<loc>_<calib_code>_setup.out
-#       tail -f applications/SHIELD/logs/<loc>_<calib_code>_chain<n>.out
-#       tail -f applications/SHIELD/logs/<loc>_<calib_code>_assemble.out
+#       tail -f /home/jheem-shared/logs/<loc>_<calib_code>_setup.out
+#       tail -f /home/jheem-shared/logs/<loc>_<calib_code>_chain<n>.out
+#       tail -f /home/jheem-shared/logs/<loc>_<calib_code>_assemble.out
 #
 # HOW IT WORKS
 #   Each city gets its own subshell that runs all phases sequentially.
@@ -29,7 +29,7 @@
 # ON FAILURE
 #   A failed chain skips assemble and releases its city slot.
 #   All other cities keep running.
-#   Check logs/<loc>_<calib_code>_chain<n>.out for the R-level error message.
+#   Check /home/jheem-shared/logs/<loc>_<calib_code>_chain<n>.out for the R-level error message.
 
 # ── shell options ──────────────────────────────────────────────────────────────
 set -uo pipefail   # `set -e` deliberately omitted: one failed city/chain must not abort the launcher
@@ -37,8 +37,29 @@ set -uo pipefail   # `set -e` deliberately omitted: one failed city/chain must n
 # ── resolve paths relative to this script's location ──────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PARENT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"   # launchers live in a subfolder; R scripts + logs are one level up
-LOG_DIR="$PARENT_DIR/logs"
+# ── where the logs go ─────────────────────────────────────────────────────────
+# Logs are written to the shared folder on this machine, so any member logged
+# into this server can follow the runs without going through the repo.
+#   1. The folder is shared per machine; it is not shared across machines,
+#      so log names from different servers never collide.
+#   2. Set JHEEM_LOG_DIR before launching to send one run's logs elsewhere.
+#   3. TO REVERT: comment the shared line and uncomment the repo line above it.
+# LOG_DIR="$PARENT_DIR/logs"          # previous setup: logs/ inside the repo
+LOG_DIR="${JHEEM_LOG_DIR:-/home/jheem-shared/logs}"
 mkdir -p "$LOG_DIR"
+umask 002   # new log files stay group-readable for the other members
+
+# ── master log ──────────────────────────────────────────────────────────────
+# Everything this launcher prints goes to one file inside LOG_DIR, so the launch
+# command carries no path of its own and cannot drift away from LOG_DIR.
+#   1. Launch with:  nohup bash <this script> > /dev/null 2>&1 &
+#      The > /dev/null only stops nohup from creating an empty nohup.out.
+#   2. Watch with:   tail -f $LOG_DIR/launcher_multiChain_<user>.out
+#   3. Run in the foreground and the output stays on your screen instead; the
+#      guard below only redirects when stdout is not a terminal.
+#   4. TO REVERT: comment the exec line and put the redirect back on the launch
+#      command:  nohup bash <this script> > applications/SHIELD/logs/launcher.out 2>&1 &
+[[ -t 1 ]] || exec > "$LOG_DIR/launcher_multiChain_${USER:-$(id -un)}.out" 2>&1
 
 # ── shared helpers ─────────────────────────────────────────────────────────────
 source "$SCRIPT_DIR/_shield_slots.sh"
@@ -63,24 +84,21 @@ ten_cities=(
 )
 
 shield3_cities=(
-    C.12060 C.12580 C.16980 C.26420 C.31080
-    C.33100 C.37980 
+     C.12060 C.12580 C.16980 C.26420 C.31080
+    C.33100 C.37980 C.38060
 )
-shield1_cities=(
-    C.38060 C.42660
-)
-
+ 
 N_CHAINS=4
 
 # ── set active cities and calibration codes here ───────────────────────────────
 # MAX_CITIES = max cities in flight at once. Each city holds N_CHAINS cores, so
 # peak cores = MAX_CITIES x N_CHAINS (5 x 4 = 20), leaving headroom on a 24-core box.
-MAX_CITIES=7
+MAX_CITIES=5
 
-CITIES=("${shield1_cities[@]}")
+CITIES=("${shield3_cities[@]}")
 
 CALIBRATION_CODES=(
-    calib.9.22.stage3
+    calib.9.23.stage3.pk
 )
 
 # ── preflight ──────────────────────────────────────────────────────────────────
