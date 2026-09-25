@@ -25,119 +25,64 @@ current aggregation code. `Rscript data_processing/hiv.surveillance.manager/test
 checks the path and shared-write contract without loading real manager files or
 running the scientific transformations.
 
-## Candidate workflow
+## CI build, promotion, and loading
 
-**Verification status, 2026-09-24 UTC:**
-[run 35952637832](https://github.com/tfojo1/jheem_analyses/actions/runs/35952637832)
-passed at `c8c978cddb11a5a85d7b07f3ef284daf309d5cf6`, including the
-active-baseline comparison and ten focused consumer checks. The
-[unchanged baseline](https://github.com/tfojo1/jheem_analyses/releases/tag/hiv-surveillance-baseline-2026.08.31)
-and [verified candidate](https://github.com/tfojo1/jheem_analyses/releases/tag/hiv-surveillance-candidate-2026.09.24-r35952637832)
-are retained as releases. This workflow revision remains on the review branch;
-no active manager, default loader, or latest alias has changed.
+Operator steps (upload sections, build, promote, refresh the shared copy) are in
+[`scripts/README.md`](../../scripts/README.md#hiv-surveillance-manager). They
+match the syphilis manager's steps. This section describes what the build checks.
 
-`.github/workflows/trial-hiv-surveillance-manager.yml` runs manually. It takes a
-dated five-section release tag and the SHA-256 of that release's
-`SHA256SUMS.txt`. All five section digests are verified before use. Movement,
-census, active-baseline, and syphilis-consumer snapshots are fixed by tag and
-digest in the workflow. R is 4.4.2; `jheem2` and `locations` use exact commits.
-Only the county-to-county movement inputs are extracted.
-Other R dependencies are installed without a lockfile; their observed versions
-are retained in `session_info.txt`, not frozen for future installations.
+The **Build HIV Surveillance Manager** workflow
+(`.github/workflows/trial-hiv-surveillance-manager.yml`) runs manually. By default
+it reads `hiv-sections-latest`, resolves the dated `hiv-sections-v*` snapshot it
+points to, and requires both to carry the same `SHA256SUMS.txt`. All five section
+digests are verified before use. An optional input can require a specific manifest
+digest. Movement, census, historical, and syphilis-consumer inputs are fixed by
+tag and digest in the workflow. R is 4.4.2; `jheem2` and `locations` use exact
+commits. Other R dependencies are installed without a lockfile; their observed
+versions are retained in `session_info.txt`.
 
-The job builds in an isolated workspace and uploads a candidate and evidence as
-a **30-day Actions artifact**. It cannot publish releases, write to shared
-storage, or change a `latest` alias. Durable publication is a separate step.
+The build runs in an isolated workspace and never writes to shared storage. When
+every check passes, it publishes an `hiv-surveillance-manager-v*` release with
+the manager, `CANDIDATE.md`, `input_identity.txt`, a validation-evidence archive,
+and `SHA256SUMS.txt`. Publishing a build doesn't change what anyone loads; only
+the **Promote HIV Surveillance Manager** workflow moves
+`hiv-surveillance-manager-latest`.
 
-### Supplying changed sections
+### What the checks mean
 
-A processing-script edit upstream of the merge is **not tested by rebuilding
-the same old sections**. Rebuild the affected sections through the existing
-section workflow, then assemble a complete, deliberately selected set of
-`surveillance.manager_section1.rdata` through `surveillance.manager_section5.rdata`.
-Unchanged sections may be reused; record that reuse rather than implying that
-all five were rebuilt together.
+- **Regression baseline:** the currently promoted `hiv-surveillance-manager-latest`
+  (before the first promotion, the fixed August 31 snapshot). Structural
+  regressions fail the build. Value and metadata differences are reported in
+  `active_baseline_report.json` and `CANDIDATE.md` for review; they don't fail the
+  build, and the baseline is never updated automatically.
+- **Historical comparison:** `historical_baseline_report.json` preserves the
+  comparison with the August 26 snapshot as evidence, not as a gate.
+- **Consumers:** `consumer_report.json` checks eight Ryan White year-series
+  queries (four outcomes in Texas and California), EHE's national stratified
+  prevalence pull, and the actual syphilis adult-population transfer into an
+  empty manager with the released syphilis source registry. These checks don't
+  run full calibrations or establish compatibility with every application.
+- **Scope:** this is section-to-final assembly. An upstream processing edit is
+  tested only after its sections are rebuilt and uploaded. Record which sections
+  were reused rather than implying all five were rebuilt together. Reproducing a
+  baseline doesn't certify scientific correctness.
 
-In a directory containing only that chosen section set, generate the manifest:
+The first CI trial (run 35952637832) reproduced the August 31 manager exactly:
+603 structural checks, no differences in 408 shared data arrays, and all ten
+consumer checks. The merge takes about 20 minutes and 7.8 GiB peak memory.
 
-```sh
-shasum -a 256 surveillance.manager_section{1,2,3,4,5}.rdata > SHA256SUMS.txt
-shasum -a 256 SHA256SUMS.txt
-```
+### Loading and rollback
 
-Publish the five files and manifest together under a new dated
-`hiv-sections-*` release. Record which processing revision, raw inputs, and
-reused sections are known; mark unknown lineage explicitly. Do not replace
-assets in an existing snapshot or use a mutable `latest` tag. Use the new tag
-and manifest digest as the workflow's two inputs. The defaults reproduce the
-September 23 snapshot.
-
-### Reading the result
-
-Download `hiv-surveillance-hosted-trial` from the completed run and begin with
-`CANDIDATE.md` (also shown in the Actions summary). A failed run may still have
-partial artifacts: their presence is not a successful build verdict.
-
-- `active_baseline_report.json` compares structure, shared-array values, and
-  stored metadata with the August 31 manager observed active on September 22. Metadata
-  comparison excludes build timestamps and runtime methods. Structural
-  regressions fail the job; value and metadata differences are reported for
-  review, not silently accepted or used to update the baseline.
-- `historical_baseline_report.json` preserves comparison with August 26. Its
-  historical differences are not the active regression gate. The first trial
-  reproduced the active manager while differing from August 26 in NSDUH MSA
-  coverage and Massachusetts adult-population values. Reproduction does not
-  certify the scientific correctness of either baseline.
-- `consumer_report.json` checks eight Ryan White year-series queries (four
-  outcomes in Texas and California), EHE's national stratified-prevalence pull,
-  and the actual syphilis adult-population transfer into an empty manager with
-  the released syphilis source registry. It uses the application's ontology
-  mapping definitions. These checks do not run full calibrations, rebuild the
-  entire syphilis manager, or establish compatibility with every application.
-- `input_identity.txt`, `session_info.txt`, build/resource logs, and the output
-  digest identify the build and its inputs.
-
-The verified hosted run found 603 structural checks passing, no differences in
-408 shared data arrays, equivalent compared metadata, and all ten consumer
-checks passing. The merge took 20:36 and used about 7.8 GiB peak resident memory.
-The serialized file digest differs from the active baseline; the equivalence
-check deliberately excludes build timestamps and runtime methods. Stored data
-and the compared descriptive metadata match.
-
-### Retaining and selecting a candidate
-
-Before the Actions artifact expires, a reviewed successful build can be retained
-as a new GitHub **prerelease**, with `--latest=false`, under a distinct
-`hiv-surveillance-candidate-*` tag. Preserve the final
-`surveillance.manager.rdata`, `CANDIDATE.md`, reports, logs, input identities,
-package/session information, and SHA-256 manifest together. Target the recorded
-analyses build commit, not whatever happens to be current at publication time.
-Publishing this review candidate is not promotion to the active manager.
-
-For isolated inspection, download the verified release into a new directory
-and verify its checksums:
+After a promotion, `source_code.R` loads the promoted manager through
+`load.data.manager.from.cache()`, the same way as the syphilis manager. To pin an
+earlier build, pass its tag as `release.tag`. To inspect a build without loading
+it by default, download it and verify its checksums:
 
 ```sh
-gh release download hiv-surveillance-candidate-2026.09.24-r35952637832 \
+gh release download hiv-surveillance-manager-v2026.09.25 \
   --repo tfojo1/jheem_analyses --dir candidate-review
 (cd candidate-review && shasum -a 256 -c SHA256SUMS.txt)
 ```
-
-Then load that exact file:
-
-```r
-candidate <- jheem2::load.data.manager(
-  file = "candidate-review/surveillance.manager.rdata"
-)
-```
-
-Selecting a previously retained file gives an inspection rollback without
-overwriting `cached/surveillance.manager.rdata` or shared storage. The existing
-[`release.tag` cache-loader option](../../commoncode/data-manager-releases.md)
-currently applies to configured GitHub-backed managers (syphilis), **not** to
-the HIV surveillance manager's default OneDrive route. Wiring an HIV release
-selector into application loading and switching its default distribution are
-separate integration steps; this workflow does neither.
 
 ## Local checks
 

@@ -1,0 +1,82 @@
+name: Promote HIV Surveillance Manager
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag to promote to latest (e.g. hiv-surveillance-manager-v2026.09.25)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RELEASE_TAG: ${{ inputs.release_tag }}
+      LATEST_TAG: hiv-surveillance-manager-latest
+    steps:
+      - name: Validate release exists
+        run: |
+          set -euo pipefail
+          # Built managers, or a recorded baseline snapshot, can be promoted.
+          if [[ ! "$RELEASE_TAG" =~ ^hiv-surveillance-(manager-v|baseline-)[0-9][0-9.]*$ ]]; then
+            echo "ERROR: '$RELEASE_TAG' is not an hiv-surveillance-manager-v* or hiv-surveillance-baseline-* tag"
+            exit 1
+          fi
+          if ! gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" &>/dev/null; then
+            echo "ERROR: Release '$RELEASE_TAG' not found"
+            exit 1
+          fi
+          echo "Found release: $RELEASE_TAG"
+
+      - name: Download and verify release assets
+        run: |
+          set -euo pipefail
+          mkdir -p _assets
+          gh release download "$RELEASE_TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --dir _assets
+          (cd _assets && sha256sum -c SHA256SUMS.txt)
+          grep -q '  surveillance.manager.rdata$' _assets/SHA256SUMS.txt
+          echo "Downloaded assets:"
+          ls -lh _assets/
+
+      - name: Update latest release
+        run: |
+          set -euo pipefail
+          # Delete existing latest release if it exists
+          gh release delete "$LATEST_TAG" --repo "$GITHUB_REPOSITORY" --cleanup-tag --yes 2>/dev/null || true
+
+          # Get the source release notes to extract build info
+          SOURCE_NOTES=$(gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json body -q .body)
+          MANAGER_SHA=$(grep '  surveillance.manager.rdata$' _assets/SHA256SUMS.txt | cut -d' ' -f1)
+
+          # The cache loader reads the "Promoted from" line as the version.
+          {
+            echo "## Latest HIV Surveillance Manager"
+            echo
+            echo "**Promoted from:** \`$RELEASE_TAG\`"
+            echo "**Promoted at:** $(date -u +%Y-%m-%d\ %H:%M\ UTC)"
+            echo "**SHA-256:** \`$MANAGER_SHA\`"
+            echo
+            echo "**Stable download URL:**"
+            echo '```'
+            echo "https://github.com/${GITHUB_REPOSITORY}/releases/download/$LATEST_TAG/surveillance.manager.rdata"
+            echo '```'
+            echo
+            echo "---"
+            echo
+            echo "$SOURCE_NOTES"
+          } > _notes.md
+
+          gh release create "$LATEST_TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "HIV Surveillance Manager (Latest)" \
+            --notes-file _notes.md \
+            --latest=false \
+            _assets/*
+          echo "Promoted $RELEASE_TAG to latest"

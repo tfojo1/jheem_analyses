@@ -1,6 +1,7 @@
 # Render a small review entry point; the JSON reports retain detailed evidence.
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) != 1L) stop("Usage: Rscript summarize_candidate.R <output-directory>")
+if (!length(args) %in% 1:2) stop("Usage: Rscript summarize_candidate.R <output-directory> [baseline-release]")
+baseline.label <- if (length(args) == 2L) paste0("`", args[[2]], "`") else "the active baseline"
 read.report <- function(name) jsonlite::read_json(file.path(args[[1]], name))
 active <- read.report("active_baseline_report.json")
 historical <- read.report("historical_baseline_report.json")
@@ -8,7 +9,8 @@ consumer <- read.report("consumer_report.json")
 stopifnot(isTRUE(active$passed), isTRUE(consumer$passed))
 text <- c(
   "# HIV surveillance-manager candidate", "",
-  "Review candidate only: no active manager or latest alias has changed.", "",
+  "Build candidate only: no active manager or latest alias has changed.",
+  paste0("Compared against ", baseline.label, "."), "",
   sprintf("- Active-baseline structural checks: %d passed, %d failed.",
           active$n_checks - active$n_failed, active$n_failed),
   sprintf("- Stored data and compared metadata reproduce the active baseline: **%s**.",
