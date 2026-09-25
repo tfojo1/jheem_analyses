@@ -20,7 +20,8 @@ source("../jheem_analyses/applications/SHIELD/shield_calib_register.R")
 
 # the table and figure functions
 source('../jheem_analyses/applications/SHIELD/analysis/intervention/intervention_helper_functions.R')
-
+# output folders for a calibration: shield.output.path(), shield.table.path(), load.shield.results()
+ 
 
 # ****************************************************************************
 # LOAD RESULTS
@@ -38,18 +39,13 @@ source('../jheem_analyses/applications/SHIELD/analysis/intervention/intervention
 # back as NA for the level that lacks it, and the function says so.
 # ****************************************************************************
 
-BASE.PATH <- paste0(ROOT.DIR, "/shield/outputs/calib.8.21.stage3.az")
+# Set the calibration once. Everything else is built from it.
+CALIB.NAME  <- "calib.8.21.stage3.az"
+TABLE.DIR   <- shield.table.path(CALIB.NAME, create = TRUE)
 
-total_raw_results  <- get(load(file = paste0(BASE.PATH, "/total_raw_results.Rdata")))
-sex_raw_results    <- get(load(file = paste0(BASE.PATH, "/sex_raw_results.Rdata")))
-total_calc_results <- get(load(file = paste0(BASE.PATH, "/total_calc_results.Rdata")))
-sex_calc_results   <- get(load(file = paste0(BASE.PATH, "/sex_calc_results.Rdata")))
-
-ALL.RESULTS <- list(total_raw_results, total_calc_results,
-                    sex_raw_results,   sex_calc_results)
+ALL.RESULTS <- load.shield.results(CALIB.NAME)
 
 COVERAGE.LEVELS <- paste0("doxy.cov.", seq(10, 100, 10))
-TABLE.DIR       <- paste0(BASE.PATH, "/tables/")
 
 
 # ****************************************************************************
@@ -86,7 +82,7 @@ if (1 == 2) {
     # Same columns as the table above, including `subgroup`, which holds
     # "Total" throughout. Tables built from different inputs now stack.
     make_multi_location_table(
-        data          = list(total_raw_results, total_calc_results),
+        data          = ALL.RESULTS[c("total_raw", "total_calc")],
         locations     = names(SHIELD.TEN.MSAS),
         outcomes      = c("pct_cum_incidence_averted"),
         interventions = COVERAGE.LEVELS,

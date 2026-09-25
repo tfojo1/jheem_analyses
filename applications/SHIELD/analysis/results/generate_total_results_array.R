@@ -8,7 +8,7 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
 source('../jheem_analyses/applications/SHIELD/analysis/intervention/int_simset_helper_functions.R')
 
-CALIB_CODE <- "calib.8.21.stage3.az"
+CALIB.NAME <- "calib.8.21.stage3.az"
 INTERVENTION.LABELS <- c(
     noint        = "No Doxy-PEP Intervention",
     doxy.cov.10   = "coverage 10%",
@@ -24,16 +24,18 @@ INTERVENTION.LABELS <- c(
 )
 INTERVENTION.CODES <- names(INTERVENTION.LABELS)
 
-if (!dir.exists(paste0("Q:/shield/outputs/",CALIB_CODE)))
-    dir.create(paste0("Q:/shield/outputs/",CALIB_CODE))
+# Everything this script writes goes in the calibration's output folder, under the JHEEM root.
+# It used to be a literal "Q:/shield/outputs/", which is the desktop drive only -- the scripts
+# that read these arrays back run on the Mac too, and looked under ROOT.DIR.
+OUT.DIR <- shield.output.path(CALIB.NAME, create = TRUE)
 
 int.simsets <- load.int.simsets(
-    SHIELD.TEN.MSAS, INTERVENTION.CODES, CALIB_CODE, 400
+    SHIELD.TEN.MSAS, INTERVENTION.CODES, CALIB.NAME, 400
 )
 
 
 # Order loc1/int1, loc1/int2, ... loc10/int5, loc10/int6
-cc = extract.int.simsets(int.simsets, calib.code = CALIB_CODE)
+cc = extract.int.simsets(int.simsets, calib.code = CALIB.NAME)
 
 # AGE (LIMITED DUE TO SIZE; NEEDED JUST FOR DOXY COVERAGE) ----
 if (1==2) {
@@ -68,7 +70,7 @@ if (1==2) {
         sapply(dn_age, length), dn_age
     )
     
-    save(age_raw_results, file = paste0("Q:/shield/outputs/",CALIB_CODE,"/age_raw_results.Rdata"))
+    save(age_raw_results, file = file.path(OUT.DIR, "age_raw_results.Rdata"))
 }
 
 # TOTAL ----
@@ -111,7 +113,7 @@ if (1==2) {
     
     # Add doxy-coverage total, which we have to aggregate from the age-stratified
     # results since the specification doesn't exclude <14 and >65 year olds.
-    age_raw_results <- get(load(paste0("Q:/shield/outputs/", CALIB_CODE, "/age_raw_results.Rdata")))
+    age_raw_results <- get(load(file.path(OUT.DIR, "age_raw_results.Rdata")))
     doxy_total <- apply(
         age_raw_results[,2:10,,,,],
         c("year", "sim","intervention", "location"),
@@ -126,7 +128,7 @@ if (1==2) {
                         dn_temp
     )
     
-    save(total_raw_results, file = paste0("Q:/shield/outputs/",CALIB_CODE,"/total_raw_results.Rdata"))
+    save(total_raw_results, file = file.path(OUT.DIR, "total_raw_results.Rdata"))
 }
 
 # SEX ----
@@ -171,5 +173,5 @@ if (1==2) {
         })),
         sapply(dn_sex, length), dn_sex
     )
-    save(sex_raw_results, file = paste0("Q:/shield/outputs/",CALIB_CODE,"/sex_raw_results.Rdata"))
+    save(sex_raw_results, file = file.path(OUT.DIR, "sex_raw_results.Rdata"))
 }

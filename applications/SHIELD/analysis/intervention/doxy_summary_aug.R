@@ -3,23 +3,21 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
 source('../jheem_analyses/applications/SHIELD/analysis/intervention/intervention_helper_functions.R')
 # ****************************************************************************************************
-BASE.PATH <- paste0(ROOT.DIR,"/shield/outputs/calib.8.21.stage3.az")
-print(BASE.PATH)
+# Set the calibration once. The folders and the four result arrays follow from it.
+CALIB.NAME <- "calib.8.21.stage3.az"
+print(shield.output.path(CALIB.NAME))
 if(1==2){
-  # raw results
-  total_raw_results=get(load(file = paste0(BASE.PATH,"/total_raw_results.Rdata")))
-  sex_raw_results=get(load(file = paste0(BASE.PATH,"/sex_raw_results.Rdata")))
-  # calculated results
-  total_calc_results=get(load(file = paste0(BASE.PATH,"/total_calc_results.Rdata")))
-  sex_calc_results=get(load(file = paste0(BASE.PATH,"/sex_calc_results.Rdata")))
-  results=list(
-    total_raw_results,
-    total_calc_results,
-    sex_raw_results,
-    sex_calc_results
-  )
-  FIG.DIR <- if (exists("BASE.PATH")) paste0(BASE.PATH, "/figures/") else "figures/"
-  TABLE.DIR <- if (exists("BASE.PATH")) paste0(BASE.PATH, "/tables/") else "tables/"
+  # total_raw, total_calc, sex_raw, sex_calc -- in that order, as before
+  results   <- load.shield.results(CALIB.NAME)
+  FIG.DIR   <- shield.fig.path(CALIB.NAME,   create = TRUE)
+  TABLE.DIR <- shield.table.path(CALIB.NAME, create = TRUE)
+  
+  # The same four arrays under their own names, for the scripts that use them that way
+  # (generate_correlation_plots.R, and the example blocks in doxy_figures.R).
+  total_raw_results  <- results$total_raw
+  total_calc_results <- results$total_calc
+  sex_raw_results    <- results$sex_raw
+  sex_calc_results   <- results$sex_calc
 }
 # ----------------------------------------------------------------------------
 # ONE city order for every figure in this script.

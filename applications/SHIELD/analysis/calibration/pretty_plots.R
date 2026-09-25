@@ -6,19 +6,18 @@ source("../jheem_analyses/applications/SHIELD/shield_specification.R")
 source('../jheem_analyses/applications/SHIELD/analysis/calibration/calibration_helper_functions.R')
 source('../jheem_analyses/applications/SHIELD/analysis/calibration/pretty_plots_helper_functions.R')
 
+# READ DATA ----
+calibration.codes <- "calib.8.21.stage3.az"
+
 # ---- OUTPUT PATHS ----
 # Still toggled off. FIG.DIR is used by the ggsave() at the bottom of this script, so that
 # call fails until you switch this to 1==1 (or set FIG.DIR yourself).
 if (1==2){
     print(paste("Root directory is set to: ",ROOT.DIR))
-    BASE.PATH <- paste0(ROOT.DIR,"/shield/outputs/calib.8.21.stage3.az")
-    FIG.DIR <- if (exists("BASE.PATH")) paste0(BASE.PATH, "/figures/") else "figures/"
-    TABLE.DIR <- if (exists("BASE.PATH")) paste0(BASE.PATH, "/tables/") else "tables/"
-    # for (d in c(TABLE.DIR, FIG.DIR)) if (!dir.exists(d)) dir.create(d, recursive = TRUE)
-    
+    FIG.DIR   <- shield.fig.path(calibration.codes,   create = TRUE)
+    TABLE.DIR <- shield.table.path(calibration.codes, create = TRUE)
 }
-# READ DATA ----
-calibration.codes <- "calib.8.21.stage3.az"
+
 calib.simsets <- load.calib.simsets(
     locations         =  SHIELD.TEN.MSAS,
     calibration.codes = calibration.codes,

@@ -67,26 +67,24 @@ if(1==2){
   source('../jheem_analyses/commoncode/locations_of_interest.R')
   source('../jheem_analyses/applications/SHIELD/shield_specification.R')
   source('../jheem_analyses/applications/SHIELD/analysis/intervention/intervention_helper_functions.R')
-  
+   
   print(paste("Root directory is set to: ",ROOT.DIR))
-  BASE.PATH <- paste0(ROOT.DIR,"/shield/outputs/calib.8.21.stage3.az")
-  FIG.DIR <- if (exists("BASE.PATH")) paste0(BASE.PATH, "/figures/") else "figures/"
-  TABLE.DIR <- if (exists("BASE.PATH")) paste0(BASE.PATH, "/tables/") else "tables/"
-  for (d in c(TABLE.DIR, FIG.DIR)) if (!dir.exists(d)) dir.create(d, recursive = TRUE)
   
-  # 
-  total_raw_results=get(load(file = paste0(BASE.PATH,"/total_raw_results.Rdata")))
-  sex_raw_results=get(load(file = paste0(BASE.PATH,"/sex_raw_results.Rdata")))
-  # calculated results
-  total_calc_results=get(load(file = paste0(BASE.PATH,"/total_calc_results.Rdata")))
-  sex_calc_results=get(load(file = paste0(BASE.PATH,"/sex_calc_results.Rdata")))
-  results=list(
-    total_raw_results,
-    total_calc_results,
-    sex_raw_results,
-    sex_calc_results
-  )
+  # Set the calibration once. The folders and the four result arrays follow from it.
+  CALIB.NAME <- "calib.8.21.stage3.az"
+  FIG.DIR    <- shield.fig.path(CALIB.NAME,   create = TRUE)
+  TABLE.DIR  <- shield.table.path(CALIB.NAME, create = TRUE)
+  print(paste("Figures/Tables will be written to: ",FIG.DIR," **/tables"))
   
+  # Loading raw and calculated results:
+  results <- load.shield.results(CALIB.NAME)
+  #
+  total_raw_results  <- results$total_raw
+  total_calc_results <- results$total_calc
+  sex_raw_results    <- results$sex_raw
+  sex_calc_results   <- results$sex_calc
+ 
+   print(paste("Results are loaded"))
 }
 {
   CCRIT.MS   <- "doxy.cov.30"                        # policy coverage level
@@ -217,6 +215,7 @@ if(1==2){
 
 # ****************************************************************************************************
 # FIGURE 2 <NOT BUILT HERE -- see the calibration / pretty-plot script> ----
+# ****************************************************************************************************
 # FIGURE 3 -- IMPACT HEATMAPS ----
 # ****************************************************************************************************
 # WHAT   MSA x coverage heatmaps in EVAL.YEAR, 2 x 2:

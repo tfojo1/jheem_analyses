@@ -1362,7 +1362,10 @@ plot_impact_over_time <- function(tbl,
 
 # examples ----
 if (1==2){
-    FIG.DIR <- if (exists("BASE.PATH")) paste0(BASE.PATH, "/figures/") else "figures/"
+    # These examples write to the driver script's FIG.DIR. Running them on their own,
+    # set the calibration name first and the folder follows from it.
+    if (!exists("CALIB.NAME")) CALIB.NAME <- "calib.8.21.stage3.az"
+    FIG.DIR <- shield.fig.path(CALIB.NAME, create = TRUE)
     
     # --- Figure 1: headline ------------------------------------------------------
     # Needs a table using a single year (e.g., 2035) and spanning multiple locations. Build it with the multi-location
@@ -2850,7 +2853,10 @@ plot_impact_over_time <- function(tbl,
 
 # examples ----
 if (1==2){
-    FIG.DIR <- if (exists("BASE.PATH")) paste0(BASE.PATH, "/figures/") else "figures/"
+    # These examples write to the driver script's FIG.DIR. Running them on their own,
+    # set the calibration name first and the folder follows from it.
+    if (!exists("CALIB.NAME")) CALIB.NAME <- "calib.8.21.stage3.az"
+    FIG.DIR <- shield.fig.path(CALIB.NAME, create = TRUE)
     
     # --- Figure 1: headline ------------------------------------------------------
     # Needs a table using a single year (e.g., 2035) and spanning multiple locations. Build it with the multi-location

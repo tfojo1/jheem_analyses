@@ -6,6 +6,9 @@
 #
 # WHAT LIVES HERE
 #   1. Path helpers      .shield.base.path()  .shield.plot.path()  ensure.plot.dir()
+#                        Output folders per calibration live in shield_output_paths.R,
+#                        which this file sources: shield.output.path(), shield.fig.path(),
+#                        shield.table.path(), load.shield.results()
 #   2. Panel building    .make.panel()  .make.patchwork()  .auto.grid()  .auto.height()
 #   3. Saving            .save.plot()
 #   4. Naming and style  .sanitize()  .build.file.suffix()  .auto.style.manager()
@@ -19,6 +22,10 @@
 
 library(ggplot2)    # plotting primitives, themes, guides
 library(patchwork)  # panel layout with wrap_plots and plot_annotation
+
+# Output folders per calibration: shield.output.path(), shield.fig.path(), shield.table.path()
+# and load.shield.results(). Sourced here so the calibration and intervention helpers get them.
+source('../jheem_analyses/applications/SHIELD/analysis/shield_output_paths.R')
 
 
 # Every function that reads simsets from disk or writes plots to disk takes a root.dir argument.

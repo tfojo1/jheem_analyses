@@ -4,7 +4,9 @@
 # percent reduction in cumulative cases (incidence and diagnosis)
 # percent reduction in cases (incidence and diagnosis)
 
-CALIB_CODE <- "calib.8.21.stage3.az"
+source('../jheem_analyses/applications/SHIELD/analysis/shield_output_paths.R')
+
+CALIB.NAME <- "calib.8.21.stage3.az"
 NOINT = "noint"
 
 ## subset_array ----
@@ -954,25 +956,26 @@ calculate_custom_outcomes <- function(raw_results, baseline.year, debug=F) {
 #     total_raw_results["2026", 3, "doxy.cov.10", "C.12580", "incidence"] ==
 #     total_calc_results["2026", 3, "doxy.cov.10", "C.12580", "num_incidence_averted"]
 
-# BASE.PATH <- paste0(ROOT.DIR,"/shield/outputs/calib.8.21.stage3.az")
-
-
 if (1==1) {
+    # The calc arrays are written next to the raw ones, in the calibration's output folder.
+    OUT.DIR <- shield.output.path(CALIB.NAME, create = TRUE)
+    
     if(1==2){
         source ("../jheem_analyses/applications/SHIELD/shield_specification.R")
         print(ROOT.DIR)
-        BASE.PATH <- paste0(ROOT.DIR,"/shield/outputs/calib.8.21.stage3.az")
-        total_raw_results <- get(load(paste0(BASE.PATH, "/total_raw_results.Rdata")))
-        sex_raw_results <- get(load(paste0(BASE.PATH, "/sex_raw_results.Rdata")))
+        # only the raw arrays exist at this point -- this script writes the calc ones
+        RAW <- load.shield.results(CALIB.NAME, which = c("total_raw", "sex_raw"))
+        total_raw_results <- RAW$total_raw
+        sex_raw_results   <- RAW$sex_raw
     }
     
     total_calc_results <- calculate_custom_outcomes(total_raw_results, baseline.year = "2022")
     save(total_calc_results,
-         file = paste0(BASE.PATH, "/total_calc_results.Rdata"))
+         file = file.path(OUT.DIR, "total_calc_results.Rdata"))
     
     sex_calc_results <- calculate_custom_outcomes(sex_raw_results, baseline.year = "2022")
     save(sex_calc_results,
-         file = paste0(BASE.PATH, "/sex_calc_results.Rdata"))
+         file = file.path(OUT.DIR, "sex_calc_results.Rdata"))
 }
 
 #cumulative incidence : add a baseline year: 2022 update all instances 
