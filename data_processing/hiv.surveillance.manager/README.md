@@ -32,7 +32,7 @@ Operator steps (upload sections, build, promote, refresh the shared copy) are in
 match the syphilis manager's steps. This section describes what the build checks.
 
 The **Build HIV Surveillance Manager** workflow
-(`.github/workflows/trial-hiv-surveillance-manager.yml`) runs manually. By default
+(`.github/workflows/build-hiv-surveillance-manager.yml`) runs manually. By default
 it reads `hiv-sections-latest`, resolves the dated `hiv-sections-v*` snapshot it
 points to, and requires both to carry the same `SHA256SUMS.txt`. All five section
 digests are verified before use. An optional input can require a specific manifest
