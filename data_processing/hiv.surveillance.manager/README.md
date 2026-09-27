@@ -32,44 +32,51 @@ Operator steps (upload sections, build, promote, refresh the shared copy) are in
 match the syphilis manager's steps. This section describes what the build checks.
 
 The **Build HIV Surveillance Manager** workflow
-(`.github/workflows/build-hiv-surveillance-manager.yml`) runs manually. By default
-it reads `hiv-sections-latest`, resolves the dated `hiv-sections-v*` snapshot it
-points to, and requires both to carry the same `SHA256SUMS.txt`. All five section
-digests are verified before use. An optional input can require a specific manifest
-digest. Movement, census, historical, and syphilis-consumer inputs are fixed by
-tag and digest in the workflow. R is 4.4.2; `jheem2` and `locations` use exact
-commits. Other R dependencies are installed without a lockfile; their observed
-versions are retained in `session_info.txt`.
+(`.github/workflows/build-hiv-surveillance-manager.yml`) runs manually. Its inputs
+are the sections release (default `hiv-sections-latest`), the raw-data release
+(`data-raw-latest`; only the county-to-county movement workbooks are used), the
+dependencies release (`data-managers-latest`; the census manager), and the `jheem2`
+ref (`dev`). `locations` comes from its default branch.
 
-The build runs in an isolated workspace and never writes to shared storage. When
-every check passes, it publishes an `hiv-surveillance-manager-v*` release with
-the manager, `CANDIDATE.md`, `input_identity.txt`, a validation-evidence archive,
-and `SHA256SUMS.txt`. Publishing a build doesn't change what anyone loads; only
-the **Promote HIV Surveillance Manager** workflow moves
+Inputs can move; builds are traceable anyway. A `*-latest` sections release must
+name a dated snapshot with an identical `SHA256SUMS.txt`, and all five section
+digests are verified. Every other download is checked against the SHA-256 digest
+GitHub publishes for the asset. `input_identity.txt` records each release, its
+digests, and the exact `jheem2`, `locations`, and analyses commits; the release
+notes summarize them. R is 4.4.2. Other R dependencies are installed without a
+lockfile; their observed versions are retained in `session_info.txt`.
+
+The build runs in an isolated workspace and never writes to shared storage. On
+`master`, a successful build publishes an `hiv-surveillance-manager-v*` release
+with the manager, `CANDIDATE.md`, `input_identity.txt`, `build_status.json`, a
+validation-evidence archive, and `SHA256SUMS.txt`. Runs from other branches only
+upload a 30-day Actions artifact. Publishing a build doesn't change what anyone
+loads; only the **Promote HIV Surveillance Manager** workflow moves
 `hiv-surveillance-manager-latest`.
 
 ### What the checks mean
 
-- **Regression baseline:** the currently promoted `hiv-surveillance-manager-latest`
-  (before the first promotion, the fixed August 31 snapshot). Structural
-  regressions fail the build. Value and metadata differences are reported in
-  `active_baseline_report.json` and `CANDIDATE.md` for review; they don't fail the
-  build, and the baseline is never updated automatically.
-- **Historical comparison:** `historical_baseline_report.json` preserves the
-  comparison with the August 26 snapshot as evidence, not as a gate.
+- **Regression baseline:** the currently promoted `hiv-surveillance-manager-latest`.
+  The baseline only moves when someone promotes; building never changes it.
+- **Structural removals** (an outcome, source, ontology, or stratification in the
+  promoted manager but not the candidate) don't fail the build. They mark it
+  **Needs review**: the release is a pre-release, its notes list the removals, and
+  the promote workflow refuses it unless the review box is ticked.
+- **Additions and value changes** are reported in `active_baseline_report.json` and
+  `CANDIDATE.md`. They're expected whenever data or processing changes.
 - **Consumers:** `consumer_report.json` checks eight Ryan White year-series
   queries (four outcomes in Texas and California), EHE's national stratified
   prevalence pull, and the actual syphilis adult-population transfer into an
-  empty manager with the released syphilis source registry. These checks don't
-  run full calibrations or establish compatibility with every application.
+  empty manager with the promoted syphilis manager's source registry. A failure
+  here fails the build. These checks don't run full calibrations or establish
+  compatibility with every application.
 - **Scope:** this is section-to-final assembly. An upstream processing edit is
-  tested only after its sections are rebuilt and uploaded. Record which sections
-  were reused rather than implying all five were rebuilt together. Reproducing a
+  tested only after its sections are rebuilt and uploaded. Reproducing a
   baseline doesn't certify scientific correctness.
 
-The first CI trial (run 35952637832) reproduced the August 31 manager exactly:
-603 structural checks, no differences in 408 shared data arrays, and all ten
-consumer checks. The merge takes about 20 minutes and 7.8 GiB peak memory.
+On 2026-09-26 the build reproduced the promoted September 24 manager's data
+exactly from the September 23 sections (0 of 408 arrays differing). The merge
+takes about 20 minutes and 7.8 GiB peak memory.
 
 ### Loading and rollback
 

@@ -7,6 +7,11 @@ on:
         description: 'Release tag to promote to latest (e.g. hiv-surveillance-manager-v2026.09.25)'
         required: true
         type: string
+      reviewed_removals:
+        description: 'I have reviewed this build''s structural removals and they are intended (only needed when the release says "Needs review")'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -17,6 +22,7 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       RELEASE_TAG: ${{ inputs.release_tag }}
+      REVIEWED_REMOVALS: ${{ inputs.reviewed_removals }}
       LATEST_TAG: hiv-surveillance-manager-latest
     steps:
       - name: Validate release exists
@@ -42,6 +48,15 @@ jobs:
             --dir _assets
           (cd _assets && sha256sum -c SHA256SUMS.txt)
           grep -q '  surveillance.manager.rdata$' _assets/SHA256SUMS.txt
+          # Builds flagged for review need explicit confirmation. Baseline
+          # snapshots have no build status and are promoted as recorded.
+          if [[ -f _assets/build_status.json ]] && \
+             [[ "$(jq -r '.needs_review' _assets/build_status.json)" == "true" ]] && \
+             [[ "$REVIEWED_REMOVALS" != "true" ]]; then
+            echo "ERROR: $RELEASE_TAG removes structure present in the promoted manager."
+            echo "Review its release notes, then re-run with the review box ticked."
+            exit 1
+          fi
           echo "Downloaded assets:"
           ls -lh _assets/
 
