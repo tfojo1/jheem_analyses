@@ -40,7 +40,8 @@ if (is.null(JHEEM.CACHE.DIR)) {
 #' @param offline If TRUE, having a missing or out of date data manager will not trigger a download from the internet. Use if offline to avoid errors.
 #' @param release.tag Optional GitHub Release tag. Immutable version tags are
 #' recommended; the configured latest alias is resolved to its promoted version.
-#' When omitted, the existing latest-manager behavior is unchanged.
+#' When omitted, GitHub-backed managers follow their latest alias: it is resolved
+#' to its promoted version, which is downloaded, verified, and cached the same way.
 load.data.manager.from.cache <- function(file, set.as.default = F, offline=F,
                                          release.tag = NULL) {
     error.prefix <- "Cannot load.data.manager.from.cache(): "
@@ -68,8 +69,9 @@ load.data.manager.from.cache <- function(file, set.as.default = F, offline=F,
 #' @title Get the Release Identity of a Loaded Data Manager
 #' @description
 #' Returns the release tag, repository, asset, digest, and local cache path for a
-#' data manager loaded with an explicit `release.tag`. Returns NULL for managers
-#' loaded through the legacy or latest-manager paths.
+#' data manager loaded from GitHub Releases, whether through its latest alias or an
+#' explicit `release.tag`. Returns NULL for managers loaded through the legacy
+#' OneDrive path or an unverified local copy.
 #' @param data.manager A loaded JHEEM data manager.
 get.data.manager.resolution <- function(data.manager) {
     attr(data.manager, "jheem.manager.resolution", exact = TRUE)
@@ -374,8 +376,11 @@ cached.release.is.valid <- function(paths, resolution) {
     required <- c("schema_version", "manager", "repository", "requested_tag",
                   "resolved_tag", "asset", "sha256", "published_at")
     if (is.null(cached) || !all(required %in% names(cached))) return(FALSE)
-    expected <- unlist(resolution[required], use.names = TRUE)
-    actual <- unlist(cached[required], use.names = TRUE)
+    # A release is identified by what it is, not how it was requested: a version
+    # fetched through the latest alias is reused when requested by its own tag.
+    identity <- setdiff(required, "requested_tag")
+    expected <- unlist(resolution[identity], use.names = TRUE)
+    actual <- unlist(cached[identity], use.names = TRUE)
     if (!identical(as.character(actual), as.character(expected))) return(FALSE)
     identical(tolower(sha256.file(paths$artifact)), tolower(resolution$sha256))
 }
@@ -483,118 +488,95 @@ load.data.manager.from.github.release <- function(file, gh.source, release.tag,
     invisible(data.manager)
 }
 
+# The configured latest alias is resolved to its promoted immutable release, which
+# is downloaded, verified, and cached exactly as an explicit release.tag would be.
+# A small pointer records the last verified version for offline use, and the
+# legacy cached/<file> copy is kept in sync for scripts that load it directly.
 load.data.manager.from.github <- function(file, gh.source, set.as.default, offline, error.prefix) {
-    local.path <- file.path(JHEEM.CACHE.DIR, file)
-    version.file <- paste0(local.path, ".version")
-    lock.file <- paste0(local.path, ".lock")
-
-    # Offline mode: skip all network checks
-    if (file.exists(local.path) && offline) {
-        return(load.data.manager(local.path, set.as.default = set.as.default))
-    }
-    if (!file.exists(local.path) && offline) {
-        stop(paste0(error.prefix, "File not found, and cannot download if 'offline' is set to TRUE"))
-    }
-
-    # Check remote version before acquiring lock (fast, read-only)
-    remote.version <- get.github.release.version(gh.source, error.prefix)
-    if (is.null(remote.version)) {
-        if (file.exists(local.path)) {
-            warning("Could not check GitHub for updates to '", file, "'. Using local copy.")
-            return(load.data.manager(local.path, set.as.default = set.as.default))
-        }
-        stop(paste0(error.prefix, "File not found locally and could not reach GitHub to download it"))
+    resolution <- NULL
+    if (!offline) {
+        resolution <- tryCatch(
+            resolve.github.release.asset(file, gh.source, gh.source$latest_tag, error.prefix),
+            error = function(e) {
+                warning("Could not check GitHub for updates to '", file, "' (",
+                        conditionMessage(e), "). Using the last downloaded version.",
+                        call. = FALSE)
+                NULL
+            })
     }
 
-    local.version <- if (file.exists(version.file)) trimws(readLines(version.file, n = 1)) else NULL
-    needs.update <- !file.exists(local.path) || is.null(local.version) || local.version != remote.version
-
-    if (needs.update) {
-        # Acquire exclusive lock — if another process is downloading, we wait here
-        lck <- filelock::lock(lock.file, timeout = 300000)
-        if (is.null(lck)) {
-            stop(paste0(error.prefix, "Could not acquire lock to download '", file, "' (timed out after 5 minutes)"))
-        }
-        on.exit(filelock::unlock(lck), add = TRUE)
-
-        # Re-check after acquiring lock — another process may have finished the download
-        local.version <- if (file.exists(version.file)) trimws(readLines(version.file, n = 1)) else NULL
-        if (file.exists(local.path) && !is.null(local.version) && local.version == remote.version) {
-            cat(file, "is up to date (", local.version, ") — updated by another process\n")
-        } else {
-            if (!is.null(local.version)) {
-                cat("Updating ", file, " (", local.version, " -> ", remote.version, ")...\n", sep = "")
-            } else if (file.exists(local.path)) {
-                cat("Updating ", file, " (unknown local version -> ", remote.version, ")...\n", sep = "")
-            } else {
-                cat(file, "not found locally. Downloading from GitHub Release...\n")
+    use.cached <- is.null(resolution)
+    if (use.cached) {
+        resolution <- read.current.github.release(file, gh.source, error.prefix)
+        if (is.null(resolution)) {
+            legacy.path <- file.path(JHEEM.CACHE.DIR, file)
+            if (file.exists(legacy.path)) {
+                warning("Loading unverified local copy '", legacy.path,
+                        "'; its release version is unknown.", call. = FALSE)
+                return(load.data.manager(legacy.path, set.as.default = set.as.default))
             }
-            download.data.manager.from.github.release(file, gh.source, error.prefix)
+            stop(paste0(error.prefix, "'", file, "' has not been downloaded yet, and ",
+                        if (offline) "'offline' is TRUE" else "GitHub could not be reached"))
         }
-    } else {
-        cat(file, "is up to date (", local.version, ")\n")
     }
 
-    load.data.manager(local.path, set.as.default = set.as.default)
+    local.path <- materialize.github.release.asset(resolution, use.cached, error.prefix)
+    if (!use.cached) write.current.github.release(resolution, error.prefix)
+    sync.legacy.cache.copy(file, local.path, resolution, error.prefix)
+    cat(file, "is", resolution$resolved_tag, "\n")
+
+    data.manager <- load.data.manager(local.path, set.as.default = set.as.default)
+    resolution$local_path <- normalizePath(local.path, mustWork = TRUE)
+    attr(data.manager, "jheem.manager.resolution") <- resolution
+    invisible(data.manager)
 }
 
-get.github.release.version <- function(gh.source, error.prefix) {
-    api.url <- paste0("https://api.github.com/repos/", gh.source$repo,
-                       "/releases/tags/", gh.source$latest_tag)
-    tryCatch({
-        resp <- httr2::request(api.url) |>
-            httr2::req_headers("Accept" = "application/vnd.github.v3+json",
-                               "User-Agent" = "jheem-cache-manager") |>
-            httr2::req_perform()
-        release.info <- jsonlite::fromJSON(httr2::resp_body_string(resp))
-        # Extract the source version tag from the release body
-        # The promotion workflow writes "**Promoted from:** `syphilis-manager-v2026.03.11`"
-        body <- release.info$body
-        promoted.match <- regmatches(body, regexpr("Promoted from:.*?`([^`]+)`", body, perl = TRUE))
-        if (length(promoted.match) == 1) {
-            return(gsub(".*`([^`]+)`.*", "\\1", promoted.match, perl = TRUE))
-        }
-        # Fallback: use the published_at timestamp as version identifier
-        release.info$published_at
-    }, error = function(e) {
-        NULL
-    })
+current.github.release.path <- function(file, error.prefix) {
+    manager <- validate.github.release.component(file, "manager name", error.prefix)
+    file.path(JHEEM.CACHE.DIR, "data-managers", manager, "current.json")
 }
 
-download.data.manager.from.github.release <- function(file, gh.source, error.prefix) {
-    local.path <- file.path(JHEEM.CACHE.DIR, file)
-    version.file <- paste0(local.path, ".version")
-    asset.name <- if (!is.null(gh.source$asset)) gh.source$asset else file
-
-    download.url <- paste0("https://github.com/", gh.source$repo,
-                           "/releases/download/", gh.source$latest_tag,
-                           "/", asset.name)
-
-    # Download to a temp file first, then atomically rename into place.
-    # This prevents other processes from reading a partially-written file.
-    tmp.path <- paste0(local.path, ".download.", Sys.getpid())
-    tryCatch({
-        resp <- httr2::request(download.url) |>
-            httr2::req_headers("User-Agent" = "jheem-cache-manager") |>
-            httr2::req_perform()
-        if (httr2::resp_status(resp) == 200) {
-            writeBin(httr2::resp_body_raw(resp), tmp.path)
-            file.rename(tmp.path, local.path)
-        } else {
-            stop("HTTP ", httr2::resp_status(resp))
-        }
-    }, error = function(e) {
-        unlink(tmp.path)
-        stop(paste0(error.prefix, "Failed to download '", file, "' from GitHub Release: ", e$message))
-    })
-
-    # Write the version sidecar
-    remote.version <- get.github.release.version(gh.source, error.prefix)
-    if (!is.null(remote.version)) {
-        writeLines(remote.version, version.file)
+write.current.github.release <- function(resolution, error.prefix) {
+    path <- current.github.release.path(resolution$manager, error.prefix)
+    temporary <- paste0(path, ".write.", Sys.getpid())
+    on.exit(unlink(temporary), add = TRUE)
+    write.release.resolution(resolution, temporary)
+    if (!file.rename(temporary, path)) {
+        stop(paste0(error.prefix, "Could not record the current release of '",
+                    resolution$manager, "'"))
     }
+}
 
-    cat("Downloaded", file, "from GitHub Release (", gh.source$latest_tag, ")\n")
+# Returns the last verified latest version, or NULL if none is cached and valid.
+read.current.github.release <- function(file, gh.source, error.prefix) {
+    current <- read.data.manager.resolution(current.github.release.path(file, error.prefix))
+    if (is.null(current) || is.null(current$resolved_tag)) return(NULL)
+    tryCatch(
+        get.cached.github.release.resolution(file, gh.source, current$resolved_tag, error.prefix),
+        error = function(e) NULL
+    )
+}
+
+# Scripts that load cached/<file> directly keep working. The .version sidecar
+# names the release the copy came from.
+sync.legacy.cache.copy <- function(file, verified.path, resolution, error.prefix) {
+    legacy.path <- file.path(JHEEM.CACHE.DIR, file)
+    version.path <- paste0(legacy.path, ".version")
+    current.version <- if (file.exists(version.path)) trimws(readLines(version.path, n = 1)) else ""
+    if (file.exists(legacy.path) && identical(current.version, resolution$resolved_tag) &&
+        identical(file.size(legacy.path), file.size(verified.path))) {
+        return(invisible(legacy.path))
+    }
+    temporary <- paste0(legacy.path, ".copy.", Sys.getpid())
+    on.exit(unlink(temporary), add = TRUE)
+    if (!file.copy(verified.path, temporary, overwrite = TRUE) ||
+        !file.rename(temporary, legacy.path)) {
+        warning("Could not update '", legacy.path, "'; scripts that load it directly ",
+                "may see an older version.", call. = FALSE)
+        return(invisible(NULL))
+    }
+    writeLines(resolution$resolved_tag, version.path)
+    invisible(legacy.path)
 }
 
 ## LEGACY ONEDRIVE FUNCTIONS ----

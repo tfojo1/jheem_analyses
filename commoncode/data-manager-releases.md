@@ -72,7 +72,15 @@ The load succeeds only if the saved release metadata and artifact digest both
 validate. A missing, incomplete, or modified cache is an error; the loader does
 not fall back to a different release.
 
-The mutable `syphilis-manager-latest` alias requires network access to resolve
-to its promoted immutable tag. Prefer the immutable tag for recorded runs and
-offline work. Omitting `release.tag` remains the supported way to follow the
-current promoted manager.
+Passing a mutable `*-latest` alias as `release.tag` requires network access to
+resolve it to its promoted immutable tag. Prefer the immutable tag for recorded
+runs and offline work.
+
+Omitting `release.tag` remains the supported way to follow the current promoted
+manager. That route resolves the alias the same way, downloads and verifies the
+promoted version into the same per-version cache, and records it in
+`cached/data-managers/<manager>/current.json`. When GitHub can't be reached, or
+with `offline = TRUE`, it loads that last verified version. It also keeps the
+older `cached/<manager>` copy, with a `.version` file naming its release, up to
+date for scripts that load that path directly. `get.data.manager.resolution()`
+returns the resolved release for managers loaded either way.
