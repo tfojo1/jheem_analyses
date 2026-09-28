@@ -12,7 +12,8 @@
 #       ssh username@10.253.170.89  (SHIELD2)
 #
 #   Monitor overall progress:
-#       tail -f /home/jheem-shared/logs/launcher_multiChain_<user>.out
+#       ls -lt /home/jheem-shared/logs/launcher_multiChain_*.out   # newest first
+#       tail -f /home/jheem-shared/logs/<the file you want>
 #
 #   Check a specific city+calibration code log:
 #       tail -f /home/jheem-shared/logs/<loc>_<calib_code>_setup.out
@@ -54,12 +55,22 @@ umask 002   # new log files stay group-readable for the other members
 # command carries no path of its own and cannot drift away from LOG_DIR.
 #   1. Launch with:  nohup bash <this script> > /dev/null 2>&1 &
 #      The > /dev/null only stops nohup from creating an empty nohup.out.
-#   2. Watch with:   tail -f $LOG_DIR/launcher_multiChain_<user>.out
+#   2. Find a run:   ls -lt $LOG_DIR/launcher_multiChain_*.out
+#      Watch it:     tail -f $LOG_DIR/<the file you want>
 #   3. Run in the foreground and the output stays on your screen instead; the
 #      guard below only redirects when stdout is not a terminal.
 #   4. TO REVERT: comment the exec line and put the redirect back on the launch
 #      command:  nohup bash <this script> > applications/SHIELD/logs/launcher.out 2>&1 &
-[[ -t 1 ]] || exec > "$LOG_DIR/launcher_multiChain_${USER:-$(id -un)}.out" 2>&1
+# ── this launch's identity ────────────────────────────────────────────────────
+# RUN_ID stamps the user and the launch time onto the launcher-level files, so a
+# new launch never overwrites a file that a previous, still-running launch is
+# still using. List them newest first to find the run you want:
+#   ls -lt $LOG_DIR/launcher_multiChain_*.out
+# TO REVERT: comment RUN_ID and the exec line below it, then uncomment the
+# previous exec line.
+RUN_ID="${USER:-$(id -un)}_$(date +%Y%m%d_%H%M%S)"
+# [[ -t 1 ]] || exec > "$LOG_DIR/launcher_multiChain_${USER:-$(id -un)}.out" 2>&1   # previous: one file per user, truncated by each launch
+[[ -t 1 ]] || exec > "$LOG_DIR/launcher_multiChain_${RUN_ID}.out" 2>&1
 
 # ── shared helpers ─────────────────────────────────────────────────────────────
 source "$SCRIPT_DIR/_shield_slots.sh"

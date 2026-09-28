@@ -25,8 +25,9 @@ calibration.codes <- c(
     # "calib.8.21.stage3.az",   # completed for 10 cities
     # calib.9.19.stage1 #after big revisions, ny didnt mix so we had to change global.trate
     
-    "calib.9.23.stage1" #compelted for 9 cities (not nyc); houston not mixing well
-    
+    # "calib.9.23.stage1" #compelted for 9 cities (not nyc); houston not mixing well
+    # "calib.9.23.stage2"
+    "calib.9.23.stage3.pk"
 )
 
 # for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.16.stage2.az"))}
@@ -35,8 +36,8 @@ calibration.codes <- c(
 calib.simsets <- load.calib.simsets(
     locations         =  SHIELD.TEN.MSAS,
     calibration.codes = calibration.codes,
-    n.sim = 300
-    # n.sim = 400
+    # n.sim = 300
+    n.sim = 400
 )
 
 # ****************************************************************************************************
@@ -55,7 +56,7 @@ inspect_mixing (
 # >> Save summary plots for a calibration version (compares the fit accross all cities)
 # ****************************************************************************************************
 # calib.name="calib.8.21.stage3.az"
-calib.name="calib.9.19.stage3"
+calib.name="calib.9.23.stage2"
 omit.data.years=2022:2024
 if(1==1){
     # 1-compare accross various locations ----

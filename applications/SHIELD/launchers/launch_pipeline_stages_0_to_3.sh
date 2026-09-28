@@ -12,7 +12,8 @@
 #       ssh username@10.253.170.89  (SHIELD2)
 #
 #   Monitor overall progress:
-#       tail -f /home/jheem-shared/logs/launcher_pipeline_<user>.out
+#       ls -lt /home/jheem-shared/logs/launcher_pipeline_*.out   # newest first
+#       tail -f /home/jheem-shared/logs/<the file you want>
 #
 #   Check a specific city+calibration code log:
 #       tail -f /home/jheem-shared/logs/<loc>_<calib_code>.out
@@ -62,15 +63,31 @@ umask 002   # new log files stay group-readable for the other members
 # command carries no path of its own and cannot drift away from LOG_DIR.
 #   1. Launch with:  nohup bash <this script> > /dev/null 2>&1 &
 #      The > /dev/null only stops nohup from creating an empty nohup.out.
-#   2. Watch with:   tail -f $LOG_DIR/launcher_pipeline_<user>.out
+#   2. Find a run:   ls -lt $LOG_DIR/launcher_pipeline_*.out
+#      Watch it:     tail -f $LOG_DIR/<the file you want>
 #   3. Run in the foreground and the output stays on your screen instead; the
 #      guard below only redirects when stdout is not a terminal.
 #   4. TO REVERT: comment the exec line and put the redirect back on the launch
 #      command:  nohup bash <this script> > applications/SHIELD/logs/launcher.out 2>&1 &
-[[ -t 1 ]] || exec > "$LOG_DIR/launcher_pipeline_${USER:-$(id -un)}.out" 2>&1
+# ── this launch's identity ────────────────────────────────────────────────────
+# RUN_ID stamps the user and the launch time onto the launcher-level files, so a
+# new launch never overwrites a file that a previous, still-running launch is
+# still using. List them newest first to find the run you want:
+#   ls -lt $LOG_DIR/launcher_pipeline_*.out
+# TO REVERT: comment RUN_ID and the exec line below it, then uncomment the
+# previous exec line.
+RUN_ID="${USER:-$(id -un)}_$(date +%Y%m%d_%H%M%S)"
+# [[ -t 1 ]] || exec > "$LOG_DIR/launcher_pipeline_${USER:-$(id -un)}.out" 2>&1   # previous: one file per user, truncated by each launch
+[[ -t 1 ]] || exec > "$LOG_DIR/launcher_pipeline_${RUN_ID}.out" 2>&1
 
-FAILED_CITIES_LOG="$LOG_DIR/phase1_failed_cities.txt"
-: > "$FAILED_CITIES_LOG"   # truncate/create fresh at start of each run
+# Phase 1 records failed cities here and phase 2 reads it back to decide what to
+# skip, so this file is state, not a log. It carries RUN_ID because a second
+# launch used to truncate the list a still-running launch was depending on -
+# which made that older run stop skipping its own failed cities.
+# TO REVERT: uncomment the line below and comment the RUN_ID one under it.
+# FAILED_CITIES_LOG="$LOG_DIR/phase1_failed_cities.txt"   # previous: one file shared by every launch
+FAILED_CITIES_LOG="$LOG_DIR/phase1_failed_cities_${RUN_ID}.txt"
+: > "$FAILED_CITIES_LOG"   # create fresh for this launch
 
 # ── shared helpers ─────────────────────────────────────────────────────────────
 source "$SCRIPT_DIR/_shield_slots.sh"
@@ -106,7 +123,9 @@ CITIES=("${ten_cities[@]}")
 # code, so the OS fully reclaims memory between them).
 SEQ_SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
 SEQ_CALIBRATION_CODES=(
-    calib.7.5.stage2.az
+    calib.9.28.stage0
+    calib.9.28.stage1
+    calib.9.28.stage2
 )
 # SEQ_MAX_CITIES = max cities in flight in phase 1 (1 core each) -> peak cores = SEQ_MAX_CITIES.
 SEQ_MAX_CITIES=20
@@ -114,9 +133,9 @@ SEQ_MAX_CITIES=20
 # Phase 2: parallel, multi-chain stage3.
 PAR_SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
 PAR_CALIBRATION_CODES=(
-    calib.7.5.stage3.az
+    calib.9.28.stage3
 )
-N_CHAINS=4
+N_CHAINS=0
 # PAR_MAX_CITIES = max cities in flight in phase 2. Each holds N_CHAINS cores, so
 # peak cores = PAR_MAX_CITIES x N_CHAINS (5 x 4 = 20).
 PAR_MAX_CITIES=5
