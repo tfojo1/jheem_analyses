@@ -62,8 +62,15 @@ loads; only the **Promote HIV Surveillance Manager** workflow moves
   promoted manager but not the candidate) don't fail the build. They mark it
   **Needs review**: the release is a pre-release, its notes list the removals, and
   the promote workflow refuses it unless the review box is ticked.
-- **Additions and value changes** are reported in `active_baseline_report.json` and
-  `CANDIDATE.md`. They're expected whenever data or processing changes.
+- **Additions and value changes** are itemized in `CANDIDATE.md` (the release
+  notes): each structural change by path, and a table of changed arrays with the
+  locations, years, and strata that changed. `active_baseline_report.json` keeps
+  the full detail. They're expected whenever data or processing changes.
+- **Data quality:** `quality_report.R` runs the shared missing-value, dimension,
+  and marginal-consistency checks used by the syphilis build and adds them to the
+  notes. It's informational and never fails a build. `known_issues.json` lists
+  reviewed patterns to suppress; it starts with the two patterns already accepted
+  for the syphilis manager.
 - **Consumers:** `consumer_report.json` checks eight Ryan White year-series
   queries (four outcomes in Texas and California), EHE's national stratified
   prevalence pull, and the actual syphilis adult-population transfer into an
@@ -99,9 +106,10 @@ Run from the repository root:
 Rscript data_processing/hiv.surveillance.manager/test_merge_paths.R
 Rscript data_processing/hiv.surveillance.manager/test_manager_value_delta.R
 Rscript data_processing/hiv.surveillance.manager/test_manager_reproduction.R
+Rscript data_processing/hiv.surveillance.manager/test_summarize_candidate.R
 Rscript data_processing/hiv.surveillance.manager/validate_candidate.R baseline.rdata candidate.rdata report.json
 Rscript data_processing/hiv.surveillance.manager/check_consumers.R candidate.rdata active-baseline.rdata syphilis.rdata consumers.json
 ```
 
-The first three use synthetic inputs; the last two require real artifacts.
+The first four use synthetic inputs; the last two require real artifacts.
 Neither changes the input files or scientific transformation code.

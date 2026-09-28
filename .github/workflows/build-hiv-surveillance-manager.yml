@@ -97,6 +97,7 @@ jobs:
           Rscript data_processing/hiv.surveillance.manager/test_merge_paths.R
           Rscript data_processing/hiv.surveillance.manager/test_manager_value_delta.R
           Rscript data_processing/hiv.surveillance.manager/test_manager_reproduction.R
+          Rscript data_processing/hiv.surveillance.manager/test_summarize_candidate.R
 
       - name: Download and verify section inputs
         run: |
@@ -218,6 +219,15 @@ jobs:
             _ci_outputs/consumer_report.json \
             2>&1 | tee _ci_outputs/consumer_summary.txt
 
+      - name: Data quality report
+        # Informational, like the syphilis build's report; never fails the build.
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          Rscript data_processing/hiv.surveillance.manager/quality_report.R \
+            _ci_outputs/surveillance.manager.rdata \
+            _ci_outputs/quality_report.txt 2>&1 | tee _ci_outputs/quality_summary.txt
+
       - name: Summarize candidate for review
         run: |
           set -euo pipefail
@@ -253,11 +263,13 @@ jobs:
           mkdir -p _release
           cp _ci_outputs/surveillance.manager.rdata _ci_outputs/CANDIDATE.md \
             _ci_outputs/input_identity.txt _ci_outputs/build_status.json _release/
-          tar -czf _release/validation-evidence.tar.gz -C _ci_outputs \
-            CANDIDATE.md input_identity.txt build_status.json session_info.txt build_log.txt \
-            resource_metrics.txt disk_before.txt disk_after.txt candidate_sha256.txt \
-            active_baseline_report.json active_baseline_summary.txt \
-            consumer_report.json consumer_summary.txt
+          EVIDENCE=(CANDIDATE.md input_identity.txt build_status.json session_info.txt build_log.txt
+            resource_metrics.txt disk_before.txt disk_after.txt candidate_sha256.txt
+            active_baseline_report.json active_baseline_summary.txt
+            consumer_report.json consumer_summary.txt)
+          # The informational quality report is included when it was produced.
+          [[ -f _ci_outputs/quality_report.txt ]] && EVIDENCE+=(quality_report.txt quality_summary.txt)
+          tar -czf _release/validation-evidence.tar.gz -C _ci_outputs "${EVIDENCE[@]}"
           (cd _release && sha256sum surveillance.manager.rdata CANDIDATE.md input_identity.txt \
             build_status.json validation-evidence.tar.gz > SHA256SUMS.txt)
 
