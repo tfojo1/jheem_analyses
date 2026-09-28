@@ -62,6 +62,7 @@ umask 002   # new log files stay group-readable for the other members
 
 # ── shared helpers ─────────────────────────────────────────────────────────────
 source "$SCRIPT_DIR/_shield_slots.sh"
+SCRIPT="$PARENT_DIR/intervention/intervention_run.R"
 
 # ── thread settings ────────────────────────────────────────────────────────────
 export OPENBLAS_NUM_THREADS=1
@@ -91,23 +92,20 @@ shield3=(
       C.12060 C.12580 C.16980 C.26420 C.31080
     C.33100 C.37980 C.38060 
 )
-
 # ── set active cities and calibration codes here ───────────────────────────────
 CITIES=("${shield3[@]}")
 
+# MAX_JOBS = max concurrent Rscript processes on this machine (1 core each).
+MAX_JOBS=32
+
 CALIBRATION_CODES=(
     calib.9.23.stage3.pk
-
 )
 
 N_SIM=400
 FIRST_YEAR=2000
 LAST_YEAR=2040
 
-SCRIPT="$PARENT_DIR/intervention/intervention_run.R"
-
-# MAX_JOBS = max concurrent Rscript processes on this machine (1 core each).
-MAX_JOBS=32
 
 # ── preflight ──────────────────────────────────────────────────────────────────
 if [[ ! -f "$SCRIPT" ]]; then
