@@ -29,20 +29,19 @@ if (!exists("JHEEM.ANALYSES.PATH")) {
     JHEEM.ANALYSES.PATH <- .d
     rm(.arg, .ofile, .d)
 }
-SHIELD.DIR <- file.path(JHEEM.ANALYSES.PATH, "applications", "SHIELD")
-cat("Repo root:", JHEEM.ANALYSES.PATH, "\n")
 
-source(file.path(SHIELD.DIR, "shield_specification.R"))
+cat("Repo root:", JHEEM.ANALYSES.PATH, "\n")
 source(file.path(JHEEM.ANALYSES.PATH, "commoncode", "locations_of_interest.R"))
-source(file.path(SHIELD.DIR, "intervention", "intervention_definitions.R"))
+source(file.path(JHEEM.ANALYSES.PATH, "applications", "SHIELD", "shield_specification.R"))
+source(file.path(JHEEM.ANALYSES.PATH, "applications", "SHIELD", "intervention", "intervention_definitions.R"))
+
+
 # source("../jheem_analyses/applications/SHIELD/intervention/intervention_helper_functions.R")
 
 # *****************************************************************************
 # SECTION 1: Configuration
 # *****************************************************************************
 # LOCATIONS        <- SHIELD.TEN.MSAS    # Named vector: names = city, values = codes
-
-
 # CALIBRATION.CODE <- "calib.6.16.stage3.az"  
 # N.SIM <- 300
 # FIRST.YEAR <- 2000
@@ -50,16 +49,21 @@ source(file.path(SHIELD.DIR, "intervention", "intervention_definitions.R"))
 
 INTERVENTION.LABELS <- c(
     noint        = "No Doxy-PEP Intervention",
+    doxy.cov.5   = "coverage 5%",
     doxy.cov.10   = "coverage 10%",
+    doxy.cov.15   = "coverage 15%",
     doxy.cov.20   = "coverage 20%",
+    doxy.cov.25   = "coverage 25%",
     doxy.cov.30   = "coverage 30%",
+    doxy.cov.35   = "coverage 35%",
     doxy.cov.40   = "coverage 40%",
-    doxy.cov.50   = "coverage 50%",
-    doxy.cov.60   = "coverage 60%",
-    doxy.cov.70   = "coverage 70%",
-    doxy.cov.80   = "coverage 80%",
-    doxy.cov.90   = "coverage 90%",
-    doxy.cov.100  = "coverage 100%"
+    doxy.cov.45   = "coverage 45%",
+    doxy.cov.50   = "coverage 50%"
+    # doxy.cov.60   = "coverage 60%",
+    # doxy.cov.70   = "coverage 70%",
+    # doxy.cov.80   = "coverage 80%",
+    # doxy.cov.90   = "coverage 90%",
+    # doxy.cov.100  = "coverage 100%"
 )
 INTERVENTION.CODES <- names(INTERVENTION.LABELS)
 

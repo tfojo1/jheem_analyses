@@ -87,16 +87,16 @@ all_except_ten_cities=(
     C.26900 C.17140 C.18140 C.12940 C.40900 C.17460
 )
 
-all_ten_except_chicago=(
-    C.12060 C.12580 C.26420 C.31080
-    C.33100 C.35620 C.37980 C.38060 C.42660
+shield3=(
+      C.12060 C.12580 C.16980 C.26420 C.31080
+    C.33100 C.37980 C.38060 
 )
 
 # ── set active cities and calibration codes here ───────────────────────────────
-CITIES=("${ten_cities[@]}")
+CITIES=("${shield3[@]}")
 
 CALIBRATION_CODES=(
-    calib.8.10.stage3.v1
+    calib.9.23.stage3.pk
 
 )
 
@@ -107,7 +107,7 @@ LAST_YEAR=2040
 SCRIPT="$PARENT_DIR/intervention/intervention_run.R"
 
 # MAX_JOBS = max concurrent Rscript processes on this machine (1 core each).
-MAX_JOBS=20
+MAX_JOBS=32
 
 # ── preflight ──────────────────────────────────────────────────────────────────
 if [[ ! -f "$SCRIPT" ]]; then

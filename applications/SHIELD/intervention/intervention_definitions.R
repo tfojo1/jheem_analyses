@@ -4,7 +4,9 @@ source("../jheem_analyses/applications/SHIELD/intervention/doxy_effectiveness.R"
 # the population is defined as the whole population here, but in the code it only applies to MSM
 WHOLE.POPULATION = create.target.population(name = 'Whole Population') 
 
-# Generate 1,000 simulated relative risk values
+# # Generate 1,000 plausible RR values using the reported estimate from DoxyPEP trial
+# #     RR = 0.20 (relative risk)
+# #     95% CI = 0.08–0.48
 doxy_rr_draws <- draw_rr_lognorm(
     n          = 1000,
     rr_mean    = 0.20,
@@ -14,6 +16,7 @@ doxy_rr_draws <- draw_rr_lognorm(
 )
 # Convert RR to doxy-PEP efficacy
 doxy_effectiveness_1000 <- 1 - doxy_rr_draws
+# hist(doxy_effectiveness_1000)
 
 DOXY.PARAMS <- matrix(doxy_effectiveness_1000,
                       nrow = 1,
