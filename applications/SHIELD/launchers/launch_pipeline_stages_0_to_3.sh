@@ -117,7 +117,7 @@ all_except_ten_cities=(
 )
 
 # ── set active cities and calibration codes here ───────────────────────────────
-CITIES=("${ten_cities[@]}")
+CITIES=(C.42660)
 
 # Phase 1: sequential, single-chain calibration codes (one Rscript process per
 # code, so the OS fully reclaims memory between them).
