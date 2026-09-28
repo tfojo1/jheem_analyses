@@ -74,6 +74,81 @@ gh workflow run "Promote Syphilis Manager" \
 This copies the manager to `syphilis-manager-latest`, which provides a
 stable download URL for the team.
 
+## HIV Surveillance Manager
+
+The HIV surveillance manager uses the same steps, with its own script and
+workflows. The merge step (aggregation, outliers, Oakland additions) runs in CI,
+so there's no need to run `hiv.surveillance.manager.merge.R` locally.
+
+1. **Rebuild sections locally** as usual (they save to `Q:/data_managers/data.manager.merge/`).
+2. **Upload them:**
+
+   ```bash
+   Rscript scripts/upload_hiv_sections.R Q:                       # Windows
+   Rscript scripts/upload_hiv_sections.R /mnt/jheem_nas_share     # Linux (shield1)
+   Rscript scripts/upload_hiv_sections.R /Volumes/jheem$          # macOS
+   ```
+
+   This uploads all 5 section files as a dated release (e.g. `hiv-sections-v2026.09.25`)
+   and points `hiv-sections-latest` at it. Add `--dry-run` to check the files first.
+
+3. **Build:** go to **Actions > Build HIV Surveillance Manager > Run workflow**, or:
+
+   ```bash
+   gh workflow run "Build HIV Surveillance Manager" --repo tfojo1/jheem_analyses
+   ```
+
+   The inputs work like the syphilis build: sections (default `hiv-sections-latest`),
+   raw data (`data-raw-latest`), dependencies (`data-managers-latest`, for the census
+   manager), and the jheem2 ref (`dev`). Change any of them to build from a specific
+   release or branch. Whatever you choose, the release notes record the exact
+   version and SHA-256 of every input.
+
+   A successful build publishes a release like `hiv-surveillance-manager-v2026.09.25`.
+   Its notes compare the new manager with the current `latest`: structural checks,
+   which values changed, and whether common queries (Ryan White, EHE, the syphilis
+   adult-population import) still work. Expected changes, such as a fix you just
+   made, show up as changed values. If the build *removes* something the current
+   manager has (an outcome, source, or stratification), the release is marked
+   **Needs review** and listed as a pre-release. The build fails only if the merge
+   itself errors or a common query stops working. Runs from branches other than
+   `master` check everything but don't publish.
+
+4. **Promote:** after reviewing the notes,
+
+   ```bash
+   gh workflow run "Promote HIV Surveillance Manager" \
+     --repo tfojo1/jheem_analyses \
+     -f release_tag=hiv-surveillance-manager-v2026.09.25
+   ```
+
+   This copies the build to `hiv-surveillance-manager-latest`. The next time anyone
+   sources `source_code.R`, their `SURVEILLANCE.MANAGER` updates automatically,
+   the same way the syphilis manager does. For a **Needs review** build, tick the
+   review box (or add `-f reviewed_removals=true`) once you've confirmed the
+   removals are intended.
+
+5. **Refresh the shared copy.** Syphilis section builds and the syphilis merge read
+   the HIV manager from `Q:/data_managers/`, and CI doesn't write there:
+
+   ```bash
+   gh release download hiv-surveillance-manager-latest --repo tfojo1/jheem_analyses \
+     --pattern surveillance.manager.rdata --dir Q:/data_managers --clobber
+   ```
+
+   If syphilis CI builds should use this version too, re-run `upload_manager_deps.R`.
+   `data_processing/QA/sync cached data manager.R` is no longer needed for HIV.
+
+To load a specific earlier version (for example, to roll back one analysis):
+
+```r
+SURVEILLANCE.MANAGER <- load.data.manager.from.cache(
+  "surveillance.manager.rdata", set.as.default = TRUE,
+  release.tag = "hiv-surveillance-manager-v2026.09.25")
+```
+
+More detail on the HIV checks: `data_processing/hiv.surveillance.manager/README.md`.
+
 ## Uploading New Raw Data
 
 When new data files are added to the NAS:
@@ -101,6 +176,7 @@ Rscript scripts/upload_manager_deps.R /mnt/jheem_nas_share
 |--------|----------------|-------------|
 | `upload_sections.R` | 4 section .rdata files | `syphilis-sections-latest` (mutable) |
 | `upload_raw_data.R` | All of `data_raw/` (per-subdir archives) | `data-raw-v{date}` (immutable) |
+| `upload_hiv_sections.R` | 5 HIV section .rdata files + `SHA256SUMS.txt` | `hiv-sections-v{date}` (immutable) and `hiv-sections-latest` (mutable) |
 | `upload_manager_deps.R` | surveillance + census managers + strat results | `data-managers-v{date}` (immutable) |
 
 All scripts take the NAS root as their first argument and require the `gh` CLI.

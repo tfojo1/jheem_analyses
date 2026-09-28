@@ -1,0 +1,304 @@
+name: Build HIV Surveillance Manager
+
+on:
+  workflow_dispatch:
+    inputs:
+      sections_release_tag:
+        description: 'Release tag for section files'
+        required: true
+        default: 'hiv-sections-latest'
+        type: string
+      raw_data_release_tag:
+        description: 'Release tag for raw data (county-to-county movement)'
+        required: true
+        default: 'data-raw-latest'
+        type: string
+      deps_release_tag:
+        description: 'Release tag for manager dependencies (census manager)'
+        required: true
+        default: 'data-managers-latest'
+        type: string
+      jheem2_ref:
+        description: 'jheem2 branch, tag, or commit to use'
+        required: false
+        default: 'dev'
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  REPO: tfojo1/jheem_analyses
+  LATEST_MANAGER_TAG: hiv-surveillance-manager-latest
+  # Consumer check: the syphilis source registry used by the adult-population import.
+  SYPHILIS_CONSUMER_TAG: syphilis-manager-latest
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SECTIONS_RELEASE: ${{ inputs.sections_release_tag }}
+      RAW_RELEASE: ${{ inputs.raw_data_release_tag }}
+      DEPS_RELEASE: ${{ inputs.deps_release_tag }}
+      JHEEM2_REF: ${{ inputs.jheem2_ref }}
+
+    steps:
+      - name: Checkout analyses
+        uses: actions/checkout@v4
+
+      - name: Check inputs
+        run: |
+          set -euo pipefail
+          [[ "$SECTIONS_RELEASE" =~ ^hiv-sections-[a-zA-Z0-9._-]+$ ]]
+          [[ "$RAW_RELEASE" =~ ^data-raw-[a-zA-Z0-9._-]+$ ]]
+          [[ "$DEPS_RELEASE" =~ ^data-managers-[a-zA-Z0-9._-]+$ ]]
+
+      - name: Checkout jheem2
+        uses: actions/checkout@v4
+        with:
+          repository: CIPHER-Epi/jheem2
+          ref: ${{ inputs.jheem2_ref }}
+          path: _jheem2
+
+      - name: Checkout locations
+        uses: actions/checkout@v4
+        with:
+          repository: tfojo1/locations
+          path: _locations
+
+      - name: Provide the sibling jheem2 path used by aggregation
+        run: ln -s "$GITHUB_WORKSPACE/_jheem2" "$GITHUB_WORKSPACE/../jheem2"
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.4.2'
+          use-public-rspm: true
+
+      - name: Install system and R dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev time
+          Rscript -e '
+            install.packages(c("remotes", "jsonlite", "digest", "httr2", "readxl", "dplyr",
+                               "stringr", "tidyr", "purrr", "haven", "tidyverse"))
+            remotes::install_local("_locations", upgrade = "never")
+            remotes::install_local("_jheem2", upgrade = "never")
+            needed <- c("jheem2", "locations", "jsonlite", "digest", "httr2", "readxl",
+                        "dplyr", "stringr", "tidyr", "purrr", "haven", "tidyverse")
+            missing <- needed[!vapply(needed, requireNamespace, logical(1), quietly = TRUE)]
+            if (length(missing)) stop("Missing merge packages: ", paste(missing, collapse = ", "))
+          '
+
+      - name: Verify merge path contract
+        run: |
+          Rscript data_processing/hiv.surveillance.manager/test_merge_paths.R
+          Rscript data_processing/hiv.surveillance.manager/test_manager_value_delta.R
+          Rscript data_processing/hiv.surveillance.manager/test_manager_reproduction.R
+
+      - name: Download and verify section inputs
+        run: |
+          set -euo pipefail
+          mkdir -p _ci_inputs/sections _ci_outputs
+          gh release download "$SECTIONS_RELEASE" --repo "$REPO" --dir _ci_inputs/sections
+          # Require exactly the five intended input files, each with a digest.
+          Rscript -e '
+            lines <- readLines("_ci_inputs/sections/SHA256SUMS.txt")
+            stopifnot(length(lines) == 5L,
+                      all(grepl("^[0-9a-f]{64}  surveillance[.]manager_section[1-5][.]rdata$", lines)),
+                      !anyDuplicated(sub("^[0-9a-f]{64}  ", "", lines)))
+          '
+          (cd _ci_inputs/sections && sha256sum -c SHA256SUMS.txt)
+
+          # A mutable pointer must name a dated snapshot with the same manifest.
+          SNAPSHOT="$SECTIONS_RELEASE"
+          if [[ "$SECTIONS_RELEASE" == *latest* ]]; then
+            SNAPSHOT=$(gh release view "$SECTIONS_RELEASE" --repo "$REPO" --json body -q .body \
+              | sed -n 's/^\*\*Snapshot:\*\* `\([^`]*\)`.*/\1/p' | head -1)
+            [[ "$SNAPSHOT" =~ ^hiv-sections-[a-zA-Z0-9._-]+$ && "$SNAPSHOT" != *latest* ]]
+            mkdir -p _ci_inputs/snapshot
+            gh release download "$SNAPSHOT" --repo "$REPO" --pattern SHA256SUMS.txt --dir _ci_inputs/snapshot
+            cmp _ci_inputs/sections/SHA256SUMS.txt _ci_inputs/snapshot/SHA256SUMS.txt
+          fi
+          echo "SECTIONS_SNAPSHOT=$SNAPSHOT" >> "$GITHUB_ENV"
+
+      - name: Download and verify raw data, dependencies, and regression baseline
+        run: |
+          set -euo pipefail
+          mkdir -p _ci_inputs/raw _ci_inputs/deps _ci_inputs/active _ci_inputs/consumer
+
+          # GitHub publishes a SHA-256 digest for each release asset; check downloads against it.
+          download_verified() {  # <tag> <asset> <dir>
+            local digest
+            digest=$(gh api "repos/$REPO/releases/tags/$1" \
+              --jq ".assets[] | select(.name == \"$2\") | .digest" | sed 's/^sha256://')
+            [[ "$digest" =~ ^[0-9a-f]{64}$ ]] || { echo "No digest for $2 in $1"; exit 1; }
+            gh release download "$1" --repo "$REPO" --pattern "$2" --dir "$3"
+            echo "$digest  $3/$2" | sha256sum -c -
+          }
+
+          download_verified "$RAW_RELEASE" data-raw-movement.tar.gz _ci_inputs/raw
+          tar -xzf _ci_inputs/raw/data-raw-movement.tar.gz -C _ci_inputs/raw \
+            --no-same-owner --no-same-permissions \
+            data_raw/movement/county.to.county
+
+          download_verified "$DEPS_RELEASE" census.manager.rdata _ci_inputs/deps
+
+          # Compare against the currently promoted manager.
+          BASELINE=$(gh release view "$LATEST_MANAGER_TAG" --repo "$REPO" --json body -q .body \
+            | sed -n 's/^\*\*Promoted from:\*\* `\([^`]*\)`.*/\1/p' | head -1)
+          [[ "$BASELINE" =~ ^hiv-surveillance-[a-zA-Z0-9._-]+$ && "$BASELINE" != *latest* ]]
+          download_verified "$LATEST_MANAGER_TAG" surveillance.manager.rdata _ci_inputs/active
+          echo "BASELINE_RELEASE=$BASELINE" >> "$GITHUB_ENV"
+
+          CONSUMER=$(gh release view "$SYPHILIS_CONSUMER_TAG" --repo "$REPO" --json body -q .body \
+            | sed -n 's/^\*\*Promoted from:\*\* `\([^`]*\)`.*/\1/p' | head -1)
+          download_verified "$SYPHILIS_CONSUMER_TAG" syphilis.manager.rdata _ci_inputs/consumer
+
+          {
+            echo "analyses_commit=$(git rev-parse HEAD)"
+            echo "jheem2_ref=$JHEEM2_REF"
+            echo "jheem2_commit=$(git -C _jheem2 rev-parse HEAD)"
+            echo "locations_commit=$(git -C _locations rev-parse HEAD)"
+            echo "sections_release=$SECTIONS_RELEASE"
+            echo "sections_snapshot=$SECTIONS_SNAPSHOT"
+            echo "sections_manifest_sha256=$(sha256sum _ci_inputs/sections/SHA256SUMS.txt | cut -d' ' -f1)"
+            echo "raw_data_release=$RAW_RELEASE"
+            echo "deps_release=$DEPS_RELEASE"
+            echo "baseline_release=$BASELINE"
+            echo "syphilis_consumer_release=$CONSUMER"
+            sha256sum _ci_inputs/sections/*.rdata _ci_inputs/raw/*.tar.gz _ci_inputs/deps/*.rdata _ci_inputs/active/*.rdata _ci_inputs/consumer/*.rdata
+          } > _ci_outputs/input_identity.txt
+          cat _ci_outputs/input_identity.txt
+          df -h . > _ci_outputs/disk_before.txt
+
+      - name: Build isolated candidate and measure Linux resources
+        run: |
+          set -euo pipefail
+          export SECTION_DIR="$GITHUB_WORKSPACE/_ci_inputs/sections"
+          export CACHED_DIR="$GITHUB_WORKSPACE/_ci_outputs"
+          export CENSUS_MANAGER_CACHE_FILE="$GITHUB_WORKSPACE/_ci_inputs/deps/census.manager.rdata"
+          export CENSUS_MANAGER_SHARED_FILE="$GITHUB_WORKSPACE/_ci_inputs/deps/census.manager.rdata"
+          export COUNTY_TO_COUNTY_DIR="$GITHUB_WORKSPACE/_ci_inputs/raw/data_raw/movement/county.to.county"
+          export WRITE_SHARED_OUTPUT=false
+          /usr/bin/time -v -o _ci_outputs/resource_metrics.txt Rscript -e '
+            library(jheem2)
+            library(locations)
+            library(dplyr)
+            library(readxl)
+            library(stringr)
+            library(tidyr)
+            source("data_processing/hiv.surveillance.manager/hiv.surveillance.processing.for.merging/hiv.surveillance.manager.merge.R")
+            writeLines(capture.output(sessionInfo()), "_ci_outputs/session_info.txt")
+          ' 2>&1 | tee _ci_outputs/build_log.txt
+          df -h . > _ci_outputs/disk_after.txt
+          sha256sum _ci_outputs/surveillance.manager.rdata > _ci_outputs/candidate_sha256.txt
+
+      - name: Compare with the promoted manager
+        run: |
+          set -uo pipefail
+          # Exit 1 with a report means structural removals: flag for review, don't fail.
+          # No report means the comparison itself failed.
+          Rscript data_processing/hiv.surveillance.manager/validate_candidate.R \
+            _ci_inputs/active/surveillance.manager.rdata \
+            _ci_outputs/surveillance.manager.rdata \
+            _ci_outputs/active_baseline_report.json \
+            2>&1 | tee _ci_outputs/active_baseline_summary.txt
+          jq -e '.n_checks' _ci_outputs/active_baseline_report.json > /dev/null
+
+      - name: Exercise focused consumer boundaries
+        run: |
+          set -euo pipefail
+          Rscript data_processing/hiv.surveillance.manager/check_consumers.R \
+            _ci_outputs/surveillance.manager.rdata \
+            _ci_inputs/active/surveillance.manager.rdata \
+            _ci_inputs/consumer/syphilis.manager.rdata \
+            _ci_outputs/consumer_report.json \
+            2>&1 | tee _ci_outputs/consumer_summary.txt
+
+      - name: Summarize candidate for review
+        run: |
+          set -euo pipefail
+          Rscript data_processing/hiv.surveillance.manager/summarize_candidate.R _ci_outputs "$BASELINE_RELEASE"
+          cat _ci_outputs/CANDIDATE.md >> "$GITHUB_STEP_SUMMARY"
+          jq '{needs_review, structural_failures, baseline_release}' _ci_outputs/build_status.json
+
+      - name: Upload candidate and evidence for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hiv-surveillance-manager-build
+          path: _ci_outputs/
+          if-no-files-found: warn
+          retention-days: 30
+          compression-level: 0
+
+      - name: Create versioned release
+        # Runs from other branches are checks only and never publish.
+        if: success() && github.ref == 'refs/heads/master'
+        run: |
+          set -euo pipefail
+          VERSION_TAG="hiv-surveillance-manager-v$(date +%Y.%m.%d)"
+          # Append sequence number if tag already exists (multiple builds in a day)
+          if gh release view "$VERSION_TAG" --repo "$REPO" &>/dev/null; then
+            SEQ=2
+            while gh release view "${VERSION_TAG}.${SEQ}" --repo "$REPO" &>/dev/null; do
+              SEQ=$((SEQ + 1))
+            done
+            VERSION_TAG="${VERSION_TAG}.${SEQ}"
+          fi
+
+          mkdir -p _release
+          cp _ci_outputs/surveillance.manager.rdata _ci_outputs/CANDIDATE.md \
+            _ci_outputs/input_identity.txt _ci_outputs/build_status.json _release/
+          tar -czf _release/validation-evidence.tar.gz -C _ci_outputs \
+            CANDIDATE.md input_identity.txt build_status.json session_info.txt build_log.txt \
+            resource_metrics.txt disk_before.txt disk_after.txt candidate_sha256.txt \
+            active_baseline_report.json active_baseline_summary.txt \
+            consumer_report.json consumer_summary.txt
+          (cd _release && sha256sum surveillance.manager.rdata CANDIDATE.md input_identity.txt \
+            build_status.json validation-evidence.tar.gz > SHA256SUMS.txt)
+
+          NEEDS_REVIEW=$(jq -r '.needs_review' _ci_outputs/build_status.json)
+          id() { grep "^$1=" _ci_outputs/input_identity.txt | cut -d= -f2; }
+          digest() { grep "  $1\$" _ci_outputs/input_identity.txt | cut -c1-12; }
+          RUN_URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          {
+            if [[ "$NEEDS_REVIEW" == "true" ]]; then
+              echo "> **Needs review:** this build removes structure present in the promoted manager."
+              echo "> Promoting it requires ticking the review box in the promote workflow."
+              echo
+            fi
+            echo "## Build Info"
+            echo "| Input | Release | Exact version |"
+            echo "|---|---|---|"
+            echo "| **Sections** | \`$(id sections_release)\` | \`$(id sections_snapshot)\`, manifest \`$(id sections_manifest_sha256 | cut -c1-12)\` |"
+            echo "| **Raw data** | \`$(id raw_data_release)\` | movement \`$(digest _ci_inputs/raw/data-raw-movement.tar.gz)\` |"
+            echo "| **Dependencies** | \`$(id deps_release)\` | census \`$(digest _ci_inputs/deps/census.manager.rdata)\` |"
+            echo "| **jheem2** | \`$(id jheem2_ref)\` | \`$(id jheem2_commit | cut -c1-8)\` |"
+            echo "| **locations** | default branch | \`$(id locations_commit | cut -c1-8)\` |"
+            echo "| **jheem_analyses** | | \`${GITHUB_SHA:0:8}\` |"
+            echo "| **Compared against** | \`$LATEST_MANAGER_TAG\` | \`$(id baseline_release)\` |"
+            echo
+            echo "Run: [$GITHUB_RUN_ID]($RUN_URL). Full digests are in \`input_identity.txt\`."
+            echo
+            echo "> To promote this build to \`latest\`, run the **Promote HIV Surveillance Manager** workflow with tag \`$VERSION_TAG\`."
+            echo
+            cat _ci_outputs/CANDIDATE.md
+          } > _release/RELEASE_NOTES.md
+
+          PRERELEASE=()
+          [[ "$NEEDS_REVIEW" == "true" ]] && PRERELEASE=(--prerelease)
+          gh release create "$VERSION_TAG" \
+            --repo "$REPO" \
+            --target "$GITHUB_SHA" \
+            --title "HIV Surveillance Manager $VERSION_TAG" \
+            --notes-file _release/RELEASE_NOTES.md \
+            --latest=false "${PRERELEASE[@]}" \
+            _release/surveillance.manager.rdata _release/CANDIDATE.md \
+            _release/input_identity.txt _release/build_status.json \
+            _release/validation-evidence.tar.gz _release/SHA256SUMS.txt
+          echo "Published release: $VERSION_TAG"
+          echo "Published release: \`$VERSION_TAG\`" >> "$GITHUB_STEP_SUMMARY"

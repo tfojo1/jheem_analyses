@@ -10,17 +10,29 @@ if (!all(file.exists(args[1:2]))) stop("Baseline and candidate files must exist"
 
 library(jheem2)
 source("data_processing/validation/manager_spec_tools.R")
+source("data_processing/hiv.surveillance.manager/manager_value_delta.R")
+source("data_processing/hiv.surveillance.manager/manager_reproduction.R")
 
-baseline <- load.data.manager(name = "surveillance.manager", file = args[[1]])
-candidate <- load.data.manager(name = "surveillance.manager", file = args[[2]])
+baseline <- load.data.manager(file = args[[1]])
+candidate <- load.data.manager(file = args[[2]])
 spec <- extract_manager_spec(baseline)
 result <- validate_manager_structure(candidate, spec)
+result$value_delta <- compare.manager.data.values(baseline$data, candidate$data)
+result$reproduction <- c(compare.manager.reproduction(baseline, candidate), list(
+  baseline_sha256 = digest::digest(file = args[[1]], algo = "sha256"),
+  candidate_sha256 = digest::digest(file = args[[2]], algo = "sha256")
+))
 
 jsonlite::write_json(result, args[[3]], pretty = TRUE, auto_unbox = TRUE,
                      null = "null")
 cat(sprintf("Structural comparison: %d checks, %d failures, %d warnings, %d notices\n",
             result$n_checks, result$n_failed, length(result$warnings),
             length(result$notices)))
+cat(sprintf("Value-delta diagnostic: %d shared arrays, %d differing arrays, %d changed cells at shared coordinates\n",
+            result$value_delta$arrays_compared,
+            result$value_delta$arrays_with_differences,
+            result$value_delta$changed_overlap_cells))
+cat("Baseline data/metadata equivalence:", result$reproduction$equivalent, "\n")
 if (length(result$failures)) {
   for (failure in result$failures) cat("FAIL: ", failure$message, "\n", sep = "")
 }
