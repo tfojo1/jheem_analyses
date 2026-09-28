@@ -103,7 +103,7 @@ This means: in the PrEP data from the CDC PrEP source, under the `cdc` ontology,
 
 **Component Consistency:** Checks that totals are at least as large as the sum of their components. For example, `total.syphilis.diagnoses` should be >= `ps.syphilis.diagnoses` + `early.syphilis.diagnoses` + `unknown.duration.or.late.syphilis.diagnoses`. This is checked cell by cell across matching year-location pairs.
 
-**Marginal Consistency:** When available, uses `inspect_marginals()` to check that demographic breakdowns sum to their aggregates (e.g., the race-stratified values for a given year and location should sum to the unstratified value for that same year and location). Currently may be skipped due to a technical limitation with deserialized managers — see the note in `data_quality_report.R`.
+**Marginal Consistency:** Uses `inspect_marginals()` to check that demographic breakdowns sum to their aggregates (e.g., the race-stratified values for a given year and location should sum to the unstratified value for that same year and location). For each outcome it lists the comparisons with rows over jheem2's default thresholds (10% and a difference of 50), with the worst case, capped at 25 comparisons. Before 2026-09-28 this section always reported every outcome as OK because results were read at the wrong nesting level; `test_marginal_consistency.R` covers the fix. It is skipped only if `inspect_marginals()` can't run on a deserialized manager.
 
 ## Updating the Spec
 

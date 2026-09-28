@@ -18,7 +18,9 @@ source("../jheem_analyses/applications/SHIELD/R/shield_multivariate_spline_prior
 # ************************************************************************************************************************
 # Helpul command: #get.intervals(variable name): Get intervals (confidence/credible intervals) for the variables in a distribution
 # HELPER FUNCTIONS ----
-
+# For the multivariate spline prior; this represents the maximum fold-change in transmission rate across 10 year intervals.
+# Originally was set to 1.5; was widened to 3 on 9/28/2026
+TRATE_DELTA <- 3
 ## logit ----
 logit = function(p){
     log(p) - log(1-p)
@@ -160,6 +162,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     # The two groups are correlated at the same spline points through the correlation parameter.
     # we assume that trate can change by 1.5 over 10 years :logsd(Delta10)=log(1.5)
     # this means that over 5 years, trate can change by sqrt(1.5) and by 20 years, it can change by 1.5^2
+    
     transmission.rate.multipliers.by.sex=make.joint.mv.spline.prior(
         parameters = paste0("transmission.rate.multiplier.", c("msm", "heterosexual")),
         logmean.baseline = c(log(3), #msm
@@ -167,11 +170,11 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
         logsd.baseline = c(log(2)*2, #msm
                            log(2)*2
         ), #het
-        logsd.deltas.past = c("1970" = 0.5*log(1.5^2), #20-year delta
-                              "1990" = 0.5*log(sqrt(1.5)), #5-year delta
-                              "1995" = 0.5*log(sqrt(1.5))), #5-year delta
-        logsd.deltas.future = c("2010" = 0.5*log(1.5), #10-year delta
-                                "2022" = 0.5*log(1.5)),#10-year delta
+        logsd.deltas.past = c("1970" = 0.5*log(TRATE_DELTA^2), #20-year delta
+                              "1990" = 0.5*log(sqrt(TRATE_DELTA)), #5-year delta
+                              "1995" = 0.5*log(sqrt(TRATE_DELTA))), #5-year delta
+        logsd.deltas.future = c("2010" = 0.5*log(TRATE_DELTA), #10-year delta
+                                "2022" = 0.5*log(TRATE_DELTA)),#10-year delta
         spline.times = c("1970", "1990", "1995", "2000", "2010", "2022"),
         correlation = 0.7
     ),
@@ -201,7 +204,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     #this is multiplied in the race mixing matrix
     # the sdlog accross the 4 studies is 0.3-0.4; we use log(2)=0.69 as double of that sd to incorporate additional uncertainty
     # mu is set to 2 so that the interval covers [0.5140697 7.7810453 ] 
-    black.black.sexual.multi = Lognormal.Distribution(meanlog = log(2), sdlog = log(2)), 
+    black.black.sexual.multi = Lognormal.Distribution(meanlog = log(2), sdlog = log(2)), # new is log(2) for meanlog on these three
     hispanic.hispanic.sexual.multi = Lognormal.Distribution(meanlog =  log(2), sdlog = log(2)),  
     other.other.sexual.multi = Lognormal.Distribution(meanlog =  log(2), sdlog = log(2)),
     

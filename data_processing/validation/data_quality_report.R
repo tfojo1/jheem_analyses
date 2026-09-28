@@ -332,19 +332,30 @@ check_component_consistency <- function(manager, checks) {
 
 # -- Marginal Consistency -----------------------------------------------------
 
-# TODO: inspect_marginals() currently fails on managers loaded from .rdata
-# because R6 method environment bindings are lost during serialization — the
-# method can't find internal jheem2 helpers (intersect.shared.dim.names,
-# array.access). This is a known R6 limitation, not a bug in our code or in
-# inspect_marginals itself.
+# inspect_marginals() compares each more stratified array's marginal sums with
+# the less stratified array of the same outcome/source/ontology, and returns a
+# nested list: outcome > source > ontology > super-stratification >
+# sub-stratification > data frame of rows over its thresholds (defaults: 10%
+# and a magnitude of 50). NULL means nothing exceeded the thresholds.
 #
-# Options to fix properly (pick one when we get to it):
-#   1. Have jheem2 export the helpers inspect_marginals depends on
-#   2. Use devtools::load_all() instead of library(jheem2) in the validation
-#      script, which rebuilds R6 class bindings from source
-#   3. Add a restore/rebind method to the data manager class
-#
-# For now, we detect the failure and skip gracefully.
+# It can fail on managers loaded from .rdata if R6 method bindings can't find
+# jheem2 internals. That was observed with earlier jheem2 builds; it runs with
+# jheem2 1.12.3.9000. The failure is still detected and reported as skipped.
+
+#' Collect the data frames from inspect_marginals() output with their path
+#' @keywords internal
+flatten_marginal_results <- function(marginals) {
+  found <- list()
+  walk <- function(node, path) {
+    if (is.data.frame(node)) {
+      found[[length(found) + 1L]] <<- list(path = path, rows = node)
+    } else if (is.list(node)) {
+      for (name in names(node)) walk(node[[name]], c(path, name))
+    }
+  }
+  walk(marginals, character())
+  found
+}
 
 #' Run inspect.marginals and summarize results
 #' @keywords internal
@@ -364,7 +375,6 @@ check_marginal_consistency <- function(manager, outcomes = NULL) {
   if (length(outcomes) == 0) return(list())
 
   # Quick check: does inspect_marginals work on this manager?
-  # Fails on deserialized R6 objects due to lost environment bindings.
   test_error <- tryCatch({
     manager$inspect_marginals(outcome = outcomes[1])
     NULL
@@ -376,8 +386,7 @@ check_marginal_consistency <- function(manager, outcomes = NULL) {
       status = "skipped",
       message = paste0(
         "inspect_marginals() unavailable on this manager (R6 environment ",
-        "bindings lost during save/load). See TODO in data_quality_report.R ",
-        "for fix options.")
+        "bindings lost during save/load).")
     )))
   }
 
@@ -385,46 +394,41 @@ check_marginal_consistency <- function(manager, outcomes = NULL) {
 
   for (outcome in outcomes) {
     tryCatch({
-      marginals <- manager$inspect_marginals(outcome = outcome)
+      comparisons <- flatten_marginal_results(manager$inspect_marginals(outcome = outcome))
 
-      if (identical(marginals, NA) || length(marginals) == 0) {
+      if (length(comparisons) == 0) {
         results[[length(results) + 1]] <- list(
           outcome = outcome,
           status = "ok",
           message = "No discrepancies above threshold"
         )
       } else {
-        # Summarize: find max discrepancy across all source/ontology combos
-        max_discrepancy <- 0
-        details <- list()
-
-        for (source_name in names(marginals)) {
-          source_results <- marginals[[source_name]]
-          if (identical(source_results, NA)) next
-
-          for (ontology_name in names(source_results)) {
-            ont_result <- source_results[[ontology_name]]
-            if (identical(ont_result, NA) || !is.matrix(ont_result)) next
-
-            non_na_vals <- ont_result[!is.na(ont_result)]
-            if (length(non_na_vals) > 0) {
-              this_max <- max(abs(non_na_vals))
-              if (this_max > max_discrepancy) max_discrepancy <- this_max
-
-              details[[length(details) + 1]] <- list(
-                source = source_name,
-                ontology = ontology_name,
-                max_discrepancy_pct = round(this_max * 100, 1),
-                n_pairs_with_issues = sum(!is.na(ont_result))
-              )
-            }
-          }
-        }
+        details <- lapply(comparisons, function(comparison) {
+          rows <- comparison$rows
+          # Path is outcome > source > ontology > super > sub.
+          path <- utils::tail(comparison$path, 4)
+          worst <- rows[which.max(abs(rows$percent_diff)), , drop = FALSE]
+          where <- intersect(c("location", "year"), names(worst))
+          list(
+            source = path[[1]],
+            ontology = path[[2]],
+            super_stratification = path[[3]],
+            sub_stratification = path[[4]],
+            n_rows = nrow(rows),
+            max_discrepancy_pct = max(abs(rows$percent_diff)),
+            worst = paste(c(vapply(where, function(column) as.character(worst[[column]]), character(1)),
+                            sprintf("total %s vs sum %s", format(worst$super_value, big.mark = ","),
+                                    format(worst$marginal_sum, big.mark = ","))),
+                          collapse = " ")
+          )
+        })
+        details <- details[order(-vapply(details, function(d) d$n_rows, numeric(1)))]
 
         results[[length(results) + 1]] <- list(
           outcome = outcome,
-          status = ifelse(max_discrepancy > 0, "discrepancies_found", "ok"),
-          max_discrepancy_pct = round(max_discrepancy * 100, 1),
+          status = "discrepancies_found",
+          n_rows = sum(vapply(details, function(d) d$n_rows, numeric(1))),
+          max_discrepancy_pct = max(vapply(details, function(d) d$max_discrepancy_pct, numeric(1))),
           details = details
         )
       }
@@ -543,21 +547,34 @@ print_quality_report <- function(report) {
       cat(sprintf("  Outcomes checked: %d (ok: %d, with discrepancies: %d, errors: %d)\n",
                   length(marg_results), ok_count, issue_count, error_count))
 
-      # Show details for outcomes with discrepancies
+      # Show details for outcomes with discrepancies, bounded so the report
+      # stays readable (and fits in release notes) when many are found.
+      format_pct <- function(x) if (is.finite(x)) sprintf("%.1f%%", x) else "n/a (total is 0)"
+      shown <- 0L
+      hidden <- 0L
       for (result in marg_results) {
         if (result$status == "discrepancies_found") {
-          cat(sprintf("  %s: max discrepancy %.1f%%\n",
-                      result$outcome, result$max_discrepancy_pct))
+          cat(sprintf("  %s: %d row(s) over threshold, max discrepancy %s\n",
+                      result$outcome, as.integer(result$n_rows),
+                      format_pct(result$max_discrepancy_pct)))
           for (detail in result$details) {
-            cat(sprintf("    %s / %s: %.1f%% (%d pair%s)\n",
-                        detail$source, detail$ontology, detail$max_discrepancy_pct,
-                        detail$n_pairs_with_issues,
-                        ifelse(detail$n_pairs_with_issues == 1, "", "s")))
+            if (shown >= 25L) {
+              hidden <- hidden + 1L
+              next
+            }
+            cat(sprintf("    %s / %s: %s vs %s: %d row(s), max %s; worst: %s\n",
+                        detail$source, detail$ontology, detail$sub_stratification,
+                        detail$super_stratification, as.integer(detail$n_rows),
+                        format_pct(detail$max_discrepancy_pct), detail$worst))
+            shown <- shown + 1L
           }
         }
         if (result$status == "error") {
           cat(sprintf("  %s: ERROR - %s\n", result$outcome, result$message))
         }
+      }
+      if (hidden > 0L) {
+        cat(sprintf("    ... and %d more comparison(s)\n", hidden))
       }
     }
     cat("\n")
