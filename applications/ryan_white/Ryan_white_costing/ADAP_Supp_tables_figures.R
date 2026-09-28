@@ -52,204 +52,298 @@ grey_border  <- fp_border(color = "#aaaaaa", width = 0.5)
 thick_border <- fp_border(color = "#1f4e79", width = 1.5)
 
 
-compute_count_metrics <- function(locs, final_year, new_excess, start_paths,
-                                  B = 100000, seed = 123) {
+compute_count_metrics <- function(
+        loc,
+        final_year,
+        new_excess,
+        start_paths
+) {
     
-    if (length(locs) == 1) {
-        inf <- new_excess %>%
-            filter(location == locs, year <= final_year) %>%
-            group_by(sim) %>%
-            summarise(cum_excess = sum(excess_incidence, na.rm = TRUE), .groups = "drop")
-        
-        py <- start_paths %>%
-            filter(location == locs, year <= final_year) %>%
-            group_by(sim) %>%
-            arrange(year, .by_group = TRUE) %>%
-            mutate(active_on_art = cumsum(total_starts)) %>%
-            summarise(py_on_art = sum(active_on_art, na.rm = TRUE), .groups = "drop")
-        
-        return(list(
-            inf = tibble(
-                med = median(inf$cum_excess, na.rm = TRUE),
-                lo  = quantile(inf$cum_excess, 0.025, na.rm = TRUE),
-                hi  = quantile(inf$cum_excess, 0.975, na.rm = TRUE)
-            ),
-            py = tibble(
-                med = median(py$py_on_art, na.rm = TRUE),
-                lo  = quantile(py$py_on_art, 0.025, na.rm = TRUE),
-                hi  = quantile(py$py_on_art, 0.975, na.rm = TRUE)
+    counts <- new_excess %>%
+        filter(
+            location == loc,
+            year <= final_year
+        ) %>%
+        group_by(sim) %>%
+        summarise(
+            cum_excess_incident = sum(excess_incidence, na.rm = TRUE),
+            cum_excess_pwh      = sum(excess_new, na.rm = TRUE),
+            .groups = "drop"
+        )
+    
+    py <- start_paths %>%
+        filter(
+            location == loc,
+            year <= final_year
+        ) %>%
+        group_by(sim) %>%
+        arrange(year, .by_group = TRUE) %>%
+        mutate(
+            active_on_art = cumsum(total_starts)
+        ) %>%
+        summarise(
+            py_on_art = sum(active_on_art, na.rm = TRUE),
+            .groups = "drop"
+        )
+    
+    if (nrow(counts) == 0) {
+        stop(
+            paste0(
+                "No count data found for ",
+                loc,
+                " through ",
+                final_year
             )
-        ))
+        )
     }
     
-    set.seed(seed)
-    
-    inf_by_loc <- new_excess %>%
-        filter(location %in% locs, year <= final_year) %>%
-        group_by(location, sim) %>%
-        summarise(cum_excess = sum(excess_new, na.rm = TRUE), .groups = "drop")
-    
-    py_by_loc <- start_paths %>%
-        filter(location %in% locs, year <= final_year) %>%
-        group_by(location, sim) %>%
-        arrange(year, .by_group = TRUE) %>%
-        mutate(active_on_art = cumsum(total_starts)) %>%
-        summarise(py_on_art = sum(active_on_art, na.rm = TRUE), .groups = "drop")
-    
-    inf_totals <- numeric(B)
-    py_totals  <- numeric(B)
-    
-    for (loc in locs) {
-        inf_vals <- inf_by_loc %>% filter(location == loc) %>% pull(cum_excess)
-        py_vals  <- py_by_loc  %>% filter(location == loc) %>% pull(py_on_art)
-        
-        if (length(inf_vals) == 0 || length(py_vals) == 0) {
-            warning("No data for location: ", loc, " \u2014 skipping in bootstrap total")
-            next
-        }
-        
-        inf_totals <- inf_totals + sample(inf_vals, B, replace = TRUE)
-        py_totals  <- py_totals  + sample(py_vals,  B, replace = TRUE)
+    if (nrow(py) == 0) {
+        stop(
+            paste0(
+                "No ART start data found for ",
+                loc,
+                " through ",
+                final_year
+            )
+        )
     }
     
     list(
-        inf = tibble(
-            med = median(inf_totals, na.rm = TRUE),
-            lo  = quantile(inf_totals, 0.025, na.rm = TRUE),
-            hi  = quantile(inf_totals, 0.975, na.rm = TRUE)
+        incident = tibble(
+            med = median(counts$cum_excess_incident, na.rm = TRUE),
+            lo  = quantile(counts$cum_excess_incident, 0.025, na.rm = TRUE),
+            hi  = quantile(counts$cum_excess_incident, 0.975, na.rm = TRUE)
         ),
+        
+        pwh = tibble(
+            med = median(counts$cum_excess_pwh, na.rm = TRUE),
+            lo  = quantile(counts$cum_excess_pwh, 0.025, na.rm = TRUE),
+            hi  = quantile(counts$cum_excess_pwh, 0.975, na.rm = TRUE)
+        ),
+        
         py = tibble(
-            med = median(py_totals, na.rm = TRUE),
-            lo  = quantile(py_totals, 0.025, na.rm = TRUE),
-            hi  = quantile(py_totals, 0.975, na.rm = TRUE)
+            med = median(py$py_on_art, na.rm = TRUE),
+            lo  = quantile(py$py_on_art, 0.025, na.rm = TRUE),
+            hi  = quantile(py$py_on_art, 0.975, na.rm = TRUE)
         )
     )
 }
 
-compute_cost_metrics <- function(locs, final_year, compare_with_rw, B = 100000, seed = 123) {
+
+# =============================================================================
+# COST METRICS — DIRECT DRAWS
+#
+# State rows:
+#   use that state's pooled simulation x cost-scenario draws directly.
+#
+# US Total:
+#   use location == "Total" for cumulative HIV care-cost draws.
+#   Reconstruct cumulative ADAP spending by summing the state-level spending
+#   rows, matching the denominator used in Figure 1.
+# =============================================================================
+
+compute_cost_metrics <- function(
+        loc,
+        final_year,
+        compare_with_rw
+) {
     
-    scenarios <- levels(compare_with_rw$cost_scenario)
+    x <- compare_with_rw %>%
+        filter(
+            location == loc,
+            year == final_year
+        )
     
-    adap_by_loc <- compare_with_rw %>%
-        filter(location %in% locs, year == final_year) %>%
-        group_by(location) %>%
-        summarise(adap_loc = first(cumulative_drug_only), .groups = "drop")
-    
-    total_adap <- sum(adap_by_loc$adap_loc, na.rm = TRUE)
-    
-    if (length(locs) == 1) {
-        
-        adap_val <- adap_by_loc$adap_loc[1]
-        
-        pooled <- compare_with_rw %>%
-            filter(location == locs, year == final_year, cost_scenario %in% scenarios) %>%
-            mutate(net_cost = cumulative_incremental_cost - adap_val)
-        
-        ratio_vals <- if (total_adap == 0 || is.na(total_adap)) {
-            rep(NA_real_, nrow(pooled))
-        } else {
-            pooled$net_cost / total_adap
-        }
-        
-        return(list(
-            total_adap = total_adap,
-            cost  = list(med = median(pooled$cumulative_incremental_cost, na.rm = TRUE),
-                         lo  = quantile(pooled$cumulative_incremental_cost, 0.025, na.rm = TRUE),
-                         hi  = quantile(pooled$cumulative_incremental_cost, 0.975, na.rm = TRUE)),
-            net   = list(med = median(pooled$net_cost, na.rm = TRUE),
-                         lo  = quantile(pooled$net_cost, 0.025, na.rm = TRUE),
-                         hi  = quantile(pooled$net_cost, 0.975, na.rm = TRUE)),
-            ratio = list(med = median(ratio_vals, na.rm = TRUE),
-                         lo  = quantile(ratio_vals, 0.025, na.rm = TRUE),
-                         hi  = quantile(ratio_vals, 0.975, na.rm = TRUE))
-        ))
+    if (nrow(x) == 0) {
+        stop(
+            paste0(
+                "No cost data found for ",
+                loc,
+                " in ",
+                final_year
+            )
+        )
     }
     
-    set.seed(seed)
-    
-    pooled_by_loc <- compare_with_rw %>%
-        filter(location %in% locs, year == final_year, cost_scenario %in% scenarios) %>%
-        left_join(adap_by_loc, by = "location") %>%
-        mutate(net_cost = cumulative_incremental_cost - adap_loc)
-    
-    cost_totals <- numeric(B)
-    net_totals  <- numeric(B)
-    
-    for (loc in locs) {
-        cp_vals <- pooled_by_loc %>% filter(location == loc) %>% pull(cumulative_incremental_cost)
-        np_vals <- pooled_by_loc %>% filter(location == loc) %>% pull(net_cost)
+    if (loc %in% c("Total", "total")) {
         
-        if (length(cp_vals) == 0) {
-            warning("No cost data for location: ", loc, " \u2014 skipping in bootstrap total")
-            next
-        }
+        total_adap <- compare_with_rw %>%
+            filter(
+                year == final_year,
+                !location %in% c("Total", "total")
+            ) %>%
+            distinct(
+                location,
+                cumulative_drug_only
+            ) %>%
+            summarise(
+                value = sum(cumulative_drug_only, na.rm = TRUE)
+            ) %>%
+            pull(value)
         
-        cost_totals <- cost_totals + sample(cp_vals, B, replace = TRUE)
-        net_totals  <- net_totals  + sample(np_vals, B, replace = TRUE)
-    }
-    
-    ratio_totals <- if (total_adap == 0 || is.na(total_adap)) {
-        rep(NA_real_, B)
     } else {
-        net_totals / total_adap
+        
+        total_adap <- x %>%
+            summarise(
+                value = first(cumulative_drug_only)
+            ) %>%
+            pull(value)
     }
+    
+    x <- x %>%
+        mutate(
+            net   = cumulative_incremental_cost - total_adap,
+            ratio = net / total_adap
+        )
     
     list(
+        cost = tibble(
+            med = median(x$cumulative_incremental_cost, na.rm = TRUE),
+            lo  = quantile(x$cumulative_incremental_cost, 0.025, na.rm = TRUE),
+            hi  = quantile(x$cumulative_incremental_cost, 0.975, na.rm = TRUE)
+        ),
+        
         total_adap = total_adap,
-        cost  = list(med = median(cost_totals, na.rm = TRUE),
-                     lo  = quantile(cost_totals, 0.025, na.rm = TRUE),
-                     hi  = quantile(cost_totals, 0.975, na.rm = TRUE)),
-        net   = list(med = median(net_totals, na.rm = TRUE),
-                     lo  = quantile(net_totals, 0.025, na.rm = TRUE),
-                     hi  = quantile(net_totals, 0.975, na.rm = TRUE)),
-        ratio = list(med = median(ratio_totals, na.rm = TRUE),
-                     lo  = quantile(ratio_totals, 0.025, na.rm = TRUE),
-                     hi  = quantile(ratio_totals, 0.975, na.rm = TRUE))
+        
+        net = tibble(
+            med = median(x$net, na.rm = TRUE),
+            lo  = quantile(x$net, 0.025, na.rm = TRUE),
+            hi  = quantile(x$net, 0.975, na.rm = TRUE)
+        ),
+        
+        ratio = tibble(
+            med = median(x$ratio, na.rm = TRUE),
+            lo  = quantile(x$ratio, 0.025, na.rm = TRUE),
+            hi  = quantile(x$ratio, 0.975, na.rm = TRUE)
+        )
     )
 }
 
-# Annual (non-cumulative) cost, pooled across scenarios, 2.5/97.5 UI.
-# Used only by Table S5's "Annual Cost of Care" column — cumulative cost,
-# net cost, and ratio in Table S5 come from compute_cost_metrics() directly,
-# not from this.
-compute_annual_cost_metrics <- function(loc, yr, compare_with_rw) {
-    scenarios <- levels(compare_with_rw$cost_scenario)
-    vals <- compare_with_rw %>%
-        filter(location == loc, year == yr, cost_scenario %in% scenarios) %>%
-        pull(annual_incremental_cost)
+
+# =============================================================================
+# ANNUAL COST METRICS — DIRECT DRAWS
+# =============================================================================
+
+compute_annual_cost_metrics <- function(
+        loc,
+        target_year,
+        compare_with_rw
+) {
     
-    list(
-        med = median(vals, na.rm = TRUE),
-        lo  = quantile(vals, 0.025, na.rm = TRUE),
-        hi  = quantile(vals, 0.975, na.rm = TRUE)
+    annual_df <- compare_with_rw %>%
+        filter(
+            location == loc,
+            year <= target_year
+        ) %>%
+        arrange(
+            sim,
+            cost_scenario,
+            year
+        ) %>%
+        group_by(
+            sim,
+            cost_scenario
+        ) %>%
+        mutate(
+            annual_incremental_cost =
+                cumulative_incremental_cost -
+                lag(cumulative_incremental_cost, default = 0)
+        ) %>%
+        ungroup() %>%
+        filter(year == target_year)
+    
+    if (nrow(annual_df) == 0) {
+        stop(
+            paste0(
+                "No annual cost data found for ",
+                loc,
+                " in ",
+                target_year
+            )
+        )
+    }
+    
+    tibble(
+        med = median(annual_df$annual_incremental_cost, na.rm = TRUE),
+        lo  = quantile(annual_df$annual_incremental_cost, 0.025, na.rm = TRUE),
+        hi  = quantile(annual_df$annual_incremental_cost, 0.975, na.rm = TRUE)
     )
 }
+
 
 # =============================================================================
 # SECTION 2: Table S6 — main manuscript / state summary table at final_year
 # =============================================================================
 
 build_summary_row <- function(
-        locs, label,
+        loc, label,
         final_year,
-        new_excess, start_paths, compare_with_rw,
-        B = 10000, seed = 123
+        new_excess, start_paths, compare_with_rw
 ) {
     
-    counts <- compute_count_metrics(locs, final_year, new_excess, start_paths, B = B, seed = seed)
-    costs  <- compute_cost_metrics(locs, final_year, compare_with_rw, B = B, seed = seed)
+    counts <- compute_count_metrics(
+        loc,
+        final_year,
+        new_excess,
+        start_paths
+    )
+    
+    costs <- compute_cost_metrics(
+        loc,
+        final_year,
+        compare_with_rw
+    )
     
     tibble(
         location      = label,
         net_med_raw   = costs$net$med,
         ratio_med_raw = ifelse(is.na(costs$ratio$med), 0, costs$ratio$med),
         State         = label,
-        `New HIV Cases\n(Cum. through 2035)` = fmt_n_ci(counts$inf$med, counts$inf$lo, counts$inf$hi),
-        `Person-Years\non ART`               = fmt_n_ci(counts$py$med,  counts$py$lo,  counts$py$hi),
-        `Cum. ART Care\nCost`                = fmt_dollar_ci(costs$cost$med, costs$cost$lo, costs$cost$hi),
-        `Cum. ADAP\nSpending Avoided`        = fmt_dollar(costs$total_adap),
-        `Net Cost\n(Care - ADAP)`            = fmt_dollar_ci(costs$net$med, costs$net$lo, costs$net$hi),
-        `NCER\n(Net Cost / ADAP Spending)`   = fmt_ratio_ci(costs$ratio$med, costs$ratio$lo, costs$ratio$hi)
+        
+        `Excess Incident HIV\nInfections (Cum.)` =
+            fmt_n_ci(
+                counts$incident$med,
+                counts$incident$lo,
+                counts$incident$hi
+            ),
+        
+        `Excess Newly Diagnosed\nPWH (Cum.)` =
+            fmt_n_ci(
+                counts$pwh$med,
+                counts$pwh$lo,
+                counts$pwh$hi
+            ),
+        
+        `Person-Years\non ART` =
+            fmt_n_ci(
+                counts$py$med,
+                counts$py$lo,
+                counts$py$hi
+            ),
+        
+        `Cum. ART Care\nCost` =
+            fmt_dollar_ci(
+                costs$cost$med,
+                costs$cost$lo,
+                costs$cost$hi
+            ),
+        
+        `Cum. ADAP\nSpending Avoided` =
+            fmt_dollar(costs$total_adap),
+        
+        `Net Cost\n(Care - ADAP)` =
+            fmt_dollar_ci(
+                costs$net$med,
+                costs$net$lo,
+                costs$net$hi
+            ),
+        
+        `NCER\n(Net Cost / ADAP Spending)` =
+            fmt_ratio_ci(
+                costs$ratio$med,
+                costs$ratio$lo,
+                costs$ratio$hi
+            )
     )
 }
 
@@ -260,9 +354,7 @@ build_state_summary <- function(
         compare_with_rw,
         exclude_locations   = c("Total", "total"),
         include_total_row   = TRUE,
-        total_label         = "Total (US)",
-        B                   = 100000,
-        seed                = 123
+        total_label         = "Total (US)"
 ) {
     
     locations <- compare_with_rw %>%
@@ -273,19 +365,23 @@ build_state_summary <- function(
     
     state_rows <- purrr::map_dfr(locations, function(loc) {
         build_summary_row(
-            locs = loc, label = loc,
+            loc = loc,
+            label = loc,
             final_year = final_year,
-            new_excess = new_excess, start_paths = start_paths,
-            compare_with_rw = compare_with_rw, B = B, seed = seed
+            new_excess = new_excess,
+            start_paths = start_paths,
+            compare_with_rw = compare_with_rw
         )
     })
     
     if (include_total_row) {
         total_row <- build_summary_row(
-            locs = locations, label = total_label,
+            loc = "Total",
+            label = total_label,
             final_year = final_year,
-            new_excess = new_excess, start_paths = start_paths,
-            compare_with_rw = compare_with_rw, B = B, seed = seed
+            new_excess = new_excess,
+            start_paths = start_paths,
+            compare_with_rw = compare_with_rw
         )
         state_rows <- bind_rows(state_rows, total_row)
     }
@@ -308,8 +404,18 @@ make_state_flextable <- function(tbl_df, total_label = "Total (US)") {
     n_cols    <- length(col_names)
     n_rows    <- nrow(display_df)
     
-    stopifnot("Width array must match column count" = n_cols == 7L)
-    col_widths_dxa <- c(600, 1950, 1550, 1900, 1900, 1950, 1950)
+    stopifnot("Width array must match column count" = n_cols == 8L)
+    
+    col_widths_dxa <- c(
+        600,   # State
+        1650,  # Incident infections
+        1650,  # Excess PWH
+        1450,  # Person-years
+        1750,  # Care cost
+        1750,  # ADAP avoided
+        1800,  # Net cost
+        1800   # NCER
+    )    
     col_widths_in  <- col_widths_dxa / 1440
     
     ft <- flextable(display_df) %>%
@@ -369,8 +475,6 @@ write_state_summary_word <- function(
         exclude_locations   = c("Total", "total"),
         include_total_row   = TRUE,
         total_label         = "Total (US)",
-        B                   = 10000,
-        seed                = 123,
         output_path         = "ADAP_state_summary_2035.docx"
 ) {
     
@@ -381,9 +485,7 @@ write_state_summary_word <- function(
         compare_with_rw   = compare_with_rw,
         exclude_locations = exclude_locations,
         include_total_row = include_total_row,
-        total_label       = total_label,
-        B                 = B,
-        seed              = seed
+        total_label       = total_label
     )
     
     ft <- make_state_flextable(tbl_df, total_label = total_label)
@@ -407,9 +509,8 @@ write_state_summary_word <- function(
             "Net Cost = Cumulative ART care cost \u2212 Cumulative ADAP spending avoided; ",
             "NCER = Net Cost / Cumulative ADAP Spending Avoided; ",
             "negative values (red) indicate ADAP savings exceed downstream care costs. ",
-            "\"", total_label, "\" sums each quantity across all 30 states, assuming independence across states: ",
-            "the national interval is constructed via bootstrap resampling (B = ", B, " draws), independently ",
-            "resampling each state's pooled (scenario x sim) value and summing across states. ",
+            "For \"", total_label, "\", national count and cost summaries use the existing Total simulation rows; ",
+            "cumulative ADAP spending is reconstructed as the sum of state-level ADAP spending. ",
             "Costs in ", final_year, " USD. ",
             "This table and Table S5 (state year-by-year detail) are generated from the same underlying ",
             "compute_cost_metrics() function, so cumulative cost, net cost, and NCER values for any given ",
@@ -451,11 +552,31 @@ build_art_table <- function(location_filter,
     # ── counts: new infections, diagnoses, ART starts (cumulative through
     #    each year, 2.5/97.5 UI, via the shared count function) ────────────
     counts_by_year <- purrr::map_dfr(years, function(yr) {
-        counts <- compute_count_metrics(location_filter, yr, new_excess, start_paths)
+        
+        counts <- compute_count_metrics(
+            location_filter,
+            yr,
+            new_excess,
+            start_paths
+        )
+        
         tibble(
-            year        = yr,
-            cum_inf_med = counts$inf$med, cum_inf_lo = counts$inf$lo, cum_inf_hi = counts$inf$hi,
-            cum_py_med  = counts$py$med,  cum_py_lo  = counts$py$lo,  cum_py_hi  = counts$py$hi
+            year = yr,
+            
+            # Cumulative excess incident HIV infections
+            cum_inc_med = counts$incident$med,
+            cum_inc_lo  = counts$incident$lo,
+            cum_inc_hi  = counts$incident$hi,
+            
+            # Cumulative excess newly diagnosed PWH
+            cum_inf_med = counts$pwh$med,
+            cum_inf_lo  = counts$pwh$lo,
+            cum_inf_hi  = counts$pwh$hi,
+            
+            # Cumulative person-years on ART
+            cum_py_med  = counts$py$med,
+            cum_py_lo   = counts$py$lo,
+            cum_py_hi   = counts$py$hi
         )
     })
     
@@ -526,19 +647,19 @@ build_art_table <- function(location_filter,
             ratio_is_negative = ratio_med < 0
         ) %>%
         dplyr::select(Year,
-               `Excess Incident HIV Infections\n(Annual) [95% UI]`,
-               `Excess New Diagnosed Infections\n(Annual) [95% UI]`,
-               `Excess New Diagnosed Infections\n(Cumulative) [95% UI]`,
-               `Estimated to Start\nART Immediately`,
-               `Estimated to Start\nART After Lag`,
-               `Total Estimated\nto Start ART`,
-               `Person-Years on ART\n(Cumulative) [95% UI]`,
-               `Annual Excess\nHIV Care Cost`,
-               `Cumulative Excess\nHIV Care Cost`,
-               `Cumulative ADAP\nSpending`,
-               `Net Cost\n(Care - ADAP)`,
-               `NCER\n(Net Cost / ADAP Spending)`,
-               net_is_negative, ratio_is_negative)
+                      `Excess Incident HIV Infections\n(Annual) [95% UI]`,
+                      `Excess New Diagnosed Infections\n(Annual) [95% UI]`,
+                      `Excess New Diagnosed Infections\n(Cumulative) [95% UI]`,
+                      `Estimated to Start\nART Immediately`,
+                      `Estimated to Start\nART After Lag`,
+                      `Total Estimated\nto Start ART`,
+                      `Person-Years on ART\n(Cumulative) [95% UI]`,
+                      `Annual Excess\nHIV Care Cost`,
+                      `Cumulative Excess\nHIV Care Cost`,
+                      `Cumulative ADAP\nSpending`,
+                      `Net Cost\n(Care - ADAP)`,
+                      `NCER\n(Net Cost / ADAP Spending)`,
+                      net_is_negative, ratio_is_negative)
     
     tbl
 }
@@ -757,20 +878,31 @@ generate_adap_text <- function(
         base_year        = 2026,
         new_excess,
         start_paths,
-        compare_with_rw,
-        B    = 10000,
-        seed = 123
+        compare_with_rw
 ) {
     
-    counts <- compute_count_metrics(location_filter, final_year, new_excess, start_paths, B = B, seed = seed)
-    cum_infections <- counts$inf
+    counts <- compute_count_metrics(
+        location_filter,
+        final_year,
+        new_excess,
+        start_paths
+    )
+    cum_infections <- counts$incident
     
-    metrics_final <- compute_cost_metrics(location_filter, final_year, compare_with_rw, B = B, seed = seed)
+    metrics_final <- compute_cost_metrics(
+        location_filter,
+        final_year,
+        compare_with_rw
+    )
     cost_final  <- metrics_final$cost
     net_final   <- metrics_final$net
     ratio_final <- metrics_final$ratio
     
-    metrics_yr1 <- compute_cost_metrics(location_filter, base_year, compare_with_rw, B = B, seed = seed)
+    metrics_yr1 <- compute_cost_metrics(
+        location_filter,
+        base_year,
+        compare_with_rw
+    )
     yr1_cost         <- metrics_yr1$cost
     yr1_adap_savings <- metrics_yr1$total_adap
     
@@ -918,19 +1050,21 @@ generate_adap_aggregate_text <- function(
         base_year         = 2026,
         new_excess,
         start_paths,
-        compare_with_rw,
-        exclude_locations = c("Total", "total"),
-        B    = 10000,
-        seed = 123
+        compare_with_rw
 ) {
     
-    locations <- compare_with_rw %>%
-        filter(year == final_year, !location %in% exclude_locations) %>%
-        distinct(location) %>%
-        pull(location) %>%
-        sort()
+    counts_total <- compute_count_metrics(
+        "Total",
+        final_year,
+        new_excess,
+        start_paths
+    )
     
-    metrics_total <- compute_cost_metrics(locations, final_year, compare_with_rw, B = B, seed = seed)
+    metrics_total <- compute_cost_metrics(
+        "Total",
+        final_year,
+        compare_with_rw
+    )
     
     total_adap_spending <- metrics_total$total_adap
     total_costs         <- metrics_total$cost
@@ -938,62 +1072,133 @@ generate_adap_aggregate_text <- function(
     
     scenarios <- levels(compare_with_rw$cost_scenario)
     
-    adap_by_loc <- compare_with_rw %>%
-        filter(location %in% locations, year == final_year) %>%
-        group_by(location) %>%
-        summarise(adap_loc = first(cumulative_drug_only), .groups = "drop")
-    
-    pooled_crossover <- compare_with_rw %>%
-        filter(location %in% locations, year <= final_year, cost_scenario %in% scenarios) %>%
-        left_join(adap_by_loc, by = "location") %>%
-        mutate(net = cumulative_incremental_cost - adap_loc) %>%
-        group_by(location, sim, cost_scenario) %>%
-        filter(net > 0) %>%
-        slice_min(year, n = 1, with_ties = FALSE) %>%
-        ungroup() %>%
-        mutate(yrs_to_crossover = year - base_year) %>%
+    # Reconstruct national cumulative ADAP spending by year from state rows.
+    total_adap_by_year <- compare_with_rw %>%
+        filter(
+            year >= base_year,
+            year <= final_year,
+            !location %in% c("Total", "total")
+        ) %>%
+        distinct(
+            location,
+            year,
+            cumulative_drug_only
+        ) %>%
+        group_by(year) %>%
         summarise(
-            med = median(yrs_to_crossover),
-            lo  = quantile(yrs_to_crossover, 0.025),
-            hi  = quantile(yrs_to_crossover, 0.975)
+            cumulative_adap = sum(cumulative_drug_only, na.rm = TRUE),
+            .groups = "drop"
         )
+    
+    crossover_by_draw <- compare_with_rw %>%
+        filter(
+            location == "Total",
+            year >= base_year,
+            year <= final_year,
+            cost_scenario %in% scenarios
+        ) %>%
+        left_join(
+            total_adap_by_year,
+            by = "year"
+        ) %>%
+        mutate(
+            net = cumulative_incremental_cost - cumulative_adap
+        ) %>%
+        group_by(
+            sim,
+            cost_scenario
+        ) %>%
+        filter(net > 0) %>%
+        slice_min(
+            year,
+            n = 1,
+            with_ties = FALSE
+        ) %>%
+        ungroup()
+    
+    if (nrow(crossover_by_draw) > 0) {
+        
+        pooled_crossover <- crossover_by_draw %>%
+            mutate(
+                yrs_to_crossover = year - base_year
+            ) %>%
+            summarise(
+                med = median(yrs_to_crossover, na.rm = TRUE),
+                lo  = quantile(yrs_to_crossover, 0.025, na.rm = TRUE),
+                hi  = quantile(yrs_to_crossover, 0.975, na.rm = TRUE)
+            )
+        
+    } else {
+        
+        pooled_crossover <- tibble(
+            med = NA_real_,
+            lo  = NA_real_,
+            hi  = NA_real_
+        )
+    }
     
     txt_aggregate <- sprintf(
         paste0(
-            "Across the %d states modeled, ADAP elimination was projected to generate ",
-            "a cumulative program spending offset of %s over 10 years; however, this was, ",
-            "on average, more than offset by projected %s in downstream HIV care costs ",
-            "attributable to incident HIV infections, yielding a national NCER of %s by %d ",
-            "(assuming independent uncertainty across states)."
+            "Across the modeled US total, ADAP elimination was projected to generate ",
+            "%s excess incident HIV infections and a cumulative program spending offset of %s ",
+            "over 10 years, compared with %s in downstream HIV care costs, yielding a ",
+            "national NCER of %s by %d."
         ),
-        length(locations),
+        fmt_n_ci(
+            counts_total$incident$med,
+            counts_total$incident$lo,
+            counts_total$incident$hi
+        ),
         fmt_dollar(total_adap_spending),
-        fmt_dollar_ci(total_costs$med, total_costs$lo, total_costs$hi),
-        fmt_ratio_ci(aggregate_ratio$med, aggregate_ratio$lo, aggregate_ratio$hi),
+        fmt_dollar_ci(
+            total_costs$med,
+            total_costs$lo,
+            total_costs$hi
+        ),
+        fmt_ratio_ci(
+            aggregate_ratio$med,
+            aggregate_ratio$lo,
+            aggregate_ratio$hi
+        ),
         final_year
     )
     
-    txt_crossover <- sprintf(
-        paste0(
-            "These findings suggest that the short-term fiscal savings of ADAP elimination ",
-            "are transient and will be outweighed within %.0f [%.0f\u2013%.0f] years by the HIV ",
-            "care costs associated with incident HIV infections in every modeled state."
-        ),
-        pooled_crossover$med, pooled_crossover$lo, pooled_crossover$hi
-    )
+    if (is.na(pooled_crossover$med)) {
+        
+        txt_crossover <- paste0(
+            "Cumulative downstream HIV care costs did not exceed cumulative ADAP ",
+            "spending within the modeled projection period for the median national trajectory."
+        )
+        
+    } else {
+        
+        txt_crossover <- sprintf(
+            paste0(
+                "Across the pooled national simulation and cost-scenario draws, downstream ",
+                "HIV care costs exceeded cumulative ADAP spending after %.0f [%.0f–%.0f] years."
+            ),
+            pooled_crossover$med,
+            pooled_crossover$lo,
+            pooled_crossover$hi
+        )
+    }
     
     cat(txt_aggregate, "\n\n")
     cat(txt_crossover, "\n")
     
-    invisible(list(
-        text_aggregate      = txt_aggregate,
-        text_crossover      = txt_crossover,
-        total_adap_spending = total_adap_spending,
-        total_costs         = total_costs,
-        aggregate_ratio     = aggregate_ratio,
-        pooled_crossover    = pooled_crossover
-    ))
+    invisible(
+        list(
+            text_aggregate      = txt_aggregate,
+            text_crossover      = txt_crossover,
+            total_counts        = counts_total,
+            total_adap_spending = total_adap_spending,
+            total_costs         = total_costs,
+            aggregate_ratio     = aggregate_ratio,
+            pooled_crossover    = pooled_crossover
+        )
+    )
 }
+
 
 # =============================================================================
 # USAGE 
@@ -1008,13 +1213,13 @@ write_state_summary_word(
     output_path     = "~/ADAP_state_summary_2035.docx"
 )
 
-# --- Table S5: FL / DC year-by-year detail ---
+# --- Table S5: US year-by-year detail ---
 write_art_word_table(
-    location_filter = "FL",
+    location_filter = "Total",
     new_excess      = new_excess,
     start_paths     = start_paths,
     compare_with_rw = compare_with_rw,
-    output_path     = "~/ART_table_FL.docx"
+    output_path     = "~/ART_table_US.docx"
 )
 # write_art_word_table(
 #     location_filter = "DC",
@@ -1028,7 +1233,7 @@ write_art_word_table(
 fig2_table_df <- build_fig2_table(plot_df, box_df = box_df, compare_with_rw = compare_with_rw)
 write_fig2_table_word(fig2_table_df, output_path = "~/figure2_state_table.docx")
 
-# --- Results-paragraph text: Florida vignette + US aggregate ---
+# --- Results-paragraph text ---
 generate_adap_text(
     location_filter = "FL",
     final_year      = 2035,

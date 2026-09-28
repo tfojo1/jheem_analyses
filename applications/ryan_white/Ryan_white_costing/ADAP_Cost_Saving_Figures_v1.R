@@ -13,28 +13,32 @@ BASELINE.YEAR <- "2025"
 
 # =============================================================================
 # Total ADAP spending, computed just-in-time for plotting
-# (not stored back into compare_with_rw / rw_funding_cum upstream)
 # =============================================================================
+
 total_drug_only <- compare_with_rw %>%
     filter(location != "Total") %>%
     distinct(location, year, cumulative_drug_only) %>%
     group_by(year) %>%
-    summarise(cumulative_drug_only = sum(cumulative_drug_only, na.rm = TRUE), .groups = "drop")
+    summarise(
+        cumulative_drug_only = sum(cumulative_drug_only, na.rm = TRUE),
+        .groups = "drop"
+    )
+
 
 # =============================================================================
-# SHARED COLOR SCALE across FL and Total panels
-#   Cost line color varies by geography; spending line is always black dotted
+# SHARED COLOR SCALE
 # =============================================================================
+
 shared_colors <- c(
-    "FL - Cumulative Excess\nHIV Healthcare System Cost"        = "#1f4e9c",  # blue
-    "US Total - Cumulative Excess\nHIV Healthcare System Cost"  = "#d62728",  # red
-    "Cumulative ADAP Spending"             = "black"
+    "US Total - Cumulative Excess\nHIV Healthcare System Cost" = "#d62728",
+    "Cumulative ADAP Spending" = "black"
 )
 
+
 # =============================================================================
-# PANEL A/B: Reusable cumulative cost vs ADAP line plot builder
-#   Now supports an optional subtitle (e.g. "Florida", "US Total")
+# PANEL A: US cumulative cost vs ADAP spending
 # =============================================================================
+
 make_cumcost_panel <- function(data, loc, tag_label, drug_only_override = NULL,
                                cost_label, subtitle = NULL) {
     
@@ -50,269 +54,499 @@ make_cumcost_panel <- function(data, loc, tag_label, drug_only_override = NULL,
         )
     
     if (!is.null(drug_only_override)) {
+        
         drug_only_line <- drug_only_override
+        
     } else {
+        
         drug_only_line <- data %>%
             filter(location == loc) %>%
             group_by(year) %>%
-            summarise(cumulative_drug_only = first(cumulative_drug_only), .groups = "drop")
+            summarise(
+                cumulative_drug_only = first(cumulative_drug_only),
+                .groups = "drop"
+            )
     }
     
-    band_df <- band_df %>% left_join(drug_only_line, by = "year")
+    band_df <- band_df %>%
+        left_join(drug_only_line, by = "year")
     
     median_line <- data %>%
-        filter(location == loc, cost_scenario == "Median cost") %>%
+        filter(
+            location == loc,
+            cost_scenario == "Median cost"
+        ) %>%
         group_by(year) %>%
         summarise(
-            p50_median_cost = median(cumulative_incremental_cost, na.rm = TRUE),
+            p50_median_cost = median(
+                cumulative_incremental_cost,
+                na.rm = TRUE
+            ),
             .groups = "drop"
         )
     
-    plot_df <- band_df %>% left_join(median_line, by = "year")
+    plot_df <- band_df %>%
+        left_join(median_line, by = "year")
     
     ggplot(plot_df, aes(x = year)) +
-        geom_ribbon(aes(ymin = p05_all / 1e9, ymax = p95_all / 1e9),
-                    fill = "#696969", alpha = 0.10) +
-        geom_ribbon(aes(ymin = p25_all / 1e9, ymax = p75_all / 1e9),
-                    fill = "#36454F", alpha = 0.20) +
-        geom_line(aes(y = p50_median_cost / 1e9, color = cost_label),
-                  linewidth = 1.2) +
-        geom_line(aes(y = cumulative_drug_only / 1e9, color = "Cumulative ADAP Spending"),
-                  linewidth = 1.2, linetype = 3) +
-        scale_color_manual(values = shared_colors, drop = FALSE) +
-        scale_x_continuous(breaks = 2026:2035) +
+        
+        geom_ribbon(
+            aes(
+                ymin = p05_all / 1e9,
+                ymax = p95_all / 1e9
+            ),
+            fill = "#696969",
+            alpha = 0.10
+        ) +
+        
+        geom_ribbon(
+            aes(
+                ymin = p25_all / 1e9,
+                ymax = p75_all / 1e9
+            ),
+            fill = "#36454F",
+            alpha = 0.20
+        ) +
+        
+        geom_line(
+            aes(
+                y = p50_median_cost / 1e9,
+                color = cost_label
+            ),
+            linewidth = 1.2
+        ) +
+        
+        geom_line(
+            aes(
+                y = cumulative_drug_only / 1e9,
+                color = "Cumulative ADAP Spending"
+            ),
+            linewidth = 1.2,
+            linetype = 3
+        ) +
+        
+        scale_color_manual(
+            values = shared_colors,
+            drop = FALSE
+        ) +
+        
+        scale_x_continuous(
+            breaks = 2026:2035
+        ) +
+        
         labs(
-            x        = NULL,
-            y        = "Cumulative Cost\n(Billions 2026 USD)",
-            color    = NULL,
-            tag      = tag_label,
+            x = NULL,
+            y = "Cumulative Cost\n(Billions 2026 USD)",
+            color = NULL,
+            tag = tag_label,
             subtitle = subtitle
         ) +
+        
         theme_bw() +
+        
         theme(
-            legend.position  = "none",
-            axis.text.x      = element_text(angle = 45, hjust = 1),
-            axis.text.y      = element_text(size = 8),
+            legend.position = "none",
+            axis.text.x = element_text(
+                angle = 45,
+                hjust = 1
+            ),
+            axis.text.y = element_text(size = 8),
             panel.grid.minor = element_blank(),
-            plot.tag         = element_text(size = 10, face = "bold"),
-            plot.subtitle    = element_text(size = 9, hjust = 0.5)
+            plot.tag = element_text(
+                size = 10,
+                face = "bold"
+            ),
+            plot.subtitle = element_text(
+                size = 9,
+                hjust = 0.5
+            )
         )
 }
 
-p_A <- make_cumcost_panel(
-    compare_with_rw, "FL", "A",
-    cost_label = "FL - Cumulative Excess\nHIV Healthcare System Cost",
-    subtitle   = "Florida"
-)
 
-p_B <- make_cumcost_panel(
-    compare_with_rw, "Total", "B",
+p_A <- make_cumcost_panel(
+    compare_with_rw,
+    "Total",
+    "A",
     drug_only_override = total_drug_only,
     cost_label = "US Total - Cumulative Excess\nHIV Healthcare System Cost",
-    subtitle   = "US Total"
+    subtitle = "US Total"
 )
 
-## =============================================================================
-# PANEL C: State-level boxplot of ratio at 2035 by Medicaid expansion,
-#          plus a pinned-last "US Total" box (shares panel B's red)
-# =============================================================================
-non_expansion <- c("AL", "FL", "GA", "ID", "KS", "MS", "NC", "SC",
-                   "SD", "TN", "TX", "WI", "WY")
-# Note: FL, GA, NC, SD, WI flipped to expansion by 2025 in some scenarios —
-# update this vector to match the policy year you are modeling.
 
-medicaid_expansion <- tibble(location = unique(compare_with_rw$location)) %>%
+# =============================================================================
+# PANEL B: State-level boxplot of NCER at 2035 by Medicaid expansion
+# =============================================================================
+
+non_expansion <- c(
+    "AL", "FL", "GA", "ID", "KS", "MS", "NC",
+    "SC", "SD", "TN", "TX", "WI", "WY"
+)
+
+medicaid_expansion <- tibble(
+    location = unique(compare_with_rw$location)
+) %>%
     mutate(
-        expanded        = !(location %in% non_expansion),
-        expansion_label = if_else(expanded, "Medicaid expansion", "Non-expansion")
+        expanded = !(location %in% non_expansion),
+        expansion_label = if_else(
+            expanded,
+            "Medicaid expansion",
+            "Non-expansion"
+        )
     )
 
-abb_to_name <- setNames(state.name, state.abb)
-abb_to_name <- c(abb_to_name, DC = "District of Columbia", PR = "Puerto Rico")
+
+abb_to_name <- setNames(
+    state.name,
+    state.abb
+)
+
+abb_to_name <- c(
+    abb_to_name,
+    DC = "District of Columbia",
+    PR = "Puerto Rico"
+)
+
 
 expansion_colors <- c(
     "Medicaid expansion" = "#2e6b75",
-    "Non-expansion"      = "#a8cdd1",
-    "US Total"           = "#d62728"   # same red as US Total line in panel B
+    "Non-expansion" = "#a8cdd1",
+    "US Total" = "#d62728"
 )
 
-# --- State-level ratios (unchanged; excludes any "Total" row from source data) ---
+
+# --- State-level ratios ---
+
 box_df <- compare_with_rw %>%
     filter(
         year == 2035,
         !location %in% c("Total", "total")
     ) %>%
     mutate(
-        ratio      = (cumulative_incremental_cost - cumulative_drug_only) / cumulative_drug_only,
-        is_total   = FALSE,
-        state_full = dplyr::coalesce(abb_to_name[location], location)
+        ratio =
+            (cumulative_incremental_cost - cumulative_drug_only) /
+            cumulative_drug_only,
+        
+        is_total = FALSE,
+        
+        state_full = dplyr::coalesce(
+            abb_to_name[location],
+            location
+        )
     ) %>%
-    left_join(medicaid_expansion, by = "location")
+    left_join(
+        medicaid_expansion,
+        by = "location"
+    )
 
-# --- US Total ratios: reuse the SAME per-sim/cost_scenario incremental cost
-#     that panel B already plots (location == "Total", straight from the
-#     simulation output) — only the denominator gets swapped for
-#     total_drug_only, since that's the piece that didn't line up before.
+
+# --- US Total ratio ---
+
 us_drug_2035 <- total_drug_only %>%
     filter(year == 2035) %>%
     pull(cumulative_drug_only)
 
+
 us_total_box_df <- compare_with_rw %>%
-    filter(location == "Total", year == 2035) %>%
+    filter(
+        location == "Total",
+        year == 2035
+    ) %>%
     mutate(
-        ratio           = (cumulative_incremental_cost - us_drug_2035) / us_drug_2035,
-        is_total        = TRUE,
-        state_full      = "US Total",
+        ratio =
+            (cumulative_incremental_cost - us_drug_2035) /
+            us_drug_2035,
+        
+        is_total = TRUE,
+        state_full = "US Total",
         expansion_label = "US Total"
     )
 
-box_df <- bind_rows(box_df, us_total_box_df)
 
-# order states by median ratio, but exclude US Total from the sort — it's pinned last
+box_df <- bind_rows(
+    box_df,
+    us_total_box_df
+)
+
+
+# Order states by median ratio; US Total pinned last
+
 state_order <- box_df %>%
     filter(!is_total) %>%
     group_by(state_full) %>%
-    summarise(med_ratio = median(ratio, na.rm = TRUE), .groups = "drop") %>%
+    summarise(
+        med_ratio = median(ratio, na.rm = TRUE),
+        .groups = "drop"
+    ) %>%
     arrange(desc(med_ratio)) %>%
     pull(state_full)
 
-state_order <- c(state_order, "US Total")
-
-p_C <- ggplot(
-    box_df %>% mutate(state_full = factor(state_full, levels = state_order)),
-    aes(x = state_full, y = ratio, fill = expansion_label)
-) +
-    geom_boxplot(outlier.shape = NA, alpha = 0.85) +
-    geom_hline(yintercept = 0, linetype = "dashed",
-               color = "grey40", linewidth = 0.5) +
-    scale_fill_manual(values = expansion_colors) +
-    scale_x_discrete(drop = TRUE) +
-    scale_y_continuous(trans = scales::pseudo_log_trans(sigma = 1), 
-                       breaks = c(0, 1, 2, 5, 10, 20)) +
-    labs(
-        x    = NULL,
-        y    = "Net Cost of ADAP Elimination\nto ADAP Expenditure Ratio",
-        fill = NULL,
-        tag  = "C"
-    ) +
-    theme_bw() +
-    theme(
-        axis.text.x      = element_text(size = 8, angle = 45, hjust = 1),
-        axis.title       = element_text(size = 9),
-        axis.text.y      = element_text(size = 8),
-        panel.grid.minor = element_blank(),
-        legend.position  = "none",
-        plot.tag         = element_text(size = 10, face = "bold")
-    )
-
-# =============================================================================
-# BUILD LEGENDS MANUALLY TO GUARANTEE NO DUPLICATE ENTRIES
-# =============================================================================
-
-# --- Legend 1: cost/spending lines (3 entries, exactly, correct linetypes) ---
-
-legend_df <- tibble(
-    x = 1, y = 1,
-    label = factor(
-        c("FL - Cumulative Excess\nHIV Healthcare System Cost",
-          "US Total - Cumulative Excess\nHIV Healthcare System Cost",
-          "Cumulative ADAP Spending"),
-        levels = c("FL - Cumulative Excess\nHIV Healthcare System Cost",
-                   "US Total - Cumulative Excess\nHIV Healthcare System Cost",
-                   "Cumulative ADAP Spending")
-    ),
-    lty = factor(c(1, 1, 3))  # solid, solid, dotted
+state_order <- c(
+    state_order,
+    "US Total"
 )
 
-p_legend_source <- ggplot(legend_df, aes(x, y, color = label)) +
-    geom_line(aes(linetype = label), linewidth = 1.2) +
-    scale_color_manual(values = shared_colors) +
-    scale_linetype_manual(values = c(
-        "FL - Cumulative Excess\nHIV Healthcare System Cost"       = 1,
-        "US Total - Cumulative Excess\nHIV Healthcare System Cost" = 1,
-        "Cumulative ADAP Spending"             = 3
-    )) +
-    labs(color = NULL, linetype = NULL) +
+
+p_B <- ggplot(
+    box_df %>%
+        mutate(
+            state_full = factor(
+                state_full,
+                levels = state_order
+            )
+        ),
+    aes(
+        x = state_full,
+        y = ratio,
+        fill = expansion_label
+    )
+) +
+    
+    geom_boxplot(
+        outlier.shape = NA,
+        alpha = 0.85
+    ) +
+    
+    geom_hline(
+        yintercept = 0,
+        linetype = "dashed",
+        color = "grey40",
+        linewidth = 0.5
+    ) +
+    
+    scale_fill_manual(
+        values = expansion_colors
+    ) +
+    
+    scale_x_discrete(
+        drop = TRUE
+    ) +
+    
+    scale_y_continuous(
+        trans = scales::pseudo_log_trans(sigma = 1),
+        breaks = c(0, 1, 2, 5, 10, 20)
+    ) +
+    
+    labs(
+        x = NULL,
+        y = "Net Cost of ADAP Elimination\nto ADAP Expenditure Ratio",
+        fill = NULL,
+        tag = "B"
+    ) +
+    
+    theme_bw() +
+    
+    theme(
+        axis.text.x = element_text(
+            size = 8,
+            angle = 45,
+            hjust = 1
+        ),
+        axis.title = element_text(size = 9),
+        axis.text.y = element_text(size = 8),
+        panel.grid.minor = element_blank(),
+        legend.position = "none",
+        plot.tag = element_text(
+            size = 10,
+            face = "bold"
+        )
+    )
+
+
+# =============================================================================
+# LEGEND 1: US cost and ADAP spending
+# =============================================================================
+
+legend_df <- tibble(
+    x = 1,
+    y = 1,
+    label = factor(
+        c(
+            "US Total - Cumulative Excess\nHIV Healthcare System Cost",
+            "Cumulative ADAP Spending"
+        ),
+        levels = c(
+            "US Total - Cumulative Excess\nHIV Healthcare System Cost",
+            "Cumulative ADAP Spending"
+        )
+    )
+)
+
+
+p_legend_source <- ggplot(
+    legend_df,
+    aes(
+        x,
+        y,
+        color = label
+    )
+) +
+    
+    geom_line(
+        aes(linetype = label),
+        linewidth = 1.2
+    ) +
+    
+    scale_color_manual(
+        values = shared_colors
+    ) +
+    
+    scale_linetype_manual(
+        values = c(
+            "US Total - Cumulative Excess\nHIV Healthcare System Cost" = 1,
+            "Cumulative ADAP Spending" = 3
+        )
+    ) +
+    
+    labs(
+        color = NULL,
+        linetype = NULL
+    ) +
+    
     guides(
         color = guide_legend(
             override.aes = list(
-                linetype  = c(1, 1, 3),
-                color     = c("#1f4e9c", "#d62728", "black"),
+                linetype = c(1, 3),
+                color = c(
+                    "#d62728",
+                    "black"
+                ),
                 linewidth = 1.2,
-                fill      = NA
+                fill = NA
             )
         ),
         linetype = "none"
     ) +
+    
     theme_void() +
+    
     theme(
-        legend.position     = "bottom",
-        legend.background   = element_rect(color = "black", fill = "white", linewidth = 0.4),
-        legend.key          = element_rect(fill = "white", color = NA),
-        legend.margin       = margin(5, 8, 5, 8),
-        legend.text         = element_text(size = 8)
+        legend.position = "bottom",
+        legend.background = element_rect(
+            color = "black",
+            fill = "white",
+            linewidth = 0.4
+        ),
+        legend.key = element_rect(
+            fill = "white",
+            color = NA
+        ),
+        legend.margin = margin(
+            5, 8, 5, 8
+        ),
+        legend.text = element_text(
+            size = 8
+        )
     )
 
-lines_legend <- cowplot::get_legend(p_legend_source)
 
-# --- Legend 2: Medicaid expansion / US Total fill (from panel C, boxed to match) ---
-p_C_legend_source <- p_C +
+lines_legend <- cowplot::get_legend(
+    p_legend_source
+)
+
+
+# =============================================================================
+# LEGEND 2: Medicaid expansion / US Total
+# =============================================================================
+
+p_B_legend_source <- p_B +
     theme(
-        legend.position    = "bottom",
-        legend.background  = element_rect(color = "black", fill = NA, linewidth = 0.4),
-        legend.margin      = margin(5, 8, 5, 8),
-        legend.text        = element_text(size = 8)
+        legend.position = "bottom",
+        legend.background = element_rect(
+            color = "black",
+            fill = NA,
+            linewidth = 0.4
+        ),
+        legend.margin = margin(
+            5, 8, 5, 8
+        ),
+        legend.text = element_text(
+            size = 8
+        )
     )
 
-fill_legend <- cowplot::get_legend(p_C_legend_source)
 
-# --- Combine both legends side by side ---
+fill_legend <- cowplot::get_legend(
+    p_B_legend_source
+)
+
+
 combined_legend <- cowplot::plot_grid(
-    lines_legend, fill_legend,
+    lines_legend,
+    fill_legend,
     nrow = 1
 )
 
+
 # =============================================================================
-# COMBINE MAIN PANELS (no legends) + MANUAL LEGEND ROW
+# DC INSET
 # =============================================================================
-p_top  <- p_A | p_B
-p_main <- p_top / p_C +
-    plot_layout(heights = c(1, 1.3))
 
-p_fig1 <- cowplot::plot_grid(
-    p_main,
-    combined_legend,
-    ncol = 1,
-    rel_heights = c(1, 0.12)
-)
-
-print(p_fig1)
-
-
-dc_df <- box_df %>% filter(state_full == "District of Columbia")
-dc_range <- range(boxplot.stats(dc_df$ratio)$stats)  # gets whisker-to-whisker range, ignoring outliers
-
-
-p_C_dc_inset <- ggplot(dc_df, aes(x = state_full, y = ratio)) +
-    geom_boxplot(outlier.shape = NA, fill = "#2e6b75", alpha = 0.85, width = 0.4) +
-    coord_cartesian(ylim = c(-1.05,-0.8)) +
-    labs(x = NULL, y = NULL) +
-    theme_bw(base_size = 7) +
-    theme(
-        axis.text.x = element_text(size = 6),
-        plot.background = element_rect(color = "black", fill = "white"),
-        plot.margin = margin(4, 8, 4, 8)
+dc_df <- box_df %>%
+    filter(
+        state_full == "District of Columbia"
     )
 
-p_C_final <- p_C + inset_element(
-    p_C_dc_inset,
-    left = 0.80, bottom = 0.55, right = 0.94, top = 0.95
-)
+
+p_B_dc_inset <- ggplot(
+    dc_df,
+    aes(
+        x = state_full,
+        y = ratio
+    )
+) +
+    
+    geom_boxplot(
+        outlier.shape = NA,
+        fill = "#2e6b75",
+        alpha = 0.85,
+        width = 0.4
+    ) +
+    
+    coord_cartesian(
+        ylim = c(-1.05, -0.8)
+    ) +
+    
+    labs(
+        x = NULL,
+        y = NULL
+    ) +
+    
+    theme_bw(
+        base_size = 7
+    ) +
+    
+    theme(
+        axis.text.x = element_text(size = 6),
+        plot.background = element_rect(
+            color = "black",
+            fill = "white"
+        ),
+        plot.margin = margin(
+            4, 8, 4, 8
+        )
+    )
 
 
-p_top  <- p_A | p_B
-p_main <- p_top / p_C_final +
-    plot_layout(heights = c(1, 1.3))
+p_B_final <- p_B +
+    inset_element(
+        p_B_dc_inset,
+        left = 0.80,
+        bottom = 0.55,
+        right = 0.94,
+        top = 0.95
+    )
+
+
+# =============================================================================
+# COMBINE FIGURE
+# =============================================================================
+
+p_main <- p_A / p_B_final +
+    plot_layout(
+        heights = c(1, 1.4)
+    )
+
 
 p_fig1 <- cowplot::plot_grid(
     p_main,
@@ -320,6 +554,7 @@ p_fig1 <- cowplot::plot_grid(
     ncol = 1,
     rel_heights = c(1, 0.12)
 )
+
 
 print(p_fig1)
 
