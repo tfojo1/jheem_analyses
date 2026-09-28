@@ -111,5 +111,5 @@ Rscript data_processing/hiv.surveillance.manager/validate_candidate.R baseline.r
 Rscript data_processing/hiv.surveillance.manager/check_consumers.R candidate.rdata active-baseline.rdata syphilis.rdata consumers.json
 ```
 
-The first three use synthetic inputs; the last two require real artifacts.
+The first four use synthetic inputs; the last two require real artifacts.
 Neither changes the input files or scientific transformation code.
