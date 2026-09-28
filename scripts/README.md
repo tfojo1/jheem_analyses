@@ -105,10 +105,19 @@ so there's no need to run `hiv.surveillance.manager.merge.R` locally.
    version and SHA-256 of every input.
 
    A successful build publishes a release like `hiv-surveillance-manager-v2026.09.25`.
-   Its notes compare the new manager with the current `latest`: structural checks,
-   which values changed, and whether common queries (Ryan White, EHE, the syphilis
-   adult-population import) still work. Expected changes, such as a fix you just
-   made, show up as changed values. If the build *removes* something the current
+   Its notes compare the new manager with the current `latest`:
+
+   - **Structural changes**: every removed and added outcome, source, ontology,
+     stratification, or dimension value, listed by path.
+   - **Value changes**: a table of each array whose values changed, with the number
+     of changed cells and which locations, years, and strata changed.
+   - **Data quality report**: the same missing-value and dimension checks as the
+     syphilis build. Accepted issues can be listed in
+     `data_processing/hiv.surveillance.manager/known_issues.json` to hide them.
+   - Whether common queries (Ryan White, EHE, the syphilis adult-population import)
+     still work.
+
+   Expected changes, such as a fix you just made, show up in these lists. If the build *removes* something the current
    manager has (an outcome, source, or stratification), the release is marked
    **Needs review** and listed as a pre-release. The build fails only if the merge
    itself errors or a common query stops working. Runs from branches other than
