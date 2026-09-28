@@ -98,6 +98,7 @@ jobs:
           Rscript data_processing/hiv.surveillance.manager/test_manager_value_delta.R
           Rscript data_processing/hiv.surveillance.manager/test_manager_reproduction.R
           Rscript data_processing/hiv.surveillance.manager/test_summarize_candidate.R
+          Rscript data_processing/validation/test_marginal_consistency.R
 
       - name: Download and verify section inputs
         run: |
