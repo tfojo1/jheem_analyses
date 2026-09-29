@@ -80,7 +80,9 @@ SHIELD model and stage-0 likelihood, two fixed-start transmission parameters,
 one chain, and two iterations. Run it with `SHIELD_CACHE_FREQUENCY=1` so the
 first iteration is a durable checkpoint that an interrupted run can resume
 from. It validates execution and checkpoint continuation only; it is not for
-scientific inference.
+scientific inference. On a GitHub-hosted runner, also set `SHIELD_ASSEMBLE=false`:
+assembling SHIELD simulations exceeds the runner's memory, so the canary stops
+after sampling. Server runs keep the default and assemble.
 
 ## Focused checks
 
