@@ -465,8 +465,8 @@ penalty.ps.diag.growth.likelihood.instructions =
         get.data.function = function(version, location) {
             sim.meta <- get.simulation.metadata(version = version, location = location)
             
-            start_year  <- 2020L
-            end_year    <- 2030L
+            start_year  <- 2019L #last full year before covid
+            end_year    <- 2029L #10-year window, matching the 10-year reference ratios
             
             get.instr <- sim.meta$prepare.optimized.get.instructions(
                 outcome                   = "diagnosis.ps",
