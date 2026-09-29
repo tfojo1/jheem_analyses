@@ -475,11 +475,14 @@ register.model.element(SHIELD.SPECIFICATION,
                            #
                            after.time = 2030, #values between 2020-2030 are scaled down to change up to 50% of modeled change between 2010-2020
                            after.modifier = 0.5, # 2030 = 2020 + delta(2020 vs 2010) * after.modifier IF delta is positive. This gets overwritten by the ~N(0.75, 0.25) fut change multiplier
+                           overwrite.modifiers.with.alphas = T, # we sampled after modifier in calibration and he should write over the default value here (not added to it
+                           modifiers.apply.to.change = T, # means it multiplies the delta
+                           #
                            after.modifier.increasing.change.link = 'identity', #if the delta is >1 (values increasing), we let the changes to grow linearly over time without rescaling them
                            after.modifier.decreasing.change.link = 'log', # if delta is <1 (values decreasing), we risk hiting zero fast, so we model these reductions in the log-scale which will 
                            #slow down the reductions when we transform the value back (assomptotic reductions)
                            # log(2030) = log(2020) + log(delta(2020 vs 2010)) * after.modifier IF delta is negative
-                           modifiers.apply.to.change = T, # means it multiplies the delta
+                           
                            min=0 #even after using log for knots, value can be negative so we need to truncate
                        )
 ) 
@@ -504,9 +507,11 @@ register.model.element(SHIELD.SPECIFICATION,
                                                                                link='identity',
                                                                                after.time = 2030, #values between 2020-2030 are scaled down to change up to 50% of modeled change between 2010-2020
                                                                                after.modifier = 0.5,
+                                                                               overwrite.modifiers.with.alphas = T, # we sampled after modifier in calibration and he should write over the default value here (not added to it)
+                                                                               modifiers.apply.to.change = T,
                                                                                after.modifier.increasing.change.link = 'identity',
-                                                                               after.modifier.decreasing.change.link = 'log',
-                                                                               modifiers.apply.to.change = T)
+                                                                               after.modifier.decreasing.change.link = 'log'
+                                                                              )
 )
 
 ##---- Sexual Contact: By AGE ----

@@ -350,6 +350,7 @@ get.fertility.rate.functional.form<-function(location, specification.metadata, p
                                              #since linear projections are too extreme, we multiply future prediction by a modifier set at 0.5
                                              after.time = 2030,
                                              after.modifier = 0.5,#modifier.min and .max could sample
+                                             overwrite.modifiers.with.alphas = T, # we sampled after modifier in calibration and he should write over the default value here (not added to it)
                                              modifiers.apply.to.change = T, # if True, modifier is multiplied into diff between knot1 and knot2 values; if False, modifier is multiplied into knot2 value
                                              min = 0 # this is to prevent values from falling below 0
                                              #@TODD: how does this modify the behavior
@@ -1260,7 +1261,8 @@ get.immigration.rates.functional.form <- function(location, specification.metada
                                           min = 0,
                                           after.time = 2030,
                                           after.modifier = 0.1,
-                                          knots.are.on.transformed.scale = F)
+                                          knots.are.on.transformed.scale = F
+                                          )
 }
 
 ## get.immigration.rates ----
