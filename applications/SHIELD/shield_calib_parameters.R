@@ -456,8 +456,6 @@ PRENATAL.PARAMETERS.PRIOR=join.distributions(
 # *********************************************************************************************************************************************************************
 #***** LINKING PARAMETERS TO FUNCTIONAL FORMS *****  -----
 # *********************************************************************************************************************************************************************
-
-## SHIELD.APPLY.PARAMETERS.FN ----
 SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){ 
     ages=model.settings$specification.metadata$dim.names$age
     sexes=model.settings$specification.metadata$dim.names$sex
@@ -484,7 +482,8 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                                applies.to.dimension.values =list(age = agegroup, race = race))
             }}}                                      
     
-    ## Fertility rates by race to time1/time2 knots----
+    ## FERTILITY RATES ----
+    ### >> by race to time1/time2 knots----
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "fertility.rate",
                                                    alpha.name = "time1",
@@ -499,7 +498,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    dimension = "race",
                                                    applies.to.dimension.values = races)
     
-    # Fertility multipliers by age to time1/time2 knots ----
+    ### >> by age to time1/time2 knots ----
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "fertility.rate",
                                                    alpha.name = "time1",
@@ -514,7 +513,8 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    dimension = "age",
                                                    applies.to.dimension.values = fertile.ages)
     
-    ## Immigration rate multipliers by race for time1/time2 knots ----
+    ## IMMIGRATION RATE ----
+    ### >> multipliers by race for time1/time2 knots ----
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "rate.immigration",
                                                    alpha.name = "time.1",
@@ -528,7 +528,8 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    dimension = "race",
                                                    applies.to.dimension.values = races)
     
-    ## Emigration coefficients  by race for time1/time2 knots ----
+    ## EMIGRATION RATE ----
+    ### >> Emigration coefficients  by race for time1/time2 knots ----
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "rate.emigration",
                                                    alpha.name = "time.1",
@@ -542,7 +543,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    dimension = "race",
                                                    applies.to.dimension.values = races)
     ## MORTALITY RATE ----
-    ## Mortality rates by race ----
+    ### >> by race ----
     races=model.settings$specification.metadata$dim.names$race
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "rate.general.mortality",
@@ -550,7 +551,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    values = parameters[paste0(races,".general.mortality.rate.multiplier")],
                                                    dimension = "race",
                                                    applies.to.dimension.values = races)
-    ## Mortality rates by sex ----
+    ### >> by sex ----
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "rate.general.mortality",
                                                    alpha.name = 'value',
@@ -564,7 +565,8 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    dimension = "sex",
                                                    applies.to.dimension.values = c('female'))
     
-    ## PROPORTION MSM: by race ----
+    ## PROPORTION MSM: 
+    ### >> by race ----
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = 'prp.msm.of.male',
                                                    alpha.name = 'value',
@@ -574,15 +576,15 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
     
     
     ## TRANSMISSION ----
-    #multipliers for msm rates in each knot:
+    ### >> by knots:
     for(time in c("1970","1990","1995","2000","2010","2022")){   
+        ### >> by sex (msm vs het) ----
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "transmission.rate.msm",
                                                        alpha.name = time,
                                                        values = parameters[paste0("transmission.rate.multiplier.msm",time)],
                                                        dimension = 'all',
                                                        applies.to.dimension.values = 'all')
-        #multipliers for heterosexual rates in each knot:
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "transmission.rate.heterosexual",
                                                        alpha.name = time,
@@ -590,13 +592,10 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                        dimension = 'all',
                                                        applies.to.dimension.values = 'all')
         
-        #race multipliers, shared for msm and heterosexuals: 
+        ### >> by race (shared among msm and het) ----
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "transmission.rate.msm",
                                                        alpha.name = time,
-                                                       # values = parameters[c("transmission.rate.multiplier.black.msm",
-                                                       #                       "transmission.rate.multiplier.hispanic.msm", 
-                                                       #                       "transmission.rate.multiplier.other.msm")],
                                                        values = parameters[c("transmission.rate.multiplier.black",
                                                                              "transmission.rate.multiplier.hispanic", 
                                                                              "transmission.rate.multiplier.other")],
@@ -605,16 +604,13 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "transmission.rate.heterosexual",
                                                        alpha.name = time,
-                                                       # values = parameters[c("transmission.rate.multiplier.black.heterosexual",
-                                                       #                       "transmission.rate.multiplier.hispanic.heterosexual", 
-                                                       #                       "transmission.rate.multiplier.other.heterosexual")],
                                                        values = parameters[c("transmission.rate.multiplier.black",
                                                                              "transmission.rate.multiplier.hispanic", 
                                                                              "transmission.rate.multiplier.other")],
                                                        dimension = "race.to", #recipient
                                                        applies.to.dimension.values = c("black","hispanic", "other"))
         
-        #age multipliers:
+        ### >> by age (different for msm and het) ----
         agegroups = c("14", "19","24", "29", "34", "39", "44", "49", "54", "64", "65")
         paramName.msm =paste0("transmission.rate.multiplier.age",agegroups, ".msm")
         paramName.heterosexual =paste0("transmission.rate.multiplier.age",agegroups, ".heterosexual")
@@ -631,7 +627,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                        dimension = "age.to", #recipient
                                                        applies.to.dimension.values = ages)
     }
-    # Future change multiplier ----
+    ### >> future change multiplier (same for everyone) ----
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "transmission.rate.heterosexual",
                                                    alpha.name = "after.modifier",
@@ -647,29 +643,8 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    dimension = "all"
     )
     
-    ## COVID multipliers ----
-    # # Sex/risk 
-    # set.element.functional.form.interaction.alphas(model.settings,
-    #                                                element.name = "max.covid.effect.sti.screening.reduction",
-    #                                                alpha.name = "value",
-    #                                                value = parameters['heterosexual.sti.screening.covid.multiplier'],
-    #                                                applies.to.dimension.values=list(sex = c("female","heterosexual_male"))
-    # )
-    # set.element.functional.form.interaction.alphas(model.settings,
-    #                                                element.name = "max.covid.effect.sti.screening.reduction",
-    #                                                alpha.name = "value",
-    #                                                value = parameters['msm.sti.screening.covid.multiplier'],
-    #                                                applies.to.dimension.values=list(sex = c("msm"))
-    # )
-    # # race
-    # set.element.functional.form.interaction.alphas(model.settings,
-    #                                                element.name = "max.covid.effect.sti.screening.reduction",
-    #                                                alpha.name = "value",
-    #                                                values = parameters[paste0(races,'.sti.screening.covid.multiplier')],
-    #                                                dimension = 'race',
-    #                                                applies.to.dimension.values = races
-    # )
-    # Sex/risk 
+    ## COVID  ----
+    ### >> by sex/risk ----
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "max.covid.effect.sti.screening.reduction",
                                                    alpha.name = "value",
@@ -684,7 +659,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    dimension = "sex",
                                                    applies.to.dimension.values="msm"
     )
-    # race
+    ### >> by race
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "max.covid.effect.sti.screening.reduction",
                                                    alpha.name = "value",
@@ -693,23 +668,23 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    applies.to.dimension.values = races
     )
     
-    ## Symptomatic Testing ---- 
-    # Logit Linear function 
-    # changes in intercept by sex
+    ## SYMPTOMATIC TESTING ---- 
+    ### >> by sex (intercept) ----
+    # Logit Linear function changes in intercept by sex
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "prob.careseek.if.symptomatic.ps",
                                                    alpha.name = "intercept",
                                                    values = parameters[paste0("or.careseeking.symptomatic.ps.", sexes)],
                                                    dimension = "sex", 
                                                    applies.to.dimension.values = sexes)
-    # changes in intercept by race
+    ### >> by race (intercept) ----
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "prob.careseek.if.symptomatic.ps",
                                                    alpha.name = "intercept",
                                                    values = parameters[paste0("or.careseeking.symptomatic.ps.", races)],
                                                    dimension = "race",  
                                                    applies.to.dimension.values = races)
-    # changing the slope
+    ### >> slope 
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "prob.careseek.if.symptomatic.ps",
                                                    alpha.name = "slope",
@@ -717,9 +692,10 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    dimension = "all", 
                                                    applies.to.dimension.values = "all") 
     
-    ## STI Screening  ----
+    ## STI SCREENING  ----
+    ### >> by knots:
     for(time in c("1990","2000","2010","2020")){
-       # msm
+        ### >> by sex ----
          set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "rate.sti.screening.over.14.without.covid",
                                                        alpha.name = time,
@@ -733,7 +709,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                        values = unname(parameters[paste0("screening.rate.multiplier.female.",time)]),
                                                        dimension = 'sex',
                                                        applies.to.dimension.values = c("female"))
-        # het_male (*rel.to.female)
+        ### >> het_male (*rel.to.female)
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "rate.sti.screening.over.14.without.covid",
                                                        alpha.name = time,
@@ -742,7 +718,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                        dimension = 'sex',
                                                        applies.to.dimension.values = c("heterosexual_male"))
         
-        # by race
+        ### >> by race ----
         for(race in races){
             set.element.functional.form.main.effect.alphas(model.settings,
                                                            element.name = "rate.sti.screening.over.14.without.covid",
@@ -752,7 +728,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                            applies.to.dimension.values = race)
         }
     }
-    ### Future change multiplier ----
+    ### >> future change multiplier ----
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "rate.sti.screening.over.14.without.covid",
                                                    alpha.name = "after.modifier",
@@ -762,20 +738,6 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
     )
     
     ## Syphilis to HIV tests Ratio ----
-    # Change intercept and slope
-    # set.element.functional.form.main.effect.alphas(model.settings,
-    #                                                element.name = "ratio.syphilis.screening.to.hiv.tests",
-    #                                                alpha.name = "intercept",
-    #                                                values = parameters[paste0("or.syphilis.to.hiv.testing.", sexes)],
-    #                                                dimension = "sex", #recipient
-    #                                                applies.to.dimension.values = sexes)
-    # set.element.functional.form.main.effect.alphas(model.settings,
-    #                                                element.name = "ratio.syphilis.screening.to.hiv.tests",
-    #                                                alpha.name = "intercept",
-    #                                                values = parameters[paste0("or.syphilis.to.hiv.testing.", races)],
-    #                                                dimension = "race", #recipient
-    #                                                applies.to.dimension.values = races)
-    
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "ratio.syphilis.screening.to.hiv.tests",
                                                    alpha.name = "intercept",
@@ -790,7 +752,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    dimension = "all", #recipient
                                                    applies.to.dimension.values = "all")
     
-    # Prenatal care ----
+    # PRENATAL CARE ----
     trimesters <- list(
         list(element = "prp.prenatal.care.first.trimester",  prefix = "first.trimester"),
         list(element = "prp.prenatal.care.second.trimester.of.those.not.screened.first", prefix = "second.trimester"),
