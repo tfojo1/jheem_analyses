@@ -1191,7 +1191,7 @@ get_sti_screening_functional_form_OPTION2 <- function(specification.metadata) {
                                                                           link = "logit",
                                                                           knot.link="logit",
                                                                           knots.are.on.transformed.scale = F,
-                                                                          after.time = 2030,
+                                                                          after.time = 2030,  #because the last knot in 2020 is 12 years apart from 2010. This projects a similar 10 year period for the after modifier 
                                                                           after.modifier = .5,
                                                                           after.modifier.increasing.change.link = 'logit',
                                                                           after.modifier.decreasing.change.link = 'logit', 
