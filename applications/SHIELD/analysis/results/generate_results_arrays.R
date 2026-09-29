@@ -251,7 +251,9 @@ for (strat in RUN.STRATA) {
     blocks[!found] <- list(array(NA_real_, dim(template)))
 
     # 2. Stack them. Intervention and location are the last two dimensions.
-    dn  <- c(dimnames(template), list(intervention = INTERVENTION.CODES, location = unname(LOCATIONS)))
+    # Keep the city names on the location codes (Atlanta = "C.12060"): the table and plot
+    # helpers look cities up by these names
+    dn  <- c(dimnames(template), list(intervention = INTERVENTION.CODES, location = LOCATIONS))
     res <- array(unlist(blocks), dim = sapply(dn, length), dimnames = dn)
 
     # 3. Total keeps the old layout, with outcome last
