@@ -2,6 +2,12 @@
 # Rscript applications/SHIELD/tests/test-recorded-runtime.R
 source("applications/SHIELD/R/shield_recorded_runtime.R")
 
+# Stand-in for jheem2's get.calibration.dir(), as a sourced or load_all()
+# session exposes it; current jheem2 orders the path calibration, then location.
+get.calibration.dir <- function(version, location, calibration.code, root.dir) {
+    file.path(root.dir, "mcmc_runs", version, calibration.code, location)
+}
+
 expect.error <- function(expr, pattern) {
     error <- tryCatch({ force(expr); NULL }, error = identity)
     stopifnot(inherits(error, "error"), grepl(pattern, conditionMessage(error)))
@@ -39,6 +45,8 @@ expect.error(shield.recorded.assert.state(config, "C.12580", "stage0"),
              "no nonempty chain-1 checkpoint")
 
 directory <- shield.recorded.calibration.dir(config, "C.12580", "stage0")
+stopifnot(identical(directory, file.path(config$root_dir, "mcmc_runs", "shield",
+                                         "stage0", "C.12580")))
 dir.create(file.path(directory, "cache"), recursive = TRUE)
 writeLines("checkpoint", file.path(directory, "cache", "chain1_control.Rdata"))
 stopifnot(identical(shield.recorded.assert.state(config, "C.12580", "stage0"),

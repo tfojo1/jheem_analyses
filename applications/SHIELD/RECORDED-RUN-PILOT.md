@@ -54,6 +54,11 @@ launcher before it can validate this source revision.
 
 ## State rules
 
+The calibration directory comes from jheem2's `get.calibration.dir()`, so it
+follows the layout of the jheem2 revision actually loaded (since `jheem2@ccb1f9b`,
+`mcmc_runs/shield/<calibration-code>/<location>`). The state check therefore runs
+after the specification has loaded jheem2, before any calibration setup.
+
 `fresh` refuses an existing calibration directory and does not call
 `clear.calibration.cache()`. It writes an input receipt under
 `JHEEM_ROOT_DIR/run_records/shield/<location>/<calibration-code>/inputs.json`
@@ -66,6 +71,16 @@ and SHA-256 digests for the census and syphilis managers. It does not by itself
 prove deterministic replay or capture the final simset. Retain the container
 image digest, complete log, checkpoint tree, and any output artifact alongside
 the receipt during a server pilot.
+
+## Container canary calibration
+
+With `SHIELD_ENABLE_CONTAINER_SMOKE=true`, a recorded run also registers
+`container.smoke.stage0` (`shield_calib_register_container_smoke.R`): the real
+SHIELD model and stage-0 likelihood, two fixed-start transmission parameters,
+one chain, and two iterations. Run it with `SHIELD_CACHE_FREQUENCY=1` so the
+first iteration is a durable checkpoint that an interrupted run can resume
+from. It validates execution and checkpoint continuation only; it is not for
+scientific inference.
 
 ## Focused checks
 

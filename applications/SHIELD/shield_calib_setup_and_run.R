@@ -30,7 +30,7 @@ if (SHIELD.RECORDED.RUN) {
                                     SHIELD.RECORDED.CONFIG$analyses_ref)
     shield.recorded.assert.checkout(SHIELD.RECORDED.CONFIG$jheem2_path,
                                     SHIELD.RECORDED.CONFIG$jheem2_ref)
-    shield.recorded.assert.state(SHIELD.RECORDED.CONFIG, LOCATION, CALIBRATION.NAME)
+    shield.recorded.assert.names(LOCATION, CALIBRATION.NAME)
     SHIELD.DIR <- file.path(SHIELD.RECORDED.CONFIG$analyses_path,
                             "applications/SHIELD")
     # The current specification and likelihood files still use repo-root
@@ -46,8 +46,13 @@ if (SHIELD.RECORDED.RUN) {
     source(file.path(SHIELD.DIR, "shield_specification.R"))
     source(file.path(SHIELD.DIR, "shield_likelihoods.R"))
     source(file.path(SHIELD.DIR, "shield_calib_register.R"))
+    if (identical(tolower(trimws(Sys.getenv("SHIELD_ENABLE_CONTAINER_SMOKE", unset = "false"))), "true")) {
+        source(file.path(SHIELD.DIR, "shield_calib_register_container_smoke.R"))
+    }
     source(file.path(SHIELD.RECORDED.CONFIG$analyses_path,
                      "commoncode/locations_of_interest.R"))
+    # Checked once jheem2 is loaded, so the calibration directory comes from jheem2.
+    shield.recorded.assert.state(SHIELD.RECORDED.CONFIG, LOCATION, CALIBRATION.NAME)
 } else {
     source('../jheem_analyses/applications/SHIELD/shield_specification.R')
     source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')

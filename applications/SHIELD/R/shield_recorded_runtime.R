@@ -95,7 +95,7 @@ shield.recorded.config <- function(getenv = Sys.getenv) {
     )
 }
 
-shield.recorded.calibration.dir <- function(config, location, calibration.code) {
+shield.recorded.assert.names <- function(location, calibration.code) {
     for (item in list(location = location, calibration.code = calibration.code)) {
         if (!is.character(item) || length(item) != 1L || is.na(item) ||
             !grepl("^[A-Za-z0-9][A-Za-z0-9._-]*$", item)) {
@@ -103,7 +103,25 @@ shield.recorded.calibration.dir <- function(config, location, calibration.code) 
                  call. = FALSE)
         }
     }
-    file.path(config$root_dir, "mcmc_runs", "shield", location, calibration.code)
+    invisible(TRUE)
+}
+
+# jheem2 owns the calibration directory layout (it changed order in
+# jheem2@ccb1f9b), so ask it rather than rebuilding the path here. Sourced and
+# load_all() sessions expose the function directly; an installed package keeps
+# it internal. jheem2 must be loaded before recorded state is checked.
+shield.recorded.calibration.dir <- function(config, location, calibration.code) {
+    shield.recorded.assert.names(location, calibration.code)
+    get.dir <- if (exists("get.calibration.dir", mode = "function")) {
+        get("get.calibration.dir", mode = "function")
+    } else if (isNamespaceLoaded("jheem2")) {
+        utils::getFromNamespace("get.calibration.dir", "jheem2")
+    } else {
+        stop("jheem2 must be loaded before checking recorded calibration state",
+             call. = FALSE)
+    }
+    get.dir(version = "shield", location = location,
+            calibration.code = calibration.code, root.dir = config$root_dir)
 }
 
 shield.recorded.assert.state <- function(config, location, calibration.code) {
@@ -172,7 +190,7 @@ shield.recorded.inputs <- function(config, census.resolution, syphilis.resolutio
 }
 
 shield.recorded.receipt.path <- function(config, location, calibration.code) {
-    shield.recorded.calibration.dir(config, location, calibration.code)
+    shield.recorded.assert.names(location, calibration.code)
     file.path(config$root_dir, "run_records", "shield", location,
               calibration.code, "inputs.json")
 }
