@@ -18,7 +18,7 @@ get.jheem.root.directory()
 # LOGS <- normalizePath("~/jheem/code/jheem_analyses/applications/SHIELD/logs/")
 
 for (x in SHIELD.TEN.MSAS){
-    print(get.calibration.progress("shield", x, "calib.9.23.stage2"))
+    print(get.calibration.progress("shield", x, "calib.9.23.stage3.pk"))
 }
 
 calibration.codes <- c(
