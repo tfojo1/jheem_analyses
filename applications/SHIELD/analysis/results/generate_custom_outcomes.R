@@ -4,9 +4,11 @@
 # percent reduction in cumulative cases (incidence and diagnosis)
 # percent reduction in cases (incidence and diagnosis)
 
+source('../jheem_analyses/applications/SHIELD/shield_specification.R')
 source('../jheem_analyses/applications/SHIELD/analysis/shield_output_paths.R')
 
-CALIB.NAME <- "calib.8.21.stage3.az"
+
+CALIB.NAME <- "calib.9.23.stage3.pk"
 NOINT = "noint"
 
 ## subset_array ----
@@ -36,7 +38,7 @@ subset_array <- function(arr, dim_indices, drop = FALSE) {
     do.call(`[`, c(list(arr), args, list(drop = drop)))
 }
 
-# ****************************************************************************
+# *******************************************************************************************************************
 # WHY THESE ARE WRITTEN WITH aperm() AND NOT apply()
 #
 # Every calculation below is a whole-array operation in disguise. `x[noint] - x`
@@ -51,7 +53,7 @@ subset_array <- function(arr, dim_indices, drop = FALSE) {
 # aperm() is also SAFER than the old array(apply(...), dn) pattern: it derives
 # the permutation from the dimension NAMES, so it cannot silently transpose the
 # result the way a mismatched hand-passed `dn.one.outcome` could.
-# ****************************************************************************
+# *******************************************************************************************************************
 
 ## .dims_last ----
 #' Move the named dimensions to the end, leaving the others in their order
@@ -869,7 +871,7 @@ calculate_custom_outcomes <- function(raw_results, baseline.year, debug=F) {
 }
 
 
-# ----------------------------------------------------------------------------
+# ********************************************************************************
 # OUTCOME NAMING CONVENTION
 #   num_*   a count               (cases, diagnoses, doxy person-years)
 #   pct_*   a percentage          (0-100)
@@ -903,9 +905,9 @@ calculate_custom_outcomes <- function(raw_results, baseline.year, debug=F) {
 #
 # NOTE: the *_ppy_doxy outcomes are NaN in the "noint" slice by construction
 # (doxy coverage is zero there, so the denominator is zero).
-# ----------------------------------------------------------------------------
+# ********************************************************************************
 
-# ----------------------------------------------------------------------------
+# ********************************************************************************
 # WHY THERE IS NO SINGLE-YEAR *_averted_ppy_doxy OUTCOME
 #
 # Removed 2026-09-08. Three outcomes existed here and are gone:
@@ -949,19 +951,19 @@ calculate_custom_outcomes <- function(raw_results, baseline.year, debug=F) {
 # doxy.coverage is still pulled into CHOSEN_OUTCOMES at the total level -- it
 # is needed for num_cum_doxy_coverage and the three cumulative rate_cum_*
 # outcomes. Only the single-year ratios are gone.
-# ----------------------------------------------------------------------------
+# ********************************************************************************
 
 # Verify accuracy of these transformations
 # total_raw_results["2026", 3, "noint", "C.12580", "incidence"] -
 #     total_raw_results["2026", 3, "doxy.cov.10", "C.12580", "incidence"] ==
 #     total_calc_results["2026", 3, "doxy.cov.10", "C.12580", "num_incidence_averted"]
-
+# RUN ----
 if (1==1) {
     # The calc arrays are written next to the raw ones, in the calibration's output folder.
-    OUT.DIR <- shield.output.path(CALIB.NAME, create = TRUE)
+    OUT.DIR <- shield.output.path(CALIB.NAME, create = F)
     
-    if(1==2){
-        source ("../jheem_analyses/applications/SHIELD/shield_specification.R")
+    if(1==1){
+        # source ("../jheem_analyses/applications/SHIELD/shield_specification.R")
         print(ROOT.DIR)
         # only the raw arrays exist at this point -- this script writes the calc ones
         RAW <- load.shield.results(CALIB.NAME, which = c("total_raw", "sex_raw"))
@@ -972,10 +974,12 @@ if (1==1) {
     total_calc_results <- calculate_custom_outcomes(total_raw_results, baseline.year = "2022")
     save(total_calc_results,
          file = file.path(OUT.DIR, "total_calc_results.Rdata"))
+    print(paste0("total_calc_results.Rdata generated"))
     
     sex_calc_results <- calculate_custom_outcomes(sex_raw_results, baseline.year = "2022")
     save(sex_calc_results,
          file = file.path(OUT.DIR, "sex_calc_results.Rdata"))
+    print(paste0("sex_calc_results.Rdata generated"))
 }
 
 #cumulative incidence : add a baseline year: 2022 update all instances 

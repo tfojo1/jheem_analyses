@@ -134,7 +134,8 @@ ensure.shield.dir <- function(path) {
 load.shield.results <- function(calibration.code,
                                 which    = c("total_raw", "total_calc", "sex_raw", "sex_calc"),
                                 root.dir = NULL) {
-
+    print(paste0("Loading ",which," results ..."))
+    
     files <- c(total_raw  = "total_raw_results.Rdata",
                total_calc = "total_calc_results.Rdata",
                sex_raw    = "sex_raw_results.Rdata",
