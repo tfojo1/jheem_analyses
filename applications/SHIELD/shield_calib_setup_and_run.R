@@ -269,15 +269,9 @@ print(paste0("DONE RUNNING MCMC: Took ",
              round(run.time/60, 0), " minutes to run "))
 
 
-# Save simset. A recorded run can stop after sampling with SHIELD_ASSEMBLE=false,
-# e.g. a CI canary on a runner too small to hold assembled SHIELD simulations.
-if (SHIELD.RECORDED.RUN &&
-    identical(tolower(trimws(Sys.getenv("SHIELD_ASSEMBLE", unset = "true"))), "false")) {
-    print("Skipping simulation-set assembly (SHIELD_ASSEMBLE=false)")
-} else {
-    simset <- assemble.simulations.from.calibration(version = VERSION,
-                                                    location = LOCATION,
-                                                    calibration.code = CALIBRATION.NAME,
-                                                    allow.incomplete = T)
-    save.simulation.set(simset)
-}
+# Save simset
+simset <- assemble.simulations.from.calibration(version = VERSION,
+                                                location = LOCATION,
+                                                calibration.code = CALIBRATION.NAME,
+                                                allow.incomplete = T)
+save.simulation.set(simset)
