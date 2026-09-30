@@ -25,3 +25,24 @@ register.calibration.info(
     max.run.time.seconds = 30,
     description = "Container checkpoint/resume canary; not for scientific inference"
 )
+
+# Starts from container.smoke.stage0's recorded outputs in the same output tree,
+# as a later stage does from its preceding stage. It validates stage chaining
+# and its lineage record, not stage-1 science, so it reuses the stage-0
+# likelihood and parameters.
+register.calibration.info(
+    "container.smoke.stage1",
+    preceding.calibration.codes = "container.smoke.stage0",
+    likelihood.instructions = lik.inst.stage0,
+    data.manager = SURVEILLANCE.MANAGER,
+    end.year = 2030,
+    parameter.names = c(
+        "global.transmission.rate.msm",
+        "global.transmission.rate.het"
+    ),
+    n.iter = 2,
+    thin = 1,
+    is.preliminary = TRUE,
+    max.run.time.seconds = 30,
+    description = "Container stage-chaining canary; not for scientific inference"
+)

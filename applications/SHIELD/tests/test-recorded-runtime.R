@@ -7,6 +7,16 @@ source("applications/SHIELD/R/shield_recorded_runtime.R")
 get.calibration.dir <- function(version, location, calibration.code, root.dir) {
     file.path(root.dir, "mcmc_runs", version, calibration.code, location)
 }
+get.mcmc.summary.file <- function(version, location, calibration.code, root.dir) {
+    file.path(root.dir, "mcmc_summaries", version, calibration.code,
+              paste0("summary_", version, "_", location, "_", calibration.code, ".Rdata"))
+}
+registered <- list(
+    stage0 = list(n.chains = 1, preceding.calibration.codes = character()),
+    stage1 = list(n.chains = 1, preceding.calibration.codes = "stage0"),
+    stage3 = list(n.chains = 4, preceding.calibration.codes = "stage1")
+)
+get.calibration.info <- function(code) registered[[code]]
 
 expect.error <- function(expr, pattern) {
     error <- tryCatch({ force(expr); NULL }, error = identity)
@@ -28,6 +38,8 @@ values <- c(
     JHEEM_ANALYSES_REF = paste(rep("a", 40L), collapse = ""),
     JHEEM2_REF = paste(rep("b", 40L), collapse = ""),
     LOCATIONS_REF = paste(rep("c", 40L), collapse = ""),
+    BAYESIAN_SIMULATIONS_REF = paste(rep("1", 40L), collapse = ""),
+    DISTRIBUTIONS_REF = paste(rep("2", 40L), collapse = ""),
     SHIELD_RANDOM_SEED = "20260916",
     JHEEM_CENSUS_MANAGER_TAG = "data-managers-v2026.08.26",
     JHEEM_SYPHILIS_MANAGER_TAG = "syphilis-manager-v2026.07.27"
@@ -67,6 +79,9 @@ values[["JHEEM_CENSUS_MANAGER_TAG"]] <- "data-managers-v2026.08.26"
 values[["JHEEM_ANALYSES_REF"]] <- "main"
 expect.error(shield.recorded.config(getenv), "full 40-character")
 values[["JHEEM_ANALYSES_REF"]] <- paste(rep("a", 40L), collapse = "")
+values[["BAYESIAN_SIMULATIONS_REF"]] <- ""
+expect.error(shield.recorded.config(getenv), "requires BAYESIAN_SIMULATIONS_REF")
+values[["BAYESIAN_SIMULATIONS_REF"]] <- paste(rep("1", 40L), collapse = "")
 values[["JHEEM_CACHE_DIR"]] <- values[["JHEEM_ROOT_DIR"]]
 expect.error(shield.recorded.config(getenv), "separate trees")
 
@@ -87,6 +102,68 @@ resume <- shield.recorded.config(getenv)
 shield.recorded.check.receipt(resume, "C.12580", "stage1", inputs)
 inputs$analyses_ref <- paste(rep("f", 40L), collapse = "")
 expect.error(shield.recorded.check.receipt(resume, "C.12580", "stage1", inputs),
+             "differ from")
+
+# Only single-chain calibrations can be recorded.
+stopifnot(identical(shield.recorded.calibration.info("stage1")$n.chains, 1))
+expect.error(shield.recorded.calibration.info("stage3"), "single-chain")
+
+# A later stage names the recorded outputs of the stage it starts from.
+stopifnot(identical(shield.recorded.preceding(fresh, "C.12580", registered$stage0),
+                    list()))
+expect.error(shield.recorded.preceding(fresh, "C.12580", registered$stage1),
+             "stage0, which has no recorded outputs")
+summary.file <- shield.recorded.summary.file(fresh, "C.12580", "stage0")
+simset.file <- file.path(fresh$root_dir, "simulations", "shield", "stage0-2",
+                         "C.12580", "simset.Rdata")
+dir.create(dirname(summary.file), recursive = TRUE)
+dir.create(dirname(simset.file), recursive = TRUE)
+writeLines("summary", summary.file)
+writeLines("simset", simset.file)
+stage0.inputs <- shield.recorded.inputs(fresh,
+    list(manager = "census.manager.rdata", resolved_tag = fresh$census_tag,
+         sha256 = paste(rep("d", 64L), collapse = "")),
+    list(manager = "syphilis.manager.rdata", resolved_tag = fresh$syphilis_tag,
+         sha256 = paste(rep("e", 64L), collapse = "")))
+outputs.path <- shield.recorded.write.outputs(fresh, "C.12580", "stage0", stage0.inputs,
+    list(mcmc_summary = summary.file, simulation_set = simset.file))
+written <- jsonlite::fromJSON(outputs.path, simplifyVector = FALSE)
+stopifnot(identical(written$inputs, stage0.inputs),
+          identical(written$outputs[[1]]$role, "mcmc_summary"),
+          identical(written$outputs[[1]]$path,
+                    "mcmc_summaries/shield/stage0/summary_shield_C.12580_stage0.Rdata"),
+          identical(written$outputs[[2]]$path,
+                    "simulations/shield/stage0-2/C.12580/simset.Rdata"),
+          identical(written$outputs[[2]]$sha256, shield.recorded.sha256(simset.file)))
+expect.error(shield.recorded.write.outputs(fresh, "C.12580", "stage0", stage0.inputs,
+    list(simulation_set = file.path(test.root, "cache", "elsewhere.Rdata"))),
+    "missing")
+writeLines("outside", file.path(test.root, "cache", "elsewhere.Rdata"))
+expect.error(shield.recorded.write.outputs(fresh, "C.12580", "stage0", stage0.inputs,
+    list(simulation_set = file.path(test.root, "cache", "elsewhere.Rdata"))),
+    "outside JHEEM_ROOT_DIR")
+# Assembling again rewrites the record to describe the files now on disk.
+writeLines("simset, assembled again", simset.file)
+shield.recorded.write.outputs(fresh, "C.12580", "stage0", stage0.inputs,
+    list(mcmc_summary = summary.file, simulation_set = simset.file))
+rewritten <- jsonlite::fromJSON(outputs.path, simplifyVector = FALSE)
+stopifnot(identical(rewritten$outputs[[2]]$sha256, shield.recorded.sha256(simset.file)),
+          !identical(rewritten$outputs[[2]]$sha256, written$outputs[[2]]$sha256))
+
+preceding <- shield.recorded.preceding(fresh, "C.12580", registered$stage1)
+stopifnot(identical(preceding, list(list(calibration_code = "stage0",
+                                         outputs_sha256 = shield.recorded.sha256(outputs.path)))))
+# Preceding outputs are part of a later stage's inputs, so resume compares them.
+stage1.inputs <- shield.recorded.inputs(fresh,
+    list(manager = "census.manager.rdata", resolved_tag = fresh$census_tag,
+         sha256 = paste(rep("d", 64L), collapse = "")),
+    list(manager = "syphilis.manager.rdata", resolved_tag = fresh$syphilis_tag,
+         sha256 = paste(rep("e", 64L), collapse = "")),
+    preceding)
+shield.recorded.write.receipt(fresh, "C.12580", "stage1b", stage1.inputs)
+shield.recorded.check.receipt(resume, "C.12580", "stage1b", stage1.inputs)
+stage1.inputs$preceding[[1]]$outputs_sha256 <- paste(rep("0", 64L), collapse = "")
+expect.error(shield.recorded.check.receipt(resume, "C.12580", "stage1b", stage1.inputs),
              "differ from")
 
 if (nzchar(Sys.which("git"))) {

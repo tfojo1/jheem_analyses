@@ -52,6 +52,7 @@ if (SHIELD.RECORDED.RUN) {
     source(file.path(SHIELD.RECORDED.CONFIG$analyses_path,
                      "commoncode/locations_of_interest.R"))
     # Checked once jheem2 is loaded, so the calibration directory comes from jheem2.
+    SHIELD.RECORDED.INFO <- shield.recorded.calibration.info(CALIBRATION.NAME)
     shield.recorded.assert.state(SHIELD.RECORDED.CONFIG, LOCATION, CALIBRATION.NAME)
 } else {
     source('../jheem_analyses/applications/SHIELD/shield_specification.R')
@@ -72,7 +73,9 @@ if (SHIELD.RECORDED.RUN) {
     recorded.inputs <- shield.recorded.inputs(
         SHIELD.RECORDED.CONFIG,
         get.data.manager.resolution(CENSUS.MANAGER),
-        get.data.manager.resolution(SURVEILLANCE.MANAGER))
+        get.data.manager.resolution(SURVEILLANCE.MANAGER),
+        shield.recorded.preceding(SHIELD.RECORDED.CONFIG, LOCATION,
+                                  SHIELD.RECORDED.INFO))
     shield.recorded.check.receipt(SHIELD.RECORDED.CONFIG, LOCATION,
                                   CALIBRATION.NAME, recorded.inputs)
     if (!START_FROM_SCRATCH) {
@@ -275,3 +278,16 @@ simset <- assemble.simulations.from.calibration(version = VERSION,
                                                 calibration.code = CALIBRATION.NAME,
                                                 allow.incomplete = T)
 save.simulation.set(simset)
+
+if (SHIELD.RECORDED.RUN) {
+    shield.recorded.write.outputs(
+        SHIELD.RECORDED.CONFIG, LOCATION, CALIBRATION.NAME, recorded.inputs,
+        list(mcmc_summary = shield.recorded.summary.file(
+                 SHIELD.RECORDED.CONFIG, LOCATION, CALIBRATION.NAME),
+             simulation_set = get.simset.filename(
+                 version = simset$version, location = simset$location,
+                 calibration.code = simset$calibration.code, n.sim = simset$n.sim,
+                 intervention.code = simset$intervention.code,
+                 sub.version = simset$sub.version,
+                 root.dir = SHIELD.RECORDED.CONFIG$root_dir)))
+}

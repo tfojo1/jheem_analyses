@@ -85,6 +85,8 @@ shield.recorded.config <- function(getenv = Sys.getenv) {
         analyses_ref = shield.recorded.revision("JHEEM_ANALYSES_REF", getenv),
         jheem2_ref = shield.recorded.revision("JHEEM2_REF", getenv),
         locations_ref = shield.recorded.revision("LOCATIONS_REF", getenv),
+        bayesian_simulations_ref = shield.recorded.revision("BAYESIAN_SIMULATIONS_REF", getenv),
+        distributions_ref = shield.recorded.revision("DISTRIBUTIONS_REF", getenv),
         census_tag = shield.recorded.tag("JHEEM_CENSUS_MANAGER_TAG", "data-managers", getenv),
         syphilis_tag = shield.recorded.tag("JHEEM_SYPHILIS_MANAGER_TAG", "syphilis-manager", getenv),
         run_mode = mode,
@@ -106,22 +108,44 @@ shield.recorded.assert.names <- function(location, calibration.code) {
     invisible(TRUE)
 }
 
-# jheem2 owns the calibration directory layout (it changed order in
-# jheem2@ccb1f9b), so ask it rather than rebuilding the path here. Sourced and
-# load_all() sessions expose the function directly; an installed package keeps
-# it internal. jheem2 must be loaded before recorded state is checked.
-shield.recorded.calibration.dir <- function(config, location, calibration.code) {
-    shield.recorded.assert.names(location, calibration.code)
-    get.dir <- if (exists("get.calibration.dir", mode = "function")) {
-        get("get.calibration.dir", mode = "function")
+# jheem2 owns the calibration layout and registry (the directory order changed
+# in jheem2@ccb1f9b), so ask it rather than rebuilding them here. Sourced and
+# load_all() sessions expose these functions directly; an installed package
+# keeps them internal. jheem2 must be loaded before recorded state is checked.
+shield.recorded.jheem2.function <- function(name) {
+    if (exists(name, mode = "function")) {
+        get(name, mode = "function")
     } else if (isNamespaceLoaded("jheem2")) {
-        utils::getFromNamespace("get.calibration.dir", "jheem2")
+        utils::getFromNamespace(name, "jheem2")
     } else {
         stop("jheem2 must be loaded before checking recorded calibration state",
              call. = FALSE)
     }
+}
+
+shield.recorded.calibration.dir <- function(config, location, calibration.code) {
+    shield.recorded.assert.names(location, calibration.code)
+    get.dir <- shield.recorded.jheem2.function("get.calibration.dir")
     get.dir(version = "shield", location = location,
             calibration.code = calibration.code, root.dir = config$root_dir)
+}
+
+shield.recorded.summary.file <- function(config, location, calibration.code) {
+    get.file <- shield.recorded.jheem2.function("get.mcmc.summary.file")
+    get.file(version = "shield", location = location,
+             calibration.code = calibration.code, root.dir = config$root_dir)
+}
+
+# The recorded launcher runs chain 1 only. A multi-chain calibration would set
+# up every chain, sample one, and assemble it as incomplete, so refuse it.
+shield.recorded.calibration.info <- function(calibration.code) {
+    get.info <- shield.recorded.jheem2.function("get.calibration.info")
+    info <- get.info(calibration.code)
+    if (!identical(as.integer(info$n.chains), 1L)) {
+        stop("Recorded runs support single-chain calibrations only; ",
+             calibration.code, " has ", info$n.chains, " chains", call. = FALSE)
+    }
+    info
 }
 
 shield.recorded.assert.state <- function(config, location, calibration.code) {
@@ -167,7 +191,34 @@ shield.recorded.assert.checkout <- function(path, revision) {
     invisible(TRUE)
 }
 
-shield.recorded.inputs <- function(config, census.resolution, syphilis.resolution) {
+shield.recorded.sha256 <- function(path) {
+    connection <- file(path, "rb")
+    on.exit(close(connection), add = TRUE)
+    as.vector(as.character(openssl::sha256(connection)))
+}
+
+shield.recorded.record.path <- function(config, location, calibration.code,
+                                        filename) {
+    shield.recorded.assert.names(location, calibration.code)
+    file.path(config$root_dir, "run_records", "shield", location,
+              calibration.code, filename)
+}
+
+# A later stage starts from its preceding stages' results in the same output
+# tree, so its inputs name the recorded outputs it starts from.
+shield.recorded.preceding <- function(config, location, calibration.info) {
+    lapply(calibration.info$preceding.calibration.codes, function(code) {
+        path <- shield.recorded.record.path(config, location, code, "outputs.json")
+        if (!file.exists(path)) {
+            stop("Recorded calibration starts from ", code, ", which has no ",
+                 "recorded outputs for ", location, ": ", path, call. = FALSE)
+        }
+        list(calibration_code = code, outputs_sha256 = shield.recorded.sha256(path))
+    })
+}
+
+shield.recorded.inputs <- function(config, census.resolution, syphilis.resolution,
+                                   preceding = list()) {
     manager <- function(resolution, tag, name) {
         if (is.null(resolution) ||
             !identical(resolution$resolved_tag, tag) ||
@@ -183,16 +234,30 @@ shield.recorded.inputs <- function(config, census.resolution, syphilis.resolutio
         analyses_ref = config$analyses_ref,
         jheem2_ref = config$jheem2_ref,
         locations_ref = config$locations_ref,
+        bayesian_simulations_ref = config$bayesian_simulations_ref,
+        distributions_ref = config$distributions_ref,
         random_seed = as.character(config$random_seed),
         census = manager(census.resolution, config$census_tag, "census.manager.rdata"),
-        syphilis = manager(syphilis.resolution, config$syphilis_tag, "syphilis.manager.rdata")
+        syphilis = manager(syphilis.resolution, config$syphilis_tag, "syphilis.manager.rdata"),
+        preceding = preceding
     )
 }
 
 shield.recorded.receipt.path <- function(config, location, calibration.code) {
-    shield.recorded.assert.names(location, calibration.code)
-    file.path(config$root_dir, "run_records", "shield", location,
-              calibration.code, "inputs.json")
+    shield.recorded.record.path(config, location, calibration.code, "inputs.json")
+}
+
+shield.recorded.write.json <- function(value, path) {
+    directory <- dirname(path)
+    dir.create(directory, recursive = TRUE, showWarnings = FALSE)
+    temporary <- tempfile(paste0(tools::file_path_sans_ext(basename(path)), "-"),
+                          tmpdir = directory, fileext = ".json")
+    on.exit(unlink(temporary), add = TRUE)
+    jsonlite::write_json(value, temporary, auto_unbox = TRUE, pretty = TRUE)
+    if (!file.rename(temporary, path)) {
+        stop("Could not persist recorded file: ", path, call. = FALSE)
+    }
+    invisible(path)
 }
 
 shield.recorded.check.receipt <- function(config, location, calibration.code,
@@ -225,23 +290,45 @@ shield.recorded.write.receipt <- function(config, location, calibration.code,
     }
     path <- shield.recorded.check.receipt(config, location, calibration.code,
                                           inputs)
-    directory <- dirname(path)
-    dir.create(directory, recursive = TRUE, showWarnings = FALSE)
+    dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
     lock <- filelock::lock(paste0(path, ".lock"), timeout = 30000)
     if (is.null(lock)) stop("Could not lock recorded input receipt", call. = FALSE)
     on.exit(filelock::unlock(lock), add = TRUE)
     if (file.exists(path)) stop("Recorded input receipt appeared concurrently", call. = FALSE)
-    temporary <- tempfile("inputs-", tmpdir = directory, fileext = ".json")
-    on.exit(unlink(temporary), add = TRUE)
-    jsonlite::write_json(list(
+    shield.recorded.write.json(list(
         schema_version = 1L,
         created_at_utc = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
         location = location,
         calibration_code = calibration.code,
         inputs = inputs
-    ), temporary, auto_unbox = TRUE, pretty = TRUE)
-    if (!file.rename(temporary, path)) {
-        stop("Could not persist recorded input receipt: ", path, call. = FALSE)
-    }
-    invisible(path)
+    ), path)
+}
+
+# Written after the simulation set is saved, and rewritten if a completed
+# calibration is assembled again, so it always describes the files on disk.
+# Paths are relative to JHEEM_ROOT_DIR.
+shield.recorded.write.outputs <- function(config, location, calibration.code,
+                                          inputs, files) {
+    root <- normalizePath(config$root_dir, mustWork = TRUE)
+    outputs <- lapply(names(files), function(role) {
+        path <- normalizePath(files[[role]], mustWork = FALSE)
+        if (!file.exists(path)) {
+            stop("Recorded output is missing: ", role, " at ", path, call. = FALSE)
+        }
+        if (!startsWith(path, paste0(root, "/"))) {
+            stop("Recorded output is outside JHEEM_ROOT_DIR: ", path, call. = FALSE)
+        }
+        list(role = role,
+             path = substring(path, nchar(root) + 2L),
+             bytes = file.size(path),
+             sha256 = shield.recorded.sha256(path))
+    })
+    shield.recorded.write.json(list(
+        schema_version = 1L,
+        created_at_utc = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
+        location = location,
+        calibration_code = calibration.code,
+        inputs = inputs,
+        outputs = outputs
+    ), shield.recorded.record.path(config, location, calibration.code, "outputs.json"))
 }
