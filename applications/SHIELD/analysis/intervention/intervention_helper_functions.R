@@ -1640,6 +1640,9 @@ plot_coverage_heatmap <- function(tbl,
                                   legend.labels = NULL,
                                   label.digits = 0,
                                   show.labels  = TRUE,
+                                  label.suffix = "",
+                                  # text size of the cell labels, in mm (3.4 is about 10 pt)
+                                  label.size   = 3.4,
                                   # NULL picks per cell by contrast against the
                                   # fill; a colour string uses that everywhere
                                   label.colour = NULL,
@@ -1812,6 +1815,12 @@ plot_coverage_heatmap <- function(tbl,
     banded.flat <- fill.style == "banded" && !band.shade
     fill.col    <- if (banded.flat) ".band" else "value"
 
+    # Cell label text, e.g. "45%". Added before ggplot() is called: the plot
+    # keeps its own copy of `long`, so a column added afterwards is not seen.
+    long$.lab <- paste0(format(round(long$value, label.digits),
+                               nsmall = label.digits, trim = TRUE),
+                        label.suffix)
+
     p <- ggplot(long, aes(x = coverage, y = row.id, fill = .data[[fill.col]])) +
         geom_tile(color = "white", linewidth = 0.6)
 
@@ -1859,8 +1868,7 @@ plot_coverage_heatmap <- function(tbl,
                                   else unit(1.2, "cm"))
 
     if (show.labels) {
-        val.lab <- aes(label = format(round(value, label.digits),
-                                      nsmall = label.digits))
+        val.lab <- aes(label = .lab)
         if (!is.null(label.colour)) {
             # One colour for every cell. Mixed black/white labels are chosen
             # for contrast, but they read as if they encode something, so a
@@ -1869,7 +1877,7 @@ plot_coverage_heatmap <- function(tbl,
             # measured against the legacy red/blue/green bands and does NOT
             # carry over: on the rdbu bands, black over #2166AC is about 3.5:1.
             # Pass label.colour = NULL for per-cell contrast instead.
-            p <- p + geom_text(val.lab, colour = label.colour, size = 3.4,
+            p <- p + geom_text(val.lab, colour = label.colour, size = label.size,
                                fontface = "bold", show.legend = FALSE)
         } else if (banded.flat) {
             # NOTE white is hardcoded here, which assumes all three bands are
@@ -1878,25 +1886,23 @@ plot_coverage_heatmap <- function(tbl,
             # including the rdbu default, whose #92C5DE mid-band would render
             # white numbers essentially invisible. Use band.shade = TRUE with
             # those, or pass an explicit label.colour.
-            p <- p + geom_text(val.lab, colour = "white", size = 3.4,
+            p <- p + geom_text(val.lab, colour = "white", size = label.size,
                                fontface = "bold", show.legend = FALSE)
         } else if (fill.style == "banded") {
             # shaded bands run pale -> saturated, so the text colour is chosen
             # per cell from the actual fill's luminance
-            p <- p + geom_text(aes(label = format(round(value, label.digits),
-                                                  nsmall = label.digits),
+            p <- p + geom_text(aes(label = .lab,
                                    colour = .txt),
-                               size = 3.4, fontface = "bold",
+                               size = label.size, fontface = "bold",
                                show.legend = FALSE) +
                      scale_colour_identity()
         } else {
             p <- p +
-                geom_text(aes(label = format(round(value, label.digits),
-                                             nsmall = label.digits),
+                geom_text(aes(label = .lab,
                               color = ifelse(value >= midpoint,
                                              (value - midpoint) / (limits[2] - midpoint),
                                              (midpoint - value) / (midpoint - limits[1])) > 0.55),
-                          size = 3.4, fontface = "bold", show.legend = FALSE) +
+                          size = label.size, fontface = "bold", show.legend = FALSE) +
                 scale_color_manual(values = c(`TRUE` = "white", `FALSE` = "grey15"))
         }
     }

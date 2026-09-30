@@ -22,7 +22,7 @@ for (x in SHIELD.TEN.MSAS){
 }
 
 calibration.codes <- c(
-    # "calib.8.21.stage3.az",   # completed for 10 cities
+    "calib.8.21.stage3.az",   # completed for 10 cities
     # calib.9.19.stage1 #after big revisions, ny didnt mix so we had to change global.trate
     
     # "calib.9.23.stage1" #compelted for 9 cities (not nyc); houston not mixing well
@@ -45,7 +45,7 @@ calib.simsets <- load.calib.simsets(
 # ****************************************************************************************************
 inspect_mixing (
     calib.simsets = calib.simsets,
-    calibration.codes = calibration.codes,
+    calibration.codes = calibration.codes[2],
     # calibration.codes = "calib.9.19.stage2",
     locations = SHIELD.TEN.MSAS,
     show.mixing = T,
@@ -56,7 +56,7 @@ inspect_mixing (
 # >> Save summary plots for a calibration version (compares the fit accross all cities)
 # ****************************************************************************************************
 # calib.name="calib.8.21.stage3.az"
-calib.name="calib.9.23.stage2"
+calib.name="calib.9.23.stage3.pk"
 omit.data.years=2022:2024
 if(1==1){
     # 1-compare accross various locations ----
@@ -267,8 +267,8 @@ compare_calibrations_by_outcome<-function(calibration.codes,folder.name,sim.subs
     )
 }
 
-compare_calibrations_by_outcome(calibration.codes=c("calib.8.21.stage3.az","calib.9.19.stage3"),
-                                folder.name = "calib.8.21.vs.9.19.stage3",
+compare_calibrations_by_outcome(calibration.codes=c("calib.8.21.stage3.az","calib.9.23.stage3.pk"),
+                                folder.name = "calib.8.21.vs.9.23.stage3.pk",
                                 sim.subset="full")
 
 
