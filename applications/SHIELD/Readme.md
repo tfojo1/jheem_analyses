@@ -2,6 +2,10 @@
 
 This guide provides instructions for accessing and using the JHEEM/SHIELD modeling servers: `pearl1`, `shield1`, `shield2`, and `shield3`.
 
+For the optional container trial, see [Trying the SHIELD container](https://github.com/tfojo1/jheem_analyses/blob/master/applications/SHIELD/CONTAINER-PILOT.md).
+It does not yet support the full multi-chain calibration workflow; keep using
+the usual workflow for planned calibrations.
+
 **Note:** You must be connected to the JHU VPN to access any of these servers.
 
 > **Important: DNS state varies by server**

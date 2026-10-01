@@ -1,5 +1,9 @@
 # Recorded SHIELD calibration path (pilot)
 
+For the prepared server pilot, use [Trying the SHIELD container](CONTAINER-PILOT.md).
+This page is the technical reference for the recorded runtime, not the operator
+setup procedure.
+
 Status (2026-09-30): opt-in implementation under validation. The ordinary
 `shield_calib_setup_and_run.R` path is unchanged when `SHIELD_RECORDED_RUN` is
 unset or `false`. A container canary and a server pilot (one realistic stage on
