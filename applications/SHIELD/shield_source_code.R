@@ -12,12 +12,37 @@
 
 cat("*** Running Shield_source_code.R ***\n")
 
+# Recorded calibrations opt in explicitly. The usual interactive/source path
+# below is left in place for existing team workflows.
+recorded.flag <- tolower(trimws(Sys.getenv("SHIELD_RECORDED_RUN", unset = "false")))
+if (!recorded.flag %in% c("true", "false")) {
+  stop("SHIELD_RECORDED_RUN must be true or false", call. = FALSE)
+}
+SHIELD.RECORDED.RUN <- identical(recorded.flag, "true")
+rm(recorded.flag)
+if (!SHIELD.RECORDED.RUN &&
+    (identical(tolower(Sys.getenv("SHIELD_CONTAINER_PROFILE")), "recorded") ||
+     identical(tolower(Sys.getenv("SHIELD_REQUIRE_IMMUTABLE_INPUTS")), "true"))) {
+  stop("Recorded SHIELD profile requires SHIELD_RECORDED_RUN=true", call. = FALSE)
+}
+if (SHIELD.RECORDED.RUN) {
+  recorded.analyses.path <- trimws(Sys.getenv("JHEEM_ANALYSES_PATH"))
+  if (!nzchar(recorded.analyses.path)) {
+    stop("Recorded SHIELD run requires JHEEM_ANALYSES_PATH", call. = FALSE)
+  }
+  source(file.path(recorded.analyses.path, "applications/SHIELD/R/shield_recorded_runtime.R"))
+  SHIELD.RECORDED.CONFIG <- shield.recorded.config()
+  rm(recorded.analyses.path)
+}
+
 # WHICH SURVEILLANCE MANAGER SHOULD WE USE?
 # Any of the dated syphilis managers from https://github.com/tfojo1/jheem_analyses/releases
 # NULL = whichever manager is promoted now. To pin an older one, put its tag
 # here instead (the commented line is an example).
 # SYPHILIS.MANAGER.RELEASE.TAG <- NULL
-SYPHILIS.MANAGER.RELEASE.TAG <- "syphilis-manager-v2026.07.27"
+SYPHILIS.MANAGER.RELEASE.TAG <- if (SHIELD.RECORDED.RUN) {
+  SHIELD.RECORDED.CONFIG$syphilis_tag
+} else "syphilis-manager-v2026.07.27"
 
 if (!is.null(SYPHILIS.MANAGER.RELEASE.TAG)) { print(paste("!!! 1-Using a potentially old Surveillance Manager :",SYPHILIS.MANAGER.RELEASE.TAG))
   }else{print("1-Using the most up to date Surveillance manager")}
@@ -30,9 +55,14 @@ if (!is.null(SYPHILIS.MANAGER.RELEASE.TAG)) { print(paste("!!! 1-Using a potenti
 # jheem2 commits. Chains verify the branch and log the SHA instead.
 # Launching straight from the terminal? Sync once by hand first:
 #   git -C ../jheem2 pull --ff-only origin dev
-PULL.GIT.UPDATES <- interactive()
-if (PULL.GIT.UPDATES) { print("2-Pulling git updates")
-}else{print("!!!2-Skipping git pulls (branch check still enforced)")}
+PULL.GIT.UPDATES <- if (SHIELD.RECORDED.RUN) FALSE else interactive()
+if (SHIELD.RECORDED.RUN) {
+  print("2-Recorded run: git pulls and branch checks disabled")
+} else if (PULL.GIT.UPDATES) {
+  print("2-Pulling git updates")
+} else {
+  print("!!!2-Skipping git pulls (branch check still enforced)")
+}
 
 
 ## =============================================================================
@@ -43,14 +73,20 @@ if (PULL.GIT.UPDATES) { print("2-Pulling git updates")
 ## literal below is the fallback for callers that have not been converted yet;
 ## it only resolves when the working directory is the repo root AND the
 ## checkout is named "jheem_analyses".
-if (!exists("JHEEM.ANALYSES.PATH")) JHEEM.ANALYSES.PATH <- "../jheem_analyses"
+if (SHIELD.RECORDED.RUN) {
+  JHEEM.ANALYSES.PATH <- SHIELD.RECORDED.CONFIG$analyses_path
+} else if (!exists("JHEEM.ANALYSES.PATH")) {
+  JHEEM.ANALYSES.PATH <- "../jheem_analyses"
+}
 
 ## jheem2 is a sibling of the analyses repo. Derive it rather than hardcoding
 ## "../jheem2": this path feeds require.repo.branch(), which checks the branch
 ## and may pull, so it must point at the sibling of the clone we are actually
 ## running from. Identical to "../jheem2" in the fallback case.
-JHEEM2.PATH         <- file.path(dirname(JHEEM.ANALYSES.PATH), "jheem2")
-JHEEM2.BRANCH       <- "dev"      # branch required for all SHIELD work
+JHEEM2.PATH         <- if (SHIELD.RECORDED.RUN) {
+  SHIELD.RECORDED.CONFIG$jheem2_path
+} else file.path(dirname(JHEEM.ANALYSES.PATH), "jheem2")
+JHEEM2.BRANCH       <- "dev"      # branch required by the ordinary source path
 
 ## =============================================================================
 ## 1. PACKAGES
@@ -134,7 +170,9 @@ require.repo.branch <- function(repo.path, branch, pull = TRUE)
 
 ## --- jheem_analyses: plain pull on whatever branch is checked out ------------
 cat("3-Checking JHEEM_ANALYSES repository status....\n")
-if (dir.exists(JHEEM.ANALYSES.PATH)) {
+if (SHIELD.RECORDED.RUN) {
+  cat("  recorded mode: source and package mutation disabled\n")
+} else if (dir.exists(JHEEM.ANALYSES.PATH)) {
   if (PULL.GIT.UPDATES)
     system2("git", c("-C", shQuote(normalizePath(JHEEM.ANALYSES.PATH)), "pull"))
   else
@@ -145,7 +183,11 @@ if (dir.exists(JHEEM.ANALYSES.PATH)) {
 
 ## Defines USE.JHEEM2.PACKAGE. Sourced AFTER the pull so we honor the current
 ## setting in the repo rather than a stale local copy.
-source(file.path(JHEEM.ANALYSES.PATH, "use_jheem2_package_setting.R"))
+if (SHIELD.RECORDED.RUN) {
+  USE.JHEEM2.PACKAGE <- identical(SHIELD.RECORDED.CONFIG$jheem2_mode, "package")
+} else {
+  source(file.path(JHEEM.ANALYSES.PATH, "use_jheem2_package_setting.R"))
+}
 
 ## =============================================================================
 ## 4. LOAD JHEEM2
@@ -154,17 +196,24 @@ cat("4-Checking JHEEM2 repository status....\n")
 if (USE.JHEEM2.PACKAGE) {
   ## --- option 1: installed package ----------------------------------------
   cat("--Using JHEEM2 package: \n")
-  update.jheem2.package()          # checks version and reinstalls as needed
+  if (!SHIELD.RECORDED.RUN) update.jheem2.package()
   library(jheem2)
-  print(check.jheem2.version())
+  if (!SHIELD.RECORDED.RUN) print(check.jheem2.version())
   
 } else {
   ## --- option 2: source directly from the local clone ----------------------
   ## devtools::install_github('tfojo1/jheem2', ref = JHEEM2.BRANCH)
   cat("--Using JHEEM2 source code: \n")
 
-  require.repo.branch(JHEEM2.PATH, branch = JHEEM2.BRANCH, pull = PULL.GIT.UPDATES)
-  source(file.path(JHEEM2.PATH, "R/tests/source_jheem2_package.R"))
+  if (SHIELD.RECORDED.RUN) {
+    if (!requireNamespace("pkgload", quietly = TRUE)) {
+      stop("Recorded source mode requires pkgload", call. = FALSE)
+    }
+    pkgload::load_all(JHEEM2.PATH, export_all = TRUE, helpers = FALSE, quiet = TRUE)
+  } else {
+    require.repo.branch(JHEEM2.PATH, branch = JHEEM2.BRANCH, pull = PULL.GIT.UPDATES)
+    source(file.path(JHEEM2.PATH, "R/tests/source_jheem2_package.R"))
+  }
 }
 
 ## =============================================================================
@@ -180,7 +229,12 @@ source(file.path(JHEEM.ANALYSES.PATH, "commoncode/target_populations.R"))
 source(file.path(JHEEM.ANALYSES.PATH, "commoncode/age_mappings.R"))
 source(file.path(JHEEM.ANALYSES.PATH, "commoncode/cache_object_for_version_functions.R"))
 source(file.path(JHEEM.ANALYSES.PATH, "commoncode/logitnorm_helpers.R"))
-source(file.path(JHEEM.ANALYSES.PATH, "commoncode/file_paths.R"))   # defines ROOT.DIR, JHEEM.CACHE.DIR
+if (SHIELD.RECORDED.RUN) {
+  ROOT.DIR <- SHIELD.RECORDED.CONFIG$root_dir
+  JHEEM.CACHE.DIR <- SHIELD.RECORDED.CONFIG$cache_dir
+} else {
+  source(file.path(JHEEM.ANALYSES.PATH, "commoncode/file_paths.R"))   # defines ROOT.DIR, JHEEM.CACHE.DIR
+}
 source(file.path(JHEEM.ANALYSES.PATH, "commoncode/locations_of_interest.R"))
 
 set.jheem.root.directory(ROOT.DIR)
@@ -190,15 +244,21 @@ cat(paste0("The root director is set to ",ROOT.DIR))
 ## =============================================================================
 
 ## --- Google mobility (COVID-era contact adjustment) --------------------------
-load(file.path(JHEEM.CACHE.DIR, "google_mobility_data.Rdata"))
+if (!SHIELD.RECORDED.RUN) {
+  load(file.path(JHEEM.CACHE.DIR, "google_mobility_data.Rdata"))
+}
 
 ## --- Census manager ----------------------------------------------------------
 ## Large; only needed to generate the initial population. Not set as default.
 if (!exists("CENSUS.MANAGER")) {
   cat("6-Reading census manager ...\n")
-  CENSUS.MANAGER <- load.data.manager.from.cache("census.manager.rdata",
-                                                 set.as.default = FALSE)
+  CENSUS.MANAGER <- load.data.manager.from.cache(
+    "census.manager.rdata", set.as.default = FALSE,
+    offline = SHIELD.RECORDED.RUN,
+    release.tag = if (SHIELD.RECORDED.RUN) SHIELD.RECORDED.CONFIG$census_tag else NULL)
   cat("Census manager read\n")
+} else if (SHIELD.RECORDED.RUN) {
+  stop("Recorded SHIELD run cannot use an already-loaded census manager", call. = FALSE)
 }
 
 ## --- Syphilis surveillance manager -------------------------------------------
@@ -206,10 +266,13 @@ if (!exists("CENSUS.MANAGER")) {
 ## Set as default so plotting functions pull outcomes from it.
 if (!exists("SURVEILLANCE.MANAGER")) {
   cat("7-Reading syphilis surveillance manager ...\n")
-  SURVEILLANCE.MANAGER <- load.data.manager.from.cache("syphilis.manager.rdata",
-                                                       set.as.default = TRUE,
-                                                       release.tag = SYPHILIS.MANAGER.RELEASE.TAG)
+  SURVEILLANCE.MANAGER <- load.data.manager.from.cache(
+    "syphilis.manager.rdata", set.as.default = TRUE,
+    offline = SHIELD.RECORDED.RUN,
+    release.tag = SYPHILIS.MANAGER.RELEASE.TAG)
   cat("Syphilis surveillance manager read\n")
+} else if (SHIELD.RECORDED.RUN) {
+  stop("Recorded SHIELD run cannot use an already-loaded syphilis manager", call. = FALSE)
 } else if (!is.null(SYPHILIS.MANAGER.RELEASE.TAG)) {
   warning("SYPHILIS.MANAGER.RELEASE.TAG was ignored because SURVEILLANCE.MANAGER was already loaded")
 }

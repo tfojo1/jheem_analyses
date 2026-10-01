@@ -1,27 +1,40 @@
-# A lot of people have done the "first time setup" already, so they need to install this new dependency
-if (nchar(system.file(package = "httr2")) == 0) {
-    install.packages("httr2")
-}
-if (nchar(system.file(package = "jsonlite")) == 0) {
-    install.packages("jsonlite")
-}
-if (nchar(system.file(package = "filelock")) == 0) {
-    install.packages("filelock")
-}
-if (nchar(system.file(package = "openssl")) == 0) {
-    install.packages("openssl")
+SHIELD.CACHE.RECORDED <- identical(
+    tolower(trimws(Sys.getenv("SHIELD_RECORDED_RUN", unset = "false"))), "true"
+)
+if (SHIELD.CACHE.RECORDED) {
+    # The recorded path must not install packages while a calibration starts.
+    required.cache.packages <- c("httr2", "jsonlite", "filelock", "openssl")
+    missing.cache.packages <- required.cache.packages[
+        !vapply(required.cache.packages, requireNamespace, logical(1), quietly = TRUE)
+    ]
+    if (length(missing.cache.packages)) {
+        stop("Missing recorded-run cache dependencies: ",
+             paste(missing.cache.packages, collapse = ", "), call. = FALSE)
+    }
+    rm(required.cache.packages, missing.cache.packages)
+} else {
+    # Preserve the existing first-time setup behavior for ordinary sessions.
+    for (package in c("httr2", "jsonlite", "filelock", "openssl")) {
+        if (nchar(system.file(package = package)) == 0) install.packages(package)
+    }
+    rm(package)
 }
 
-JHEEM.CACHE.DIR <- NULL
-if (dir.exists("../../cached")) {
-    JHEEM.CACHE.DIR <- "../../cached"
+if (SHIELD.CACHE.RECORDED) {
+    JHEEM.CACHE.DIR <- normalizePath(Sys.getenv("JHEEM_CACHE_DIR"), mustWork = TRUE)
+    cache.source.root <- normalizePath(Sys.getenv("JHEEM_ANALYSES_PATH"), mustWork = TRUE)
+} else {
+    JHEEM.CACHE.DIR <- NULL
+    if (dir.exists("../../cached")) JHEEM.CACHE.DIR <- "../../cached"
+    if (dir.exists("../jheem_analyses/cached")) {
+        JHEEM.CACHE.DIR <- "../jheem_analyses/cached"
+    }
+    cache.source.root <- "../jheem_analyses"
 }
-if (dir.exists("../jheem_analyses/cached")) {
-    JHEEM.CACHE.DIR <- "../jheem_analyses/cached"
-}
-DATA.MANAGER.CACHE.METADATA.FILE <- "../jheem_analyses/commoncode/data_manager_cache_metadata.Rdata"
-DATA.MANAGER.SOURCES.FILE <- "../jheem_analyses/commoncode/data_manager_sources.json"
-PACKAGE.VERSION.CACHE.FILE <- "../jheem_analyses/commoncode/package_version_cache.Rdata"
+DATA.MANAGER.CACHE.METADATA.FILE <- file.path(cache.source.root, "commoncode/data_manager_cache_metadata.Rdata")
+DATA.MANAGER.SOURCES.FILE <- file.path(cache.source.root, "commoncode/data_manager_sources.json")
+PACKAGE.VERSION.CACHE.FILE <- file.path(cache.source.root, "commoncode/package_version_cache.Rdata")
+rm(cache.source.root)
 
 if (is.null(JHEEM.CACHE.DIR)) {
     stop("No 'cached' directory exists - you need to get this from Todd's One-Drive")
@@ -239,6 +252,12 @@ sync.package.version <- function(package="jheem2", allow.flag=F) {
 ## GITHUB RELEASE FUNCTIONS ----
 
 get.github.release.source <- function(file) {
+    # Census uses its existing OneDrive path in ordinary sessions; the
+    # immutable GitHub release is selected only for the recorded SHIELD path.
+    if (identical(file, "census.manager.rdata") &&
+        !identical(tolower(trimws(Sys.getenv("SHIELD_RECORDED_RUN"))), "true")) {
+        return(NULL)
+    }
     if (!file.exists(DATA.MANAGER.SOURCES.FILE)) return(NULL)
     sources <- jsonlite::fromJSON(DATA.MANAGER.SOURCES.FILE)
     if (!(file %in% names(sources))) return(NULL)

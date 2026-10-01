@@ -1,4 +1,11 @@
 # Get location and calibration stage from command-line arguments ----
+if (identical(tolower(Sys.getenv("SHIELD_RECORDED_RUN")), "true") ||
+    identical(tolower(Sys.getenv("SHIELD_CONTAINER_PROFILE")), "recorded") ||
+    identical(tolower(Sys.getenv("SHIELD_REQUIRE_IMMUTABLE_INPUTS")), "true")) {
+    stop("Recorded SHIELD runs are not yet supported by the modular launcher; refusing its cache-clearing setup path",
+         call. = FALSE)
+}
+
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) < 3) stop("Usage: Rscript script.R <location> <calibration.stage> <run.stage> [chain]")
 
@@ -230,5 +237,4 @@ if (RUN.STAGE == 'assemble'| RUN.STAGE == 'all') {
     save.simulation.set(simset)
     print(paste0("Assembly complete for ", LOCATION))
 }
-
 
