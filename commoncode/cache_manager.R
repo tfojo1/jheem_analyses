@@ -433,6 +433,14 @@ download.github.release.asset <- function(resolution, destination, error.prefix)
 
 materialize.github.release.asset <- function(resolution, offline, error.prefix) {
     paths <- data.manager.release.paths(resolution, error.prefix)
+    # Verified inputs can be mounted read-only. Never acquire a writer lock or
+    # create directories just to read an already verified release.
+    if (cached.release.is.valid(paths, resolution)) return(paths$artifact)
+    if (offline) {
+        stop(paste0(error.prefix, "The cached copy of '", resolution$manager,
+                    "' for release '", resolution$resolved_tag,
+                    "' is missing or failed digest verification, and 'offline' is TRUE"))
+    }
     dir.create(paths$directory, recursive = TRUE, showWarnings = FALSE)
     lock <- filelock::lock(paths$lock, timeout = 300000)
     if (is.null(lock)) {
@@ -493,6 +501,15 @@ load.data.manager.from.github.release <- function(file, gh.source, release.tag,
 # A small pointer records the last verified version for offline use, and the
 # legacy cached/<file> copy is kept in sync for scripts that load it directly.
 load.data.manager.from.github <- function(file, gh.source, set.as.default, offline, error.prefix) {
+    # Keep alias resolution, the current pointer, and its compatibility copy
+    # ordered across concurrent online callers. Offline reads never write.
+    if (!offline) {
+        manager <- validate.github.release.component(file, "manager name", error.prefix)
+        lock <- filelock::lock(file.path(JHEEM.CACHE.DIR, paste0(manager, ".latest.lock")),
+                               timeout = 300000)
+        if (is.null(lock)) stop(paste0(error.prefix, "Could not lock latest-manager resolution"))
+        on.exit(filelock::unlock(lock), add = TRUE)
+    }
     resolution <- NULL
     if (!offline) {
         resolution <- tryCatch(
@@ -521,8 +538,10 @@ load.data.manager.from.github <- function(file, gh.source, set.as.default, offli
     }
 
     local.path <- materialize.github.release.asset(resolution, use.cached, error.prefix)
-    if (!use.cached) write.current.github.release(resolution, error.prefix)
-    sync.legacy.cache.copy(file, local.path, resolution, error.prefix)
+    if (!use.cached) {
+        sync.legacy.cache.copy(file, local.path, resolution, error.prefix)
+        write.current.github.release(resolution, error.prefix)
+    }
     cat(file, "is", resolution$resolved_tag, "\n")
 
     data.manager <- load.data.manager(local.path, set.as.default = set.as.default)
@@ -547,14 +566,21 @@ write.current.github.release <- function(resolution, error.prefix) {
     }
 }
 
-# Returns the last verified latest version, or NULL if none is cached and valid.
+# NULL means this cache has never recorded a verified current version. A broken
+# record or artifact is an error, not permission to downgrade to a legacy copy.
 read.current.github.release <- function(file, gh.source, error.prefix) {
-    current <- read.data.manager.resolution(current.github.release.path(file, error.prefix))
-    if (is.null(current) || is.null(current$resolved_tag)) return(NULL)
-    tryCatch(
-        get.cached.github.release.resolution(file, gh.source, current$resolved_tag, error.prefix),
-        error = function(e) NULL
-    )
+    path <- current.github.release.path(file, error.prefix)
+    if (!file.exists(path)) return(NULL)
+    current <- read.data.manager.resolution(path)
+    if (is.null(current) || is.null(current$resolved_tag)) {
+        stop(paste0(error.prefix, "The saved current release record is invalid: ", path))
+    }
+    resolution <- get.cached.github.release.resolution(
+        file, gh.source, current$resolved_tag, error.prefix)
+    if (!cached.release.is.valid(data.manager.release.paths(resolution, error.prefix), current)) {
+        stop(paste0(error.prefix, "The saved current release record differs from its verified cache: ", path))
+    }
+    resolution
 }
 
 # Scripts that load cached/<file> directly keep working. The .version sidecar
@@ -564,7 +590,7 @@ sync.legacy.cache.copy <- function(file, verified.path, resolution, error.prefix
     version.path <- paste0(legacy.path, ".version")
     current.version <- if (file.exists(version.path)) trimws(readLines(version.path, n = 1)) else ""
     if (file.exists(legacy.path) && identical(current.version, resolution$resolved_tag) &&
-        identical(file.size(legacy.path), file.size(verified.path))) {
+        identical(sha256.file(legacy.path), resolution$sha256)) {
         return(invisible(legacy.path))
     }
     temporary <- paste0(legacy.path, ".copy.", Sys.getpid())

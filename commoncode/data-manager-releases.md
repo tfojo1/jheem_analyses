@@ -41,29 +41,18 @@ get.data.manager.resolution(SURVEILLANCE.MANAGER)
 ```
 
 This includes the repository, requested and resolved tags, asset name, SHA-256
-digest, publication time, and local cache path. Managers loaded through the
-default or legacy paths return `NULL` because those paths do not yet provide the
-same immutable identity contract.
+digest, publication time, and local cache path. Both default GitHub loading and
+explicit release selection expose this identity. The OneDrive path and an
+unverified legacy-only offline copy return `NULL`.
 
 ## SHIELD
 
-SHIELD uses the promoted manager unless a selector is provided before
-`shield_source_code.R` is sourced:
-
-```r
-SYPHILIS.MANAGER.RELEASE.TAG <- "syphilis-manager-v2026.07.27"
-source("../jheem_analyses/applications/SHIELD/shield_source_code.R")
-```
-
-The same selection can be made for a batch job without changing an R script:
-
-```sh
-JHEEM_SYPHILIS_MANAGER_TAG=syphilis-manager-v2026.07.27 Rscript my_run.R
-```
-
-Set the selector before the manager is loaded. If `SURVEILLANCE.MANAGER`
-already exists, `shield_source_code.R` retains that object and warns that the
-selector was ignored.
+The ordinary SHIELD bootstrap currently sets
+`SYPHILIS.MANAGER.RELEASE.TAG` to `syphilis-manager-v2026.07.27` inside
+`shield_source_code.R`. Setting the same variable before sourcing that file
+does not override it. The generic loader examples above do not change this
+application-specific choice. If `SURVEILLANCE.MANAGER` already exists, the
+ordinary bootstrap retains that object and warns that its selector was ignored.
 
 ## Offline use
 
@@ -84,3 +73,18 @@ with `offline = TRUE`, it loads that last verified version. It also keeps the
 older `cached/<manager>` copy, with a `.version` file naming its release, up to
 date for scripts that load that path directly. `get.data.manager.resolution()`
 returns the resolved release for managers loaded either way.
+
+Offline reads do not create locks or update the compatibility copy, so a verified
+cache can be read-only. A broken current-version record or a corrupt verified
+artifact fails explicitly. Only a legacy-only cache, with no current-version
+record, may fall back to the old file with an unverified-copy warning; this
+preserves offline access during migration without assigning it a release identity.
+
+The synthetic regression check needs neither real data nor the NAS:
+
+```sh
+Rscript commoncode/tests/test_data_manager_release_selection.R
+```
+
+It runs in the **Test manager cache** workflow independently of SHIELD's
+scientific/model-test tiers.
