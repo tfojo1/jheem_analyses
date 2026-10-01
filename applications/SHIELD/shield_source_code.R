@@ -42,7 +42,8 @@ if (SHIELD.RECORDED.RUN) {
 # SYPHILIS.MANAGER.RELEASE.TAG <- NULL
 SYPHILIS.MANAGER.RELEASE.TAG <- if (SHIELD.RECORDED.RUN) {
   SHIELD.RECORDED.CONFIG$syphilis_tag
-} else "syphilis-manager-v2026.07.27"
+} else NULL
+#"syphilis-manager-v2026.07.27"
 
 if (!is.null(SYPHILIS.MANAGER.RELEASE.TAG)) { print(paste("!!! 1-Using a potentially old Surveillance Manager :",SYPHILIS.MANAGER.RELEASE.TAG))
   }else{print("1-Using the most up to date Surveillance manager")}
