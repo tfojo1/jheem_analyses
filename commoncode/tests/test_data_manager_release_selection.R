@@ -8,11 +8,15 @@ script.argument <- grep("^--file=", commandArgs(FALSE), value = TRUE)
 if (length(script.argument) != 1) stop("Could not locate this test script")
 script.path <- normalizePath(sub("^--file=", "", script.argument))
 repository.root <- normalizePath(file.path(dirname(script.path), "../.."))
-original.working.directory <- setwd(repository.root)
+bootstrap.root <- tempfile("manager-loader-bootstrap-")
+bootstrap.checkout <- file.path(bootstrap.root, "jheem_analyses")
+dir.create(file.path(bootstrap.checkout, "cached"), recursive = TRUE)
+original.working.directory <- setwd(bootstrap.checkout)
 on.exit(setwd(original.working.directory), add = TRUE)
 
 test.environment <- new.env(parent = globalenv())
-sys.source("commoncode/cache_manager.R", envir = test.environment)
+sys.source(file.path(repository.root, "commoncode/cache_manager.R"), envir = test.environment)
+test.environment$DATA.MANAGER.SOURCES.FILE <- file.path(repository.root, "commoncode/data_manager_sources.json")
 
 assert.error <- function(expression, pattern = NULL) {
     error <- tryCatch({
@@ -196,6 +200,124 @@ assert.error(
 bad.paths <- test.environment$data.manager.release.paths(bad.resolution, "test: ")
 stopifnot(!file.exists(bad.paths$artifact), !file.exists(bad.paths$metadata))
 test.environment$download.github.release.asset <- original.download
+
+## The latest alias uses the same verified, version-scoped cache.
+latest.cache <- file.path(fixture.directory, "latest-cache")
+dir.create(latest.cache)
+test.environment$JHEEM.CACHE.DIR <- latest.cache
+fixture2.file <- file.path(fixture.directory, "fixture2.rdata")
+writeBin(charToRaw("second verified release\n"), fixture2.file)
+fixture2.digest <- test.environment$sha256.file(fixture2.file)
+alias.resolution.for <- function(tag, digest) {
+    resolution <- alias.resolution
+    resolution$resolved_tag <- tag
+    resolution$sha256 <- digest
+    resolution
+}
+latest.target <- alias.resolution.for("manager-v1", fixture.digest)
+original.resolve <- test.environment$resolve.github.release.asset
+test.environment$resolve.github.release.asset <- function(file, gh.source, release.tag,
+                                                          error.prefix) {
+    if (is.null(latest.target)) stop("network unavailable")
+    resolution <- latest.target
+    resolution$requested_tag <- release.tag
+    resolution
+}
+downloads <- character()
+test.environment$download.github.release.asset <- function(resolution, destination,
+                                                            error.prefix) {
+    downloads <<- c(downloads, resolution$resolved_tag)
+    source <- if (identical(resolution$resolved_tag, "manager-v2")) fixture2.file else fixture.file
+    stopifnot(file.copy(source, destination, overwrite = TRUE))
+    invisible(destination)
+}
+test.environment$load.data.manager <- function(file, set.as.default = FALSE) {
+    list(path = file)
+}
+legacy.path <- file.path(latest.cache, "fixture.rdata")
+current.path <- file.path(latest.cache, "data-managers", "fixture.rdata", "current.json")
+load.latest <- function(offline = FALSE) {
+    test.environment$load.data.manager.from.github(
+        "fixture.rdata", source.configuration, FALSE, offline, "test: "
+    )
+}
+
+# First load: resolve, download the immutable version, record it, sync the legacy copy.
+loaded <- load.latest()
+stopifnot(identical(downloads, "manager-v1"))
+stopifnot(grepl("data-managers/fixture.rdata/manager-v1/fixture.rdata$", loaded$path))
+stopifnot(identical(test.environment$get.data.manager.resolution(loaded)$resolved_tag, "manager-v1"))
+stopifnot(identical(jsonlite::fromJSON(current.path)$resolved_tag, "manager-v1"))
+stopifnot(identical(test.environment$sha256.file(legacy.path), fixture.digest))
+stopifnot(identical(readLines(paste0(legacy.path, ".version")), "manager-v1"))
+
+# Unchanged latest and an explicit request for the same version reuse the cache.
+load.latest()
+test.environment$load.data.manager.from.github.release(
+    "fixture.rdata", source.configuration, "manager-v1", FALSE, FALSE, "test: "
+)
+stopifnot(identical(downloads, "manager-v1"))
+
+# A promotion is labeled by the version actually downloaded.
+latest.target <- alias.resolution.for("manager-v2", fixture2.digest)
+loaded <- load.latest()
+stopifnot(identical(downloads, c("manager-v1", "manager-v2")))
+stopifnot(identical(jsonlite::fromJSON(current.path)$resolved_tag, "manager-v2"))
+stopifnot(identical(test.environment$sha256.file(legacy.path), fixture2.digest))
+stopifnot(identical(readLines(paste0(legacy.path, ".version")), "manager-v2"))
+stopifnot(file.exists(file.path(latest.cache, "data-managers", "fixture.rdata",
+                                "manager-v1", "fixture.rdata")))
+
+# Unreachable GitHub or offline mode loads the last verified version without downloading.
+latest.target <- NULL
+unreachable <- withCallingHandlers(load.latest(), warning = function(w) {
+    stopifnot(grepl("Could not check GitHub", conditionMessage(w)))
+    invokeRestart("muffleWarning")
+})
+stopifnot(grepl("manager-v2/fixture.rdata$", unreachable$path))
+stopifnot(grepl("manager-v2/fixture.rdata$", load.latest(offline = TRUE)$path))
+stopifnot(identical(length(downloads), 2L))
+
+# Read-only offline loads neither repair the compatibility copy nor lock the release.
+v2.path <- loaded$path
+release.lock <- paste0(dirname(v2.path), ".lock")
+unlink(release.lock)
+writeBin(charToRaw("modified legacy copy\n"), legacy.path)
+legacy.digest <- test.environment$sha256.file(legacy.path)
+load.latest(offline = TRUE)
+stopifnot(!file.exists(release.lock),
+          identical(test.environment$sha256.file(legacy.path), legacy.digest))
+
+# An online load repairs a damaged compatibility copy, even at the same size.
+latest.target <- alias.resolution.for("manager-v2", fixture2.digest)
+writeBin(as.raw(rep(120L, file.size(fixture2.file))), legacy.path)
+load.latest()
+stopifnot(identical(test.environment$sha256.file(legacy.path), fixture2.digest))
+latest.target <- NULL
+
+# A known verified cache must not silently downgrade to an unverified copy.
+writeBin(charToRaw("corrupt\n"), file.path(latest.cache, "data-managers", "fixture.rdata",
+                                            "manager-v2", "fixture.rdata"))
+assert.error(load.latest(offline = TRUE), "failed metadata or digest verification")
+file.copy(fixture2.file, v2.path, overwrite = TRUE)
+writeLines("invalid JSON", current.path)
+assert.error(load.latest(offline = TRUE), "current release record is invalid")
+
+# Legacy-only installations retain an explicitly unverified offline fallback.
+unlink(current.path)
+legacy.warning <- NULL
+legacy.load <- withCallingHandlers(load.latest(offline = TRUE), warning = function(w) {
+    legacy.warning <<- conditionMessage(w)
+    invokeRestart("muffleWarning")
+})
+stopifnot(identical(legacy.load$path, legacy.path), grepl("unverified", legacy.warning))
+unlink(legacy.path)
+assert.error(load.latest(offline = TRUE), "has not been downloaded yet")
+
+test.environment$resolve.github.release.asset <- original.resolve
+rm("load.data.manager", envir = test.environment)
+test.environment$download.github.release.asset <- original.download
+test.environment$JHEEM.CACHE.DIR <- file.path(fixture.directory, "cache")
 
 ## Optional end-to-end check against a real historical manager.
 if (identical(tolower(Sys.getenv("RUN_DATA_MANAGER_RELEASE_INTEGRATION")), "true")) {
