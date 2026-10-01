@@ -212,6 +212,42 @@ Populate this `~/jheem/code/jheem_analyses/cached/` directory with the required 
   scp -r /path/to/local/cached/* YOUR_USERNAME@10.253.170.91:~/jheem/code/jheem_analyses/cached/
   ```
 
+### Add a GitHub Token (Recommended)
+
+**Why:** every R process that loads the SHIELD model checks GitHub for the latest data managers (about 3 requests per process). Without a token, GitHub allows only 60 requests per hour per server, shared by everyone on that server. A large launch (for example 32 cities, or 8 cities x 4 chains) goes over that limit. The runs do not fail, but the extra processes print warnings and fall back to your local copy in `cached/`. With a token the limit is 5,000 per hour.
+
+**1. Create the token on GitHub.** Go to Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token.
+- Repository access: choose **Public repositories** (read-only is enough; `tfojo1/jheem_analyses` is public).
+- Permissions: leave them all off.
+- Expiration: pick a date and note it.
+- Copy the token (it starts with `github_pat_`).
+
+**2. Add it on EACH server you use.** Log in over SSH and run:
+```bash
+echo 'GITHUB_TOKEN=github_pat_your_token_here' >> ~/.Renviron
+chmod 600 ~/.Renviron
+```
+- `~/.Renviron` is read by every R process: `Rscript` jobs started by the launchers and RStudio Server sessions. `.bashrc` is not read by RStudio Server.
+- Write it with no `export` and no spaces around `=`.
+- `chmod 600` makes the file readable only by you.
+
+**3. Check that R sees it:**
+```bash
+Rscript -e 'nzchar(Sys.getenv("GITHUB_TOKEN"))'
+```
+It should print `[1] TRUE` with no warning. Restart any open RStudio Server session so it picks up the token.
+
+**If you see `File ~/.Renviron contains invalid line(s)`:** the paste most likely split into two lines, leaving a bare `github_pat_...` line. R ignores that line, but you can remove it:
+```bash
+sed 's/github_pat_.*/github_pat_<hidden>/' ~/.Renviron   # look at the file without printing the token
+sed -i '/^github_pat_/d' ~/.Renviron                       # delete lines that START with github_pat_
+```
+Keep exactly one `GITHUB_TOKEN=...` line.
+
+**Notes:**
+- Never put the token in the repo or in any committed file. Do not create a `.Renviron` inside `jheem_analyses`: git does not ignore it, and R would read it instead of your home one.
+- When the token expires, runs still work, but the warnings come back until you replace the line in `~/.Renviron`.
+
 ## Running R and Model Scripts
 
 **R Environment:** R and common JHEEM-related R packages are installed globally on the server. You generally do not need to install these for standard model runs.
