@@ -113,7 +113,7 @@ PAL.OFF   <- unname(SHIELD.PAL["off"])
 SHIELD.HEAT.PALETTES <- list(
     rdbu   = unname(SHIELD.PAL[c("red", "tint", "blue")]),
     rdylbu = c("#D73027", "#FEE090", "#4575B4"),  # warm mid; strongest 3-way split
-    teal   = c("#B2182B", "#D9D9D9", "#35978F"),  # neutral mid; CVD-safe vs red
+    teal   = c("#D9D9D9", "#D9D9D9", "#35978F"),  # neutral mid; CVD-safe vs red
     legacy = c("#e34948", "#2a78d6", "#008300")   # pre-2026-09 red/blue/green
 )
 SHIELD.HEAT.PAL  <- "teal"
@@ -1643,12 +1643,23 @@ plot_coverage_heatmap <- function(tbl,
                                   label.suffix = "",
                                   # text size of the cell labels, in mm (3.4 is about 10 pt)
                                   label.size   = 3.4,
+                                  # base text size in pt: title, axis titles,
+                                  # axis labels and legend all scale from it
+                                  base.size    = 12,
+                                  # Font size (pt) of each text element. NULL
+                                  # follows base.size: titles = base.size, axis
+                                  # and legend labels = 0.8 x base.size.
+                                  title.size        = NULL,   # plot title
+                                  axis.title.size   = NULL,   # x-axis title
+                                  axis.text.size    = NULL,   # city names and coverage levels
+                                  legend.title.size = NULL,
+                                  legend.text.size  = NULL,
                                   # NULL picks per cell by contrast against the
                                   # fill; a colour string uses that everywhere
                                   label.colour = NULL,
                                   row.sep      = " — ",
                                   title        = NULL,
-                                  x.lab        = "Doxy-PEP Coverage (%)",
+                                  x.lab        = "Doxy-PEP Coverage \namong MSM by 2030 (%)",
                                   fill.lab     = NULL,
                                   # TRUE locks the panel's aspect with
                                   # coord_fixed(), which is what leaves an
@@ -1857,10 +1868,16 @@ plot_coverage_heatmap <- function(tbl,
         scale_x_discrete(expand = c(0, 0)) +
         scale_y_discrete(expand = c(0, 0)) +
         labs(x = x.lab, y = NULL, title = title) +
-        theme_minimal(base_size = 12) +
+        theme_minimal(base_size = base.size) +
         theme(panel.grid = element_blank(),
               axis.ticks = element_blank(),
-              plot.title = element_text(face = "bold", size = 12),
+              plot.title = element_text(face = "bold",
+                                        size = if (is.null(title.size)) base.size else title.size),
+              # size = NULL keeps the theme's own size, which follows base.size
+              axis.title   = element_text(size = axis.title.size),
+              axis.text    = element_text(size = axis.text.size),
+              legend.title = element_text(size = legend.title.size),
+              legend.text  = element_text(size = legend.text.size),
               legend.position = if (legend.dir == "horizontal") "bottom" else "right",
               # the colourbar guides above set their own size in banded mode;
               # this stays for the continuous default

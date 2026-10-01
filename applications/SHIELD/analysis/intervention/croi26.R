@@ -33,6 +33,8 @@ if(1==1){
     EVAL.YEAR  <- "2030"                               # policy evaluation horizon
     BASE.YEAR  <- "2022"
     COVERAGE.LEVELS <- paste0("doxy.cov.", seq(5, 50, 5))
+    COVERAGE.LEVELS <- paste0("doxy.cov.", c(10,25,50))
+    
     .ccrit     <- as.integer(sub("doxy\\.cov\\.", "", CCRIT.MS))
     
     .pos <- function(x) ifelse(!is.na(x) & x > 0, x, NA_real_)
@@ -44,8 +46,18 @@ if(1==1){
     }
     
     
-    HEAT.MIDPOINT <- 49      # policy target; also the upper break between bands
-    HEAT.LABEL    <- NULL    # NULL = per-cell contrast, which shaded bands need
+    HEAT.MIDPOINT <- 50      # policy target; also the upper break between bands
+    HEAT.LABEL    <- "black" # cell number colour. NULL = white or black per cell, by contrast
+    # Font sizes (pt) for the heatmap figure, one per text element
+    HEAT.FONT <- list(
+        base         = 6.4,   # spacing and margins scale from this
+        title        = 6.4,   # panel titles "A: ..." and "B: ..."
+        axis.title   = 6.4,   # "Doxy-PEP Coverage ..."
+        axis.text    = 6.4,   # city names and coverage levels
+        legend.title = 6.4,
+        legend.text  = 5.1,
+        cell         = 5.6    # numbers inside the tiles
+    )
     
     MSAS <- names(SHIELD.TEN.MSAS)
     PRINT.VERSION = T #
@@ -136,11 +148,31 @@ if(1==1){
             legend.dir   = "horizontal",
             fixed.aspect = FALSE,
             label.suffix="%",
-            label.size=3)
+            # font sizes, all from HEAT.FONT above
+            base.size         = HEAT.FONT$base,
+            title.size        = HEAT.FONT$title,
+            axis.title.size   = HEAT.FONT$axis.title,
+            axis.text.size    = HEAT.FONT$axis.text,
+            legend.title.size = HEAT.FONT$legend.title,
+            legend.text.size  = HEAT.FONT$legend.text,
+            # cell text is set in mm, not pt; .pt converts
+            label.size        = HEAT.FONT$cell / ggplot2::.pt) +
+            # spell out the abbreviated city names on the y-axis. Replaces the
+            # function's own y scale, so expand = c(0, 0) is repeated here.
+            scale_y_discrete(expand = c(0, 0),
+                             labels = c(LA = "Los Angeles", NYC = "New York City",
+                                        Atlanta = "Atlanta", Baltimore = "Baltimore",
+                                        Chicago = "Chicago", Houston = "Houston",
+                                        Miami = "Miami", Philadelphia = "Philadelphia",
+                                        Phoenix = "Phoenix", Seattle = "Seattle")) +
+            # all text in black. axis.text is set on its own because the theme
+            # gives it its own dark grey, which `text` does not override
+            theme(text      = element_text(colour = "black"),
+                  axis.text = element_text(colour = "black"))
     }
     
-    p.heat.1 <- .mk.heat(tbl.cov.vs.noint,          "msm",   "A: Projected Incidence Reduction among MSM \n by 2030 with- vs. without- Doxy-PEP (%)")
-    p.heat.2 <- .mk.heat(tbl.cov.vs.noint,          "Total", "B: Projected Incidence Reduction among Total Population \n by 2030 with- vs. without- Doxy-PEP (%)")
+    p.heat.1 <- .mk.heat(tbl.cov.vs.noint,          "msm",   "A: Projected Incidence Reduction \namong MSM by 2030 \nwith Doxy-PEP vs no Doxy-PEP")
+    p.heat.2 <- .mk.heat(tbl.cov.vs.noint,          "Total", "B: Projected Incidence Reduction \namong Total Population by 2030 \nwith Doxy-PEP vs no Doxy-PEP")
     
     .no.y.heat <- theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
     .no.x.heat <- theme(axis.title.x = element_blank(), axis.text.x = element_blank())
@@ -150,12 +182,13 @@ if(1==1){
     # becomes a separate throwaway statement, and each panel keeps its own legend.
     # The two guides merge only because both panels are built with the same limits,
     # band.breaks, colours, fill.lab and squish.marks = "always".
-    fig.heatmap <- (p.heat.1 + p.heat.2 ) +
+    fig.heatmap <- (p.heat.1 + p.heat.2+.no.y.heat ) +
         plot_layout(guides = "collect") &
         theme(legend.position = "bottom");fig.heatmap
     
     ggsave(file.path(FIG.DIR, "fig_CROI.png"), fig.heatmap,
-           width = 12, height = 5, dpi = 300, bg = "white")
+           width = 4, height = 4, dpi = 300, bg = "white")
+ 
 }
 
 # ****************************************************************************************************

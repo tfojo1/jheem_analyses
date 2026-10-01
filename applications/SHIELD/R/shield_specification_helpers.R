@@ -1141,13 +1141,18 @@ get_sti_screening_functional_form  <- function(specification.metadata) {
                                                                           link = "logit",
                                                                           knot.link="logit",
                                                                           knots.are.on.transformed.scale = F,
-                                                                          after.time = 2030,  #because the last knot in 2020 is 12 years apart from 2010. This projects a similar 10 year period for the after modifier 
-                                                                          after.modifier = .5,
-                                                                          after.modifier.increasing.change.link = 'logit',
-                                                                          after.modifier.decreasing.change.link = 'logit', 
                                                                           min=0,
-                                                                          max=0.9
-    )
+                                                                          max=0.9, #we bound the scale to 90%
+                                                                          #
+                                                                          after.time = 2030,  #because the last knot in 2020 is 12 years apart from 2010. This projects a similar 10 year period for the after modifier 
+                                                                          after.modifier = .5, #initial value; will be overwritten by the value sampled in calibration
+                                                                          overwrite.modifiers.with.alphas = TRUE, 
+                                                                          modifier.link = "identity", #after.modifier is sampled on identity scale
+                                                                          after.modifier.increasing.change.link = 'logit', # the after modifier is applied to changes in the logit scale logit(p2030) = logit(p2020) + m * [logit(p2020) - logit(p2010)]
+                                                                          after.modifier.decreasing.change.link = 'logit', 
+                                                                          modifier.min = 0,
+                                                                          modifier.max = Inf 
+                                                                              )
     #logit(2030)=logit(2020)+ logit(2020)/logit(2010) * after_modifier
     # after modifier is unique for everyone
     sti_screening_functional_form
