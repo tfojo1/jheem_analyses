@@ -1125,57 +1125,7 @@ get.max.covid.effect.sti.screening.reduction = function(specification.metadata){
 
 
 #-- STI SCREENING --# ----
-# OPTION1: Using logistic linear function
-# get_sti_screening_functional_form_OPTION1 <- function(specification.metadata) {
-#   # Get a cached object
-#   # We read the HIV testing prior from BRFSS in, then shift it to serve as our STI screening functional form's priors
-#   # (After implementation in the model, we will calculate HIV tests based on simulated sti screenings again and fit it against BRFSS)
-#   #
-#   hiv_testing_prior <- get.cached.object.for.version(name = "hiv.testing.prior",
-#                                                      version = specification.metadata$version)
-# 
-#   # Use HIV testing prior slope and intercept and shift to find STI screening functional form slope and intercept
-#   # We will add log(0.5) assuming half the odds of an syphilis screen compared to the odds of an HIV test in the last year.
-#   # The 0.9 that was in here was to say we never think we screen more than 90% of people in a stratum, and must subtract log(0.9) to compensate mathematically.
-#   sti_screening_functional_form <- create.logistic.linear.functional.form(intercept = hiv_testing_prior$intercepts + log(0.5),
-#                                                                           slope = hiv_testing_prior$slopes,
-#                                                                           anchor.year = 2010,
-#                                                                           max = 1,
-#                                                                           parameters.are.on.logit.scale = T)
-# 
-# 
-#   sti_screening_functional_form
-# }
-
-# OPTION2: Using linear spline function (provides the flexibility to change after modifier)
-# get_sti_screening_functional_form_OPTION2 <- function(specification.metadata) {
-#   hiv_testing_prior <- get.cached.object.for.version(name = "hiv.testing.prior",
-#                                                      version = specification.metadata$version)
-#   # specification.metadata=get.specification.metadata('shield',"C.12580")
-#   # HIV testing data starts in 2014, however, the anchor year that was used to fit the function was set at 2010
-#   expit = function(x){return(1/(1+exp(-x)))}
-#     sti_screening_functional_form <- create.linear.spline.functional.form(knot.times = c("2010"=2010,"2020"=2020),
-#                                                                           knot.values = list("2010"= expit(hiv_testing_prior$intercepts +log(.6)), #0.6 is the prior for ratio of syphilis to HIV testing
-#                                                                                              "2020"=expit(hiv_testing_prior$intercepts +log(.6)+ 
-#                                                                                                             hiv_testing_prior$slopes* (2020-2010))),
-#                                                                           link = "logit",
-#                                                                           knot.link="logit",
-#                                                                           knots.are.on.transformed.scale = F,
-#                                                                           after.time = 2030,
-#                                                                           after.modifier = .5,
-#                                                                           after.modifier.increasing.change.link = 'logit',
-#                                                                           after.modifier.decreasing.change.link = 'logit', 
-#                                                                           min=0,
-#                                                                           max=0.9
-#                                                                             )
-#     #logit(2030)=logit(2020)+ logit(2020)/logit(2010) * after_modifier
-#     # after modifier is unique for everyone
-#     sti_screening_functional_form
-#     
-# }
-
-## get_sti_screening_functional_form_OPTION2 ----
-get_sti_screening_functional_form_OPTION2 <- function(specification.metadata) {
+get_sti_screening_functional_form  <- function(specification.metadata) {
     hiv_testing_prior <- get.cached.object.for.version(name = "hiv.testing.prior",
                                                        version = specification.metadata$version)
     # specification.metadata=get.specification.metadata('shield',"C.12580")
@@ -1191,7 +1141,7 @@ get_sti_screening_functional_form_OPTION2 <- function(specification.metadata) {
                                                                           link = "logit",
                                                                           knot.link="logit",
                                                                           knots.are.on.transformed.scale = F,
-                                                                          after.time = 2030,
+                                                                          after.time = 2030,  #because the last knot in 2020 is 12 years apart from 2010. This projects a similar 10 year period for the after modifier 
                                                                           after.modifier = .5,
                                                                           after.modifier.increasing.change.link = 'logit',
                                                                           after.modifier.decreasing.change.link = 'logit', 

@@ -473,7 +473,7 @@ register.model.element(SHIELD.SPECIFICATION,
                            knot.link = 'log',
                            link='identity', #linear projections between the knots     
                            #
-                           after.time = 2030, #values between 2020-2030 are scaled down to change up to 50% of modeled change between 2010-2020
+                           after.time = 2034, #because the last knot in 2022 is 12 years apart from 2010. This projects a similar 12 year period for the after modifier
                            after.modifier = 0.5, # 2030 = 2020 + delta(2020 vs 2010) * after.modifier IF delta is positive. This gets overwritten by the ~N(0.75, 0.25) fut change multiplier
                            overwrite.modifiers.with.alphas = T, # we sampled after modifier in calibration and he should write over the default value here (not added to it
                            modifiers.apply.to.change = T, # means it multiplies the delta
@@ -505,7 +505,7 @@ register.model.element(SHIELD.SPECIFICATION,
                                                                                min=0,
                                                                                knot.link = 'log',
                                                                                link='identity',
-                                                                               after.time = 2030, #values between 2020-2030 are scaled down to change up to 50% of modeled change between 2010-2020
+                                                                               after.time = 2034, #because the last knot in 2022 is 12 years apart from 2010. This projects a similar 12 year period for the after modifier
                                                                                after.modifier = 0.5,
                                                                                overwrite.modifiers.with.alphas = T, # we sampled after modifier in calibration and he should write over the default value here (not added to it)
                                                                                modifiers.apply.to.change = T,
@@ -1154,7 +1154,7 @@ register.model.quantity(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'rate.sti.screening.over.14.without.covid',
                        scale = 'rate',
-                       get.functional.form.function = get_sti_screening_functional_form_OPTION2,
+                       get.functional.form.function = get_sti_screening_functional_form,
                        functional.form.from.time = 1970,
                        functional.form.scale = 'proportion')
 

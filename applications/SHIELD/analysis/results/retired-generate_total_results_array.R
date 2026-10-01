@@ -8,19 +8,24 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
 source('../jheem_analyses/applications/SHIELD/analysis/intervention/int_simset_helper_functions.R')
 
-CALIB.NAME <- "calib.8.21.stage3.az"
+CALIB.NAME <- "calib.9.23.stage3.pk"
 INTERVENTION.LABELS <- c(
     noint        = "No Doxy-PEP Intervention",
+    doxy.cov.5   = "coverage 5%",
     doxy.cov.10   = "coverage 10%",
+    doxy.cov.15   = "coverage 15%",
     doxy.cov.20   = "coverage 20%",
+    doxy.cov.25   = "coverage 25%",
     doxy.cov.30   = "coverage 30%",
+    doxy.cov.35   = "coverage 35%",
     doxy.cov.40   = "coverage 40%",
-    doxy.cov.50   = "coverage 50%",
-    doxy.cov.60   = "coverage 60%",
-    doxy.cov.70   = "coverage 70%",
-    doxy.cov.80   = "coverage 80%",
-    doxy.cov.90   = "coverage 90%",
-    doxy.cov.100  = "coverage 100%"
+    doxy.cov.45   = "coverage 45%",
+    doxy.cov.50   = "coverage 50%"
+    # doxy.cov.60   = "coverage 60%",
+    # doxy.cov.70   = "coverage 70%",
+    # doxy.cov.80   = "coverage 80%",
+    # doxy.cov.90   = "coverage 90%",
+    # doxy.cov.100  = "coverage 100%"
 )
 INTERVENTION.CODES <- names(INTERVENTION.LABELS)
 
@@ -74,7 +79,7 @@ if (1==2) {
 }
 
 # TOTAL ----
-if (1==2) {
+if (1==1) {
     OUTCOMES = c(
         "diagnosis.el.misclassified",
         "diagnosis.late.misclassified",
@@ -132,7 +137,7 @@ if (1==2) {
 }
 
 # SEX ----
-if (1==2) {
+if (1==1) {
     SEX_OUTCOMES <- c(
         "diagnosis.total",
         "diagnosis.ps",

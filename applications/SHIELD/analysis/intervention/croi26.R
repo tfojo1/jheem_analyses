@@ -4,15 +4,15 @@
 #
 
 # CONFIGURATION ------------------------------------------------------
-if(1==2){
+if(1==1){
     source('../jheem_analyses/commoncode/locations_of_interest.R')
-    source('../jheem_analyses/applications/SHIELD/shield_specification.R')
+    # source('../jheem_analyses/applications/SHIELD/shield_specification.R')
     source('../jheem_analyses/applications/SHIELD/analysis/intervention/intervention_helper_functions.R')
     
     print(paste("Root directory is set to: ",ROOT.DIR))
     
     # Set the calibration once. The folders and the four result arrays follow from it.
-    CALIB.NAME <- "calib.8.21.stage3.az"
+    CALIB.NAME <- "calib.9.23.stage3.pk"
     FIG.DIR    <- shield.fig.path(CALIB.NAME,   create = TRUE)
     TABLE.DIR  <- shield.table.path(CALIB.NAME, create = TRUE)
     print(paste("Figures/Tables will be written to: ",FIG.DIR," **/tables/"))
@@ -32,7 +32,7 @@ if(1==2){
     CCRIT.MS   <- "doxy.cov.20"                        # policy coverage level
     EVAL.YEAR  <- "2030"                               # policy evaluation horizon
     BASE.YEAR  <- "2022"
-    COVERAGE.LEVELS <- paste0("doxy.cov.", seq(10, 50, 10))
+    COVERAGE.LEVELS <- paste0("doxy.cov.", seq(5, 50, 5))
     .ccrit     <- as.integer(sub("doxy\\.cov\\.", "", CCRIT.MS))
     
     .pos <- function(x) ifelse(!is.na(x) & x > 0, x, NA_real_)
@@ -54,7 +54,6 @@ if(1==2){
 # ****************************************************************************************************
 # SHARED INPUTS -- the coverage x location surfaces used by Figures 3 and 3a ----
 # ****************************************************************************************************
-
 {
     tbl.cov.vs.noint <- make_multi_location_table(
         data          = results,
@@ -135,7 +134,9 @@ if(1==2){
             title        = ttl,
             fill.lab     = .hf$lab,
             legend.dir   = "horizontal",
-            fixed.aspect = FALSE)
+            fixed.aspect = FALSE,
+            label.suffix="%",
+            label.size=3)
     }
     
     p.heat.1 <- .mk.heat(tbl.cov.vs.noint,          "msm",   "A: Projected Incidence Reduction among MSM \n by 2030 with- vs. without- Doxy-PEP (%)")
