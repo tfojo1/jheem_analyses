@@ -127,6 +127,7 @@ stage0.inputs <- shield.recorded.inputs(fresh,
          sha256 = paste(rep("e", 64L), collapse = "")))
 outputs.path <- shield.recorded.write.outputs(fresh, "C.12580", "stage0", stage0.inputs,
     list(mcmc_summary = summary.file, simulation_set = simset.file))
+shield.recorded.write.receipt(fresh, "C.12580", "stage0", stage0.inputs)
 written <- jsonlite::fromJSON(outputs.path, simplifyVector = FALSE)
 stopifnot(identical(written$inputs, stage0.inputs),
           identical(written$outputs[[1]]$role, "mcmc_summary"),
@@ -153,6 +154,37 @@ stopifnot(identical(rewritten$outputs[[2]]$sha256, shield.recorded.sha256(simset
 preceding <- shield.recorded.preceding(fresh, "C.12580", registered$stage1)
 stopifnot(identical(preceding, list(list(calibration_code = "stage0",
                                          outputs_sha256 = shield.recorded.sha256(outputs.path)))))
+
+# A completed record never substitutes for missing or modified artifacts.
+shield.recorded.validate.outputs(fresh, "C.12580", "stage0", stage0.inputs)
+writeLines("tampered", simset.file)
+expect.error(shield.recorded.preceding(fresh, "C.12580", registered$stage1), "verification")
+unlink(simset.file)
+expect.error(shield.recorded.validate.outputs(fresh, "C.12580", "stage0"), "missing")
+writeLines("simset, assembled again", simset.file)
+changed.inputs <- stage0.inputs
+changed.inputs$random_seed <- "99"
+expect.error(shield.recorded.validate.outputs(fresh, "C.12580", "stage0", changed.inputs), "inputs differ")
+changed.record <- rewritten
+changed.record$location <- "C.99999"
+shield.recorded.write.json(changed.record, outputs.path)
+expect.error(shield.recorded.validate.outputs(fresh, "C.12580", "stage0"), "invalid recorded")
+shield.recorded.write.json(rewritten, outputs.path)
+shield.recorded.validate.outputs(fresh, "C.12580", "stage0")
+changed.record <- rewritten
+changed.record$outputs[[2]]$path <- "../cache/elsewhere.Rdata"
+shield.recorded.write.json(changed.record, outputs.path)
+expect.error(shield.recorded.validate.outputs(fresh, "C.12580", "stage0"), "outside")
+shield.recorded.write.json(rewritten, outputs.path)
+
+# Interrupted setup leaves its receipt intact: neither resume without a
+# checkpoint nor another fresh start may silently replace that state.
+shield.recorded.write.receipt(fresh, "C.12580", "setup.interrupted", stage0.inputs)
+setup.receipt <- shield.recorded.receipt.path(fresh, "C.12580", "setup.interrupted")
+setup.digest <- shield.recorded.sha256(setup.receipt)
+expect.error(shield.recorded.assert.state(resume, "C.12580", "setup.interrupted"), "no nonempty")
+expect.error(shield.recorded.check.receipt(fresh, "C.12580", "setup.interrupted", stage0.inputs), "already has")
+stopifnot(identical(shield.recorded.sha256(setup.receipt), setup.digest))
 # Preceding outputs are part of a later stage's inputs, so resume compares them.
 stage1.inputs <- shield.recorded.inputs(fresh,
     list(manager = "census.manager.rdata", resolved_tag = fresh$census_tag,
@@ -165,6 +197,17 @@ shield.recorded.check.receipt(resume, "C.12580", "stage1b", stage1.inputs)
 stage1.inputs$preceding[[1]]$outputs_sha256 <- paste(rep("0", 64L), collapse = "")
 expect.error(shield.recorded.check.receipt(resume, "C.12580", "stage1b", stage1.inputs),
              "differ from")
+
+# A later completed stage must still verify the earlier outputs it names.
+stage1.inputs$preceding <- preceding
+shield.recorded.write.outputs(fresh, "C.12580", "stage1b", stage1.inputs,
+    list(mcmc_summary = summary.file, simulation_set = simset.file))
+shield.recorded.validate.outputs(fresh, "C.12580", "stage1b")
+changed.record <- rewritten
+changed.record$created_at_utc <- "2000-01-01T00:00:00Z"
+shield.recorded.write.json(changed.record, outputs.path)
+expect.error(shield.recorded.validate.outputs(fresh, "C.12580", "stage1b"), "preceding-stage outputs changed")
+shield.recorded.write.json(rewritten, outputs.path)
 
 if (nzchar(Sys.which("git"))) {
     checkout <- file.path(test.root, "jheem_analyses")

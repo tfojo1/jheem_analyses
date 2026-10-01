@@ -204,6 +204,74 @@ shield.recorded.record.path <- function(config, location, calibration.code,
               calibration.code, filename)
 }
 
+# A receipt is evidence to verify, not a completion sentinel. Validate both
+# records and their actual artifacts before skipping or consuming a stage.
+shield.recorded.validate.outputs <- function(config, location, calibration.code,
+                                             expected.inputs = NULL, ancestors = character()) {
+    if (calibration.code %in% ancestors) stop("Cycle in recorded stage lineage", call. = FALSE)
+    read.record <- function(filename) {
+        path <- shield.recorded.record.path(config, location, calibration.code, filename)
+        value <- tryCatch(jsonlite::fromJSON(path, simplifyVector = FALSE),
+                          error = function(e) NULL)
+        if (is.null(value) || !identical(value$schema_version, 1L) ||
+            !identical(value$location, location) ||
+            !identical(value$calibration_code, calibration.code) ||
+            !is.list(value$inputs)) {
+            stop("Missing or invalid recorded ", filename, " for ", calibration.code,
+                 " at ", path, call. = FALSE)
+        }
+        value
+    }
+    receipt <- read.record("inputs.json")
+    result <- read.record("outputs.json")
+    if (!identical(receipt$inputs, result$inputs) ||
+        (!is.null(expected.inputs) && !identical(result$inputs, expected.inputs))) {
+        stop("Completed stage inputs differ from the recorded or requested inputs: ",
+             calibration.code, call. = FALSE)
+    }
+    text.value <- function(x) is.character(x) && length(x) == 1L && !is.na(x) && nzchar(x)
+    roles <- vapply(result$outputs, function(output) {
+        if (is.list(output) && text.value(output$role)) output$role else ""
+    }, character(1))
+    if (!identical(sort(roles), c("mcmc_summary", "simulation_set"))) {
+        stop("Recorded outputs must name one summary and one simulation set", call. = FALSE)
+    }
+    root <- normalizePath(config$root_dir, mustWork = TRUE)
+    for (output in result$outputs) {
+        if (!text.value(output$path) || grepl("^(/|[A-Za-z]:|\\\\)", output$path) ||
+            !text.value(output$sha256) || !grepl("^[a-f0-9]{64}$", output$sha256) ||
+            !is.numeric(output$bytes) || length(output$bytes) != 1L ||
+            !is.finite(output$bytes) || output$bytes < 0) {
+            stop("Invalid recorded output description: ", output$role, call. = FALSE)
+        }
+        path <- file.path(root, output$path)
+        if (!file.exists(path) || dir.exists(path)) {
+            stop("Recorded output is missing: ", path, call. = FALSE)
+        }
+        path <- normalizePath(path, mustWork = TRUE)
+        if (!startsWith(path, paste0(root, "/"))) {
+            stop("Recorded output is outside JHEEM_ROOT_DIR: ", path, call. = FALSE)
+        }
+        if (!isTRUE(file.size(path) == output$bytes) ||
+            !identical(shield.recorded.sha256(path), output$sha256)) {
+            stop("Recorded output failed size or SHA-256 verification: ", path, call. = FALSE)
+        }
+    }
+    if (!is.list(result$inputs$preceding)) stop("Missing recorded preceding-stage list", call. = FALSE)
+    for (previous in result$inputs$preceding) {
+        shield.recorded.assert.names(location, previous$calibration_code)
+        shield.recorded.validate.outputs(config, location, previous$calibration_code,
+                                         ancestors = c(ancestors, calibration.code))
+        previous.path <- shield.recorded.record.path(config, location,
+                                                      previous$calibration_code, "outputs.json")
+        if (!identical(shield.recorded.sha256(previous.path), previous$outputs_sha256)) {
+            stop("Recorded preceding-stage outputs changed: ", previous$calibration_code,
+                 call. = FALSE)
+        }
+    }
+    invisible(result)
+}
+
 # A later stage starts from its preceding stages' results in the same output
 # tree, so its inputs name the recorded outputs it starts from.
 shield.recorded.preceding <- function(config, location, calibration.info) {
@@ -213,6 +281,7 @@ shield.recorded.preceding <- function(config, location, calibration.info) {
             stop("Recorded calibration starts from ", code, ", which has no ",
                  "recorded outputs for ", location, ": ", path, call. = FALSE)
         }
+        shield.recorded.validate.outputs(config, location, code)
         list(calibration_code = code, outputs_sha256 = shield.recorded.sha256(path))
     })
 }

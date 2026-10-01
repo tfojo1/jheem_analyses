@@ -74,6 +74,17 @@ the same output tree. A stage whose preceding stage has no recorded outputs does
 not start. Because the preceding outputs are inputs, `resume` also refuses if
 they changed.
 
+Reusing a completed stage verifies both record identities, the actual output
+files' sizes and SHA-256 digests, and the recorded preceding-stage lineage.
+The container's completion command additionally checks that the completed
+stage used the requested source revisions, manager assets, and seed. A leftover
+`outputs.json` is not sufficient to skip a stage. Failed verification stops;
+it never clears, repairs, or reruns the affected stage automatically.
+
+If setup was interrupted after creating its input receipt but before a usable
+checkpoint, neither fresh nor resume silently replaces it. Preserve that run
+tree for diagnosis and use a separate output root for a deliberate new attempt.
+
 After the simulation set is saved, the run writes `outputs.json` beside the
 receipt: the same inputs, and the path (relative to `JHEEM_ROOT_DIR`), size, and
 SHA-256 of the MCMC summary and the simulation set. Assembling a completed
