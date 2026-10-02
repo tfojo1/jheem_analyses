@@ -35,6 +35,11 @@ fixture <- function(n = 2L, bad = NULL) {
     ), class = "jheem.simulation.set")
 }
 report <- shield.output.report(fixture(), "C.12580", "stage0")
+named.location <- fixture()
+named.location$location <- c(C.12580 = "C.12580")
+stopifnot(identical(report, shield.output.report(named.location, "C.12580", "stage0")))
+named.location$location <- c(C.12580 = "C.99999")
+expect.error(shield.output.report(named.location, "C.12580", "stage0"), "location.*identity")
 stopifnot(report$n_sim == 2L, report$parameter_count == 2L,
           length(report$outcomes) == 4L,
           identical(report$parameters[[1]]$sample_values, list(1L, 3L)),
