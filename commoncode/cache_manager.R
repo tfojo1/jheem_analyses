@@ -540,6 +540,8 @@ load.data.manager.from.github.release <- function(file, gh.source, release.tag,
     data.manager <- load.data.manager(local.path, set.as.default = set.as.default)
     resolution$local_path <- normalizePath(local.path, mustWork = TRUE)
     attr(data.manager, "jheem.manager.resolution") <- resolution
+    cat("Loaded ", file, " from ", resolution$resolved_tag,
+        " (SHA-256 ", resolution$sha256, ")\n", sep = "")
     invisible(data.manager)
 }
 
@@ -590,11 +592,11 @@ load.data.manager.from.github <- function(file, gh.source, set.as.default, offli
         sync.legacy.cache.copy(file, local.path, resolution, error.prefix)
         write.current.github.release(resolution, error.prefix)
     }
-    cat(file, "is", resolution$resolved_tag, "\n")
-
     data.manager <- load.data.manager(local.path, set.as.default = set.as.default)
     resolution$local_path <- normalizePath(local.path, mustWork = TRUE)
     attr(data.manager, "jheem.manager.resolution") <- resolution
+    cat("Loaded ", file, " from ", resolution$resolved_tag,
+        " (SHA-256 ", resolution$sha256, ")\n", sep = "")
     invisible(data.manager)
 }
 

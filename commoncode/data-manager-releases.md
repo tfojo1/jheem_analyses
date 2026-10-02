@@ -45,12 +45,30 @@ digest, publication time, and local cache path. Both default GitHub loading and
 explicit release selection expose this identity. The OneDrive path and an
 unverified legacy-only offline copy return `NULL`.
 
+After successfully loading a verified release, the loader prints the resolved
+tag and SHA-256 digest. This applies to exact selection, following the promoted
+alias, and verified offline reads. The message describes the loaded file, not
+just the requested version; it is useful in launch logs but is not a complete
+run record.
+
 ## SHIELD
 
-The ordinary SHIELD bootstrap sets `SYPHILIS.MANAGER.RELEASE.TAG` to `NULL`
-inside `shield_source_code.R`, selecting the promoted manager. Setting the same
-variable before sourcing that file does not override it. Recorded runs instead
-use their explicitly configured release. If `SURVEILLANCE.MANAGER` already
+The ordinary SHIELD bootstrap selects `syphilis-manager-v2026.09.09` with the
+editable `SYPHILIS.MANAGER.RELEASE.TAG` assignment near the top of
+`shield_source_code.R`. Keep a dated release fixed across a calibration's stages;
+selecting a different manager does not update an earlier stage's results or
+make its checkpoints safe to resume. Setting the same variable before sourcing
+that file does not override it. Recorded runs always use their configured
+release instead of the ordinary setting.
+
+`NULL` remains an explicit choice to follow the currently promoted release,
+not the newest published candidate. It resolves and verifies that release or
+stops; it does not authorize fallback to an older cached input. Requiring a
+dated tag globally is unnecessary for consumers that deliberately follow
+promotion. For a long-running, multi-stage calibration, use a dated tag or a
+recorded configuration that keeps the resolved version fixed.
+
+If `SURVEILLANCE.MANAGER` already
 exists, the ordinary bootstrap retains that object and warns that its selector
 was ignored. The generic loader examples above do not override these
 application-specific choices.

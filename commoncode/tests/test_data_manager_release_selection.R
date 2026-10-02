@@ -327,7 +327,9 @@ load.latest <- function(offline = FALSE) {
 }
 
 # First load: resolve, download the immutable version, record it, sync the legacy copy.
-loaded <- load.latest()
+loaded.message <- capture.output(loaded <- load.latest())
+stopifnot(identical(loaded.message, paste0("Loaded fixture.rdata from manager-v1 (SHA-256 ",
+                                          fixture.digest, ")")))
 stopifnot(identical(downloads, "manager-v1"))
 stopifnot(grepl("data-managers/fixture.rdata/manager-v1/fixture.rdata$", loaded$path))
 stopifnot(identical(test.environment$get.data.manager.resolution(loaded)$resolved_tag, "manager-v1"))
@@ -337,9 +339,14 @@ stopifnot(identical(readLines(paste0(legacy.path, ".version")), "manager-v1"))
 
 # Unchanged latest and an explicit request for the same version reuse the cache.
 load.latest()
-test.environment$load.data.manager.from.github.release(
+exact.message <- capture.output(test.environment$load.data.manager.from.github.release(
     "fixture.rdata", source.configuration, "manager-v1", FALSE, FALSE, "test: "
-)
+))
+stopifnot(identical(exact.message, loaded.message))
+exact.offline.message <- capture.output(test.environment$load.data.manager.from.github.release(
+    "fixture.rdata", source.configuration, "manager-v1", FALSE, TRUE, "test: "
+))
+stopifnot(identical(exact.offline.message, loaded.message))
 stopifnot(identical(downloads, "manager-v1"))
 
 # A promotion is labeled by the version actually downloaded.
@@ -356,9 +363,15 @@ stopifnot(file.exists(file.path(latest.cache, "data-managers", "fixture.rdata",
 latest.target <- NULL
 pointer.before <- readBin(current.path, "raw", file.info(current.path)$size)
 assert.error(load.latest(), "No cached manager was substituted")
+assert.error(test.environment$load.data.manager.from.github.release(
+    "fixture.rdata", source.configuration, "manager-v1", FALSE, FALSE, "test: "
+), "network unavailable")
 stopifnot(identical(readBin(current.path, "raw", file.info(current.path)$size), pointer.before))
 # Explicit offline mode still loads the last verified version without downloading.
-stopifnot(grepl("manager-v2/fixture.rdata$", load.latest(offline = TRUE)$path))
+offline.message <- capture.output(offline.loaded <- load.latest(offline = TRUE))
+stopifnot(grepl("manager-v2/fixture.rdata$", offline.loaded$path),
+          identical(offline.message, paste0("Loaded fixture.rdata from manager-v2 (SHA-256 ",
+                                            fixture2.digest, ")")))
 stopifnot(identical(length(downloads), 2L))
 
 # Read-only offline loads neither repair the compatibility copy nor lock the release.
