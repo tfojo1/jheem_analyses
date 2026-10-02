@@ -3,11 +3,16 @@
 shield.output.report <- function(simset, location, calibration.code,
                                   years = seq(2010L, 2030L, 5L)) {
     fail <- function(message) stop(message, call. = FALSE)
-    if (!inherits(simset, "jheem.simulation.set") ||
-        !identical(simset$version, "shield") ||
-        !identical(simset$location, location) ||
-        !identical(simset$calibration.code, calibration.code)) {
-        fail("Simulation set identity does not match the requested SHIELD stage")
+    if (!inherits(simset, "jheem.simulation.set")) fail("Not a JHEEM simulation set")
+    expected <- list(version = "shield", location = location, calibration.code = calibration.code)
+    for (field in names(expected)) {
+        actual <- simset[[field]]
+        # locations::sanitize() preserves the input as the scalar's name;
+        # compare the identifier value, not that harmless name attribute.
+        if (!is.character(actual) || length(actual) != 1L || is.na(actual) ||
+            !identical(unname(actual), unname(expected[[field]]))) {
+            fail(paste("Simulation set", field, "does not match the requested identity"))
+        }
     }
     n <- simset$n.sim
     if (!is.numeric(n) || length(n) != 1L || !is.finite(n) ||
