@@ -116,8 +116,41 @@ From the repository root:
 ```sh
 Rscript applications/SHIELD/tests/test-recorded-runtime.R
 Rscript applications/SHIELD/tests/test-recorded-cache.R
+Rscript applications/SHIELD/tests/test-output-checks.R
 ```
 
 These test preflight rejection, receipt matching, and verified offline loading
 without launching a calibration. Passing them does not substitute for an
 interrupted/resumed MCMC canary using the current source and manager releases.
+
+## Inspecting completed results
+
+The output inspector checks the recorded files' digests and lineage before
+loading the simset with its matching installed jheem2 package. Use it only on
+trusted, completed outputs, not a live calibration's files:
+
+```sh
+Rscript applications/SHIELD/tests/inspect-recorded-outputs.R \
+  /path/to/run-root C.12580 container.smoke.stage0 > output-report.json
+```
+
+It checks the stage identity, simulation count, named finite parameters, and
+finite population, incidence, total diagnoses, and primary/secondary diagnoses
+at five-year intervals from 2010 through 2030. Total population must be positive.
+Negative values in other outcomes are reported rather than assigned an arbitrary
+scientific tolerance. Missing outcomes or years fail; missing/infinite values
+are not dropped or replaced with zero by the getter.
+
+The JSON report includes per-parameter and per-year minima, medians, maxima,
+negative-value counts, and actual values from up to five simulations, together
+with the input identities and simset digest. These are descriptive checks, not
+posterior intervals or convergence evidence: the CI canary has only two
+iterations. They supplement, rather than replace, the byte-integrity checks.
+
+For a native/container comparison, first hold the scientific sources, manager
+bytes, initial conditions, and a saved parameter vector constant. Compare the
+resulting trajectories and individual likelihood contributions, reporting
+absolute and relative differences with justified numerical tolerances. That
+comparison is separate work; this inspector does not run the model or calculate
+likelihoods. MCMC traces or serialized-file digests need not match across new
+runs, and the current pilot does not promise deterministic sampler replay.
