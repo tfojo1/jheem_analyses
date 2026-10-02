@@ -214,7 +214,7 @@ Populate this `~/jheem/code/jheem_analyses/cached/` directory with the required 
 
 ### Add a GitHub Token (Recommended)
 
-**Why:** every R process that loads the SHIELD model checks GitHub for the latest data managers (about 3 requests per process). Without a token, GitHub allows only 60 requests per hour per server, shared by everyone on that server. A large launch (for example 32 cities, or 8 cities x 4 chains) goes over that limit. The runs do not fail, but the extra processes print warnings and fall back to your local copy in `cached/`. With a token the limit is 5,000 per hour.
+**Why:** every R process that loads the SHIELD model makes 1 GitHub request at startup, to look up the pinned syphilis manager (the census manager loads locally and makes no request). If the syphilis manager tag is set to `NULL` ("latest"), it makes 2. Without a token, GitHub allows only 60 requests per hour per server, shared by everyone on that server. A large launch (for example stage 3 for 10 cities: setup, 4 chains, and assemble each, about 60 processes) can reach that limit, especially when others are running too. With a pinned tag, a process that is refused by GitHub **stops with an error** (`Could not resolve GitHub Release tag ...`), even though the file is already in `cached/`. With a token the limit is 5,000 per hour.
 
 **1. Create the token on GitHub.** Go to Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token.
 - Repository access: choose **Public repositories** (read-only is enough; `tfojo1/jheem_analyses` is public).
