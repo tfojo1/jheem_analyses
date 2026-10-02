@@ -61,10 +61,19 @@ local({
         ))
     }
     has.auth <- function(req) "authorization" %in% tolower(names(req$headers))
+    dummy.authorization <- function(req) {
+        # Newer httr2 stores sensitive headers as weak references. Read only
+        # this test's synthetic tokens via its public accessor when available;
+        # older supported versions keep ordinary strings in req$headers.
+        headers <- if ("req_get_headers" %in% getNamespaceExports("httr2")) {
+            httr2::req_get_headers(req, redacted = "reveal")
+        } else req$headers
+        headers[[which(tolower(names(headers)) == "authorization")]]
+    }
     result <- perform()
     stopifnot(httr2::resp_status(result) == 200L, length(requests) == 2L,
               identical(requests[[1]]$url, requests[[2]]$url),
-              identical(requests[[1]]$headers$Authorization, "Bearer manager-test-token"),
+              identical(dummy.authorization(requests[[1]]), "Bearer manager-test-token"),
               !has.auth(requests[[2]]), length(messages) == 1L,
               !grepl("manager-test-token|shadow-test-token", messages))
 
@@ -95,7 +104,7 @@ local({
 
     Sys.unsetenv("GITHUB_TOKEN")
     perform(statuses = 200L)
-    stopifnot(identical(requests[[1]]$headers$Authorization, "Bearer shadow-test-token"))
+    stopifnot(identical(dummy.authorization(requests[[1]]), "Bearer shadow-test-token"))
     Sys.unsetenv("GH_TOKEN")
     perform(statuses = 200L)
     stopifnot(!has.auth(requests[[1]]), length(requests) == 1L)
