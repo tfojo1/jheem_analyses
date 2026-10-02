@@ -487,17 +487,27 @@ ggsave(file.path(OUT.DIR, 'fig11_observed_vs_jheem_baseline.png'), fig11, width 
        dpi = 200, bg = 'white')
 
 # 7. FIGURE 12: HOW EACH RAW JHEEM OUTCOME EVOLVES ----
-# Counts are shown as an index: each state's value / its own 2019 value (2 = twice 2019),
+# Counts are shown as an index: each state's value / its own value in INDEX.YEAR (2 = twice INDEX.YEAR),
 # so large and small states can share one panel. Proportions in percent; the rate as is.
 # Thin lines = one state (its median across simulations). Thick lines = median state.
+#
+# INDEX.YEAR
+#   1. 2019 (EHE launch) when the saved model years include it ('baseline' simsets).
+#   2. Otherwise the first saved year. Example: 'noint' simsets start in 2025, so the index is 2025 = 1.
+#   Without this fallback the count panels are empty (value / missing 2019 value = NA).
+INDEX.YEAR = if (2019 %in% model.outcomes$year) 2019 else min(model.outcomes$year)
+if (INDEX.YEAR != 2019)
+    print(paste0("Figure 12: no model year 2019 in the saved numbers; counts are indexed to ", INDEX.YEAR))
+fig12.labels = sub('2019 = 1', paste0(INDEX.YEAR, ' = 1'), FIGURE12.OUTCOMES$label)
+
 fig12.data = model.outcomes %>%
     left_join(FIGURE12.OUTCOMES %>% select(outcome, type, label), by = 'outcome') %>%
     group_by(state, outcome, group) %>%
-    mutate(value = case_when(type == 'count' ~ median / median[year == 2019][1],
+    mutate(value = case_when(type == 'count' ~ median / median[year == INDEX.YEAR][1],
                              type == 'proportion' ~ 100 * median,
                              TRUE ~ median)) %>%
     ungroup() %>%
-    mutate(label = factor(label, levels = FIGURE12.OUTCOMES$label),
+    mutate(label = factor(sub('2019 = 1', paste0(INDEX.YEAR, ' = 1'), label), levels = fig12.labels),
            group = factor(group, levels = names(COLS.GROUP)))
 
 fig12.medians = fig12.data %>%
@@ -517,12 +527,13 @@ fig12 = ggplot() +
          title = 'What JHEEM projects for PrEP, testing and suppression with no new interventions',
          subtitle = how.to.read(
              x.axis = 'calendar year.',
-             y.axis = 'the unit in each panel title: index (2019 = 1) for counts, % for proportions, tests per person per year for the rate.',
+             y.axis = paste0('the unit in each panel title: index (', INDEX.YEAR,
+                             ' = 1) for counts, % for proportions, tests per person per year for the rate.'),
              read = c(paste0('Thin lines = one state (', length(unique(fig12.data$state)),
                              ' states, median across simulations). Thick lines = median state. Blue = everyone, orange = MSM.'),
                       paste0('After ', LAST.DATA.YEAR, ' (light shading) the lines are the model\'s own projection: ',
                              'the trend assumptions in the dictionary at the top of the code.'),
-                      'Index panels: 2 = twice the 2019 value. A flat line = no change.',
+                      paste0('Index panels: 2 = twice the ', INDEX.YEAR, ' value. A flat line = no change.'),
                       'Dashed vertical line = 2019 (EHE launch). Darker shading = 2020-2021 (COVID).')),
          caption = paste0('JHEEM baseline = "', SIMSET.FILE, '" simsets (', CALIBRATION.CODE, '), no added interventions. ',
                           'Awareness and tests per population are kept for everyone only (no sex breakdown in the model).')) +
