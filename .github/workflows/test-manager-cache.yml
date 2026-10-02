@@ -7,12 +7,16 @@ on:
       - 'commoncode/cache_manager.R'
       - 'commoncode/data_manager_sources.json'
       - 'commoncode/tests/test_data_manager_release_selection.R'
+      - 'applications/SHIELD/shield_source_code.R'
+      - 'applications/SHIELD/tests/test-manager-selection.R'
       - '.github/workflows/test-manager-cache.yml'
   pull_request:
     paths:
       - 'commoncode/cache_manager.R'
       - 'commoncode/data_manager_sources.json'
       - 'commoncode/tests/test_data_manager_release_selection.R'
+      - 'applications/SHIELD/shield_source_code.R'
+      - 'applications/SHIELD/tests/test-manager-selection.R'
       - '.github/workflows/test-manager-cache.yml'
   workflow_dispatch:
 
@@ -37,3 +41,5 @@ jobs:
         run: Rscript -e 'install.packages(c("httr2", "jsonlite", "filelock", "openssl"))'
       - name: Check version selection, verification, migration, and offline reads
         run: Rscript commoncode/tests/test_data_manager_release_selection.R
+      - name: Check SHIELD ordinary and recorded manager selection
+        run: Rscript applications/SHIELD/tests/test-manager-selection.R

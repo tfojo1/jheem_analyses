@@ -35,18 +35,24 @@ if (SHIELD.RECORDED.RUN) {
   rm(recorded.analyses.path)
 }
 
-# WHICH SURVEILLANCE MANAGER SHOULD WE USE?
-# Any of the dated syphilis managers from https://github.com/tfojo1/jheem_analyses/releases
-# NULL = whichever manager is promoted now. To pin an older one, put its tag
-# here instead (the commented line is an example).
-# SYPHILIS.MANAGER.RELEASE.TAG <- NULL
-SYPHILIS.MANAGER.RELEASE.TAG <- if (SHIELD.RECORDED.RUN) {
-  SHIELD.RECORDED.CONFIG$syphilis_tag
-} else "syphilis-manager-v2026.09.09"
-#"syphilis-manager-v2026.07.27"
+# WHICH SYPHILIS MANAGER SHOULD WE USE?
+# Keep the same dated release across a calibration's stages. Edit this setting
+# for ordinary runs; releases are at https://github.com/tfojo1/jheem_analyses/releases.
+# NULL deliberately follows the promoted release (not the newest candidate).
+# A failed online lookup stops; it never substitutes an older cached manager.
+SYPHILIS.MANAGER.RELEASE.TAG <- "syphilis-manager-v2026.09.09"
 
-if (!is.null(SYPHILIS.MANAGER.RELEASE.TAG)) { print(paste("!!! 1-Using a potentially old Surveillance Manager :",SYPHILIS.MANAGER.RELEASE.TAG))
-  }else{print("1-Using the most up to date Surveillance manager")}
+# Recorded runs always use their saved configuration, not the setting above.
+if (SHIELD.RECORDED.RUN) {
+  SYPHILIS.MANAGER.RELEASE.TAG <- SHIELD.RECORDED.CONFIG$syphilis_tag
+}
+
+if (is.null(SYPHILIS.MANAGER.RELEASE.TAG)) {
+  cat("1-Requesting the promoted syphilis manager\n")
+} else {
+  cat("1-Requesting syphilis manager release: ", SYPHILIS.MANAGER.RELEASE.TAG,
+      "\n", sep = "")
+}
 
 
 # SHOULD WE PULL GIT UPDATES?
