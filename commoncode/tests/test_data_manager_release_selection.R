@@ -28,6 +28,81 @@ assert.error <- function(expression, pattern = NULL) {
     invisible(error)
 }
 
+## Public release authentication: use only synthetic tokens and mocked responses.
+local({
+    token.names <- c("GITHUB_TOKEN", "GH_TOKEN")
+    saved.tokens <- Sys.getenv(token.names, unset = NA_character_)
+    on.exit({
+        Sys.unsetenv(token.names)
+        present <- !is.na(saved.tokens)
+        if (any(present)) do.call(Sys.setenv, as.list(saved.tokens[present]))
+    }, add = TRUE)
+    Sys.setenv(GITHUB_TOKEN = "manager-test-token", GH_TOKEN = "shadow-test-token")
+    public.url <- "https://api.github.com/repos/tfojo1/jheem_analyses/releases/tags/manager-v1"
+    requests <- list()
+    messages <- character()
+    response <- function(status) httr2::response(
+        status, headers = list("content-type" = "application/json"),
+        body = charToRaw('{"message":"fixture"}')
+    )
+    perform <- function(url = public.url, statuses = c(401L, 200L), path = NULL) {
+        requests <<- list()
+        messages <<- character()
+        httr2::with_mocked_responses(function(req) {
+            requests[[length(requests) + 1L]] <<- req
+            if (length(requests) > length(statuses)) stop("unexpected extra HTTP request")
+            response(statuses[[length(requests)]])
+        }, withCallingHandlers(
+            test.environment$perform.github.release.request(url, path),
+            warning = function(w) {
+                messages <<- c(messages, conditionMessage(w))
+                invokeRestart("muffleWarning")
+            }
+        ))
+    }
+    has.auth <- function(req) "authorization" %in% tolower(names(req$headers))
+    result <- perform()
+    stopifnot(httr2::resp_status(result) == 200L, length(requests) == 2L,
+              identical(requests[[1]]$url, requests[[2]]$url),
+              identical(requests[[1]]$headers$Authorization, "Bearer manager-test-token"),
+              !has.auth(requests[[2]]), length(messages) == 1L,
+              !grepl("manager-test-token|shadow-test-token", messages))
+
+    # Asset requests get the same retry. httr2's mock does not write `path`;
+    # materialization and digest enforcement are exercised below separately.
+    destination <- tempfile("manager-http-test-")
+    on.exit(unlink(destination), add = TRUE)
+    perform("https://github.com/tfojo1/jheem_analyses/releases/download/manager-v1/fixture.rdata",
+            path = destination)
+    stopifnot(length(requests) == 2L,
+              !has.auth(requests[[2]]))
+
+    assert.error(perform(statuses = c(401L, 401L)), "401")
+    stopifnot(length(requests) == 2L)
+    for (status in c(403L, 404L, 429L, 500L)) {
+        assert.error(perform(statuses = status), as.character(status))
+        stopifnot(length(requests) == 1L, length(messages) == 0L)
+    }
+    for (url in c("https://api.github.com/repos/example/private/releases/tags/v1",
+                  "https://api.github.com/repos/tfojo1/jheem_analyses-other/releases/tags/v1",
+                  "https://api.github.com/user")) {
+        assert.error(perform(url, statuses = 401L), "401")
+        stopifnot(length(requests) == 1L)
+    }
+    stopifnot(!has.auth(test.environment$github.release.request(
+        "https://github.com.example.invalid/asset"
+    )))
+
+    Sys.unsetenv("GITHUB_TOKEN")
+    perform(statuses = 200L)
+    stopifnot(identical(requests[[1]]$headers$Authorization, "Bearer shadow-test-token"))
+    Sys.unsetenv("GH_TOKEN")
+    perform(statuses = 200L)
+    stopifnot(!has.auth(requests[[1]]), length(requests) == 1L)
+    assert.error(perform(statuses = 401L), "401")
+    stopifnot(length(requests) == 1L, length(messages) == 0L)
+})
+
 ## The new argument is last so existing positional calls keep their meaning.
 stopifnot(identical(
     names(formals(test.environment$load.data.manager.from.cache)),
@@ -268,13 +343,12 @@ stopifnot(identical(readLines(paste0(legacy.path, ".version")), "manager-v2"))
 stopifnot(file.exists(file.path(latest.cache, "data-managers", "fixture.rdata",
                                 "manager-v1", "fixture.rdata")))
 
-# Unreachable GitHub or offline mode loads the last verified version without downloading.
+# Online failure must not select an older input on the operator's behalf.
 latest.target <- NULL
-unreachable <- withCallingHandlers(load.latest(), warning = function(w) {
-    stopifnot(grepl("Could not check GitHub", conditionMessage(w)))
-    invokeRestart("muffleWarning")
-})
-stopifnot(grepl("manager-v2/fixture.rdata$", unreachable$path))
+pointer.before <- readBin(current.path, "raw", file.info(current.path)$size)
+assert.error(load.latest(), "No cached manager was substituted")
+stopifnot(identical(readBin(current.path, "raw", file.info(current.path)$size), pointer.before))
+# Explicit offline mode still loads the last verified version without downloading.
 stopifnot(grepl("manager-v2/fixture.rdata$", load.latest(offline = TRUE)$path))
 stopifnot(identical(length(downloads), 2L))
 
@@ -305,6 +379,10 @@ assert.error(load.latest(offline = TRUE), "current release record is invalid")
 
 # Legacy-only installations retain an explicitly unverified offline fallback.
 unlink(current.path)
+legacy.before <- test.environment$sha256.file(legacy.path)
+assert.error(load.latest(), "No cached manager was substituted")
+stopifnot(identical(test.environment$sha256.file(legacy.path), legacy.before),
+          !file.exists(current.path))
 legacy.warning <- NULL
 legacy.load <- withCallingHandlers(load.latest(offline = TRUE), warning = function(w) {
     legacy.warning <<- conditionMessage(w)
