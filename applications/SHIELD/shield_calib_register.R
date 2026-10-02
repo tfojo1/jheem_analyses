@@ -80,16 +80,6 @@ register.calibration.info("calib.10.1.stage3",
 #                           n.burn = 0, n.chains = 4, max.run.time.seconds = 30, description = "NA"????
 # )
 ##
-register.calibration.info("calib.9.23.stage3.pk",
-                          preceding.calibration.codes = 'calib.9.23.stage2',
-                          likelihood.instructions = lik.inst.stage3,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          parameter.names = c(
-                              SHIELD.FULL.PARAMETERS.PRIOR@var.names
-                          ),
-                          n.iter = 10000, thin = 50, is.preliminary = F, n.chains = 4, max.run.time.seconds = 30, description = "NA"
-)
 
 # 9.28, widening the multivariate spline prior for trate to 3-fold from 1.5 fold (and ensuring prop.male.diag lik uses only up to 2021)
 register.calibration.info("calib.9.28.stage0",

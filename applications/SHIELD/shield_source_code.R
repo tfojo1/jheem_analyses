@@ -35,18 +35,24 @@ if (SHIELD.RECORDED.RUN) {
   rm(recorded.analyses.path)
 }
 
-# WHICH SURVEILLANCE MANAGER SHOULD WE USE?
-# Any of the dated syphilis managers from https://github.com/tfojo1/jheem_analyses/releases
-# NULL = whichever manager is promoted now. To pin an older one, put its tag
-# here instead (the commented line is an example).
-# SYPHILIS.MANAGER.RELEASE.TAG <- NULL
-SYPHILIS.MANAGER.RELEASE.TAG <- if (SHIELD.RECORDED.RUN) {
-  SHIELD.RECORDED.CONFIG$syphilis_tag
-} else "syphilis-manager-v2026.09.09"
-#"syphilis-manager-v2026.07.27"
+# WHICH SYPHILIS MANAGER SHOULD WE USE?
+# Keep the same dated release across a calibration's stages. Edit this setting
+# for ordinary runs; releases are at https://github.com/tfojo1/jheem_analyses/releases.
+# NULL deliberately follows the promoted release (not the newest candidate).
+# A failed online lookup stops; it never substitutes an older cached manager.
+SYPHILIS.MANAGER.RELEASE.TAG <- "syphilis-manager-v2026.09.09"
 
-if (!is.null(SYPHILIS.MANAGER.RELEASE.TAG)) { print(paste("!!! 1-Using a potentially old Surveillance Manager :",SYPHILIS.MANAGER.RELEASE.TAG))
-  }else{print("1-Using the most up to date Surveillance manager")}
+# Recorded runs always use their saved configuration, not the setting above.
+if (SHIELD.RECORDED.RUN) {
+  SYPHILIS.MANAGER.RELEASE.TAG <- SHIELD.RECORDED.CONFIG$syphilis_tag
+}
+
+if (is.null(SYPHILIS.MANAGER.RELEASE.TAG)) {
+  cat("1-Requesting the promoted syphilis manager\n")
+} else {
+  cat("1-Requesting syphilis manager release: ", SYPHILIS.MANAGER.RELEASE.TAG,
+      "\n", sep = "")
+}
 
 
 # SHOULD WE PULL GIT UPDATES?
@@ -119,24 +125,24 @@ require.repo.branch <- function(repo.path, branch, pull = TRUE)
     stop("Git executable not found on PATH")
   if (!dir.exists(file.path(repo.path, ".git")))
     stop("Not a git repository: ", repo.path)
-
+  
   repo <- normalizePath(repo.path, mustWork = TRUE)
   git  <- function(..., capture = FALSE) {
     args <- c("-C", shQuote(repo), ...)
     if (capture) suppressWarnings(system2("git", args, stdout = TRUE, stderr = TRUE))
     else         system2("git", args)                       # returns exit status
   }
-
+  
   ## --- 1. branch check: read-only, parallel-safe ----------------------------
   current <- git("rev-parse", "--abbrev-ref", "HEAD", capture = TRUE)[1]
-
+  
   if (identical(current, "HEAD"))
     stop("\n", repo, " is in a DETACHED HEAD state.\n",
          "SHIELD requires branch '", branch, "'. Nothing was changed.\n",
          "Fix it by hand, then re-run:\n",
          "    cd ", repo, "\n",
          "    git checkout ", branch, "\n")
-
+  
   if (!identical(current, branch))
     stop("\n", repo, " is on branch '", current, "'.\n",
          "SHIELD requires branch '", branch, "'.\n",
@@ -145,10 +151,10 @@ require.repo.branch <- function(repo.path, branch, pull = TRUE)
          "    cd ", repo, "\n",
          "    git status\n",
          "    git checkout ", branch, "\n")
-
+  
   cat("  on '", current, "' @ ",
       git("rev-parse", "--short", "HEAD", capture = TRUE)[1], "\n", sep = "")
-
+  
   ## --- 2. pull: only when asked ---------------------------------------------
   if (pull) {
     cat("  pulling origin/", branch, " ...\n", sep = "")
@@ -161,7 +167,7 @@ require.repo.branch <- function(repo.path, branch, pull = TRUE)
   } else {
     cat("  pull skipped\n")
   }
-
+  
   invisible(TRUE)
 }
 
@@ -205,7 +211,7 @@ if (USE.JHEEM2.PACKAGE) {
   ## --- option 2: source directly from the local clone ----------------------
   ## devtools::install_github('tfojo1/jheem2', ref = JHEEM2.BRANCH)
   cat("--Using JHEEM2 source code: \n")
-
+  
   if (SHIELD.RECORDED.RUN) {
     if (!requireNamespace("pkgload", quietly = TRUE)) {
       stop("Recorded source mode requires pkgload", call. = FALSE)
