@@ -59,4 +59,15 @@ expect.error(shield.output.report(fixture(), "C.12580", "stage0", years = intege
 negative <- shield.output.report(fixture(bad = "negative"), "C.12580", "stage0")
 stopifnot(negative$outcomes[[2]]$years[[1]]$negative_values == 1L,
           negative$outcomes[[2]]$years[[1]]$minimum == -0.001)
+local({
+    path <- tempfile("shield-output-report-", fileext = ".json")
+    on.exit(unlink(path), add = TRUE)
+    shield.output.write.report(report, path)
+    decoded <- jsonlite::fromJSON(path, simplifyVector = FALSE)
+    stopifnot(decoded$n_sim == 2L, length(decoded$parameters) == 2L,
+              identical(decoded$outcomes[[1]]$years[[1]]$sample_values, list(1L, 6L)))
+    original <- readLines(path)
+    expect.error(shield.output.write.report(negative, path), "Refusing to replace")
+    stopifnot(identical(readLines(path), original))
+})
 cat("SHIELD output checks passed\n")

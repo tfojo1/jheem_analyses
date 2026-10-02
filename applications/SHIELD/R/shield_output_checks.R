@@ -75,3 +75,11 @@ shield.output.report <- function(simset, location, calibration.code,
         outcomes = outcomes
     )
 }
+
+# Keep structured output separate from R/renv startup messages on stdout.
+shield.output.write.report <- function(report, path) {
+    if (file.exists(path)) stop("Refusing to replace an existing output report: ", path, call. = FALSE)
+    if (!dir.exists(dirname(path))) stop("Output report directory does not exist", call. = FALSE)
+    jsonlite::write_json(report, path, auto_unbox = TRUE, pretty = TRUE, digits = NA)
+    invisible(path)
+}
