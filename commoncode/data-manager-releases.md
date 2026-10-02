@@ -47,12 +47,30 @@ unverified legacy-only offline copy return `NULL`.
 
 ## SHIELD
 
-The ordinary SHIELD bootstrap currently sets
-`SYPHILIS.MANAGER.RELEASE.TAG` to `syphilis-manager-v2026.07.27` inside
-`shield_source_code.R`. Setting the same variable before sourcing that file
-does not override it. The generic loader examples above do not change this
-application-specific choice. If `SURVEILLANCE.MANAGER` already exists, the
-ordinary bootstrap retains that object and warns that its selector was ignored.
+The ordinary SHIELD bootstrap sets `SYPHILIS.MANAGER.RELEASE.TAG` to `NULL`
+inside `shield_source_code.R`, selecting the promoted manager. Setting the same
+variable before sourcing that file does not override it. Recorded runs instead
+use their explicitly configured release. If `SURVEILLANCE.MANAGER` already
+exists, the ordinary bootstrap retains that object and warns that its selector
+was ignored. The generic loader examples above do not override these
+application-specific choices.
+
+## Public downloads and authentication
+
+The managers in `tfojo1/jheem_analyses` are public; credentials are optional.
+The loader uses `GITHUB_TOKEN`, or otherwise `GH_TOKEN`, for higher API rate
+limits. If GitHub rejects that credential with HTTP 401, a request to this
+repository's release API or public release-download path is retried once without
+authentication, with a warning. The requested resource and digest verification
+do not change. No anonymous retry is made for other repositories or endpoints,
+HTTP 403/429 rate or permission failures, or a second failed request. Credentials
+are not sent to download hosts other than `github.com` or `api.github.com`.
+
+An online lookup that still fails stops rather than substituting a cached input.
+This applies even when a previously verified version is available. Use explicit
+offline mode below when loading cached data is intended; the error message names
+that option. Updating authentication does not change an already running
+calibration's loaded manager.
 
 ## Offline use
 
@@ -68,8 +86,8 @@ runs and offline work.
 Omitting `release.tag` remains the supported way to follow the current promoted
 manager. That route resolves the alias the same way, downloads and verifies the
 promoted version into the same per-version cache, and records it in
-`cached/data-managers/<manager>/current.json`. When GitHub can't be reached, or
-with `offline = TRUE`, it loads that last verified version. It also keeps the
+`cached/data-managers/<manager>/current.json`. With `offline = TRUE`, it loads
+that last verified version without checking for updates. It also keeps the
 older `cached/<manager>` copy, with a `.version` file naming its release, up to
 date for scripts that load that path directly. `get.data.manager.resolution()`
 returns the resolved release for managers loaded either way.
@@ -77,8 +95,11 @@ returns the resolved release for managers loaded either way.
 Offline reads do not create locks or update the compatibility copy, so a verified
 cache can be read-only. A broken current-version record or a corrupt verified
 artifact fails explicitly. Only a legacy-only cache, with no current-version
-record, may fall back to the old file with an unverified-copy warning; this
-preserves offline access during migration without assigning it a release identity.
+record and an explicit `offline = TRUE` request, may use the old file with an
+unverified-copy warning. This preserves deliberate offline access during
+migration without assigning it a release identity; it is not automatic recovery
+from an online lookup failure. Prefer an exact release with verified metadata
+for a new analysis run.
 
 The synthetic regression check needs neither real data nor the NAS:
 

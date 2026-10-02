@@ -274,7 +274,7 @@ validate.github.release.component <- function(value, label, error.prefix) {
     value
 }
 
-github.release.request <- function(url) {
+github.release.request <- function(url, authenticate = TRUE) {
     req <- httr2::request(url) |>
         httr2::req_headers(
             "Accept" = "application/vnd.github+json",
@@ -283,8 +283,37 @@ github.release.request <- function(url) {
         )
     token <- Sys.getenv("GITHUB_TOKEN")
     if (!nzchar(token)) token <- Sys.getenv("GH_TOKEN")
-    if (nzchar(token)) req <- httr2::req_auth_bearer_token(req, token)
+    # Never send an ambient credential to an arbitrary asset-download host.
+    if (authenticate && nzchar(token) &&
+        grepl("^https://(api\\.)?github\\.com/", url)) {
+        req <- httr2::req_auth_bearer_token(req, token)
+    }
     req
+}
+
+perform.github.release.request <- function(url, path = NULL) {
+    request <- github.release.request(url)
+    authenticated <- "authorization" %in% tolower(names(request$headers))
+    # These manager releases are public. Do not generalize this retry to private
+    # repositories, other hosts, permission failures, or rate-limit responses.
+    public.manager.url <- grepl(
+        "^https://api\\.github\\.com/repos/tfojo1/jheem_analyses/releases(/|$)", url
+    ) || grepl(
+        "^https://github\\.com/tfojo1/jheem_analyses/releases/download/", url
+    )
+    tryCatch(
+        httr2::req_perform(request, path = path),
+        error = function(e) {
+            if (!authenticated || !public.manager.url ||
+                !inherits(e, "httr2_http_401")) stop(e)
+            warning("GitHub rejected the configured token; retrying this public manager request without authentication.",
+                    call. = FALSE)
+            # Retry the identical resource once; release and digest checks still
+            # apply. A second failure propagates instead of retrying recursively.
+            httr2::req_perform(github.release.request(url, authenticate = FALSE),
+                              path = path)
+        }
+    )
 }
 
 get.github.release.by.tag <- function(repo, tag, error.prefix) {
@@ -294,7 +323,7 @@ get.github.release.by.tag <- function(repo, tag, error.prefix) {
         utils::URLencode(tag, reserved = TRUE)
     )
     tryCatch({
-        resp <- github.release.request(api.url) |> httr2::req_perform()
+        resp <- perform.github.release.request(api.url)
         jsonlite::fromJSON(httr2::resp_body_string(resp), simplifyVector = FALSE)
     }, error = function(e) {
         stop(paste0(error.prefix, "Could not resolve GitHub Release tag '", tag,
@@ -440,8 +469,7 @@ get.cached.github.release.resolution <- function(file, gh.source, release.tag,
 
 download.github.release.asset <- function(resolution, destination, error.prefix) {
     tryCatch(
-        github.release.request(resolution$download_url) |>
-            httr2::req_perform(path = destination),
+        perform.github.release.request(resolution$download_url, path = destination),
         error = function(e) {
             stop(paste0(error.prefix, "Failed to download '", resolution$asset,
                         "' from release '", resolution$resolved_tag, "': ",
@@ -534,10 +562,11 @@ load.data.manager.from.github <- function(file, gh.source, set.as.default, offli
         resolution <- tryCatch(
             resolve.github.release.asset(file, gh.source, gh.source$latest_tag, error.prefix),
             error = function(e) {
-                warning("Could not check GitHub for updates to '", file, "' (",
-                        conditionMessage(e), "). Using the last downloaded version.",
-                        call. = FALSE)
-                NULL
+                stop(paste0(error.prefix, "Could not resolve the promoted manager '",
+                            file, "' (", conditionMessage(e), "). No cached manager was substituted. ",
+                            "Retry the lookup, or deliberately use offline = TRUE to load the cached version; ",
+                            "prefer release.tag with an immutable tag when the intended version is known."),
+                     call. = FALSE)
             })
     }
 
