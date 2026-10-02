@@ -131,7 +131,7 @@ trusted, completed outputs, not a live calibration's files:
 
 ```sh
 Rscript applications/SHIELD/tests/inspect-recorded-outputs.R \
-  /path/to/run-root C.12580 container.smoke.stage0 > output-report.json
+  /path/to/run-root C.12580 container.smoke.stage0 output-report.json
 ```
 
 It checks the stage identity, simulation count, named finite parameters, and
@@ -146,6 +146,8 @@ negative-value counts, and actual values from up to five simulations, together
 with the input identities and simset digest. These are descriptive checks, not
 posterior intervals or convergence evidence: the CI canary has only two
 iterations. They supplement, rather than replace, the byte-integrity checks.
+The report is written separately from console messages and refuses to replace
+an existing file; choose a new filename for another inspection.
 
 For a native/container comparison, first hold the scientific sources, manager
 bytes, initial conditions, and a saved parameter vector constant. Compare the
