@@ -51,8 +51,10 @@ local({
     expect.error(shield.stage1.read.cases(path, parameters), "every model parameter")
 })
 fake.simulation <- function(bad = NULL) list(get = function(
-        outcomes, keep.dimensions, dimension.values, replace.inf.values.with.zero, na.rm) {
+        outcomes, keep.dimensions, dimension.values, drop.single.sim.dimension,
+        summary.type, replace.inf.values.with.zero, na.rm) {
     stopifnot(identical(keep.dimensions, c("year", "age", "race", "sex")),
+              drop.single.sim.dimension, identical(summary.type, "individual.simulation"),
               !replace.inf.values.with.zero, !na.rm)
     labels <- list(sex = c("msm", "female"), year = c("2010", "2011"),
                    race = c("black", "other"), age = c("15", "20"))

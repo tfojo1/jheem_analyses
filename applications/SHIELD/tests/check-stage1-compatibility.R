@@ -60,6 +60,7 @@ shield.stage1.trajectories <- function(simulation, years = 2010:2030) {
         values <- simulation$get(
             outcomes = outcome, keep.dimensions = dimensions,
             dimension.values = list(year = as.character(years)),
+            drop.single.sim.dimension = TRUE, summary.type = "individual.simulation",
             replace.inf.values.with.zero = FALSE, na.rm = FALSE)
         shield.stage1.require.finite(values, paste("Trajectory", outcome))
         labels <- dimnames(values)
