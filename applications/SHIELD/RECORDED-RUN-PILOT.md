@@ -156,3 +156,32 @@ absolute and relative differences with justified numerical tolerances. That
 comparison is separate work; this inspector does not run the model or calculate
 likelihoods. MCMC traces or serialized-file digests need not match across new
 runs, and the current pilot does not promise deterministic sampler replay.
+# Seed and checkpoint replay diagnostic
+
+`container.smoke.repeatability` is loaded only when the existing
+`SHIELD_ENABLE_CONTAINER_SMOKE=true` test switch is enabled. It uses the real
+Baltimore stage-0 model and likelihood, samples the two transmission rates, and
+runs eight iterations with no burn-in or thinning. The container test harness
+sets a checkpoint every two iterations, creating four chunks.
+
+The `jheem-containers` SHIELD workflow has an opt-in **Compare calibration
+traces** input. It starts two separate fresh processes under the same seed,
+then another run stopped after checkpoints one and two and resumed in new
+processes. A fourth run changes the seed. Each run has a separate empty output
+root and uses the same identified image and offline manager bytes.
+
+`tests/inspect-calibration-trace.R` exports the saved original model parameters,
+initial sampled parameters, checkpoint seeds, sampled values, likelihood and
+prior traces, acceptance counts, and adaptive state at each checkpoint. Numeric
+values use full-precision decimal strings. It reads completed trusted test
+state in its matching package environment; it does not evaluate model functions.
+`tests/check-calibration-checkpoint.R` verifies a paused test run's complete
+checkpoint before interruption. The harness verifies that resuming preserves
+the earlier chunks byte-for-byte.
+
+The comparison reports exact agreement or the first differing checkpoint,
+field, and coordinate. Runtime durations, timestamps, and serialized simulation
+identifiers are excluded. The changed-seed control must change both stored
+checkpoint seeds and sampled values or likelihoods. Eight iterations of one
+chain characterize this setup; they do not establish convergence, long-run or
+multi-chain replay, or the behavior of the sampler's explicit seed argument.

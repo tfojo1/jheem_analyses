@@ -46,3 +46,26 @@ register.calibration.info(
     max.run.time.seconds = 30,
     description = "Container stage-chaining canary; not for scientific inference"
 )
+
+# Four two-iteration chunks let the replay check compare two fresh processes
+# and a run resumed after both its first and second checkpoints. Uses the same
+# model, likelihood, and sampling setup as stage0; only the test length differs.
+register.calibration.info(
+    "container.smoke.repeatability",
+    likelihood.instructions = lik.inst.stage0,
+    data.manager = SURVEILLANCE.MANAGER,
+    end.year = 2030,
+    fixed.initial.parameter.values = c(
+        "global.transmission.rate.msm" = 1.6,
+        "global.transmission.rate.het" = 1.6
+    ),
+    parameter.names = c(
+        "global.transmission.rate.msm",
+        "global.transmission.rate.het"
+    ),
+    n.iter = 8,
+    thin = 1,
+    is.preliminary = TRUE,
+    max.run.time.seconds = 30,
+    description = "Seed and checkpoint replay check; not for scientific inference"
+)

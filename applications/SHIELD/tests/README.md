@@ -17,6 +17,11 @@ For the bounded, fail-on-missing-input check of the real stage-1 likelihood,
 see [Stage-1 manager compatibility](STAGE1-COMPATIBILITY.md). It runs independently
 of the tiers below and does not start MCMC or reuse production calibration state.
 
+The opt-in [seed and checkpoint replay diagnostic](../RECORDED-RUN-PILOT.md#seed-and-checkpoint-replay-diagnostic)
+uses the container workflow to compare completed test traces across fresh and
+resumed processes. It is independent of the tiers below; its cache inspector
+reads only trusted, completed test state in the matching package environment.
+
 ## Running it
 
 From the repo root:
