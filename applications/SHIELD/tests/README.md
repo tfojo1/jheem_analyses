@@ -13,6 +13,10 @@ a test is, how to run these, how to read the output, and what to do when
 something fails. This file is the reference: what the suite covers and how it is
 put together.
 
+For the bounded, fail-on-missing-input check of the real stage-1 likelihood,
+see [Stage-1 manager compatibility](STAGE1-COMPATIBILITY.md). It runs independently
+of the tiers below and does not start MCMC or reuse production calibration state.
+
 ## Running it
 
 From the repo root:

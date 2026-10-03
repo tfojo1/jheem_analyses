@@ -1,0 +1,106 @@
+# Stage-1 manager compatibility check
+
+This standalone check asks whether the selected manager works with the current
+registered stage-1 likelihood. It loads the real SHIELD specification and
+calibration registry, instantiates that likelihood for Baltimore, and evaluates
+three fixed parameter vectors through the real engine. It does not launch MCMC,
+clear calibration caches, or read a running calibration's outputs.
+
+The three vectors are the model's prior medians and two diagnostic variations
+with both global transmission rates multiplied by 0.9 or 1.1. They are not
+posterior samples or proposed changes to the model's priors. A failure at one
+vector is diagnostic evidence, not proof that every calibration must fail.
+
+## Running it
+
+Use prepared checkouts and an isolated library/environment. Configure the
+[recorded runtime inputs](../RECORDED-RUN-PILOT.md#required-inputs), including
+full source revisions and exact manager releases. For the October 2026 check,
+the intended selections are:
+
+- `jheem_analyses`: `4264842ce3fda9fbbc9c3e6717f958c11b5152ca` scientific source;
+- `jheem2`: `9578726b012a2ee380b380ef0203733d1bd81163`;
+- `locations`: `2481fc440cf1d981bb1005dd903708a88a528d13`;
+- `bayesian.simulations`: `4e0d13e85857396bb0e6e2ac1d244775b2145f75`;
+- `distributions`: `4d71d9644b4439a59210e804520ac8717ae8f079`;
+- census: `data-managers-v2026.08.26`;
+- syphilis: `syphilis-manager-v2026.09.09`.
+
+The check uses `shield_specification.R` and its existing recorded bootstrap, not
+the separate test-suite bootstrap. Set `SHIELD_RECORDED_RUN=true` and
+`SHIELD_RUN_MODE=fresh`. `JHEEM_ROOT_DIR` must be an **empty isolated directory**,
+separate from `JHEEM_CACHE_DIR`. Both managers must already have verified cache
+entries; missing inputs fail rather than being downloaded or skipped.
+
+For a checkout-based test, `JHEEM2_MODE=source` uses the recorded bootstrap's
+`pkgload::load_all()`. This is **not** the ordinary hand-sourced native loading
+path. Compilation tools and all dependencies must be available. The check
+requires Git metadata for both source checkouts; adapting it to a Git-free image
+requires a separately verified build attestation. Package mode requires an
+already installed build from the selected engine source, not merely a matching
+version number. Declared support-package revisions must likewise correspond to
+the prepared packages; the report includes installed versions, library paths,
+and `RemoteSha` where available, not a claim that every installation has one.
+
+From the analyses checkout, with that environment configured:
+
+```sh
+Rscript --vanilla applications/SHIELD/tests/check-stage1-compatibility.R \
+  /path/to/new-report-directory C.12580 calib.10.1.stage1
+```
+
+The report directory must not exist, and its parent must exist. Location and
+calibration code default to Baltimore and `calib.10.1.stage1`. The selected
+calibration must use the current stage-1 likelihood. Use a fresh R process for
+each invocation.
+
+Outputs are `summary.txt` and `report.json`, with actual manager identities,
+source file hashes, runtime information, tested parameter vectors, each
+likelihood contribution, and the total. Optimized calibration scoring is checked
+against ordinary consistency-checking evaluation and the sum of the individual
+components. Missing prerequisites, non-finite scores, disagreement, and model
+errors return a nonzero status and retain the failed report. Existing reports
+are never overwritten. Earlier successful samples in a failed report do not
+make the overall check pass.
+
+The fast helper checks need only R and `jsonlite`, without managers or JHEEM:
+
+```sh
+Rscript --vanilla applications/SHIELD/tests/test-stage1-compatibility.R
+```
+
+## What a pass does not establish
+
+- Full stage-1 startup from completed stage-0 outputs: no predecessor simset is
+  supplied, and `set.up.calibration()` is not called.
+- Support for all locations or parameter values, convergence, or fitted results.
+- Native/container equivalence, same-seed replay, or interrupted-run equality.
+- Scientific acceptance of the selected manager's values or likelihood formulas.
+
+Those are separate checks. This script covers the stage-1 likelihood surface
+that the tiny container stage-chaining canary does not exercise. It is runnable
+independently of the broader test suite; it is not yet a CI or promotion gate.
+
+## Verification checkpoint: October 3, 2026
+
+The selections above were tested locally with R 4.4.2 on macOS using recorded
+source mode. The real `calib.10.1.stage1` likelihood was instantiated for Baltimore.
+
+| Syphilis manager | Result |
+|---|---|
+| September 9 | All three vectors produced 12 finite components. Component sums, optimized totals, and ordinary checked totals agreed. |
+| May 5 (historical negative control) | Failed during likelihood construction because `prop.male.ps.diag.among.msm` is not a registered outcome, before any simulation or MCMC. |
+
+September's total log likelihoods were approximately -23521.59650 (prior
+medians), -14933.33716 (transmission rates × 0.9), and -35400.40713 (× 1.1).
+These are observations under this setup, not cross-platform golden constants or
+scientific acceptance criteria. The diagnostic engine allowed 60 seconds per
+simulation, rather than the calibration registration's 30-second limit; no
+solver settings or scientific formulas were changed.
+
+The negative control reproduces the reported failure; it does not establish the
+identity of an operator's old cache. Both executions used isolated input caches
+and an empty scientific-output root, which remained empty. No active run was
+read or modified. JSON reports retain exact manager digests, tested values,
+source hashes, and runtime information. Full staged calibration and the runtime
+comparisons listed above remain separate work.
