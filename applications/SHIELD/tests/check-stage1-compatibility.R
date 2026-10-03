@@ -34,6 +34,50 @@ shield.stage1.instructions <- function(info, location) {
     } else info$likelihood.instructions
 }
 
+shield.stage1.read.cases <- function(path, medians) {
+    # Read only the trusted numeric fixture produced by this diagnostic. RDS
+    # preserves the exact doubles; a JSON round-trip can round parameter values.
+    cases <- readRDS(path)
+    if (!is.list(cases) || !length(cases) || is.null(names(cases)) ||
+        anyNA(names(cases)) || any(!nzchar(names(cases))) || anyDuplicated(names(cases))) {
+        stop("Parameter cases must be a nonempty named object", call. = FALSE)
+    }
+    lapply(cases, function(values) {
+        if (!is.numeric(values) || is.null(names(values)) || anyDuplicated(names(values)) ||
+            !setequal(names(values), names(medians)) ||
+            any(!is.finite(values))) {
+            stop("Parameter case must contain every model parameter exactly once, finite and numeric",
+                 call. = FALSE)
+        }
+        values[names(medians)]
+    })
+}
+
+shield.stage1.trajectories <- function(simulation, years = 2010:2030) {
+    dimensions <- c("year", "age", "race", "sex")
+    result <- lapply(c("population", "incidence", "diagnosis.total", "diagnosis.ps"),
+                     function(outcome) {
+        values <- simulation$get(
+            outcomes = outcome, keep.dimensions = dimensions,
+            dimension.values = list(year = as.character(years)),
+            replace.inf.values.with.zero = FALSE, na.rm = FALSE)
+        shield.stage1.require.finite(values, paste("Trajectory", outcome))
+        labels <- dimnames(values)
+        if (is.null(labels) || !setequal(names(labels), dimensions) ||
+            any(vapply(labels, function(x) is.null(x) || !length(x) || anyNA(x) ||
+                       any(!nzchar(x)) || anyDuplicated(x) > 0L, logical(1)))) {
+            stop("Missing or inconsistent trajectory dimensions: ", outcome, call. = FALSE)
+        }
+        values <- aperm(values, match(dimensions, names(labels)))
+        if (!identical(dimnames(values)$year, as.character(years))) {
+            stop("Missing trajectory years: ", outcome, call. = FALSE)
+        }
+        list(dimensions = lapply(dimnames(values), as.list), values = as.list(as.vector(values)))
+    })
+    names(result) <- c("population", "incidence", "diagnosis.total", "diagnosis.ps")
+    result
+}
+
 shield.stage1.score <- function(likelihood, simulation) {
     # Match calibration's optimized scoring, while also checking the result via
     # the ordinary, consistency-checking path. Neither path changes the formula.
@@ -133,6 +177,10 @@ shield.stage1.main <- function(args = commandArgs(trailingOnly = TRUE)) {
         assign("SHIELD.DIR", file.path(analyses, "applications/SHIELD"), envir = globalenv())
         set.stage("load specification and exact offline managers")
         source(file.path(SHIELD.DIR, "shield_specification.R"), local = globalenv())
+        if (identical(get0("SHIELD.COMPARISON.ENGINE.LOADING", envir = globalenv()),
+                      "native-source")) {
+            report$loading_mode <- "hand-sourced engine with diagnostic offline bootstrap"
+        }
         report$managers <- list(census = get.data.manager.resolution(CENSUS.MANAGER),
                                syphilis = get.data.manager.resolution(SURVEILLANCE.MANAGER))
         for (manager in report$managers) {
@@ -161,12 +209,31 @@ shield.stage1.main <- function(args = commandArgs(trailingOnly = TRUE)) {
         set.stage("build engine")
         engine <- create.jheem.engine("shield", location, end.year = info$end.year,
                                       max.run.time.seconds = 60)
-        cases <- shield.stage1.parameter.cases(get.medians(SHIELD.FULL.PARAMETERS.PRIOR))
+        medians <- get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
+        parameter.file <- Sys.getenv("SHIELD_COMPARISON_PARAMETERS")
+        cases <- if (nzchar(parameter.file)) shield.stage1.read.cases(parameter.file, medians)
+                 else shield.stage1.parameter.cases(medians)
+        save.parameters <- Sys.getenv("SHIELD_SAVE_PARAMETERS")
+        if (nzchar(save.parameters)) {
+            if (nzchar(parameter.file) || file.exists(save.parameters) ||
+                !dir.exists(dirname(save.parameters))) {
+                stop("Choose a new parameter fixture path, without an input fixture")
+            }
+            saveRDS(cases, save.parameters, version = 3)
+            parameter.file <- save.parameters
+        }
+        report$parameter_source <- if (nzchar(parameter.file)) {
+            list(path = normalizePath(parameter.file, mustWork = TRUE),
+                 sha256 = shield.recorded.sha256(parameter.file))
+        } else "prior medians and diagnostic transmission variations"
+        trajectories <- Sys.getenv("SHIELD_COMPARE_TRAJECTORIES", unset = "false")
+        if (!trajectories %in% c("true", "false")) stop("SHIELD_COMPARE_TRAJECTORIES must be true or false")
         for (name in names(cases)) {
             set.stage(paste("simulate and score", name))
             started <- proc.time()[["elapsed"]]
             simulation <- engine$run(cases[[name]])
             result <- shield.stage1.score(likelihood, simulation)
+            if (trajectories == "true") result$trajectories <- shield.stage1.trajectories(simulation)
             report$samples[[name]] <- c(list(parameters = as.list(cases[[name]])), result,
                                        list(elapsed_seconds = proc.time()[["elapsed"]] - started))
         }

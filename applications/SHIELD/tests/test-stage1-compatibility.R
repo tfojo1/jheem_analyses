@@ -42,6 +42,33 @@ expect.error(shield.stage1.score(fake.likelihood(checked = -14), NULL), "disagre
 expect.error(shield.stage1.score(fake.likelihood(pieces = c(-10, -5)), NULL), "must have names")
 expect.error(shield.stage1.score(fake.likelihood(total = c(-15, -15)), NULL), "one total")
 
+local({
+    path <- tempfile(fileext = ".rds")
+    on.exit(unlink(path))
+    saveRDS(cases, path)
+    stopifnot(identical(shield.stage1.read.cases(path, parameters), cases))
+    saveRDS(list(bad = c(global.transmission.rate.msm = 1)), path)
+    expect.error(shield.stage1.read.cases(path, parameters), "every model parameter")
+})
+fake.simulation <- function(bad = NULL) list(get = function(
+        outcomes, keep.dimensions, dimension.values, replace.inf.values.with.zero, na.rm) {
+    stopifnot(identical(keep.dimensions, c("year", "age", "race", "sex")),
+              !replace.inf.values.with.zero, !na.rm)
+    labels <- list(sex = c("msm", "female"), year = c("2010", "2011"),
+                   race = c("black", "other"), age = c("15", "20"))
+    values <- array(seq_len(16L), dim = c(2, 2, 2, 2), dimnames = labels)
+    if (identical(bad, "finite")) values[1] <- Inf
+    if (identical(bad, "years")) dimnames(values)$year[1] <- "2009"
+    if (identical(bad, "strata")) dimnames(values)$sex[1] <- "female"
+    values
+})
+trajectory <- shield.stage1.trajectories(fake.simulation(), 2010:2011)$population
+stopifnot(identical(names(trajectory$dimensions), c("year", "age", "race", "sex")),
+          length(trajectory$values) == 16L)
+expect.error(shield.stage1.trajectories(fake.simulation("finite"), 2010:2011), "finite")
+expect.error(shield.stage1.trajectories(fake.simulation("years"), 2010:2011), "years")
+expect.error(shield.stage1.trajectories(fake.simulation("strata"), 2010:2011), "dimensions")
+
 # A failed prerequisite must persist a failed report and return an error, not
 # skip to a green result. Existing reports must never be overwritten.
 temporary <- tempfile("stage1-compatibility-tests-")
