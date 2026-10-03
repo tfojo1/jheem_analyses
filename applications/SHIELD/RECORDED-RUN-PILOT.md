@@ -158,7 +158,7 @@ likelihoods. MCMC traces or serialized-file digests need not match across new
 runs, and the current pilot does not promise deterministic sampler replay.
 # Seed and checkpoint replay diagnostic
 
-`container.smoke.repeatability` is loaded only when the existing
+`container.smoke.replay` is loaded only when the existing
 `SHIELD_ENABLE_CONTAINER_SMOKE=true` test switch is enabled. It uses the real
 Baltimore stage-0 model and likelihood, samples the two transmission rates, and
 runs eight iterations with no burn-in or thinning. The container test harness

@@ -51,7 +51,7 @@ register.calibration.info(
 # and a run resumed after both its first and second checkpoints. Uses the same
 # model, likelihood, and sampling setup as stage0; only the test length differs.
 register.calibration.info(
-    "container.smoke.repeatability",
+    "container.smoke.replay",
     likelihood.instructions = lik.inst.stage0,
     data.manager = SURVEILLANCE.MANAGER,
     end.year = 2030,
