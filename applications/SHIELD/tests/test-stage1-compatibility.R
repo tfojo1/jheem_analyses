@@ -35,6 +35,10 @@ fake.likelihood <- function(pieces = c(first = -10, second = -5),
 result <- shield.stage1.score(fake.likelihood(), NULL)
 stopifnot(identical(result$total, -15), length(result$components) == 2L,
           result$components[[2L]]$name == "second")
+precise <- 1.6 * 1.1
+precise.result <- shield.stage1.score(fake.likelihood(c(first = precise)), NULL)
+stopifnot(identical(as.numeric(precise.result$total_exact), precise),
+          identical(as.numeric(precise.result$components[[1L]]$value_exact), precise))
 expect.error(shield.stage1.score(fake.likelihood(c(first = -10, second = -Inf)), NULL), "finite")
 expect.error(shield.stage1.score(fake.likelihood(total = NaN), NULL), "finite")
 expect.error(shield.stage1.score(fake.likelihood(total = -14), NULL), "disagree")
@@ -66,7 +70,7 @@ fake.simulation <- function(bad = NULL) list(get = function(
 })
 trajectory <- shield.stage1.trajectories(fake.simulation(), 2010:2011)$population
 stopifnot(identical(names(trajectory$dimensions), c("year", "age", "race", "sex")),
-          length(trajectory$values) == 16L)
+          length(trajectory$values) == 16L, is.character(trajectory$values[[1L]]))
 expect.error(shield.stage1.trajectories(fake.simulation("finite"), 2010:2011), "finite")
 expect.error(shield.stage1.trajectories(fake.simulation("years"), 2010:2011), "years")
 expect.error(shield.stage1.trajectories(fake.simulation("strata"), 2010:2011), "dimensions")

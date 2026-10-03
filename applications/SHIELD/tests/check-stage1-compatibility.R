@@ -73,7 +73,8 @@ shield.stage1.trajectories <- function(simulation, years = 2010:2030) {
         if (!identical(dimnames(values)$year, as.character(years))) {
             stop("Missing trajectory years: ", outcome, call. = FALSE)
         }
-        list(dimensions = lapply(dimnames(values), as.list), values = as.list(as.vector(values)))
+        list(dimensions = lapply(dimnames(values), as.list),
+             values = as.list(sprintf("%.17g", as.vector(values))))
     })
     names(result) <- c("population", "incidence", "diagnosis.total", "diagnosis.ps")
     result
@@ -102,8 +103,10 @@ shield.stage1.score <- function(likelihood, simulation) {
              call. = FALSE)
     }
     list(total = unname(total), checked_total = unname(checked),
+         total_exact = sprintf("%.17g", total),
          components = lapply(seq_along(pieces), function(i) {
-             list(index = i, name = names(pieces)[[i]], value = unname(pieces[[i]]))
+             list(index = i, name = names(pieces)[[i]], value = unname(pieces[[i]]),
+                  value_exact = sprintf("%.17g", pieces[[i]]))
          }))
 }
 

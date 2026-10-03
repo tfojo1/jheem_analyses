@@ -75,7 +75,11 @@ Rscript --vanilla applications/SHIELD/tests/test-stage1-compatibility.R
 total diagnoses, and primary/secondary diagnoses for 2010–2030, retaining age,
 race, and sex dimensions. Missing strata/years and non-finite values fail rather
 than being silently omitted. The JSON stores dimension labels and R-column-major
-flattened values; no simset is serialized.
+flattened values; no simset is serialized. Trajectory values use 17-significant-
+digit decimal strings to preserve the underlying doubles. Likelihood components
+and totals retain ordinary numeric fields plus `value_exact` / `total_exact`
+strings for the comparator. Equality refers to those full-precision values,
+not rounded display numbers.
 
 To give two processes exactly the same parameter doubles, the first can set
 `SHIELD_SAVE_PARAMETERS=/path/to/new-parameters.rds`. The second sets
