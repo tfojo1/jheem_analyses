@@ -194,7 +194,7 @@ shield.stage1.main <- function(args = commandArgs(trailingOnly = TRUE)) {
         }
         set.stage("load actual calibration registry")
         source(file.path(SHIELD.DIR, "shield_calib_register.R"), local = globalenv())
-        info <- get.calibration.info(code)
+        info <- shield.recorded.jheem2.function("get.calibration.info")(code)
         report$preceding_calibration_codes <- info$preceding.calibration.codes
         report$end_year <- info$end.year
         instructions <- shield.stage1.instructions(info, location)
