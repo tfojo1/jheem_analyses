@@ -3,7 +3,7 @@
 The container provides the R setup for running SHIELD and keeps a record of the
 code and data used. Your usual R installation and calibration outputs are unchanged.
 
-**Currently supported:** single-chain calibrations and sequential stages 0–2.
+**Currently supported:** single-chain calibrations and sequential stages.
 Multi-chain stage 3 and transferring container results into a native stage-3 run
 are not supported yet. Use the usual workflow for full calibrations.
 
@@ -21,6 +21,12 @@ cd /path/to/jheem_analyses
 
 Setup loads the image on first use and prints your output directory. You don't
 need another repository checkout or any R package installation.
+
+If you are trying a newer pilot, use its installation path for the alias instead.
+Each prepared pilot selects its own runtime, manager versions, and separate
+output directory. Setup prints those choices; confirm they are the ones you
+intend to use. Keep using the same installation and output directory when
+checking or continuing a run. Selecting a new pilot does not upgrade an old run.
 
 The first start of a calibration code saves a copy of your committed analysis
 code. Commit any edits first; local commits don't have to be pushed. New
@@ -50,19 +56,20 @@ the status command doesn't check their contents. This test isn't for analysis.
 
 ## Stop and continue
 
-For a longer calibration defined in your selected source, for example:
+Choose the calibration defined in your committed checkout that you intend to
+run. For a longer single-chain calibration, for example:
 
 ```bash
-shield-run start C.12580 calib.9.28.stage0
+shield-run start C.12580 calib.10.1.stage0
 shield-run status
-shield-run logs C.12580 calib.9.28.stage0
+shield-run logs C.12580 calib.10.1.stage0
 ```
 
 Jobs keep running when you log out after successful setup. To stop and resume:
 
 ```bash
-shield-run stop C.12580 calib.9.28.stage0
-shield-run resume C.12580 calib.9.28.stage0
+shield-run stop C.12580 calib.10.1.stage0
+shield-run resume C.12580 calib.10.1.stage0
 ```
 
 Wait for at least one saved checkpoint before practicing this. Resume repeats
@@ -72,7 +79,7 @@ sequence as an uninterrupted run. `start` won't replace an existing run.
 To run stages in order:
 
 ```bash
-shield-run pipeline C.12580 calib.9.28.stage0 calib.9.28.stage1 calib.9.28.stage2
+shield-run pipeline C.12580 calib.10.1.stage0 calib.10.1.stage1
 ```
 
 Repeat the same command to continue a stopped pipeline. It checks completed
@@ -82,8 +89,10 @@ cannot resume; preserve it and use a new output directory for a new attempt.
 
 ## Results and troubleshooting
 
-Results go to `/mnt/jheem_nas_share/tmp/shield-container/<your username>/`,
-under `mcmc_runs/`, `mcmc_summaries/`, and `simulations/`. The `run_records/`
+Results go to the output directory printed by setup, under `mcmc_runs/`,
+`mcmc_summaries/`, and `simulations/`. The original pilot uses
+`/mnt/jheem_nas_share/tmp/shield-container/<your username>/`; newer pilots use
+separate directories. The `run_records/`
 directory holds the code/data versions and start/resume history. `run_sources/`
 holds the saved code and the selections shared across locations. Keep these
 directories together and don't share one run directory between accounts.
