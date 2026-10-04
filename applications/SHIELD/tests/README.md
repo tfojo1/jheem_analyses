@@ -24,6 +24,12 @@ reads only trusted, completed test state in the matching package environment.
 See the [October 3 results](REPLAY-COMPARISON.md): fresh same-seed runs matched,
 but the resumed run followed a different trajectory.
 
+The [actual stage-1 handoff diagnostic](../RECORDED-RUN-PILOT.md#actual-stage-1-predecessor-handoff-diagnostic)
+uses test-only, two-iteration copies of the real registrations. It checks the
+stage-1 likelihood and exact transfer from its predecessor summary, without
+changing production calibration definitions or scientific formulas.
+The [October 4 result](STAGE1-HANDOFF.md) records the passing handoff and its limits.
+
 ## Running it
 
 From the repo root:

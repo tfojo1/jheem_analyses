@@ -4,10 +4,11 @@ For the prepared server pilot, use [Trying the SHIELD container](CONTAINER-PILOT
 This page is the technical reference for the recorded runtime, not the operator
 setup procedure.
 
-Status (2026-09-30): opt-in implementation under validation. The ordinary
+Status: opt-in pilot, not yet the team's full calibration procedure. The ordinary
 `shield_calib_setup_and_run.R` path is unchanged when `SHIELD_RECORDED_RUN` is
 unset or `false`. A container canary and a server pilot (one realistic stage on
-shield2) have passed; this path is not yet the team's calibration procedure.
+shield2) have passed; multi-chain execution and the current-runtime operator trial
+remain separate follow-ups.
 
 The recorded path uses the same SHIELD specification, likelihoods, calibration
 register, and MCMC call as the ordinary path. It changes startup and state
@@ -191,3 +192,33 @@ between two fresh same-seed runs, but a different trajectory after resuming.
 With the tested package revisions, enabling this optional comparison therefore
 fails the workflow on the measured resume difference. Successful operational
 continuation is not a promise of identical sampling across restarts.
+
+## Actual stage-1 predecessor handoff diagnostic
+
+With the same opt-in test switch, `container.actual.stage0` and
+`container.actual.stage1` copy the current `calib.10.1` registrations. Their
+likelihoods, sampled parameter sets, aliases, solver settings, manager, and
+predecessor weighting remain unchanged. Only test codes, predecessor code,
+iteration count (two), burn-in (zero), thinning (one), and descriptions change.
+The fixtures reject an unexpected multi-chain or predecessor configuration.
+They are not substitutes for a scientifically meaningful calibration.
+
+The container workflow's optional **Check stage-1 handoff** input runs both in
+an isolated output root. Use `september-2026` inputs. The completed-state
+inspector verifies output digests and predecessor lineage, checks the saved
+stage-1 likelihood includes the MSM diagnosis term, and verifies that its
+initial model parameters exactly equal the predecessor summary's saved values.
+Both stages' stored sample/likelihood/prior values must be finite. Numerical
+simset inspection follows, then a second pipeline invocation must verify and
+skip both completed stages. Reports/logs are retained as `shield-stage1-handoff`.
+
+This closes a different gap from the older stage-chaining canary, which uses
+stage-0 likelihoods in both stages, and the fixed-parameter compatibility check,
+which does not reuse predecessor outputs or start MCMC. A passing short handoff
+still does not establish convergence, realistic-stage performance, stage 2/3,
+multi-chain execution, or identical trajectories across restarts.
+
+The [October 4 hosted result](tests/STAGE1-HANDOFF.md) passed: 173 predecessor
+parameters transferred exactly, the actual twelve-term stage-1 likelihood was
+used, both stages produced two simulations, and a repeated pipeline verified
+and skipped their outputs. The installed server image remains unchanged.

@@ -66,7 +66,8 @@ shield-run resume C.12580 calib.9.28.stage0
 ```
 
 Wait for at least one saved checkpoint before practicing this. Resume repeats
-work since the last checkpoint. `start` won't replace an existing run.
+work since the last checkpoint. It does not currently guarantee the same sample
+sequence as an uninterrupted run. `start` won't replace an existing run.
 
 To run stages in order:
 
