@@ -21,6 +21,8 @@ The opt-in [seed and checkpoint replay diagnostic](../RECORDED-RUN-PILOT.md#seed
 uses the container workflow to compare completed test traces across fresh and
 resumed processes. It is independent of the tiers below; its cache inspector
 reads only trusted, completed test state in the matching package environment.
+See the [October 3 results](REPLAY-COMPARISON.md): fresh same-seed runs matched,
+but the resumed run followed a different trajectory.
 
 ## Running it
 

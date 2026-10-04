@@ -156,7 +156,7 @@ absolute and relative differences with justified numerical tolerances. That
 comparison is separate work; this inspector does not run the model or calculate
 likelihoods. MCMC traces or serialized-file digests need not match across new
 runs, and the current pilot does not promise deterministic sampler replay.
-# Seed and checkpoint replay diagnostic
+## Seed and checkpoint replay diagnostic
 
 `container.smoke.replay` is loaded only when the existing
 `SHIELD_ENABLE_CONTAINER_SMOKE=true` test switch is enabled. It uses the real
@@ -185,3 +185,9 @@ identifiers are excluded. The changed-seed control must change both stored
 checkpoint seeds and sampled values or likelihoods. Eight iterations of one
 chain characterize this setup; they do not establish convergence, long-run or
 multi-chain replay, or the behavior of the sampler's explicit seed argument.
+
+The [October 3 comparison](tests/REPLAY-COMPARISON.md) found exact agreement
+between two fresh same-seed runs, but a different trajectory after resuming.
+With the tested package revisions, enabling this optional comparison therefore
+fails the workflow on the measured resume difference. Successful operational
+continuation is not a promise of identical sampling across restarts.
