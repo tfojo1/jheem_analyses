@@ -9,11 +9,11 @@ are not supported yet. Use the usual workflow for full calibrations.
 
 ## Get started
 
-On a server with the container installed, open an SSH terminal (see the
+On shield2, open an SSH terminal (see the
 [server guide](Readme.md)), rather than the R console or RStudio web terminal:
 
 ```bash
-alias shield-run=/home/jheem-shared/shield-container/shield-run.sh
+alias shield-run=/home/jheem-shared/shield-container-20261004/shield-run.sh
 shield-run setup
 # Open your jheem_analyses checkout before starting a new calibration.
 cd /path/to/jheem_analyses
@@ -22,7 +22,9 @@ cd /path/to/jheem_analyses
 Setup loads the image on first use and prints your output directory. You don't
 need another repository checkout or any R package installation.
 
-If you are trying a newer pilot, use its installation path for the alias instead.
+To check or continue a run from the original installation, keep using
+`/home/jheem-shared/shield-container/shield-run.sh` and its original output
+directory. For a different prepared installation, use its path for the alias.
 Each prepared pilot selects its own runtime, manager versions, and separate
 output directory. Setup prints those choices; confirm they are the ones you
 intend to use. Keep using the same installation and output directory when
@@ -90,9 +92,10 @@ cannot resume; preserve it and use a new output directory for a new attempt.
 ## Results and troubleshooting
 
 Results go to the output directory printed by setup, under `mcmc_runs/`,
-`mcmc_summaries/`, and `simulations/`. The original pilot uses
-`/mnt/jheem_nas_share/tmp/shield-container/<your username>/`; newer pilots use
-separate directories. The `run_records/`
+`mcmc_summaries/`, and `simulations/`. The installation above uses
+`/mnt/jheem_nas_share/tmp/shield-container-r37210907071/<your username>/`.
+The original pilot uses `/mnt/jheem_nas_share/tmp/shield-container/<your username>/`.
+The `run_records/`
 directory holds the code/data versions and start/resume history. `run_sources/`
 holds the saved code and the selections shared across locations. Keep these
 directories together and don't share one run directory between accounts.
