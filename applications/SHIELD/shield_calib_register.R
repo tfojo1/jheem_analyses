@@ -20,6 +20,78 @@ par.aliases.transmission = list(
     trate.5 = c("transmission.rate.multiplier.msm2022", "transmission.rate.multiplier.heterosexual2022")
 )
 
+# 10.5
+# Testing adding the historical penalty likelihood to stage 0. Stage 1 stays the same
+register.calibration.info("calib.10.5.stage0.1x",
+                          likelihood.instructions = lik.inst.stage0.hist.1x,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          fixed.initial.parameter.values = c("global.transmission.rate.msm"=1.6,
+                                                             "global.transmission.rate.het"=1.6),
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate.msm",
+                                              "global.transmission.rate.het"),
+                          parameter.aliases = par.aliases.transmission,
+                          n.iter = 20000, thin = 80, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info('calib.10.5.stage1.1x',
+                          preceding.calibration.codes = 'calib.10.5.stage0.1x',
+                          likelihood.instructions = lik.inst.stage1,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = 20000, thin = 80, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info("calib.10.5.stage0.2x",
+                          likelihood.instructions = lik.inst.stage0.hist.2x,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          fixed.initial.parameter.values = c("global.transmission.rate.msm"=1.6,
+                                                             "global.transmission.rate.het"=1.6),
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate.msm",
+                                              "global.transmission.rate.het"),
+                          parameter.aliases = par.aliases.transmission,
+                          n.iter = 20000, thin = 80, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info('calib.10.5.stage1.2x',
+                          preceding.calibration.codes = 'calib.10.5.stage0.2x',
+                          likelihood.instructions = lik.inst.stage1,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = 20000, thin = 80, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info("calib.10.5.stage0.4x",
+                          likelihood.instructions = lik.inst.stage0.hist.4x,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          fixed.initial.parameter.values = c("global.transmission.rate.msm"=1.6,
+                                                             "global.transmission.rate.het"=1.6),
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate.msm",
+                                              "global.transmission.rate.het"),
+                          parameter.aliases = par.aliases.transmission,
+                          n.iter = 20000, thin = 80, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info('calib.10.5.stage1.4x',
+                          preceding.calibration.codes = 'calib.10.5.stage0.4x',
+                          likelihood.instructions = lik.inst.stage1,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = 20000, thin = 80, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
 # 10.1: fixing the issues with spline functions; after modifiers; setting TRATE_DELTA=3
 # thining every 80 (since we have >80 blocks)
 register.calibration.info("calib.10.1.stage0",
