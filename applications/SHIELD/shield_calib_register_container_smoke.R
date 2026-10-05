@@ -70,6 +70,48 @@ register.calibration.info(
     description = "Seed and checkpoint replay check; not for scientific inference"
 )
 
+# A single-chain stage long enough that its summary (the last quarter of its
+# checkpoints, at one iteration per checkpoint) holds four samples, so the
+# four-chain stage below can start each chain from a different sample.
+register.calibration.info(
+    "container.smoke.pre3",
+    preceding.calibration.codes = "container.smoke.stage0",
+    likelihood.instructions = lik.inst.stage0,
+    data.manager = SURVEILLANCE.MANAGER,
+    end.year = 2030,
+    parameter.names = c(
+        "global.transmission.rate.msm",
+        "global.transmission.rate.het"
+    ),
+    n.iter = 16,
+    thin = 1,
+    is.preliminary = TRUE,
+    max.run.time.seconds = 30,
+    description = "Multi-chain canary predecessor; not for scientific inference"
+)
+
+# Runs like a stage 3: four chains seeded from the preceding stage's samples,
+# one setup, each chain in its own process, then one assembly. Two iterations
+# per chain; same model, likelihood, and parameters as stage0.
+register.calibration.info(
+    "container.smoke.stage3",
+    preceding.calibration.codes = "container.smoke.pre3",
+    likelihood.instructions = lik.inst.stage0,
+    data.manager = SURVEILLANCE.MANAGER,
+    end.year = 2030,
+    parameter.names = c(
+        "global.transmission.rate.msm",
+        "global.transmission.rate.het"
+    ),
+    n.iter = 2,
+    thin = 1,
+    n.burn = 0,
+    n.chains = 4,
+    is.preliminary = FALSE,
+    max.run.time.seconds = 30,
+    description = "Multi-chain stage canary; not for scientific inference"
+)
+
 # Exercise the current production registrations' actual stage-0 -> stage-1
 # handoff, without editing them or maintaining a second scientific definition.
 # Only test identity, predecessor identity, length/thinning, and description

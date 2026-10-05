@@ -26,6 +26,9 @@ if (SHIELD.RECORDED.RUN) {
                                  "applications/SHIELD/R/shield_recorded_runtime.R")
     source(recorded.source)
     SHIELD.RECORDED.CONFIG <- shield.recorded.config()
+    # setup | run (one chain) | assemble, or all three in one process for one chain.
+    SHIELD.RECORDED.PHASE <- shield.recorded.phase()
+    shield.recorded.assert.phase.mode(SHIELD.RECORDED.CONFIG, SHIELD.RECORDED.PHASE)
     shield.recorded.assert.checkout(SHIELD.RECORDED.CONFIG$analyses_path,
                                     SHIELD.RECORDED.CONFIG$analyses_ref)
     shield.recorded.assert.checkout(SHIELD.RECORDED.CONFIG$jheem2_path,
@@ -52,8 +55,15 @@ if (SHIELD.RECORDED.RUN) {
     source(file.path(SHIELD.RECORDED.CONFIG$analyses_path,
                      "commoncode/locations_of_interest.R"))
     # Checked once jheem2 is loaded, so the calibration directory comes from jheem2.
-    SHIELD.RECORDED.INFO <- shield.recorded.calibration.info(CALIBRATION.NAME)
-    shield.recorded.assert.state(SHIELD.RECORDED.CONFIG, LOCATION, CALIBRATION.NAME)
+    SHIELD.RECORDED.INFO <- shield.recorded.calibration.info(
+        CALIBRATION.NAME, allow.multiple.chains = !identical(SHIELD.RECORDED.PHASE$phase, "all"))
+    if (identical(SHIELD.RECORDED.PHASE$phase, "run") &&
+        SHIELD.RECORDED.PHASE$chain > as.integer(SHIELD.RECORDED.INFO$n.chains)) {
+        stop(CALIBRATION.NAME, " has ", SHIELD.RECORDED.INFO$n.chains, " chains; there is no chain ",
+             SHIELD.RECORDED.PHASE$chain, call. = FALSE)
+    }
+    shield.recorded.assert.state(SHIELD.RECORDED.CONFIG, LOCATION, CALIBRATION.NAME,
+        chain = if (identical(SHIELD.RECORDED.PHASE$phase, "run")) SHIELD.RECORDED.PHASE$chain else 1L)
 } else {
     source('../jheem_analyses/applications/SHIELD/shield_specification.R')
     source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
@@ -114,6 +124,48 @@ if (START_FROM_SCRATCH) {
                        cache.frequency = CACHE.FREQ #100 #how often write the results to disk
     )
     print(paste0("Calibration is set up for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
+}
+
+# Assemble the stage's simulation set and, for a recorded run, record its outputs.
+assemble.stage <- function() {
+    simset <- assemble.simulations.from.calibration(version = VERSION,
+                                                    location = LOCATION,
+                                                    calibration.code = CALIBRATION.NAME,
+                                                    allow.incomplete = T)
+    save.simulation.set(simset)
+    if (SHIELD.RECORDED.RUN) {
+        shield.recorded.write.outputs(
+            SHIELD.RECORDED.CONFIG, LOCATION, CALIBRATION.NAME, recorded.inputs,
+            list(mcmc_summary = shield.recorded.summary.file(
+                     SHIELD.RECORDED.CONFIG, LOCATION, CALIBRATION.NAME),
+                 simulation_set = get.simset.filename(
+                     version = simset$version, location = simset$location,
+                     calibration.code = simset$calibration.code, n.sim = simset$n.sim,
+                     intervention.code = simset$intervention.code,
+                     sub.version = simset$sub.version,
+                     root.dir = SHIELD.RECORDED.CONFIG$root_dir)))
+    }
+}
+
+if (SHIELD.RECORDED.RUN && identical(SHIELD.RECORDED.PHASE$phase, "setup")) {
+    shield.recorded.write.chains(SHIELD.RECORDED.CONFIG, LOCATION, CALIBRATION.NAME,
+                                 SHIELD.RECORDED.INFO$n.chains)
+    print(paste0("Recorded setup complete: ", SHIELD.RECORDED.INFO$n.chains, " chain(s)"))
+    quit(save = "no", status = 0)
+}
+
+if (SHIELD.RECORDED.RUN && identical(SHIELD.RECORDED.PHASE$phase, "assemble")) {
+    n.chains <- as.integer(SHIELD.RECORDED.INFO$n.chains)
+    shield.recorded.assert.chains.complete(SHIELD.RECORDED.CONFIG, LOCATION, CALIBRATION.NAME, n.chains)
+    # Each chain process caches the summary when it finishes; chains finishing
+    # together can race. Rebuild the complete summary once, here, before recording it.
+    cache.mcmc.summary(version = VERSION, location = LOCATION,
+                       calibration.code = CALIBRATION.NAME,
+                       root.dir = SHIELD.RECORDED.CONFIG$root_dir,
+                       get.one.set.of.parameters = F, throw.error.if.incomplete = T)
+    assemble.stage()
+    print(paste0("Assembled ", n.chains, " chain(s) for ", LOCATION))
+    quit(save = "no", status = 0)
 }
 
 #SECTION2: RUN
@@ -196,7 +248,9 @@ for (attempt in seq_len(MAX.ATTEMPTS)) {
             mcmc <- run.calibration(version = VERSION,
                                     location = LOCATION,
                                     calibration.code = CALIBRATION.NAME,
-                                    chains = 1,
+                                    chains = if (SHIELD.RECORDED.RUN &&
+                                                 identical(SHIELD.RECORDED.PHASE$phase, "run"))
+                                        SHIELD.RECORDED.PHASE$chain else 1,
                                     update.frequency = UPDATE.FREQ,
                                     update.detail = 'med')
             NULL   # reaching this line means the run succeeded
@@ -271,23 +325,10 @@ run.time <- as.numeric(end.time) - as.numeric(start.time)
 print(paste0("DONE RUNNING MCMC: Took ",
              round(run.time/60, 0), " minutes to run "))
 
+if (SHIELD.RECORDED.RUN && identical(SHIELD.RECORDED.PHASE$phase, "run")) {
+    quit(save = "no", status = 0)
+}
+
 
 # Save simset
-simset <- assemble.simulations.from.calibration(version = VERSION,
-                                                location = LOCATION,
-                                                calibration.code = CALIBRATION.NAME,
-                                                allow.incomplete = T)
-save.simulation.set(simset)
-
-if (SHIELD.RECORDED.RUN) {
-    shield.recorded.write.outputs(
-        SHIELD.RECORDED.CONFIG, LOCATION, CALIBRATION.NAME, recorded.inputs,
-        list(mcmc_summary = shield.recorded.summary.file(
-                 SHIELD.RECORDED.CONFIG, LOCATION, CALIBRATION.NAME),
-             simulation_set = get.simset.filename(
-                 version = simset$version, location = simset$location,
-                 calibration.code = simset$calibration.code, n.sim = simset$n.sim,
-                 intervention.code = simset$intervention.code,
-                 sub.version = simset$sub.version,
-                 root.dir = SHIELD.RECORDED.CONFIG$root_dir)))
-}
+assemble.stage()
