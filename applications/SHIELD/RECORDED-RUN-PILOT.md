@@ -7,8 +7,8 @@ setup procedure.
 Status: opt-in pilot, not yet the team's full calibration procedure. The ordinary
 `shield_calib_setup_and_run.R` path is unchanged when `SHIELD_RECORDED_RUN` is
 unset or `false`. A container canary and a server pilot (one realistic stage on
-shield2) have passed; multi-chain execution and the current-runtime operator trial
-remain separate follow-ups.
+shield2) have passed. Multi-chain stages run in phases (below); the
+current-runtime operator trial remains a separate follow-up.
 
 The recorded path uses the same SHIELD specification, likelihoods, calibration
 register, and MCMC call as the ordinary path. It changes startup and state
@@ -52,11 +52,27 @@ environment. The recorded entrypoint changes into the analyses repository
 before sourcing the model's existing relative paths. No new calibration API is
 required.
 
-Only this monolithic calibration entrypoint supports recorded mode in the
-current slice, and it runs chain 1 only, so recorded mode refuses calibrations
-registered with more than one chain (stage 3). The modular
+Only this calibration entrypoint supports recorded mode. The modular
 `setup`/`run`/`assemble` launcher explicitly refuses the recorded profile
 because its ordinary setup still clears cache.
+
+## Phases and multiple chains
+
+By default the entrypoint runs a stage in one process: setup when `fresh`, then
+chain 1, then assembly. That path takes single-chain calibrations only. A runner
+can instead set `SHIELD_RECORDED_PHASE`, as the native stage-3 launcher does
+with separate processes:
+
+| Phase | Run mode | Does |
+|---|---|---|
+| `setup` | `fresh` | Checks state, writes the input receipt, sets up every chain, and writes the chain count to `chains.txt` beside the receipt |
+| `run` (with `SHIELD_RECORDED_CHAIN=<k>`) | `resume` | Samples chain `k` from its own checkpoint; chains run in parallel |
+| `assemble` | `resume` | Refuses unless every chain is complete, rebuilds the MCMC summary, assembles and saves the simulation set, and writes `outputs.json` |
+
+Each chain process caches the summary when it finishes, and chains finishing
+together can race to write it, so assembly rebuilds it once before recording it.
+Running a chain again continues it from its last checkpoint; a finished chain
+returns immediately. The SHIELD container runs every stage this way.
 
 ## State rules
 
@@ -68,7 +84,7 @@ after the specification has loaded jheem2, before any calibration setup.
 `fresh` refuses an existing calibration directory and does not call
 `clear.calibration.cache()`. It writes an input receipt under
 `JHEEM_ROOT_DIR/run_records/shield/<location>/<calibration-code>/inputs.json`
-before setup. `resume` requires a nonempty chain-1 control file, readable
+before setup. `resume` requires a nonempty control file for its chain, readable
 calibration progress, and the matching receipt. A missing or changed identity
 stops before `run.calibration()`; it is not repaired or silently replaced.
 
@@ -108,7 +124,9 @@ first iteration is a durable checkpoint that an interrupted run can resume
 from. It validates execution and checkpoint continuation only; it is not for
 scientific inference. `container.smoke.stage1` is the same size and starts from
 `container.smoke.stage0`'s outputs, to validate stage chaining and its lineage
-record.
+record. `container.smoke.stage3` runs four two-iteration chains seeded from
+`container.smoke.pre3`, a 16-iteration single-chain stage whose summary holds
+four samples, to validate phased multi-chain execution.
 
 ## Focused checks
 
