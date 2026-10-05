@@ -20,6 +20,67 @@ par.aliases.transmission = list(
     trate.5 = c("transmission.rate.multiplier.msm2022", "transmission.rate.multiplier.heterosexual2022")
 )
 
+# 10.1: fixing the issues with spline functions; after modifiers; setting TRATE_DELTA=3
+# thining every 80 (since we have >80 blocks)
+register.calibration.info("calib.10.1.stage0",
+                          likelihood.instructions = lik.inst.stage0,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          fixed.initial.parameter.values = c("global.transmission.rate.msm"=1.6,
+                                                             "global.transmission.rate.het"=1.6),
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate.msm",
+                                              "global.transmission.rate.het"),
+                          parameter.aliases = par.aliases.transmission,
+                          n.iter = 20000, thin = 80, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info('calib.10.1.stage1',
+                          preceding.calibration.codes = 'calib.10.1.stage0',
+                          likelihood.instructions = lik.inst.stage1,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = 20000, thin = 80, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info("calib.10.1.stage2",
+                          preceding.calibration.codes = 'calib.10.1.stage1',
+                          likelihood.instructions = lik.inst.stage2,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              SHIELD.FULL.PARAMETERS.PRIOR@var.names
+                          ),
+                          n.iter = 20000, thin = 80, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+# short parallel chains to review performance
+register.calibration.info("calib.10.1.stage3",
+                          preceding.calibration.codes = 'calib.10.1.stage2',
+                          likelihood.instructions = lik.inst.stage3,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              SHIELD.FULL.PARAMETERS.PRIOR@var.names
+                          ),
+                          n.iter = 30000, thin = 80, is.preliminary = F, 
+                          n.burn = 0, n.chains = 4, max.run.time.seconds = 30, description = "NA"
+)
+# long parallel chains to finalize results
+# register.calibration.info("calib.10.1.stage4",
+#                           preceding.calibration.codes = 'calib.10.1.stage2',
+#                           likelihood.instructions = lik.inst.stage3,
+#                           data.manager = SURVEILLANCE.MANAGER,
+#                           end.year = 2030,
+#                           parameter.names = c(
+#                               SHIELD.FULL.PARAMETERS.PRIOR@var.names
+#                           ),
+#                           n.iter = 250000, thin = 80, is.preliminary = F, ?????
+#                           n.burn = 0, n.chains = 4, max.run.time.seconds = 30, description = "NA"????
+# )
+##
+
 # 9.28, widening the multivariate spline prior for trate to 3-fold from 1.5 fold (and ensuring prop.male.diag lik uses only up to 2021)
 register.calibration.info("calib.9.28.stage0",
                           likelihood.instructions = lik.inst.stage0,

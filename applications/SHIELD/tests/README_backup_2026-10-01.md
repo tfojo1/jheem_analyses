@@ -13,23 +13,6 @@ a test is, how to run these, how to read the output, and what to do when
 something fails. This file is the reference: what the suite covers and how it is
 put together.
 
-For the bounded, fail-on-missing-input check of the real stage-1 likelihood,
-see [Stage-1 manager compatibility](STAGE1-COMPATIBILITY.md). It runs independently
-of the tiers below and does not start MCMC or reuse production calibration state.
-
-The opt-in [seed and checkpoint replay diagnostic](../RECORDED-RUN-PILOT.md#seed-and-checkpoint-replay-diagnostic)
-uses the container workflow to compare completed test traces across fresh and
-resumed processes. It is independent of the tiers below; its cache inspector
-reads only trusted, completed test state in the matching package environment.
-See the [October 3 results](REPLAY-COMPARISON.md): fresh same-seed runs matched,
-but the resumed run followed a different trajectory.
-
-The [actual stage-1 handoff diagnostic](../RECORDED-RUN-PILOT.md#actual-stage-1-predecessor-handoff-diagnostic)
-uses test-only, two-iteration copies of the real registrations. It checks the
-stage-1 likelihood and exact transfer from its predecessor summary, without
-changing production calibration definitions or scientific formulas.
-The [October 4 result](STAGE1-HANDOFF.md) records the passing handoff and its limits.
-
 ## Running it
 
 From the repo root:
@@ -55,8 +38,8 @@ inputs are missing says why and is not counted against you.
 | Tier | Needs | Time | Files |
 |---|---|---|---|
 | **static** | R only | ~7 s | `parse` (every file parses, every `source()` target exists, no diff markers, no deleted-but-tracked files) · `wiring` (launcher ↔ register, runner ↔ intervention definitions, sampling blocks) · `hygiene` (secrets, absolute paths, seeding, scratch files, mutating git) · `penalties` (the two custom penalty likelihoods' known problems) · `bootstrap-drift` |
-| **unit** | jheem2, `distributions` | ~3 s | `spline-prior` (all three builders) · `doxy-effectiveness` · `pairing` · `base-parameters` · `restratify` (the data-ingest funnel) · `error-terms` (the likelihood CV estimator) · `functional-form-modifiers` (jheem2 spline after.modifier semantics) |
-| **integration** | cached data managers | ~22 s | `manager-contract` · `jheem2-api` · `specification` · `spec-helpers` · `ontology-mappings` · `parameters` (prior, apply-fn, register) · `engine` · `likelihoods` · `interventions` · `functional-forms` (future-change splines, apply-fn double writes, screening routing) |
+| **unit** | jheem2, `distributions` | ~3 s | `spline-prior` (all three builders) · `doxy-effectiveness` · `pairing` · `base-parameters` · `restratify` (the data-ingest funnel) · `error-terms` (the likelihood CV estimator) |
+| **integration** | cached data managers | ~22 s | `manager-contract` · `jheem2-api` · `specification` · `spec-helpers` · `ontology-mappings` · `parameters` (prior, apply-fn, register) · `engine` · `likelihoods` · `interventions` |
 
 ## Files
 
@@ -125,32 +108,6 @@ asserted somewhere in the suite.
    toolchain). `test-integration-jheem2-api.R` then reports the mismatch by
    name, and the likelihood and intervention tests skip with that reason instead
    of erroring.
-
-### Future-change splines need jheem2 dev @ 9578726 or later
-
-The transmission (MSM, heterosexual) and STI-screening splines project past
-their last knot with a calibrated future-change multiplier `m`:
-`g(after.time) = g(last knot) + m * [g(last knot) - g(penultimate knot)]`,
-where `g` is the change link (identity/log for transmission, the 0-0.9
-bounded logit for screening). Two files guard this:
-
-* `test-unit-functional-form-modifiers.R` checks that the jheem2 in use
-  supports it. Before jheem2 dev @ 9578726 (1 Oct 2026) the change links were
-  built from the modifier's bounds, so a bounded-logit spline could not take an
-  unbounded `m`: the STI-screening spline fails to build and these tests fail
-  with that explanation.
-* `test-integration-functional-forms.R` checks the specification's own
-  functional forms: `m` replaces the base `after.modifier` (it is not added to
-  it), the projection interval equals the last knot interval, the projected
-  knot follows the formula above in every stratum, `SHIELD.APPLY.PARAMETERS.FN`
-  never writes the same alpha slot twice (a second write silently replaces the
-  first), and the female screening multiplier reaches females and
-  heterosexual men but not MSM. The last check needs a simulation and skips
-  under `SHIELD_TEST_SKIP_SLOW=true`.
-
-```bash
-Rscript applications/SHIELD/tests/run_tests.R --filter=functional-form
-```
 
 ### Tests that are meant to fail today
 

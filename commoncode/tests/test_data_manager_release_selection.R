@@ -28,6 +28,90 @@ assert.error <- function(expression, pattern = NULL) {
     invisible(error)
 }
 
+## Public release authentication: use only synthetic tokens and mocked responses.
+local({
+    token.names <- c("GITHUB_TOKEN", "GH_TOKEN")
+    saved.tokens <- Sys.getenv(token.names, unset = NA_character_)
+    on.exit({
+        Sys.unsetenv(token.names)
+        present <- !is.na(saved.tokens)
+        if (any(present)) do.call(Sys.setenv, as.list(saved.tokens[present]))
+    }, add = TRUE)
+    Sys.setenv(GITHUB_TOKEN = "manager-test-token", GH_TOKEN = "shadow-test-token")
+    public.url <- "https://api.github.com/repos/tfojo1/jheem_analyses/releases/tags/manager-v1"
+    requests <- list()
+    messages <- character()
+    response <- function(status) httr2::response(
+        status, headers = list("content-type" = "application/json"),
+        body = charToRaw('{"message":"fixture"}')
+    )
+    perform <- function(url = public.url, statuses = c(401L, 200L), path = NULL) {
+        requests <<- list()
+        messages <<- character()
+        httr2::with_mocked_responses(function(req) {
+            requests[[length(requests) + 1L]] <<- req
+            if (length(requests) > length(statuses)) stop("unexpected extra HTTP request")
+            response(statuses[[length(requests)]])
+        }, withCallingHandlers(
+            test.environment$perform.github.release.request(url, path),
+            warning = function(w) {
+                messages <<- c(messages, conditionMessage(w))
+                invokeRestart("muffleWarning")
+            }
+        ))
+    }
+    has.auth <- function(req) "authorization" %in% tolower(names(req$headers))
+    dummy.authorization <- function(req) {
+        # Newer httr2 stores sensitive headers as weak references. Read only
+        # this test's synthetic tokens via its public accessor when available;
+        # older supported versions keep ordinary strings in req$headers.
+        headers <- if ("req_get_headers" %in% getNamespaceExports("httr2")) {
+            httr2::req_get_headers(req, redacted = "reveal")
+        } else req$headers
+        headers[[which(tolower(names(headers)) == "authorization")]]
+    }
+    result <- perform()
+    stopifnot(httr2::resp_status(result) == 200L, length(requests) == 2L,
+              identical(requests[[1]]$url, requests[[2]]$url),
+              identical(dummy.authorization(requests[[1]]), "Bearer manager-test-token"),
+              !has.auth(requests[[2]]), length(messages) == 1L,
+              !grepl("manager-test-token|shadow-test-token", messages))
+
+    # Asset requests get the same retry. httr2's mock does not write `path`;
+    # materialization and digest enforcement are exercised below separately.
+    destination <- tempfile("manager-http-test-")
+    on.exit(unlink(destination), add = TRUE)
+    perform("https://github.com/tfojo1/jheem_analyses/releases/download/manager-v1/fixture.rdata",
+            path = destination)
+    stopifnot(length(requests) == 2L,
+              !has.auth(requests[[2]]))
+
+    assert.error(perform(statuses = c(401L, 401L)), "401")
+    stopifnot(length(requests) == 2L)
+    for (status in c(403L, 404L, 429L, 500L)) {
+        assert.error(perform(statuses = status), as.character(status))
+        stopifnot(length(requests) == 1L, length(messages) == 0L)
+    }
+    for (url in c("https://api.github.com/repos/example/private/releases/tags/v1",
+                  "https://api.github.com/repos/tfojo1/jheem_analyses-other/releases/tags/v1",
+                  "https://api.github.com/user")) {
+        assert.error(perform(url, statuses = 401L), "401")
+        stopifnot(length(requests) == 1L)
+    }
+    stopifnot(!has.auth(test.environment$github.release.request(
+        "https://github.com.example.invalid/asset"
+    )))
+
+    Sys.unsetenv("GITHUB_TOKEN")
+    perform(statuses = 200L)
+    stopifnot(identical(dummy.authorization(requests[[1]]), "Bearer shadow-test-token"))
+    Sys.unsetenv("GH_TOKEN")
+    perform(statuses = 200L)
+    stopifnot(!has.auth(requests[[1]]), length(requests) == 1L)
+    assert.error(perform(statuses = 401L), "401")
+    stopifnot(length(requests) == 1L, length(messages) == 0L)
+})
+
 ## The new argument is last so existing positional calls keep their meaning.
 stopifnot(identical(
     names(formals(test.environment$load.data.manager.from.cache)),
@@ -243,7 +327,9 @@ load.latest <- function(offline = FALSE) {
 }
 
 # First load: resolve, download the immutable version, record it, sync the legacy copy.
-loaded <- load.latest()
+loaded.message <- capture.output(loaded <- load.latest())
+stopifnot(identical(loaded.message, paste0("Loaded fixture.rdata from manager-v1 (SHA-256 ",
+                                          fixture.digest, ")")))
 stopifnot(identical(downloads, "manager-v1"))
 stopifnot(grepl("data-managers/fixture.rdata/manager-v1/fixture.rdata$", loaded$path))
 stopifnot(identical(test.environment$get.data.manager.resolution(loaded)$resolved_tag, "manager-v1"))
@@ -253,9 +339,14 @@ stopifnot(identical(readLines(paste0(legacy.path, ".version")), "manager-v1"))
 
 # Unchanged latest and an explicit request for the same version reuse the cache.
 load.latest()
-test.environment$load.data.manager.from.github.release(
+exact.message <- capture.output(test.environment$load.data.manager.from.github.release(
     "fixture.rdata", source.configuration, "manager-v1", FALSE, FALSE, "test: "
-)
+))
+stopifnot(identical(exact.message, loaded.message))
+exact.offline.message <- capture.output(test.environment$load.data.manager.from.github.release(
+    "fixture.rdata", source.configuration, "manager-v1", FALSE, TRUE, "test: "
+))
+stopifnot(identical(exact.offline.message, loaded.message))
 stopifnot(identical(downloads, "manager-v1"))
 
 # A promotion is labeled by the version actually downloaded.
@@ -268,14 +359,19 @@ stopifnot(identical(readLines(paste0(legacy.path, ".version")), "manager-v2"))
 stopifnot(file.exists(file.path(latest.cache, "data-managers", "fixture.rdata",
                                 "manager-v1", "fixture.rdata")))
 
-# Unreachable GitHub or offline mode loads the last verified version without downloading.
+# Online failure must not select an older input on the operator's behalf.
 latest.target <- NULL
-unreachable <- withCallingHandlers(load.latest(), warning = function(w) {
-    stopifnot(grepl("Could not check GitHub", conditionMessage(w)))
-    invokeRestart("muffleWarning")
-})
-stopifnot(grepl("manager-v2/fixture.rdata$", unreachable$path))
-stopifnot(grepl("manager-v2/fixture.rdata$", load.latest(offline = TRUE)$path))
+pointer.before <- readBin(current.path, "raw", file.info(current.path)$size)
+assert.error(load.latest(), "No cached manager was substituted")
+assert.error(test.environment$load.data.manager.from.github.release(
+    "fixture.rdata", source.configuration, "manager-v1", FALSE, FALSE, "test: "
+), "network unavailable")
+stopifnot(identical(readBin(current.path, "raw", file.info(current.path)$size), pointer.before))
+# Explicit offline mode still loads the last verified version without downloading.
+offline.message <- capture.output(offline.loaded <- load.latest(offline = TRUE))
+stopifnot(grepl("manager-v2/fixture.rdata$", offline.loaded$path),
+          identical(offline.message, paste0("Loaded fixture.rdata from manager-v2 (SHA-256 ",
+                                            fixture2.digest, ")")))
 stopifnot(identical(length(downloads), 2L))
 
 # Read-only offline loads neither repair the compatibility copy nor lock the release.
@@ -305,6 +401,10 @@ assert.error(load.latest(offline = TRUE), "current release record is invalid")
 
 # Legacy-only installations retain an explicitly unverified offline fallback.
 unlink(current.path)
+legacy.before <- test.environment$sha256.file(legacy.path)
+assert.error(load.latest(), "No cached manager was substituted")
+stopifnot(identical(test.environment$sha256.file(legacy.path), legacy.before),
+          !file.exists(current.path))
 legacy.warning <- NULL
 legacy.load <- withCallingHandlers(load.latest(offline = TRUE), warning = function(w) {
     legacy.warning <<- conditionMessage(w)

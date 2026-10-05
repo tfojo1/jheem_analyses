@@ -123,22 +123,22 @@ CITIES=("${ten_cities[@]}")
 # code, so the OS fully reclaims memory between them).
 SEQ_SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
 SEQ_CALIBRATION_CODES=(
-    calib.9.28.stage0
-    calib.9.28.stage1
-    calib.9.28.stage2
+    calib.10.1.stage0
+    calib.10.1.stage1
+    calib.10.1.stage2
 )
 # SEQ_MAX_CITIES = max cities in flight in phase 1 (1 core each) -> peak cores = SEQ_MAX_CITIES.
-SEQ_MAX_CITIES=20
+SEQ_MAX_CITIES=32
 
 # Phase 2: parallel, multi-chain stage3.
 PAR_SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
 PAR_CALIBRATION_CODES=(
-    calib.9.28.stage3
+    calib.10.1.stage3
 )
 N_CHAINS=0
 # PAR_MAX_CITIES = max cities in flight in phase 2. Each holds N_CHAINS cores, so
 # peak cores = PAR_MAX_CITIES x N_CHAINS (5 x 4 = 20).
-PAR_MAX_CITIES=5
+PAR_MAX_CITIES=8
 
 # ── preflight ──────────────────────────────────────────────────────────────────
 for s in "$SEQ_SCRIPT" "$PAR_SCRIPT"; do

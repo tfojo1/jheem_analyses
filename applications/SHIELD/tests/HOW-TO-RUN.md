@@ -1,8 +1,5 @@
 # How to run the SHIELD tests
 
-Written for someone who has not used an automated test suite before. It assumes
-you know R and you know SHIELD; it assumes nothing about testing.
-
 If you only read one line: open a terminal, go to the `jheem_analyses` folder,
 and run
 
@@ -39,20 +36,15 @@ Three things follow from that, and they are worth internalising early:
 
 ## 2. Running them
 
-All commands are run **from the repo root** (`/Users/Trinity/JHEEM/jheem_analyses`),
-not from inside the tests folder. This matters: SHIELD resolves paths like
+All commands are run **from the repo root** not from inside the tests folder. 
+This matters: SHIELD resolves paths like
 `../jheem_analyses/...`, so the working directory is not arbitrary.
-
-```bash
-cd /Users/Trinity/JHEEM/jheem_analyses
-```
 
 ### Everything
 
 ```bash
 Rscript applications/SHIELD/tests/run_tests.R
 ```
-
 About 30 seconds. Builds the specification, runs the model once, and checks
 everything.
 

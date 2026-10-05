@@ -2,6 +2,10 @@
 
 This guide provides instructions for accessing and using the JHEEM/SHIELD modeling servers: `pearl1`, `shield1`, `shield2`, and `shield3`.
 
+For the optional container trial, see [Trying the SHIELD container](https://github.com/tfojo1/jheem_analyses/blob/master/applications/SHIELD/CONTAINER-PILOT.md).
+It does not yet support the full multi-chain calibration workflow; keep using
+the usual workflow for planned calibrations.
+
 **Note:** You must be connected to the JHU VPN to access any of these servers.
 
 > **Important: DNS state varies by server**
@@ -207,6 +211,42 @@ Populate this `~/jheem/code/jheem_analyses/cached/` directory with the required 
   ```bash
   scp -r /path/to/local/cached/* YOUR_USERNAME@10.253.170.91:~/jheem/code/jheem_analyses/cached/
   ```
+
+### Add a GitHub Token (Recommended)
+
+**Why:** every R process that loads the SHIELD model makes 1 GitHub request at startup, to look up the pinned syphilis manager (the census manager loads locally and makes no request). If the syphilis manager tag is set to `NULL` ("latest"), it makes 2. Without a token, GitHub allows only 60 requests per hour per server, shared by everyone on that server. A large launch (for example stage 3 for 10 cities: setup, 4 chains, and assemble each, about 60 processes) can reach that limit, especially when others are running too. With a pinned tag, a process that is refused by GitHub **stops with an error** (`Could not resolve GitHub Release tag ...`), even though the file is already in `cached/`. With a token the limit is 5,000 per hour.
+
+**1. Create the token on GitHub.** Go to Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token.
+- Repository access: choose **Public repositories** (read-only is enough; `tfojo1/jheem_analyses` is public).
+- Permissions: leave them all off.
+- Expiration: pick a date and note it.
+- Copy the token (it starts with `github_pat_`).
+
+**2. Add it on EACH server you use.** Log in over SSH and run:
+```bash
+echo 'GITHUB_TOKEN=github_pat_your_token_here' >> ~/.Renviron
+chmod 600 ~/.Renviron
+```
+- `~/.Renviron` is read by every R process: `Rscript` jobs started by the launchers and RStudio Server sessions. `.bashrc` is not read by RStudio Server.
+- Write it with no `export` and no spaces around `=`.
+- `chmod 600` makes the file readable only by you.
+
+**3. Check that R sees it:**
+```bash
+Rscript -e 'nzchar(Sys.getenv("GITHUB_TOKEN"))'
+```
+It should print `[1] TRUE` with no warning. Restart any open RStudio Server session so it picks up the token.
+
+**If you see `File ~/.Renviron contains invalid line(s)`:** the paste most likely split into two lines, leaving a bare `github_pat_...` line. R ignores that line, but you can remove it:
+```bash
+sed 's/github_pat_.*/github_pat_<hidden>/' ~/.Renviron   # look at the file without printing the token
+sed -i '/^github_pat_/d' ~/.Renviron                       # delete lines that START with github_pat_
+```
+Keep exactly one `GITHUB_TOKEN=...` line.
+
+**Notes:**
+- Never put the token in the repo or in any committed file. Do not create a `.Renviron` inside `jheem_analyses`: git does not ignore it, and R would read it instead of your home one.
+- When the token expires, runs still work, but the warnings come back until you replace the line in `~/.Renviron`.
 
 ## Running R and Model Scripts
 

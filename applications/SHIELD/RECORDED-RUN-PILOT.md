@@ -1,9 +1,14 @@
 # Recorded SHIELD calibration path (pilot)
 
-Status (2026-09-30): opt-in implementation under validation. The ordinary
+For the prepared server pilot, use [Trying the SHIELD container](CONTAINER-PILOT.md).
+This page is the technical reference for the recorded runtime, not the operator
+setup procedure.
+
+Status: opt-in pilot, not yet the team's full calibration procedure. The ordinary
 `shield_calib_setup_and_run.R` path is unchanged when `SHIELD_RECORDED_RUN` is
 unset or `false`. A container canary and a server pilot (one realistic stage on
-shield2) have passed; this path is not yet the team's calibration procedure.
+shield2) have passed; multi-chain execution and the current-runtime operator trial
+remain separate follow-ups.
 
 The recorded path uses the same SHIELD specification, likelihoods, calibration
 register, and MCMC call as the ordinary path. It changes startup and state
@@ -112,8 +117,108 @@ From the repository root:
 ```sh
 Rscript applications/SHIELD/tests/test-recorded-runtime.R
 Rscript applications/SHIELD/tests/test-recorded-cache.R
+Rscript applications/SHIELD/tests/test-output-checks.R
 ```
 
 These test preflight rejection, receipt matching, and verified offline loading
 without launching a calibration. Passing them does not substitute for an
 interrupted/resumed MCMC canary using the current source and manager releases.
+
+## Inspecting completed results
+
+The output inspector checks the recorded files' digests and lineage before
+loading the simset with its matching installed jheem2 package. Use it only on
+trusted, completed outputs, not a live calibration's files:
+
+```sh
+Rscript applications/SHIELD/tests/inspect-recorded-outputs.R \
+  /path/to/run-root C.12580 container.smoke.stage0 output-report.json
+```
+
+It checks the stage identity, simulation count, named finite parameters, and
+finite population, incidence, total diagnoses, and primary/secondary diagnoses
+at five-year intervals from 2010 through 2030. Total population must be positive.
+Negative values in other outcomes are reported rather than assigned an arbitrary
+scientific tolerance. Missing outcomes or years fail; missing/infinite values
+are not dropped or replaced with zero by the getter.
+
+The JSON report includes per-parameter and per-year minima, medians, maxima,
+negative-value counts, and actual values from up to five simulations, together
+with the input identities and simset digest. These are descriptive checks, not
+posterior intervals or convergence evidence: the CI canary has only two
+iterations. They supplement, rather than replace, the byte-integrity checks.
+The report is written separately from console messages and refuses to replace
+an existing file; choose a new filename for another inspection.
+
+For a native/container comparison, first hold the scientific sources, manager
+bytes, initial conditions, and a saved parameter vector constant. Compare the
+resulting trajectories and individual likelihood contributions, reporting
+absolute and relative differences with justified numerical tolerances. That
+comparison is separate work; this inspector does not run the model or calculate
+likelihoods. MCMC traces or serialized-file digests need not match across new
+runs, and the current pilot does not promise deterministic sampler replay.
+## Seed and checkpoint replay diagnostic
+
+`container.smoke.replay` is loaded only when the existing
+`SHIELD_ENABLE_CONTAINER_SMOKE=true` test switch is enabled. It uses the real
+Baltimore stage-0 model and likelihood, samples the two transmission rates, and
+runs eight iterations with no burn-in or thinning. The container test harness
+sets a checkpoint every two iterations, creating four chunks.
+
+The `jheem-containers` SHIELD workflow has an opt-in **Compare calibration
+traces** input. It starts two separate fresh processes under the same seed,
+then another run stopped after checkpoints one and two and resumed in new
+processes. A fourth run changes the seed. Each run has a separate empty output
+root and uses the same identified image and offline manager bytes.
+
+`tests/inspect-calibration-trace.R` exports the saved original model parameters,
+initial sampled parameters, checkpoint seeds, sampled values, likelihood and
+prior traces, acceptance counts, and adaptive state at each checkpoint. Numeric
+values use full-precision decimal strings. It reads completed trusted test
+state in its matching package environment; it does not evaluate model functions.
+`tests/check-calibration-checkpoint.R` verifies a paused test run's complete
+checkpoint before interruption. The harness verifies that resuming preserves
+the earlier chunks byte-for-byte.
+
+The comparison reports exact agreement or the first differing checkpoint,
+field, and coordinate. Runtime durations, timestamps, and serialized simulation
+identifiers are excluded. The changed-seed control must change both stored
+checkpoint seeds and sampled values or likelihoods. Eight iterations of one
+chain characterize this setup; they do not establish convergence, long-run or
+multi-chain replay, or the behavior of the sampler's explicit seed argument.
+
+The [October 3 comparison](tests/REPLAY-COMPARISON.md) found exact agreement
+between two fresh same-seed runs, but a different trajectory after resuming.
+With the tested package revisions, enabling this optional comparison therefore
+fails the workflow on the measured resume difference. Successful operational
+continuation is not a promise of identical sampling across restarts.
+
+## Actual stage-1 predecessor handoff diagnostic
+
+With the same opt-in test switch, `container.actual.stage0` and
+`container.actual.stage1` copy the current `calib.10.1` registrations. Their
+likelihoods, sampled parameter sets, aliases, solver settings, manager, and
+predecessor weighting remain unchanged. Only test codes, predecessor code,
+iteration count (two), burn-in (zero), thinning (one), and descriptions change.
+The fixtures reject an unexpected multi-chain or predecessor configuration.
+They are not substitutes for a scientifically meaningful calibration.
+
+The container workflow's optional **Check stage-1 handoff** input runs both in
+an isolated output root. Use `september-2026` inputs. The completed-state
+inspector verifies output digests and predecessor lineage, checks the saved
+stage-1 likelihood includes the MSM diagnosis term, and verifies that its
+initial model parameters exactly equal the predecessor summary's saved values.
+Both stages' stored sample/likelihood/prior values must be finite. Numerical
+simset inspection follows, then a second pipeline invocation must verify and
+skip both completed stages. Reports/logs are retained as `shield-stage1-handoff`.
+
+This closes a different gap from the older stage-chaining canary, which uses
+stage-0 likelihoods in both stages, and the fixed-parameter compatibility check,
+which does not reuse predecessor outputs or start MCMC. A passing short handoff
+still does not establish convergence, realistic-stage performance, stage 2/3,
+multi-chain execution, or identical trajectories across restarts.
+
+The [October 4 hosted result](tests/STAGE1-HANDOFF.md) passed: 173 predecessor
+parameters transferred exactly, the actual twelve-term stage-1 likelihood was
+used, both stages produced two simulations, and a repeated pipeline verified
+and skipped their outputs. The installed server image remains unchanged.
