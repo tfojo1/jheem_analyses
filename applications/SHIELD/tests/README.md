@@ -13,6 +13,23 @@ a test is, how to run these, how to read the output, and what to do when
 something fails. This file is the reference: what the suite covers and how it is
 put together.
 
+For the bounded, fail-on-missing-input check of the real stage-1 likelihood,
+see [Stage-1 manager compatibility](STAGE1-COMPATIBILITY.md). It runs independently
+of the tiers below and does not start MCMC or reuse production calibration state.
+
+The opt-in [seed and checkpoint replay diagnostic](../RECORDED-RUN-PILOT.md#seed-and-checkpoint-replay-diagnostic)
+uses the container workflow to compare completed test traces across fresh and
+resumed processes. It is independent of the tiers below; its cache inspector
+reads only trusted, completed test state in the matching package environment.
+See the [October 3 results](REPLAY-COMPARISON.md): fresh same-seed runs matched,
+but the resumed run followed a different trajectory.
+
+The [actual stage-1 handoff diagnostic](../RECORDED-RUN-PILOT.md#actual-stage-1-predecessor-handoff-diagnostic)
+uses test-only, two-iteration copies of the real registrations. It checks the
+stage-1 likelihood and exact transfer from its predecessor summary, without
+changing production calibration definitions or scientific formulas.
+The [October 4 result](STAGE1-HANDOFF.md) records the passing handoff and its limits.
+
 ## Running it
 
 From the repo root:

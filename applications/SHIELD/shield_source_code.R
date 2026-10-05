@@ -125,24 +125,24 @@ require.repo.branch <- function(repo.path, branch, pull = TRUE)
     stop("Git executable not found on PATH")
   if (!dir.exists(file.path(repo.path, ".git")))
     stop("Not a git repository: ", repo.path)
-
+  
   repo <- normalizePath(repo.path, mustWork = TRUE)
   git  <- function(..., capture = FALSE) {
     args <- c("-C", shQuote(repo), ...)
     if (capture) suppressWarnings(system2("git", args, stdout = TRUE, stderr = TRUE))
     else         system2("git", args)                       # returns exit status
   }
-
+  
   ## --- 1. branch check: read-only, parallel-safe ----------------------------
   current <- git("rev-parse", "--abbrev-ref", "HEAD", capture = TRUE)[1]
-
+  
   if (identical(current, "HEAD"))
     stop("\n", repo, " is in a DETACHED HEAD state.\n",
          "SHIELD requires branch '", branch, "'. Nothing was changed.\n",
          "Fix it by hand, then re-run:\n",
          "    cd ", repo, "\n",
          "    git checkout ", branch, "\n")
-
+  
   if (!identical(current, branch))
     stop("\n", repo, " is on branch '", current, "'.\n",
          "SHIELD requires branch '", branch, "'.\n",
@@ -151,10 +151,10 @@ require.repo.branch <- function(repo.path, branch, pull = TRUE)
          "    cd ", repo, "\n",
          "    git status\n",
          "    git checkout ", branch, "\n")
-
+  
   cat("  on '", current, "' @ ",
       git("rev-parse", "--short", "HEAD", capture = TRUE)[1], "\n", sep = "")
-
+  
   ## --- 2. pull: only when asked ---------------------------------------------
   if (pull) {
     cat("  pulling origin/", branch, " ...\n", sep = "")
@@ -167,7 +167,7 @@ require.repo.branch <- function(repo.path, branch, pull = TRUE)
   } else {
     cat("  pull skipped\n")
   }
-
+  
   invisible(TRUE)
 }
 
@@ -211,7 +211,7 @@ if (USE.JHEEM2.PACKAGE) {
   ## --- option 2: source directly from the local clone ----------------------
   ## devtools::install_github('tfojo1/jheem2', ref = JHEEM2.BRANCH)
   cat("--Using JHEEM2 source code: \n")
-
+  
   if (SHIELD.RECORDED.RUN) {
     if (!requireNamespace("pkgload", quietly = TRUE)) {
       stop("Recorded source mode requires pkgload", call. = FALSE)

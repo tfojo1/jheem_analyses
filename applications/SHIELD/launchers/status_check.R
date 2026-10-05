@@ -4,7 +4,7 @@ source("../jheem_analyses/applications/SHIELD/shield_specification.R")
 
 calib="calib.9.23.stage3"
 
-calib="calib.9.23.stage3.pk"
+calib="calib.10.1.stage2"
 root.dir = get.jheem.root.directory();root.dir
 
 get.calibration.progress("shield","C.12060",calib,root.dir = root.dir)
@@ -16,12 +16,6 @@ get.calibration.progress("shield","C.31080",calib,root.dir = root.dir)
 get.calibration.progress("shield","C.33100",calib,root.dir = root.dir)
 get.calibration.progress("shield","C.37980",calib,root.dir = root.dir)
 get.calibration.progress("shield","C.38060",calib,root.dir = root.dir)
-
-
-calib="calib.9.23.stage1"# still finishing stahe1
 get.calibration.progress("shield","C.42660",calib,root.dir = root.dir)
-
-calib="calib.9.23.stage2"
 get.calibration.progress("shield","C.35620",calib,root.dir = root.dir)
 
-assemble.mcmc.from.calibration()
