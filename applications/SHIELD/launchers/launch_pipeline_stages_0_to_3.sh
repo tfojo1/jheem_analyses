@@ -127,8 +127,8 @@ CITIES=("${ten_cities[@]}")
 # code, so the OS fully reclaims memory between them).
 SEQ_SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
 SEQ_CALIBRATION_CODES=(
-    calib.10.5.stage0.1x
     calib.10.5.stage1.1x
+    calib.10.5.stage2.1x
 )
 # 1 = resume the first SEQ code from its cache (after a killed run); 0 = start it fresh.
 # Every city in CITIES must have been interrupted in that same code.
@@ -138,8 +138,8 @@ SEQ_MAX_CITIES=32
 
 # Phase 2: parallel, multi-chain stage3.
 PAR_SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
+# Leave empty - PAR_CALIBRATION_CODES=() - to skip phase 2 entirely.
 PAR_CALIBRATION_CODES=(
-    calib.10.1.stage3
 )
 N_CHAINS=0
 # PAR_MAX_CITIES = max cities in flight in phase 2. Each holds N_CHAINS cores, so
@@ -164,10 +164,7 @@ if (( ${#SEQ_CALIBRATION_CODES[@]} == 0 )); then
     echo "Error: SEQ_CALIBRATION_CODES is empty — check the array name in the config block above" >&2
     exit 1
 fi
-if (( ${#PAR_CALIBRATION_CODES[@]} == 0 )); then
-    echo "Error: PAR_CALIBRATION_CODES is empty — check the array name in the config block above" >&2
-    exit 1
-fi
+# PAR_CALIBRATION_CODES=() is allowed: it means "skip phase 2"
 
 
 # ── PHASE 1: per-city sequential pipeline (stages 0-2) ─────────────────────────
@@ -290,6 +287,13 @@ done
 
 wait   # block here until EVERY city has finished (or failed) phase 1
 echo "[$(date '+%F %T')] ===== PHASE 1 COMPLETE FOR ALL CITIES ====="
+
+# no parallel codes configured -> stop after phase 1
+if (( ${#PAR_CALIBRATION_CODES[@]} == 0 )); then
+    echo "[$(date '+%F %T')] PAR_CALIBRATION_CODES is empty — skipping phase 2"
+    echo "[$(date '+%F %T')] ===== ALL CITIES DONE (PHASE 1 ONLY) ====="
+    exit 0
+fi
 
 
 # ════════════════════════════════════════════════════════════════════════════
