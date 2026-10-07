@@ -25,6 +25,10 @@
 #     If any calibration code fails for a city, the remaining ones for that city
 #     are skipped and the city is recorded in FAILED_CITIES_LOG.
 #     Up to SEQ_MAX_CITIES cities run in parallel (1 core each).
+#     If RESUME_FIRST_SEQ_CODE=1, the FIRST code is resumed from its cache
+#     (run chain 1 + assemble, appending to its existing log; setup is skipped
+#     because it clears the cache) instead of started fresh - use this after
+#     killing a run. Later codes always run fresh.
 #     The script BLOCKS here (`wait`) until every city has finished phase 1.
 #
 #   PHASE 2 (parallel, multi-chain stage3):
@@ -126,6 +130,9 @@ SEQ_CALIBRATION_CODES=(
     calib.10.5.stage0.1x
     calib.10.5.stage1.1x
 )
+# 1 = resume the first SEQ code from its cache (after a killed run); 0 = start it fresh.
+# Every city in CITIES must have been interrupted in that same code.
+RESUME_FIRST_SEQ_CODE=0
 # SEQ_MAX_CITIES = max cities in flight in phase 1 (1 core each) -> peak cores = SEQ_MAX_CITIES.
 SEQ_MAX_CITIES=32
 
@@ -169,14 +176,26 @@ run_city_sequential() {
     local loc="$1"
     shift   # drop city arg so "$@" contains only calibration codes
     local rc
+    local resume=$RESUME_FIRST_SEQ_CODE   # only ever applies to the first code
 
     for calib_code in "$@"; do
 
-        echo "[$(date '+%F %T')] START   $loc :: $calib_code"
+        if (( resume )); then
+            # resume chain 1 from the cache, then assemble; append to the original log
+            echo "[$(date '+%F %T')] RESUME  $loc :: $calib_code"
+            Rscript "$SEQ_SCRIPT" "$loc" "$calib_code" run 1 \
+                >> "$LOG_DIR/${loc}_${calib_code}.out" 2>&1 \
+            && Rscript "$SEQ_SCRIPT" "$loc" "$calib_code" assemble \
+                >> "$LOG_DIR/${loc}_${calib_code}.out" 2>&1
+            rc=$?
+            resume=0
+        else
+            echo "[$(date '+%F %T')] START   $loc :: $calib_code"
 
-        Rscript "$SEQ_SCRIPT" "$loc" "$calib_code" all \
-            > "$LOG_DIR/${loc}_${calib_code}.out" 2>&1
-        rc=$?
+            Rscript "$SEQ_SCRIPT" "$loc" "$calib_code" all \
+                > "$LOG_DIR/${loc}_${calib_code}.out" 2>&1
+            rc=$?
+        fi
 
         if (( rc != 0 )); then
             echo "[$(date '+%F %T')] FAILED  $loc :: $calib_code (exit $rc) — skipping remaining codes and stage3" >&2
@@ -256,6 +275,9 @@ run_city_parallel() {
 # PHASE 1 — run stages 0-2 sequentially for every city (bounded parallelism)
 # ════════════════════════════════════════════════════════════════════════════
 echo "[$(date '+%F %T')] ===== PHASE 1: stages 0-2 (sequential per city) ====="
+if (( RESUME_FIRST_SEQ_CODE )); then
+    echo "[$(date '+%F %T')] RESUMING ${SEQ_CALIBRATION_CODES[0]} from cache (no setup)"
+fi
 
 for loc in "${CITIES[@]}"; do
 
