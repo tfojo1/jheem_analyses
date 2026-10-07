@@ -1,14 +1,16 @@
+#===============================================================================
+#This code cleans and puts data from Atlas Plus for Syphilis and Gonorrhea
+#===============================================================================
 
-#  Syphilis (2000-2022) -----------------------------------
+#Read in data:
 DATA.DIR.SYPHILIS="Q:/data_raw/syphilis.manager/syphilis"
 syphilis_files <- Sys.glob(paste0(DATA.DIR.SYPHILIS, '/*.csv'))
 syphilis.data <- lapply(syphilis_files, function(x){
-  skip=7
-  list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
+    skip=7
+    list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
 })
 
-# Mappings ----------------------------------------------------------------
-
+#Create Mappings:
 outcome.mappings.syphilis = c('Primary and Secondary Syphilis'='ps.syphilis',
                               'Early Non-Primary, Non-Secondary Syphilis' = 'early.syphilis',
                               'Congenital Syphilis' = 'congenital.syphilis',
@@ -26,8 +28,7 @@ syphilis.mappings.age = c('0-14' = '13-14 years',  #decided to make this change 
                           '65+' = '65+ years',
                           'Unknown' = 'Unknown')
 
-# Cleaning ----------------------------------------------------------------
-
+#Clean raw data:
 syphilis.clean = lapply(syphilis.data, function(file){
   
   data=file[["data"]]
@@ -56,8 +57,6 @@ syphilis.clean = lapply(syphilis.data, function(file){
     data$location = "US"
   }
   
-  ##Demographic conditionals##
-  
   if(grepl("agegrp", filename)) {
     data$age = syphilis.mappings.age[data$Age.Group]
   }
@@ -75,8 +74,7 @@ syphilis.clean = lapply(syphilis.data, function(file){
   list(filename, data)
 })
 
-# Put Syphilis---------------------------------------------------------------------
-
+#Put:
 syphilis.clean.put = lapply(syphilis.clean, `[[`, 2)
 
 for (data in syphilis.clean.put) {
@@ -90,17 +88,13 @@ for (data in syphilis.clean.put) {
     details = 'CDC Atlas Plus')
 }
 
+#===============================================================================
+#Early and Late Syphilis 
 
+#(Separate Processing because age categories are different)
+#===============================================================================
 
-# Clean + Put Early Syphilis because age categories are different ---------
-
-DATA.DIR.SYPHILIS.EARLY="Q:/data_raw/syphilis.manager/syphilis/early.syphilis"
-syphilis_files_early <- Sys.glob(paste0(DATA.DIR.SYPHILIS.EARLY, '/*.csv'))
-syphilis.data.early <- lapply(syphilis_files_early, function(x){
-  skip=7
-  list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
-})
-
+#Mappings:
 early.syphilis.age = c('0-14' = '13-14 years',  #decided to make this change on 5-6-24 to align with ontology (assume no on under 13 has STI)
                        '15-24' = '15-24 years',
                        '25-34' = '25-34 years',
@@ -110,24 +104,19 @@ early.syphilis.age = c('0-14' = '13-14 years',  #decided to make this change on 
                        '65+' = '65+ years',
                        'Unknown' = 'Unknown')
 
-
-
-# Clean + Put Early Syphilis because age categories are different ---------
-
-# -------------------------------------------------------------------------
-#Function to read in early/late syphilis data bc header skips vary across files:
-# -------------------------------------------------------------------------
+#Created function to read in early/late syphilis data
+#Header is inconsistent across files (varying skip patterns):
 
 read_syphilis <- function(x) {
     lines <- readLines(x)
-    
+
     # Find header line containing "Indicator" anywhere
     header_line <- grep("Indicator", lines)
-    
+
     if (length(header_line) == 0) {
         stop(paste("Could not find header row in file:", x))
     }
-    
+
     df <- read.csv(
         x,
         skip = header_line[1] - 1,
@@ -135,16 +124,16 @@ read_syphilis <- function(x) {
         colClasses = c(FIPS = "character"),
         check.names = FALSE
     )
-    
+
     # Remove leading row-number / blank column if present
     if (!"Indicator" %in% names(df)) {
         df <- df[, -1]
     }
-    
+
     df
 }
 
-# -------------------------------------------------------------------------
+#Read:
 DATA.DIR.SYPHILIS.EARLY="Q:/data_raw/syphilis.manager/syphilis/early.syphilis"
 syphilis_files_early <- Sys.glob(paste0(DATA.DIR.SYPHILIS.EARLY, '/*.csv'))
 
@@ -152,17 +141,14 @@ syphilis.data.early <- lapply(
     syphilis_files_early,
     function(x) list(
         filename = x,
-        data = read_syphilis(x),
+        data = suppressWarnings(read_syphilis(x)),
         colClasses = c(FIPS = "character")
     )
 )
 
-
-#I used Nick's code to download from Atlas Using R
-#But the formatting has created some issues in the data cleaning,
-#This funciton is to help with that.
-
-#Correct which dataframe is missing cases and reformat them:
+#Additional Data Cleaning Function:
+#(This corrects formatting issues as a result of using our automatic download setup).
+#Identify which dataframe is missing cases and reformat:
 
 syphilis.data.early.clean1 <- lapply(syphilis.data.early, function(x) {
     # x[[1]] is filename, x[[2]] is the actual data frame
@@ -187,9 +173,7 @@ syphilis.data.early.clean1 <- lapply(syphilis.data.early, function(x) {
 })
 
 
-# Clean Early and Late Syphilis -------------------------------------------
-
-
+# Clean:
 syphilis.data.early.clean2 = lapply(syphilis.data.early.clean1, function(file){
     
     data=file[["df"]]
@@ -216,8 +200,6 @@ syphilis.data.early.clean2 = lapply(syphilis.data.early.clean1, function(file){
         data$location = "US"
     }
     
-    ##Demographic conditionals##
-    
     if(grepl("agegrp", filename)) {
         data$age = syphilis.mappings.age[data$`Age Group`]
     }
@@ -236,8 +218,7 @@ syphilis.data.early.clean2 = lapply(syphilis.data.early.clean1, function(file){
 })
 
 
-# Put Early and Late Syphilis ---------------------------------------------
-
+#Put
 
 early.syphilis.put = lapply(syphilis.data.early.clean2, `[[`, 2)
 
@@ -253,8 +234,14 @@ for (data in early.syphilis.put) {
 }
 
 
-# Gonorrhea Data ----------------------------------------------------------
+#===============================================================================
 
+#Gonorrhea
+
+
+#===============================================================================
+
+#Read:
 DATA.DIR.GC="Q:/data_raw/gonorrhea"
 gonorrhea_files <- Sys.glob(paste0(DATA.DIR.GC, '/*.csv'))
 gonorrhea.data <- lapply(gonorrhea_files, function(x){
@@ -262,6 +249,7 @@ gonorrhea.data <- lapply(gonorrhea_files, function(x){
   list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
 })
 
+#Clean:
 gonorrhea.clean = lapply(gonorrhea.data, function(file){
   
   data=file[["data"]]
@@ -286,9 +274,6 @@ gonorrhea.clean = lapply(gonorrhea.data, function(file){
     data$location = data$FIPS
   }
   
-  
-  ##Demographic conditionals##
-  
   if(grepl("age", filename)) {
     data$age = syphilis.mappings.age[data$Age.Group]
   }
@@ -306,7 +291,7 @@ gonorrhea.clean = lapply(gonorrhea.data, function(file){
   list(filename, data)
 })
 
-# Put Gonorrhea -----------------------------------------------------------
+#Put
 gonorrhea.clean.put = lapply(gonorrhea.clean, `[[`, 2)
 
 for (data in gonorrhea.clean.put) {
