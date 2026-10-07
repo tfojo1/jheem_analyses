@@ -20,7 +20,7 @@ source("../jheem_analyses/applications/SHIELD/R/shield_multivariate_spline_prior
 # HELPER FUNCTIONS ----
 # For the multivariate spline prior; this represents the maximum fold-change in transmission rate across 10 year intervals.
 # Originally was set to 1.5; was widened to 3 on 9/28/2026
-TRATE_DELTA <- 3
+TRATE_DELTA <- 1.5
 
 ## logit ----
 logit = function(p){
