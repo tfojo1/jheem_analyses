@@ -193,7 +193,7 @@ for (data in us.total.deaths.put) {
     census.manager$put.long.form(
         data = data,
         ontology.name = 'census',
-        source = 'census.population',
+        source = 'census.deaths',
         dimension.values = list(),
         url = 'www.census.gov',
         details = 'Census Reporting')
