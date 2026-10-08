@@ -1,9 +1,11 @@
-###You'll need to add this as a source file into the main census processing code###
-#library(jheem2) #Remove this once you are sourcing the file#
-#library(tidyverse)
-################################################################################
-                ###Read in MSA Scraped PDF Files### 
-################################################################################
+
+#===============================================================================
+#HIV Surveillance Report Data Processing
+
+#This Code Processes data scraped from PDF files of old CDC HIV Surveillance Reports
+#===============================================================================
+
+#Read:
 DATA.DIR.MSA.TOTAL="Q:/data_raw/msa_surveillance_reports/total"
 DATA.DIR.MSA.DEATHS="Q:/data_raw/msa_surveillance_reports/deaths"
 DATA.DIR.MSA.SEX="Q:/data_raw/msa_surveillance_reports/sex"
@@ -22,7 +24,6 @@ msa_sex_risk <- Sys.glob(paste0(DATA.DIR.MSA.SEX.RISK, '/*.csv'))
 msa_race_risk <- Sys.glob(paste0(DATA.DIR.MSA.RACE.RISK, '/*.csv'))
 msa_before <- Sys.glob(paste0(DATA.DIR.MSA.BEFORE, '/*.csv'))
 
-#creating a list with sublists of filename, data#
 data.list.msa_total <- lapply(msa_total, function(x){
   list(filename=x, data=read.csv(x, header=TRUE))
 })
@@ -47,9 +48,8 @@ data.list.msa_race_risk <- lapply(msa_race_risk, function(x){
 data.list.msa_2009 <- lapply(msa_before, function(x){
   list(filename=x, data=read.csv(x, header=TRUE))
 })
-################################################################################
-                            ###MAPPINGS###
-################################################################################
+
+#Create mappings:
 age.msa.mappings = c('1' = '13-24 years',
                         '2' = '25-34 years',
                         '3' = '35-44 years',
@@ -70,11 +70,15 @@ risk.msa.mappings = c('1'= 'msm',
 
 outcome.mappings.v2 = c('diagnoses'='diagnoses',
                      'prevalence' = 'diagnosed.prevalence',
-                     "aids.diagnosed.prevalence" = "aids.diagnosed.prevalence",
-                     "aids.diagnoses"= "aids.diagnoses")
-################################################################################
-                            ###MSA DEATHS BY SEX### 
-################################################################################
+                     'aids.diagnosed.prevalence' = 'aids.diagnosed.prevalence',
+                     'aids.diagnoses'= 'aids.diagnoses')
+
+#===============================================================================
+
+                            #Clean: MSA Level Deaths by Sex 
+
+#===============================================================================
+
 data.list.msa_deaths.clean = lapply(data.list.msa_deaths, function(file){
   
   data=file[["data"]] 
@@ -112,30 +116,8 @@ data$location = as.character(locations::get.cbsa.for.msa.name(data$MSA))
 data$male = (gsub("[[:punct:]]", "", data$male_num))
 data$female = (gsub("[[:punct:]]", "", data$female_num))
 
-  if(grepl("2009", filename)) {
-    data$year = as.character("2009")
-  }
-   if(grepl("2010", filename)) {
-     data$year = as.character("2010")
-   }
-   if(grepl("2012", filename)) {
-     data$year = as.character("2012")
-   }
-   if(grepl("2013", filename)) {
-     data$year = as.character("2013")
-   }
-   if(grepl("2014", filename)) {
-     data$year = as.character("2014")
-   }
-   if(grepl("2015", filename)) {
-     data$year = as.character("2015")
-   }
-   if(grepl("2016", filename)) {
-     data$year = as.character("2016")
-   }
-   if(grepl("2018", filename)) {
-     data$year = as.character("2018")
-   }
+data$year <- str_extract(filename, "20(09|1[0-8])")
+
       data <- data %>%
    #     select("year", "location", "male", "female") %>%
        pivot_longer(cols=c(one_of("male", "female")),
@@ -151,9 +133,13 @@ data$female = (gsub("[[:punct:]]", "", data$female_num))
   list(filename, data)  
   
 })
-################################################################################
-                         ###MSA PREVALENCE TOTAL###
-################################################################################
+
+#===============================================================================
+
+#Clean: MSA Level Prevalence Total
+
+#===============================================================================
+
 data.list.msa_total.clean = lapply(data.list.msa_total, function(file){
   
   data=file[["data"]] 
@@ -253,9 +239,13 @@ data.list.msa_total.clean = lapply(data.list.msa_total, function(file){
   list(filename, data) 
   
 })
-################################################################################
-                            ###MSA BY SEX ONLY###
-################################################################################
+
+#===============================================================================
+
+#Clean: MSA Level Data by Sex (alone)
+
+#===============================================================================
+
 data.list.msa_sex.clean = lapply(data.list.msa_sex, function(file){
   
   data=file[["data"]] 
@@ -361,9 +351,12 @@ data.list.msa_sex.clean = lapply(data.list.msa_sex, function(file){
   
   list(filename, data) 
 })
-################################################################################
-                        ###MSA BY SEX AND AGE###
-################################################################################
+#===============================================================================
+
+#Clean: MSA Level Data by Sex + Age
+
+#===============================================================================
+
 data.list.msa_sex_age.clean = lapply(data.list.msa_sex_age, function(file){
   
   data=file[["data"]] 
@@ -398,37 +391,8 @@ data.list.msa_sex_age.clean = lapply(data.list.msa_sex_age, function(file){
   
   data$location = as.character(locations::get.cbsa.for.msa.name(data$MSA))
   
-  #Create Year#
-  if(grepl("2009", filename)) {
-    data$year = as.character("2009")
-  }
-  if(grepl("2010", filename)) {
-    data$year = as.character("2010")
-  }
-  if(grepl("2011", filename)) {
-    data$year = as.character("2011")
-  }
-  if(grepl("2012", filename)) {
-    data$year = as.character("2012")
-  }
-  if(grepl("2013", filename)) {
-    data$year = as.character("2013")
-  }
-  if(grepl("2014", filename)) {
-    data$year = as.character("2014")
-  }
-  if(grepl("2015", filename)) {
-    data$year = as.character("2015")
-  }
-  if(grepl("2016", filename)) {
-    data$year = as.character("2016")
-  }
-  if(grepl("2017", filename)) {
-    data$year = as.character("2017")
-  }
-  if(grepl("2018", filename)) {
-    data$year = as.character("2018")
-  }
+  data$year <- str_extract(filename, "20(09|1[0-8])")
+  
   #Create Sex# 
   if(grepl("male", filename)){
     data$sex="male"
@@ -524,10 +488,15 @@ data.list.msa_sex_age.clean = lapply(data.list.msa_sex_age, function(file){
   list(filename, data) 
   
 })
-################################################################################
-                        ###BEFORE 2009 FILES###
-      ###Note: these files have AIDS and HIV data differentiated######
-################################################################################
+
+#===============================================================================
+
+#Clean: Files Prior to 2009
+
+#Note: These files have data differentiated by AIDS vs. HIV
+
+#===============================================================================
+
 data.list.msa_2009.clean = lapply(data.list.msa_2009, function(file){
   
   data=file[["data"]] 
@@ -928,9 +897,12 @@ gsub("Louisiville, KY-IN", "Louisville, KY",  data$msa))))))))))))))))))))))))))
   list(filename, data) 
 })
 
-################################################################################
-                          ###MSA BY SEX AND RACE###
-################################################################################
+#===============================================================================
+
+#Clean: MSA Level Data by Sex + Race
+
+#===============================================================================
+
 data.list.msa_sex_race.clean = lapply(data.list.msa_sex_race, function(file){
   
   data=file[["data"]] 
@@ -970,37 +942,8 @@ data.list.msa_sex_race.clean = lapply(data.list.msa_sex_race, function(file){
   
   data$location = as.character(locations::get.cbsa.for.msa.name(data$MSA))
   
-  #Create Year#
-  if(grepl("2009", filename)) {
-    data$year = as.character("2009")
-  }
-  if(grepl("2010", filename)) {
-    data$year = as.character("2010")
-  }
-  if(grepl("2011", filename)) {
-    data$year = as.character("2011")
-  }
-  if(grepl("2012", filename)) {
-    data$year = as.character("2012")
-  }
-  if(grepl("2013", filename)) {
-    data$year = as.character("2013")
-  }
-  if(grepl("2014", filename)) {
-    data$year = as.character("2014")
-  }
-  if(grepl("2015", filename)) {
-    data$year = as.character("2015")
-  }
-  if(grepl("2016", filename)) {
-    data$year = as.character("2016")
-  }
-  if(grepl("2017", filename)) {
-    data$year = as.character("2017")
-  }
-  if(grepl("2018", filename)) {
-    data$year = as.character("2018")
-  }
+  data$year <- str_extract(filename, "20(09|1[0-8])")
+  
   #Create Sex# 
   if(grepl("male", filename)){
     data$sex="male"
@@ -1096,9 +1039,12 @@ list(filename, data)
 
 })
 
-################################################################################
-                    ###MSA BY RACE AND RISK##
-################################################################################
+#===============================================================================
+
+#Clean: MSA Level Data by Race and Risk
+
+#===============================================================================
+
 data.list.msa_race_risk.clean = lapply(data.list.msa_race_risk, function(file){
   
   data=file[["data"]] 
@@ -1139,37 +1085,7 @@ data.list.msa_race_risk.clean = lapply(data.list.msa_race_risk, function(file){
   data$location = as.character(locations::get.cbsa.for.msa.name(data$MSA))
 
 
-  #Create Year#
-  if(grepl("2009", filename)) {
-    data$year = as.character("2009")
-  }
-  if(grepl("2010", filename)) {
-    data$year = as.character("2010")
-  }
-  if(grepl("2011", filename)) {
-    data$year = as.character("2011")
-  }
-  if(grepl("2012", filename)) {
-    data$year = as.character("2012")
-  }
-  if(grepl("2013", filename)) {
-    data$year = as.character("2013")
-  }
-  if(grepl("2014", filename)) {
-    data$year = as.character("2014")
-  }
-  if(grepl("2015", filename)) {
-    data$year = as.character("2015")
-  }
-  if(grepl("2016", filename)) {
-    data$year = as.character("2016")
-  }
-  if(grepl("2017", filename)) {
-    data$year = as.character("2017")
-  }
-  if(grepl("2018", filename)) {
-    data$year = as.character("2018")
-  }
+  data$year <- str_extract(filename, "20(09|1[0-8])")
 
   #Create Race#
   if(grepl("black", filename)){
@@ -1280,9 +1196,13 @@ data.list.msa_race_risk.clean = lapply(data.list.msa_race_risk, function(file){
   list(filename, data) 
   
 })
-################################################################################
-                      ###MSA BY SEX AND RISK###
-################################################################################
+
+#===============================================================================
+
+#Clean: MSA Level Data by Sex and Risk
+
+#===============================================================================
+
 data.list.msa_sex_risk.clean = lapply(data.list.msa_sex_risk, function(file){
   
   data=file[["data"]] 
@@ -1317,37 +1237,7 @@ data.list.msa_sex_risk.clean = lapply(data.list.msa_sex_risk, function(file){
   
   data$location = as.character(locations::get.cbsa.for.msa.name(data$MSA))
   
-  #Create Year#
-  if(grepl("2009", filename)) {
-    data$year = as.character("2009")
-  }
-  if(grepl("2010", filename)) {
-    data$year = as.character("2010")
-  }
-  if(grepl("2011", filename)) {
-    data$year = as.character("2011")
-  }
-  if(grepl("2012", filename)) {
-    data$year = as.character("2012")
-  }
-  if(grepl("2013", filename)) {
-    data$year = as.character("2013")
-  }
-  if(grepl("2014", filename)) {
-    data$year = as.character("2014")
-  }
-  if(grepl("2015", filename)) {
-    data$year = as.character("2015")
-  }
-  if(grepl("2016", filename)) {
-    data$year = as.character("2016")
-  }
-  if(grepl("2017", filename)) {
-    data$year = as.character("2017")
-  }
-  if(grepl("2018", filename)) {
-    data$year = as.character("2018")
-  }
+  data$year <- str_extract(filename, "20(09|1[0-8])")
   
   data$sex = ifelse(grepl("female", filename), "female", "male")
   
@@ -1482,9 +1372,12 @@ data.list.msa_sex_risk.clean = lapply(data.list.msa_sex_risk, function(file){
   
   list(filename, data) 
 })
-################################################################################
-                  ###Put Data into Data Manager###
-################################################################################
+
+#===============================================================================
+
+#Put: All Processed data into Data Manager
+
+#===============================================================================
 
 ##MSA Deaths
 msa_deaths = lapply(data.list.msa_deaths.clean, `[[`, 2)

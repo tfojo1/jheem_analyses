@@ -2,18 +2,20 @@
 library(jheem2)
 library(tidyverse)
 library(readxl)
-library(stringr)
 library(haven)
 library(locations)
 library(tools)
 
-###############################################################################
+#===============================================================================
 
-#####SECTION 5#####
-#AIDS data
-#Also adding data from CDC Surveillance Reports that include diagnosed.prevalence
-#hiv.deaths and diagnoses
-###############################################################################
+#SECTION 5
+
+#AIDS data: aids.diagnoses, aids.diagnosed.prevalence, aids.diagnoses.alive.by.2001,
+#aids.diagnoses.deceased.by.2001, aids.deaths
+
+#CDC Surveillance Report Data: diagnosed.prevalence, hiv.deaths, diagnoses
+
+#===============================================================================
 
 data.manager = create.data.manager('surveillance', description='surveillance data manager')
 
@@ -82,7 +84,7 @@ data.manager$register.outcome(
     description = "HIV Deaths"))
 
 data.manager$register.outcome(
-  'diagnosed.prevalence', #Changing this from prevalence to diagnosed.prevalence bc CDC's prevalence only includes people who know their status#
+  'diagnosed.prevalence', #Changing this from prevalence to diagnosed.prevalence - CDC's prevalence only includes people who know their status#
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
     display.name = 'Diganosed Prevalence',
@@ -97,9 +99,7 @@ data.manager$register.source('cdc.surveillance.reports', parent.source= "NHSS", 
 data.manager$register.source('cdc.aids', parent.source= "NHSS", full.name = "CDC Wonder AIDS Public Information Data", short.name='cdc.aids') #child (This is CDC Wonder)
 data.manager$register.source('cdc.atlas.plus.aids', parent.source= "NHSS", full.name = "CDC Atlas Plus AIDS Data", short.name='cdc.atlas.plus.aids') #child
 
-
 #Register Ontologies:
-
 data.manager$register.ontology(
   'cdc.msa.reports',
   ont = ontology(
