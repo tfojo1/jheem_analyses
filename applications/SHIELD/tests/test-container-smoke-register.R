@@ -26,10 +26,16 @@ scope$register.calibration.info <- function(code, ...) {
 }
 sys.source("applications/SHIELD/shield_calib_register_container_smoke.R", envir = scope)
 stopifnot(identical(names(definitions), c("container.smoke.stage0", "container.smoke.stage1",
-                                         "container.smoke.replay", "container.actual.stage0",
+                                         "container.smoke.replay", "container.smoke.pre3",
+                                         "container.smoke.stage3", "container.actual.stage0",
                                          "container.actual.stage1")),
           definitions[["container.smoke.replay"]]$n.iter == 8,
-          definitions[["container.smoke.replay"]]$thin == 1)
+          definitions[["container.smoke.replay"]]$thin == 1,
+          definitions[["container.smoke.stage3"]]$n.chains == 4,
+          identical(definitions[["container.smoke.stage3"]]$is.preliminary, FALSE),
+          identical(definitions[["container.smoke.stage3"]]$preceding.calibration.codes,
+                    "container.smoke.pre3"),
+          definitions[["container.smoke.pre3"]]$n.iter == 16)
 allowed.changes <- c("code", "preceding.calibration.codes", "n.iter", "n.burn", "thin", "description")
 for (stage in c("stage0", "stage1")) {
     original <- templates[[paste0("calib.10.1.", stage)]]

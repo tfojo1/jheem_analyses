@@ -104,9 +104,53 @@ inputs$analyses_ref <- paste(rep("f", 40L), collapse = "")
 expect.error(shield.recorded.check.receipt(resume, "C.12580", "stage1", inputs),
              "differ from")
 
-# Only single-chain calibrations can be recorded.
+# The single-process launcher takes single-chain calibrations; phases take any.
 stopifnot(identical(shield.recorded.calibration.info("stage1")$n.chains, 1))
 expect.error(shield.recorded.calibration.info("stage3"), "single-chain")
+stopifnot(identical(shield.recorded.calibration.info("stage3", allow.multiple.chains = TRUE)$n.chains, 4))
+
+# Phases: setup starts a calibration; each chain and assembly continue it.
+stopifnot(identical(shield.recorded.phase(getenv), list(phase = "all", chain = NA_integer_)))
+values[["SHIELD_RECORDED_PHASE"]] <- "run"
+expect.error(shield.recorded.phase(getenv), "SHIELD_RECORDED_CHAIN")
+values[["SHIELD_RECORDED_CHAIN"]] <- "3"
+stopifnot(identical(shield.recorded.phase(getenv), list(phase = "run", chain = 3L)))
+values[["SHIELD_RECORDED_PHASE"]] <- "sample"
+expect.error(shield.recorded.phase(getenv), "must be all, setup, run, or assemble")
+expect.error(shield.recorded.assert.phase.mode(fresh, list(phase = "run", chain = 1L)),
+             "SHIELD_RUN_MODE=resume")
+expect.error(shield.recorded.assert.phase.mode(resume, list(phase = "setup", chain = NA)),
+             "SHIELD_RUN_MODE=fresh")
+stopifnot(isTRUE(shield.recorded.assert.phase.mode(resume, list(phase = "assemble", chain = NA))),
+          isTRUE(shield.recorded.assert.phase.mode(fresh, list(phase = "all", chain = NA))))
+values[["SHIELD_RECORDED_PHASE"]] <- ""
+values[["SHIELD_RECORDED_CHAIN"]] <- ""
+
+# A chain resumes from its own checkpoint, and setup records the chain count.
+chained <- shield.recorded.calibration.dir(resume, "C.12580", "stage3")
+dir.create(file.path(chained, "cache"), recursive = TRUE)
+writeLines("checkpoint", file.path(chained, "cache", "chain2_control.Rdata"))
+stopifnot(identical(shield.recorded.assert.state(resume, "C.12580", "stage3", chain = 2L), chained))
+expect.error(shield.recorded.assert.state(resume, "C.12580", "stage3", chain = 3L),
+             "no nonempty chain-3 checkpoint")
+dir.create(dirname(shield.recorded.record.path(fresh, "C.12580", "stage3", "chains.txt")),
+           recursive = TRUE, showWarnings = FALSE)
+shield.recorded.write.chains(fresh, "C.12580", "stage3", 4L)
+stopifnot(identical(readLines(shield.recorded.record.path(fresh, "C.12580", "stage3", "chains.txt")), "4"))
+
+# Assembly refuses until every chain is finished.
+progress <- c(100, 100, 100, 100)
+get.calibration.progress <- function(version, locations, calibration.code, root.dir, ...) {
+    matrix(progress, nrow = 1, dimnames = list(location = locations,
+                                               chain = paste0("chain", seq_along(progress))))
+}
+stopifnot(isTRUE(shield.recorded.assert.chains.complete(resume, "C.12580", "stage3", 4L)))
+progress <- c(100, 50, 100, NA)
+expect.error(shield.recorded.assert.chains.complete(resume, "C.12580", "stage3", 4L),
+             "Not every chain.*50%.*missing")
+progress <- c(100, 100)
+expect.error(shield.recorded.assert.chains.complete(resume, "C.12580", "stage3", 4L),
+             "Not every chain")
 
 # A later stage names the recorded outputs of the stage it starts from.
 stopifnot(identical(shield.recorded.preceding(fresh, "C.12580", registered$stage0),

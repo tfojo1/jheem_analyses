@@ -136,19 +136,74 @@ shield.recorded.summary.file <- function(config, location, calibration.code) {
              calibration.code = calibration.code, root.dir = config$root_dir)
 }
 
-# The recorded launcher runs chain 1 only. A multi-chain calibration would set
-# up every chain, sample one, and assemble it as incomplete, so refuse it.
-shield.recorded.calibration.info <- function(calibration.code) {
+# The single-process launcher runs chain 1 only. A multi-chain calibration would
+# set up every chain, sample one, and assemble it as incomplete, so it must use
+# the setup/run/assemble phases instead.
+shield.recorded.calibration.info <- function(calibration.code, allow.multiple.chains = FALSE) {
     get.info <- shield.recorded.jheem2.function("get.calibration.info")
     info <- get.info(calibration.code)
-    if (!identical(as.integer(info$n.chains), 1L)) {
-        stop("Recorded runs support single-chain calibrations only; ",
-             calibration.code, " has ", info$n.chains, " chains", call. = FALSE)
+    n.chains <- as.integer(info$n.chains)
+    if (length(n.chains) != 1L || is.na(n.chains) || n.chains < 1L) {
+        stop("Calibration ", calibration.code, " has an invalid chain count", call. = FALSE)
+    }
+    if (!allow.multiple.chains && n.chains != 1L) {
+        stop("The single-process recorded launcher supports single-chain calibrations only; ",
+             calibration.code, " has ", n.chains, " chains. Run it in phases ",
+             "(setup, each chain, assemble)", call. = FALSE)
     }
     info
 }
 
-shield.recorded.assert.state <- function(config, location, calibration.code) {
+# A multi-chain stage runs as separate processes: one setup, one per chain (in
+# parallel), then one assembly. "all" is the single-process path for one chain.
+shield.recorded.phase <- function(getenv = Sys.getenv) {
+    phase <- trimws(getenv("SHIELD_RECORDED_PHASE", unset = "all"))
+    if (!nzchar(phase)) phase <- "all"
+    if (!phase %in% c("all", "setup", "run", "assemble")) {
+        stop("SHIELD_RECORDED_PHASE must be all, setup, run, or assemble", call. = FALSE)
+    }
+    chain <- NA_integer_
+    if (identical(phase, "run")) {
+        chain <- shield.recorded.integer("SHIELD_RECORDED_CHAIN", minimum = 1L, getenv = getenv)
+    }
+    list(phase = phase, chain = chain)
+}
+
+# Setup must start a calibration; later phases continue one.
+shield.recorded.assert.phase.mode <- function(config, phase) {
+    expected <- switch(phase$phase, setup = "fresh", run = , assemble = "resume", NULL)
+    if (!is.null(expected) && !identical(config$run_mode, expected)) {
+        stop("Recorded ", phase$phase, " phase requires SHIELD_RUN_MODE=", expected, call. = FALSE)
+    }
+    invisible(TRUE)
+}
+
+# Written by setup so a runner knows how many chain processes to start.
+shield.recorded.write.chains <- function(config, location, calibration.code, n.chains) {
+    path <- shield.recorded.record.path(config, location, calibration.code, "chains.txt")
+    temporary <- tempfile("chains-", tmpdir = dirname(path), fileext = ".txt")
+    on.exit(unlink(temporary), add = TRUE)
+    writeLines(as.character(as.integer(n.chains)), temporary)
+    if (!file.rename(temporary, path)) stop("Could not persist chain count: ", path, call. = FALSE)
+    invisible(path)
+}
+
+# Assembly reads every chain's checkpoint state; all must be finished.
+shield.recorded.assert.chains.complete <- function(config, location, calibration.code, n.chains) {
+    get.progress <- shield.recorded.jheem2.function("get.calibration.progress")
+    progress <- get.progress(version = "shield", locations = location,
+                             calibration.code = calibration.code,
+                             root.dir = config$root_dir, as.pct = TRUE, round.to.digits = NA)
+    progress <- as.numeric(progress[1, ])
+    if (length(progress) != n.chains || any(is.na(progress)) || any(progress < 100)) {
+        stop("Not every chain of ", calibration.code, " is complete (progress: ",
+             paste(ifelse(is.na(progress), "missing", paste0(round(progress, 1), "%")),
+                   collapse = ", "), ")", call. = FALSE)
+    }
+    invisible(TRUE)
+}
+
+shield.recorded.assert.state <- function(config, location, calibration.code, chain = 1L) {
     directory <- shield.recorded.calibration.dir(config, location, calibration.code)
     if (identical(config$run_mode, "fresh")) {
         if (file.exists(directory)) {
@@ -156,10 +211,10 @@ shield.recorded.assert.state <- function(config, location, calibration.code) {
                  directory, call. = FALSE)
         }
     } else {
-        control <- file.path(directory, "cache", "chain1_control.Rdata")
+        control <- file.path(directory, "cache", paste0("chain", chain, "_control.Rdata"))
         if (!file.exists(control) || is.na(file.info(control)$size) ||
             file.info(control)$size <= 0L) {
-            stop("Resume requested but no nonempty chain-1 checkpoint exists: ",
+            stop("Resume requested but no nonempty chain-", chain, " checkpoint exists: ",
                  control, call. = FALSE)
         }
     }
