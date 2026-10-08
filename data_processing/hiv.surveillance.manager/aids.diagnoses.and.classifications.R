@@ -1,12 +1,24 @@
-#This code processes data from Atlas Plus on
+
+#=============================================================================
+#This code processes Atlas Plus data for:
 #AIDS classifications (diagnoses) and AIDS deaths
-#Downloaded 5-11-26
-#State level; aids.diagnoses; aids.deaths; 2000-2023 for most
 
-#=============================================================================
-#Read in Data (ontology age 65+)
+#(state level; aids.diagnoses; aids.deaths; mostly 2000-2023)
+
+#Certain Data points were available with more or less stratification-
+#so there is some data by age 65+ and other data by 85+.  We used 85+ when 
+#it was available.
 #=============================================================================
 
+#Create Mappings:
+risk.mappings = c('Heterosexual contact' = 'heterosexual',
+                  'Injection drug use' = 'idu',
+                  'Other' = 'other',
+                  'Male-to-male sexual contact' = 'msm',
+                  'Male-to-male sexual contact and injection drug use' = 'msm_idu')
+
+
+#Read - (Age 65+):
 DATA.DIR.ATLAS.AIDS.CLASS= "Q:/data_raw/aids_diagnoses/atlas.plus"
 
 aids.class.files <- Sys.glob(paste0(DATA.DIR.ATLAS.AIDS.CLASS, '/*.csv'))
@@ -15,7 +27,6 @@ aids.class.data <- lapply(aids.class.files, function(x){
     lines <- readLines(x, n = 50)
     header_line <- grep("Indicator", lines)[1]
     skip <- header_line - 1
-    
     list(
         filename = x,
         data = read.csv(x,
@@ -25,19 +36,7 @@ aids.class.data <- lapply(aids.class.files, function(x){
     )
 })
 
-#=============================================================================
-#Mappings
-#=============================================================================
-
-risk.mappings = c('Heterosexual contact' = 'heterosexual',
-                  'Injection drug use' = 'idu',
-                  'Other' = 'other',
-                  'Male-to-male sexual contact' = 'msm',
-                  'Male-to-male sexual contact and injection drug use' = 'msm_idu')
-
-#=============================================================================
-#Clean - Age 65+
-#=============================================================================
+#Clean - (Age 65+):
 aids.class.data.clean = lapply(aids.class.data, function(file){
     
     data=file[["data"]]
@@ -46,7 +45,6 @@ aids.class.data.clean = lapply(aids.class.data, function(file){
     data$Geography <- trimws(gsub("[^A-Za-z ]", "", data$Geography))
     
     data <- data%>%
-        #mutate(Geography = gsub("[[:punct:]]", "", Geography))%>%
         mutate(location = state.abb[match(data$Geography, state.name)])%>%
         mutate(location = ifelse(Geography  == "District of Columbia", "DC", location))%>%
         mutate(year = as.character(Year))%>%
@@ -57,11 +55,9 @@ aids.class.data.clean = lapply(aids.class.data, function(file){
     if(grepl("classification", filename)) {
         data$outcome = "aids.diagnoses"
     }
-    
     if(grepl("deaths", filename)) {
         data$outcome= "aids.deaths"
     }
-    
     
     if(grepl("sex", filename)) {
         data$sex = tolower(data$Sex)
@@ -89,10 +85,7 @@ aids.class.data.clean = lapply(aids.class.data, function(file){
     
 })
 
-#=============================================================================
-#Put- Age 65+
-#=============================================================================
-
+#Put - (Age 65+):
 aids.class.data.clean.put = lapply(aids.class.data.clean, `[[`, 2)  
 
 for (data in aids.class.data.clean.put) {
@@ -107,32 +100,23 @@ for (data in aids.class.data.clean.put) {
         details = 'CDC Atlas Plus data')
 }
 
-#=============================================================================
-#Read in additional data for the same outcomes
-#Certain datapoints were available by more stratified age ontology
-#Age 85+
-#=============================================================================
-
+#Read - (Age 85+):
 DATA.DIR.ATLAS.AIDS.CLASS.AGE2= "Q:/data_raw/aids_diagnoses/atlas.plus/separate.age.ontology"
-
 aids.class.files.age2 <- Sys.glob(paste0(DATA.DIR.ATLAS.AIDS.CLASS.AGE2, '/*.csv'))
-
 aids.class.data.age2 <- lapply(aids.class.files.age2, function(x){
     lines <- readLines(x, n = 50)
     header_line <- grep("Indicator", lines)[1]
     skip <- header_line - 1
-    
     list(
         filename = x,
         data = read.csv(x,
                         skip = skip,
                         header = TRUE,
-                        colClasses = c(FIPS = "character"))
+                       colClasses = c(FIPS = "character"))
     )
 })
 
-## 
-
+#Clean  - (Age 85+):
 aids.class.data.clean.age2 = lapply(aids.class.data.age2, function(file){
     
     data=file[["data"]]
@@ -150,16 +134,13 @@ aids.class.data.clean.age2 = lapply(aids.class.data.age2, function(file){
             value = readr::parse_number(as.character(Cases))
         )
     
-    
     if(grepl("classification", filename)) {
         data$outcome = "aids.diagnoses"
     }
-    
     if(grepl("deaths", filename)) {
         data$outcome= "aids.deaths"
     }
-    
-    
+
     if(grepl("sex", filename)) {
         data$sex = tolower(data$Sex)
     }
@@ -169,7 +150,6 @@ aids.class.data.clean.age2 = lapply(aids.class.data.age2, function(file){
     if(grepl("risk", filename)) {
         data$risk = risk.mappings[data$`Transmission.Category`]
     }
-    
     
     if(grepl("age1", filename)) {
         data = subset(data, data$Age.Group != "65+") #Removing this if it exists to accomodate prescence of the other ages
@@ -189,9 +169,7 @@ aids.class.data.clean.age2 = lapply(aids.class.data.age2, function(file){
     
 })
 
-#=============================================================================
-#Put- Age 85+
-#=============================================================================
+#Put - (Age 85+):
 
 aids.class.data.clean.age2.put = lapply(aids.class.data.clean.age2, `[[`, 2)  
 

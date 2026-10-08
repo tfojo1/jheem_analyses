@@ -2,16 +2,17 @@
 library(jheem2)
 library(tidyverse)
 library(readxl)
-library(stringr)
 library(haven)
 library(locations)
 library(tools)
 
-###############################################################################
+#===============================================================================
 
-#####SECTION 4#####
+#SECTION 4
+
 #STI data + NSDUH data (drugs+depression)
-###############################################################################
+
+#===============================================================================
 
 data.manager = create.data.manager('surveillance', description='surveillance data manager')
 
@@ -89,7 +90,8 @@ data.manager$register.source('cdc.sti', parent.source= "NNDSS", full.name = "CDC
 data.manager$register.source('cdc.aggregated.county', parent.source= "NHSS", full.name = 'CDC Aggregated County', short.name = 'cdc aggd county') #child #Note this is for the aggregated county data being used to represent MSAs
 
 #Register Ontologies:
-data.manager$register.ontology(   #This is for the Atlas Plus STI data, creating a separate ontology bc age groups are different#
+#(There are two because the age groupings are different for Syphilis data from Atlas Plus)
+data.manager$register.ontology(    
   'cdc.sti', 
   ont = ontology(
     year= NULL,

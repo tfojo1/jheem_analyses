@@ -91,6 +91,16 @@ register.calibration.info('calib.10.5.stage1.4x',
                                               TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
                           n.iter = 20000, thin = 80, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
+register.calibration.info("calib.10.5.stage2",
+                          preceding.calibration.codes = 'calib.10.5.stage1.1x',
+                          likelihood.instructions = lik.inst.stage2,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              SHIELD.FULL.PARAMETERS.PRIOR@var.names
+                          ),
+                          n.iter = 20000, thin = 80, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
 
 # 10.1: fixing the issues with spline functions; after modifiers; setting TRATE_DELTA=3
 # thining every 80 (since we have >80 blocks)
