@@ -1,10 +1,10 @@
 #Use this code to merge the different saved sections of the census manager into a complete version
 
 # PROCESS -----------------------------------------------------------------
-source('data_processing/census.manager/census.processing.for.merging/population1.processing.R')
-source('data_processing/census.manager/census.processing.for.merging/population2.processing.R')
-source('data_processing/census.manager/census.processing.for.merging/population3.processing.R')
-source('data_processing/census.manager/census.processing.for.merging/births.deaths.processing.R')
+# source('data_processing/census.manager/census.processing.for.merging/population1.processing.R')
+# source('data_processing/census.manager/census.processing.for.merging/population2.processing.R')
+# source('data_processing/census.manager/census.processing.for.merging/population3.processing.R')
+# source('data_processing/census.manager/census.processing.for.merging/births.deaths.processing.R')
 
 # MERGE -------------------------------------------------------------------
 
