@@ -145,6 +145,7 @@ assemble.stage <- function() {
                      sub.version = simset$sub.version,
                      root.dir = SHIELD.RECORDED.CONFIG$root_dir)))
     }
+    simset
 }
 
 if (SHIELD.RECORDED.RUN && identical(SHIELD.RECORDED.PHASE$phase, "setup")) {
@@ -331,4 +332,4 @@ if (SHIELD.RECORDED.RUN && identical(SHIELD.RECORDED.PHASE$phase, "run")) {
 
 
 # Save simset
-assemble.stage()
+simset <- assemble.stage()
