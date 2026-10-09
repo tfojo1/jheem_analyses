@@ -48,6 +48,16 @@ register.calibration.info('calib.10.5.stage1.1x',
                                               TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
                           n.iter = 20000, thin = 80, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
+register.calibration.info('calib.10.5.stage1.Seattle',
+                          preceding.calibration.codes = 'calib.10.5.stage0.1x',
+                          likelihood.instructions = lik.inst.stage1.Seattle,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = 20000, thin = 80, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
 register.calibration.info("calib.10.5.stage0.2x",
                           likelihood.instructions = lik.inst.stage0.hist.2x,
                           data.manager = SURVEILLANCE.MANAGER,
