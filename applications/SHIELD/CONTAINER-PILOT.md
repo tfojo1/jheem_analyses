@@ -18,13 +18,15 @@ the RStudio terminal for long runs: if one job runs out of memory there, others
 started from RStudio can be stopped with it.
 
 ```bash
-alias shield-run=/home/jheem-shared/shield-container-20261008/shield-run.sh
+alias shield-run=/home/jheem-shared/shield-container-20261009/shield-run.sh
 shield-run setup
 cd ~/jheem/code/jheem_analyses
 ```
 
-Setup loads the container the first time and prints your results folder. To keep
-the `shield-run` shortcut in later sessions, add the `alias` line to `~/.bashrc`.
+Setup loads the container the first time and prints your results folder and the
+data managers it uses: the census released October 8 (`census-manager-v2026.10.08`)
+and the syphilis manager released September 9. To keep the `shield-run` shortcut in
+later sessions, add the `alias` line to `~/.bashrc`.
 
 **Commit your changes first.** The container uses your committed
 `jheem_analyses` code and your committed `jheem2` code (the `jheem2` folder next
