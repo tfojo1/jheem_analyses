@@ -799,6 +799,10 @@ ps.diag.target.msm.stage1=join.likelihood.instructions(
     proportion.male.diagnosis.among.msm.nested.likelihood.instructions,
     additional.weights = PS.DIAG.RATE.AMONG.MSM.WEIGHT.STAGE1
 )
+ps.diag.target.msm.stage1.V2=join.likelihood.instructions(
+    ps.diag.rate.among.msm.nested.likelihood.instructions,
+    additional.weights = PS.DIAG.RATE.AMONG.MSM.WEIGHT.STAGE1
+)
 # stage1 ----
 lik.inst.stage1=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
@@ -841,7 +845,7 @@ lik.inst.stage1.Seattle=join.likelihood.instructions(
     penalty.ps.diag.growth.stage1, #this has a weight of 1/stage1.weight baked into it     
     #
     # ps.diag.target.msm.stage1, #this has a weight of 1/stage1.weight baked into it
-    ps.diag.target.msm.stage1,
+    ps.diag.target.msm.stage1.V2,
     #
     additional.weights = STAGE.1.WEIGHT
 )
