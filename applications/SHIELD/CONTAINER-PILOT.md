@@ -1,109 +1,106 @@
 # Running SHIELD in a container
 
-The container provides the R setup for running SHIELD and keeps a record of the
-code and data used. Your usual R installation and calibration outputs are unchanged.
+The container runs your SHIELD calibrations with a fixed R setup and keeps a
+record of exactly which code and data each run used. It runs the same stages as
+the usual launcher, including stage 3 with four chains, for a list of cities at a
+time. Your own R installation and your usual results are not touched.
 
-**Currently supported:** single-chain calibrations and sequential stages.
-Multi-chain stage 3 and transferring container results into a native stage-3 run
-are not supported yet. Use the usual workflow for full calibrations.
+In a test on shield2 (October 2026), `calib.10.5.stage0.1x` for Baltimore and
+Seattle gave exactly the same results in the container as with the usual
+launcher: the same samples, likelihoods, simulations, and outcomes, from the
+same code, data, and seed. Two container runs with the same seed were also
+identical.
 
 ## Get started
 
-On shield2, open an SSH terminal (see the
-[server guide](Readme.md)), rather than the R console or RStudio web terminal:
+On shield2, open an SSH terminal (see the [server guide](Readme.md)). Don't use
+the RStudio terminal for long runs: if one job runs out of memory there, others
+started from RStudio can be stopped with it.
 
 ```bash
-alias shield-run=/home/jheem-shared/shield-container-20261004/shield-run.sh
+alias shield-run=/home/jheem-shared/shield-container-20261009/shield-run.sh
 shield-run setup
-# Open your jheem_analyses checkout before starting a new calibration.
-cd /path/to/jheem_analyses
+cd ~/jheem/code/jheem_analyses
 ```
 
-Setup loads the image on first use and prints your output directory. You don't
-need another repository checkout or any R package installation.
+Setup loads the container the first time and prints your results folder and the
+data managers it uses: the census released October 8 (`census-manager-v2026.10.08`)
+and the syphilis manager released September 9. To keep the `shield-run` shortcut in
+later sessions, add the `alias` line to `~/.bashrc`.
 
-To check or continue a run from the original installation, keep using
-`/home/jheem-shared/shield-container/shield-run.sh` and its original output
-directory. For a different prepared installation, use its path for the alias.
-Each prepared pilot selects its own runtime, manager versions, and separate
-output directory. Setup prints those choices; confirm they are the ones you
-intend to use. Keep using the same installation and output directory when
-checking or continuing a run. Selecting a new pilot does not upgrade an old run.
+**Commit your changes first.** The container uses your committed
+`jheem_analyses` code and your committed `jheem2` code (the `jheem2` folder next
+to `jheem_analyses`). It refuses to start if either has uncommitted changes.
+Local commits are fine; they don't have to be pushed.
 
-The first start of a calibration code saves a copy of your committed analysis
-code. Commit any edits first; local commits don't have to be pushed. New
-calibration codes pick up your updated checkout without rebuilding the container.
-Later locations and resumes for the same code use its saved copy. A pipeline
-saves one copy for all its stages, even if you update the checkout while it runs.
-
-To rerun the same calibration code with different code or inputs, use a separate
-output directory. Package or engine changes may still need an updated container.
-Manager versions are shown during startup and saved with the run; updating your
-checkout does not select newer data. Confirm those versions before an analysis
-run. A startup check catches some source/package incompatibilities, not all model
-errors or scientific differences.
-
-## Try a small run
+## Run a list of cities
 
 ```bash
-shield-run start C.12580 container.smoke.stage0
-shield-run status
-shield-run logs C.12580 container.smoke.stage0
+shield-run batch C.12580,C.35620,C.12060 calib.10.5.stage0 calib.10.5.stage1 calib.10.5.stage2 calib.10.5.stage3
 ```
 
-This is a two-iteration Baltimore test, usually taking a few minutes. Run
-`status` again to check progress. When it finishes, expect `exited (exit 0)`
-and `outputs recorded (not rechecked)`. The latter means output records exist;
-the status command doesn't check their contents. This test isn't for analysis.
+This runs the stages in order for each city, each stage after the previous one
+finishes. Five cities run at a time by default; set `SHIELD_MAX_CITIES` to change
+that, for example `SHIELD_MAX_CITIES=8 shield-run batch ...`. Allow about 12 GB
+of memory for a city in stages 0–2, and about 40 GB for a city in stage 3, whose
+four chains run at the same time.
+
+For one city, use `shield-run pipeline C.12580 calib.10.5.stage0 calib.10.5.stage1`.
+
+Starting takes a few minutes: the container saves a copy of your code, checks
+it, and the first run with a new `jheem2` version prepares it. Runs keep going
+after you log out.
+
+## Check progress
+
+```bash
+shield-run status
+shield-run logs C.12580 calib.10.5.stage3
+```
+
+`status` shows each batch and city, and how many checkpoints each chain has
+saved. Stage 3 chains also write their own logs, under
+`run_records/shield/<city>/<calibration>/logs/` in your results folder.
 
 ## Stop and continue
 
-Choose the calibration defined in your committed checkout that you intend to
-run. For a longer single-chain calibration, for example:
-
 ```bash
-shield-run start C.12580 calib.10.1.stage0
-shield-run status
-shield-run logs C.12580 calib.10.1.stage0
+shield-run stop-batch <batch-id>      # the ID is shown when the batch starts and in status
+shield-run stop C.12580 calib.10.5.stage3
 ```
 
-Jobs keep running when you log out after successful setup. To stop and resume:
+Run the same `batch` or `pipeline` command again to continue: finished stages
+are checked and skipped, and the others continue from their last checkpoint
+(within about 30 minutes of where they stopped). A continued run is a valid
+calibration, but it is not sample-for-sample identical to one that was never
+stopped.
+
+## Use the results
+
+Results are saved in your results folder in the usual layout (`mcmc_runs/`,
+`mcmc_summaries/`, `simulations/`). To read them with your usual analysis
+scripts, run
 
 ```bash
-shield-run stop C.12580 calib.10.1.stage0
-shield-run resume C.12580 calib.10.1.stage0
+shield-run where
 ```
 
-Wait for at least one saved checkpoint before practicing this. Resume repeats
-work since the last checkpoint. It does not currently guarantee the same sample
-sequence as an uninterrupted run. `start` won't replace an existing run.
+and copy the `Sys.setenv(JHEEM_ROOT_DIR = ...)` line it prints for your computer
+(server, Mac, or Windows) to the top of your script, before it sources the
+SHIELD code. Remove that line to go back to your usual results.
 
-To run stages in order:
+## If something goes wrong
 
-```bash
-shield-run pipeline C.12580 calib.10.1.stage0 calib.10.1.stage1
-```
+- **A stage fails during setup:** fix the problem, register the calibration under
+  a new code, and run the batch again with the new code. Finished earlier stages
+  in your results folder are reused.
+- **Anything else:** run `shield-run status` and `shield-run logs <city>
+  <calibration>`, and share the output with the server name and the batch ID.
+- Keep the files of failed runs; don't delete them to force a restart.
+- The same calibration code shouldn't be run both the usual way and in the
+  container in the same results folder.
 
-Repeat the same command to continue a stopped pipeline. It checks completed
-outputs before skipping them and stops if a stage fails. Stopping any listed
-stage stops the whole pipeline. A stage interrupted before its first checkpoint
-cannot resume; preserve it and use a new output directory for a new attempt.
-
-## Results and troubleshooting
-
-Results go to the output directory printed by setup, under `mcmc_runs/`,
-`mcmc_summaries/`, and `simulations/`. The installation above uses
-`/mnt/jheem_nas_share/tmp/shield-container-r37210907071/<your username>/`.
-The original pilot uses `/mnt/jheem_nas_share/tmp/shield-container/<your username>/`.
-The `run_records/`
-directory holds the code/data versions and start/resume history. `run_sources/`
-holds the saved code and the selections shared across locations. Keep these
-directories together and don't share one run directory between accounts.
-
-If setup fails, a run exits with a nonzero code, or resume refuses to start,
-share the message, server name, output directory, and `status`/`logs` output.
-Keep the existing files, including failed runs; don't delete them to force a
-restart. A run stopped before its first checkpoint may need a separate output
-directory for a new attempt.
+To check or continue a run started with an earlier container installation, keep
+using that installation's `shield-run.sh`.
 
 For implementation details, see the [recorded-runtime reference](RECORDED-RUN-PILOT.md).

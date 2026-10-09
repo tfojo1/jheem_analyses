@@ -26,6 +26,15 @@
 # Monitor:
 #   tail -f /home/jheem-shared/logs/<city>_<calib_code>_chain<chain>.out
 #
+# SINGLE-CHAIN STAGES (stage0/1/2 from launch_pipeline_stages_0_to_3.sh)
+#   Omit <chain>:
+#       nohup bash applications/SHIELD/launchers/launch_resume_chain.sh C.37980 calib.10.5.stage0.1x #           > /dev/null 2>&1 &
+#   This resumes chain 1, then assembles (the original 'all' run would have
+#   assembled at the end, and the next stage needs that simset). Setup is
+#   never rerun, since it clears the cache. Output is appended to the log the
+#   original run used:  /home/jheem-shared/logs/<city>_<calib_code>.out
+#   Note: this resumes only the one code; launch any later stages yourself.
+#
 # NOTE ON LOGGING
 #   This appends (>>) to the same log file the original chain run used, so the
 #   full history (original failure + resume) stays in one place. Change ">>" to
@@ -74,15 +83,17 @@ RUN_ID="${USER:-$(id -un)}_$(date +%Y%m%d_%H%M%S)"
 SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
 
 # ── args ───────────────────────────────────────────────────────────────────────
-if (( $# != 3 )); then
-    echo "Usage: bash $(basename "$0") <city> <calib_code> <chain>" >&2
-    echo "  e.g. bash $(basename "$0") C.37980 calib.7.30.stage2.az 3" >&2
+if (( $# != 2 && $# != 3 )); then
+    echo "Usage: bash $(basename "$0") <city> <calib_code> [chain]" >&2
+    echo "  e.g. bash $(basename "$0") C.37980 calib.7.30.stage2.az 3   # one chain of a multi-chain stage" >&2
+    echo "       bash $(basename "$0") C.37980 calib.10.5.stage0.1x     # single-chain stage: run + assemble" >&2
     exit 2
 fi
 
 LOC="$1"
 CALIB_CODE="$2"
-CHAIN="$3"
+# No chain given -> single-chain stage: resume chain 1, then assemble
+if (( $# == 3 )); then SINGLE_CHAIN=0; CHAIN="$3"; else SINGLE_CHAIN=1; CHAIN=1; fi
 
 # chain must be a positive integer
 if ! [[ "$CHAIN" =~ ^[1-9][0-9]*$ ]]; then
@@ -102,7 +113,12 @@ export OMP_NUM_THREADS=1
 export MKL_NUM_THREADS=1
 
 # ── run ────────────────────────────────────────────────────────────────────────
-LOG_FILE="$LOG_DIR/${LOC}_${CALIB_CODE}_chain${CHAIN}.out"
+# single-chain stages log where the pipeline's 'all' run logged (no _chain suffix)
+if (( SINGLE_CHAIN )); then
+    LOG_FILE="$LOG_DIR/${LOC}_${CALIB_CODE}.out"
+else
+    LOG_FILE="$LOG_DIR/${LOC}_${CALIB_CODE}_chain${CHAIN}.out"
+fi
 
 echo "[$(date '+%F %T')] START   RESUME $LOC :: $CALIB_CODE :: chain $CHAIN"
 echo "[$(date '+%F %T')] Logging to $LOG_FILE"
@@ -113,6 +129,17 @@ rc=$?
 if (( rc != 0 )); then
     echo "[$(date '+%F %T')] FAILED  RESUME $LOC :: $CALIB_CODE :: chain $CHAIN (exit $rc)" >&2
     exit "$rc"
+fi
+
+# single-chain stages: assemble, as the original 'all' run would have
+if (( SINGLE_CHAIN )); then
+    echo "[$(date '+%F %T')] ASSEMBLE $LOC :: $CALIB_CODE"
+    Rscript "$SCRIPT" "$LOC" "$CALIB_CODE" assemble >> "$LOG_FILE" 2>&1
+    rc=$?
+    if (( rc != 0 )); then
+        echo "[$(date '+%F %T')] FAILED  ASSEMBLE $LOC :: $CALIB_CODE (exit $rc)" >&2
+        exit "$rc"
+    fi
 fi
 
 echo "[$(date '+%F %T')] DONE    RESUME $LOC :: $CALIB_CODE :: chain $CHAIN"

@@ -38,6 +38,19 @@ register.calibration.info("calib.10.5.stage0.1x",
 register.calibration.info('calib.10.5.stage1.1x',
                           preceding.calibration.codes = 'calib.10.5.stage0.1x',
                           likelihood.instructions = lik.inst.stage1,
+                          special.case.likelihood.instructions = list(
+                              "C.42660" = lik.inst.stage1.Seattle
+                          ),
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = 20000, thin = 80, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info('calib.10.5.stage1.Seattle',
+                          preceding.calibration.codes = 'calib.10.5.stage0.1x',
+                          likelihood.instructions = lik.inst.stage1.Seattle,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
@@ -89,6 +102,16 @@ register.calibration.info('calib.10.5.stage1.4x',
                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
                                               STI.TESTING.PARAMETERS.PRIOR@var.names,
                                               TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
+                          n.iter = 20000, thin = 80, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+register.calibration.info("calib.10.5.stage2",
+                          preceding.calibration.codes = 'calib.10.5.stage1.1x',
+                          likelihood.instructions = lik.inst.stage2,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              SHIELD.FULL.PARAMETERS.PRIOR@var.names
+                          ),
                           n.iter = 20000, thin = 80, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
