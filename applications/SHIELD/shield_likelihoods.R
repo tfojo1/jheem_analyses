@@ -903,7 +903,7 @@ lik.inst.stage1.Seattle=join.likelihood.instructions(
     penalty.ps.diag.growth.stage1, #this has a weight of 1/stage1.weight baked into it     
     #
     # ps.diag.target.msm.stage1, #this has a weight of 1/stage1.weight baked into it
-    ps.diag.target.msm.stage1.V2,
+    ps.diag.target.msm.stage1,
     #
     additional.weights = STAGE.1.WEIGHT
 )
