@@ -96,7 +96,6 @@ ten_cities=(
 
 shield3_cities=(
      C.12060 C.12580 C.16980 C.26420 C.31080
-    C.33100 C.37980 C.38060
 )
  
 N_CHAINS=4
@@ -109,7 +108,7 @@ MAX_CITIES=5
 CITIES=("${shield3_cities[@]}")
 
 CALIBRATION_CODES=(
-    calib.9.23.stage3.pk
+    calib.10.5.stage3
 )
 
 # ── preflight ──────────────────────────────────────────────────────────────────
