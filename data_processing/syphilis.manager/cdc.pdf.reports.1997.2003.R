@@ -198,7 +198,13 @@ msa.totals = lapply(cdc.pdf.reports.msa, function(file){
     mutate(location = ifelse(city.name == "New York City", "C.35620", location))%>%
     filter(City != "Yonkers, NY")%>%
     mutate(location = as.character(location))%>%
-     select(year, location, outcome, value)
+     select(year, location, outcome, value)%>%
+      
+      #Sum cases together:
+      group_by(year, location, outcome)%>%
+      mutate(value.new = sum(value))%>%
+      select(-value)%>%
+      rename(value = value.new)
 
   
   data= as.data.frame(data)
@@ -338,7 +344,12 @@ stratified.msa = lapply(stratified.msa.raw, function(file){
     mutate(location = ifelse(city.name == "New York City", "C.35620", location))%>%
     filter(City != "Yonkers, NY")%>%
     mutate(location = as.character(location))%>%
-   select(year, location, outcome, value)
+   select(year, location, outcome, value)%>%
+      #Sum cases together:
+      group_by(year, location, outcome)%>%
+      mutate(value.new = sum(value))%>%
+      select(-value)%>%
+      rename(value = value.new)
   
   if(grepl("msa_female", filename)) {
   data$sex = 'female'
