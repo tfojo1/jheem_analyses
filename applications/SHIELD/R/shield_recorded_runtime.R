@@ -87,7 +87,9 @@ shield.recorded.config <- function(getenv = Sys.getenv) {
         locations_ref = shield.recorded.revision("LOCATIONS_REF", getenv),
         bayesian_simulations_ref = shield.recorded.revision("BAYESIAN_SIMULATIONS_REF", getenv),
         distributions_ref = shield.recorded.revision("DISTRIBUTIONS_REF", getenv),
-        census_tag = shield.recorded.tag("JHEEM_CENSUS_MANAGER_TAG", "data-managers", getenv),
+        # Census releases: the manager-build dependency bundle (data-managers-v*) or a
+        # census-only release (census-manager-v*).
+        census_tag = shield.recorded.tag("JHEEM_CENSUS_MANAGER_TAG", "(data-managers|census-manager)", getenv),
         syphilis_tag = shield.recorded.tag("JHEEM_SYPHILIS_MANAGER_TAG", "syphilis-manager", getenv),
         run_mode = mode,
         jheem2_mode = package.mode,
