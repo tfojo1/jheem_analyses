@@ -75,6 +75,12 @@ stopifnot(identical(shield.recorded.assert.state(fresh, "C.12580", "stage1"),
 
 values[["JHEEM_CENSUS_MANAGER_TAG"]] <- "data-managers-latest"
 expect.error(shield.recorded.config(getenv), "immutable dated release")
+values[["JHEEM_CENSUS_MANAGER_TAG"]] <- "census-manager-latest"
+expect.error(shield.recorded.config(getenv), "immutable dated release")
+values[["JHEEM_CENSUS_MANAGER_TAG"]] <- "syphilis-manager-v2026.09.09"
+expect.error(shield.recorded.config(getenv), "immutable dated release")
+values[["JHEEM_CENSUS_MANAGER_TAG"]] <- "census-manager-v2026.10.08"
+stopifnot(identical(shield.recorded.config(getenv)$census_tag, "census-manager-v2026.10.08"))
 values[["JHEEM_CENSUS_MANAGER_TAG"]] <- "data-managers-v2026.08.26"
 values[["JHEEM_ANALYSES_REF"]] <- "main"
 expect.error(shield.recorded.config(getenv), "full 40-character")
