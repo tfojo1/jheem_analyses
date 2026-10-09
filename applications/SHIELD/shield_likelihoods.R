@@ -822,6 +822,29 @@ lik.inst.stage1=join.likelihood.instructions(
     #
     additional.weights = STAGE.1.WEIGHT
 )
+lik.inst.stage1.Seattle=join.likelihood.instructions(
+    total.diagnosis.likelihood.instructions,
+    total.diagnosis.by.strata.stage1.likelihood.instructions,
+    #
+    ps.diagnosis.total.likelihood.instructions,
+    ps.diagnosis.by.strata.stage1.likelihood.instructions,
+    #
+    early.diagnosis.total.likelihood.instructions,
+    early.diagnosis.by.strata.stage1.likelihood.instructions,
+    #
+    late.diagnosis.total.likelihood.instructions,
+    late.diagnosis.by.strata.stage1.likelihood.instructions,
+    #
+    proportion.tested.total.by.age.race.sex.nested.likelihood.instructions,
+    #
+    historical.diagnosis.likelihood.instructions,
+    penalty.ps.diag.growth.stage1, #this has a weight of 1/stage1.weight baked into it     
+    #
+    # ps.diag.target.msm.stage1, #this has a weight of 1/stage1.weight baked into it
+    ps.diag.target.msm.stage1,
+    #
+    additional.weights = STAGE.1.WEIGHT
+)
 ## *** STAGE 23 *** ## ----
 # < All likelihood combined >
 lik.inst.demog.stage23=join.likelihood.instructions(
