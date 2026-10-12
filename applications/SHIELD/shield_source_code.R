@@ -40,7 +40,8 @@ if (SHIELD.RECORDED.RUN) {
 # for ordinary runs; releases are at https://github.com/tfojo1/jheem_analyses/releases.
 # NULL deliberately follows the promoted release (not the newest candidate).
 # A failed online lookup stops; it never substitutes an older cached manager.
-SYPHILIS.MANAGER.RELEASE.TAG <- "syphilis-manager-v2026.09.09"
+# SYPHILIS.MANAGER.RELEASE.TAG <- "syphilis-manager-v2026.09.09"
+SYPHILIS.MANAGER.RELEASE.TAG <- "syphilis-manager-v2026.10.09"
 
 # Recorded runs always use their saved configuration, not the setting above.
 if (SHIELD.RECORDED.RUN) {
