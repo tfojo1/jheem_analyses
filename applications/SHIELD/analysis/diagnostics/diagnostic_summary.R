@@ -27,6 +27,8 @@
 library(bayesian.simulations)
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 source("../jheem_analyses/applications/SHIELD/shield_specification.R")   # also sets the jheem root dir
+source("../jheem_analyses/applications/SHIELD/shield_likelihoods.R")      # likelihood instructions (for 3i)
+source("../jheem_analyses/applications/SHIELD/shield_calib_register.R")   # so get.calibration.info() finds the run settings
 
 # ---- SETUP ----
 CALIBRATION.CODE <- "calib.9.23.stage3.pk"
@@ -415,22 +417,114 @@ compare.calibration.mixing <- function(locations, calibration.codes, n.cores = 4
 }
 
 
+# ---- 3i. Likelihood breakdown: what each likelihood contributes ----
+# Uses the saved simset (not the raw MCMC), because the likelihood needs the simulations.
+# For each city:
+#  1. change.during.run - how much each likelihood improved from the start of each chain to its end
+#                         (averaged over chains). Shows which targets the chains worked on.
+#  2. posterior.sd      - how much each likelihood varies across the kept sims.
+#                         Large = it drives which sims are kept. Near zero = it barely constrains anything.
+#  3. conflicts         - pairs of likelihoods that pull against each other (correlation < -0.5)
+# Raw values are not comparable between likelihoods (constants, number of data points), so look at changes.
+if (!exists("lik.list"))           lik.list           <- list()
+if (!exists("lik.breakdown.list")) lik.breakdown.list <- list()
+
+# Same likelihood the calibration used for this city (slow to build, so kept in lik.list)
+.get.calibration.likelihood <- function(loc, calibration.code) {
+    key <- .mcmc.key(loc, calibration.code)
+    if (is.null(lik.list[[key]])) {
+        info  <- get.calibration.info(calibration.code)
+        instr <- info$special.case.likelihood.instructions[[loc]]
+        if (is.null(instr)) instr <- info$likelihood.instructions
+        lik.list[[key]] <<- instr$instantiate.likelihood(version = "shield", location = loc,
+                                                         data.manager = info$data.manager)
+    }
+    lik.list[[key]]
+}
+
+likelihood.breakdown <- function(loc, calibration.code, n.sims = 50, burn.keep = 0.5, n.sim.saved = NULL) {
+    info <- get.calibration.info(calibration.code)
+    if (is.null(n.sim.saved))   # e.g. 4 chains x 30000 / 80 = 1500
+        n.sim.saved <- info$n.chains * floor((info$n.iter - info$n.burn) / info$thin)
+
+    simset <- retrieve.simulation.set(version = "shield", location = loc,
+                                      calibration.code = calibration.code, n.sim = n.sim.saved)
+    lik    <- .get.calibration.likelihood(loc, calibration.code)
+    score  <- function(i) lik$compute.piecewise(simset$subset(i))
+
+    # 1. start vs end of each chain, averaged over chains
+    chains <- simset$simulation.chain
+    change <- rowMeans(sapply(unique(chains), function(ch) {
+        i <- which(chains == ch)
+        score(max(i)) - score(min(i))
+    }))
+
+    # 2. spread across the kept sims (second half of each chain by default)
+    kept   <- simset$burn(keep = burn.keep)
+    idx    <- round(seq(1, kept$n.sim, length.out = min(n.sims, kept$n.sim)))
+    pieces <- t(sapply(idx, function(i) lik$compute.piecewise(kept$subset(i))))
+
+    by.component <- data.frame(component         = colnames(pieces),
+                               change.during.run = round(change[colnames(pieces)], 1),
+                               posterior.sd      = round(apply(pieces, 2, sd), 2))
+    by.component <- by.component[order(-by.component$posterior.sd), ]
+    rownames(by.component) <- NULL
+
+    # 3. pairs that pull against each other
+    cm    <- suppressWarnings(cor(pieces))
+    pairs <- which(upper.tri(cm) & cm < -0.5, arr.ind = TRUE)
+    conflicts <- data.frame(component.1 = rownames(cm)[pairs[, 1]],
+                            component.2 = colnames(cm)[pairs[, 2]],
+                            correlation = round(cm[pairs], 2))
+    conflicts <- conflicts[order(conflicts$correlation), ]
+
+    list(by.component = by.component, conflicts = conflicts, pieces = pieces)
+}
+
+# Many cities, one at a time (each simset is large). Returns posterior.sd: likelihood x city
+run.likelihood.breakdown <- function(locations, calibration.code, force.recompute = FALSE, ...) {
+    locations <- unname(locations)
+    for (loc in locations) {
+        key <- .mcmc.key(loc, calibration.code)
+        if (!force.recompute && !is.null(lik.breakdown.list[[key]])) next
+        message("Likelihood breakdown: ", .city.name(loc))
+        res <- tryCatch(likelihood.breakdown(loc, calibration.code, ...),
+                        error = function(e) { message(loc, ": ", e$message); NULL })
+        if (!is.null(res)) lik.breakdown.list[[key]] <<- res
+    }
+    sds <- lapply(locations, function(loc) {
+        r <- lik.breakdown.list[[.mcmc.key(loc, calibration.code)]]
+        if (!is.null(r)) setNames(r$by.component$posterior.sd, r$by.component$component)
+    })
+    names(sds) <- .city.name(locations)
+    sds <- sds[!sapply(sds, is.null)]
+    if (length(sds) == 0) return(NULL)
+    comps <- unique(unlist(lapply(sds, names)))
+    out <- sapply(sds, function(s) s[comps])
+    out <- matrix(out, nrow = length(comps), dimnames = list(comps, names(sds)))
+    out
+}
+
+
 # ---- 3h. Write a shareable report (one self-contained HTML file) ----
 # Everything from the diagnostics in one file you can email / post:
 #  1. Run settings + a "how to read this" table
 #  2. Overview: one row per city with PASS / CHECK / FAIL and the reasons
 #  3. Parameters that mix badly in several cities
 #  4. Per city: chains, worst parameters, acceptance by block, drop-one-chain, burn-in, plots
+#  5. If include.likelihood = TRUE: the likelihood breakdown from 3i (slow, so off by default)
 # Also writes the overview and all per-parameter stats as CSV files next to it.
 write.mixing.report <- function(locations, calibration.code,
                                 folder = REPORT.DIR,
                                 n.worst.params = 15,
                                 n.trace.params = 9,
-                                include.plots = TRUE) {
+                                include.plots = TRUE,
+                                include.likelihood = FALSE) {
     dir.create(folder, showWarnings = FALSE, recursive = TRUE)
     locations <- unname(locations)
 
     overview <- run.mixing.diagnostics(locations, calibration.code)
+    lik.by.city <- if (include.likelihood) run.likelihood.breakdown(locations, calibration.code) else NULL
 
     # ---- small HTML helpers ----
     esc <- function(x) htmltools::htmlEscape(as.character(x))
@@ -520,6 +614,19 @@ write.mixing.report <- function(locations, calibration.code,
                                             exact.var.names = TRUE)), height = 900)
         ) else ""
 
+        lb <- lik.breakdown.list[[key]]
+        lik.html <- if (include.likelihood) {
+            if (is.null(lb)) "<h3>Likelihood breakdown</h3><p><em>Not computed.</em></p>"
+            else paste0(
+                "<h3>Likelihood breakdown</h3>",
+                "<p class='note'>change.during.run: how much each likelihood improved from the start to the end of each chain (averaged over chains). ",
+                "posterior.sd: how much it varies across the kept sims; large = it drives which sims are kept. ",
+                "Raw values are not comparable between likelihoods, so only changes are shown.</p>",
+                tbl(lb$by.component),
+                "<h3>Likelihoods that pull against each other (correlation &lt; -0.5)</h3>",
+                tbl(lb$conflicts))
+        } else ""
+
         paste0(
             "<h2 id='", esc(loc), "'>", esc(name), " <span class='pill ", tolower(v$verdict), "'>",
             v$verdict, "</span></h2>",
@@ -533,6 +640,7 @@ write.mixing.report <- function(locations, calibration.code,
             "<h3>Burn-in check</h3>",
             "<p class='note'>If R-hat drops a lot as early samples are removed, the chains were still converging.</p>",
             tbl(burn),
+            lik.html,
             plots)
     }, "")
 
@@ -584,6 +692,11 @@ write.mixing.report <- function(locations, calibration.code,
         "<h2>Parameters that mix badly, and in how many cities</h2>",
         "<p class='note'>R-hat &gt; 1.1 or ESS &lt; 100. A parameter that fails in many cities points to a prior or model issue, not just run length.</p>",
         tbl(failing),
+        if (!is.null(lik.by.city)) paste0(
+            "<h2>Likelihood breakdown across cities</h2>",
+            "<p class='note'>posterior.sd of each likelihood, by city. A likelihood that is large in every city ",
+            "may be weighted too heavily; one near zero everywhere barely constrains the fit.</p>",
+            tbl(cbind(likelihood = rownames(lik.by.city), as.data.frame(lik.by.city)))) else "",
         paste(city.sections, collapse = ""),
         "</body></html>")
 
@@ -642,3 +755,12 @@ plot.mcmc.diagnostics(m, d, title = .city.name(loc))
 
 # 7. Shareable report: one HTML file (+ 2 CSVs) in REPORT.DIR, to send to the team
 write.mixing.report(LOCATIONS, CALIBRATION.CODE)
+
+# 8. Likelihood breakdown (slow: loads each city's simset and likelihood, one city at a time)
+lik.by.city <- run.likelihood.breakdown(LOCATIONS, CALIBRATION.CODE)
+lik.by.city                                                         # posterior.sd: likelihood x city
+lik.breakdown.list[[.mcmc.key(loc, CALIBRATION.CODE)]]$by.component  # one city: change + spread per likelihood
+lik.breakdown.list[[.mcmc.key(loc, CALIBRATION.CODE)]]$conflicts     # one city: likelihoods that pull against each other
+
+# 9. Report with the likelihood breakdown included (reuses what step 8 computed)
+# write.mixing.report(LOCATIONS, CALIBRATION.CODE, include.likelihood = TRUE)
