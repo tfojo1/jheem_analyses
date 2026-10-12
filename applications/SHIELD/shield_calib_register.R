@@ -20,8 +20,12 @@ par.aliases.transmission = list(
     trate.5 = c("transmission.rate.multiplier.msm2022", "transmission.rate.multiplier.heterosexual2022")
 )
 #10.11
+# Using the new manager
+# Including historical penalty likelihood in STAGE.0
+# Revised infectious seeds in 1970 to have a floor (will affect Seattle and phoenix)
+# also adding ratio.of.undiagnosed.to.diagnosed.1970 & prp.infections.among.msm.1970 to stage0 for sampling 
 register.calibration.info("calib.10.11.stage0",
-                          likelihood.instructions = lik.inst.stage0.hist.1x,
+                          likelihood.instructions = lik.inst.stage0.hist,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
                           fixed.initial.parameter.values = c("global.transmission.rate.msm"=1.6,
@@ -29,16 +33,16 @@ register.calibration.info("calib.10.11.stage0",
                           parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
                                               AGING.PARAMETERS.PRIOR@var.names,
                                               "global.transmission.rate.msm",
-                                              "global.transmission.rate.het"),
+                                              "global.transmission.rate.het",
+                                              "ratio.of.undiagnosed.to.diagnosed.1970",
+                                              "prp.infections.among.msm.1970"),
                           parameter.aliases = par.aliases.transmission,
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
+
 register.calibration.info('calib.10.11.stage1',
-                          preceding.calibration.codes = 'calib.10.5.stage0.1x',
+                          preceding.calibration.codes = 'calib.10.11.stage0',
                           likelihood.instructions = lik.inst.stage1,
-                          special.case.likelihood.instructions = list(
-                              "C.42660" = lik.inst.stage1.Seattle
-                          ),
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,

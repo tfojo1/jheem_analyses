@@ -1341,34 +1341,54 @@ get.fraction.over.age <- function(location,
 # Since diagnoses data is unavailable in 1970, we need to use another (later year) to approximate 1970
 # We will use the first year that data is reported in each city (1993)
 # Population Proportion (Rate)= #diagnosesin stage X / population size 
-# 1993 is the earliest year of data
+# 1993 is the earliest year of data in most cities (not all)
 # proportion of PS diagnoses that are in the primary stage in 1970:
 # we estimate this as 25% based on duration of primary (4 weeks relative to PS duration of 12 months)
+# because some cities (like seattle) have an exptionally low epidemic early on, we take a minimum prpProp of infectious states (PS, EARLY Latent) 
+# to increase the infectious seed. that floor is set to 25th percentile value accross all to 40MSAs 
+# shield_1993_rate_benchmark.R ran with Surveillance manage 10.9
+# ==== Summary across 35 MSAs (per 100k) ====
+#     ps.per100k el.per100k late.per100k
+# min          0.50       0.55         1.25
+# p10          1.07       2.34         2.02
+# p25          3.93       3.87         3.84 (USED as a floor)
+# median       7.26      15.09         6.27
+# US          10.21      16.13        11.83
+## get_seed_rate ----
+# Diagnosis rate used to seed 1970 (diagnoses / population), with a minimum floor
+# 1. use 1993 if both diagnoses and population exist
+# 2. otherwise use the first later year where both exist (e.g. Orlando 2001, Denver 2000)
+# 3. if no year has both, stop with an error (e.g. Baton Rouge has no diagnosis data)
+# 4. return the larger of the rate and the floor (floors from shield_1993_rate_benchmark.R)
+get_seed_rate <- function(outcome, location, floor = 0) {
+    dx  <- SURVEILLANCE.MANAGER$data[[outcome]]$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location
+    pop <- SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location
+    if (!(location %in% colnames(dx)) || !(location %in% colnames(pop)))
+        stop(paste0("No ", outcome, " or population data for ", location))
+    years <- intersect(rownames(dx), rownames(pop))
+    years <- years[as.numeric(years) >= 1993 & !is.na(dx[years, location]) & !is.na(pop[years, location])]
+    if (length(years) == 0)
+        stop(paste0("No year with both ", outcome, " and population for ", location))
+    if (years[1] != "1993")
+        message("Seeding 1970 for ", location, " from ", years[1], " ", outcome, " (no 1993 data)")
+    max(floor, dx[years[1], location] / pop[years[1], location])
+}
+
 get_popProp_primary_diag_1970<-function(location){
-    popProp.ps.diag.1970= 0.25 * 
-        SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location["1993",location]/
-        SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location["1993",location]
-    popProp.ps.diag.1970
+    0.25 * get_seed_rate("ps.syphilis.diagnoses", location, floor = 3.93 /100000)
 }
 
 ## get_popProp_secondary_diag_1970 ----
 get_popProp_secondary_diag_1970<-function(location){
-    popProp.ps.diag.1970= 0.75 * 
-        SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location["1993",location]/
-        SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location["1993",location]
-    popProp.ps.diag.1970
+    0.75 * get_seed_rate("ps.syphilis.diagnoses", location, floor = 3.93/100000)
 }
 
 ## get_popProp_el_diag_1970 ----
 get_popProp_el_diag_1970<-function(location){
-    popProp.el.diag.1970= SURVEILLANCE.MANAGER$data$early.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location["1993",location]/
-        SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location["1993",location]
-    popProp.el.diag.1970
+    get_seed_rate("early.syphilis.diagnoses", location, floor = 3.87/100000)
 }
 
 ## get_popProp_lu_diag_1970 ----
 get_popProp_lu_diag_1970<-function(location){
-    popProp.lu.diag.1970= SURVEILLANCE.MANAGER$data$unknown.duration.or.late.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location["1993",location]/
-        SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location["1993",location]
-    popProp.lu.diag.1970
+    get_seed_rate("unknown.duration.or.late.syphilis.diagnoses", location,floor = 3.84/100000)
 }

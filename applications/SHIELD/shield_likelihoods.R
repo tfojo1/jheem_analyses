@@ -766,7 +766,7 @@ proportion.tested.total.by.age.race.sex.nested.likelihood.instructions <-
 # < All Demog likelihoods + total PS diag >
 # < Calibrating to data through 2021 >
 
-lik.inst.stage0.hist.1x=
+lik.inst.stage0.hist=
     lik.inst.stage0.nyc =join.likelihood.instructions(
         population.likelihood.instructions,
         deaths.likelihood.instructions, 
@@ -775,49 +775,12 @@ lik.inst.stage0.hist.1x=
         emigration.likelihood.instructions,
         #
         ps.diagnosis.stage0.total.likelihood.instructions, 
-        #
-        join.likelihood.instructions(
-            historical.diagnosis.likelihood.instructions,
-            additional.weights = 1
-        ),
+        historical.diagnosis.likelihood.instructions,
         
         additional.weights = STAGE.0.WEIGHT
     )
 
-lik.inst.stage0.hist.2x=
-    lik.inst.stage0.nyc =join.likelihood.instructions(
-        population.likelihood.instructions,
-        deaths.likelihood.instructions, 
-        fertility.likelihood.instructions,
-        immigration.likelihood.instructions,
-        emigration.likelihood.instructions,
-        #
-        ps.diagnosis.stage0.total.likelihood.instructions, 
-        #
-        join.likelihood.instructions(
-            historical.diagnosis.likelihood.instructions,
-            additional.weights = 2
-        ),
-        
-        additional.weights = STAGE.0.WEIGHT
-    )
-lik.inst.stage0.hist.4x=
-    lik.inst.stage0.nyc =join.likelihood.instructions(
-        population.likelihood.instructions,
-        deaths.likelihood.instructions, 
-        fertility.likelihood.instructions,
-        immigration.likelihood.instructions,
-        emigration.likelihood.instructions,
-        #
-        ps.diagnosis.stage0.total.likelihood.instructions, 
-        #
-        join.likelihood.instructions(
-            historical.diagnosis.likelihood.instructions,
-            additional.weights = 4
-        ),
-        
-        additional.weights = STAGE.0.WEIGHT
-    )
+ 
 
 lik.inst.stage0 =join.likelihood.instructions(
     population.likelihood.instructions,
