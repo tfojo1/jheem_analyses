@@ -67,15 +67,9 @@ census.manager$register.ontology(
     ))
 
 #Codes:
-# source('data_processing/census.manager/census.population.10.19.R') #Sourcing more recent census population data that is stratified but not by single year age just by age group which is why we added it so much later
-# source('data_processing/census.manager/census.population.20.23.R') #UPDATE 7-16: Temporarily commenting out 181 to source the newer stratified data I'll use this to decide if we want age groups or single year
-# source('data_processing/census.manager/aggregating.national.population.census.R') # Aggregating County Population to National
-
-
-#NEW:
-#census.total.population.by.county
-#stratified code
-#aggregate to state code and msa and national??
+source('data_processing/census.manager/NEW.census.total.population.by.county.R') #Processes county level total population data
+source('data_processing/census.manager/NEW.census.stratified.population.by.county.R') #Processes county level stratified population data
+source('data_processing/census.manager/NEW.aggregate.census.population.to.national.R') #Aggregates county level population data to national
 
 #Save:
 save(census.manager, file="Q:/data_managers/data.manager.merge/census.manager_population2.rdata")

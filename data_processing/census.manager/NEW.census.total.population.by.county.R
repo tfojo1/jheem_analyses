@@ -202,7 +202,7 @@ census.county.total.data.clean = lapply(census.county.total.data, function(file)
                                          
                                          is.na(correct_fips) & county == "Fairfield County" ~ "09110", #These are the pre 2020 names but the post 2020 code - ask todd
                                          is.na(correct_fips) & county == "Hartford County" ~ "09120",
-                                         is.na(correct_fips) & county == "Lichtfield County" ~ "09130",
+                                         is.na(correct_fips) & county == "Litchfield County" ~ "09130",
                                          is.na(correct_fips) & county == "Middlesex County" ~ "09140",
                                          
                                          is.na(correct_fips) & county == "New Haven County" ~ "09150",
@@ -210,7 +210,9 @@ census.county.total.data.clean = lapply(census.county.total.data, function(file)
                                          is.na(correct_fips) & county == "Tolland County" ~ "09170",
                                          is.na(correct_fips) & county == "Windham County" ~ "09180",
                                          
-                                         TRUE ~ correct_fips))
+                                         TRUE ~ correct_fips))%>%
+        select(-location)%>%
+        rename(location = correct_fips)
 
     data= as.data.frame(data)
     
@@ -222,33 +224,27 @@ census.county.total.data.clean = lapply(census.county.total.data, function(file)
 
 #Note: Putting these separately because the 'details' differ (to explain type of estimate)
 #===============================================================================
+put.2010.2019.intercensal = census.county.total.data.clean[[1]][[2]]
+put.2020.2025.vintage = census.county.total.data.clean[[2]][[2]]
 
-###SPLIT
 
 #Put: 2010-2019 (intercensal)
-# census.2000.clean.put = lapply(census.2000.clean, `[[`, 2)
-# 
-# for (data in census.2000.clean.put) {
-#     
-#     census.manager$put.long.form(
-#         data = data,
-#         ontology.name = 'census',
-#         source = 'census.population',
-#         dimension.values = list(),
-#         url = 'www.census.gov',
-#         details = 'Census Intercensal Estimates')
-# }
-# 
-# #Put: 2020-2025 (vintage)
-# census.2000.clean.put = lapply(census.2000.clean, `[[`, 2)
-# 
-# for (data in census.2000.clean.put) {
-#     
-#     census.manager$put.long.form(
-#         data = data,
-#         ontology.name = 'census',
-#         source = 'census.population',
-#         dimension.values = list(),
-#         url = 'www.census.gov',
-#         details = 'Census Intercensal Estimates')
-# }
+
+    census.manager$put.long.form(
+        data = put.2010.2019.intercensal,
+        ontology.name = 'census',
+        source = 'census.population',
+        dimension.values = list(),
+        url = 'www.census.gov',
+        details = 'Census Intercensal Estimates')
+
+
+#Put: 2020-2025 (vintage)
+
+    census.manager$put.long.form(
+        data = put.2020.2025.vintage,
+        ontology.name = 'census',
+        source = 'census.population',
+        dimension.values = list(),
+        url = 'www.census.gov',
+        details = 'Census Vintage')
