@@ -28,10 +28,18 @@ select <- function(recorded = FALSE, follow.promoted = FALSE) {
     list(tag = env$SYPHILIS.MANAGER.RELEASE.TAG, output = output)
 }
 
+# The ordinary release is a scientific choice made in shield_source_code.R; check
+# its form, not its value: NULL (follow the promoted release) or a dated release.
 ordinary <- select()
-stopifnot(identical(ordinary$tag, "syphilis-manager-v2026.09.09"),
-          identical(ordinary$output,
-                    "1-Requesting syphilis manager release: syphilis-manager-v2026.09.09"))
+if (is.null(ordinary$tag)) {
+    stopifnot(identical(ordinary$output, "1-Requesting the promoted syphilis manager"))
+} else {
+    stopifnot(is.character(ordinary$tag), length(ordinary$tag) == 1L,
+              grepl("^syphilis-manager-v[0-9]{4}\\.[0-9]{2}\\.[0-9]{2}([.-][0-9A-Za-z]+)*$",
+                    ordinary$tag),
+              identical(ordinary$output,
+                        paste0("1-Requesting syphilis manager release: ", ordinary$tag)))
+}
 recorded <- select(recorded = TRUE)
 stopifnot(identical(recorded$tag, "syphilis-manager-v2026.07.27"),
           identical(recorded$output,
