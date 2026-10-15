@@ -2,8 +2,8 @@
 # 1993 SEED-RATE BENCHMARK (SHIELD MSAs + US) ----
 # ****************************************************************************************************
 # Why this exists:
-#  1. The model seeds each city's 1970 infected population from that city's 1993 diagnosis rate
-#     (see get_popProp_*_diag_1970 in R/shield_specification_helpers.R)
+#  1. The model seeds each city's 1970 infected population from that city's 1993 diagnosis count,
+#     with a minimum rate (floor) chosen here (see get_diag_seed_rate_1970 in R/shield_specification_helpers.R)
 #  2. Some cities (e.g. Seattle) had very low syphilis in 1993, so their 1970 seed is tiny
 #  3. This script shows the same 1993 rates for the SHIELD MSAs and the US, to help choose a minimum rate
 #

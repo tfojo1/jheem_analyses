@@ -1335,12 +1335,11 @@ get.fraction.over.age <- function(location,
 # plot(t, logit_x, type = "l", main = "logit(x) — linear")
 # plot(t, x,       type = "l", main = "x — S-shaped logistic")
 
-## get_popProp_primary_diag_1970 ----
 ## Initial population proportion of syphilis diagnosis 1970 -----
-# First, we need to estimate the POPULATION PROPORTION (RATE) of diagnosis in year 1970 as = "n diag/population size" 
+# First, we need to estimate the number of diagnoses in year 1970, as a proportion of the MODEL population = "n diag / model population size"
 # Since diagnoses data is unavailable in 1970, we need to use another (later year) to approximate 1970
 # We will use the first year that data is reported in each city (1993)
-# Population Proportion (Rate)= #diagnosesin stage X / population size 
+# Population Proportion = #diagnoses in stage X (count in 1993) / model population size (2010 census, see get_diag_seed_rate_1970)
 # 1993 is the earliest year of data in most cities (not all)
 # proportion of PS diagnoses that are in the primary stage in 1970:
 # we estimate this as 25% based on duration of primary (4 weeks relative to PS duration of 12 months)
@@ -1354,41 +1353,93 @@ get.fraction.over.age <- function(location,
 # p25          3.93       3.87         3.84 (USED as a floor)
 # median       7.26      15.09         6.27
 # US          10.21      16.13        11.83
-## get_seed_rate ----
-# Diagnosis rate used to seed 1970 (diagnoses / population), with a minimum floor
+## get_initial_population_count ----
+# Total model population (all ages), the same numbers as n.initial.population
+# The model uses the 2010 census for every year before 2010 (see register.fixed.model.strata)
+get_initial_population_count <- function(location, specification.metadata) {
+    sum(get.n.initial.female.population(location, specification.metadata)) +
+        sum(get.n.initial.male.population(location, specification.metadata))
+}
+
+## get_diag_seed_rate_1970 ----
+# How many diagnoses should the model start with in 1970, as a fraction of the model's population?
+# It is called four times, once for each stage: P&S, early latent, late latent and the unknown-duration late group.
+#
+# We seed by COUNT, not by rate: the model population (2010 census) is larger than the real population in 1993,
+# and the model is calibrated to diagnosis counts, so the seed should match the 1993 count
 # 1. use 1993 if both diagnoses and population exist
 # 2. otherwise use the first later year where both exist (e.g. Orlando 2001, Denver 2000)
 # 3. if no year has both, stop with an error (e.g. Baton Rouge has no diagnosis data)
-# 4. return the larger of the rate and the floor (floors from shield_1993_rate_benchmark.R)
-get_seed_rate <- function(outcome, location, floor = 0) {
+# 4. real rate = diagnoses / real population that year, raised to the floor if lower (floors from shield_1993_rate_benchmark.R)
+# 5. count = real rate x real population that year (= the reported count, unless the floor was used)
+# 6. return count / model population
+get_diag_seed_rate_1970 <- function(outcome, location, specification.metadata, floor = 0) {
     dx  <- SURVEILLANCE.MANAGER$data[[outcome]]$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location
     pop <- SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location
+    #
     if (!(location %in% colnames(dx)) || !(location %in% colnames(pop)))
         stop(paste0("No ", outcome, " or population data for ", location))
     years <- intersect(rownames(dx), rownames(pop))
     years <- years[as.numeric(years) >= 1993 & !is.na(dx[years, location]) & !is.na(pop[years, location])]
+    #
     if (length(years) == 0)
         stop(paste0("No year with both ", outcome, " and population for ", location))
     if (years[1] != "1993")
         message("Seeding 1970 for ", location, " from ", years[1], " ", outcome, " (no 1993 data)")
-    max(floor, dx[years[1], location] / pop[years[1], location])
+    #
+    # we don't allow the real rate to fall below a certain threshold to make sure we seed enough infections
+    real.rate <- max(floor, dx[years[1], location] / pop[years[1], location])
+    # once we have the rate we can calculate the total count
+    count     <- real.rate * pop[years[1], location]
+    count / get_initial_population_count(location, specification.metadata) #fraction of the model population DIAGNOSED in 1970 (becomes infections after x ratio.of.undiagnosed.to.diagnosed.1970 and x seed.multiplier in the specification)
 }
 
-get_popProp_primary_diag_1970<-function(location){
-    0.25 * get_seed_rate("ps.syphilis.diagnoses", location, floor = 3.93 /100000)
+## get_primary_diag_seed_rate_1970 ----
+get_primary_diag_seed_rate_1970<-function(location, specification.metadata){
+    0.25 * get_diag_seed_rate_1970("ps.syphilis.diagnoses", location, specification.metadata, floor = 3.93 /100000)
 }
 
-## get_popProp_secondary_diag_1970 ----
-get_popProp_secondary_diag_1970<-function(location){
-    0.75 * get_seed_rate("ps.syphilis.diagnoses", location, floor = 3.93/100000)
+## get_secondary_diag_seed_rate_1970 ----
+get_secondary_diag_seed_rate_1970<-function(location, specification.metadata){
+    0.75 * get_diag_seed_rate_1970("ps.syphilis.diagnoses", location, specification.metadata, floor = 3.93/100000)
 }
 
-## get_popProp_el_diag_1970 ----
-get_popProp_el_diag_1970<-function(location){
-    get_seed_rate("early.syphilis.diagnoses", location, floor = 3.87/100000)
+## get_el_diag_seed_rate_1970 ----
+get_el_diag_seed_rate_1970<-function(location, specification.metadata){
+    get_diag_seed_rate_1970("early.syphilis.diagnoses", location, specification.metadata, floor = 3.87/100000)
 }
 
-## get_popProp_lu_diag_1970 ----
-get_popProp_lu_diag_1970<-function(location){
-    get_seed_rate("unknown.duration.or.late.syphilis.diagnoses", location,floor = 3.84/100000)
+## get_lu_diag_seed_rate_1970 ----
+get_lu_diag_seed_rate_1970<-function(location, specification.metadata){
+    get_diag_seed_rate_1970("unknown.duration.or.late.syphilis.diagnoses", location, specification.metadata, floor = 3.84/100000)
+}
+
+## get_pop_shares_1970 ----
+# Share of the TOTAL population (all ages) that is in each sex group AND aged 15+
+# Used to split the 1970 seed between sex groups (see shield_specification.R):
+# 1. population = 2010 census, the same source as n.initial.population
+# 2. MSM = males x proportion MSM by race (the same best guess used for prp.msm.of.male)
+# 3. ages 0-14 are not seeded, so they are left out of each group (but stay in the total)
+get_pop_shares_1970 <- function(location, specification.metadata) {
+    female <- get.n.initial.female.population(location, specification.metadata) # age x race
+    male   <- get.n.initial.male.population(location, specification.metadata)   # age x race
+    p.msm  <- get.best.guess.msm.proportions(location, specification.metadata,
+                                             years = DEFAULT.POPULATION.YEARS,
+                                             keep.race = T, keep.age = F)
+    msm    <- sweep(male, 2, p.msm[dimnames(male)$race], `*`)
+    total  <- sum(female) + sum(male)
+    adult  <- dimnames(female)$age[-1] # drop 0-14
+    #
+    c(female            = sum(female[adult, ]) / total,
+      heterosexual_male = sum((male - msm)[adult, ]) / total,
+      msm               = sum(msm[adult, ]) / total)
+}
+get_pop_share_female_1970 <- function(location, specification.metadata) {
+    get_pop_shares_1970(location, specification.metadata)[['female']]
+}
+get_pop_share_het_male_1970 <- function(location, specification.metadata) {
+    get_pop_shares_1970(location, specification.metadata)[['heterosexual_male']]
+}
+get_pop_share_msm_1970 <- function(location, specification.metadata) {
+    get_pop_shares_1970(location, specification.metadata)[['msm']]
 }
