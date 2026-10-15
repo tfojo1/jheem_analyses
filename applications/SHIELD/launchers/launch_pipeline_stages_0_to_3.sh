@@ -119,16 +119,17 @@ all_except_ten_cities=(
     C.14460 C.41740 C.16740 C.41700 C.27260 C.35380 C.32820 C.12420
     C.26900 C.17140 C.18140 C.12940 C.40900 C.17460
 )
-
+shield3=(
+    C.12060 C.12580 C.16980 C.26420 C.31080
+    C.33100 
+)
 # ── set active cities and calibration codes here ───────────────────────────────
-CITIES=("${ten_cities[@]}")
+CITIES=("${shield3[@]}")
 
 # Phase 1: sequential, single-chain calibration codes (one Rscript process per
 # code, so the OS fully reclaims memory between them).
 SEQ_SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
 SEQ_CALIBRATION_CODES=(
-    calib.10.5.stage1.1x
-    calib.10.5.stage2.1x
 )
 # 1 = resume the first SEQ code from its cache (after a killed run); 0 = start it fresh.
 # Every city in CITIES must have been interrupted in that same code.
@@ -140,11 +141,12 @@ SEQ_MAX_CITIES=32
 PAR_SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
 # Leave empty - PAR_CALIBRATION_CODES=() - to skip phase 2 entirely.
 PAR_CALIBRATION_CODES=(
+    calib.10.11.stage3
 )
-N_CHAINS=0
+N_CHAINS=4
 # PAR_MAX_CITIES = max cities in flight in phase 2. Each holds N_CHAINS cores, so
 # peak cores = PAR_MAX_CITIES x N_CHAINS (5 x 4 = 20).
-PAR_MAX_CITIES=8
+PAR_MAX_CITIES=6
 
 # ── preflight ──────────────────────────────────────────────────────────────────
 for s in "$SEQ_SCRIPT" "$PAR_SCRIPT"; do

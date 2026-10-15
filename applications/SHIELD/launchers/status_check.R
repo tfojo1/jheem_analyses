@@ -2,7 +2,7 @@ source("../jheem_analyses/applications/SHIELD/shield_specification.R")
 # root.dir = "../jheem_analyses/applications/SHIELD/logs/"
 # JHEEM.ANALYSES.PATH="../jheem_analyses/applications/SHIELD/logs/"
 
-calib="calib.10.5.stage3"
+calib="calib.10.11.stage2"
 root.dir = get.jheem.root.directory();root.dir
 
 get.calibration.progress("shield","C.12060",calib,root.dir = root.dir)
@@ -13,7 +13,8 @@ get.calibration.progress("shield","C.31080",calib,root.dir = root.dir)
 get.calibration.progress("shield","C.33100",calib,root.dir = root.dir)
 get.calibration.progress("shield","C.37980",calib,root.dir = root.dir)
 get.calibration.progress("shield","C.38060",calib,root.dir = root.dir)
-
 get.calibration.progress("shield","C.42660",calib,root.dir = root.dir)
 get.calibration.progress("shield","C.35620",calib,root.dir = root.dir)
 
+# mcmc1<-assemble.mcmc.from.calibration("shield","C.42660","calib.10.11.stage1")
+simplot(mcmc1,"diagnosis.ps")
