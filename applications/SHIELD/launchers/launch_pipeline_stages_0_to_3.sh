@@ -119,12 +119,15 @@ all_except_ten_cities=(
     C.14460 C.41740 C.16740 C.41700 C.27260 C.35380 C.32820 C.12420
     C.26900 C.17140 C.18140 C.12940 C.40900 C.17460
 )
+shield2=(
+    C.35620 C.37980 C.38060 C.42660
+)
 shield3=(
     C.12060 C.12580 C.16980 C.26420 C.31080
     C.33100 
 )
 # ── set active cities and calibration codes here ───────────────────────────────
-CITIES=("${shield3[@]}")
+CITIES=("${shield2[@]}")
 
 # Phase 1: sequential, single-chain calibration codes (one Rscript process per
 # code, so the OS fully reclaims memory between them).
