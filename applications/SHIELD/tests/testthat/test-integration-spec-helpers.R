@@ -249,11 +249,11 @@ test_that("the 1970 stage seeding proportions are valid proportions", {
     ## These set the initial infected distribution in 1970 and are never
     ## calibrated against anything, so nothing else would notice if one were
     ## out of range.
-    for (fn in list(get_popProp_primary_diag_1970,
-                    get_popProp_secondary_diag_1970,
-                    get_popProp_el_diag_1970,
-                    get_popProp_lu_diag_1970)) {
-        v <- fn(LOC)
+    for (fn in list(get_primary_diag_seed_rate_1970,
+                    get_secondary_diag_seed_rate_1970,
+                    get_el_diag_seed_rate_1970,
+                    get_lu_diag_seed_rate_1970)) {
+        v <- fn(LOC, spec_meta())
         expect_true(all(is.finite(v)))
         expect_true(all(v >= 0 & v <= 1),
                     info = "1970 seeding proportions must lie in [0, 1]")

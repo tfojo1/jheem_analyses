@@ -329,6 +329,11 @@ shield.test.stage("has.shield.helpers", {
                                      "30-34 years", "35-39 years", "40-44 years",
                                      "45-49 years", "50-54 years", "55-64 years"),
            envir = globalenv())
+    ## ages seeded with infections in 1970 (shield_specification.R)
+    assign("ADULT.AGES", c("15-19 years", "20-24 years", "25-29 years",
+                           "30-34 years", "35-39 years", "40-44 years",
+                           "45-49 years", "50-54 years", "55-64 years", "65+ years"),
+           envir = globalenv())
     assign("DEFAULT.STI.SCREENING.START.YEAR", 1980, envir = globalenv())
     assign("DEFAULT.PRENATAL.CARE.START.YEAR", 1980, envir = globalenv())
     assign("DEFAULT.TRANSMISSION.START.YEAR",  1980, envir = globalenv())
