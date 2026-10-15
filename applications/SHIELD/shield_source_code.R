@@ -339,7 +339,8 @@ NON.FERTILE.AGES <- c("0-14 years", "45-49 years", "50-54 years",
 SEXUAL.ACTIVITY.AGES <- c("15-19 years", "20-24 years", "25-29 years",
                           "30-34 years", "35-39 years", "40-44 years",
                           "45-49 years", "50-54 years", "55-64 years")
-
+ADULT.AGES = c('15-19 years','20-24 years','25-29 years','30-34 years','35-39 years',
+                       '40-44 years','45-49 years','50-54 years','55-64 years','65+ years')
 ## --- Intervention / testing start years --------------------------------------
 ## Projections are held at these years' values for all earlier years.
 DEFAULT.STI.SCREENING.START.YEAR <- 1980
