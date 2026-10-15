@@ -11,8 +11,6 @@
 source('data_processing/aggregate_county_to_msa_new.R') #This aggregates county level data to other locations (updated 2026)
 
 source('../jheem2/R/HELPERS_array_helpers.R')
-source('commoncode/locations_of_interest.R')
-source('commoncode/additional_locations_of_interest.R')
 
 #===============================================================================
 
@@ -20,29 +18,34 @@ source('commoncode/additional_locations_of_interest.R')
 
 #===============================================================================
 
-#County --> National (Total)
-put.msa.data.as.new.source.NEW(outcome = 'adult.population',
+census.manager$register.source('census.aggregated.population', parent.source= "census", full.name = 'Census Aggregated Population', short.name = 'census.agg.pop')
+
+national <- c("US")
+
+#County --> National 
+put.msa.data.as.new.source.NEW(outcome = 'poulation',
                                from.source.name = 'census.population',
-                               to.source.name = 'census.aggregated.adult.population',
-                               to.locations =  state.vector, 
+                               to.source.name = 'census.aggregated.population',
+                               to.locations =  national, 
                                geographic.type.from = 'COUNTY',
-                               geographic.type.to = 'STATE',
+                               geographic.type.to = 'COUNTRY',
                                details.for.new.data = 'estimated from county data',
-                               data.manager = surveillance.manager,
+                               data.manager = census.manager,
                                required.coverage=0.95,
-                               outcome.for.relative.contribution = 'adult.population',
+                               outcome.for.relative.contribution = 'population',
                                source.for.relative.contribution = 'census.population',
                                ontology.for.relative.contribution = 'census')
 
-put.msa.data.as.new.source.NEW(outcome = 'adult.population',
+
+put.msa.data.as.new.source.NEW(outcome = 'poulation',
                                from.source.name = 'census.population',
-                               to.source.name = 'census.aggregated.adult.population',
+                               to.source.name = 'census.aggregated.population',
                                to.locations =  state.vector, 
                                geographic.type.from = 'COUNTY',
-                               geographic.type.to = 'STATE',
+                               geographic.type.to = 'COUNTRY',
                                details.for.new.data = 'estimated from county data',
-                               data.manager = surveillance.manager,
+                               data.manager = census.manager,
                                required.coverage=0.95,
-                               outcome.for.relative.contribution = 'adult.population',
+                               outcome.for.relative.contribution = 'population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
