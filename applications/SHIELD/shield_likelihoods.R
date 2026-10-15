@@ -33,7 +33,7 @@ FUTURE.PENALTY.PS.DIAG.GROWTH.WEIGHT.STAGE23 = 1 / STAGE.23.WEIGHT # representin
 # Now that we separate stage 2 and 3 likelihoods as of 9/22/2026
 STAGE.2.WEIGHT = STAGE.23.WEIGHT
 STAGE.3.WEIGHT = STAGE.23.WEIGHT * 1/2
- 
+
 ## SHIELD.DUMMY.PARTITIONING.FUNCTION ----
 SHIELD.DUMMY.PARTITIONING.FUNCTION <- function(arr, version = 'shield', location) {
     # Intentionally do nothing:
@@ -42,7 +42,7 @@ SHIELD.DUMMY.PARTITIONING.FUNCTION <- function(arr, version = 'shield', location
 proportion.tested.bias.estimates = get.cached.object.for.version(name = "proportion.tested.bias.estimates", 
                                                                  version = 'shield')
 prop_male_diag_among_msm_bias_estimates = get.cached.object.for.version(name = "prop_male_diag_among_msm_bias_estimates", 
-                                                                 version = 'shield')
+                                                                        version = 'shield')
 
 ## SHIELD.PARTITIONING.FUNCTION ----
 SHIELD.PARTITIONING.FUNCTION <- function(arr, version, location)
@@ -162,7 +162,7 @@ deaths.likelihood.instructions =
                                          from.year = 2010, 
                                          error.variance.type = 'function.sd',
                                          error.variance.term = population.error.sd.shield, 
-                                         observation.correlation.form = 'compound.symmetry', 
+                                         observation.correlation.form = 'autoregressive.1', # errors in consecutive time periods are more strongly correlated, but this correlation weakens over time
                                          na.rm =T,
                                          equalize.weight.by.year = T
     )
@@ -259,13 +259,13 @@ historical.diagnosis.likelihood.instructions <-
                 if (r  < min_r) {
                     sd_low <- σ_low/sqrt(weights)
                     logp_annual  <- dnorm(log(r),     mean = log(min_r), sd = sd_low, log = TRUE) -
-                                    dnorm(log(min_r), mean = log(min_r), sd = sd_low, log = TRUE)
+                        dnorm(log(min_r), mean = log(min_r), sd = sd_low, log = TRUE)
                 }
                 # if fall over max threshold: penalize by distance above max_r
                 if (r > max_r) {
                     sd_high <- σ_high/sqrt(weights)
                     logp_annual   <- dnorm(log(r),     mean = log(max_r), sd = sd_high, log = TRUE) -
-                                     dnorm(log(max_r), mean = log(max_r), sd = sd_high, log = TRUE)
+                        dnorm(log(max_r), mean = log(max_r), sd = sd_high, log = TRUE)
                 }
                 #
                 logp_annual
@@ -478,7 +478,7 @@ penalty.ps.diag.growth.likelihood.instructions =
                 race_vals[as.character(end_year),] / (race_vals[as.character(start_year),] + 1),
                 sex_vals[as.character(end_year),] / (sex_vals[as.character(start_year),] + 1)
             )
-
+            
             # If we considered correlation... but I don't think there's an easily available lognormal form of mvtnorm::dmvnorm
             # correlation_different_strata <- 0.5
             # 
@@ -771,21 +771,23 @@ proportion.tested.total.by.age.race.sex.nested.likelihood.instructions <-
 # < All Demog likelihoods + total PS diag >
 # < Calibrating to data through 2021 >
 
-lik.inst.stage0.hist=
-    lik.inst.stage0.nyc =join.likelihood.instructions(
-        population.likelihood.instructions,
-        deaths.likelihood.instructions, 
-        fertility.likelihood.instructions,
-        immigration.likelihood.instructions,
-        emigration.likelihood.instructions,
-        #
-        ps.diagnosis.stage0.total.likelihood.instructions, 
+lik.inst.stage0.hist=join.likelihood.instructions(
+    population.likelihood.instructions,
+    deaths.likelihood.instructions, 
+    fertility.likelihood.instructions,
+    immigration.likelihood.instructions,
+    emigration.likelihood.instructions,
+    #
+    ps.diagnosis.stage0.total.likelihood.instructions, 
+    #
+    join.likelihood.instructions(
         historical.diagnosis.likelihood.instructions,
-        
-        additional.weights = STAGE.0.WEIGHT
-    )
+        additional.weights = 1/STAGE.0.WEIGHT), # giving it a weight of 1
+    #
+    additional.weights = STAGE.0.WEIGHT
+)
 
- 
+
 
 lik.inst.stage0 =join.likelihood.instructions(
     population.likelihood.instructions,
@@ -798,19 +800,7 @@ lik.inst.stage0 =join.likelihood.instructions(
     #
     additional.weights = STAGE.0.WEIGHT
 )
-lik.inst.stage0.nyc =join.likelihood.instructions(
-    population.likelihood.instructions,
-    deaths.likelihood.instructions, 
-    fertility.likelihood.instructions,
-    immigration.likelihood.instructions,
-    emigration.likelihood.instructions,
-    #
-    ps.diagnosis.stage0.total.likelihood.instructions, 
-    #
-    historical.diagnosis.likelihood.instructions, ### Sep22: ADDED to help NYC be less wild in 1970
-    
-    additional.weights = STAGE.0.WEIGHT
-)
+ 
 
 ## *** STAGE 1 *** ## ----
 # <All Syphilis related likelihoods 1-way stratified>
