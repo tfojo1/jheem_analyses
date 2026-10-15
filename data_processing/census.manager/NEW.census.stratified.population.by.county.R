@@ -3,17 +3,14 @@
 #This code processes stratified county level population data from Census.
 
 #The datasets are organized differently:
-#Single year age data is only available for 2020-2025 from a vinage.
+#Single year age data is only available for 2020-2025 from a vintage.
 #The rest of data stratified by age is 5 year age groups.
 
-#Stratified datasets include: age+sex+race/eth
+#Stratified datasets include: age+sex+race+eth
 
 #Data is saved in folders by year range with files for each state
 
-#These will be put into the census manager in all possible combinations:
-#sex alone, age alone, raceeth alone
-#age+sex, age+raceeth, sex+raceeth
-#age+sex+raceeth
+#This puts data with a 4 way stratification: age+race+sex+ethnicity
 
 #===============================================================================
 
@@ -220,6 +217,9 @@ four.way.stratified = lapply(all.age.sex.race.eth.data, function(file){
         }
     
     data$outcome = "population"
+    
+    data = subset(data, data$location != "51515") #Removing county we took out of locations package (invalid location)
+    
         
     data= as.data.frame(data)
     
