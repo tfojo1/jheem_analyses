@@ -6,6 +6,13 @@
 # we should bound agegroups at 85+
 # source("applications/SHIELD/inputs/input_future_change_ten_year_ratio_likelihood_penalty.R")
 
+
+# compound.symmetry: every pair of years is equally related (0.5), whether 1 year apart or 25	years
+# good for:  constant bias that never changes
+# autoregressive1: nearby years are similar and the link fades with distance (0.5, then 0.25, 0.125,,,,) 
+# good for:  reporting practices that drift slowly over time
+
+
 #estiamting cv for ps diagnosis from 2 available sources:
 source("applications/SHIELD/R/shield_calculating_error_terms_for_likelihoods.R") #calculates PS_CV
 
@@ -303,7 +310,7 @@ total.diagnosis.age.sex.race.only.oneway.likelihood.instructions =
                                          error.variance.term = diagnosis_cv,
                                          correlation.different.strata = 0, #after adding age-specific targets in stage2, the model didnt fit to overall targets as well as before. 
                                          #
-                                         observation.correlation.form = 'compound.symmetry',  #short time frame
+                                         observation.correlation.form = 'autoregressive.1', # long timeframe (1993+): errors in nearby years are more alike than in distant years
                                          #
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1 
@@ -321,7 +328,7 @@ total.diagnosis.age.sex.race.only.oneway.twoway.likelihood.instructions =
                                          error.variance.term = diagnosis_cv,
                                          correlation.different.strata = 0, #after adding age-specific targets in stage2, the model didnt fit to overall targets as well as before. 
                                          #
-                                         observation.correlation.form = 'compound.symmetry',  #short time frame
+                                         observation.correlation.form = 'autoregressive.1', # long timeframe (1993+): errors in nearby years are more alike than in distant years
                                          #
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1 
@@ -357,7 +364,7 @@ ps.diagnosis.age.sex.race.only.oneway.likelihood.instructions =
                                          error.variance.term = list(diagnosis_cv),
                                          correlation.different.strata = 0,#after adding age-specific targets in stage2, the model didnt fit to overall targets as well as before.
                                          #
-                                         observation.correlation.form = 'compound.symmetry', #short timeframe
+                                         observation.correlation.form = 'autoregressive.1', # long timeframe (1993+): errors in nearby years are more alike than in distant years
                                          #
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
@@ -375,7 +382,7 @@ ps.diagnosis.age.sex.race.only.oneway.twoway.likelihood.instructions =
                                          error.variance.term = list(diagnosis_cv),
                                          correlation.different.strata = 0,#after adding age-specific targets in stage2, the model didnt fit to overall targets as well as before.
                                          #
-                                         observation.correlation.form = 'compound.symmetry', #short timeframe
+                                         observation.correlation.form = 'autoregressive.1', # long timeframe (1993+): errors in nearby years are more alike than in distant years
                                          #
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
@@ -543,7 +550,7 @@ early.diagnosis.age.sex.race.only.oneway.likelihood.instructions =
                                          error.variance.term = diagnosis_cv,
                                          correlation.different.strata = 0,#after adding age-specific targets in stage2, the model didnt fit to overall targets as well as before.
                                          #
-                                         observation.correlation.form = 'compound.symmetry',
+                                         observation.correlation.form = 'autoregressive.1', # long timeframe (1993+): errors in nearby years are more alike than in distant years
                                          #
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
@@ -561,7 +568,7 @@ early.diagnosis.age.sex.race.only.oneway.twoway.likelihood.instructions =
                                          error.variance.term = diagnosis_cv,
                                          correlation.different.strata = 0,#after adding age-specific targets in stage2, the model didnt fit to overall targets as well as before.
                                          #
-                                         observation.correlation.form = 'compound.symmetry',
+                                         observation.correlation.form = 'autoregressive.1', # long timeframe (1993+): errors in nearby years are more alike than in distant years
                                          #
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
@@ -597,7 +604,7 @@ late.diagnosis.age.sex.race.only.oneway.likelihood.instructions =
                                          error.variance.term = diagnosis_cv,
                                          correlation.different.strata = 0,#after adding age-specific targets in stage2, the model didnt fit to overall targets as well as before.
                                          #
-                                         observation.correlation.form = 'compound.symmetry',
+                                         observation.correlation.form = 'autoregressive.1', # long timeframe (1993+): errors in nearby years are more alike than in distant years
                                          #
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
@@ -615,7 +622,7 @@ late.diagnosis.age.sex.race.only.oneway.twoway.likelihood.instructions =
                                          error.variance.term = diagnosis_cv,
                                          correlation.different.strata = 0,#after adding age-specific targets in stage2, the model didnt fit to overall targets as well as before.
                                          #
-                                         observation.correlation.form = 'compound.symmetry',
+                                         observation.correlation.form = 'autoregressive.1', # long timeframe (1993+): errors in nearby years are more alike than in distant years
                                          #
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
