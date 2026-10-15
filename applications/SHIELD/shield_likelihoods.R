@@ -221,9 +221,9 @@ emigration.likelihood.instructions =
 # this helps us avoid models that project very large or very small number of new diagnosis between 1970-1990 before calibration begins
 # >> using national level data on total diagnosis, we estimated the min and max value of the ratio between annual diagnosis relative to the peak in 1990
 # for each year between 1970-1990 in the model, we calculate a similar ratio and bound the values to fall within this min/max threshold (to align with national trend)
-# if the values fall below min, we penalize the likelihood by dlnorm. 
+# if the values fall below min, we penalize the likelihood by a normal density on log(ratio), centered at log(min)
 # if they fall between min and max, they likelihood is 1
-# if the value falls over max, we penalize it by dlnorm
+# if the value falls over max, we penalize it by a normal density on log(ratio), centered at log(max)
 
 NATIONAL_TOTAL_DIAGNOSIS_DATA <- tryCatch(
     {SURVEILLANCE.MANAGER$data$total.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location[as.character(1970:1993), "US"]},
@@ -252,15 +252,20 @@ historical.diagnosis.likelihood.instructions <-
             logp_annual = 0 #by default
             #
             total.logp = lapply(ratio, function(r){
-                # if fall below min threshold: penalize with a lognormal centered at min_r
+                # penalty = normal density of log(ratio), centered at log(threshold)
+                # 1. we subtract the density at the threshold, so the penalty is 0 at the threshold and only gets more negative further away
+                # 2. we don't use dlnorm here: dlnorm = dnorm(log(r)) * 1/r, and the 1/r term rewarded ratios far below min
+                # if fall below min threshold: penalize by distance below min_r
                 if (r  < min_r) {
-                    μ_low <- log(min_r)
-                    logp_annual  <- dlnorm(r, meanlog = μ_low, sdlog = σ_low/sqrt(weights), log = TRUE)
+                    sd_low <- σ_low/sqrt(weights)
+                    logp_annual  <- dnorm(log(r),     mean = log(min_r), sd = sd_low, log = TRUE) -
+                                    dnorm(log(min_r), mean = log(min_r), sd = sd_low, log = TRUE)
                 }
-                # if fall over max threshold:  penalize with a lognormal centered at max_r
+                # if fall over max threshold: penalize by distance above max_r
                 if (r > max_r) {
-                    μ_high <- log(max_r)
-                    logp_annual   <- dlnorm(r, meanlog = μ_high, sdlog = σ_high/sqrt(weights), log = TRUE)
+                    sd_high <- σ_high/sqrt(weights)
+                    logp_annual   <- dnorm(log(r),     mean = log(max_r), sd = sd_high, log = TRUE) -
+                                     dnorm(log(max_r), mean = log(max_r), sd = sd_high, log = TRUE)
                 }
                 #
                 logp_annual
