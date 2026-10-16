@@ -47,14 +47,13 @@ census.2000.clean = lapply(census.2000, function(file){
     
     #Pivot:
     data<- data %>%
-        select(location,contains("POPESTIMATE"), contains("DEATHS"))%>%
+        select(location,contains("POPESTIMATE"))%>%
         rename_with(~ sub("(\\d{4})$", "_\\1", .x))%>% #insert _ between population and year
-        pivot_longer(cols=c(contains("POPESTIMATE"), contains("DEATHS")),
+        pivot_longer(cols=c(contains("POPESTIMATE")),
                      names_to = c("outcome", "year"),
                      names_sep = "_",
                      values_to = "value")%>%
-        mutate(outcome = case_when(outcome == "POPESTIMATE" ~ "population",
-                                   outcome == "DEATHS" ~ "deaths"))
+        mutate(outcome = case_when(outcome == "POPESTIMATE" ~ "population"))
     
     data = subset(data, data$location != "51515") #Removing county we took out of locations package (invalid location)
     
