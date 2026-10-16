@@ -3,14 +3,11 @@
 #This code aggregates county level population data from the Census from
 #county to national level using our aggregation function.
 
-#This is for years 2000-2025.
+#This is for years 2000-2025 for stratified data.
 
-#===============================================================================
-
-#Source aggregation related codes:
-source('data_processing/aggregate_county_to_msa_new.R') #This aggregates county level data to other locations (updated 2026)
-
-source('../jheem2/R/HELPERS_array_helpers.R')
+#US data is put from census files for total level for years 2010-2025.  Because
+#the total level file for 2000-2009 doesn't contain US, that is aggregated 
+#here as well.
 
 #===============================================================================
 
@@ -18,67 +15,35 @@ source('../jheem2/R/HELPERS_array_helpers.R')
 
 #===============================================================================
 
-census.manager$register.source('census.aggregated.population', parent.source= "census", full.name = 'Census Aggregated Population', short.name = 'census.agg.pop')
 
-national <- c("US")
+# US Total for 2000-2009 --------------------------------------------------
+counties = dimnames(census.manager$data$population$estimate$census.population$census$year__location)$location #3133 counties
 
+total.00.09 = census.manager$pull(
+    outcome = "population",
+    source = 'census.population', 
+    from.ontology.names = "census", 
+    dimension.values = list(location = counties), 
+    keep.dimensions = c('year'),
+    na.rm = T) 
 
-#County --> National 
-put.msa.data.as.new.source.NEW(outcome = 'test.poulation',
-                               from.source.name = 'census.population',
-                               to.source.name = 'census.aggregated.population',
-                               to.locations =  national, 
-                               geographic.type.from = 'COUNTY',
-                               geographic.type.to = 'COUNTRY',
-                               details.for.new.data = 'estimated from county data',
-                               data.manager = census.manager,
-                               required.coverage=0.95,
-                               #skip.coverage.condition=T,
-                               outcome.for.relative.contribution = 'population',
-                               source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census')
+years.to.aggregate <- c("2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009")
 
-
-put.msa.data.as.new.source.NEW(outcome = 'poulation',
-                               from.source.name = 'census.population',
-                               to.source.name = 'census.aggregated.population',
-                               to.locations =  national, 
-                               geographic.type.from = 'COUNTY',
-                               geographic.type.to = 'COUNTRY',
-                               details.for.new.data = 'estimated from county data',
-                               data.manager = census.manager,
-                               required.coverage=0.95,
-                               outcome.for.relative.contribution = 'population',
-                               source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'single.year.age.census')
-
-
-
-
-
-
-
-
-#===============================================================================
-
-
-#Updating and using this older code until I can get the function to work:
-
-#This code pulls population data from the census and aggregates the county level data to the national level 
-#To be put into the CENSUS manager as national population data
-
-#Data is from 2000-2025
-
-#===============================================================================
-
+total.00.09 = as.data.frame.table(total.00.09)%>%
+    filter(year %in% years.to.aggregate)%>%
+    mutate(year = as.character(year))%>%
+    mutate(value = as.numeric(Freq))%>%
+    mutate(outcome = "population")%>%
+    mutate(location = "US")%>%
+    select(-Freq, -source)
 
 # ONE WAY STRATA ----------------------------------------------------------
 
 # Sex alone  ----------------------------------------------------
 
-counties = dimnames(census.mansexr$data$population$estimate$census.population$census$year__location__sex)$location #3133 counties
+counties = dimnames(census.manager$data$population$estimate$census.population$census$year__location__sex)$location #3133 counties
 
-sex.alone.00.25 = census.mansexr$pull(
+sex.alone.00.25 = census.manager$pull(
     outcome = "population",
     source = 'census.population', 
     from.ontology.names = "census", 
@@ -427,6 +392,8 @@ race.ethnicity.age.sex.00.25 = as.data.frame.table(race.ethnicity.age.sex.00.25)
 
 national.population.stratified = list(
     
+    total.00.09,
+    
     eth.alone.00.25,
     race.alone.00.25,
     age.alone.00.25,
@@ -486,7 +453,7 @@ for (data in national.population.stratified.vintage) {
         source = 'census.population',
         dimension.values = list(),
         url = 'www.census.gov',
-        details = 'Census Data- Manually Aggregated from Postcensal estimates (vintage')
+        details = 'Census Data- Manually Aggregated from Postcensal estimates vintage')
 }
 
 
