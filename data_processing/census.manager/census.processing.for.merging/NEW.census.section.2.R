@@ -29,9 +29,20 @@ census.manager$register.outcome(
         units = 'population',
         description = "Populaion Estimate"))
 
+census.manager$register.outcome(
+    'deaths',
+    metadata = create.outcome.metadata(  #This represent deaths from the census
+        scale = 'non.negative.number',
+        display.name = 'Deaths',
+        axis.name = 'Deaths',
+        units = 'deaths',
+        description = "Deaths"))
+
 #Register Sources:
 census.manager$register.parent.source('census', full.name = 'United States Census Bureau', short.name= "census") #parent
-census.manager$register.source('census.population', parent.source= "census", full.name = "Census Population Data", short.name='census.population') #child
+census.manager$register.parent.source('NCHS', full.name = 'National Center for Health Statistics', short.name= "NCHS")#parent
+census.manager$register.source('census.population', parent.source= "census", full.name = "Census Population Data", short.name='census.population')#child
+census.manager$register.source('census.deaths', parent.source= "NCHS", full.name = "Census Death Data", short.name='census.deaths') #child
 
 #Register Ontologies:
 census.manager$register.ontology(
@@ -73,7 +84,12 @@ source('data_processing/census.manager/NEW.census.total.population.by.county.R')
 source('data_processing/census.manager/NEW.four.way.stratified.census.county.population.data.R') #Processes county level 4 way stratified population data
 source('data_processing/census.manager/NEW.one.two.three.way.stratified.census.county.population.data.R') #Adds one, two, and three way strata
 source('data_processing/census.manager/NEW.single.year.age.group.county.population.census.data.R') #Adds single year age stratified data for 2020-2025
-source('data_processing/census.manager/NEW.aggregate.census.population.to.national.R') #Aggregates county level population data to national
+source('data_processing/census.manager/NEW.census.postcensal.deaths.by.county.R') #Adds postcensal death estimates by county (these are not avialable in intercensal form)
+
+#TEMP TESTING:
+save(census.manager, file="Q:/data_managers/data.manager.merge/census.manager_population2_NEW.rdata")
+
+#source('data_processing/census.manager/NEW.aggregate.census.population.to.national.R') #Aggregates county level population data to national
 
 #Save:
-save(census.manager, file="Q:/data_managers/data.manager.merge/census.manager_population2.rdata")
+#save(census.manager, file="Q:/data_managers/data.manager.merge/census.manager_population2.rdata")
