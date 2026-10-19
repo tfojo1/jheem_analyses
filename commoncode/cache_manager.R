@@ -537,12 +537,24 @@ load.data.manager.from.github.release <- function(file, gh.source, release.tag,
         resolve.github.release.asset(file, gh.source, release.tag, error.prefix)
     }
     local.path <- materialize.github.release.asset(resolution, offline, error.prefix)
-    data.manager <- load.data.manager(local.path, set.as.default = set.as.default)
+    data.manager <- load.verified.data.manager(local.path, set.as.default, resolution)
     resolution$local_path <- normalizePath(local.path, mustWork = TRUE)
     attr(data.manager, "jheem.manager.resolution") <- resolution
     cat("Loaded ", file, " from ", resolution$resolved_tag,
         " (SHA-256 ", resolution$sha256, ")\n", sep = "")
     invisible(data.manager)
+}
+
+# jheem2 records each loaded manager's file and digest; versions that accept
+# 'provenance' also keep the release identity verified here.
+load.verified.data.manager <- function(path, set.as.default, resolution) {
+    if (!("provenance" %in% names(formals(load.data.manager)))) {
+        return(load.data.manager(path, set.as.default = set.as.default))
+    }
+    load.data.manager(path, set.as.default = set.as.default,
+                      provenance = list(sha256 = resolution$sha256,
+                                        release = resolution$resolved_tag,
+                                        repository = resolution$repository))
 }
 
 # The configured latest alias is resolved to its promoted immutable release, which
@@ -592,7 +604,7 @@ load.data.manager.from.github <- function(file, gh.source, set.as.default, offli
         sync.legacy.cache.copy(file, local.path, resolution, error.prefix)
         write.current.github.release(resolution, error.prefix)
     }
-    data.manager <- load.data.manager(local.path, set.as.default = set.as.default)
+    data.manager <- load.verified.data.manager(local.path, set.as.default, resolution)
     resolution$local_path <- normalizePath(local.path, mustWork = TRUE)
     attr(data.manager, "jheem.manager.resolution") <- resolution
     cat("Loaded ", file, " from ", resolution$resolved_tag,

@@ -337,6 +337,19 @@ stopifnot(identical(jsonlite::fromJSON(current.path)$resolved_tag, "manager-v1")
 stopifnot(identical(test.environment$sha256.file(legacy.path), fixture.digest))
 stopifnot(identical(readLines(paste0(legacy.path, ".version")), "manager-v1"))
 
+# A jheem2 that accepts provenance receives the verified release identity.
+plain.load <- test.environment$load.data.manager
+test.environment$load.data.manager <- function(file, set.as.default = FALSE, provenance = NULL) {
+    list(path = file, provenance = provenance)
+}
+invisible(capture.output(with.identity <- test.environment$load.data.manager.from.github.release(
+    "fixture.rdata", source.configuration, "manager-v1", FALSE, FALSE, "test: "
+)))
+stopifnot(identical(with.identity$provenance,
+                    list(sha256 = fixture.digest, release = "manager-v1",
+                         repository = source.configuration$repo)))
+test.environment$load.data.manager <- plain.load
+
 # Unchanged latest and an explicit request for the same version reuse the cache.
 load.latest()
 exact.message <- capture.output(test.environment$load.data.manager.from.github.release(
@@ -436,6 +449,13 @@ if (identical(tolower(Sys.getenv("RUN_DATA_MANAGER_RELEASE_INTEGRATION")), "true
         identity$sha256,
         "0d9bf7e02d58554a52844bdce85e0506c99aec27ac578d052f6b4d2eb89339eb"
     ))
+    if (exists("get.data.manager.provenance")) {
+        provenance <- get.data.manager.provenance(manager)
+        stopifnot(identical(provenance$release, "syphilis-manager-v2026.07.27"),
+                  identical(provenance$sha256, identity$sha256),
+                  identical(provenance$repository, "tfojo1/jheem_analyses"),
+                  identical(provenance$modified, FALSE))
+    }
     offline.manager <- test.environment$load.data.manager.from.cache(
         "syphilis.manager.rdata",
         set.as.default = FALSE,
