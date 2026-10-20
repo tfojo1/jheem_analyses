@@ -341,7 +341,34 @@ msm_sexualActivity_sdlog <- 0.5*log(2)
 # Heterosexual_sexualActivity (these are female values)
 # het_sexualActivity_means <- ESTIAMTED IN input_estimate_sexual_activity_by_age.R 
 het_sexualActivity_meanlog <- log(het_sexualActivity_means)
-het_sexualActivity_sdlog <- 0.5*log(2)     
+het_sexualActivity_sdlog <- 0.5*log(2)
+
+## 15-19 sexual activity: adjust the GSS value for 15-17 year olds ----
+# GSS covers ages 18+, so its "15-19" value describes 18-19 year olds only.
+# We scale it by how sexually active 15-17 year olds are compared with 18-19 year olds.
+#
+# Source: NSFG, never-married teens, % ever had sexual intercourse (special tabulation by NCHS)
+#   https://www.cdc.gov/nchs/nsfg/key_statistics/t-keystat.htm
+#
+# Ratio of 15-17 to 18-19:
+#                                     2015-2017            2017-2019            average of both
+#   female (used for heterosexuals)   23.6 / 65.3 = 0.36   27.6 / 61.4 = 0.45   0.41
+#   male   (used for MSM)             23.1 / 58.7 = 0.39   23.2 / 62.7 = 0.37   0.38
+#
+# The two rounds differ by less than the survey uncertainty (female 2017-2019: 95% range 0.34-0.56),
+# so we average them; female and male are then close enough to use one value (about 0.4).
+#
+# The 15-19 group = 3 years at the 15-17 level + 2 years at the 18-19 level:
+#   fraction of the 18-19 value = (3 * 0.4 + 2) / 5 = 0.64
+#
+# Why: in calib.10.15.stage3 the model over-predicted diagnoses at 15-19 in all 10 cities
+# (total 1.2-2.4x the data), while 20-24 fit well (see analysis/diagnostics/check_fit_by_age.R).
+ratio.15.17.to.18.19 <- mean(c(23.6/65.3, 27.6/61.4,     # female 2015-2017, 2017-2019
+                               23.1/58.7, 23.2/62.7))    # male   2015-2017, 2017-2019
+FRACTION.15.19.OF.18.19 <- (3 * ratio.15.17.to.18.19 + 2) / 5   # 0.64
+het_sexualActivity_meanlog[1] <- het_sexualActivity_meanlog[1] + log(FRACTION.15.19.OF.18.19)
+msm_sexualActivity_meanlog[1] <- msm_sexualActivity_meanlog[1] + log(FRACTION.15.19.OF.18.19)
+
 # AR parameters 
 rho_age <- 0.7  # p: correlation between adjacent ages
 # Covariance matrices
