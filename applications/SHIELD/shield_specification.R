@@ -1155,7 +1155,8 @@ register.model.quantity(SHIELD.SPECIFICATION,
                         scale = 'rate',
                         value=0)
 
-# HIV testing data (BRFFS) starts from age 18. We assume those age 15-17 have similar testing proportions as those in 18-19 agegroup
+# HIV testing data (BRFFS) starts from age 18. For 15-19 we scale the 18-24 testing rate by 0.65,
+# from CDC-funded HIV test counts (62% of 15-19 tests among 18-19 year olds); see get_sti_screening_functional_form.
 # we assume 0 testing in the youngest age-group [0-14].
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'rate.sti.screening.over.14.without.covid',

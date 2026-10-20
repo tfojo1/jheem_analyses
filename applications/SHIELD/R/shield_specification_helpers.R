@@ -1132,12 +1132,28 @@ get_sti_screening_functional_form  <- function(specification.metadata) {
     # HIV testing data starts in 2014, however, the anchor year that was used to fit the function was set at 2010
     expit = function(x){return(1/(1+exp(-x)))}
     val_2010= hiv_testing_prior$intercepts +log(.6)  #0.6 is the prior for ratio of syphilis to HIV testing
+
+    # 15-19 screening ----
+    # BRFSS covers ages 18+, so the prior for 15-19 is the 18-24 testing rate applied to all 15-19 year olds.
+    # We scale it using CDC-funded HIV test counts (inputs/input_fraction_hiv_test_by_age.R):
+    # 1. 62% of tests in the 15-19 group are among 18-19 year olds, who are 2 of the 5 years (40%)
+    # 2. so testing per person in the whole 15-19 group is 0.40 / 0.62 = 0.65 of the 18-19 level
+    #    (15-17 year olds at 0.41 of 18-19; close to the 0.64 used for 15-19 sexual activity)
+    # 3. rate.testing.hiv.over.18 multiplies the 15-19 rate by 0.62 / 0.40 to compare with BRFSS 18-24,
+    #    so with this scaling the model's 18-19 HIV testing lands back on the BRFSS level
+    screening.15.19.based.on.18.19 <- (2/5) / SHIELD_BASE_PARAMETER_VALUES[['fraction.hiv.tests.18.19.among.15.19']]
+    knot.value <- function(year) {
+        p <- expit(val_2010 + hiv_testing_prior$slopes * (year - 2010))   # age x race x sex, probabilities
+        p["15-19 years", , ] <- p["15-19 years", , ] * screening.15.19.based.on.18.19
+        p
+    }
+
     sti_screening_functional_form <- create.linear.spline.functional.form(knot.times = c("1990"=1990,"2000"=2000, "2010"=2010,"2020"=2020),
                                                                           knot.values = list(
-                                                                              "1990"=expit(val_2010 +  hiv_testing_prior$slopes* (1990-2010)),
-                                                                              "2000"=expit(val_2010 +  hiv_testing_prior$slopes* (2000-2010)),
-                                                                              "2010"=expit(val_2010 ),
-                                                                              "2020"=expit(val_2010 +  hiv_testing_prior$slopes* (2020-2010))),
+                                                                              "1990"=knot.value(1990),
+                                                                              "2000"=knot.value(2000),
+                                                                              "2010"=knot.value(2010),
+                                                                              "2020"=knot.value(2020)),
                                                                           link = "logit",
                                                                           knot.link="logit",
                                                                           knots.are.on.transformed.scale = F,
@@ -1306,7 +1322,9 @@ get.fraction.over.age <- function(location,
                                       keep.dimensions = c('age','sex','race','ethnicity'),
                                       from.ontology.names = 'census')
             
-            age.brackets = make.age.strata.names(endpoints = c(ages[1], age, ages[length(ages)]))
+            # brackets run from one endpoint up to (not including) the next, so the last endpoint is the
+            # group's upper bound (20 for 15-19), not its last age (19), or the oldest single age is dropped
+            age.brackets = make.age.strata.names(endpoints = c(ages[1], age, specification.metadata$age.upper.bounds[i]))
             
             pop2 = map.value.ontology(pop, 
                                       target.dim.names = c(list(age=age.brackets),
