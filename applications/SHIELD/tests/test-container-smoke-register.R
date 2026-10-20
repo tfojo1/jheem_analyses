@@ -18,7 +18,10 @@ names(templates) <- c("calib.10.1.stage0", "calib.10.1.stage1")
 original.templates <- unserialize(serialize(templates, NULL))
 scope$shield.recorded.jheem2.function <- function(name) {
     stopifnot(identical(name, "get.calibration.info"))
-    function(code) templates[[code]]
+    function(code, throw.error.if.missing = TRUE) {
+        if (is.null(templates[[code]]) && throw.error.if.missing) stop("not registered: ", code)
+        templates[[code]]
+    }
 }
 scope$register.calibration.info <- function(code, ...) {
     validate(code, error.prefix = "Container test registration: ")
@@ -55,5 +58,18 @@ templates <- original.templates
 templates[["calib.10.1.stage1"]]$preceding.calibration.codes <- "different.stage0"
 stopifnot(inherits(try(sys.source("applications/SHIELD/shield_calib_register_container_smoke.R",
                                envir = scope), silent = TRUE), "try-error"))
+# Code that no longer registers the fixture's production codes keeps the smoke stages.
+templates <- list()
+definitions <- list()
+notes <- character()
+withCallingHandlers(
+    sys.source("applications/SHIELD/shield_calib_register_container_smoke.R", envir = scope),
+    message = function(m) { notes <<- c(notes, conditionMessage(m)); invokeRestart("muffleMessage") })
+stopifnot(identical(names(definitions), c("container.smoke.stage0", "container.smoke.stage1",
+                                         "container.smoke.replay", "container.smoke.pre3",
+                                         "container.smoke.stage3")),
+          any(grepl("Not registering container.actual", notes)),
+          !any(c("template", "templates", "stage", "get.info") %in% ls(scope)))
 cat("Container test registrations passed the engine path validator\n")
 cat("Actual handoff fixtures preserve scientific fields and reject registration drift\n")
+cat("Smoke stages register without the fixture's production codes\n")
