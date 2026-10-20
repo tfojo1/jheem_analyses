@@ -165,10 +165,13 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     # this means that over 5 years, trate can change by sqrt(1.5) and by 20 years, it can change by 1.5^2
     
     transmission.rate.multipliers.by.sex=make.joint.mv.spline.prior(
+        # the baseline values for MSM and HET "are not" correlated 
+        # the delta values across parameters "are" correlated within the same year.
+        #
         parameters = paste0("transmission.rate.multiplier.", c("msm", "heterosexual")),
-        logmean.baseline = c(log(3), #msm
+        logmean.baseline = c(log(3), #msm (assumption): the baselineSD is so wide that this doesnt restrict the calibration
                              log(1)), #het
-        logsd.baseline = c(log(2)*2, #msm
+        logsd.baseline = c(log(2)*2, # translate to 1.39 (mu+-1.96*sd ~ +- 1.96*1.39 = 2.7)> exponentiated: exp(2.72)= 15>  95% range of ×/÷ 16
                            log(2)*2
         ), #het
         logsd.deltas.past = c("1970" = 0.5*log(TRATE_DELTA^2), #20-year delta

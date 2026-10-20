@@ -293,8 +293,8 @@ if (1==2){
 # -parameter 2 at 1970, 1990, 1995, 2000, 2010, 2017
 # each parameter has a baseline value at one year,
 # values in other years are modeled as multiplicative deltas relative to the baseline,
-# the baseline values across parameters can be correlated,
-# the delta values across parameters can also be correlated within the same year.
+# the baseline values for MSM and HET "are not" correlated 
+# the delta values across parameters "are" correlated within the same year.
 # e.g., transmission multipliers for the MSM and heterosexual population. We allow these multipliers to have a joint distribution for each group and we also want them to have a similar direction of change overtime.
 
 ## make.joint.mv.spline.prior ----

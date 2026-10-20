@@ -70,7 +70,7 @@ register.calibration.info("calib.10.15.stage3",
                           n.iter = 20000, thin = 50, is.preliminary = F, 
                           n.burn = 0, n.chains = 4, max.run.time.seconds = 30, description = "NA"
 )
-
+# changed the from.to:1970 for statified diagnosis data+ autoregressive=1
 register.calibration.info('calib.10.19.stage1',
                           preceding.calibration.codes = 'calib.10.15.stage0',
                           likelihood.instructions = lik.inst.stage1,
@@ -81,27 +81,22 @@ register.calibration.info('calib.10.19.stage1',
                                               TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-register.calibration.info("calib.10.19.stage2",
-                          preceding.calibration.codes = 'calib.10.19.stage1',
-                          likelihood.instructions = lik.inst.stage2,
+#changed a bunch of things:
+# equlize.weight.by.year=F for startified diagnosis to fit them better in recent years
+# onthology mapping fix for MSM: likelihood couldnt see the male diagnosis data from cdc.pdf.reports before this
+# lowring the transmission and screening priors for 15-17 year olds
+register.calibration.info('calib.10.20.stage1',
+                          preceding.calibration.codes = 'calib.10.15.stage0',
+                          likelihood.instructions = lik.inst.stage1,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
-                          parameter.names = c(
-                              SHIELD.FULL.PARAMETERS.PRIOR@var.names
-                          ),
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names,
+                                              TRANS.BY.AGE.SAMPLING.PRIOR@var.names),
                           n.iter = 15000, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-register.calibration.info("calib.10.19.stage3",
-                          preceding.calibration.codes = 'calib.10.19.stage2',
-                          likelihood.instructions = lik.inst.stage3,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          parameter.names = c(
-                              SHIELD.FULL.PARAMETERS.PRIOR@var.names
-                          ),
-                          n.iter = 20000, thin = 50, is.preliminary = F, 
-                          n.burn = 0, n.chains = 4, max.run.time.seconds = 30, description = "NA"
-)
+
+
 # #10.11
 # # Using the new manager
 # # Including historical penalty likelihood in STAGE.0
