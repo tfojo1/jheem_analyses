@@ -53,25 +53,23 @@ run record.
 
 ## SHIELD
 
-The ordinary SHIELD bootstrap selects `syphilis-manager-v2026.09.09` with the
-editable `SYPHILIS.MANAGER.RELEASE.TAG` assignment near the top of
-`shield_source_code.R`. Keep a dated release fixed across a calibration's stages;
-selecting a different manager does not update an earlier stage's results or
-make its checkpoints safe to resume. Setting the same variable before sourcing
-that file does not override it. Recorded runs always use their configured
-release instead of the ordinary setting.
+The ordinary SHIELD bootstrap loads the releases declared in
+`applications/SHIELD/data_managers.csv` (columns `name,file,release`; lines
+starting with `#` are comments). Syphilis must name a dated release. Census
+`unpinned` keeps census on the release named by the shared cached-metadata file,
+as before. To change a release, edit the file and commit. Keep the releases fixed
+across a calibration's stages; selecting a different manager does not update an
+earlier stage's results or make its checkpoints safe to resume. Setting
+`SYPHILIS.MANAGER.RELEASE.TAG` before sourcing the bootstrap does not override the
+file. Recorded runs always use their configured releases instead, and the
+container wrapper reads the same file from the commit it captures.
 
-`NULL` remains an explicit choice to follow the currently promoted release,
-not the newest published candidate. It resolves and verifies that release or
-stops; it does not authorize fallback to an older cached input. Requiring a
-dated tag globally is unnecessary for consumers that deliberately follow
-promotion. For a long-running, multi-stage calibration, use a dated tag or a
-recorded configuration that keeps the resolved version fixed.
-
-If `SURVEILLANCE.MANAGER` already
-exists, the ordinary bootstrap retains that object and warns that its selector
-was ignored. The generic loader examples above do not override these
-application-specific choices.
+After loading, the bootstrap registers the managers as `census` and `syphilis`,
+so code can refer to them as `get.data.manager("census")` (with a jheem2 that has
+the data-manager registry). If `CENSUS.MANAGER` or `SURVEILLANCE.MANAGER` already
+exists, the ordinary bootstrap keeps that object, and warns when it is not the
+declared release or has changed since it was loaded. The generic loader still
+follows the promoted release when given no tag; SHIELD's declaration does not.
 
 ## Public downloads and authentication
 

@@ -35,27 +35,6 @@ if (SHIELD.RECORDED.RUN) {
   rm(recorded.analyses.path)
 }
 
-# WHICH SYPHILIS MANAGER SHOULD WE USE?
-# Keep the same dated release across a calibration's stages. Edit this setting
-# for ordinary runs; releases are at https://github.com/tfojo1/jheem_analyses/releases.
-# NULL deliberately follows the promoted release (not the newest candidate).
-# A failed online lookup stops; it never substitutes an older cached manager.
-# SYPHILIS.MANAGER.RELEASE.TAG <- "syphilis-manager-v2026.09.09"
-SYPHILIS.MANAGER.RELEASE.TAG <- "syphilis-manager-v2026.10.09"
-
-# Recorded runs always use their saved configuration, not the setting above.
-if (SHIELD.RECORDED.RUN) {
-  SYPHILIS.MANAGER.RELEASE.TAG <- SHIELD.RECORDED.CONFIG$syphilis_tag
-}
-
-if (is.null(SYPHILIS.MANAGER.RELEASE.TAG)) {
-  cat("1-Requesting the promoted syphilis manager\n")
-} else {
-  cat("1-Requesting syphilis manager release: ", SYPHILIS.MANAGER.RELEASE.TAG,
-      "\n", sep = "")
-}
-
-
 # SHOULD WE PULL GIT UPDATES?
 # Only in an interactive session. `git pull` writes to the index, the refs and
 # the working tree, so parallel chains pulling one clone collide ("Unable to
@@ -95,6 +74,29 @@ JHEEM2.PATH         <- if (SHIELD.RECORDED.RUN) {
   SHIELD.RECORDED.CONFIG$jheem2_path
 } else file.path(dirname(JHEEM.ANALYSES.PATH), "jheem2")
 JHEEM2.BRANCH       <- "dev"      # branch required by the ordinary source path
+
+# WHICH DATA MANAGERS SHOULD WE USE?
+# applications/SHIELD/data_managers.csv lists them: edit a release there and
+# commit, keeping the same releases across a calibration's stages. A failed
+# online lookup stops; it never substitutes an older cached manager.
+source(file.path(JHEEM.ANALYSES.PATH, "applications/SHIELD/R/shield_data_managers.R"))
+SHIELD.DATA.MANAGERS <- shield.declared.data.managers(
+  file.path(JHEEM.ANALYSES.PATH, "applications/SHIELD/data_managers.csv"))
+SYPHILIS.MANAGER.RELEASE.TAG <- SHIELD.DATA.MANAGERS$syphilis
+CENSUS.MANAGER.RELEASE.TAG <- SHIELD.DATA.MANAGERS$census    # NULL: unpinned
+
+# Recorded runs always use their saved configuration, not the declarations.
+if (SHIELD.RECORDED.RUN) {
+  SYPHILIS.MANAGER.RELEASE.TAG <- SHIELD.RECORDED.CONFIG$syphilis_tag
+  CENSUS.MANAGER.RELEASE.TAG <- SHIELD.RECORDED.CONFIG$census_tag
+}
+
+cat("1-Requesting syphilis manager release: ", SYPHILIS.MANAGER.RELEASE.TAG,
+    "\n", sep = "")
+if (!is.null(CENSUS.MANAGER.RELEASE.TAG)) {
+  cat("1-Requesting census manager release: ", CENSUS.MANAGER.RELEASE.TAG,
+      "\n", sep = "")
+}
 
 ## =============================================================================
 ## 1. PACKAGES
@@ -263,10 +265,12 @@ if (!exists("CENSUS.MANAGER")) {
   CENSUS.MANAGER <- load.data.manager.from.cache(
     "census.manager.rdata", set.as.default = FALSE,
     offline = SHIELD.RECORDED.RUN,
-    release.tag = if (SHIELD.RECORDED.RUN) SHIELD.RECORDED.CONFIG$census_tag else NULL)
+    release.tag = CENSUS.MANAGER.RELEASE.TAG)
   cat("Census manager read\n")
 } else if (SHIELD.RECORDED.RUN) {
   stop("Recorded SHIELD run cannot use an already-loaded census manager", call. = FALSE)
+} else {
+  shield.check.loaded.data.manager(CENSUS.MANAGER, "CENSUS.MANAGER", CENSUS.MANAGER.RELEASE.TAG)
 }
 
 ## --- Syphilis surveillance manager -------------------------------------------
@@ -281,8 +285,15 @@ if (!exists("SURVEILLANCE.MANAGER")) {
   cat("Syphilis surveillance manager read\n")
 } else if (SHIELD.RECORDED.RUN) {
   stop("Recorded SHIELD run cannot use an already-loaded syphilis manager", call. = FALSE)
-} else if (!is.null(SYPHILIS.MANAGER.RELEASE.TAG)) {
-  warning("SYPHILIS.MANAGER.RELEASE.TAG was ignored because SURVEILLANCE.MANAGER was already loaded")
+} else {
+  shield.check.loaded.data.manager(SURVEILLANCE.MANAGER, "SURVEILLANCE.MANAGER",
+                                   SYPHILIS.MANAGER.RELEASE.TAG)
+}
+
+## Code can refer to these managers by name: get.data.manager("census").
+if (exists("register.data.manager", mode = "function")) {
+  register.data.manager("census", CENSUS.MANAGER)
+  register.data.manager("syphilis", SURVEILLANCE.MANAGER)
 }
 
 

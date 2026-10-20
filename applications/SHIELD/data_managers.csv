@@ -1,0 +1,7 @@
+# Data managers SHIELD uses: every run loads exactly these releases. To change
+# one, edit its release here and commit; keep the same releases across a
+# calibration's stages. Releases: https://github.com/tfojo1/jheem_analyses/releases
+# "unpinned" keeps census on the release named by the shared cached-metadata file.
+name,file,release
+census,census.manager.rdata,unpinned
+syphilis,syphilis.manager.rdata,syphilis-manager-v2026.10.09
