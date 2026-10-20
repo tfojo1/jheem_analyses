@@ -116,25 +116,33 @@ register.calibration.info(
 # handoff, without editing them or maintaining a second scientific definition.
 # Only test identity, predecessor identity, length/thinning, and description
 # change. Two draws are an operational check, not a calibration result.
-for (handoff.stage in c("stage0", "stage1")) {
-    handoff.template <- shield.recorded.jheem2.function("get.calibration.info")(
-        paste0("calib.10.1.", handoff.stage))
-    if (!identical(as.integer(handoff.template$n.chains), 1L) ||
-        !isTRUE(handoff.template$is.preliminary)) {
-        stop("Stage-1 handoff fixture requires a single-chain preliminary registration")
+# Production codes are retired as calibrations are reworked; when this code no
+# longer registers the fixture's, skip it rather than block the smoke stages.
+local({
+    get.info <- shield.recorded.jheem2.function("get.calibration.info")
+    templates <- lapply(c(stage0 = "calib.10.1.stage0", stage1 = "calib.10.1.stage1"),
+                        get.info, throw.error.if.missing = FALSE)
+    if (any(vapply(templates, is.null, logical(1)))) {
+        message("Not registering container.actual.*: this code does not register ",
+                "calib.10.1.stage0 and calib.10.1.stage1")
+        return(invisible())
     }
-    handoff.expected.parent <- if (handoff.stage == "stage0") character()
-                              else "calib.10.1.stage0"
-    if (!identical(handoff.template$preceding.calibration.codes, handoff.expected.parent)) {
-        stop("Stage-1 handoff fixture's production predecessor changed; review the fixture")
+    for (stage in c("stage0", "stage1")) {
+        template <- templates[[stage]]
+        if (!identical(as.integer(template$n.chains), 1L) || !isTRUE(template$is.preliminary)) {
+            stop("Stage-1 handoff fixture requires a single-chain preliminary registration")
+        }
+        expected.parent <- if (stage == "stage0") character() else "calib.10.1.stage0"
+        if (!identical(template$preceding.calibration.codes, expected.parent)) {
+            stop("Stage-1 handoff fixture's production predecessor changed; review the fixture")
+        }
+        template$code <- paste0("container.actual.", stage)
+        template$preceding.calibration.codes <- if (stage == "stage0") character()
+                                                else "container.actual.stage0"
+        template$n.iter <- 2L
+        template$n.burn <- 0L
+        template$thin <- 1L
+        template$description <- "Actual stage-1 handoff canary; not for scientific inference"
+        do.call(register.calibration.info, template)
     }
-    handoff.template$code <- paste0("container.actual.", handoff.stage)
-    handoff.template$preceding.calibration.codes <- if (handoff.stage == "stage0") character()
-                                                   else "container.actual.stage0"
-    handoff.template$n.iter <- 2L
-    handoff.template$n.burn <- 0L
-    handoff.template$thin <- 1L
-    handoff.template$description <- "Actual stage-1 handoff canary; not for scientific inference"
-    do.call(register.calibration.info, handoff.template)
-}
-rm(handoff.stage, handoff.template, handoff.expected.parent)
+})
