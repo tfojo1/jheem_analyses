@@ -312,7 +312,7 @@ total.diagnosis.age.sex.race.only.oneway.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'autoregressive.1', # long timeframe (1993+): errors in nearby years are more alike than in distant years
                                          #
-                                         equalize.weight.by.year = T,
+                                         equalize.weight.by.year = F,
                                          minimum.error.sd = 1 
     )
 ##---- twoway stratified Stage2  ---- 
@@ -330,7 +330,7 @@ total.diagnosis.age.sex.race.only.oneway.twoway.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'autoregressive.1', # long timeframe (1993+): errors in nearby years are more alike than in distant years
                                          #
-                                         equalize.weight.by.year = T,
+                                         equalize.weight.by.year = F,
                                          minimum.error.sd = 1 
     )
 
@@ -366,7 +366,7 @@ ps.diagnosis.age.sex.race.only.oneway.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'autoregressive.1', # long timeframe (1993+): errors in nearby years are more alike than in distant years
                                          #
-                                         equalize.weight.by.year = T,
+                                         equalize.weight.by.year = F,
                                          minimum.error.sd = 1
     )
 ##---- twoway stratified Stage2 ----
@@ -384,7 +384,7 @@ ps.diagnosis.age.sex.race.only.oneway.twoway.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'autoregressive.1', # long timeframe (1993+): errors in nearby years are more alike than in distant years
                                          #
-                                         equalize.weight.by.year = T,
+                                         equalize.weight.by.year = F,
                                          minimum.error.sd = 1
     )
 
@@ -552,7 +552,7 @@ early.diagnosis.age.sex.race.only.oneway.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'autoregressive.1', # long timeframe (1993+): errors in nearby years are more alike than in distant years
                                          #
-                                         equalize.weight.by.year = T,
+                                         equalize.weight.by.year = F,
                                          minimum.error.sd = 1
     )
 ##---- twoway stratified Stage2 ----
@@ -570,7 +570,7 @@ early.diagnosis.age.sex.race.only.oneway.twoway.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'autoregressive.1', # long timeframe (1993+): errors in nearby years are more alike than in distant years
                                          #
-                                         equalize.weight.by.year = T,
+                                         equalize.weight.by.year = F,
                                          minimum.error.sd = 1
     )
 
@@ -606,7 +606,7 @@ late.diagnosis.age.sex.race.only.oneway.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'autoregressive.1', # long timeframe (1993+): errors in nearby years are more alike than in distant years
                                          #
-                                         equalize.weight.by.year = T,
+                                         equalize.weight.by.year = F,
                                          minimum.error.sd = 1
     )
 ##---- twoway stratified Stage2 ----
@@ -624,7 +624,7 @@ late.diagnosis.age.sex.race.only.oneway.twoway.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'autoregressive.1', # long timeframe (1993+): errors in nearby years are more alike than in distant years
                                          #
-                                         equalize.weight.by.year = T,
+                                         equalize.weight.by.year = F,
                                          minimum.error.sd = 1
     )
 
