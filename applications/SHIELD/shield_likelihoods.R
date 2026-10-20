@@ -23,9 +23,14 @@ SHIELD.DUMMY.PARTITIONING.FUNCTION <- function(arr, version = 'shield', location
     # Intentionally do nothing:
     return(arr)
 }
-proportion.tested.bias.estimates = get.cached.object.for.version(name = "proportion.tested.bias.estimates", 
+# Bias between MSA and state proportions tested for HIV (BRFSS), used by the proportion tested likelihood below.
+# Made by inputs/input_cache_proportion_hiv_tested_bias.R: CBSAs vs states, stratified by age and sex only.
+# Race is left out on purpose: race-specific BRFSS proportions at MSA level rest on small samples, and adding
+# race almost triples the bias SD (0.150 vs 0.055); see that script for the comparison.
+proportion.tested.bias.estimates = get.cached.object.for.version(name = "proportion.tested.bias.estimates",
                                                                  version = 'shield')
-prop_male_diag_among_msm_bias_estimates = get.cached.object.for.version(name = "prop_male_diag_among_msm_bias_estimates", 
+# Made by inputs/p_bias_prop_male_diag.R
+prop_male_diag_among_msm_bias_estimates = get.cached.object.for.version(name = "prop_male_diag_among_msm_bias_estimates",
                                                                         version = 'shield')
 
 ## SHIELD.PARTITIONING.FUNCTION ----

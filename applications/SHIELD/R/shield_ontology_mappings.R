@@ -1,13 +1,19 @@
 
 # BRFSS & SHIELD ----
 
-# Needed for finding p bias estimates for SHIELD proportion tested
+# Converts sex = female/male/msm to female/male. Needed for finding p bias estimates for SHIELD proportion tested
+# (inputs/input_cache_proportion_hiv_tested_bias.R), and used by jheem2 for any data with these three categories,
+# including the CDC surveillance reports' ps.syphilis.diagnoses.
+# In both BRFSS and the CDC reports, male = ALL men (MSM included) and msm is a subgroup of male,
+# so we keep male as it is and drop msm (NA = discard in the transformation).
+# Before 2026-10 msm was added to male: male came out NaN wherever msm was missing (every MSA) and
+# double-counted wherever it was reported.
 register.ontology.mapping("brfss.shield.to.cdc.sex",
                           from.dimensions = "sex",
                           to.dimensions = "sex",
                           mappings = rbind(c("male", "male"),
                                            c("female", "female"),
-                                           c("msm", "male")))
+                                           c("msm", NA)))
 
 #This maps shield to BRFSS.SHIELD ontology
 register.ontology.mapping('shield.to.brfss.shield.sex',
