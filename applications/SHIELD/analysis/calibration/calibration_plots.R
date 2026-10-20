@@ -22,7 +22,7 @@ get.jheem.root.directory()
 # }
 
 calibration.codes <- c(
-    "calib.10.11.stage2"
+    "calib.10.15.stage3"
 )
 
 # for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.16.stage2.az"))}
@@ -32,7 +32,7 @@ calib.simsets <- load.calib.simsets(
     locations         =  SHIELD.TEN.MSAS,
     calibration.codes = calibration.codes,
     # n.sim = 250
-    # n.sim = 400
+    n.sim = 1600
 )
 # smb://cloud.nas.jh.edu/jheem$/simulations/shield/calib.10.1.stage0-250/C.42660
 # ****************************************************************************************************
@@ -51,153 +51,154 @@ inspect_mixing (
 # >> Save summary plots for a calibration version (compares the fit accross all cities)
 # ****************************************************************************************************
 
-calib.name="calib.10.11.stage2"
+calib.name="calib.10.11.stage3"
 omit.data.years=2022:2024
-if(1==1){
-    # 1-compare accross various locations ----
-    save_summary_plots_by_outcome<-function(calibration.code,folder.name,sim.subset="full"){
-        plot.calib.comparison(calib.simsets = calib.simsets,
-                              calibration.codes = calibration.code,
-                              sim.subset = sim.subset,
-                              locations = SHIELD.TEN.MSAS,
-                              separate.by = "outcome",
-                              folder.name = folder.name,
-                              outcomes =c("incidence","diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.late.misclassified",
-                                          "hiv.testing","sti.screening", "prop.male.ps.diag.among.msm"
-                                          ,"ps.diag.rate.among.msm"
-                              ),
-                              years = c(1970:2030),
-                              omit.data.years = omit.data.years,
-                              ncol=5
-        )
-        # #
-        plot.calib.comparison(calib.simsets = calib.simsets,
-                              calibration.codes = calibration.code,
-                              sim.subset = sim.subset,
-                              locations = SHIELD.TEN.MSAS,
-                              separate.by = "outcome",
-                              folder.name = folder.name,
-                              outcomes = c("incidence","diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.late.misclassified",
-                                           "hiv.testing","sti.screening"),
-                              years = c(1970:2030),
-                              omit.data.years = omit.data.years,
-                              split.by ="sex",
-                              ncol = 5
-        )
-        #
-        plot.calib.comparison(calib.simsets = calib.simsets,
-                              calibration.codes = calibration.code,
-                              sim.subset = sim.subset,
-                              locations = SHIELD.TEN.MSAS,
-                              separate.by = "outcome",
-                              folder.name = folder.name,
-                              outcomes = c("incidence","diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.late.misclassified",
-                                           "hiv.testing","sti.screening" ),
-                              years = c(1970:2030),
-                              omit.data.years = omit.data.years,
-                              split.by = "race" ,
-                              ncol = 5
-        )
-        
-        # Sim-only by sex (to see MSM)
-        plot.calib.comparison(calib.simsets = calib.simsets,
-                              calibration.codes = calibration.code,
-                              sim.subset = sim.subset,
-                              locations = SHIELD.TEN.MSAS,
-                              separate.by = "outcome",
-                              folder.name = folder.name,
-                              outcomes = c("incidence","diagnosis.ps","hiv.testing","sti.screening"),
-                              years = c(1970:2030),
-                              omit.data.years = omit.data.years,
-                              split.by = "sex" ,
-                              ncol = 5,
-                              plot.which = "sim.only"
-        )
-        # Two way break down by sex and race
-        plot.calib.comparison(calib.simsets = calib.simsets,
-                              calibration.codes = calibration.code,
-                              sim.subset = sim.subset,
-                              locations = SHIELD.TEN.MSAS,
-                              separate.by = "outcome",
-                              folder.name = folder.name,
-                              outcomes = c("incidence","diagnosis.ps" ,"diagnosis.el.misclassified"),
-                              years = c(1970:2030),
-                              omit.data.years = omit.data.years,
-                              split.by = "race" , facet.by="sex",
-                              ncol = 2
-        )
-        plot.calib.comparison(calib.simsets = calib.simsets,
-                              calibration.codes = calibration.code,
-                              sim.subset = sim.subset,
-                              locations = SHIELD.TEN.MSAS,
-                              separate.by = "outcome",
-                              folder.name = folder.name,
-                              outcomes = c("incidence","diagnosis.ps", "diagnosis.el.misclassified"),
-                              years = c(1970:2030),
-                              omit.data.years = omit.data.years,
-                              split.by = "race" , facet.by="sex",
-                              ncol = 2, #2 cities in each row (6 columns)
-                              plot.which = "sim.only"
-        )
-    }
-    
-    # 2-compare various outcomes in a single location ----
-    save_summary_plots_by_location<-function(calibration.code,folder.name,sim.subset="last20"){
-        # plot.calib.comparison(calib.simsets = calib.simsets,
-        #                       calibration.codes = calibration.code,
-        #                       sim.subset = sim.subset,
-        #                       locations = SHIELD.TEN.MSAS,
-        #                       separate.by = "location",
-        #                       folder.name = folder.name,
-        #                       outcomes =c("diagnosis.total", "diagnosis.ps","diagnosis.el.misclassified","diagnosis.late.misclassified",
-        #                                   "hiv.testing","sti.screening", "prop.male.ps.diag.among.msm"
-        #                                   ,"ps.diag.rate.among.msm"
-        #                       ),
-        #                       years = c(1970:2030),
-        #                       omit.data.years = omit.data.years,
-        # )
-        # plot.calib.comparison(calib.simsets = calib.simsets,
-        #                       calibration.codes = calibration.code,
-        #                       sim.subset = sim.subset,
-        #                       locations = SHIELD.TEN.MSAS,
-        #                       separate.by = "location",
-        #                       folder.name = folder.name,
-        #                       outcomes =c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.late.misclassified",
-        #                                   "hiv.testing","sti.screening"),
-        #                       split.by = "sex",
-        #                       years = c(1970:2030),
-        #                       omit.data.years = omit.data.years,
-        # )
-        # plot.calib.comparison(calib.simsets = calib.simsets,
-        #                       calibration.codes = calibration.code,
-        #                       sim.subset = sim.subset,
-        #                       locations = SHIELD.TEN.MSAS,
-        #                       separate.by = "location",
-        #                       folder.name = folder.name,
-        #                       outcomes =c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.late.misclassified",
-        #                                   "hiv.testing","sti.screening"),
-        #                       split.by = "race",
-        #                       years = c(1970:2030),
-        #                       omit.data.years = omit.data.years,
-        # )
-        plot.calib.comparison(calib.simsets = calib.simsets,
-                              calibration.codes = calibration.code,
-                              sim.subset = sim.subset,
-                              locations = SHIELD.TEN.MSAS,
-                              separate.by = "location",
-                              folder.name = folder.name,
-                              outcomes =c("diagnosis.ps"),
-                              facet = "sex",
-                              years = c(1990:2025),
-                              omit.data.years = omit.data.years,
-        )
-        }
-    
-    save_summary_plots_by_outcome(calibration.code =calib.name,folder.name = paste0(calib.name,".summary"),sim.subset="full")
-    save_summary_plots_by_location(calibration.code =calib.name,folder.name = paste0(calib.name,".summary"),sim.subset="full")
-}
 
-save_summary_plots_by_location<-function(calibration.code,folder.name,location=SHIELD.TEN.MSAS[1],sim.subset="last20"){
+# 1-compare accross various locations ----
+save_summary_plots_by_outcome<-function(calibration.code,folder.name,sim.subset="full"){
+    plot.calib.comparison(calib.simsets = calib.simsets,
+                          calibration.codes = calibration.code,
+                          sim.subset = sim.subset,
+                          locations = SHIELD.TEN.MSAS,
+                          separate.by = "outcome",
+                          folder.name = folder.name,
+                          outcomes =c("incidence","diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.late.misclassified",
+                                      "hiv.testing","sti.screening", "prop.male.ps.diag.among.msm"
+                                      ,"ps.diag.rate.among.msm"
+                          ),
+                          years = c(1970:2030),
+                          omit.data.years = omit.data.years,
+                          ncol=5
+    )
+    # #
+    plot.calib.comparison(calib.simsets = calib.simsets,
+                          calibration.codes = calibration.code,
+                          sim.subset = sim.subset,
+                          locations = SHIELD.TEN.MSAS,
+                          separate.by = "outcome",
+                          folder.name = folder.name,
+                          outcomes = c("incidence","diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.late.misclassified",
+                                       "hiv.testing","sti.screening"),
+                          years = c(1970:2030),
+                          omit.data.years = omit.data.years,
+                          split.by ="sex",
+                          ncol = 5
+    )
+    #
+    plot.calib.comparison(calib.simsets = calib.simsets,
+                          calibration.codes = calibration.code,
+                          sim.subset = sim.subset,
+                          locations = SHIELD.TEN.MSAS,
+                          separate.by = "outcome",
+                          folder.name = folder.name,
+                          outcomes = c("incidence","diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.late.misclassified",
+                                       "hiv.testing","sti.screening" ),
+                          years = c(1970:2030),
+                          omit.data.years = omit.data.years,
+                          split.by = "race" ,
+                          ncol = 5
+    )
+    
+    # Sim-only by sex (to see MSM)
+    plot.calib.comparison(calib.simsets = calib.simsets,
+                          calibration.codes = calibration.code,
+                          sim.subset = sim.subset,
+                          locations = SHIELD.TEN.MSAS,
+                          separate.by = "outcome",
+                          folder.name = folder.name,
+                          outcomes = c("incidence","diagnosis.ps","hiv.testing","sti.screening"),
+                          years = c(1970:2030),
+                          omit.data.years = omit.data.years,
+                          split.by = "sex" ,
+                          ncol = 5,
+                          plot.which = "sim.only"
+    )
+    # Two way break down by sex and race
+    plot.calib.comparison(calib.simsets = calib.simsets,
+                          calibration.codes = calibration.code,
+                          sim.subset = sim.subset,
+                          locations = SHIELD.TEN.MSAS,
+                          separate.by = "outcome",
+                          folder.name = folder.name,
+                          outcomes = c("incidence","diagnosis.ps" ,"diagnosis.el.misclassified"),
+                          years = c(1970:2030),
+                          omit.data.years = omit.data.years,
+                          split.by = "race" , facet.by="sex",
+                          ncol = 2
+    )
+    plot.calib.comparison(calib.simsets = calib.simsets,
+                          calibration.codes = calibration.code,
+                          sim.subset = sim.subset,
+                          locations = SHIELD.TEN.MSAS,
+                          separate.by = "outcome",
+                          folder.name = folder.name,
+                          outcomes = c("incidence","diagnosis.ps", "diagnosis.el.misclassified"),
+                          years = c(1970:2030),
+                          omit.data.years = omit.data.years,
+                          split.by = "race" , facet.by="sex",
+                          ncol = 2, #2 cities in each row (6 columns)
+                          plot.which = "sim.only"
+    )
+}
+save_summary_plots_by_outcome(calibration.code =calib.name,folder.name = paste0(calib.name,".summary"),sim.subset="full")
+
+
+# 2-compare various outcomes in a single location ----
+save_summary_plots_by_location<-function(calibration.code,folder.name,sim.subset="last20"){
+    plot.calib.comparison(calib.simsets = calib.simsets,
+                          calibration.codes = calibration.code,
+                          sim.subset = sim.subset,
+                          locations = SHIELD.TEN.MSAS,
+                          separate.by = "location",
+                          folder.name = folder.name,
+                          outcomes =c("diagnosis.total", "diagnosis.ps","diagnosis.el.misclassified","diagnosis.late.misclassified",
+                                      "hiv.testing","sti.screening", "prop.male.ps.diag.among.msm"
+                                      ,"ps.diag.rate.among.msm"
+                          ),
+                          years = c(1970:2030),
+                          omit.data.years = omit.data.years,
+    )
+    plot.calib.comparison(calib.simsets = calib.simsets,
+                          calibration.codes = calibration.code,
+                          sim.subset = sim.subset,
+                          locations = SHIELD.TEN.MSAS,
+                          separate.by = "location",
+                          folder.name = folder.name,
+                          outcomes =c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.late.misclassified",
+                                      "hiv.testing","sti.screening"),
+                          split.by = "sex",
+                          years = c(1970:2030),
+                          omit.data.years = omit.data.years,
+    )
+    plot.calib.comparison(calib.simsets = calib.simsets,
+                          calibration.codes = calibration.code,
+                          sim.subset = sim.subset,
+                          locations = SHIELD.TEN.MSAS,
+                          separate.by = "location",
+                          folder.name = folder.name,
+                          outcomes =c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.late.misclassified",
+                                      "hiv.testing","sti.screening"),
+                          split.by = "race",
+                          years = c(1970:2030),
+                          omit.data.years = omit.data.years,
+    )
+    plot.calib.comparison(calib.simsets = calib.simsets,
+                          calibration.codes = calibration.code,
+                          sim.subset = sim.subset,
+                          locations = SHIELD.TEN.MSAS,
+                          separate.by = "location",
+                          folder.name = folder.name,
+                          outcomes =c("diagnosis.ps"),
+                          facet = "sex",
+                          years = c(1990:2025),
+                          omit.data.years = omit.data.years,
+    )
+}
+save_summary_plots_by_location(calibration.code =calib.name,folder.name = paste0(calib.name,".summary"),sim.subset="full")
+
+
+# 3-compare accross various locations ----
+save_summary_plots_by_location2<-function(calibration.code,folder.name,location=SHIELD.TEN.MSAS,sim.subset="last20"){
     plot.calib.comparison(calib.simsets = calib.simsets,
                           calibration.codes = calibration.code,
                           sim.subset = sim.subset,
@@ -217,7 +218,7 @@ save_summary_plots_by_location<-function(calibration.code,folder.name,location=S
                           separate.by = "location",
                           folder.name = folder.name,
                           outcomes =c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.late.misclassified"
-                                       ),
+                          ),
                           facet.by = "sex",ncol = 2,
                           years = c(1970:2025),
                           omit.data.years = omit.data.years
@@ -236,13 +237,10 @@ save_summary_plots_by_location<-function(calibration.code,folder.name,location=S
                           plot.which = "sim.only"
     )
 }
-save_summary_plots_by_location(calibration.code ="calib.10.11.stage0",folder.name = paste0("calib.10.11.stage0.debug"),location = SHIELD.TEN.MSAS[1],sim.subset="full")
-save_summary_plots_by_location(calibration.code ="calib.10.11.stage1",folder.name = paste0("calib.10.11.stage1.debug"),location = SHIELD.TEN.MSAS[1],sim.subset="full")
-save_summary_plots_by_location(calibration.code ="calib.10.11.stage2",folder.name = paste0("calib.10.11.stage2.debug"),location = SHIELD.TEN.MSAS[1],sim.subset="full")
-save_summary_plots_by_location(calibration.code =c("calib.10.11.stage0",
-                                                   "calib.10.11.stage1",
-                                                   "calib.10.11.stage2"),
-                               folder.name = paste0("calib.10.11.stage012.debug"),location = SHIELD.TEN.MSAS[1],sim.subset="full")
+# save_summary_plots_by_location2(calibration.code =c("calib.10.11.stage0",
+#                                                    "calib.10.11.stage1",
+#                                                    "calib.10.11.stage2"),
+#                                folder.name = paste0("calib.10.11.stage012.debug"),location = SHIELD.TEN.MSAS[1],sim.subset="full")
 
 # **********************************************************************************************************************************************************
 # >> compare_calibrations_by_outcome ----
