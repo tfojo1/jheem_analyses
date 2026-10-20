@@ -2,6 +2,7 @@
 *.Rhistory
 *.Ruserdata
 *.csv
+!applications/SHIELD/data_managers.csv
 *.png
 *.pptx
 *.html
