@@ -98,7 +98,9 @@ data.list.county.90.clean = lapply(data.list.county.90 , function(file){
   
   data <- data %>% #Fixing Dade and St Geneive Counties
     mutate(location = ifelse(location == "12025", "12086", location))%>%
-    mutate(location = ifelse(location == "29193", "29186", location))
+    mutate(location = ifelse(location == "29193", "29186", location))%>%
+      mutate(test = locations::is.location.valid(location))%>%
+      filter(test != F)
   
   
   data = as.data.frame(data)
@@ -136,7 +138,9 @@ data.list.80.county.clean = lapply(county_80.89 , function(file){
   
   data <- data %>% #Fixing Dade and St Geneive Counties
     mutate(location = ifelse(location == "12025", "12086", location))%>%
-    mutate(location = ifelse(location == "29193", "29186", location))
+    mutate(location = ifelse(location == "29193", "29186", location))%>%
+    mutate(test = locations::is.location.valid(location))%>%
+      filter(test != F)
   
   list(sheet, data)  
   
@@ -197,7 +201,9 @@ data= as.data.frame(data)
 
 data <- data %>%
   mutate(location = ifelse(location == "12025", "12086", location))%>%
-  mutate(location = ifelse(location == "29193", "29186", location))
+  mutate(location = ifelse(location == "29193", "29186", location))%>%
+    mutate(test = locations::is.location.valid(location))%>%
+    filter(test != F)
 
 list(filename, data)  
 

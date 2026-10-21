@@ -34,8 +34,8 @@ race.sex.mappings = c('1' = 'white male',
 
 data.list.census.sas.clean = lapply(census_sas_data_list, function(file){
 
-   data=file[["data"]] #apply the function to the data element#
-   filename = file[["filename"]] #apply the function to the filename element#
+   data=file[["data"]] 
+   filename = file[["filename"]] 
   
    data$ethnicity= hisp.sas.mappings[data$hisp]
    data$race_sex= race.sex.mappings[data$RACESEX]
@@ -78,20 +78,20 @@ data.list.census.sas.clean = lapply(census_sas_data_list, function(file){
    data$population_2017 = data$POP2017
     }
    data <- data %>%
-     select(location, age, race, ethnicity, sex, (one_of("population_2005", "population_2006", "population_2007", "population_2008", "population_2009", "population_2010", "population_2011", 
-                                                         "population_2012", "population_2013", "population_2014", "population_2015",
-                                                         "population_2016", "population_2017")))
-   data <- data %>%
-     pivot_longer(cols=c(one_of("population_2005", "population_2006", "population_2007", "population_2008", "population_2009", "population_2010", "population_2011", 
-                                "population_2012", "population_2013", "population_2014", "population_2015",
-                                "population_2016", "population_2017")),
+     select(location, age, race, ethnicity, sex, contains('population'))%>%
+
+     pivot_longer(cols=c(contains("population")),
                   names_to = c("outcome", "year"),
                   names_sep = "_",
-                  values_to = "value")
-   
-   data <- data %>% #Fixing Dade and St Geneive Counties
-     mutate(location = ifelse(location == "12025", "12086", location))%>%
-     mutate(location = ifelse(location == "29193", "29186", location))
+                  values_to = "value")%>%
+       mutate(test = locations::is.location.valid(location))%>%
+
+ #Fixing Dade and St Geneive Counties (I'm not grouping and summing these because the first two are name changes and the last two don't have data)
+       mutate(location = case_when(location == "12025" ~ "12086", #Miami renamed Miami Dade in 1997
+                                   location == "29193" ~ "29186", #Missouri county changed FIPS in 1979
+                                   location== "51515" ~ "51019", #VA county merged in 2013
+                                   location == "51560" ~ "51005", #VA county merged in 2001
+                                   TRUE ~ location))
    
  data = as.data.frame(data)
   list(filename, data)
@@ -109,7 +109,7 @@ for (data in census_sas_pops) {
   
   census.manager$put.long.form(
     data = data,
-    ontology.name = 'census',
+    ontology.name = 'single.year.age.census',
     source = 'census.population',
     dimension.values = list(),
     url = 'www.census.gov',
@@ -125,22 +125,22 @@ for (data in census_sas_pops) {
 #And then were removed as counties at some point.  We noticed this for FL, MO, and VA.
 #we decided to put them here as NA so then we won't run into the dimnames
 #related error
-
-  dummy.counties.census <- data.frame(
-    outcome = c('population'),
-    year = c('2010'),
-    location = c('51560', '51780', '51123'), #These are the counties that have changed#
-    value = as.numeric(NA),
-    race = c('white'),
-    ethnicity = c('not hispanic'),
-    age = c('< 1 year'),
-    sex = c('male'))
-
-    census.manager$put.long.form(
-      data = dummy.counties.census,
-      ontology.name = 'census',
-      source = 'census.population',
-      dimension.values = list(),
-      url = 'www.census.gov',
-      details = 'Census Reporting',
-      allow.na.to.overwrite = T )
+  # 
+  # dummy.counties.census <- data.frame(
+  #   outcome = c('population'),
+  #   year = c('2010'),
+  #   location = c('51560', '51780', '51123'), #These are the counties that have changed#
+  #   value = as.numeric(NA),
+  #   race = c('white'),
+  #   ethnicity = c('not hispanic'),
+  #   age = c('< 1 year'),
+  #   sex = c('male'))
+  # 
+  #   census.manager$put.long.form(
+  #     data = dummy.counties.census,
+  #     ontology.name = 'census',
+  #     source = 'census.population',
+  #     dimension.values = list(),
+  #     url = 'www.census.gov',
+  #     details = 'Census Reporting',
+  #     allow.na.to.overwrite = T )

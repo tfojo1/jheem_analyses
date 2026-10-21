@@ -43,9 +43,12 @@ data.list.cdc.wonder.clean = lapply(data.list.cdc.wonder  , function(file){
     select(outcome, year, location, age, race, ethnicity, sex, value)%>%
     filter(year != "2020")  #Removign 2020 data now that we have census data for 2020 by single year ages
   
-  data <- data %>% #Fixing Dade and St Geneive Counties
-    mutate(location = ifelse(location == "12025", "12086", location))%>%
-    mutate(location = ifelse(location == "29193", "29186", location))
+  data <- data %>% #Fixing Dade and St Geneive Counties (I'm not grouping and summing these because the first two are name changes and the last two don't have data)
+     mutate(location = case_when(location == "12025" ~ "12086", #Miami renamed Miami Dade in 1997
+                                location == "29193" ~ "29186", #Missouri county changed FIPS in 1979
+                                location== "51515" ~ "51019", #VA county merged in 2013
+                                location == "51560" ~ "51005", #VA county merged in 2001
+                                TRUE ~ location))
   
   data = as.data.frame(data)
   list(filename, data)  
@@ -78,23 +81,23 @@ for (data in county_single_year_age) {
 #related error
 
 #year_location_age_race_ethnicity
-dummy.counties.cdc.wonder  <- data.frame(
-  outcome = c('population'),
-  year = c('2018'),
-  location = c('51560', '51780', '51123'), #These are the counties that have changed#
-  value = as.numeric(NA),
-  race = c('american indian or alaska native'),
-  ethnicity = c('hispanic or latino'),
-  age = c('< 1 year'),
-  sex = c('male'))
-  
-  census.manager$put.long.form(
-    data = dummy.counties.cdc.wonder,
-    ontology.name = 'census.cdc.wonder.population',
-    source = 'cdc_wonder',
-    dimension.values = list(),
-    url ='https://wonder.cdc.gov/',
-    details = 'CDC Wonder',
-    allow.na.to.overwrite = T )
+# dummy.counties.cdc.wonder  <- data.frame(
+#   outcome = c('population'),
+#   year = c('2018'),
+#   location = c('51560', '51780', '51123'), #These are the counties that have changed#
+#   value = as.numeric(NA),
+#   race = c('american indian or alaska native'),
+#   ethnicity = c('hispanic or latino'),
+#   age = c('< 1 year'),
+#   sex = c('male'))
+#   
+#   census.manager$put.long.form(
+#     data = dummy.counties.cdc.wonder,
+#     ontology.name = 'census.cdc.wonder.population',
+#     source = 'cdc_wonder',
+#     dimension.values = list(),
+#     url ='https://wonder.cdc.gov/',
+#     details = 'CDC Wonder',
+#     allow.na.to.overwrite = T )
   
 
