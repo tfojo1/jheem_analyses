@@ -27,4 +27,4 @@ save(census.manager, file="Q:/data_managers/census.manager.rdata")
 #SAVE Final, Complete Census Manager, Archive a dated version to the Q Drive#
 timestamp <- Sys.Date()  
 filename <- paste0("Q:/data_managers/Archive/census.manager_", timestamp, ".rdata")
-save(population1, file=filename)
+save(census.manager, file=filename)

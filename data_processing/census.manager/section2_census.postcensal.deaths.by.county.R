@@ -3,7 +3,8 @@
 #===============================================================================
 
 #This code processes postcensal death estimates by county from the Census
-#Total level for years 2000-2025
+#Total level for years 2000-2025 and then aggregates deaths
+#from county to national
 
 #===============================================================================
 
@@ -68,3 +69,35 @@ for (data in census.deaths.clean.put) {
         url = 'www.census.gov',
         details = 'Census Postcensal Death Estimates')
 }
+
+
+#===============================================================================
+#Aggregate deaths from county to national
+#===============================================================================
+
+counties = dimnames(census.manager$data$deaths$estimate$census.deaths$census$year__location)$location #3133 counties
+
+deaths.by.county = census.manager$pull(
+    outcome = "deaths",
+    source = 'census.deaths', 
+    from.ontology.names = "census", 
+    dimension.values = list(location = counties), 
+    keep.dimensions = c('year'),
+    na.rm = T) 
+
+
+deaths.by.county = as.data.frame.table(deaths.by.county)%>%
+    mutate(year = as.character(year))%>%
+    mutate(value = as.numeric(Freq))%>%
+    mutate(outcome = "deaths")%>%
+    mutate(location = "US")%>%
+    select(-Freq, -source)
+
+    
+    census.manager$put.long.form(
+        data = deaths.by.county,
+        ontology.name = 'census',
+        source = 'census.deaths',
+        dimension.values = list(),
+        url = 'www.census.gov',
+        details = 'Census Postcensal Death Estimates')
