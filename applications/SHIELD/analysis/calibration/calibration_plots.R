@@ -22,7 +22,9 @@ get.jheem.root.directory()
 # }
 
 calibration.codes <- c(
-    "calib.10.15.stage3"
+    "calib.10.20.stage1",
+    "calib.10.19.stage1",
+    "calib.10.15.stage1"
 )
 
 # for (x in SHIELD.TEN.MSAS) {print(get.calibration.progress("shield",x,"calib.6.16.stage2.az"))}
@@ -32,7 +34,7 @@ calib.simsets <- load.calib.simsets(
     locations         =  SHIELD.TEN.MSAS,
     calibration.codes = calibration.codes,
     # n.sim = 250
-    n.sim = 1600
+    # n.sim = 1600
 )
 # smb://cloud.nas.jh.edu/jheem$/simulations/shield/calib.10.1.stage0-250/C.42660
 # ****************************************************************************************************
@@ -51,7 +53,7 @@ inspect_mixing (
 # >> Save summary plots for a calibration version (compares the fit accross all cities)
 # ****************************************************************************************************
 
-calib.name="calib.10.11.stage3"
+calib.name="calib.10.20.stage1"
 omit.data.years=2022:2024
 
 # 1-compare accross various locations ----
@@ -237,10 +239,10 @@ save_summary_plots_by_location2<-function(calibration.code,folder.name,location=
                           plot.which = "sim.only"
     )
 }
-# save_summary_plots_by_location2(calibration.code =c("calib.10.11.stage0",
-#                                                    "calib.10.11.stage1",
-#                                                    "calib.10.11.stage2"),
-#                                folder.name = paste0("calib.10.11.stage012.debug"),location = SHIELD.TEN.MSAS[1],sim.subset="full")
+save_summary_plots_by_location2(calibration.code =c("calib.10.15.stage1",
+                                                   "calib.10.19.stage1",
+                                                   "calib.10.20.stage1"),
+                               folder.name = paste0("calib.15-20.stage1.debug"),location = SHIELD.TEN.MSAS,sim.subset="full")
 
 # **********************************************************************************************************************************************************
 # >> compare_calibrations_by_outcome ----
