@@ -235,7 +235,7 @@ deaths.total = as.data.frame.table(census.manager$data$deaths$estimate$census.de
 # National Level Death Data -----------------------------------------------
 
 #from census
-national.deaths.total <- as.data.frame.table(census.manager$data$deaths$estimate$census.population$census$year__location)%>%
+national.deaths.total <- as.data.frame.table(census.manager$data$deaths$estimate$census.deaths$census$year__location)%>%
   filter(location == "US")%>%
   mutate(outcome = "deaths")%>%
   mutate(year = as.character(year))%>%
