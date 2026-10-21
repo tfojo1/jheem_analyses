@@ -1,4 +1,3 @@
-#This file is being used as a draft to adjust the census processing to save as several smaller data managers that can be merged to cut processing time
 
 library(jheem2)
 library(tidyverse)
@@ -7,11 +6,14 @@ library(readxl)
 library(haven)
 library(locations)
 
-###############################################################################
+#===============================================================================
 
-#####POPULATION 2######
+#Section Population 2
 
-###############################################################################
+#This code processes Stratified Census population data from 2010-2023
+
+#===============================================================================
+
 
 census.manager = create.data.manager('census_manager', description='an additional data manager for census data')
 
