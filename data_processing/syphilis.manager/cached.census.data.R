@@ -4,15 +4,6 @@
 census.manager = load.data.manager(name="census.manager", file=file.path(Q_ROOT, "data_managers/census.manager.rdata"))
 
 
-#Population total 1970-2025
-population.total = as.data.frame.table(census.manager$data$population$estimate$census.population$census$year__location)%>%
-  rename(value = Freq)%>%
-  mutate(year = as.character(year))%>%
-  mutate(location = as.character(location))%>%
-  mutate(value = as.numeric(value))%>%
-  mutate(outcome = "population")%>%
-  filter(location != "51123" & location != "51515" & location != "51560" & location != "51780" & location != "46131")
-
 # THESE ARE ONTOLOGY = single.year.age.census ----------------------------------------
 
 #Age 2020-2025 (SINGLE YEAR)
@@ -37,7 +28,6 @@ age.sex.20.25 = as.data.frame.table(census.manager$data$population$estimate$cens
 
 #Combine
 population.data.list = list(
-  population.total,
   population.age.20.25,
   age.sex.20.25
   
@@ -49,14 +39,23 @@ for (data in population.data.list) {
 
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'census', #need to change the racial groups
+    ontology.name = 'single.year.age.census', #need to change the racial groups
     source = 'census.population', 
     dimension.values = list(),
     url = 'www.census.gov',
     details = 'Census Reporting')
 }
 
-# THESE ARE ONTOLOGY = STRATIFIED.CENSUS -----------------------
+# THESE ARE ONTOLOGY = CENSUS -----------------------
+
+#Population total 1970-2025
+population.total = as.data.frame.table(census.manager$data$population$estimate$census.population$census$year__location)%>%
+    rename(value = Freq)%>%
+    mutate(year = as.character(year))%>%
+    mutate(location = as.character(location))%>%
+    mutate(value = as.numeric(value))%>%
+    mutate(outcome = "population")%>%
+    filter(location != "51123" & location != "51515" & location != "51560" & location != "51780" & location != "46131")
 
 #Age 2000-2025 (AGE GROUP)
 population.age.00.25 = as.data.frame.table(census.manager$data$population$estimate$census.population$census$year__location__age)%>%
@@ -189,6 +188,7 @@ age.race.eth.sex = as.data.frame.table(census.manager$data$population$estimate$c
 # Put for ontology = stratified census ------------------------------------
 #Combine
 population.stratified.census = list(
+population.total,
   population.age.00.25,
   population.sex.00.25,
   population.race,
@@ -206,7 +206,7 @@ for (data in population.stratified.census) {
   
 data.manager$put.long.form(
   data = data,
-  ontology.name = 'stratified.census', 
+  ontology.name = 'census', 
   source = 'census.population', 
   dimension.values = list(),
   url = 'www.census.gov',

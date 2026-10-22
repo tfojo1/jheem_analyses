@@ -20,14 +20,8 @@
 proportion.msm.county <- as.data.frame.table(surveillance.manager$data$proportion.msm$estimate$emory$emory$year__location)%>% rename(proprtion.msm = Freq) %>% filter(str_detect(location, "^\\d{5}$"))%>%
     filter(year == "2013") %>% select(-year)
 
-#2010-2019
-male.population.county.1 <- as.data.frame.table(syphilis.manager$data$population$estimate$census.population$stratified.census$year__location__sex) %>% filter(sex == 'male')%>% rename(male.population.count = Freq)
-
-#2020-2023
-male.population.county.2 <- as.data.frame.table(syphilis.manager$data$population$estimate$census.population$census$year__location__sex) %>% filter(sex == 'male')%>% rename(male.population.count = Freq)
-
-#Combine separate years of population data into one data frame:
-male.population.data <- rbind(male.population.county.1, male.population.county.2)%>% filter(str_detect(location, "^\\d{5}$"))
+#2000-2025
+male.population.data <- as.data.frame.table(syphilis.manager$data$population$estimate$census.population$census$year__location__sex) %>% filter(sex == 'male')%>% rename(male.population.count = Freq)
 
 #Combine population data with MSM proportion data:
 all.male.data <- inner_join(male.population.data, proportion.msm.county, by=c( "location", "sex"))

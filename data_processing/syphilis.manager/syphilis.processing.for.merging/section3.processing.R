@@ -156,7 +156,7 @@ data.manager$register.source('cdc.wonder.aggregated.population', parent.source= 
 
 #Register Ontologies:
 data.manager$register.ontology(
-  'census',
+  'single.year.age.census',
   ont = ontology(
     year= NULL,
     location= NULL,
@@ -196,7 +196,7 @@ data.manager$register.ontology(     #This is for the births+births denominator d
     sex=c('male','female')
   ))
 data.manager$register.ontology(
-  'stratified.census',
+  'census',
   ont = ontology(
     year= NULL,
     location= NULL,
