@@ -8,7 +8,20 @@ Scripts and workflows for building, validating, and publishing data managers.
 2. The **merge workflow** downloads sections + dependencies, merges them, runs validation, and publishes a versioned release
 3. After reviewing the quality report, a **promotion workflow** marks a build as `latest`
 
-## Uploading Sections After a Local Rebuild
+Each manager has its own upload script and workflows. Both upload scripts read the
+same NAS folder (`data_managers/data.manager.merge/`) but take only their own files:
+
+| | Syphilis manager | HIV surveillance manager |
+|---|---|---|
+| Section files | `syphilis.manager_section1–4.rdata` | `surveillance.manager_section1–5.rdata` |
+| Upload | `scripts/upload_sections.R` | `scripts/upload_hiv_sections.R` |
+| Build workflow | Build Syphilis Manager | Build HIV Surveillance Manager |
+| Promote workflow | Promote Syphilis Manager | Promote HIV Surveillance Manager |
+| Steps | [Syphilis manager](#syphilis-manager) | [HIV surveillance manager](#hiv-surveillance-manager) |
+
+## Syphilis Manager
+
+### Uploading Syphilis Sections After a Local Rebuild
 
 After rebuilding one or more sections locally and saving to the Q: drive:
 
@@ -19,12 +32,12 @@ Rscript scripts/upload_sections.R /mnt/jheem_nas_share     # Linux (shield1)
 Rscript scripts/upload_sections.R /Volumes/jheem$          # macOS
 ```
 
-This uploads all 4 section files from `{nas}/data_managers/data.manager.merge/`
+This uploads the 4 syphilis section files from `{nas}/data_managers/data.manager.merge/`
 to the `syphilis-sections-latest` release. The merge workflow will pick them up.
 
 **Requires:** `gh` CLI installed and authenticated (`gh auth login`).
 
-## Triggering a Merge Build
+### Triggering a Syphilis Build
 
 Go to **Actions > Build Syphilis Manager > Run workflow** on GitHub, or:
 
@@ -40,7 +53,7 @@ If the structure has changed intentionally (new outcomes, removed stratification
 set `update_spec=true` to regenerate the spec. The release notes will include a
 summary of what changed.
 
-## Reading the Build Results
+### Reading the Build Results
 
 Each successful build creates a release like `syphilis-manager-v2026.03.11`.
 The release notes contain:
@@ -49,19 +62,19 @@ The release notes contain:
 - **Spec Changes** (if spec was updated) — what structural changes occurred vs the previous spec
 - **Validation Report** — structural check results + data quality summary
 
-### Structural Validation (pass/fail)
+#### Structural Validation (pass/fail)
 
 Checks that the built manager matches the expected spec. Failures mean
 something is missing or changed unexpectedly. Warnings are informational
 (e.g., new years of data added).
 
-### Data Quality Report (informational)
+#### Data Quality Report (informational)
 
 - **NA Analysis** — percentage of empty cells per stratification
 - **Component Consistency** — totals >= sum of components
 - **Marginal Consistency** — demographic breakdowns sum to aggregates
 
-## Promoting a Build
+### Promoting a Syphilis Build
 
 After reviewing the quality report:
 
