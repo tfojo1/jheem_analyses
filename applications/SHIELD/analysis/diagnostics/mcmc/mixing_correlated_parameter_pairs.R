@@ -48,13 +48,13 @@
 # ****************************************************************************************************
 
 # specification (SHIELD.FULL.PARAMETERS.SAMPLING.BLOCKS), dplyr and helpers/mcmc_helpers.R
-# (.mcmc.key, .city.name, .get.samples, .diagnostics.dir)
+# (.mcmc.key, .city.name, .get.samples, .cache.dir, .mixing.dir)
 source("../jheem_analyses/applications/SHIELD/analysis/diagnostics/diagnostics_setup.R")
 
 # ---- SETUP ----
 # CALIBRATION.CODE and LOCATIONS are set in diagnostics_setup.R
-MCMC.CACHE.DIR   <- .diagnostics.dir("mcmc_cache")   # same cache as mixing_check.R
-REPORT.DIR       <- .diagnostics.dir("reports")
+MCMC.CACHE.DIR   <- .cache.dir()                       # same cache as mixing_check.R
+REPORT.DIR       <- .mixing.dir(CALIBRATION.CODE)      # calibration_diagnostics/<code>/mixing/
 dir.create(REPORT.DIR, recursive = TRUE, showWarnings = FALSE)
 
 R.FLAG <- 0.8    # |r.within| above this = strong trade-off

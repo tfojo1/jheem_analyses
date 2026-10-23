@@ -31,7 +31,7 @@
 source("../jheem_analyses/applications/SHIELD/analysis/diagnostics/diagnostics_setup.R")
 
 # ---- SETUP ----
-# Outputs are saved on the server (shared with the team): <jheem root>/shield/mcmc_diagnostics/
+# Outputs are saved on the server (shared with the team): <jheem root>/shield/calibration_diagnostics/<code>/mixing/
 # To change the PASS / CHECK / FAIL cut-offs, edit MIXING.THRESHOLDS here after sourcing the helpers,
 # e.g. MIXING.THRESHOLDS$ess.min <- 200
 
@@ -69,7 +69,7 @@ plot.mcmc.diagnostics(m, d, title = .city.name(loc))
 # 6. Compare two calibrations
 # compare.calibration.mixing(LOCATIONS, c("calib.10.15.stage3", CALIBRATION.CODE))
 
-# 7. Shareable report: one HTML file (+ 2 CSVs) in <jheem root>/shield/mcmc_diagnostics/reports, to send to the team
+# 7. Shareable report: one HTML file (+ 2 CSVs) in calibration_diagnostics/<code>/mixing/, to send to the team
 write.mixing.report(LOCATIONS, CALIBRATION.CODE)
 
 # 8. Likelihood breakdown (slow: loads each city's simset and likelihood, one city at a time)

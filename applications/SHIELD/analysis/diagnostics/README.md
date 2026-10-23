@@ -6,12 +6,14 @@
 2. Optional: source `diagnostics_setup.R` once ahead of time, to load the specification and helpers.
 3. Run any script below from `jheem_analyses`. Each one sources `diagnostics_setup.R` itself, and
    the heavy files load only once per R session.
+4. Or run several at once: switch them on in `run_diagnostics.R` and source that file.
 
 Outputs:
 
 1. `fit/` and `prior/` write to `<jheem root>/shield/calibration_diagnostics/<calibration code>/`
    (data-only scripts write to `calibration_diagnostics/data_only/`)
-2. `mcmc/` writes to `<jheem root>/shield/mcmc_diagnostics/`
+2. `mcmc/` writes to `calibration_diagnostics/<calibration code>/mixing/` (plots in `mixing/plots/`);
+   only its MCMC cache stays in `<jheem root>/shield/mcmc_diagnostics/mcmc_cache/`
 
 ## Files
 

@@ -21,12 +21,17 @@
 
 library(bayesian.simulations)
 
-# Default folders, on the server (shared with the team): <jheem root>/shield/mcmc_diagnostics/<sub>
-#  mcmc_cache - slimmed MCMCs, for fast re-loading (load.mcmc)
-#  plots      - PDFs from save.mixing.plots()
-#  reports    - HTML reports from write.mixing.report()
+# Default folders, on the server (shared with the team):
+#  1. outputs, in the same calibration folder as the fit and prior diagnostics:
+#     <jheem root>/shield/calibration_diagnostics/<calibration code>/mixing/
+#       reports and CSVs - from write.mixing.report() and mixing_correlated_parameter_pairs.R
+#       plots/           - PDFs from save.mixing.plots()
+#  2. mcmc_cache: <jheem root>/shield/mcmc_diagnostics/mcmc_cache/
+#     slimmed MCMCs, for fast re-loading (load.mcmc); not an output, so it stays here and old caches are reused
 # Worked out when a function is called, so sourcing this file does not need the root directory yet.
-.diagnostics.dir <- function(sub) file.path(get.jheem.root.directory(), "shield", "mcmc_diagnostics", sub)
+.mixing.dir <- function(calibration.code, sub = "") file.path(get.jheem.root.directory(), "shield", "calibration_diagnostics",
+                                                              calibration.code, "mixing", sub)
+.cache.dir  <- function() file.path(get.jheem.root.directory(), "shield", "mcmc_diagnostics", "mcmc_cache")
 
 # Thresholds used to flag a city (used by mixing.verdict)
 MIXING.THRESHOLDS <- list(
@@ -63,7 +68,7 @@ if (!exists("diag.list")) diag.list <- list()
 # 3. Otherwise assembles from the calibration, drops the simulations, and saves it
 #    (only saved to disk if all chains are complete, so a partial run is not reused later)
 load.mcmc <- function(locations, calibration.code,
-                      cache.dir = .diagnostics.dir("mcmc_cache"),
+                      cache.dir = .cache.dir(),
                       n.cores = 4,
                       force.reload = FALSE) {
     dir.create(cache.dir, showWarnings = FALSE, recursive = TRUE)
@@ -382,7 +387,7 @@ burn.in.check <- function(m, fractions = c(0, 0.25, 0.5)) {
 
 
 # ---- 3f. Save diagnostic plots to one PDF per city ----
-save.mixing.plots <- function(locations, calibration.code, folder = .diagnostics.dir("plots"), n.worst = 9) {
+save.mixing.plots <- function(locations, calibration.code, folder = .mixing.dir(calibration.code, "plots"), n.worst = 9) {
     dir.create(folder, showWarnings = FALSE, recursive = TRUE)
     for (loc in unname(locations)) {
         key <- .mcmc.key(loc, calibration.code)
@@ -506,7 +511,7 @@ run.likelihood.breakdown <- function(locations, calibration.code, force.recomput
 #  5. If include.likelihood = TRUE: the likelihood breakdown from 3i (slow, so off by default)
 # Also writes the overview and all per-parameter stats as CSV files next to it.
 write.mixing.report <- function(locations, calibration.code,
-                                folder = .diagnostics.dir("reports"),
+                                folder = .mixing.dir(calibration.code),
                                 n.worst.params = 15,
                                 n.trace.params = 9,
                                 include.plots = TRUE,

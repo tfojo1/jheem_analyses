@@ -44,7 +44,7 @@ if (is.null(LOCATIONS)) LOCATIONS <- SHIELD.TEN.MSAS
 # 1. OUT.DIR      = the folder for CALIBRATION.CODE
 # 2. out.dir(code) = the folder for any other code (for scripts that loop over CALIBRATION.CODES)
 # 3. DATA.OUT.DIR = outputs from data-only scripts, which do not depend on a calibration
-# the mixing scripts save under shield/mcmc_diagnostics/ (see helpers/mcmc_helpers.R)
+# the mixing scripts save in <calibration code>/mixing/ (see helpers/mcmc_helpers.R)
 out.dir <- function(code = CALIBRATION.CODE) {
     d <- file.path(get.jheem.root.directory(), "shield", "calibration_diagnostics", code)
     dir.create(d, recursive = TRUE, showWarnings = FALSE)
