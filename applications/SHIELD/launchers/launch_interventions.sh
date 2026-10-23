@@ -100,8 +100,8 @@ all_except_ten_cities=(
 )
 
 shield3=(
-      C.12060 C.12580 C.16980 C.26420 C.31080
-    C.33100 C.37980 C.38060 
+  C.12060 C.12580 C.16980 C.26420 C.31080
+  C.33100 C.35620 C.37980 C.38060 C.42660 
 )
 # ── set active cities and calibration codes here ───────────────────────────────
 CITIES=("${shield3[@]}")
@@ -110,7 +110,7 @@ CITIES=("${shield3[@]}")
 MAX_JOBS=32
 
 CALIBRATION_CODES=(
-    calib.9.23.stage3.pk
+    calib.10.20.stage3.pk
 )
 
 N_SIM=400
