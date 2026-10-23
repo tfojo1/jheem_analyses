@@ -365,7 +365,7 @@ het_sexualActivity_sdlog <- 0.5*log(2)
 #   fraction of the 18-19 value = (3 * 0.4 + 2) / 5 = 0.64
 #
 # Why: in calib.10.15.stage3 the model over-predicted diagnoses at 15-19 in all 10 cities
-# (total 1.2-2.4x the data), while 20-24 fit well (see analysis/diagnostics/check_fit_by_age.R).
+# (total 1.2-2.4x the data), while 20-24 fit well (see analysis/diagnostics/fit/check_fit_by_age.R).
 ratio.15.17.to.18.19 <- mean(c(23.6/65.3, 27.6/61.4,     # female 2015-2017, 2017-2019
                                23.1/58.7, 23.2/62.7))    # male   2015-2017, 2017-2019
 FRACTION.15.19.OF.18.19 <- (3 * ratio.15.17.to.18.19 + 2) / 5   # 0.64

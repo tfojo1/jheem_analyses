@@ -117,6 +117,17 @@ register.calibration.info("calib.10.20.stage3",
                           n.iter = 20000, thin = 50, is.preliminary = F, 
                           n.burn = 0, n.chains = 4, max.run.time.seconds = 30, description = "NA"
 )
+register.calibration.info("calib.10.20.stage4",
+                          preceding.calibration.codes = 'calib.10.20.stage2',
+                          likelihood.instructions = lik.inst.stage3,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(
+                              SHIELD.FULL.PARAMETERS.PRIOR@var.names
+                          ),
+                          n.iter = 250000, thin = 50, is.preliminary = F, 
+                          n.burn = 0, n.chains = 4, max.run.time.seconds = 30, description = "NA"
+)
 # #10.11
 # # Using the new manager
 # # Including historical penalty likelihood in STAGE.0
