@@ -1,0 +1,311 @@
+---
+title: "MSM share of men: Emory vs BRFSS, and where SHIELD sits"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+params:
+  calibration.code: ""
+  run.model: true
+---
+
+```{r setup, include = FALSE}
+# How to run:
+# 1. Knit in RStudio, or from the console:
+#    rmarkdown::render("applications/SHIELD/analysis/diagnostics/reports/msm_share_emory_vs_brfss.Rmd", envir = globalenv())
+#    (envir = globalenv() reuses SURVEILLANCE.MANAGER and calib.simsets if they are already loaded)
+# 2. Set run.model = FALSE to skip section 6 (it loads one simset per city, which is slow)
+# 3. Sections 1-5 only need the surveillance manager
+# 4. The calibration comes from diagnostics_setup.R; params$calibration.code overrides it for this report only
+# EASIER OPTION From console:
+# out <- rmarkdown::render("applications/SHIELD/analysis/diagnostics/reports/msm_share_emory_vs_brfss.Rmd", envir = globalenv())
+# browseURL(out)
+# To change the settings from the console, add params:
+# out <- rmarkdown::render("applications/SHIELD/analysis/diagnostics/reports/msm_share_emory_vs_brfss.Rmd",
+#                          envir = globalenv(),
+#                          params = list(calibration.code = "calib.10.20.stage2", run.model = TRUE))
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.width = 9, fig.height = 5)
+knitr::opts_knit$set(root.dir = normalizePath("../../../../.."))   # jheem_analyses
+```
+
+```{r sources}
+source("../jheem_analyses/applications/SHIELD/analysis/diagnostics/diagnostics_setup.R")
+if (nzchar(params$calibration.code)) CALIBRATION.CODE <- params$calibration.code
+
+## DATA ----
+# 1. Emory: proportion of men who are MSM (states, MSAs, counties), 2013 and 2020
+# 2. Emory: estimated MSM counts by state, 2010-2023
+# 3. BRFSS: proportion of men who are MSM, states only, 2014-2024
+emory.prop  <- SURVEILLANCE.MANAGER$data$proportion.msm$estimate$emory$emory$year__location
+emory.count <- SURVEILLANCE.MANAGER$data$estimated.count.msm$estimate$emory.aggregated$emory$year__location
+brfss       <- SURVEILLANCE.MANAGER$data$proportion.msm$estimate$brfss$brfss.msm$year__location
+county.pop  <- SURVEILLANCE.MANAGER$data$population$estimate$census.population$census$year__location   # counties
+
+STATES <- intersect(c(state.abb, "DC"), intersect(colnames(brfss), colnames(emory.prop)))
+EARLY  <- c("2014", "2015", "2016")   # BRFSS years closest to Emory 2013
+LATE   <- c("2022", "2023", "2024")
+
+# state of each city's main city (multi-state MSAs also overlap other states)
+MAIN.STATE <- c(Atlanta = "GA", Baltimore = "MD", Chicago = "IL", Houston = "TX", LA = "CA",
+                Miami = "FL", NYC = "NY", Philadelphia = "PA", Phoenix = "AZ", Seattle = "WA")
+CITY.STATES <- lapply(SHIELD.TEN.MSAS, function(loc) unname(locations::get.overlapping.locations(loc, "state")))
+
+## brfss.mean ----
+# mean BRFSS value over the given years and states (NA if there is no data)
+brfss.mean <- function(states, years = rownames(brfss)) {
+    x <- mean(brfss[intersect(years, rownames(brfss)), intersect(states, colnames(brfss))], na.rm = TRUE)
+    if (is.finite(x)) x else NA
+}
+pct <- function(x, digits = 1) round(100 * x, digits)
+
+# BRFSS early vs late, in the states that have both (used in the summary and section 1)
+early <- sapply(STATES, brfss.mean, years = EARLY)
+late  <- sapply(STATES, brfss.mean, years = LATE)
+both  <- is.finite(early) & is.finite(late)
+```
+
+## Summary
+
+The two sources disagree in ways that matter for calibrating the MSM population:
+
+1. **BRFSS rises over time.** In the `r sum(both)` states with data in both periods, it goes from `r pct(mean(early[both]))`% in 2014–2016 to `r pct(mean(late[both]))`% in 2022–2024. So which BRFSS years we use changes the answer.
+Note: BRFSS asks about sexual identity not sexual history. 
+2. **Emory's 2013 and 2020 numbers don't fit together.** Its 2020 proportions are about half of 2013, but its counts went up. We use 2013 only.
+3. **At state level, Emory and BRFSS agree only roughly.** How well depends on the BRFSS years (section 3).
+4. **At MSA level, Emory is above BRFSS for the city's states in all 10 of our cities** (section 4).
+5. **Emory's MSA value is above its state's in large metros.** Metros over 1 million are usually above their state, and smaller metros are usually below it (section 5). So comparing an MSA with statewide BRFSS is biased in a direction that depends on the size of the metro.
+6. **The SHIELD model is anchored to Emory MSA 2013.** It sits close to Emory and above BRFSS in most cities (section 6).
+
+## 1. BRFSS rises over time
+
+Each grey point is a state in one year, spread out sideways a little because BRFSS values in the manager are rounded to whole percents. The black line is the mean across states that year. The numbers show how many states have data that year.
+
+```{r brfss-trend}
+brfss.long <- data.frame(year  = as.numeric(rep(rownames(brfss), times = length(STATES))),
+                         state = rep(STATES, each = nrow(brfss)),
+                         value = c(brfss[, STATES]))
+brfss.long <- brfss.long[is.finite(brfss.long$value), ]
+yearly <- aggregate(value ~ year, brfss.long, function(x) c(mean = mean(x), n = length(x)))
+yearly <- data.frame(year = yearly$year, mean = yearly$value[, "mean"], n = yearly$value[, "n"])
+
+ggplot(brfss.long, aes(year, 100 * value)) +
+    geom_jitter(width = 0.2, height = 0, colour = "grey60", alpha = 0.6) +
+    geom_line(data = yearly, aes(year, 100 * mean), linewidth = 1) +
+    geom_point(data = yearly, aes(year, 100 * mean), size = 2) +
+    geom_text(data = yearly, aes(year, 100 * max(brfss.long$value) + 0.4, label = n), size = 3) +
+    scale_x_continuous(breaks = yearly$year) +
+    labs(x = NULL, y = "% of men who are MSM", title = "BRFSS by state, 2014-2024") +
+    theme_bw()
+```
+
+Is the rise just new states joining? Here are the same states early and late:
+
+```{r brfss-same-states}
+data.frame(states.with.both = sum(both),
+           mean.2014.16 = pct(mean(early[both]), 2),
+           mean.2022.24 = pct(mean(late[both]), 2),
+           late.over.early = round(mean(late[both]) / mean(early[both]), 2),
+           states.that.rose = sum(late[both] > early[both]))
+```
+
+## 2. Emory 2013 vs 2020
+
+From 2013 to 2020, Emory's proportions drop by about half while its counts go up. So the two years must use different denominators. Only 2013 is used below.
+
+```{r emory-2013-2020}
+st <- intersect(STATES, colnames(emory.count))
+emory.check <- data.frame(state = st,
+                          prop.2013  = pct(emory.prop["2013", st], 2),
+                          prop.2020  = pct(emory.prop["2020", st], 2),
+                          count.2013 = round(emory.count["2013", st]),
+                          count.2020 = round(emory.count["2020", st]))
+emory.check$prop.ratio  <- round(emory.check$prop.2020 / emory.check$prop.2013, 2)
+emory.check$count.ratio <- round(emory.check$count.2020 / emory.check$count.2013, 2)
+data.frame(states = nrow(emory.check),
+           median.prop.2020.over.2013  = median(emory.check$prop.ratio),
+           median.count.2020.over.2013 = median(emory.check$count.ratio))
+```
+
+## 3. Emory vs BRFSS at state level
+
+Each point is a state. The dashed line means the two sources are equal; the dotted lines are ±20%. The left panel uses the BRFSS years closest to 2013; the right panel uses all BRFSS years.
+
+```{r state-agreement, fig.height = 5.5}
+state.tab <- data.frame(state = STATES,
+                        emory = emory.prop["2013", STATES],
+                        early = sapply(STATES, brfss.mean, years = EARLY),
+                        all   = sapply(STATES, brfss.mean))
+state.long <- rbind(data.frame(state = STATES, emory = state.tab$emory, brfss = state.tab$early, window = "BRFSS 2014-2016"),
+                    data.frame(state = STATES, emory = state.tab$emory, brfss = state.tab$all,   window = "BRFSS 2014-2024"))
+state.long <- state.long[is.finite(state.long$brfss), ]
+state.long$ours <- ifelse(state.long$state %in% unlist(CITY.STATES), "overlaps our 10 MSAs", "other states")
+
+ggplot(state.long, aes(100 * brfss, 100 * emory, label = state, colour = ours)) +
+    geom_abline(slope = 1, intercept = 0, linetype = 2, colour = "grey50") +
+    geom_abline(slope = c(0.8, 1.2), intercept = 0, linetype = 3, colour = "grey70") +
+    geom_text(size = 2.8) +
+    facet_wrap(~ window) + coord_equal() +
+    scale_colour_manual(values = c("other states" = "grey40", "overlaps our 10 MSAs" = "firebrick")) +
+    labs(x = "BRFSS (% of men)", y = "Emory 2013 (% of men)", colour = NULL) +
+    theme_bw() + theme(legend.position = "bottom")
+```
+
+```{r state-agreement-table}
+do.call(rbind, lapply(split(state.long, state.long$window), function(d) {
+    r <- d$emory / d$brfss
+    data.frame(brfss.years = d$window[1], states = nrow(d),
+               median.emory.over.brfss = round(median(r), 2),
+               within.20pct = sum(abs(r - 1) <= 0.2),
+               emory.higher.20pct = sum(r > 1.2),
+               emory.lower.20pct = sum(r < 0.8),
+               correlation = round(cor(d$emory, d$brfss), 2))
+}))
+```
+
+## 4. Emory vs BRFSS for our 10 cities
+
+BRFSS has no MSA-level data, so each city is compared with the average of the states it overlaps.
+As you can see, the Emory estiamte for urban MSAs are higher than those in the same city states (driven lower by rural areas)
+And in general, the Emory state estiamte is higher than BRFSS by a few percentage point. 
+
+```{r msa-agreement, fig.height = 5}
+city.tab <- data.frame(city        = names(SHIELD.TEN.MSAS),
+                       emory.msa   = emory.prop["2013", unname(SHIELD.TEN.MSAS)],
+                       emory.state = emory.prop["2013", MAIN.STATE[names(SHIELD.TEN.MSAS)]],
+                       brfss.early = sapply(CITY.STATES, brfss.mean, years = EARLY),
+                       brfss.all   = sapply(CITY.STATES, brfss.mean),
+                       states      = sapply(CITY.STATES, paste, collapse = ", "))
+city.long <- rbind(data.frame(city = city.tab$city, value = city.tab$emory.msa,   source = "Emory 2013, MSA"),
+                   data.frame(city = city.tab$city, value = city.tab$emory.state, source = "Emory 2013, main state"),
+                   data.frame(city = city.tab$city, value = city.tab$brfss.early, source = "BRFSS 2014-2016, states"),
+                   data.frame(city = city.tab$city, value = city.tab$brfss.all,   source = "BRFSS 2014-2024, states"))
+
+# cities sorted by their mean across sources; pos = their place on the y axis (1 = lowest)
+d <- city.long[is.finite(city.long$value), ]
+d$city <- reorder(d$city, d$value)
+d$pos  <- as.numeric(d$city)
+
+# one straight line per source, fitted across the cities (value ~ city position)
+ggplot(d, aes(100 * value, pos, colour = source, shape = source)) +
+    geom_smooth(aes(group = source), method = "lm", formula = y ~ x, orientation = "y", se = FALSE, linewidth = 0.7) +
+    geom_point(size = 3) +
+    scale_y_continuous(breaks = seq_along(levels(d$city)), labels = levels(d$city)) +
+    labs(x = "% of men who are MSM", y = NULL, colour = NULL, shape = NULL) +
+    theme_bw() + theme(legend.position = "bottom") + guides(colour = guide_legend(nrow = 2))
+```
+
+```{r msa-agreement-table}
+data.frame(city = city.tab$city, states = city.tab$states,
+           emory.msa = pct(city.tab$emory.msa, 2),
+           brfss.2014.16 = pct(city.tab$brfss.early, 2),
+           brfss.2014.24 = pct(city.tab$brfss.all, 2),
+           emory.over.brfss.2014.16 = round(city.tab$emory.msa / city.tab$brfss.early, 2),
+           emory.over.brfss.2014.24 = round(city.tab$emory.msa / city.tab$brfss.all, 2))
+```
+
+## 5. Emory: MSA vs its state
+
+### Our 10 cities
+
+```{r msa-vs-state-cities}
+data.frame(city = city.tab$city, main.state = MAIN.STATE[city.tab$city],
+           emory.msa = pct(city.tab$emory.msa, 2), emory.state = pct(city.tab$emory.state, 2),
+           msa.over.state = round(city.tab$emory.msa / city.tab$emory.state, 2))
+```
+
+### All metro areas that sit in one state
+
+Each point is a metro area that lies in a single state, plotted by population. Metros above 1 have a higher MSM share than their state. Our cities are in red. NYC, Chicago and Philadelphia span several states, so they're not in this plot.
+
+```{r msa-vs-state-all, fig.height = 5}
+msas   <- grep("^C\\.", colnames(emory.prop), value = TRUE)
+msas   <- msas[is.finite(emory.prop["2013", msas])]
+states <- lapply(msas, function(x) tryCatch(locations::get.overlapping.locations(x, "state"), error = function(e) character(0)))
+one    <- sapply(states, length) == 1
+msa.tab <- data.frame(msa = msas[one], state = unlist(states[one]))
+msa.tab <- msa.tab[msa.tab$state %in% colnames(emory.prop), ]
+msa.tab$ratio <- emory.prop["2013", msa.tab$msa] / emory.prop["2013", msa.tab$state]
+# metro population = sum of its counties in 2013
+msa.tab$pop   <- sapply(msa.tab$msa, function(x)
+    sum(county.pop["2013", intersect(locations::get.contained.locations(x, "county"), colnames(county.pop))], na.rm = TRUE))
+msa.tab <- msa.tab[is.finite(msa.tab$ratio) & msa.tab$pop > 0, ]
+msa.tab$ours <- msa.tab$msa %in% SHIELD.TEN.MSAS
+msa.tab$name <- names(SHIELD.TEN.MSAS)[match(msa.tab$msa, SHIELD.TEN.MSAS)]
+
+ggplot(msa.tab, aes(pop, ratio)) +
+    geom_hline(yintercept = 1, linetype = 2, colour = "grey50") +
+    geom_point(aes(colour = ours), alpha = 0.6) +
+    geom_smooth(method = "loess", se = FALSE, colour = "black", linewidth = 0.6) +
+    geom_text(data = msa.tab[msa.tab$ours, ], aes(label = name), colour = "firebrick", size = 3, vjust = -0.8) +
+    scale_x_log10(labels = scales::comma) +
+    scale_colour_manual(values = c(`FALSE` = "grey55", `TRUE` = "firebrick"), guide = "none") +
+    labs(x = "Metro population, 2013 (log scale)", y = "Emory MSA ÷ Emory state, 2013") +
+    theme_bw()
+```
+
+```{r msa-vs-state-all-table}
+msa.tab$size <- cut(msa.tab$pop, c(0, 250e3, 1e6, 3e6, Inf), labels = c("< 250k", "250k-1M", "1M-3M", "> 3M"))
+do.call(rbind, lapply(split(msa.tab, msa.tab$size), function(d)
+    data.frame(size = d$size[1], metros = nrow(d),
+               median.msa.over.state = round(median(d$ratio), 2),
+               share.above.state = round(mean(d$ratio > 1), 2))))
+```
+
+## 6. Where the model sits
+
+This section shows the model's MSM share of men aged 15+ for calibration ``r CALIBRATION.CODE``: the median line and the 95% band across simulations. The data points are:
+
+1. BRFSS by year, averaged over the city's states.
+2. Emory 2013 for the MSA, which is the model's starting value.
+3. Emory 2013 for the main state.
+
+```{r model, eval = params$run.model, fig.height = 9}
+YEARS <- 2000:2030
+calib.simsets <- load.calib.simsets(locations = SHIELD.TEN.MSAS, calibration.codes = CALIBRATION.CODE)
+
+## model.total ----
+# share of men aged 15+ who are MSM: median and 95% interval across sims, by year
+model.total <- function(simset) {
+    men <- function(sex) simset$get("population", keep.dimensions = "year",
+                                    dimension.values = list(year = YEARS, age = ADULT.AGES, sex = sex))   # year x sim
+    share <- men("msm") / men(c("msm", "heterosexual_male"))
+    q <- apply(share, 1, quantile, probs = c(0.025, 0.5, 0.975), na.rm = TRUE)                         # 3 x year
+    data.frame(year = as.numeric(colnames(q)), lo = q[1, ], median = q[2, ], hi = q[3, ])
+}
+entries <- Filter(function(e) e$calib.code == CALIBRATION.CODE, calib.simsets)
+model <- do.call(rbind, lapply(entries, function(e) cbind(city = e$location.name, model.total(e$full_simset))))
+
+# data points per city
+obs <- do.call(rbind, lapply(names(SHIELD.TEN.MSAS), function(city) {
+    b <- sapply(rownames(brfss), function(y) brfss.mean(CITY.STATES[[city]], years = y))
+    rbind(data.frame(city = city, year = as.numeric(names(b)), value = b, source = "BRFSS, states"),
+          data.frame(city = city, year = 2013, value = city.tab$emory.msa[city.tab$city == city],   source = "Emory 2013, MSA"),
+          data.frame(city = city, year = 2013, value = city.tab$emory.state[city.tab$city == city], source = "Emory 2013, main state"))
+}))
+obs <- obs[is.finite(obs$value) & obs$city %in% model$city, ]
+
+ggplot() +
+    geom_ribbon(data = model, aes(year, ymin = 100 * lo, ymax = 100 * hi), fill = "steelblue", alpha = 0.25) +
+    geom_line(data = model, aes(year, 100 * median), colour = "steelblue") +
+    geom_point(data = obs, aes(year, 100 * value, colour = source, shape = source), size = 2) +
+    facet_wrap(~ city, ncol = 2, scales = "free_y") +
+    labs(x = NULL, y = "% of men aged 15+ who are MSM", colour = NULL, shape = NULL,
+         title = paste("Model vs Emory and BRFSS:", CALIBRATION.CODE)) +
+    theme_bw() + theme(legend.position = "bottom")
+```
+
+The table compares the model median in 2013 with Emory, and in the BRFSS years with BRFSS.
+
+```{r model-table, eval = params$run.model}
+do.call(rbind, lapply(unique(model$city), function(city) {
+    m  <- model[model$city == city, ]
+    m13 <- m$median[m$year == 2013]
+    data.frame(city = city,
+               model.2013 = pct(m13, 2),
+               model.over.emory.msa   = round(m13 / city.tab$emory.msa[city.tab$city == city], 2),
+               model.over.emory.state = round(m13 / city.tab$emory.state[city.tab$city == city], 2),
+               model.over.brfss.2014.16 = round(mean(m$median[m$year %in% 2014:2016]) / city.tab$brfss.early[city.tab$city == city], 2),
+               model.over.brfss.2014.24 = round(mean(m$median[m$year %in% 2014:2024]) / city.tab$brfss.all[city.tab$city == city], 2))
+}))
+```

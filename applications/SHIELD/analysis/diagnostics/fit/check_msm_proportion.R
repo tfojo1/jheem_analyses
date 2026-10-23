@@ -17,22 +17,17 @@
 # 5. table: model / data, and the calibrated multipliers
 #
 # Simsets already in memory (calib.simsets) are reused; anything missing is loaded from file.
-# Run from jheem_analyses.
+#
+# USAGE
+#   1. set CALIBRATION.CODE (and LOCATIONS) in diagnostics_setup.R
+#   2. from jheem_analyses:  source("applications/SHIELD/analysis/diagnostics/fit/check_msm_proportion.R")
 # ****************************************************************************************************
 
-## SETTINGS ----
-CALIBRATION.CODE <- "calib.10.15.stage3"
-LOCATIONS        <- NULL       # NULL = all 10 cities; or e.g. c(Baltimore = "C.12580")
-YEARS            <- 2000:2030  # model years to plot
-
 ## SOURCES ----
-# only source what is not already loaded, so re-running in the same session is quick
-if (!exists("SURVEILLANCE.MANAGER"))  source("../jheem_analyses/applications/SHIELD/shield_source_code.R")
-if (!exists("SHIELD.SPECIFICATION"))  source("../jheem_analyses/applications/SHIELD/shield_specification.R")
-if (!exists("SHIELD.TEN.MSAS"))       source("../jheem_analyses/commoncode/locations_of_interest.R")
-if (!exists("load.calib.simsets"))    source("../jheem_analyses/applications/SHIELD/analysis/calibration/calibration_helper_functions.R")
-library(ggplot2)
-if (is.null(LOCATIONS)) LOCATIONS <- SHIELD.TEN.MSAS
+source("../jheem_analyses/applications/SHIELD/analysis/diagnostics/diagnostics_setup.R")
+
+## SETTINGS ----
+YEARS            <- 2000:2030  # model years to plot
 
 ## LOAD SIMSETS ----
 calib.simsets <- load.calib.simsets(locations         = LOCATIONS,
@@ -140,8 +135,6 @@ cat("\n== Calibrated multipliers on the starting MSM share (median; 1 = unchange
 print(round(do.call(rbind, mults), 3))
 
 ## SAVE ----
-out.dir <- file.path(get.jheem.root.directory(), "shield", "calibration_diagnostics")
-dir.create(out.dir, recursive = TRUE, showWarnings = FALSE)
-ggsave(file.path(out.dir, paste0("msm_share_", CALIBRATION.CODE, ".pdf")), p,
+ggsave(file.path(OUT.DIR, paste0("msm_share_", CALIBRATION.CODE, ".pdf")), p,
        width = 11, height = 2.2 * length(unique(model$city)), limitsize = FALSE)
-write.csv(ratio.table, file.path(out.dir, paste0("msm_share_", CALIBRATION.CODE, ".csv")), row.names = FALSE)
+write.csv(ratio.table, file.path(OUT.DIR,paste0("msm_share_", CALIBRATION.CODE, ".csv")), row.names = FALSE)

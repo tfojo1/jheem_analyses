@@ -5,11 +5,11 @@
 # Reads the raw MCMC (not the simsets), because acceptance rates only live there.
 #
 # This file only sets things up and runs the diagnostics.
-# The functions live in diagnostic_helpers.R - source that file alone to use them in other code.
+# The functions live in helpers/mcmc_helpers.R - source that file alone to use them in other code.
 #
 # How to use:
-#  1. Set LOCATIONS and CALIBRATION.CODE in the SETUP section
-#     (start with one city to test, then switch to SHIELD.TEN.MSAS)
+#  1. Set CALIBRATION.CODE and LOCATIONS in diagnostics_setup.R
+#     (start with one city to test, then switch to all 10)
 #  2. Source the file up to "RUN", then run the RUN section line by line
 #
 # What each statistic tells you:
@@ -27,15 +27,10 @@
 #  8. Log-likelihood by chain - if one chain sits much lower, it is stuck in a worse spot.
 # ****************************************************************************************************
 
-source('../jheem_analyses/commoncode/locations_of_interest.R')
-source("../jheem_analyses/applications/SHIELD/shield_specification.R")   # also sets the jheem root dir
-source("../jheem_analyses/applications/SHIELD/shield_likelihoods.R")      # likelihood instructions (for 3i)
-source("../jheem_analyses/applications/SHIELD/shield_calib_register.R")   # so get.calibration.info() finds the run settings
-source("../jheem_analyses/applications/SHIELD/analysis/diagnostics/diagnostic_helpers.R")   # all the functions
+# specification, calibration register (+ likelihoods) and helpers/mcmc_helpers.R
+source("../jheem_analyses/applications/SHIELD/analysis/diagnostics/diagnostics_setup.R")
 
 # ---- SETUP ----
-CALIBRATION.CODE <- "calib.9.23.stage3.pk"
-LOCATIONS        <- SHIELD.TEN.MSAS      # test with one city first; then use SHIELD.TEN.MSAS
 # Outputs are saved on the server (shared with the team): <jheem root>/shield/mcmc_diagnostics/
 # To change the PASS / CHECK / FAIL cut-offs, edit MIXING.THRESHOLDS here after sourcing the helpers,
 # e.g. MIXING.THRESHOLDS$ess.min <- 200
@@ -72,7 +67,7 @@ plot.mcmc.diagnostics(m, d, title = .city.name(loc))
 # params.failing.across.cities(LOCATIONS, CALIBRATION.CODE)
 
 # 6. Compare two calibrations
-# compare.calibration.mixing(LOCATIONS, c("calib.9.23.stage3", "calib.9.23.stage3.pk"))
+# compare.calibration.mixing(LOCATIONS, c("calib.10.15.stage3", CALIBRATION.CODE))
 
 # 7. Shareable report: one HTML file (+ 2 CSVs) in <jheem root>/shield/mcmc_diagnostics/reports, to send to the team
 write.mixing.report(LOCATIONS, CALIBRATION.CODE)

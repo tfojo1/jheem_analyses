@@ -1,0 +1,312 @@
+---
+title: "MSM and heterosexual transmission prior: review and options"
+date: "2026-10-22"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+```
+
+# 1. Purpose and status
+
+This note records what we learned about the prior on the MSM and heterosexual transmission multipliers
+(`transmission.rate.multipliers.by.sex` in `applications/SHIELD/shield_calib_parameters.R`), and the
+structural changes we may consider.
+
+1. **Nothing in this note has been changed in the model.** `calib.10.20.stage1` is running with the prior as it is.
+2. `calib.10.20.stage1` is the first fit whose likelihood sees male P&S diagnoses by sex before 2019
+   (see section 8). Decide on the changes below after it finishes.
+3. Numbers from the data were made with `prior/check_spline_prior_against_data.R` and
+   syphilis-manager-v2026.10.09. Numbers from the fits come from `calib.10.15.stage3`.
+
+# 2. The prior as it is now
+
+```{r prior-now}
+transmission.rate.multipliers.by.sex = make.joint.mv.spline.prior(
+    parameters          = paste0("transmission.rate.multiplier.", c("msm", "heterosexual")),
+    logmean.baseline    = c(log(3), log(1)),                    # 2000 medians: msm 3, het 1
+    logsd.baseline      = c(log(2)*2, log(2)*2),                # 95% range x/÷ 16, msm and het independent
+    logsd.deltas.past   = c("1970" = 0.5*log(TRATE_DELTA^2),    # 1970-1990
+                            "1990" = 0.5*log(sqrt(TRATE_DELTA)),# 1990-1995
+                            "1995" = 0.5*log(sqrt(TRATE_DELTA))),# 1995-2000
+    logsd.deltas.future = c("2010" = 0.5*log(TRATE_DELTA),      # 2000-2010
+                            "2022" = 0.5*log(TRATE_DELTA)),     # 2010-2022
+    spline.times        = c("1970", "1990", "1995", "2000", "2010", "2022"),
+    correlation         = 0.7)
+# TRATE_DELTA = 1.5
+```
+
+How to read it:
+
+1. Each group (MSM, heterosexual) has a value at 2000 (the baseline) and a change ("delta") for each step
+   between spline years. Values between spline years are drawn as straight lines.
+2. Each change is on the log scale: 0 = no change, +0.69 = doubled, -0.69 = halved.
+3. Each change has mean 0 ("no change expected") and an SD set by `TRATE_DELTA`.
+4. Within the same step, the MSM and heterosexual changes are correlated (0.7). Different steps are independent.
+   The 2000 baselines are independent (the code resets the baseline block to diagonal).
+
+The assumptions, with their current values:
+
+| | Assumption | Current value |
+|---|---|---|
+| 1 | Spline points | 1970, 1990, 1995, 2000, 2010, 2022 |
+| 2 | Baseline medians (2000) | MSM 3, heterosexual 1 |
+| 3 | Baseline spread | SD 1.39 (95% x/÷ 16), MSM and het independent |
+| 4 | **A. Expected change in each step** | **0** for both groups |
+| 5 | Spread of each change | per-group SD 0.405 (1970-1990), **0.101** (each 5-year step), **0.203** (each 10-year step) |
+| 6 | **B. How the SD grows with the step length** | **in proportion to years** (5 years = half of 10, 20 years = double) |
+| 7 | **C. MSM-het correlation of change** | **0.7**, the same for every step |
+| 8 | Steps independent of each other | yes |
+
+The SD of the change in the MSM:heterosexual ratio is the per-group SD x sqrt(2 x (1 - 0.7)) = per-group SD x 0.775:
+0.079 for a 5-year step and 0.157 for a 10-year step.
+
+History: `TRATE_DELTA` was 3 at calib.10.1. We lowered it to 1.5 after a calibration gave very high diagnoses
+before 1990, and at the same time added the historical diagnosis penalty for 1970-1989. Since 10.15 that
+penalty has effective weight 1 in every stage (4-32x stronger than before), so it now holds pre-1990 trends itself.
+
+# 3. Evidence from the fits (calib.10.15.stage3)
+
+## 3.1 Parameters pressed against the prior
+
+Percentile of the posterior median among 10,000 prior draws (`check_prior_and_ps_el_split.R`, now `prior/check_prior_position.R`); flagged below 2.5% (LOW) or above 97.5% (HIGH).
+
+| Change | Flagged |
+|---|---|
+| MSM - het, 1995-2000 | HIGH in 4 (Chicago, Houston, NYC, Philadelphia); LOW in Phoenix |
+| MSM - het, 2000-2010 | HIGH in 5 (Atlanta, Chicago, LA, Miami, NYC) |
+| MSM, 1990-1995 | LOW in 3 (Houston, LA, NYC) |
+| MSM, 1995-2000 | HIGH in 3 (Houston, Miami, NYC); LOW in Phoenix |
+| Het, 2000-2010 | LOW in 2 (LA, NYC) |
+| MSM - het, 2010-2022 | LOW in LA only |
+| Care-seeking, symptomatic women | LOW in 6 (Houston, LA, Miami, NYC, Phoenix, Seattle) |
+
+Being pressed against the prior is not a problem on its own. It matters only when it comes with a misfit.
+
+## 3.2 The misfit: P&S male:female ratio, model / data (`check_ps_by_sex_over_time.R`, now part of `fit/check_fit_by_sex_over_time.R`)
+
+| Period | Male:female, model / data (range over 10 cities) | Male P&S, model / data |
+|---|---|---|
+| 1993-1999 | 1.40 - 2.32 (too high everywhere) | 0.90 - 1.86 |
+| 2000-2004 | 0.44 - 1.75 | 0.46 - 1.43 |
+| 2005-2009 | 0.40 - 1.04 (too low in 9 of 10) | 0.42 - 0.77 |
+| 2010-2014 | 0.44 - 0.78 (too low in all) | 0.47 - 0.82 |
+| 2015-2019 | 0.49 - 0.86 (too low in all) | 0.59 - 0.88 |
+
+1. In the data, men pull far ahead of women after 2000. In the model they pull ahead much less.
+2. **Caveat:** calib.10.15 never had male P&S by sex before 2019 in its likelihood (the mapping bug, section 8).
+   Part of this misfit may disappear in calib.10.20.
+3. The model's MSM share of male P&S is too high in 6 cities (model 70-90%, data 50-67%, 2016-2021). With male P&S too low
+   at the same time, this points to **heterosexual men** being too low, not only MSM. If so, the levers are
+   the heterosexual-male parameters (care-seeking, screening, mixing), not the MSM-het transmission split.
+
+# 4. Evidence from the data
+
+## 4.1 How the numbers are made
+
+From the CDC surveillance reports (P&S diagnoses by sex, all MSAs, 1993-2019):
+
+1. For two years, each city's change = log(end / start), for men and for women.
+2. "Men minus women" = how far men moved compared with women.
+3. Only cities with at least 20 cases for each sex in both years are used.
+4. Count noise is removed from spreads. A count of N cases varies by chance with variance about N
+   (Poisson), so log(N) varies with variance about 1/N, and a change between two years with about
+   1/start + 1/end. The spread across cities = real spread + noise, so real = observed - average noise.
+
+Cautions for all tables:
+
+1. These are diagnoses, not transmission. An epidemic amplifies small changes in transmission, so the
+   data values are upper bounds for the prior.
+2. "Male" is all men, including heterosexual men; the true MSM-het differences are larger.
+3. Mostly large cities (because of the 20-case minimum), and each row uses a different set of cities.
+
+To regenerate (needs `SURVEILLANCE.MANAGER`; data only, takes about a minute):
+
+```{r regenerate}
+source("applications/SHIELD/analysis/diagnostics/prior/check_spline_prior_against_data.R")
+```
+
+## 4.2 Table 1: average change by period (tests assumption A, expected change = 0)
+
+| Period | Cities | Men | Women | Men - women | Men relative to women |
+|---|---|---|---|---|---|
+| 1993-1995 | 30 | -0.48 | -0.46 | -0.02 | x0.98 |
+| 1995-2000 | 14 | -0.41 | -0.46 | 0.05 | x1.05 |
+| **2000-2005** | 9 | **+0.89** | -0.23 | **+1.12** | **x3.05** |
+| 2005-2010 | 10 | 0.26 | 0.10 | 0.15 | x1.17 |
+| 2000-2010 | 7 | 1.50 | 0.07 | 1.43 | x4.18 |
+| 2010-2019 | 14 | 0.60 | 0.50 | 0.10 | x1.10 |
+
+1. The 1990s decline was shared: men and women fell together.
+2. The divergence was one event, in 2000-2005 (the MSM resurgence), in every city with data.
+3. After 2005, and in the recent rise (2010-2019), men and women moved nearly together.
+4. So "expected change = 0" fits every step except 2000-2010.
+
+## 4.3 Table 2: spread of change across cities, by gap length (tests assumption B, SD grows in proportion to years)
+
+Each city's change minus that period's national average; SD across cities, count noise removed.
+
+| Gap | 1y | 2y | 3y | 5y | 7y | 10y | 15y |
+|---|---|---|---|---|---|---|---|
+| Men | 0.267 | 0.406 | 0.496 | 0.635 | 0.638 | 0.666 | 0.762 |
+| Women | 0.264 | 0.443 | 0.559 | 0.671 | 0.657 | 0.698 | 0.705 |
+| Men - women | 0.109 | 0.221 | 0.296 | 0.401 | 0.482 | 0.630 | 0.552 |
+| Prior per group, now (proportional to years) | 0.020 | 0.041 | 0.061 | 0.101 | 0.142 | 0.203 | 0.304 |
+| Prior per group, square root of years | 0.064 | 0.091 | 0.111 | 0.143 | 0.170 | 0.203 | 0.248 |
+| Prior MSM - het, now | 0.016 | 0.031 | 0.047 | 0.079 | 0.110 | 0.157 | 0.236 |
+
+How fast the spread grows (SD ~ years^power): men 0.37, women 0.35, **men - women 0.63**, prior now 1.
+
+1. Per sex, the spread grows quickly for a few years and then levels off: unusual rises or falls in a city fade,
+   and part of the 1-year spread is reporting swings.
+2. The men - women spread keeps growing, roughly like the square root of years (a random walk), not in proportion to years.
+3. The prior is 3-5x narrower than the data at 10 years, and up to 13x narrower at short gaps. With the
+   square root of years it is about equally narrower at every gap.
+
+## 4.4 Table 3: correlation of men's and women's change (tests assumption C, 0.7)
+
+| Gap | 1y | 2y | 3y | 5y | 7y | 10y | 15y |
+|---|---|---|---|---|---|---|---|
+| Correlation | 0.92 | 0.87 | 0.85 | 0.81 | 0.72 | 0.57 | 0.72 |
+
+0.7 fits the 5- to 15-year spline steps. No change needed.
+
+# 5. Verdict on each assumption
+
+| | Assumption | Supported by the data? |
+|---|---|---|
+| 1 | Spline points | Missing a point at 2005 for the sharp 2000-2005 shift (we decided this is not essential, section 6) |
+| 2 | Baseline medians | No conflict (not pinned; the baseline is wide) |
+| 3 | Baseline spread | No conflict |
+| 4 | A. Expected change 0 | **No, for 2000-2010** (shared shift, men x4 relative to women); yes for other steps |
+| 5 | TRATE_DELTA = 1.5 | Probably too tight; how much is unknown (diagnoses overstate transmission change) |
+| 6 | B. SD proportional to years | **No**: grows close to the square root of years |
+| 7 | C. Correlation 0.7 | Yes for 5- to 15-year steps |
+| 8 | Steps independent | Cannot be tested with this data |
+
+# 6. Candidate revisions
+
+## 6.1 Spread grows with the square root of years (assumption B)
+
+1. **Idea:** transmission changes a little each year in a random direction; over 10 years some changes cancel,
+   so the total spread grows like sqrt(10), not 10.
+2. **Evidence:** table 2 (men - women grows as years^0.63).
+3. **Effect:** short 5-year steps get looser, the long 1970-1990 step tighter, the 10-year step stays the same.
+   The 2010-2022 step gets its true length (12 years; now treated as 10).
+4. **Code:** only the SDs passed to the prior change, not the function.
+
+## 6.2 Raise TRATE_DELTA (the overall size of change)
+
+1. **Idea:** one number sets how far transmission can move in 10 years (95% range x/÷ TRATE_DELTA).
+2. **Evidence:** table 2; the prior is 3-5x narrower than the data at 10 years. It should be narrower
+   (diagnoses amplify), but not necessarily that much. 2-2.5 is consistent with the data.
+3. **Combine with 6.1** so one rule applies to every step.
+
+Per-group SD and 95% range, square root of years, by TRATE_DELTA:
+
+| Step | Years | Now (proportional, 1.5) | Sqrt, 1.5 | Sqrt, 2 | Sqrt, 2.5 |
+|---|---|---|---|---|---|
+| 1970-1990 | 20 | 0.405 (x/÷ 2.25) | 0.287 (x/÷ 1.78) | 0.490 (x/÷ 2.66) | 0.648 (x/÷ 3.65) |
+| 1990-1995, 1995-2000 | 5 | 0.101 (x/÷ 1.22) | 0.143 (x/÷ 1.33) | 0.245 (x/÷ 1.63) | 0.324 (x/÷ 1.91) |
+| 2000-2010 | 10 | 0.203 (x/÷ 1.5) | 0.203 (x/÷ 1.5) | 0.347 (x/÷ 2.0) | 0.458 (x/÷ 2.5) |
+| 2010-2022 | 12 | 0.203 (treated as 10) | 0.222 | 0.380 | 0.502 |
+
+At TRATE_DELTA = 2, the MSM - het SD for 2000-2010 is 0.27 (data: 0.63 in diagnoses, so about half),
+and the 2000-2010 shift in table 1 (+1.43) is about 5 SDs away instead of 9.
+
+Code for 6.1 + 6.2:
+
+```{r revision-sqrt}
+# Spread of the transmission multiplier changes between spline years: SD grows with the square root of
+# the number of years (a random walk). TRATE_DELTA = 95% fold range of a 10-year change (x/÷ TRATE_DELTA).
+TRATE_DELTA <- 2
+trate.step.sd <- function(years) 0.5 * log(TRATE_DELTA) * sqrt(years / 10)
+
+    logsd.deltas.past   = c("1970" = trate.step.sd(20),   # 1970-1990
+                            "1990" = trate.step.sd(5),    # 1990-1995
+                            "1995" = trate.step.sd(5)),   # 1995-2000
+    logsd.deltas.future = c("2010" = trate.step.sd(10),   # 2000-2010
+                            "2022" = trate.step.sd(12)),  # 2010-2022
+```
+
+Check after a run: the historical penalty stays small (the 1970-1990 step widens slightly, x/÷ 2.66 vs 2.25).
+
+## 6.3 Expect MSM to rise relative to heterosexuals in 2000-2010 (assumption A)
+
+1. **Idea:** the prior says "expect no change" in every step. In 2000-2010 every city moved the same way, so let
+   the prior expect MSM up and heterosexuals down in that step. 6.1 and 6.2 give more room; this moves the centre.
+2. **Evidence:** table 1 (+1.43 over 2000-2010, +1.12 in 2000-2005, in diagnoses).
+3. **Size:** about half of the observed shift, since diagnoses overstate transmission change; e.g. MSM +0.35,
+   het -0.35 (MSM:het ratio x2). Run a second version at +0.5 / -0.5 to see how sensitive the fit is.
+4. **Code:** `make.joint.mv.spline.prior` fixes every delta mean at 0 (`untransformed_mu`). Add an optional
+   argument with default 0, so other uses do not change. A sketch (not tested):
+
+```{r revision-mean-shift}
+# new optional argument: named list of delta means per parameter and step year (default: all 0)
+make.joint.mv.spline.prior <- function(parameters, logmean.baseline, logsd.baseline,
+                                       logsd.deltas.past, logsd.deltas.future, spline.times,
+                                       correlation = 0.5,
+                                       logmean.deltas = list()) {
+    # ... unchanged validation and sorting of logsd.deltas.past / logsd.deltas.future ...
+    delta.years <- c(names(logsd.deltas.past), names(logsd.deltas.future))   # oldest to newest, as sorted
+    delta.means <- unlist(lapply(delta.years, function(y) sapply(parameters, function(p) {
+        v <- logmean.deltas[[p]][y]
+        if (is.null(v) || is.na(v)) 0 else unname(v)
+    })))
+    untransformed_mu <- c(logmean.baseline, delta.means)                   # was: rep(0, ...) for the deltas
+    # ... rest unchanged ...
+}
+
+# use:
+make.joint.mv.spline.prior(...,
+    logmean.deltas = list("transmission.rate.multiplier.msm"          = c("2010" =  0.35),
+                          "transmission.rate.multiplier.heterosexual" = c("2010" = -0.35)))
+```
+
+## 6.4 Correlation
+
+Keep 0.7 (table 3). A correlation per step would need a function change and is not supported strongly enough.
+
+## 6.5 A spline point at 2005
+
+Would match the sharp 2000-2005 shift, but adds two parameters. Set aside: for calibration and projection,
+the levels by 2010 and the 2010-2022 trend matter more than the timing within the 2000s.
+
+# 7. Plan after calib.10.20.stage1
+
+1. Run, with `CALIBRATION.CODE <- "calib.10.20.stage1"`:
+   - `fit/check_fit_by_sex_over_time.R`: does male P&S fit 2000-2014 now?
+   - `prior/check_prior_position.R`: are the MSM - het 1995-2000 and 2000-2010 changes still pinned?
+   - `fit/check_fit_by_age.R`: has 15-19 moved toward 1?
+2. If male P&S still trails the data in 2000-2014 **and** MSM - het is still pinned: apply 6.1 + 6.2 (no function change).
+3. If that is not enough: add 6.3.
+4. If instead the gap is heterosexual men (MSM share too high while male P&S is too low): look at the
+   heterosexual-male care-seeking, screening and mixing priors, not the transmission split.
+5. Any of these is a stage-1 prior: rerun from stage 1, reusing calib.10.15.stage0.
+
+# 8. Related fixes already committed (in calib.10.20.stage1)
+
+| Commit | Change |
+|---|---|
+| f3ce1cb9 | `equalize.weight.by.year = F` for stratified diagnosis likelihoods (the long sex-only series had been inflated) |
+| 8da73166 | 15-19 sexual activity prior x 0.64 (GSS covers 18+; NSFG ratio of 15-17 to 18-19) |
+| ea95e081 | 15-19 STI screening x 0.65 (CDC-funded HIV test counts); 18-19 population fraction fixed (`get.fraction.over.age` dropped age 19) |
+| 7baf3f93 | Sex mapping fix: `msm` was added to `male` (male = all men in BRFSS and the CDC reports), so male P&S from the reports was NaN at MSA level; proportion tested bias re-cached |
+| 67d90901 | calib.10.20.stage1 registered (stage 1 only) |
+
+# 9. Files
+
+| File | What it is |
+|---|---|
+| `applications/SHIELD/shield_calib_parameters.R` | the prior (`transmission.rate.multipliers.by.sex`, `TRATE_DELTA`) |
+| `applications/SHIELD/R/shield_multivariate_spline_prior.R` | `make.joint.mv.spline.prior` |
+| `analysis/diagnostics/prior/check_spline_prior_against_data.R` | tables 1-3 |
+| `analysis/diagnostics/prior/check_diagnosis_shifts_by_sex.R` | shifts by city and period, share of each 10-year change in the first half |
+| `analysis/diagnostics/prior/check_prior_position.R` | percentiles of fitted parameters in the prior |
+| `analysis/diagnostics/fit/check_ps_el_split.R` | P&S:EL, model vs data |
+| `analysis/diagnostics/fit/check_fit_by_sex_over_time.R` | diagnoses by sex (P&S included), model / data by period |
+| `analysis/diagnostics/fit/check_fit_by_age.R` | diagnoses by age, model / data |

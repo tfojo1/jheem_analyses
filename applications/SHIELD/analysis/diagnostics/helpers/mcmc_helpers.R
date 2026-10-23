@@ -3,7 +3,7 @@
 # ****************************************************************************************************
 # Functions only. Sourcing this file does not load the specification, data managers or calibrations,
 # so you can source it from any script and use the functions on their own.
-# To run the full diagnostics on a calibration, use diagnostic_summary.R (it sources this file).
+# To run the full diagnostics on a calibration, use mcmc/mixing_check.R (diagnostics_setup.R sources this file).
 #
 # What the functions need when you call them:
 #  1. jheem2 loaded and the jheem root directory set - for loading MCMCs / simsets and the default folders

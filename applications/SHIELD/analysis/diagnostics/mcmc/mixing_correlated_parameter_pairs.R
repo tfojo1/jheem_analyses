@@ -47,35 +47,27 @@
 
 # ****************************************************************************************************
 
-library(bayesian.simulations)
-library(dplyr)
-source('../jheem_analyses/commoncode/locations_of_interest.R')
-source("../jheem_analyses/applications/SHIELD/shield_specification.R")   # also sets the jheem root dir
-if (!exists("SHIELD.FULL.PARAMETERS.SAMPLING.BLOCKS"))
-    source("../jheem_analyses/applications/SHIELD/shield_calib_parameters.R")
+# specification (SHIELD.FULL.PARAMETERS.SAMPLING.BLOCKS), dplyr and helpers/mcmc_helpers.R
+# (.mcmc.key, .city.name, .get.samples, .diagnostics.dir)
+source("../jheem_analyses/applications/SHIELD/analysis/diagnostics/diagnostics_setup.R")
 
 # ---- SETUP ----
-CALIBRATION.CODE <- "calib.9.23.stage3.pk"
-LOCATIONS        <- SHIELD.TEN.MSAS
-MCMC.CACHE.DIR   <- file.path(get.jheem.root.directory(), "shield", "mcmc_diagnostics", "mcmc_cache")  # same cache as check_mixing.R
-REPORT.DIR       <- file.path(get.jheem.root.directory(), "shield", "mcmc_diagnostics", "reports")
+# CALIBRATION.CODE and LOCATIONS are set in diagnostics_setup.R
+MCMC.CACHE.DIR   <- .diagnostics.dir("mcmc_cache")   # same cache as mixing_check.R
+REPORT.DIR       <- .diagnostics.dir("reports")
+dir.create(REPORT.DIR, recursive = TRUE, showWarnings = FALSE)
 
 R.FLAG <- 0.8    # |r.within| above this = strong trade-off
 
 if (!exists("pair.corr.list")) pair.corr.list <- list()    # per-city results, keyed "location | calibration.code"
-
-.mcmc.key <- function(loc, code) paste0(loc, " | ", code)
-.city.name <- function(loc) {
-    nm <- names(SHIELD.TEN.MSAS)[match(loc, SHIELD.TEN.MSAS)]
-    ifelse(is.na(nm), loc, nm)
-}
 
 
 # ****************************************************************************************************
 # PART 1: HELPERS
 # ****************************************************************************************************
 
-# Load one slimmed MCMC: memory (mcmc.list from check_mixing.R) -> disk cache -> assemble
+# Load one slimmed MCMC: memory (mcmc.list from mixing_check.R) -> disk cache -> assemble
+# one city at a time and not kept in mcmc.list, so 10 cities do not all sit in memory at once
 .load.one.mcmc <- function(loc, calibration.code, cache.dir = MCMC.CACHE.DIR) {
     key <- .mcmc.key(loc, calibration.code)
     if (exists("mcmc.list") && !is.null(mcmc.list[[key]])) return(mcmc.list[[key]])
@@ -86,14 +78,6 @@ if (!exists("pair.corr.list")) pair.corr.list <- list()    # per-city results, k
                                         calibration.code = calibration.code, allow.incomplete = TRUE)
     m@simulations <- list()
     m
-}
-
-# samples as a 3D array: iteration x chain x variable (same as check_mixing.R)
-.get.samples <- function(m) {
-    s <- m@samples
-    if (!is.null(names(dimnames(s))))
-        s <- aperm(s, match(c("iteration", "chain", "variable"), names(dimnames(s))))
-    s
 }
 
 # logit for proportions, log for other positive parameters
@@ -185,7 +169,7 @@ run.correlation.check <- function(locations, calibration.code, force.recompute =
 # RUN
 # ****************************************************************************************************
 
-# 1. One city first, then set LOCATIONS <- SHIELD.TEN.MSAS and re-run
+# 1. One city first (LOCATIONS in diagnostics_setup.R), then switch to all 10 and re-run
 pairs <- run.correlation.check(LOCATIONS, CALIBRATION.CODE)
 
 # 2. The main result: pairs that trade off in the most cities

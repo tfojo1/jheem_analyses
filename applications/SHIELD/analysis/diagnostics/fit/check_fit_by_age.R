@@ -5,7 +5,7 @@
 # Use it before changing the age priors: a multiplier sitting far below its prior mean only
 # matters if the fit at that age is off.
 #
-# For each city in one calibration:
+# For each city in the calibration set in diagnostics_setup.R:
 # 1. plots of each diagnosis outcome by age (saved by plot.calib.comparison)
 # 2. a table of model / data by age group, 2019-2021
 #    1 = right, > 1 = model too high, < 1 = model too low
@@ -13,15 +13,16 @@
 # Simsets already in memory (calib.simsets) are reused; anything missing is loaded from file.
 #
 # USAGE
-#   1. set CALIBRATION.CODE (and LOCATIONS if you want fewer cities) below
-#   2. from jheem_analyses:  source("applications/SHIELD/analysis/diagnostics/check_fit_by_age.R")
+#   1. set CALIBRATION.CODE (and LOCATIONS) in diagnostics_setup.R
+#   2. from jheem_analyses:  source("applications/SHIELD/analysis/diagnostics/fit/check_fit_by_age.R")
 #   If step 0 stops with a compiled-code error, re-source shield_source_code.R; if that is not
 #   enough, restart R without restoring the workspace and run again.
 # ****************************************************************************************************
 
+## SOURCES ----
+source("../jheem_analyses/applications/SHIELD/analysis/diagnostics/diagnostics_setup.R")
+
 ## SETTINGS ----
-CALIBRATION.CODE <- "calib.10.15.stage3"
-LOCATIONS        <- NULL                         # NULL = all 10 cities; or e.g. c(Baltimore = "C.12580")
 YEARS            <- as.character(2019:2021)      # MSA data by age exists only for these years
 PLOT.YEARS       <- 2010:2025
 MAKE.PLOTS       <- T
@@ -29,16 +30,6 @@ OUTCOMES <- c(diagnosis.total              = "total.syphilis.diagnoses",        
               diagnosis.ps                 = "ps.syphilis.diagnoses",
               diagnosis.el.misclassified   = "early.syphilis.diagnoses",
               diagnosis.late.misclassified = "unknown.duration.or.late.syphilis.diagnoses")
-out.dir <- file.path(get.jheem.root.directory(), "shield", "calibration_diagnostics")
-dir.create(out.dir, recursive = TRUE, showWarnings = FALSE)
-
-## SOURCES ----
-# only source what is not already loaded, so re-running in the same session is quick
-if (!exists("SURVEILLANCE.MANAGER"))  source("../jheem_analyses/applications/SHIELD/shield_source_code.R")
-if (!exists("SHIELD.SPECIFICATION"))  source("../jheem_analyses/applications/SHIELD/shield_specification.R")
-if (!exists("SHIELD.TEN.MSAS"))       source("../jheem_analyses/commoncode/locations_of_interest.R")
-if (!exists("load.calib.simsets"))    source("../jheem_analyses/applications/SHIELD/analysis/calibration/calibration_helper_functions.R")
-if (is.null(LOCATIONS)) LOCATIONS <- SHIELD.TEN.MSAS
 
 ## LOAD SIMSETS ----
 # load.calib.simsets() finds calib.simsets in the session, reuses those entries and reads only the missing ones from file
@@ -47,13 +38,7 @@ entries <- Filter(function(e) e$calib.code == CALIBRATION.CODE, calib.simsets)
 if (length(entries) == 0) stop("No simsets loaded for ", CALIBRATION.CODE)
 
 ## 0. SESSION CHECK ----
-# mapping data to the model's age groups uses compiled code; in a session restored from a saved
-# workspace its address is empty and every pull fails with "NULL value passed as symbol address"
-tryCatch(
-    SURVEILLANCE.MANAGER$pull(OUTCOMES[[1]], keep.dimensions = c("year", "age"),
-                              dimension.values = list(location = entries[[1]]$location.code, year = YEARS)),
-    error = function(e) stop("Ontology mapping fails in this session (", conditionMessage(e), ").\n",
-                             "Re-source shield_source_code.R, or restart R without restoring the workspace."))
+check.session(entries[[1]]$location.code, outcome = OUTCOMES[[1]], keep.dimensions = c("year", "age"))
 
 ## AGE BINS ----
 # model and CDC data use different age groups; both nest into these bins by their lower age
@@ -66,7 +51,7 @@ bin.sum <- function(m) t(apply(m, 1, function(r) tapply(r, to.bin(names(r)), sum
 # one figure per outcome, one panel per age; saved under calibrationPlots/comparison/<code>/by_outcome
 if (MAKE.PLOTS)
     plot.calib.comparison(calib.simsets, calibration.codes = CALIBRATION.CODE, locations = LOCATIONS,
-                          save.dir = out.dir,
+                          save.dir = OUT.DIR,
                           outcomes = names(OUTCOMES), separate.by = "outcome",
                           facet.by = "age", years = PLOT.YEARS)
 
@@ -102,7 +87,7 @@ for (out in names(OUTCOMES)) {
 }
 # SAVE:
 for (out in names(ratio.tables))
-    write.csv(ratio.tables[[out]], file.path(out.dir, paste0("fit_by_age_", out, "_", CALIBRATION.CODE, ".csv")))
+    write.csv(ratio.tables[[out]], file.path(OUT.DIR,paste0("fit_by_age_", out, "_", CALIBRATION.CODE, ".csv")))
 
 
 # Reading a value

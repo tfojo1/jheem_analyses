@@ -24,50 +24,21 @@
 # Only years where both sexes are observed are used.
 #
 # USAGE
-#   1. set OUTCOMES, LOCATIONS and the periods below
-#   2. from jheem_analyses:  source("applications/SHIELD/analysis/diagnostics/check_diagnosis_shifts_by_sex.R")
+#   1. set OUTCOMES and the periods below; the cities come from LOCATIONS in diagnostics_setup.R (US is added)
+#   2. from jheem_analyses:  source("applications/SHIELD/analysis/diagnostics/prior/check_diagnosis_shifts_by_sex.R")
 # ****************************************************************************************************
+
+## SOURCES ----
+# observed.by.sex() is in helpers/fit_helpers.R
+source("../jheem_analyses/applications/SHIELD/analysis/diagnostics/diagnostics_setup.R")
 
 ## SETTINGS ----
 OUTCOMES       <- c("ps.syphilis.diagnoses")     # can add "early.syphilis.diagnoses", "total.syphilis.diagnoses"
-LOCATIONS      <- NULL                           # NULL = US + the 10 cities; or e.g. c(Baltimore = "C.12580")
+SHIFT.LOCATIONS <- c(US = "US", LOCATIONS)       # US + the cities in diagnostics_setup.R
 YEAR.WINDOW    <- 1                              # 1 = mean of year-1..year+1 at each end; 0 = single years
 PERIODS.5      <- list(c(1990, 1995), c(1995, 2000), c(2000, 2005), c(2005, 2010), c(2010, 2015), c(2015, 2020))
 PERIODS.10     <- list(c(1990, 2000), c(1995, 2005), c(2000, 2010), c(2005, 2015), c(2010, 2020))
 PERIODS.SPLINE <- list(c(1990, 1995), c(1995, 2000), c(2000, 2010), c(2010, 2022))  # steps between spline points
-
-## SOURCES ----
-# only source what is not already loaded, so re-running in the same session is quick
-if (!exists("SURVEILLANCE.MANAGER")) source("../jheem_analyses/applications/SHIELD/shield_source_code.R")
-if (!exists("SHIELD.TEN.MSAS"))      source("../jheem_analyses/commoncode/locations_of_interest.R")
-if (is.null(LOCATIONS)) LOCATIONS <- c(US = "US", SHIELD.TEN.MSAS)
-
-# output folder for tables (after the sources, since it needs jheem2)
-out.dir <- file.path(get.jheem.root.directory(), "shield", "calibration_diagnostics")
-dir.create(out.dir, recursive = TRUE, showWarnings = FALSE)
-
-## observed.by.sex ----
-# observed diagnoses by sex for one outcome and city (years x male/female), averaged over every source
-# read directly rather than with pull(): the CDC surveillance reports also have an "msm" category,
-# and pull() then returns only the county aggregates (2019 on). Male already includes MSM.
-observed.by.sex <- function(outcome, location) {
-    d <- SURVEILLANCE.MANAGER$data[[outcome]]$estimate
-    if (is.null(d)) stop("No data in SURVEILLANCE.MANAGER for ", outcome)
-    years <- as.character(1980:2025)
-    by.source <- list()
-    for (s in names(d)) for (o in names(d[[s]])) {
-        a <- d[[s]][[o]]$year__location__sex                                  # year x location x sex
-        if (is.null(a) || !location %in% dimnames(a)$location || !all(c("male", "female") %in% dimnames(a)$sex)) next
-        m <- matrix(NA_real_, length(years), 2, dimnames = list(years, c("male", "female")))
-        y <- intersect(years, dimnames(a)$year)
-        m[y, ] <- a[y, location, c("male", "female")]
-        by.source[[paste(s, o)]] <- m
-    }
-    if (length(by.source) == 0) return(NULL)
-    out <- apply(simplify2array(by.source), c(1, 2), mean, na.rm = TRUE)    # average over sources
-    out[is.nan(out)] <- NA
-    out
-}
 
 ## value.at ----
 # male and female value at one year: mean over the window, using only years with both sexes observed
@@ -96,8 +67,8 @@ shift <- function(d, start, end) {
 # one row per outcome x city x period
 PERIOD.SETS <- list("5-year" = PERIODS.5, "10-year" = PERIODS.10, "spline" = PERIODS.SPLINE)
 rows <- list()
-for (outcome in OUTCOMES) for (loc.name in names(LOCATIONS)) {
-    d <- observed.by.sex(outcome, LOCATIONS[[loc.name]])
+for (outcome in OUTCOMES) for (loc.name in names(SHIFT.LOCATIONS)) {
+    d <- observed.by.sex(outcome, SHIFT.LOCATIONS[[loc.name]])
     if (is.null(d)) { message(loc.name, ": no ", outcome, " data by sex"); next }
     for (set in names(PERIOD.SETS)) for (p in PERIOD.SETS[[set]]) {
         r <- shift(d, p[1], p[2])
@@ -129,5 +100,5 @@ for (outcome in OUTCOMES) for (set in names(PERIOD.SETS)) {
 }
 
 ## SAVE ----
-write.csv(shifts, file.path(out.dir, "diagnosis_shifts_by_sex.csv"), row.names = FALSE)
-cat("\nSaved to", file.path(out.dir, "diagnosis_shifts_by_sex.csv"), "\n")
+write.csv(shifts, file.path(DATA.OUT.DIR, "diagnosis_shifts_by_sex.csv"), row.names = FALSE)
+cat("\nSaved to", file.path(DATA.OUT.DIR, "diagnosis_shifts_by_sex.csv"), "\n")
