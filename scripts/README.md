@@ -205,7 +205,7 @@ merge runs in CI, so there's no need to run `census.manager.merge.R` locally.
      outcome, source, ontology, stratification, or dimension value.
    - **Value changes**: each array whose values changed, with the number of changed cells.
    - **SHIELD check**: whether the SHIELD model still starts with this census (its
-     specification compiles and a Baltimore kernel builds), using the syphilis release in
+     specification compiles and a Baltimore engine builds), using the syphilis release in
      `applications/SHIELD/data_managers.csv`. The same check runs on the promoted census
      as a control.
    - **Data quality report**: the same missing-value and dimension checks as the other

@@ -8,11 +8,12 @@
 # SHIELD runs in recorded mode, as container runs do: offline, with exactly these two
 # managers placed in a temporary verified cache, so the result depends only on the
 # inputs given. The check sources the SHIELD specification, which is where a census
-# whose structure SHIELD can't use fails, and builds one location's kernel, which reads
-# the census population data. It writes a report and exits 0 whether SHIELD passes or
-# not; run it on the current census as well, so a failure of the check itself (a missing
-# package, say) is not mistaken for a problem with the candidate. It exits non-zero only
-# when it can't produce a report.
+# whose structure SHIELD can't use fails, and builds one location's engine (jheem2's
+# exported create.jheem.engine, which first builds the kernel from the census data).
+# It writes a report and exits 0 whether SHIELD passes or not; run it on the current
+# census as well, so a failure of the check itself (a missing package, say) is not
+# mistaken for a problem with the candidate. It exits non-zero only when it can't
+# produce a report.
 #
 # JHEEM2_PATH names the jheem2 checkout (default ../jheem2); JHEEM2_MODE is package
 # (default, uses the installed jheem2) or source. Revisions recorded by recorded mode
@@ -102,8 +103,9 @@ checks$census_used <- run.check("SHIELD loaded the given census", {
              ", not the given ", census$sha256)
 })
 if (checks$specification$passed) {
-    checks$kernel <- run.check(paste("SHIELD kernel builds for", location),
-                               create.jheem.kernel(version = "shield", location = location))
+    checks$engine <- run.check(paste("SHIELD engine builds for", location),
+                               create.jheem.engine(version = "shield", location = location,
+                                                   end.year = 2030))
 }
 
 report <- list(consumer = "SHIELD", location = location, census = census, syphilis = syphilis,

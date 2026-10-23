@@ -40,7 +40,7 @@ shared-write contract without loading real manager files.
 - **SHIELD starts** (`check_consumers.R`): the SHIELD model is started in recorded mode,
   offline, with the candidate census and the syphilis release in
   `applications/SHIELD/data_managers.csv`; its specification is compiled and one
-  location's kernel (Baltimore) is built. The same check on the promoted census is a
+  location's engine (Baltimore) is built, which builds its kernel from the census data. The same check on the promoted census is a
   control: if that fails, the check itself is broken and the build stops, rather than
   blaming the candidate.
 - **Data quality** (`quality_report.R`, informational): missing values and dimension

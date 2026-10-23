@@ -123,7 +123,7 @@ text <- c(
           if (breaks.consumer) "**failed**" else "passed"),
   "", "## SHIELD consumer check", "",
   "The SHIELD model is started in recorded mode with this census and the syphilis release",
-  "SHIELD declares: its specification is compiled and one location's kernel is built.",
+  "SHIELD declares: its specification is compiled and one location's engine is built.",
   "The same check on the baseline census is the control.", "",
   "This build:", "", consumer.lines(consumer), "",
   paste0("Baseline ", baseline.label, ":"), "", consumer.lines(control), "",
