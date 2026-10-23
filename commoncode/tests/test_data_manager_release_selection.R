@@ -405,10 +405,47 @@ stopifnot(file.exists(file.path(latest.cache, "data-managers", "fixture.rdata",
 latest.target <- NULL
 pointer.before <- readBin(current.path, "raw", file.info(current.path)$size)
 assert.error(load.latest(), "No cached manager was substituted")
+stopifnot(identical(readBin(current.path, "raw", file.info(current.path)$size), pointer.before))
+
+# A named immutable release that is cached and verifies is the requested file: it
+# loads with no GitHub lookup at all (the network is down here), and downloads nothing.
+lookups <- 0L
+counted.resolve <- test.environment$resolve.github.release.asset
+test.environment$resolve.github.release.asset <- function(...) {
+    lookups <<- lookups + 1L
+    counted.resolve(...)
+}
+cached.message <- capture.output(test.environment$load.data.manager.from.github.release(
+    "fixture.rdata", source.configuration, "manager-v1", FALSE, FALSE, "test: "
+))
+stopifnot(identical(cached.message, paste0("Loaded fixture.rdata from manager-v1 (SHA-256 ",
+                                           fixture.digest, ")")),
+          identical(lookups, 0L), identical(length(downloads), 2L))
+# A mutable alias passed as release.tag is still resolved online every time.
+assert.error(test.environment$load.data.manager.from.github.release(
+    "fixture.rdata", source.configuration, "manager-latest", FALSE, FALSE, "test: "
+), "network unavailable")
+assert.error(test.environment$load.data.manager.from.github.release(
+    "fixture.rdata", source.configuration, "other-manager-latest", FALSE, FALSE, "test: "
+), "network unavailable")
+stopifnot(identical(lookups, 2L))
+# A damaged cached copy is not used: the load goes online, which fails here.
+v1.cached <- file.path(latest.cache, "data-managers", "fixture.rdata", "manager-v1", "fixture.rdata")
+writeBin(charToRaw("corrupt\n"), v1.cached)
 assert.error(test.environment$load.data.manager.from.github.release(
     "fixture.rdata", source.configuration, "manager-v1", FALSE, FALSE, "test: "
 ), "network unavailable")
-stopifnot(identical(readBin(current.path, "raw", file.info(current.path)$size), pointer.before))
+stopifnot(identical(lookups, 3L))
+# With the network back, the same load re-downloads and verifies it.
+latest.target <- alias.resolution.for("manager-v1", fixture.digest)
+invisible(capture.output(test.environment$load.data.manager.from.github.release(
+    "fixture.rdata", source.configuration, "manager-v1", FALSE, FALSE, "test: "
+)))
+stopifnot(identical(lookups, 4L), identical(downloads, c("manager-v1", "manager-v2", "manager-v1")),
+          identical(test.environment$sha256.file(v1.cached), fixture.digest))
+latest.target <- NULL
+downloads <- downloads[1:2]
+test.environment$resolve.github.release.asset <- counted.resolve
 # Explicit offline mode still loads the last verified version without downloading.
 offline.message <- capture.output(offline.loaded <- load.latest(offline = TRUE))
 stopifnot(grepl("manager-v2/fixture.rdata$", offline.loaded$path),
