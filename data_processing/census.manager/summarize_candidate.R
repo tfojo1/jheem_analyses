@@ -75,8 +75,11 @@ value.lines <- function(delta) {
 
 consumer.lines <- function(report) {
   vapply(report$checks, function(check) {
+    # One line per check; the JSON report keeps the full message.
+    message <- if (is.null(check$message)) NULL else gsub("\\s+", " ", gsub("`", "'", check$message))
+    if (!is.null(message) && nchar(message) > 400) message <- paste0(substr(message, 1, 400), " …")
     sprintf("- %s %s%s", if (isTRUE(check$passed)) "Passed:" else "**Failed:**", check$name,
-            if (is.null(check$message)) "" else paste0(": `", gsub("`", "'", check$message), "`"))
+            if (is.null(message)) "" else paste0(": `", message, "`"))
   }, character(1))
 }
 
