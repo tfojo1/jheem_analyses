@@ -26,6 +26,7 @@ RUN <- c(
     # fit to data: loads one simset per city (slow the first time; reused after)
     "fit/check_fit_by_sex_over_time.R"          = TRUE,
     "fit/check_fit_by_age.R"                    = TRUE,
+    "fit/check_fit_by_race.R"                   = TRUE,
     "fit/check_ps_el_split.R"                   = TRUE,
     "fit/check_msm_proportion.R"                = TRUE,
     "prior/check_prior_position.R"              = TRUE,
@@ -34,7 +35,9 @@ RUN <- c(
     "mcmc/mixing_check.R"                       = FALSE,
     "mcmc/mixing_correlated_parameter_pairs.R"  = FALSE,
     # reports: knitted to HTML next to the .Rmd (section 6 of msm_share loads simsets)
-    "reports/msm_share_emory_vs_brfss.Rmd"      = FALSE
+    "reports/msm_share_emory_vs_brfss.Rmd"      = FALSE,
+    # review page: reads what the scripts above saved; knitted into the calibration folder. Keep it last.
+    "reports/calibration_review.Rmd"            = TRUE
 )
 
 ## run.one ----
@@ -47,7 +50,11 @@ run.one <- function(script) {
     cat("## ", script, "\n", sep = "")
     cat("####################################################################\n")
     err <- tryCatch({
-        if (grepl("\\.Rmd$", script)) {
+        if (grepl("calibration_review\\.Rmd$", script)) {
+            out <- rmarkdown::render(path, output_dir = OUT.DIR, envir = globalenv(), quiet = TRUE,
+                                     output_file = paste0("calibration_review_", CALIBRATION.CODE, ".html"))
+            cat("Knitted:", out, "\n")
+        } else if (grepl("\\.Rmd$", script)) {
             out <- rmarkdown::render(path, envir = globalenv(), quiet = TRUE)
             cat("Knitted:", out, "\n")
         } else {
@@ -71,3 +78,8 @@ run.log <- do.call(rbind, lapply(selected, run.one))
 cat("\n\n== Diagnostics run for ", CALIBRATION.CODE, " ==\n", sep = "")
 print(run.log, row.names = FALSE)
 cat("Outputs in", OUT.DIR, "\n")
+review <- file.path(OUT.DIR, paste0("calibration_review_", CALIBRATION.CODE, ".html"))
+if (RUN[["reports/calibration_review.Rmd"]] && file.exists(review)) {
+    cat("Review page:", review, "\n")
+    if (interactive()) browseURL(review)
+}

@@ -1,0 +1,393 @@
+---
+title: "Calibration review"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 2
+---
+
+```{r setup, include = FALSE}
+# One page with every diagnostic saved for one calibration.
+# It only reads the CSVs and plots already in the calibration folder; it does not re-run anything.
+#
+# How to run (from jheem_analyses):
+# 1. run the diagnostics first (run_diagnostics.R); this page is its last step
+# 2. to knit it by hand:
+#      source("applications/SHIELD/analysis/diagnostics/diagnostics_setup.R")
+#      rmarkdown::render("applications/SHIELD/analysis/diagnostics/reports/calibration_review.Rmd",
+#                        output_dir = OUT.DIR, output_file = paste0("calibration_review_", CALIBRATION.CODE, ".html"),
+#                        envir = globalenv())
+# 3. the page is saved in the calibration folder, next to the files it reads
+# For another calibration: change CALIBRATION.CODE in diagnostics_setup.R and run both lines again.
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, results = "asis")
+knitr::opts_knit$set(root.dir = normalizePath("../../../../.."))   # jheem_analyses
+```
+
+```{r sources}
+source("../jheem_analyses/applications/SHIELD/analysis/diagnostics/diagnostics_setup.R")
+CODE <- CALIBRATION.CODE
+DIR  <- OUT.DIR
+OUTCOME.LABELS <- c(diagnosis.ps                 = "P&S",
+                    diagnosis.total              = "Total",
+                    diagnosis.el.misclassified   = "Early latent",
+                    diagnosis.late.misclassified = "Late / unknown duration")
+
+## file.in ----
+# path of a file in the calibration folder, or NULL if it is not there
+file.in <- function(name, sub = "") {
+    f <- file.path(DIR, sub, name)
+    if (file.exists(f)) f else NULL
+}
+
+## latest ----
+# newest mixing file for this calibration whose name starts with prefix (mixing files end in a time stamp)
+latest <- function(prefix, sub = "mixing") {
+    f <- list.files(file.path(DIR, sub), full.names = TRUE,
+                    pattern = paste0("^", prefix, gsub(".", "\\.", CODE, fixed = TRUE), "_[0-9]"))
+    if (length(f) == 0) NULL else sort(f, decreasing = TRUE)[1]
+}
+
+## read.tab ----
+# a saved table, with its first column as row names
+read.tab <- function(f) read.csv(f, row.names = 1, check.names = FALSE, stringsAsFactors = FALSE)
+
+## colours ----
+# 1. ratio.colour: model / data
+#    green = within 0.8-1.2
+#    reds  = model too high: light = 1.2-1.5, dark = above 1.5
+#    blues = model too low:  light = 0.67-0.8, dark = below 0.67
+#    grey  = no value
+# 2. verdict.colour: mixing PASS / CHECK / FAIL
+# 3. flag.colour: LOW / HIGH in the prior (blue / red, as for the ratios)
+# 4. pct.colour: prior percentile below 2.5% or above 97.5%
+GREEN <- "#d9f0d3"; AMBER <- "#fee8c8"; GREY <- "#eeeeee"
+RED   <- "#f9c6c0"; RED.DARK  <- "#e8837a"
+BLUE  <- "#cfe2f3"; BLUE.DARK <- "#86b3dc"
+ratio.colour   <- function(x) ifelse(!is.finite(x), GREY,
+                              ifelse(x > 1.5, RED.DARK, ifelse(x > 1.2, RED,
+                              ifelse(x >= 0.8, GREEN, ifelse(x >= 1/1.5, BLUE, BLUE.DARK)))))
+verdict.colour <- function(x) unname(c(PASS = GREEN, CHECK = AMBER, FAIL = RED.DARK)[as.character(x)])
+flag.colour    <- function(x) ifelse(x %in% "LOW", BLUE, ifelse(x %in% "HIGH", RED, ""))
+pct.colour     <- function(x) ifelse(x < 0.025, BLUE, ifelse(x > 0.975, RED, ""))
+
+## html.table ----
+# a table as HTML, with coloured cells
+# 1. colour.fun + colour.cols: colour those columns by their own values
+# 2. colour.fun + colour.by: colour every cell by a numeric matrix of the same shape (for tables of text)
+html.table <- function(tab, colour.fun = NULL, colour.cols = NULL, colour.by = NULL, digits = 2, row.names = TRUE) {
+    tab <- as.data.frame(tab, check.names = FALSE, stringsAsFactors = FALSE)
+    esc <- function(x) gsub(">", "&gt;", gsub("<", "&lt;", gsub("&", "&amp;", x)))
+    cols <- lapply(seq_along(tab), function(j) {
+        x <- tab[[j]]
+        if (is.numeric(x)) {
+            d   <- if (all(x[is.finite(x)] %% 1 == 0)) 0 else digits      # counts without decimals
+            txt <- ifelse(is.na(x), "", ifelse(is.infinite(x), as.character(x),
+                                               formatC(x, format = "f", digits = d, big.mark = ",")))
+            cls <- ""
+        } else {
+            txt <- ifelse(is.na(x), "", esc(as.character(x)))
+            cls <- " class=\"txt\""
+        }
+        bg <- rep("", length(x))
+        if (!is.null(colour.by))                                          bg <- colour.fun(colour.by[, j])
+        else if (!is.null(colour.fun) && names(tab)[j] %in% colour.cols) bg <- colour.fun(x)
+        bg[is.na(bg)] <- ""
+        paste0("<td", cls, ifelse(nzchar(bg), paste0(" style=\"background:", bg, "\""), ""), ">", txt, "</td>")
+    })
+    cells <- do.call(cbind, cols)
+    head  <- paste0("<tr>", if (row.names) "<th></th>", paste0("<th>", esc(names(tab)), "</th>", collapse = ""), "</tr>")
+    rn    <- if (row.names) paste0("<th>", esc(rownames(tab)), "</th>") else ""
+    body  <- paste0("<tr>", rn, apply(cells, 1, paste, collapse = ""), "</tr>", collapse = "")
+    paste0("<table class=\"diag\">", head, body, "</table>\n\n")
+}
+
+## summarise.ratios ----
+# rows x cities of model / data  ->  "median (cities within 0.8-1.2 / cities with data)" per row,
+# and the medians, for colouring
+summarise.ratios <- function(values, groups) {
+    med  <- tapply(values, groups, function(v) if (any(is.finite(v))) median(v[is.finite(v)]) else NA)
+    n.ok <- tapply(values, groups, function(v) sum(v >= 0.8 & v <= 1.2, na.rm = TRUE))
+    n    <- tapply(values, groups, function(v) sum(is.finite(v)))
+    txt  <- ifelse(n == 0, "", paste0(formatC(med, format = "f", digits = 2), " (", n.ok, "/", n, ")"))
+    dim(txt) <- dim(med); dimnames(txt) <- dimnames(med)
+    list(text = txt, median = med)
+}
+
+## show ----
+# small helpers for the page
+img     <- function(f) if (!is.null(f)) cat("<img src=\"", base64enc::dataURI(file = f, mime = "image/png"),
+                                             "\" style=\"max-width:100%\">\n\n", sep = "")
+missing <- function(script) cat("<p class=\"missing\">Not in this folder. Run <code>", script, "</code>.</p>\n\n", sep = "")
+link    <- function(f, label = basename(f)) if (!is.null(f))
+    cat("<p>Open: <a href=\"", sub(paste0(DIR, "/"), "", f, fixed = TRUE), "\">", label, "</a></p>\n\n", sep = "")
+```
+
+<style>
+table.diag { border-collapse: collapse; font-size: 12px; margin: 6px 0 18px 0; }
+table.diag th, table.diag td { border: 1px solid #ddd; padding: 3px 7px; text-align: right; white-space: nowrap; }
+table.diag td.txt { text-align: left; white-space: normal; }
+table.diag th { background: #f5f5f5; }
+table.diag tr th:first-child { text-align: left; }
+.missing { color: #999; font-style: italic; }
+.key span { padding: 2px 8px; margin-right: 6px; }
+</style>
+
+**Calibration:** `r CODE`
+**Folder:** `r DIR`
+**Page made:** `r format(Sys.time(), "%Y-%m-%d %H:%M")`
+
+<p class="key">Model / data colours: model too low
+<span style="background:#86b3dc">below 0.67</span>
+<span style="background:#cfe2f3">0.67 to 0.8</span>
+<span style="background:#d9f0d3">0.8 to 1.2</span>
+<span style="background:#f9c6c0">1.2 to 1.5</span>
+<span style="background:#e8837a">above 1.5</span>
+model too high &nbsp;
+<span style="background:#eeeeee">no value</span></p>
+
+# Summary
+
+## Mixing
+
+```{r summary-mixing}
+f <- latest("mixing_overview_")
+if (is.null(f)) missing("mcmc/mixing_check.R (write.mixing.report)") else {
+    ov <- read.csv(f, stringsAsFactors = FALSE)
+    cat(html.table(ov[, intersect(c("city", "verdict", "max.rhat", "min.ess", "accept.total", "max.loglik.gap", "reasons"), names(ov))],
+                   verdict.colour, "verdict", row.names = FALSE))
+    link(latest("mixing_report_"), "full mixing report")
+}
+```
+
+## Fit by sex over time
+
+Median model / data across cities, with (cities within 0.8–1.2 / cities with data). 2022-2023 is after the calibration period.
+
+```{r summary-sex}
+f <- file.in(paste0("fit_by_sex_all_", CODE, ".csv"))
+if (is.null(f)) missing("fit/check_fit_by_sex_over_time.R") else {
+    long <- read.csv(f, stringsAsFactors = FALSE)
+    long <- long[long$period != "median over periods", ]
+    long$row <- paste(OUTCOME.LABELS[long$outcome], "-", long$measure)
+    s <- summarise.ratios(long$value, list(factor(long$row, unique(long$row)), factor(long$period, unique(long$period))))
+    cat(html.table(s$text, ratio.colour, colour.by = s$median))
+}
+```
+
+## Fit by race
+
+Median model / data across cities, with (cities within 0.8–1.2 / cities with data). Race data exist only for 2019-2023 (county aggregates, with gaps); 2022-2023 is after the calibration period. black.to.other = (model black / model other) / (data black / data other).
+
+```{r summary-race}
+f <- file.in(paste0("fit_by_race_all_", CODE, ".csv"))
+if (is.null(f)) missing("fit/check_fit_by_race.R") else {
+    long <- read.csv(f, stringsAsFactors = FALSE)
+    long$row <- paste(OUTCOME.LABELS[long$outcome], "-", long$measure)
+    s <- summarise.ratios(long$value, list(factor(long$row, unique(long$row)), factor(long$period, unique(long$period))))
+    cat(html.table(s$text, ratio.colour, colour.by = s$median))
+}
+```
+
+## Fit by age, 2019-2021
+
+Median model / data across cities, with (cities within 0.8–1.2 / cities with data).
+
+```{r summary-age}
+tabs <- lapply(names(OUTCOME.LABELS), function(o) {
+    f <- file.in(paste0("fit_by_age_", o, "_", CODE, ".csv"))
+    if (is.null(f)) NULL else read.tab(f)
+})
+names(tabs) <- OUTCOME.LABELS
+tabs <- Filter(Negate(is.null), tabs)
+if (length(tabs) == 0) missing("fit/check_fit_by_age.R") else {
+    ages  <- rownames(tabs[[1]])
+    long  <- do.call(rbind, lapply(names(tabs), function(o)
+        data.frame(age = rep(rownames(tabs[[o]]), ncol(tabs[[o]])), outcome = o, value = unlist(tabs[[o]]))))
+    s <- summarise.ratios(long$value, list(factor(long$age, ages), factor(long$outcome, names(tabs))))
+    cat(html.table(s$text, ratio.colour, colour.by = s$median))
+}
+```
+
+## Pressed against the prior
+
+Parameters whose posterior median sits below 2.5% (LOW) or above 97.5% (HIGH) of the prior in at least 3 cities.
+
+```{r summary-prior}
+f <- file.in(paste0("prior_flags_", CODE, ".csv"))
+if (is.null(f)) missing("prior/check_prior_position.R") else {
+    flags  <- read.tab(f)
+    cities <- setdiff(names(flags), c("n.low", "n.high"))
+    flags$cities <- apply(flags[, cities, drop = FALSE], 1, function(v) paste(cities[v %in% c("LOW", "HIGH")], collapse = ", "))
+    top <- flags[flags$n.low + flags$n.high >= 3, c("n.low", "n.high", "cities"), drop = FALSE]
+    if (nrow(top) == 0) cat("<p>None.</p>\n\n") else cat(html.table(top))
+    cat("<p>", nrow(flags), " parameters are flagged in at least one city; all of them are in the Prior position section.</p>\n\n")
+}
+```
+
+## Correlated parameter pairs
+
+```{r summary-pairs}
+f <- latest("correlated_pairs_")
+if (is.null(f)) missing("mcmc/mixing_correlated_parameter_pairs.R") else {
+    pairs <- read.csv(f, stringsAsFactors = FALSE)
+    split <- pairs[!pairs$same.block, ]
+    cat("<p>", nrow(pairs), " pairs are strongly correlated (|r| > 0.8) in at least one city; ",
+        nrow(split), " of them are in different sampling blocks (the sampler cannot learn those):</p>\n\n", sep = "")
+    if (nrow(split) > 0)
+        cat(html.table(split[, c("param.1", "param.2", "n.cities.strong", "median.r.within", "block.1", "block.2")], row.names = FALSE))
+}
+```
+
+# Details
+
+## Fit by sex {.tabset}
+
+Model / data by period. men.to.women = (model men / model women) / (data men / data women); below 1 = the model's men are too low relative to women.
+
+```{r detail-sex}
+for (o in names(OUTCOME.LABELS)) {
+    cat("\n\n### ", OUTCOME.LABELS[[o]], "\n\n", sep = "")
+    found <- FALSE
+    for (what in c("men", "women", "men.to.women")) {
+        f <- file.in(paste0("fit_by_sex_", o, "_", what, "_", CODE, ".csv"))
+        if (is.null(f)) next
+        found <- TRUE
+        tab <- read.tab(f)
+        cat("<h4>", what, "</h4>\n\n")
+        cat(html.table(tab, ratio.colour, setdiff(names(tab), "in.0.8.to.1.2")))
+    }
+    if (!found) missing("fit/check_fit_by_sex_over_time.R")
+    img(file.in(paste0("compare_", gsub(".", "-", o, fixed = TRUE), "_accross_locations_split-sex.png")))
+}
+```
+
+## Fit by race {.tabset}
+
+Model / data by race and period. Rows: each race, then black and hispanic relative to other.
+
+```{r detail-race}
+for (o in names(OUTCOME.LABELS)) {
+    cat("\n\n### ", OUTCOME.LABELS[[o]], "\n\n", sep = "")
+    f <- file.in(paste0("fit_by_race_", o, "_", CODE, ".csv"))
+    if (is.null(f)) missing("fit/check_fit_by_race.R") else {
+        tab <- read.tab(f)
+        cat(html.table(tab, ratio.colour, setdiff(names(tab), "in.0.8.to.1.2")))
+    }
+    img(file.in(paste0("compare_", gsub(".", "-", o, fixed = TRUE), "_accross_locations_facet-race.png")))
+}
+```
+
+## Fit by age {.tabset}
+
+Model / data by age group, 2019-2021. Inf = the data has 0 cases and the model has some; NaN or blank = no cases or no data.
+
+```{r detail-age}
+for (o in names(OUTCOME.LABELS)) {
+    cat("\n\n### ", OUTCOME.LABELS[[o]], "\n\n", sep = "")
+    f <- file.in(paste0("fit_by_age_", o, "_", CODE, ".csv"))
+    if (is.null(f)) missing("fit/check_fit_by_age.R") else {
+        tab <- read.tab(f)
+        cat(html.table(tab, ratio.colour, names(tab)))
+    }
+    img(file.in(paste0("compare_", gsub(".", "-", o, fixed = TRUE), "_accross_locations_facet-age.png")))
+}
+```
+
+## P&S : EL split
+
+P&S diagnoses / EL diagnoses, 2015-2021.
+
+```{r detail-psel}
+f <- file.in(paste0("ps_el_split_", CODE, ".csv"))
+if (is.null(f)) missing("fit/check_ps_el_split.R") else cat(html.table(read.tab(f), ratio.colour, "model.over.data"))
+```
+
+## MSM share of men
+
+Model / data. BRFSS is state level (model "other" compared to BRFSS "white"); Emory is the MSA in 2013, the model's starting value.
+
+```{r detail-msm}
+f <- file.in(paste0("msm_share_", CODE, ".csv"))
+if (is.null(f)) missing("fit/check_msm_proportion.R") else {
+    d   <- read.csv(f, stringsAsFactors = FALSE)
+    key <- paste(d$race, "|", d$source)
+    w   <- tapply(d$model.over.data, list(d$city, factor(key, unique(key))), function(v) v[1])
+    cat(html.table(w, ratio.colour, colnames(w)))
+    link(file.in(paste0("msm_share_", CODE, ".pdf")), "plot (PDF)")
+}
+```
+
+## Transmission multipliers {.tabset}
+
+Posterior medians at the spline years. msm.to.het = MSM multiplier / heterosexual multiplier.
+
+```{r detail-trate}
+for (g in c("msm", "het", "msm.to.het")) {
+    cat("\n\n### ", g, "\n\n", sep = "")
+    f <- file.in(paste0("trate_multiplier_", g, "_", CODE, ".csv"))
+    if (is.null(f)) { missing("fit/check_fit_by_sex_over_time.R"); next }
+    tab <- read.tab(f)
+    tab$median <- apply(tab, 1, median)
+    cat(html.table(tab))
+}
+```
+
+## Incidence and share diagnosed {.tabset}
+
+Model incidence per period, and P&S diagnoses / incidence. If incidence has the expected shape but the diagnosed share is off, the problem is detection; if incidence is off, it is transmission.
+
+```{r detail-incidence}
+for (g in c("msm", "heterosexual_male", "female")) {
+    cat("\n\n### ", g, "\n\n", sep = "")
+    for (what in c("incidence", "diagnosed.share")) {
+        f <- file.in(paste0("model_", what, "_", g, "_", CODE, ".csv"))
+        if (is.null(f)) { missing("fit/check_fit_by_sex_over_time.R"); next }
+        tab <- read.tab(f)
+        tab$median <- apply(tab, 1, median)
+        cat("<h4>", what, "</h4>\n\n")
+        cat(html.table(tab, digits = if (what == "incidence") 0 else 3))
+    }
+}
+```
+
+## Prior position
+
+Flagged parameters, then their percentiles (0 = bottom of the prior, 1 = top).
+
+```{r detail-prior}
+f <- file.in(paste0("prior_flags_", CODE, ".csv"))
+if (is.null(f)) missing("prior/check_prior_position.R") else {
+    flags  <- read.tab(f)
+    cities <- setdiff(names(flags), c("n.low", "n.high"))
+    cat(html.table(flags, flag.colour, cities))
+    p <- file.in(paste0("prior_percentiles_", CODE, ".csv"))
+    if (!is.null(p)) {
+        pct <- read.tab(p)
+        pct <- pct[intersect(rownames(flags), rownames(pct)), , drop = FALSE]
+        cat("<h4>percentiles of the flagged parameters</h4>\n\n")
+        cat(html.table(pct, pct.colour, names(pct), digits = 3))
+    }
+}
+```
+
+## Correlated pairs
+
+The 30 pairs that are strong in the most cities.
+
+```{r detail-pairs}
+f <- latest("correlated_pairs_")
+if (is.null(f)) missing("mcmc/mixing_correlated_parameter_pairs.R") else {
+    pairs <- read.csv(f, stringsAsFactors = FALSE)
+    cat(html.table(head(pairs[, c("param.1", "param.2", "same.block", "n.cities.strong", "median.r.within",
+                                  "min.r.within", "max.r.within", "block.1", "block.2")], 30), row.names = FALSE))
+}
+```
+
+## Files in this folder
+
+```{r detail-files}
+files <- list.files(DIR, recursive = TRUE)
+files <- files[!grepl("^calibration_review_", files)]
+cat("<ul>", paste0("<li><a href=\"", files, "\">", files, "</a></li>", collapse = ""), "</ul>\n\n")
+```
