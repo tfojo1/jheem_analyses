@@ -45,7 +45,7 @@ put.msa.data.as.new.source.NEW(outcome = 'adult.population',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
 
 
 #county --> MSA
@@ -73,7 +73,7 @@ put.msa.data.as.new.source.NEW(outcome = 'adult.population',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
 
 #county --> NSDUH Substate Regions
 
@@ -109,7 +109,7 @@ put.msa.data.as.new.source.NEW(outcome = 'adult.population',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
 
 #Deaths county --> MSA
 census.manager = load.data.manager(name="census.manager", file=Sys.getenv("CENSUS_MANAGER_SHARED_FILE", "Q:/data_managers/census.manager.rdata"))
@@ -154,7 +154,7 @@ put.msa.data.as.new.source.NEW(outcome = 'deaths',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
 
 #===============================================================================
 
@@ -188,7 +188,7 @@ put.msa.data.as.new.source.NEW(outcome = 'diagnosed.prevalence',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
 
 put.msa.data.as.new.source.NEW(outcome = 'diagnoses',
                                from.source.name = 'cdc.hiv',
@@ -214,7 +214,7 @@ put.msa.data.as.new.source.NEW(outcome = 'diagnoses',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
 
 put.msa.data.as.new.source.NEW(outcome = 'total.prevalence',
                                from.source.name = 'cdc.hiv',
@@ -240,7 +240,7 @@ put.msa.data.as.new.source.NEW(outcome = 'total.prevalence',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
 
 #Prep data
 put.msa.data.as.new.source.NEW(outcome = 'prep',
@@ -267,7 +267,7 @@ put.msa.data.as.new.source.NEW(outcome = 'prep',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
 
 put.msa.data.as.new.source.NEW(outcome = 'prep',
                                from.source.name = 'aidsvu',
@@ -293,7 +293,7 @@ put.msa.data.as.new.source.NEW(outcome = 'prep',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
 
 put.msa.data.as.new.source.NEW(outcome = 'prep.indications',
                                from.source.name = 'cdc.prep.indications',
@@ -319,7 +319,7 @@ put.msa.data.as.new.source.NEW(outcome = 'prep.indications',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
 
 #Put proportion outcomes (awareness and suppression)
 put.msa.data.as.new.source.NEW(outcome = 'awareness',
@@ -349,7 +349,7 @@ put.msa.data.as.new.source.NEW(outcome = 'awareness',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age',
+                               ontology.for.relative.contribution = 'single.year.age.census',
                                source.for.denominator='cdc.hiv',
                                ontology.for.denominator='cdc')
 
@@ -379,7 +379,7 @@ put.msa.data.as.new.source.NEW(outcome = 'suppression',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age',
+                               ontology.for.relative.contribution = 'single.year.age.census',
                                source.for.denominator='cdc.hiv',
                                ontology.for.denominator='cdc')
 
@@ -423,7 +423,7 @@ put.msa.data.as.new.source.NEW(outcome = 'gonorrhea',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
 
 
 #county --> MSA
@@ -451,7 +451,7 @@ put.msa.data.as.new.source.NEW(outcome = 'ps.syphilis',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
 
 
 # This aggregates specific NSDUH Data to MSA ------------------------------
@@ -459,7 +459,7 @@ put.msa.data.as.new.source.NEW(outcome = 'ps.syphilis',
 
 #Aggregate cocaine + heroin for LA (C.31080), Vegas (C.29820), San Diego (C.41740)
 
-los.angeles.msa <- c('CA.11', 'CA.14') 
+los.angeles.msa <- c('CA.11', 'CA.14')
 
 las.vegas.msa <- c("NV.2") 
 
@@ -470,10 +470,10 @@ la.cocaine.aggregated = surveillance.manager$pull(outcome = "cocaine",
                                                   dimension.values=list(location=los.angeles.msa),
                                                   keep.dimensions='year')
 
-la.heroin.aggregated = surveillance.manager$pull(outcome = "heroin",
-                                                 metric = "estimate",
-                                                 dimension.values=list(location=los.angeles.msa),
-                                                 keep.dimensions='year')
+# la.heroin.aggregated = surveillance.manager$pull(outcome = "heroin",
+#                                                  metric = "estimate",
+#                                                  dimension.values=list(location=los.angeles.msa),
+#                                                  keep.dimensions='year')
 
 sd.cocaine.aggregated = surveillance.manager$pull(outcome = "cocaine",
                                                   metric = "estimate",
@@ -513,11 +513,11 @@ vegas.cocaine = as.data.frame.table(vegas.cocaine.aggregated)%>%
     mutate(outcome = "cocaine")%>%
     mutate(location = 'C.29820')
 
-la.heroin = as.data.frame.table(la.heroin.aggregated)%>%
-    mutate(year = as.character(year))%>%
-    mutate(value = as.numeric(Freq))%>%
-    mutate(outcome = "heroin")%>%
-    mutate(location = 'C.31080')
+# la.heroin = as.data.frame.table(la.heroin.aggregated)%>%
+#     mutate(year = as.character(year))%>%
+#     mutate(value = as.numeric(Freq))%>%
+#     mutate(outcome = "heroin")%>%
+#     mutate(location = 'C.31080')
 
 sd.heroin = as.data.frame.table(sd.heroin.aggregated)%>%
     mutate(year = as.character(year))%>%
@@ -531,7 +531,10 @@ vegas.heroin = as.data.frame.table(vegas.heroin.aggregated)%>%
     mutate(outcome = "heroin")%>%
     mutate(location = 'C.29820')
 
-aggregated.nsduh.data <- rbind(la.cocaine, sd.cocaine, vegas.cocaine, la.heroin, sd.heroin, vegas.heroin)
+#aggregated.nsduh.data <- rbind(la.cocaine, sd.cocaine, vegas.cocaine, la.heroin, sd.heroin, vegas.heroin)
+
+aggregated.nsduh.data <- rbind(la.cocaine, sd.cocaine, vegas.cocaine, sd.heroin, vegas.heroin)
+
 
 surveillance.manager$put.long.form(
     data = aggregated.nsduh.data,

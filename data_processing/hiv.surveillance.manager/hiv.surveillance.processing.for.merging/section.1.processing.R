@@ -2,16 +2,17 @@
 library(jheem2)
 library(tidyverse)
 library(readxl)
-library(stringr)
 library(haven)
 library(locations)
 library(tools)
 
-###############################################################################
+#===============================================================================
 
-#####SECTION 1#####
-#Population related data
-###############################################################################
+#SECTION 1
+
+#Population Outcomes Data 
+
+#===============================================================================
 
 data.manager = create.data.manager('surveillance', description='surveillance data manager')
 
@@ -73,7 +74,7 @@ data.manager$register.outcome(
     description = "Deaths"))
 
 data.manager$register.outcome(
-  'heroin', #can change to heroin use but leave display name the same#
+  'heroin', 
   metadata = create.outcome.metadata(
     scale = 'proportion',
     display.name = 'Heroin Use in the Past Year',
@@ -112,9 +113,8 @@ data.manager$register.source('census.aggregated.adult.population', parent.source
 data.manager$register.source('nsduh', parent.source= "NSDUH", full.name = "National Survey on Drug Use and Health", short.name='nsduh') #child 
 
 #Register Ontologies:
-
 data.manager$register.ontology(
-  'census',
+  'single.year.age.census',
   ont = ontology(
     year= NULL,
     location= NULL,
@@ -156,7 +156,7 @@ data.manager$register.ontology(
   ))
 
 data.manager$register.ontology(
-  'census.grouped.age',
+  'census',
   ont = ontology(
     year= NULL,
     location= NULL,
@@ -226,10 +226,8 @@ surveillance.manager=data.manager
 census.manager = load.data.manager("../../cached/census.manager.rdata")
 
  source('data_processing/put_msa_data_without_estimation_script.R') #Creates adult.population for single year ages
- source('data_processing/hiv.surveillance.manager/adult.population.10.23.R') #creates adult population for 2010-2023, stratified data
+ source('data_processing/hiv.surveillance.manager/adult.population.00.25.R') #creates adult population for 2010-2023, stratified data
 
 
-# SAVE --------------------------------------------------------------------
-
-
+#Save:
 save(surveillance.manager, file="Q:/data_managers/data.manager.merge/surveillance.manager_section1.rdata")
