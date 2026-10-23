@@ -1,7 +1,9 @@
 # Data managers SHIELD uses: every run loads exactly these releases. To change
 # one, edit its release here and commit; keep the same releases across a
 # calibration's stages. Releases: https://github.com/tfojo1/jheem_analyses/releases
-# "unpinned" keeps census on the release named by the shared cached-metadata file.
+# "unpinned" would keep census on the release named by the shared cached-metadata
+# file. Census is pinned to October 8 because SHIELD's specification does not
+# compile with the October 21 census (its census ages are 5-year groups).
 name,file,release
-census,census.manager.rdata,unpinned
+census,census.manager.rdata,census-manager-v2026.10.08
 syphilis,syphilis.manager.rdata,syphilis-manager-v2026.10.09

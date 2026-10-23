@@ -32,11 +32,9 @@ container load exactly those releases. To change one, edit its release there and
 commit. In the container, a calibration that already started keeps the managers
 it started with; with the usual launcher, keep the same releases across a
 calibration's stages yourself.
-Census is `unpinned` for now: the usual launcher uses the census named by the
-shared cached-metadata file, and the container uses the October 8 release
-(`census-manager-v2026.10.08`, currently the same file). The first run with a new
-release downloads it once and checks it; releases are kept on the NAS in
-`data_manager_releases`.
+Census is pinned to the October 8 release (`census-manager-v2026.10.08`) in both.
+The first run with a new release downloads it once and checks it; the container
+keeps releases on the NAS in `data_manager_releases`.
 
 **Commit your changes first.** The container uses your committed
 `jheem_analyses` code and your committed `jheem2` code (the `jheem2` folder next

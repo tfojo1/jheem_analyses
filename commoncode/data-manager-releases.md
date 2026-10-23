@@ -55,9 +55,12 @@ run record.
 
 The ordinary SHIELD bootstrap loads the releases declared in
 `applications/SHIELD/data_managers.csv` (columns `name,file,release`; lines
-starting with `#` are comments). Syphilis must name a dated release. Census
-`unpinned` keeps census on the release named by the shared cached-metadata file,
-as before. To change a release, edit the file and commit. Keep the releases fixed
+starting with `#` are comments). Syphilis must name a dated release. Census may
+too (`census-manager-v2026.10.08`), or be `unpinned`, which keeps it on the
+release named by the shared cached-metadata file. A named census release is
+loaded from GitHub Releases and verified like syphilis; loads that name no census
+release, in SHIELD or elsewhere, keep the OneDrive path. To change a release, edit
+the file and commit. Keep the releases fixed
 across a calibration's stages; selecting a different manager does not update an
 earlier stage's results or make its checkpoints safe to resume. Setting
 `SYPHILIS.MANAGER.RELEASE.TAG` before sourcing the bootstrap does not override the

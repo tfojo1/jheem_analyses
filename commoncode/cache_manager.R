@@ -60,7 +60,7 @@ load.data.manager.from.cache <- function(file, set.as.default = F, offline=F,
     error.prefix <- "Cannot load.data.manager.from.cache(): "
 
     # Check if this manager has a GitHub Release source
-    gh.source <- get.github.release.source(file)
+    gh.source <- get.github.release.source(file, explicit.release = !is.null(release.tag))
 
     if (!is.null(release.tag)) {
         if (is.null(gh.source)) {
@@ -251,10 +251,10 @@ sync.package.version <- function(package="jheem2", allow.flag=F) {
 
 ## GITHUB RELEASE FUNCTIONS ----
 
-get.github.release.source <- function(file) {
-    # Census uses its existing OneDrive path in ordinary sessions; the
-    # immutable GitHub release is selected only for the recorded SHIELD path.
-    if (identical(file, "census.manager.rdata") &&
+get.github.release.source <- function(file, explicit.release = FALSE) {
+    # Census uses its existing OneDrive path in ordinary sessions; its immutable
+    # GitHub releases are used when a release is named or in recorded SHIELD runs.
+    if (identical(file, "census.manager.rdata") && !explicit.release &&
         !identical(tolower(trimws(Sys.getenv("SHIELD_RECORDED_RUN"))), "true")) {
         return(NULL)
     }
