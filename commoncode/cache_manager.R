@@ -441,11 +441,19 @@ write.release.resolution <- function(resolution, path) {
     jsonlite::write_json(persisted, path, auto_unbox = TRUE, pretty = TRUE)
 }
 
-get.cached.github.release.resolution <- function(file, gh.source, release.tag,
-                                                 error.prefix) {
-    if (identical(release.tag, gh.source$latest_tag)) {
-        stop(paste0(error.prefix, "The mutable alias '", release.tag,
-                    "' cannot be resolved offline; use its immutable release tag"))
+# Release tags ending in -latest (and the configured alias) are moved between
+# versions, so they are always resolved online, never answered from the cache.
+is.mutable.github.release.tag <- function(tag, gh.source) {
+    identical(tag, gh.source$latest_tag) || grepl("-latest$", tag)
+}
+
+# The cached resolution of a named immutable release, or NULL if it is missing,
+# its metadata doesn't match, or the artifact fails its recorded digest.
+find.cached.github.release.resolution <- function(file, gh.source, release.tag,
+                                                  error.prefix) {
+    if (!is.character(release.tag) || length(release.tag) != 1 ||
+        is.na(release.tag) || is.mutable.github.release.tag(release.tag, gh.source)) {
+        return(NULL)
     }
     tag <- validate.github.release.component(release.tag, "tag", error.prefix)
     asset <- if (!is.null(gh.source$asset)) gh.source$asset else file
@@ -460,8 +468,21 @@ get.cached.github.release.resolution <- function(file, gh.source, release.tag,
         is.null(resolution$sha256) ||
         !grepl("^[0-9a-fA-F]{64}$", resolution$sha256) ||
         !cached.release.is.valid(paths, resolution)) {
+        return(NULL)
+    }
+    resolution
+}
+
+get.cached.github.release.resolution <- function(file, gh.source, release.tag,
+                                                 error.prefix) {
+    if (is.mutable.github.release.tag(release.tag, gh.source)) {
+        stop(paste0(error.prefix, "The mutable alias '", release.tag,
+                    "' cannot be resolved offline; use its immutable release tag"))
+    }
+    resolution <- find.cached.github.release.resolution(file, gh.source, release.tag, error.prefix)
+    if (is.null(resolution)) {
         stop(paste0(error.prefix, "The cached copy of '", file,
-                    "' for release '", tag,
+                    "' for release '", release.tag,
                     "' is missing or failed metadata or digest verification, and 'offline' is TRUE"))
     }
     resolution
@@ -531,12 +552,20 @@ materialize.github.release.asset <- function(resolution, offline, error.prefix) 
 load.data.manager.from.github.release <- function(file, gh.source, release.tag,
                                                   set.as.default, offline,
                                                   error.prefix) {
-    resolution <- if (offline) {
-        get.cached.github.release.resolution(file, gh.source, release.tag, error.prefix)
+    # A named immutable release that is already cached and verifies against its
+    # recorded digest is the requested file, so it needs no GitHub lookup. Anything
+    # else (not cached, damaged, or a mutable alias) is resolved as before.
+    resolution <- find.cached.github.release.resolution(file, gh.source, release.tag, error.prefix)
+    if (!is.null(resolution)) {
+        local.path <- data.manager.release.paths(resolution, error.prefix)$artifact
     } else {
-        resolve.github.release.asset(file, gh.source, release.tag, error.prefix)
+        resolution <- if (offline) {
+            get.cached.github.release.resolution(file, gh.source, release.tag, error.prefix)
+        } else {
+            resolve.github.release.asset(file, gh.source, release.tag, error.prefix)
+        }
+        local.path <- materialize.github.release.asset(resolution, offline, error.prefix)
     }
-    local.path <- materialize.github.release.asset(resolution, offline, error.prefix)
     data.manager <- load.verified.data.manager(local.path, set.as.default, resolution)
     resolution$local_path <- normalizePath(local.path, mustWork = TRUE)
     attr(data.manager, "jheem.manager.resolution") <- resolution

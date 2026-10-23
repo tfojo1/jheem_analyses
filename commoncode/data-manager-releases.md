@@ -85,11 +85,15 @@ do not change. No anonymous retry is made for other repositories or endpoints,
 HTTP 403/429 rate or permission failures, or a second failed request. Credentials
 are not sent to download hosts other than `github.com` or `api.github.com`.
 
-An online lookup that still fails stops rather than substituting a cached input.
-This applies even when a previously verified version is available. Use explicit
-offline mode below when loading cached data is intended; the error message names
-that option. Updating authentication does not change an already running
-calibration's loaded manager.
+A named immutable release (`release.tag = "syphilis-manager-v2026.10.09"`) that is
+already cached, and whose file still matches the SHA-256 recorded when it was
+downloaded and verified, loads without contacting GitHub: it is exactly the file
+requested. A `*-latest` alias, a release not yet cached, or a cached copy that fails
+verification is resolved online. An online lookup that fails stops rather than
+substituting a cached input; for the promoted alias this applies even when an older
+verified version is cached. Use explicit offline mode below when loading cached data
+is intended; the error message names that option. Updating authentication does not
+change an already running calibration's loaded manager.
 
 ## Offline use
 
