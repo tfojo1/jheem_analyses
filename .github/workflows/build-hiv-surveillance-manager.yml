@@ -200,15 +200,21 @@ jobs:
 
       - name: Compare with the promoted manager
         run: |
-          set -uo pipefail
           # Exit 1 with a report means structural removals: flag for review, don't fail.
-          # No report means the comparison itself failed.
+          # No report means the comparison itself failed. (Steps run with bash -e, so the
+          # comparison's own exit status is collected explicitly.)
+          rm -f _ci_outputs/active_baseline_report.json
+          set +e
           Rscript data_processing/hiv.surveillance.manager/validate_candidate.R \
             _ci_inputs/active/surveillance.manager.rdata \
             _ci_outputs/surveillance.manager.rdata \
             _ci_outputs/active_baseline_report.json \
             2>&1 | tee _ci_outputs/active_baseline_summary.txt
+          status=${PIPESTATUS[0]}
+          set -e
+          echo "Comparison exit status: $status (1 means structural removals, flagged for review)"
           jq -e '.n_checks' _ci_outputs/active_baseline_report.json > /dev/null
+          [[ $status -eq 0 || $status -eq 1 ]]
 
       - name: Exercise focused consumer boundaries
         run: |
