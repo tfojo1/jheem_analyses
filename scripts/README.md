@@ -11,13 +11,13 @@ Scripts and workflows for building, validating, and publishing data managers.
 Each manager has its own upload script and workflows. Both upload scripts read the
 same NAS folder (`data_managers/data.manager.merge/`) but take only their own files:
 
-| | Syphilis manager | HIV surveillance manager |
-|---|---|---|
-| Section files | `syphilis.manager_section1–4.rdata` | `surveillance.manager_section1–5.rdata` |
-| Upload | `scripts/upload_sections.R` | `scripts/upload_hiv_sections.R` |
-| Build workflow | Build Syphilis Manager | Build HIV Surveillance Manager |
-| Promote workflow | Promote Syphilis Manager | Promote HIV Surveillance Manager |
-| Steps | [Syphilis manager](#syphilis-manager) | [HIV surveillance manager](#hiv-surveillance-manager) |
+| | Syphilis manager | HIV surveillance manager | Census manager |
+|---|---|---|---|
+| Section files | `syphilis.manager_section1–4.rdata` | `surveillance.manager_section1–5.rdata` | `census.manager_section1–3.rdata` |
+| Upload | `scripts/upload_sections.R` | `scripts/upload_hiv_sections.R` | `scripts/upload_census_sections.R` |
+| Build workflow | Build Syphilis Manager | Build HIV Surveillance Manager | Build Census Manager |
+| Promote workflow | Promote Syphilis Manager | Promote HIV Surveillance Manager | Promote Census Manager |
+| Steps | [Syphilis manager](#syphilis-manager) | [HIV surveillance manager](#hiv-surveillance-manager) | [Census manager](#census-manager) |
 
 ## Syphilis Manager
 
@@ -171,6 +171,70 @@ SURVEILLANCE.MANAGER <- load.data.manager.from.cache(
 
 More detail on the HIV checks: `data_processing/hiv.surveillance.manager/README.md`.
 
+## Census Manager
+
+The census manager uses the same steps, with its own script and workflows. The
+merge runs in CI, so there's no need to run `census.manager.merge.R` locally.
+
+1. **Rebuild sections locally** with
+   `data_processing/census.manager/census.processing.for.merging/section.1.processing.R`
+   through `section.3.processing.R`. They save to
+   `Q:/data_managers/data.manager.merge/census.manager_section1.rdata` through `_section3.rdata`.
+2. **Upload them:**
+
+   ```bash
+   Rscript scripts/upload_census_sections.R Q:                       # Windows
+   Rscript scripts/upload_census_sections.R /mnt/jheem_nas_share     # Linux (shield1)
+   Rscript scripts/upload_census_sections.R /Volumes/jheem$          # macOS
+   ```
+
+   This uploads the three section files as a dated release (e.g. `census-sections-v2026.10.23`)
+   and points `census-sections-latest` at it. Add `--dry-run` to check the files first.
+
+3. **Build:** go to **Actions > Build Census Manager > Run workflow**, or:
+
+   ```bash
+   gh workflow run "Build Census Manager" --repo tfojo1/jheem_analyses
+   ```
+
+   The inputs are the sections (default `census-sections-latest`), the census to compare
+   against (default `census-manager-latest`, the promoted one), and the jheem2 ref (`dev`).
+   A successful build publishes a release like `census-manager-v2026.10.23`. Its notes show:
+
+   - **Structural changes** compared with the promoted census: every removed or added
+     outcome, source, ontology, stratification, or dimension value.
+   - **Value changes**: each array whose values changed, with the number of changed cells.
+   - **SHIELD check**: whether the SHIELD model still starts with this census (its
+     specification compiles and a Baltimore kernel builds), using the syphilis release in
+     `applications/SHIELD/data_managers.csv`. The same check runs on the promoted census
+     as a control.
+   - **Data quality report**: the same missing-value and dimension checks as the other
+     builds. Accepted issues can be listed in `data_processing/census.manager/known_issues.json`.
+
+   If the build removes something the promoted census has, or SHIELD doesn't start with it,
+   the release is marked **Needs review** and listed as a pre-release. Runs from branches
+   other than `master` check everything but don't publish.
+
+4. **Promote:** after reviewing the notes,
+
+   ```bash
+   gh workflow run "Promote Census Manager" \
+     --repo tfojo1/jheem_analyses \
+     -f release_tag=census-manager-v2026.10.23
+   ```
+
+   This copies the build to `census-manager-latest`. For a **Needs review** build, tick the
+   review box (or add `-f reviewed_changes=true`) once you've confirmed the changes are intended.
+
+**What this changes for people using census, for now.** Nothing loads `census-manager-latest`
+automatically yet. SHIELD loads the dated census named in `applications/SHIELD/data_managers.csv`;
+other applications load census through the cached-metadata (OneDrive) path; and the syphilis and
+HIV builds take census from the `data-managers-*` dependency bundle. So after promoting, update
+those as before (the cached-metadata file, and `upload_manager_deps.R` if the builds should use it).
+To use a new census in SHIELD, change its line in `data_managers.csv` to the new dated release.
+
+More detail on the census build: `data_processing/census.manager/README.md`.
+
 ## Uploading New Raw Data
 
 When new data files are added to the NAS:
@@ -199,6 +263,7 @@ Rscript scripts/upload_manager_deps.R /mnt/jheem_nas_share
 | `upload_sections.R` | 4 section .rdata files | `syphilis-sections-latest` (mutable) |
 | `upload_raw_data.R` | All of `data_raw/` (per-subdir archives) | `data-raw-v{date}` (immutable) |
 | `upload_hiv_sections.R` | 5 HIV section .rdata files + `SHA256SUMS.txt` | `hiv-sections-v{date}` (immutable) and `hiv-sections-latest` (mutable) |
+| `upload_census_sections.R` | 3 census section .rdata files + `SHA256SUMS.txt` | `census-sections-v{date}` (immutable) and `census-sections-latest` (mutable) |
 | `upload_manager_deps.R` | surveillance + census managers + strat results | `data-managers-v{date}` (immutable) |
 
 All scripts take the NAS root as their first argument and require the `gh` CLI.
