@@ -1,0 +1,4 @@
+{
+    "_comment": "Known dimension value issues in the census manager that have been reviewed and accepted. The data-quality report suppresses warnings matching these entries. Remove an entry to start flagging it again.",
+    "dimension_sanity": []
+}
