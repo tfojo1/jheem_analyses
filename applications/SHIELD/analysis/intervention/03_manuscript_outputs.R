@@ -34,7 +34,7 @@
 # truth; the filenames are historical. Same for Table S2a, which still writes
 # 5-spillover-associations-*.csv.
 #
-# DEPENDENCY. Table S2 builds `table4` (and `t4.share`, `t4.impact`, `av`).
+# DEPENDENCY. Table S2 builds `table4` (and `t4.share`, `t4.impact`, `chg`).
 # Table S2a, Figure 5 and Check 1 all read those, so Table S2 must run first.
 # Figures 3 and 3a both read the SHARED INPUTS block. Nothing else is coupled.
 #
@@ -53,7 +53,7 @@
 # TWO METHOD CHOICES THAT DIFFER FROM THE EXPLORATORY CODE IN archive/doxy_figures.R
 #
 #   1. HETEROSEXUAL GROWTH IS COMPUTED FROM COUNTS, NOT FROM A SUM OF RATES.
-#      rate_incidence_per_pop for heterosexual_male and for female have
+#      incidence_rate for heterosexual_male and for female have
 #      DIFFERENT denominators, so their sum is not the heterosexual incidence
 #      rate, and its year-on-year ratio is not the heterosexual growth rate. On
 #      a worked example the error was ~6%, and it fed straight into `divergence`
@@ -118,10 +118,11 @@ if(1==1){
 # ****************************************************************************************************
 # SHARED INPUTS -- the coverage x location surfaces used by Figures 3 and 3a ----
 # ****************************************************************************************************
-# WHAT   Median % incidence reduction for every MSA x coverage level in
-#        EVAL.YEAR, under the two comparators the paper uses throughout:
-#          tbl.cov.vs2022     vs the 2022 baseline          (pct_incidence_reduction_vs_baseline)
-#          tbl.cov.vs.noint   vs no intervention, same year (pct_incidence_averted)
+# WHAT   Median % change in incidence for every MSA x coverage level in
+#        EVAL.YEAR, under the two references the paper uses throughout:
+#          tbl.cov.vs2022     vs YEAR0, same intervention   (pct_change_incidence_vs_year0)
+#          tbl.cov.vs.noint   vs no intervention, same year (pct_change_incidence_vs_noint)
+#        Negative = fewer infections than the reference.
 # WHY    Figures 3 and 3a plot the SAME surface two ways -- Figure 3 reads it as
 #        a dose-response, Figure 3a searches it for a threshold -- so it is
 #        built once here rather than twice under two sets of object names.
@@ -131,7 +132,7 @@ if(1==1){
   tbl.cov.vs2022 <- make_multi_location_table(
     data          = results,
     locations     = MSAS,
-    outcomes      = c("pct_incidence_reduction_vs_baseline"),
+    outcomes      = c("pct_change_incidence_vs_year0"),
     interventions = COVERAGE.LEVELS,
     years         = EVAL.YEAR,
     stat.type     = "median",
@@ -140,7 +141,7 @@ if(1==1){
   tbl.cov.vs.noint <- make_multi_location_table(
     data          = results,
     locations     = MSAS,
-    outcomes      = c("pct_incidence_averted"),
+    outcomes      = c("pct_change_incidence_vs_noint"),
     interventions = COVERAGE.LEVELS,
     years         = EVAL.YEAR,
     stat.type     = "median",
@@ -153,8 +154,8 @@ if(1==1){
 # TABLE 1 -- BASELINE EPIDEMIOLOGY, NO INTERVENTION ----
 # ****************************************************************************************************
 # WHAT   One row per MSA describing the epidemic BEFORE Doxy-PEP: incidence rate,
-#        fold-change 2022 -> 2030, total diagnosis rate, P&S diagnoses per
-#        incident infection, and the MSM share of incidence.
+#        % change in the incidence rate 2022 -> 2030, total diagnosis rate, P&S
+#        diagnoses per incident infection, and the MSM share of incidence.
 # INPUT  results, MSAS; `noint` only; 2022 and 2030; median with 95% CrI.
 # OUTPUT tables/1-notInt.csv  (object `final`)
 # NOTE   tbl1 is the Total stratum; tbl2 supplies the MSM share and is joined on
@@ -164,21 +165,20 @@ if(1==1){
 {
   tbl1 = make_multi_location_table(
     data = results, locations = MSAS,
-    outcomes = c("rate_incidence_per_pop",
-                 "ratio_rate_incidence_per_pop_vs_baseline",
-                 "rate_diagnosis_total_per_pop",
-                 "ratio_ps_diagnosis_to_incidence"),
+    outcomes = c("incidence_rate",
+                 "pct_change_incidence_rate_vs_year0",
+                 "diagnosis_total_rate",
+                 "diagnosis_ps_per_incidence"),
     interventions = "noint", filter.by.strat = "Total",
     years = as.character(c(2022, 2030)), stat.type = "median.ci",
-    digits = c(.default                                 = 0,
-               ratio_rate_incidence_per_pop_vs_baseline = 2,
-               ratio_ps_diagnosis_to_incidence          = 2)
+    digits = c(.default                   = 0,
+               diagnosis_ps_per_incidence = 2)
   )
   
   tbl2 = make_multi_location_table(
     data          = results,
     locations     = MSAS,
-    outcomes      = c("pct_incidence_share" ),
+    outcomes      = c("share_incidence" ),
     interventions = "noint",
     filter.by.strat = c("msm"),
     years         = as.character(c(2022,2030)),
@@ -186,19 +186,19 @@ if(1==1){
   );
   
   final <- left_join(tbl1,
-                     select(tbl2, location, stat, starts_with("pct_incidence_share")),
+                     select(tbl2, location, stat, starts_with("share_incidence")),
                      by = c("location", "stat"))
   col.labels <- c(
     location                                            = "MSA",
-    rate_incidence_per_pop_noint_2022                   = "Incidence rate (per 100,000 persons), 2022",
-    rate_incidence_per_pop_noint_2030                   = "Incidence rate (per 100,000 persons), 2030",
-    ratio_rate_incidence_per_pop_vs_baseline_noint_2030 = "Fold-change in incidence rate, 2030 vs 2022",
-    rate_diagnosis_total_per_pop_noint_2022                = "Total diagnosis rate (per 100,000 persons), 2022",
-    rate_diagnosis_total_per_pop_noint_2030                = "Total diagnosis rate (per 100,000 persons), 2030",
-    ratio_ps_diagnosis_to_incidence_noint_2022          = "P&S diagnoses per incident infection, 2022",
-    ratio_ps_diagnosis_to_incidence_noint_2030          = "P&S diagnoses per incident infection, 2030",
-    pct_incidence_share_noint_2022                      = "MSM share of incidence (%), 2022",
-    pct_incidence_share_noint_2030                      = "MSM share of incidence (%), 2030"
+    incidence_rate_noint_2022                           = "Incidence rate (per 100,000 persons), 2022",
+    incidence_rate_noint_2030                           = "Incidence rate (per 100,000 persons), 2030",
+    pct_change_incidence_rate_vs_year0_noint_2030       = "Change in incidence rate, 2022-2030 (%)",
+    diagnosis_total_rate_noint_2022                     = "Total diagnosis rate (per 100,000 persons), 2022",
+    diagnosis_total_rate_noint_2030                     = "Total diagnosis rate (per 100,000 persons), 2030",
+    diagnosis_ps_per_incidence_noint_2022               = "P&S diagnoses per incident infection, 2022",
+    diagnosis_ps_per_incidence_noint_2030               = "P&S diagnoses per incident infection, 2030",
+    share_incidence_noint_2022                          = "MSM share of incidence (%), 2022",
+    share_incidence_noint_2030                          = "MSM share of incidence (%), 2030"
   )
   hit <- names(final) %in% names(col.labels)
   names(final)[hit] <- col.labels[names(final)[hit]]
@@ -221,10 +221,10 @@ baseline.tbl <- make_multi_location_table(
     data            = results,
     locations       = MSAS,
     outcomes        = c("incidence",
-                        "rate_incidence_per_pop",
-                        "pct_incidence_share",
-                        "ratio_ps_diagnosis_to_incidence",
-                        "rate_diagnosis_ps_per_pop"),
+                        "incidence_rate",
+                        "share_incidence",
+                        "diagnosis_ps_per_incidence",
+                        "diagnosis_ps_rate"),
     interventions   = "noint",
     filter.by.strat = c("Total", "msm"),
     years           = as.character(2022:2030),
@@ -238,18 +238,18 @@ p.base.A <- plot_trend_by_location(baseline.tbl, outcome = "incidence",
                                    y.breaks = c(1000, 5000, 10000,50000,100000),
                                    y.limits = c(1000,100000),
                                    y.lab = "Incident cases")
-p.base.B <- plot_trend_by_location(baseline.tbl, outcome = "rate_incidence_per_pop",
+p.base.B <- plot_trend_by_location(baseline.tbl, outcome = "incidence_rate",
                                    subgroup = "Total", 
                                    # dashed = HL,
                                    y.lab = "Incidence rate (per 100,000 person-years)")
 
 
-p.base.C <- plot_trend_by_location(baseline.tbl, outcome = "pct_incidence_share",
+p.base.C <- plot_trend_by_location(baseline.tbl, outcome = "share_incidence",
                                    subgroup = "msm", 
                                    # dashed = HL,
                                    y.lab = "MSM share of incident infections (%)")
 
-p.base.D <- plot_trend_by_location(baseline.tbl, outcome = "rate_diagnosis_ps_per_pop",
+p.base.D <- plot_trend_by_location(baseline.tbl, outcome = "diagnosis_ps_rate",
                                    subgroup = "Total", 
                                    # dashed = HL,
                                    y.lab = "PS Diagnosis rate (per 100,000 person-years)")
@@ -266,8 +266,8 @@ fig.baseline <- (p.base.A | p.base.B)/( p.base.D | p.base.C) + plot_annotation(t
 #          A  MSM   vs the 2022 baseline        B  Total vs the 2022 baseline
 #          C  MSM   vs no intervention, 2030    D  Total vs no intervention, 2030
 # INPUT  tbl.cov.vs2022 and tbl.cov.vs.noint from SHARED INPUTS above.
-# OPTION HEAT.FRAME picks what a cell MEANS -- % reduction or % change. See the
-#        block below; it must agree with the panel titles.
+# OPTION HEAT.FRAME picks what a cell MEANS -- % change (as computed) or % reduction
+#        (sign flipped). See the block below; it must agree with the panel titles.
 # OUTPUT figures/fig3_heatmaps.png  (object `fig.heatmap`)
 # COLOUR SHIELD.HEAT.COLS / SHIELD.HEAT.SHADE, from the helper's SHIELD
 #        FIGURE PALETTE; HEAT.MIDPOINT / HEAT.LABEL from CONFIGURATION here.
@@ -278,10 +278,10 @@ fig.baseline <- (p.base.A | p.base.B)/( p.base.D | p.base.C) + plot_annotation(t
 {
   # ---- OPTION: what does a cell MEAN? ----------------------------------------
   # HEAT.FRAME
-  #   "reduction"  cell = % REDUCTION in incidence. Positive = incidence FELL.
-  #                This is the scale the model outcomes are computed on, so
-  #                nothing is transformed.
   #   "change"     cell = % CHANGE in incidence. Positive = incidence ROSE.
+  #                This is the scale the outcomes are computed on
+  #                (pct_change_*), so nothing is transformed.
+  #   "reduction"  cell = % REDUCTION in incidence. Positive = incidence FELL.
   #                Every value is negated, and the band breaks and their colours
   #                are flipped with it, so blue still means "target met" and red
   #                still means "worse off". Only the sign convention changes --
@@ -291,9 +291,9 @@ fig.baseline <- (p.base.A | p.base.B)/( p.base.D | p.base.C) + plot_annotation(t
   # if you change HEAT.FRAME you must change them to match, or the figure will
   # say one thing and mean the other.
   #
-  # SCOPE: this flips the FIGURE only. tbl.cov.vs2022 / tbl.cov.vs.noint are
-  # left on the reduction scale, because FIGURE 3a searches those same tables
-  # for "value >= 50" and would find nothing on a flipped copy.
+  # SCOPE: this flips the FIGURE only. tbl.cov.vs2022 / tbl.cov.vs.noint stay
+  # on the change scale, because FIGURE 3a searches those same tables for
+  # "value <= -50".
   #
   # EDGE CASE, only if you ever set SHIELD.HEAT.SHADE = FALSE: the flat-band
   # path assigns bands with cut(right = FALSE), so a value sitting EXACTLY on a
@@ -308,13 +308,13 @@ fig.baseline <- (p.base.A | p.base.B)/( p.base.D | p.base.C) + plot_annotation(t
   .flip.values <- function(tbl, pattern = "^(.*)_doxy\\.cov\\.(\\d+)_(\\d+)$") {
     hit <- grepl(pattern, names(tbl))
     if (!any(hit))
-      stop("HEAT.FRAME = 'change': no column matched '", pattern, "', so ",
+      stop("HEAT.FRAME = 'reduction': no column matched '", pattern, "', so ",
            "nothing would be flipped and the figure would silently stay on the ",
-           "reduction scale. Has col.pattern changed?")
+           "change scale. Has col.pattern changed?")
     tbl[hit] <- lapply(tbl[hit], function(v) {
       num <- suppressWarnings(as.numeric(v))
       if (all(is.na(num)) && !all(is.na(v)))
-        stop("HEAT.FRAME = 'change': a value column is not numeric and cannot ",
+        stop("HEAT.FRAME = 'reduction': a value column is not numeric and cannot ",
              "be sign-flipped. A median.ci table carries '[lower-upper]' ",
              "strings -- use stat.type = 'median' for this figure.")
       -num
@@ -346,7 +346,7 @@ fig.baseline <- (p.base.A | p.base.B)/( p.base.D | p.base.C) + plot_annotation(t
   # helper code to build the heatmap from each table
   .mk.heat <- function(tbl, strat, ttl){
     plot_coverage_heatmap(
-      if (HEAT.FRAME == "change") .flip.values(tbl) else tbl,
+      if (HEAT.FRAME == "reduction") .flip.values(tbl) else tbl,
       locations    = MSAS,
       subgroup     = strat,
       midpoint     = .hf$midpoint,
@@ -385,7 +385,8 @@ fig.baseline <- (p.base.A | p.base.B)/( p.base.D | p.base.C) + plot_annotation(t
 # ****************************************************************************************************
 # FIGURE 3a -- CRITICAL COVERAGE (SUPPLEMENTARY) ----
 # ****************************************************************************************************
-# WHAT   The coverage each MSA needs to reach a 50% reduction. Same 2 x 2 layout
+# WHAT   The coverage each MSA needs to reach a change of -50% or lower (incidence at
+#        least halved). Same 2 x 2 layout
 #        and reading order as Figure 3, so the two can sit side by side:
 #          A  MSM   vs the 2022 baseline        B  Total vs the 2022 baseline
 #          C  MSM   vs no intervention, 2030    D  Total vs no intervention, 2030
@@ -394,7 +395,7 @@ fig.baseline <- (p.base.A | p.base.B)/( p.base.D | p.base.C) + plot_annotation(t
 #        Supplementary -- related to Figure 3, but not a numbered figure.
 #
 # Figure 3 asks how much reduction each coverage level buys. This figure reads
-# the same surface the other way round: how much coverage is needed to cross 50%.
+# the same surface the other way round: how much coverage is needed to cross -50%.
 #
 # THE LADDER STOPS AT 50%. "not reached" therefore means "not reached at or
 # below 50% coverage", and CANNOT distinguish "needs 70%" from "never gets
@@ -414,8 +415,8 @@ fig.baseline <- (p.base.A | p.base.B)/( p.base.D | p.base.C) + plot_annotation(t
 # 2022 level (A and B). The gap between the top and bottom rows is the whole
 # point of showing both comparators.
 #
-# COUNT-VS-RATE CAVEAT, top row: pct_incidence_reduction_vs_baseline is computed
-# on incident COUNTS, so "50% reduction vs 2022" means half the INFECTIONS, not
+# COUNT-VS-RATE CAVEAT, top row: pct_change_incidence_vs_year0 is computed
+# on incident COUNTS, so "-50% vs 2022" means half the INFECTIONS, not
 # half the incidence RATE. With a growing population those differ, and the count
 # target is the harder of the two.
 
@@ -429,7 +430,8 @@ fig.baseline <- (p.base.A | p.base.B)/( p.base.D | p.base.C) + plot_annotation(t
       tbl,
       locations = MSAS,
       subgroup  = strat,
-      target    = 50,
+      target    = -50,          # values are % change: -50 = incidence halved
+      higher.is.better = FALSE, # so the target is reached at -50 or lower
       order.by  = "alpha",      # common row order across all four panels
       title     = ttl,
       filename  = NULL)
@@ -458,9 +460,12 @@ fig.baseline <- (p.base.A | p.base.B)/( p.base.D | p.base.C) + plot_annotation(t
 #        the three impact metrics, columns are the three populations:
 #
 #                          Total   MSM   Women
-#          relative          A      B      C     % incidence averted
-#          absolute          D      E      F     averted per 100,000 (own denominator)
-#          cumulative        G      H      I     infections averted, 2022-EVAL.YEAR
+#          relative          A      B      C     % change in incidence vs no intervention
+#          absolute          D      E      F     change per 100,000 (own denominator)
+#          cumulative        G      H      I     change in infections, 2022-EVAL.YEAR
+#
+#        All three are changes against no intervention, so they are NEGATIVE when
+#        Doxy-PEP prevents infections.
 #
 # INPUT  the CALCULATED arrays inside `results`, read at simulation level (see
 #        WHY SIM-LEVEL below). Independent of every other section.
@@ -483,7 +488,7 @@ fig.baseline <- (p.base.A | p.base.B)/( p.base.D | p.base.C) + plot_annotation(t
   # draw, so flagging the tails as outliers would be wrong.
   #
   # DENOMINATORS IN ROW 2 ARE STRATUM-SPECIFIC and that is deliberate. The MSM
-  # box is infections averted per 100,000 MSM and the female box per 100,000
+  # box is the change per 100,000 MSM and the female box per 100,000
   # women, so each reads as the absolute benefit to a member of that group. They
   # are directly comparable as risk differences even though the denominators
   # differ.
@@ -495,9 +500,9 @@ fig.baseline <- (p.base.A | p.base.B)/( p.base.D | p.base.C) + plot_annotation(t
     # ---- 0. locate the calculated arrays inside `results` -----------------------
     .has.oc <- function(a, oc) oc %in% dimnames(a)$outcome
     .arr.tot <- Filter(function(a) !("sex" %in% names(dimnames(a))) &&
-                         .has.oc(a, "pct_incidence_averted"), results)
+                         .has.oc(a, "pct_change_incidence_vs_noint"), results)
     .arr.sex <- Filter(function(a)  ("sex" %in% names(dimnames(a))) &&
-                         .has.oc(a, "pct_incidence_averted"), results)
+                         .has.oc(a, "pct_change_incidence_vs_noint"), results)
     if (!length(.arr.tot) || !length(.arr.sex))
       stop("Figure 4 (impact) needs both the total-level and sex-level CALCULATED arrays ",
            "in `results`. Found total: ", length(.arr.tot),
@@ -527,9 +532,9 @@ fig.baseline <- (p.base.A | p.base.B)/( p.base.D | p.base.C) + plot_annotation(t
       df
     }
     
-    F5.METRICS <- c(rel = "pct_incidence_averted",
-                    abs = "rate_incidence_averted_per_pop",
-                    cum = "num_cum_incidence_averted")
+    F5.METRICS <- c(rel = "pct_change_incidence_vs_noint",
+                    abs = "abs_change_incidence_rate_vs_noint",
+                    cum = "abs_change_cum_incidence_vs_noint")
     
     f5.raw <- bind_rows(lapply(names(F5.METRICS), function(k) bind_rows(
       transform(.sim.long(.arr.tot, F5.METRICS[[k]]),          population = "Total",  metric = k),
@@ -537,12 +542,13 @@ fig.baseline <- (p.base.A | p.base.B)/( p.base.D | p.base.C) + plot_annotation(t
       transform(.sim.long(.arr.sex, F5.METRICS[[k]], "female"), population = "Women",  metric = k))))
     
     # ---- 2. one city order for ALL six panels ----------------------------------
-    # Ranked by the total-population relative reduction, so the strongest responder
-    # is leftmost everywhere. Set F5.ORDER <- MSAS to use the common city order.
+    # Ranked by the total-population relative change, most negative first, so the
+    # strongest responder is leftmost everywhere. Set F5.ORDER <- MSAS to use the
+    # common city order.
     F5.ORDER <- f5.raw %>%
       filter(metric == "rel", population == "Total") %>%
       group_by(location) %>% summarise(m = stats::median(value), .groups = "drop") %>%
-      arrange(desc(m)) %>% pull(location)
+      arrange(m) %>% pull(location)
     
     # ---- 3. box statistics, computed explicitly rather than left to the default --
     f5.box <- f5.raw %>%
@@ -565,8 +571,8 @@ fig.baseline <- (p.base.A | p.base.B)/( p.base.D | p.base.C) + plot_annotation(t
     # MSM, women in the tens per 100,000 women -- so a shared axis compresses the
     # female boxes to a line and hides all the between-city variation that the
     # panel exists to show. Each panel therefore carries its own y scale, EXCEPT
-    # row 1, where the metric is a percentage and a common 0-100 axis is what makes
-    # the three columns comparable.
+    # row 1, where the metric is a percentage and a common -100 to 0 axis is what
+    # makes the three columns comparable.
     #
     # One colour per population, applied consistently down each column. No legend:
     # every panel holds a single series and its title names it.
@@ -586,38 +592,38 @@ fig.baseline <- (p.base.A | p.base.B)/( p.base.D | p.base.C) + plot_annotation(t
               plot.title         = element_text(face = "bold", size = 9),
               legend.position    = "none")
       if (met == "rel")
-        p <- p + geom_hline(yintercept = 50, linetype = "dashed",
+        p <- p + geom_hline(yintercept = -50, linetype = "dashed",
                             colour = PAL.FIT, linewidth = 0.3)
-      if (fix.pct)     p <- p + scale_y_continuous(limits = c(0, 100),
-                                                   breaks = seq(0, 100, 25))
+      if (fix.pct)     p <- p + scale_y_continuous(limits = c(-100, 0),
+                                                   breaks = seq(-100, 0, 25))
       else if (log.y)  p <- p + scale_y_log10(labels = scales::comma)
       else             p <- p + scale_y_continuous(labels = scales::comma)
       p
     }
     
     .yr <- EVAL.YEAR
-    # row 1 -- relative reduction, shared 0-100 axis so the columns are comparable
-    p5.A <- .f5.panel("rel","Total","A. Relative reduction, total population",
-                      paste0("Incidence averted by ", .yr, " (%)"), fix.pct = TRUE)
-    p5.B <- .f5.panel("rel","MSM",  "B. Relative reduction, MSM",
-                      paste0("Incidence averted by ", .yr, " (%)"), fix.pct = TRUE)
-    p5.C <- .f5.panel("rel","Women","C. Relative reduction, women",
-                      paste0("Incidence averted by ", .yr, " (%)"), fix.pct = TRUE)
-    # row 2 -- absolute reduction, INDEPENDENT y scales (see note above)
-    p5.D <- .f5.panel("abs","Total","D. Absolute reduction, total population",
-                      "Averted per 100,000 population")
-    p5.E <- .f5.panel("abs","MSM",  "E. Absolute reduction, MSM",
-                      "Averted per 100,000 MSM")
-    p5.F <- .f5.panel("abs","Women","F. Absolute reduction, women",
-                      "Averted per 100,000 women")
-    # row 3 -- cumulative counts on a LINEAR scale (log.y = FALSE below). Switch
-    #          log.y = TRUE if the largest MSAs compress the smaller ones flat.
-    p5.G <- .f5.panel("cum","Total","G. Cumulative infections averted, total population",
-                      paste0("Infections averted, 2022-", .yr), log.y = F)
-    p5.H <- .f5.panel("cum","MSM",  "H. Cumulative infections averted, MSM",
-                      paste0("Infections averted, 2022-", .yr), log.y = F)
-    p5.I <- .f5.panel("cum","Women","I. Cumulative infections averted, women",
-                      paste0("Infections averted, 2022-", .yr), log.y = F)
+    # row 1 -- relative change, shared -100 to 0 axis so the columns are comparable
+    p5.A <- .f5.panel("rel","Total","A. Relative change, total population",
+                      paste0("Change in incidence, ", .yr, " (%)"), fix.pct = TRUE)
+    p5.B <- .f5.panel("rel","MSM",  "B. Relative change, MSM",
+                      paste0("Change in incidence, ", .yr, " (%)"), fix.pct = TRUE)
+    p5.C <- .f5.panel("rel","Women","C. Relative change, women",
+                      paste0("Change in incidence, ", .yr, " (%)"), fix.pct = TRUE)
+    # row 2 -- absolute change, INDEPENDENT y scales (see note above)
+    p5.D <- .f5.panel("abs","Total","D. Absolute change, total population",
+                      "Change per 100,000 population")
+    p5.E <- .f5.panel("abs","MSM",  "E. Absolute change, MSM",
+                      "Change per 100,000 MSM")
+    p5.F <- .f5.panel("abs","Women","F. Absolute change, women",
+                      "Change per 100,000 women")
+    # row 3 -- cumulative change on a LINEAR scale. A log scale cannot show
+    #          negative values, so keep log.y = FALSE here.
+    p5.G <- .f5.panel("cum","Total","G. Change in cumulative infections, total population",
+                      paste0("Change in infections, 2022-", .yr), log.y = F)
+    p5.H <- .f5.panel("cum","MSM",  "H. Change in cumulative infections, MSM",
+                      paste0("Change in infections, 2022-", .yr), log.y = F)
+    p5.I <- .f5.panel("cum","Women","I. Change in cumulative infections, women",
+                      paste0("Change in infections, 2022-", .yr), log.y = F)
     
     fig.impact <- (p5.A | p5.B | p5.C) /
       (p5.D | p5.E | p5.F) /
@@ -631,7 +637,7 @@ fig.baseline <- (p.base.A | p.base.B)/( p.base.D | p.base.C) + plot_annotation(t
     cat("    (the 95% credible interval), across", length(unique(f5.raw$sim)),
         "posterior simulations.\n")
     cat("    No outliers drawn: every simulation is a valid draw.\n")
-    cat("    City order (all nine panels), by total-population relative reduction:\n      ",
+    cat("    City order (all nine panels), by total-population relative change:\n      ",
         paste(F5.ORDER, collapse = " > "), "\n")
   }
 }
@@ -670,27 +676,29 @@ fig.baseline <- (p.base.A | p.base.B)/( p.base.D | p.base.C) + plot_annotation(t
 #             person-year they cost. The decision-relevant number, and the one
 #             that falls as the MSM epidemic saturates.
 #
-# NOTE there is deliberately no single-year version of either. See "WHY THERE
-# IS NO SINGLE-YEAR *_averted_ppy_doxy OUTCOME" at the foot of
-# 02_generate_custom_outcomes.R.
+# NOTE there is deliberately no single-year version of either: drug given in
+# one year keeps preventing infections in later years.
+#
+# INFECTIONS AVERTED = minus abs_change_cum_incidence_vs_noint. The change is
+# negative when infections are prevented; this table needs the positive count.
 # ****************************************************************************************************
 {
     t3.long <- table_to_long(make_multi_location_table(
         data          = results,
         locations     = MSAS,
-        outcomes      = c("num_cum_doxy_coverage", "num_cum_incidence_averted"),
+        outcomes      = c("cum_doxy_coverage", "abs_change_cum_incidence_vs_noint"),
         interventions = COVERAGE.LEVELS,
         years         = EVAL.YEAR,
         stat.type     = "median"))
     
     t3.py <- t3.long %>%
-        filter(outcome == "num_cum_doxy_coverage", subgroup == "Total") %>%
+        filter(outcome == "cum_doxy_coverage", subgroup == "Total") %>%
         select(location, year, coverage, cum_py = value)
     
     t3.av <- t3.long %>%
-        filter(outcome == "num_cum_incidence_averted",
+        filter(outcome == "abs_change_cum_incidence_vs_noint",
                subgroup %in% c("Total", "msm", "female")) %>%
-        select(location, year, coverage, subgroup, averted = value)
+        transmute(location, year, coverage, subgroup, averted = -value)
     
     t3.step <- t3.av %>%
         left_join(t3.py, by = c("location", "year", "coverage")) %>%
@@ -756,8 +764,7 @@ cat("               rung against no intervention); what the last 10 points\n")
 cat("               bought per additional person-year they cost.\n")
 cat("    NOT shown  any single-year efficiency. Drug given in one year keeps\n")
 cat("               preventing infections in later years, so a same-year\n")
-cat("               ratio credits the wrong year -- see the note at the foot\n")
-cat("               of 02_generate_custom_outcomes.R.\n\n")
+cat("               ratio credits the wrong year.\n\n")
 print(as.data.frame(table3), digits = 4, row.names = FALSE)
 
 # ****************************************************************************************************
@@ -779,7 +786,7 @@ print(as.data.frame(table3), digits = 4, row.names = FALSE)
   t2.outcomes1 <- c(
     # ---- BLOCK 0: KEY outcomes ----
     "incidence",
-    "rate_incidence_per_pop"
+    "incidence_rate"
   )
   
   tbl2.impact1 <- make_multi_location_table(
@@ -790,21 +797,18 @@ print(as.data.frame(table3), digits = 4, row.names = FALSE)
     filter.by.strat = c("Total", "msm","female","heterosexual_male"),
     years           = c(YEAR0, EVAL.YEAR),
     stat.type       = "median",
-    digits = c(.default                       = 0,
-               pct_incidence_averted          = 1,
-               pct_cum_incidence_averted      = 1,
-               rate_incidence_averted_per_pop = 1)
+    digits = c(.default                           = 0,
+               pct_change_incidence_vs_noint      = 1,
+               abs_change_incidence_rate_vs_noint = 1)
   )
   
   t2.outcomes2 <- c(
-    # ---- BLOCK A: single year. RELATIVE and ABSOLUTE effect, no efficiency ----
-    "pct_incidence_averted",
-    "rate_incidence_averted_per_pop",
-    # ---- BLOCK B: cumulative from baseline.year. Burden prevented, and the
-    #      antibiotic it cost. Efficiency lives HERE and only here ----
-    "num_cum_incidence_averted"
-    # "pct_cum_incidence_averted",
-    # "rate_cum_incidence_averted_ppy_doxy"
+    # ---- BLOCK A: single year, change vs no intervention: relative and absolute ----
+    "pct_change_incidence_vs_noint",
+    "abs_change_incidence_rate_vs_noint",
+    # ---- BLOCK B: cumulative from YEAR0, change vs no intervention ----
+    "abs_change_cum_incidence_vs_noint"
+    # "pct_change_cum_incidence_vs_noint"
   )
   
   tbl2.impact2 <- make_multi_location_table(
@@ -815,10 +819,9 @@ print(as.data.frame(table3), digits = 4, row.names = FALSE)
     filter.by.strat = c("Total", "msm","female","heterosexual_male"),
     years           = EVAL.YEAR,
     stat.type       = "median",
-    digits = c(.default                       = 0,
-               pct_incidence_averted          = 1,
-               pct_cum_incidence_averted      = 1,
-               rate_incidence_averted_per_pop = 1)
+    digits = c(.default                           = 0,
+               pct_change_incidence_vs_noint      = 1,
+               abs_change_incidence_rate_vs_noint = 1)
   )
   
   # column names come back as <outcome>_<intervention>_<year>
@@ -843,11 +846,10 @@ print(as.data.frame(table3), digits = 4, row.names = FALSE)
       paste0("Incidence Rate (per 100,000 population) ", EVAL.YEAR, ", Doxy Coverage ",.t2cov,"%"),
       
       
-      paste0("Incidence averted (%), ", EVAL.YEAR),
-      paste0("Incidence averted per 100,000 population, ", EVAL.YEAR),
-      paste0("Cumulative infections averted, 2022-", EVAL.YEAR)
-      # paste0("Cumulative incidence averted (%), 2022-", EVAL.YEAR),
-      # paste0("Cumulative infections averted per 1000 doxy person-years, 2022-", EVAL.YEAR)),
+      paste0("Change in incidence vs no intervention (%), ", EVAL.YEAR),
+      paste0("Change in incidence rate vs no intervention (per 100,000 population), ", EVAL.YEAR),
+      paste0("Change in cumulative infections vs no intervention, ", YEAR0, "-", EVAL.YEAR)
+      # paste0("Change in cumulative infections vs no intervention (%), ", YEAR0, "-", EVAL.YEAR)
     ),
     #
     names(tbl2)[-3]
@@ -873,27 +875,28 @@ print(as.data.frame(table3), digits = 4, row.names = FALSE)
 # ****************************************************************************************************
 # TABLE S2 -- SPILLOVER AND ITS CANDIDATE DRIVERS ----
 # ****************************************************************************************************
-# WHAT   One row per MSA: % incidence averted in each population at CCRIT.MS in
-#        EVAL.YEAR, the spillover ratio (women / MSM), and seven candidate
+# WHAT   One row per MSA: % change in incidence vs no intervention in each population
+#        at CCRIT.MS in EVAL.YEAR, the spillover ratio (women / MSM), and seven candidate
 #        city-level drivers, all measured at YEAR0 under NO intervention so
 #        they describe the epidemic Doxy-PEP is dropped into, not its effects.
 # INPUT  results, MSAS. Percentages pulled at digits = 3 (header, item 2).
 # OUTPUT tables/S2-spillover-cov<c>.csv  (object `final4`)
-# BUILDS `table4`, plus t4.share / t4.impact / av. Table S2a, Figure 5 and
+# BUILDS `table4`, plus t4.share / t4.impact / chg. Table S2a, Figure 5 and
 #        Check 1 all read those, so THIS SECTION MUST RUN BEFORE ALL THREE.
 
 {
   t4.impact <- table_to_long(make_multi_location_table(
-  data = results, locations = MSAS, outcomes = "pct_incidence_averted",
+  data = results, locations = MSAS, outcomes = "pct_change_incidence_vs_noint",
   interventions = CCRIT.MS, years = EVAL.YEAR,
   stat.type = "median", digits = 3))
 
-av <- t4.impact %>%
+# chg_<group> = % change in incidence vs no intervention (negative = fewer infections)
+chg <- t4.impact %>%
   select(location, subgroup, value) %>%
-  pivot_wider(names_from = subgroup, values_from = value, names_prefix = "av_")
+  pivot_wider(names_from = subgroup, values_from = value, names_prefix = "chg_")
 
 t4.share <- table_to_long(make_multi_location_table(
-  data = results, locations = MSAS, outcomes = "pct_incidence_share",
+  data = results, locations = MSAS, outcomes = "share_incidence",
   interventions = "noint", years = c(YEAR0, EVAL.YEAR),
   stat.type = "median", digits = 3))
 
@@ -904,7 +907,7 @@ sh.msm <- t4.share %>%
 
 # ---- growth, from COUNTS (see item 1 in the header) *********************
 # incidence is a count at every stratification level, so summing
-# heterosexual_male + female is well defined. Summing rate_incidence_per_pop
+# heterosexual_male + female is well defined. Summing incidence_rate
 # would not be: those two rates have different denominators.
 # growth= 2030 levels -2022 levels
 #divergence=log(growth_het / growth_msm)
@@ -937,7 +940,7 @@ g <- t4.growth %>%
 # (a) baseline incidence RATE in each stratum 2022 -- how intense each epidemic is
 #     per capita, in its own denominator
 inc.rate <- table_to_long(make_multi_location_table(
-  data = results, locations = MSAS, outcomes = "rate_incidence_per_pop",
+  data = results, locations = MSAS, outcomes = "incidence_rate",
   interventions = "noint", years = YEAR0,
   stat.type = "median", digits = 3)) %>%
   filter(subgroup %in% c("msm", "female")) %>%
@@ -969,20 +972,21 @@ msm.pop <- table_to_long(make_multi_location_table(
 #     it the most informative one to add.
 detect <- table_to_long(make_multi_location_table(
   data = results, locations = MSAS,
-  outcomes = "ratio_ps_diagnosis_to_incidence",
+  outcomes = "diagnosis_ps_per_incidence",
   interventions = "noint", years = YEAR0,
   stat.type = "median", digits = 3)) %>%
   filter(subgroup == "msm") %>%
   select(location, ps_detect_msm = value)
 
-table4 <- av %>%
+table4 <- chg %>%
   left_join(sh.msm,   by = "location") %>%
   left_join(g,        by = "location") %>%
   left_join(inc.rate, by = "location") %>%
   left_join(msm.pop,  by = "location") %>%
   left_join(detect,   by = "location") %>%
-  mutate(spillover = av_female / .pos(av_msm)) %>%
-  # select(location, av_msm, av_heterosexual_male, av_female, av_Total,
+  # both changes are negative, so the ratio is positive. NA when MSM incidence did not fall.
+  mutate(spillover = ifelse(chg_msm < 0, chg_female / chg_msm, NA_real_)) %>%
+  # select(location, chg_msm, chg_heterosexual_male, chg_female, chg_Total,
   #        spillover, dplyr::starts_with("msm_share_"),
   #        growth_msm, growth_het, divergence) %>%
   arrange(desc(spillover))
@@ -990,7 +994,7 @@ table4 <- av %>%
 # ---- format like Tables 1-3: MSA first, labelled columns *********************
 T4.COLS <- c("location",
              # outcome
-             "av_msm", "av_heterosexual_male", "av_female", "av_Total",
+             "chg_msm", "chg_heterosexual_male", "chg_female", "chg_Total",
              "spillover",
              # candidate drivers, all at YEAR0 under no intervention
              paste0("msm_share_", YEAR0), paste0("msm_share_", EVAL.YEAR),
@@ -1000,10 +1004,10 @@ T4.COLS <- c("location",
 
 col.labels.t4 <- stats::setNames(
   c("MSA",
-    "Incidence averted, MSM (%)",
-    "Incidence averted, heterosexual men (%)",
-    "Incidence averted, women (%)",
-    "Incidence averted, total population (%)",
+    "Change in incidence vs no intervention, MSM (%)",
+    "Change in incidence vs no intervention, heterosexual men (%)",
+    "Change in incidence vs no intervention, women (%)",
+    "Change in incidence vs no intervention, total population (%)",
     "Spillover ratio (women / MSM)",
     paste0("MSM share of incidence, ", YEAR0, " (%)"),
     paste0("MSM share of incidence, ", EVAL.YEAR, " (%)"),
@@ -1029,7 +1033,7 @@ write.csv(final4, file.path(TABLE.DIR, paste0("S2-spillover-cov", .ccrit, ".csv"
           row.names = FALSE)
 
 cat("\n\n=== TABLE 4: spillover and its drivers,", CCRIT.MS, "in", EVAL.YEAR, "===\n")
-cat("    Outcome    spillover = % averted in women / % averted in MSM.\n")
+cat("    Outcome    spillover = % change in women / % change in MSM (both vs no intervention).\n")
 cat("    Drivers    all measured at", YEAR0, "under NO INTERVENTION, so they\n")
 cat("               describe the epidemic Doxy-PEP is dropped into rather than\n")
 cat("               anything it caused. All scale-free: an absolute MSM\n")
@@ -1116,7 +1120,7 @@ write.csv(final5,
           row.names = FALSE)
 
 cat("\n\n=== TABLE 5: candidate drivers of the spillover ratio ===\n")
-cat("    Outcome    spillover = % incidence averted in women / % averted in MSM,\n")
+cat("    Outcome    spillover = % change in incidence in women / % change in MSM,\n")
 cat("               at", CCRIT.MS, "in", EVAL.YEAR, "\n")
 cat("    Drivers    measured at", YEAR0, "under no intervention\n")
 cat("    Statistic  Spearman rank correlation across the", nrow(table4),
@@ -1146,13 +1150,13 @@ print(round(cor(table4[, .cand], method = "spearman", use = "pairwise.complete.o
 # measuring lag rather than coupling strength, and the drivers above are
 # confounded by it.
 .sp2035 <- table_to_long(make_multi_location_table(
-  data = results, locations = MSAS, outcomes = "pct_incidence_averted",
+  data = results, locations = MSAS, outcomes = "pct_change_incidence_vs_noint",
   interventions = CCRIT.MS, years = "2035",
   stat.type = "median", digits = 3)) %>%
   filter(subgroup %in% c("msm", "female")) %>%
   select(location, subgroup, value) %>%
   pivot_wider(names_from = subgroup, values_from = value) %>%
-  transmute(location, spillover.2035 = female / .pos(msm)) %>%
+  transmute(location, spillover.2035 = ifelse(msm < 0, female / msm, NA_real_)) %>%
   left_join(table4[, c("location", "spillover")], by = "location")
 
 cat("\n=== does the spillover ranking hold at 2035? ===\n")
@@ -1167,11 +1171,11 @@ print(as.data.frame(.sp2035), digits = 3, row.names = FALSE)
 
 
 # ---- what did fixing the rate-summing bug change? --------------------------
-# Rebuilds `divergence` the OLD way -- summing rate_incidence_per_pop across
+# Rebuilds `divergence` the OLD way -- summing incidence_rate across
 # the two heterosexual strata -- so the two correlations can be compared. Kept
 # in the script rather than in a commit message: a reviewer may ask.
 .old <- table_to_long(make_multi_location_table(
-  data = results, locations = MSAS, outcomes = "rate_incidence_per_pop",
+  data = results, locations = MSAS, outcomes = "incidence_rate",
   interventions = "noint", years = c(YEAR0, EVAL.YEAR),
   stat.type = "median")) %>%
   filter(subgroup %in% c("msm", "heterosexual_male", "female")) %>%
@@ -1215,18 +1219,19 @@ cat("   largest per-MSA change in divergence:",
   # ---- OPTION: scale the points by a third variable --------------------------
   # SPILL.SIZE.BY
   #   NULL      every point the same size. The default, and what the paper used.
-  #   "<col>"   any numeric column of table4. "av_msm" is the % incidence
-  #             averted among MSM at CCRIT.MS in EVAL.YEAR, i.e. the projected
-  #             reduction among MSM by 2030.
+  #   "<col>"   any numeric column of table4. "chg_msm" is the % change in
+  #             incidence among MSM vs no intervention at CCRIT.MS in EVAL.YEAR.
+  #             Point AREA uses the absolute value, so a change of -60% draws a
+  #             bigger point than -30%.
   #
   # AREA, NOT RADIUS. scale_size_area() maps the value to point AREA and pins
   # zero to zero area. ggplot's default scale_size() maps to RADIUS, which
   # squares the visual weight of large values and reliably misleads. Limits are
   # pinned to the full column range so all four panels share one legend.
   #
-  # READ THIS BEFORE SIZING BY av_msm. The y axis is
-  #     spillover = av_female / av_msm
-  # so av_msm is the DENOMINATOR of the quantity already being plotted. Point
+  # READ THIS BEFORE SIZING BY chg_msm. The y axis is
+  #     spillover = chg_female / chg_msm
+  # so chg_msm is the DENOMINATOR of the quantity already being plotted. Point
   # size is then a component of y, NOT an independent covariate: a small point
   # sits high partly for an arithmetic reason. That is precisely why it is worth
   # showing -- it separates cities that reach a high spillover through a strong
@@ -1234,8 +1239,8 @@ cat("   largest per-MSA change in divergence:",
   # must be described that way, never as a third variable that "explains" the
   # pattern. Sizing by a driver that is NOT inside the ratio (inc_rate_female,
   # ps_detect_msm, msm_pop_share_male) carries no such caveat.
-  SPILL.SIZE.BY   <- NULL                  # e.g. "av_msm"
-  SPILL.SIZE.LAB  <- paste0("Incidence averted,\nMSM (%), ", EVAL.YEAR)
+  SPILL.SIZE.BY   <- NULL                  # e.g. "chg_msm"
+  SPILL.SIZE.LAB  <- paste0("Change in incidence,\nMSM (%, size), ", EVAL.YEAR)
   SPILL.SIZE.MAX  <- 9                     # area of the largest point
 
   .panel <- function(xvar, xlab, ttl, size.by = SPILL.SIZE.BY) {
@@ -1247,7 +1252,7 @@ cat("   largest per-MSA change in divergence:",
       if (!size.by %in% names(table4))
         stop("SPILL.SIZE.BY = '", size.by, "' is not a column of table4. ",
              "Available: ", paste(names(table4), collapse = ", "), ".")
-      d$size.var <- table4[[size.by]][match(d$location, table4$location)]
+      d$size.var <- abs(table4[[size.by]][match(d$location, table4$location)])
     }
 
     p <- ggplot(d, aes(x = x, y = spillover)) +
@@ -1267,12 +1272,12 @@ cat("   largest per-MSA change in divergence:",
                  max_size = SPILL.SIZE.MAX,
                  # identical limits on every panel, or patchwork cannot merge
                  # the four legends into one
-                 limits   = c(0, max(table4[[size.by]], na.rm = TRUE)))
+                 limits   = c(0, max(abs(table4[[size.by]]), na.rm = TRUE)))
 
     p +
       .label_layer() +
       scale_x_continuous(expand = expansion(mult = c(0.10, 0.20))) +
-      labs(x = xlab, y = "Spillover Ratio", #(% averted in women / % averted in MSM)
+      labs(x = xlab, y = "Spillover Ratio", #(% change in women / % change in MSM)
            title = ttl,
            subtitle = paste0("Spearman rho = ", round(rho, 2) )) +
       theme_minimal(base_size = 11) +
@@ -1315,7 +1320,7 @@ cat("   largest per-MSA change in divergence:",
       theme(legend.position = "bottom")
   fig.spillover
   # plot_annotation(
-  #     caption = paste0("Spillover = % incidence averted in women / % averted ",
+  #     caption = paste0("Spillover = % change in incidence in women / % change ",
   #                      "in MSM, at ", CCRIT.MS, " in ", EVAL.YEAR,
   #                      ". Drivers measured at ", YEAR0,
   #                      " under no intervention; growth is the fold-change in ",
@@ -1336,13 +1341,13 @@ cat("   largest per-MSA change in divergence:",
 #        no-intervention year. This is what licenses the entire "spillover
 #        explains the spread" argument, so it RUNS EVERY TIME rather than being
 #        trusted -- a check that does not run is not a check, and it is free.
-# INPUT  t4.share, t4.impact and av, all from TABLE S2. Console output only.
+# INPUT  t4.share, t4.impact and chg, all from TABLE S2. Console output only.
 # PASS   a few tenths of a percentage point is rounding. Several points means
 #        the decomposition does not hold and the Table S2 argument needs
 #        re-examining before anything is written up.
 #
 # REMOVED: the two efficiency checks that used to live here (Table 3 against the
-# model's own rate_cum_incidence_averted_ppy_doxy, and the Table 3 / Table S2
+# model's own efficiency outcome, since removed, and the Table 3 / Table S2
 # spillover multiplier). Both read `table3`, which did not exist in this file at
 # the time, so both were dead code that would error on a clean run. `table3` is
 # now built in the TABLE 3 section above, but these two checks have not been
@@ -1359,11 +1364,11 @@ sh.all <- t4.share %>%
   select(location, subgroup, share = value)
 chk1 <- t4.impact %>%
   filter(subgroup %in% c("msm", "heterosexual_male", "female")) %>%
-  select(location, subgroup, averted = value) %>%
+  select(location, subgroup, change = value) %>%
   left_join(sh.all, by = c("location", "subgroup")) %>%
   group_by(location) %>%
-  summarise(predicted.total = sum(share * averted) / 100, .groups = "drop") %>%
-  left_join(av %>% select(location, model.total = av_Total), by = "location") %>%
+  summarise(predicted.total = sum(share * change) / 100, .groups = "drop") %>%
+  left_join(chg %>% select(location, model.total = chg_Total), by = "location") %>%
   mutate(difference = predicted.total - model.total)
 print(as.data.frame(chk1), digits = 4, row.names = FALSE)
 cat("   largest absolute discrepancy:",

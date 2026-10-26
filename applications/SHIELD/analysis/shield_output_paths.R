@@ -109,52 +109,93 @@ ensure.shield.dir <- function(path) {
 # Reads the result arrays for one calibration and returns them in a list, ready to pass
 # straight to the 'data' argument of the table and figure functions.
 #
-#   RESULTS <- load.shield.results("calib.8.21.stage3.az")
-#   make_multi_location_table(data = RESULTS, ...)
+#   intervention.results <- load.shield.results(CALIB.NAME)
+#   make_multi_location_table(data = intervention.results, ...)
 #
-# 1. THE FOUR ARRAYS
-#    Two stratification levels x two kinds:
+# 1. THE ARRAYS
+#    Each array is one stratification level x one kind, saved as <level>_<kind>_results.Rdata:
 #
-#                      raw outcomes       calculated outcomes
-#      total level     total_raw          total_calc
-#      sex level       sex_raw            sex_calc
+#                      raw outcomes (step 01)   calculated outcomes (step 02)
+#      total level     total_raw                total_calc
+#      sex level       sex_raw                  sex_calc
+#      race level      race_raw                 race_calc       (only if steps 01-02 built them)
 #
-#    The list keeps that order, which is the order the scripts used when they built
-#    'results' by hand, so figures that index data[[1]] behave as before.
+#    By default the four total and sex arrays are loaded, in that order. Ask for others with
+#    `which`, e.g. which = c("total_raw", "total_calc", "race_raw", "race_calc").
 #
-# 2. ASKING FOR A SUBSET
-#    02_generate_custom_outcomes.R runs before the calculated arrays exist, so it asks for the
-#    raw ones only:
+# 2. REUSING WHAT IS ALREADY LOADED
+#    Loading takes a while, so the arrays are read from disk only when needed. If an object
+#    called `cache.name` (default "intervention.results") is already in your workspace, it is
+#    reused when all three hold:
+#      1. it was loaded for the same calibration
+#      2. it holds every array you asked for
+#      3. none of its files has changed on disk since it was loaded (e.g. step 02 was re-run)
+#    Otherwise the arrays are read from disk again. This only works if you assign the result to
+#    that same name, as in the example above.
 #
-#      RAW <- load.shield.results(CALIB.NAME, which = c("total_raw", "sex_raw"))
+# 3. FORCING A RELOAD
+#    force.reload = TRUE always reads from disk.
 #
-# 3. A MISSING FILE IS AN ERROR
+# 4. A MISSING FILE IS AN ERROR
 #    It names the file and the script that writes it, rather than returning a short list that
 #    would silently shift every data[[i]] index.
 load.shield.results <- function(calibration.code,
-                                which    = c("total_raw", "total_calc", "sex_raw", "sex_calc"),
-                                root.dir = NULL) {
-    print(paste0("Loading ",which," results ..."))
-    
-    files <- c(total_raw  = "total_raw_results.Rdata",
-               total_calc = "total_calc_results.Rdata",
-               sex_raw    = "sex_raw_results.Rdata",
-               sex_calc   = "sex_calc_results.Rdata")
+                                which        = c("total_raw", "total_calc", "sex_raw", "sex_calc"),
+                                cache.name   = "intervention.results",
+                                force.reload = FALSE,
+                                root.dir     = NULL) {
 
-    which <- match.arg(which, choices = names(files), several.ok = TRUE)
+    # 1. Where the files are
+    bad <- which[!grepl("^[a-z]+_(raw|calc)$", which)]
+    if (length(bad) > 0)
+        stop("'which' entries must look like \"total_raw\" or \"sex_calc\", not: ",
+             paste(bad, collapse = ", "))
 
     out.dir <- shield.output.path(calibration.code, root.dir = root.dir)
     if (!dir.exists(out.dir))
         stop("No output folder for '", calibration.code, "':\n  ", out.dir,
              "\nCheck the calibration name, or run intervention/01_generate_raw_results_arrays.R first.")
 
-    paths   <- file.path(out.dir, files[which])
+    paths   <- setNames(file.path(out.dir, paste0(which, "_results.Rdata")), which)
     missing <- which[!file.exists(paths)]
     if (length(missing) > 0)
         stop("Missing result file(s) in ", out.dir, ":\n  ",
-             paste(files[missing], collapse = "\n  "),
+             paste(basename(paths[missing]), collapse = "\n  "),
              "\nraw arrays come from intervention/01_generate_raw_results_arrays.R,",
              " calc arrays from intervention/02_generate_custom_outcomes.R.")
+    mtimes <- setNames(file.mtime(paths), which)   # file.mtime() drops the names
 
-    setNames(lapply(paths, function(f) get(load(f))), which)
+    # 2. Reuse the copy in the workspace if it is still current
+    if (!force.reload && exists(cache.name, envir = globalenv(), inherits = FALSE)) {
+        cached   <- get(cache.name, envir = globalenv())
+        same.cal <- identical(attr(cached, "calibration.code"), calibration.code)
+        has.all  <- all(which %in% names(cached))
+        old.time <- attr(cached, "file.mtimes")
+        same.files <- has.all && !is.null(old.time) && all(which %in% names(old.time)) &&
+            all(old.time[which] == mtimes[which])
+
+        if (same.cal && has.all && same.files) {
+            message("Using '", cache.name, "' already in memory (", calibration.code, "). ",
+                    "force.reload = TRUE to read from disk.")
+            out <- cached[which]
+            attr(out, "calibration.code") <- calibration.code
+            attr(out, "file.mtimes")      <- old.time[which]
+            return(out)
+        }
+        message("Reloading: '", cache.name, "' in memory is ",
+                if (!same.cal) paste0("for ", if (is.null(attr(cached, "calibration.code"))) "an unknown calibration"
+                                              else attr(cached, "calibration.code"))
+                else if (!has.all) "missing some of the arrays asked for"
+                else "older than the files on disk")
+    }
+
+    # 3. Read from disk
+    out <- lapply(which, function(w) {
+        message("Loading ", w, " ...")
+        get(load(paths[[w]]))
+    })
+    names(out) <- which
+    attr(out, "calibration.code") <- calibration.code
+    attr(out, "file.mtimes")      <- mtimes
+    out
 }

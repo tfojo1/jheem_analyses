@@ -1,9 +1,9 @@
 # ****************************************************************************
 # 04 SHIELD / Doxy-PEP -- INCREMENTAL EFFICIENCY OF DOXY-PEP COVERAGE
 # ****************************************************************************
-# Step 4 of the workflow listed in 00_settings.R. Run it after
-# 03_manuscript_outputs.R, in the same R session, or on its own: if `results`
-# is not loaded yet, the block under CONFIGURATION loads it.
+# Step 4 of the workflow listed in 00_settings.R. Run it on its own or after
+# 03b_manuscript_main.R. The result arrays already in memory are reused (see
+# load.shield.results() in shield_output_paths.R).
 #
 # NOTE 03_manuscript_outputs.R builds a second version of Table 3
 # (tables/3-efficiency.csv). Keep one of the two.
@@ -58,14 +58,14 @@ library(tidyr)
 
 # ---- 0. CONFIGURATION ------------------------------------------------------
 
-# Run on its own: load the settings, the helpers and the four arrays.
-# After 03_manuscript_outputs.R they are already in the session.
-if (!exists("results")) {
+# Run on its own: load the settings and the helpers. After 03b they are already loaded.
+if (!exists("make_multi_location_table")) {
     source('../jheem_analyses/applications/SHIELD/analysis/intervention/00_settings.R')
     source('../jheem_analyses/applications/SHIELD/analysis/intervention/intervention_helper_functions.R')
-    results   <- load.shield.results(CALIB.NAME)
-    TABLE.DIR <- shield.table.path(CALIB.NAME, create = TRUE)
 }
+TABLE.DIR <- shield.table.path(CALIB.NAME, create = TRUE)
+# Reuses the arrays already in memory when they are current; force.reload = TRUE re-reads them
+intervention.results <- load.shield.results(CALIB.NAME)
 
 # COVERAGE.LEVELS comes from 00_settings.R. The rungs of the ladder are those
 # levels, so the arrays must hold every one of them.
@@ -74,32 +74,35 @@ DIGITS.RATIO    <- 1
 
 
 # ---- 1. PULL THE MEDIANS ---------------------------------------------------
-# num_cum_doxy_coverage exists only at the total level, so the sex rows come
+# cum_doxy_coverage exists only at the total level, so the sex rows come
 # back NA for it. That is expected, and so is the "Dropped N cell(s)" message.
+#
+# Infections averted = minus abs_change_cum_incidence_vs_noint: the change is
+# negative when infections are prevented, and this table needs the positive count.
 
 lng <- table_to_long(make_multi_location_table(
-    data          = results,
+    data          = intervention.results,
     locations     = MSAS,
-    outcomes      = c("num_cum_incidence_averted", "num_cum_doxy_coverage"),
+    outcomes      = c("abs_change_cum_incidence_vs_noint", "cum_doxy_coverage"),
     interventions = COVERAGE.LEVELS,
     years         = EFF.HORIZONS,
     stat.type     = "median"))
 
 py <- lng %>%
-    filter(outcome == "num_cum_doxy_coverage", subgroup == "Total") %>%
+    filter(outcome == "cum_doxy_coverage", subgroup == "Total") %>%
     select(location, year, coverage, cum_py = value)
 
 av <- lng %>%
-    filter(outcome == "num_cum_incidence_averted",
+    filter(outcome == "abs_change_cum_incidence_vs_noint",
            subgroup %in% c("msm", "Total")) %>%
-    select(location, year, coverage, subgroup, value) %>%
+    transmute(location, year, coverage, subgroup, value = -value) %>%
     pivot_wider(names_from = subgroup, values_from = value) %>%
     rename(cum_averted_msm = msm, cum_averted_tot = Total)
 
 dat <- left_join(av, py, by = c("location", "year", "coverage"))
 if (any(is.na(dat$cum_py)))
     stop("Missing Doxy-PEP person-years for ", sum(is.na(dat$cum_py)),
-         " cell(s). Is num_cum_doxy_coverage present in the total-level array?")
+         " cell(s). Is cum_doxy_coverage present in the total-level array?")
 
 dat
 # ---- 2. INCREMENTS ---------------------------------------------------------
@@ -285,9 +288,9 @@ if (nrow(ed) == 0) cat("   OK - ratios rise monotonically in every MSA.\n") else
 cat("\n=== CHECK 3: are Doxy-PEP person-years zero under no intervention? ===\n")
 cat("   (the assumption behind lag(default = 0) for the lowest rung)\n")
 z  <- make_multi_location_table(
-          data = results, locations = MSAS, outcomes = "num_cum_doxy_coverage",
+          data = intervention.results, locations = MSAS, outcomes = "cum_doxy_coverage",
           interventions = "noint", years = EFF.HORIZONS, stat.type = "median")
-zc <- unlist(z[, grep("num_cum_doxy_coverage_noint_", names(z)), drop = FALSE])
+zc <- unlist(z[, grep("cum_doxy_coverage_noint_", names(z)), drop = FALSE])
 zv <- suppressWarnings(as.numeric(gsub(",", "", as.character(zc))))
 zv <- zv[!is.na(zv)]
 if (!length(zv))  cat("   could not read the noint columns; check manually.\n") else
@@ -306,7 +309,7 @@ cat("   doxy.coverage is counting the wrong people.\n")
 # the arrays used to run to 100% coverage; they now stop at 50%, so use the top rung
 TOP.COV <- max(step$coverage)
 mp <- table_to_long(make_multi_location_table(
-          data = results, locations = MSAS, outcomes = "population.msm",
+          data = intervention.results, locations = MSAS, outcomes = "population.msm",
           interventions = COVERAGE.LEVELS, years = EFF.HORIZONS,
           stat.type = "median")) %>%
     filter(subgroup == "Total", coverage == TOP.COV) %>%

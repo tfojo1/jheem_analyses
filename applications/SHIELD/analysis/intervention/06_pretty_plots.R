@@ -104,4 +104,11 @@ SHIELD.DEFAULT.WINDOW <- "history"
                     log.y = F,free.y = T,ncol = 5,
                     show.sources = T,show.proj.line = T,
                     title = "Proportion of PS Diagnosis among MSM");p5
-    }
+
+    # saving: 10 cities in a 5 x 2 grid, each as png and pdf
+    save.shield.fig(p1, "supplement-calibration-diagnosis-total",     size = "panel", ncol = 5, nrow = 2)
+    save.shield.fig(p2, "supplement-calibration-diagnosis-ps",        size = "panel", ncol = 5, nrow = 2)
+    save.shield.fig(p3, "supplement-calibration-diagnosis-ps-by-sex", size = "panel", ncol = 5, nrow = 2)
+    save.shield.fig(p4, "supplement-calibration-diagnosis-ps-by-race", size = "panel", ncol = 5, nrow = 2)
+    save.shield.fig(p5, "supplement-calibration-prop-ps-msm",         size = "panel", ncol = 5, nrow = 2)
+}

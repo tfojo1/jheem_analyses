@@ -110,27 +110,12 @@ PAL.FIT   <- unname(SHIELD.PAL["fit"])
 PAL.LINE  <- unname(SHIELD.PAL["line"])   # outlines
 PAL.OFF   <- unname(SHIELD.PAL["off"])
 
-# ---- the ordered 3-band heat scale -----------------------------------------
-# These bands are ORDERED, not diverging: harm (< 0), benefit below the target,
-# target met. "rdbu" walks the family above, so the heatmaps and the categorical
-# figures are the same two hues. The alternatives are kept here so a palette can
-# be compared without editing any figure code:
-#     SHIELD.HEAT.COLS <- SHIELD.HEAT.PALETTES[["rdylbu"]]
-SHIELD.HEAT.PALETTES <- list(
-    rdbu   = unname(SHIELD.PAL[c("red", "tint", "blue")]),
-    rdylbu = c("#D73027", "#FEE090", "#4575B4"),  # warm mid; strongest 3-way split
-    teal   = c("#D9D9D9", "#D9D9D9", "#35978F"),  # neutral mid; CVD-safe vs red
-    legacy = c("#e34948", "#2a78d6", "#008300")   # pre-2026-09 red/blue/green
-)
-SHIELD.HEAT.PAL  <- "teal"
-SHIELD.HEAT.COLS <- SHIELD.HEAT.PALETTES[[SHIELD.HEAT.PAL]]
-
-# TRUE ramps pale -> saturated WITHIN each band, and the label colour is then
-# chosen per cell from that cell's own luminance. FALSE gives flat bands and a
-# 3-swatch legend, which reads more cleanly -- BUT the flat branch in
-# plot_coverage_heatmap() hardcodes WHITE labels, so it is legible only when all
-# three bands are dark. That is true of "legacy" and of nothing else here.
-SHIELD.HEAT.SHADE <- TRUE
+# ---- heatmap colours ---------------------------------------------------------
+# The default `colours` for plot_coverage_heatmap(): which value gets which colour.
+# The names are the values; colours in between are blended.
+#   one colour, light to dark:  c("-100" = "#35978F", "0" = "#F2F2F2")
+#   two colours:                c("-100" = "#2166AC", "0" = "#F7F7F7", "100" = "#B2182B")
+SHIELD.HEAT.COLOURS <- c("-100" = "#35978F", "0" = "#F2F2F2")
 # ****************************************************************************
 
 
@@ -1558,381 +1543,132 @@ plot_trend_by_location <- function(tbl,
 # HEAT MAP: locations (x strata) down the side, coverage across the top
 # ----------------------------------------------------------------------------
 
-## .lighten ----
-#' @param tbl Wide table from make_multi_location_table(), or a long one.
-#' @param locations,subgroup Optional row filters.
-#' @param year Optional year filter. NULL keeps every year in the table and
-#'   facets when there is more than one.
-#' @param midpoint Value placed at the neutral (white) colour.
-#' @param threshold Value used for row ordering; defaults to `midpoint`.
-#' @param limits Fill scale bounds. NULL uses c(0, 100).
-#' @param higher.is.better FALSE flips the palette and the ordering test.
-#' @param order.rows "threshold" (lowest coverage reaching `threshold`), "max",
-#'   "alpha", or "none".
-#' @param row.sep Separator used when both location and subgroup label a row.
-#' @param save.dir,filename Where to write the figure and what to call it.
-#'   `filename` is the switch: give one and a PNG is written, leave it NULL
-#'   (the default) and nothing is. The ".png" extension is appended for you and
-#'   `save.dir` defaults to FIG.DIR when your driver script has set it. Same
-#'   two arguments, same behaviour, as the table functions.
-#' Blend a colour towards white. amount 0 = unchanged, 1 = white.
-#' @noRd
-.lighten <- function(hex, amount) {
-    v <- grDevices::col2rgb(hex) / 255
-    grDevices::rgb(t(v + (1 - v) * amount))
-}
-
-## .rel_lum ----
-#' WCAG relative luminance of one or more colours
-#' @noRd
-.rel_lum <- function(hex) {
-    m   <- grDevices::col2rgb(hex) / 255
-    lin <- ifelse(m <= 0.03928, m / 12.92, ((m + 0.055) / 1.055)^2.4)
-    as.numeric(0.2126 * lin[1, ] + 0.7152 * lin[2, ] + 0.0722 * lin[3, ])
-}
-
-## .text_on ----
-#' Pick white or near-black text for a given fill, by contrast ratio
-#'
-#' A shaded band runs from a pale end to a saturated one, so no single text
-#' colour works across it -- this picks per cell instead of guessing.
-#' @noRd
-.text_on <- function(hex) {
-    L <- .rel_lum(hex)
-    ifelse(1.05 / (L + 0.05) >= (L + 0.05) / 0.0694, "white", "grey15")
-}
-
-
 ## plot_coverage_heatmap ----
+# Heatmap of one outcome: MSAs (x subgroups) down the side, coverage levels across the top, and
+# the value printed in each cell. All text is black.
+#
+# COLOURS
+#   `colours` says which value gets which colour. The names are the values, and the colours in
+#   between are blended. The lowest and highest names are the ends of the scale; values beyond
+#   them take the end colour.
+#     one colour, light to dark:  colours = c("-100" = "#35978F", "0" = "#F2F2F2")
+#     two colours:                colours = c("-100" = "#2166AC", "0" = "#F7F7F7", "100" = "#B2182B")
+#   Keep the darkest colour light enough to read black text on it: #35978F is fine (contrast
+#   about 6:1); #2166AC is hard to read (about 3.6:1).
+#
+# HIGHLIGHTING A TARGET
+#   highlight.at = -50 draws a black outline around every cell at or below -50. The test uses the
+#   number printed in the cell, so a cell that shows "-50" is outlined. NULL (default) = no outline.
+#
+# ROWS (top to bottom)
+#   order.rows = "alpha"   alphabetical (the default)
+#                "given"   the order of `locations`
+#                "value"   by the value at the highest coverage level, lowest first
+#
+# OTHER ARGUMENTS
+#   locations, subgroup, year    which rows and which year to show
+#   legend.breaks                ticks on the colour bar. NULL = 5 evenly spaced ticks
+#   title, x.lab, fill.lab       text. fill.lab is the legend title
+#   label.digits, label.suffix   the cell numbers, e.g. label.suffix = "%"
+#   base.size, label.size        text size in pt; cell numbers in mm (3.4 mm is about 10 pt)
+#   legend.dir                   "horizontal" (bar under the plot) or "vertical"
+#   fixed.aspect                 FALSE lets the tiles stretch to fill a patchwork cell
+#   save.dir, filename           give a filename to write a PNG; NULL (default) writes nothing
 plot_coverage_heatmap <- function(tbl,
-                                  location.col = "location",
-                                  locations    = NULL,
-                                  subgroup     = NULL,
-                                  order.by     = NULL,
-                                  year         = NULL,
-                                  col.pattern  = "^(.*)_doxy\\.cov\\.(\\d+)_(\\d+)$",
-                                  cov.pattern  = "doxy\\.cov\\.(\\d+)",
-                                  midpoint     = 50,
-                                  threshold    = midpoint,
-                                  limits       = NULL,
-                                  higher.is.better = TRUE,
-                                  order.rows   = c("threshold", "max", "alpha", "none"),
-                                  fill.style   = c("diverging", "banded"),
-                                  band.breaks  = NULL,
-                                  # SHIELD FIGURE PALETTE, top of this file
-                                  band.colours = SHIELD.HEAT.COLS,
-                                  band.shade   = SHIELD.HEAT.SHADE,
-                                  # Which bands run dark -> pale (extreme end
-                                  # DARKEST) instead of pale -> dark. Band 1 by
-                                  # default: it is the harm band and its extreme
-                                  # sits at the LOW end of the scale. On a
-                                  # flipped scale, where two bands lie below the
-                                  # neutral value, pass c(1, 2) -- otherwise the
-                                  # middle band saturates towards "no effect".
-                                  band.reverse = 1L,
-                                  band.light   = 0.78,
-                                  legend.dir   = c("vertical", "horizontal"),
+                                  locations     = NULL,
+                                  subgroup      = NULL,
+                                  year          = NULL,
+                                  colours       = SHIELD.HEAT.COLOURS,
                                   legend.breaks = NULL,
-                                  # "auto" marks a squished end with <= / >=
-                                  # only when THIS panel's data runs past the
-                                  # limit. That makes the labels depend on the
-                                  # data, so two panels sharing a scale can end
-                                  # up with different legends -- and patchwork's
-                                  # guides = "collect" then cannot merge them,
-                                  # which is how a 2x2 ends up with two
-                                  # colourbars. Force "always" or "never" when
-                                  # panels must share one legend.
-                                  squish.marks = c("auto", "always", "never"),
-                                  legend.labels = NULL,
-                                  label.digits = 0,
-                                  show.labels  = TRUE,
-                                  label.suffix = "",
-                                  # text size of the cell labels, in mm (3.4 is about 10 pt)
-                                  label.size   = 3.4,
-                                  # base text size in pt: title, axis titles,
-                                  # axis labels and legend all scale from it
-                                  base.size    = 12,
-                                  # Font size (pt) of each text element. NULL
-                                  # follows base.size: titles = base.size, axis
-                                  # and legend labels = 0.8 x base.size.
-                                  title.size        = NULL,   # plot title
-                                  axis.title.size   = NULL,   # x-axis title
-                                  axis.text.size    = NULL,   # city names and coverage levels
-                                  legend.title.size = NULL,
-                                  legend.text.size  = NULL,
-                                  # NULL picks per cell by contrast against the
-                                  # fill; a colour string uses that everywhere
-                                  label.colour = NULL,
-                                  row.sep      = " — ",
-                                  title        = NULL,
-                                  x.lab        = "Doxy-PEP Coverage \namong MSM by 2030 (%)",
-                                  fill.lab     = NULL,
-                                  # TRUE locks the panel's aspect with
-                                  # coord_fixed(), which is what leaves an
-                                  # empty margin when the saved width/height
-                                  # do not match that aspect. Set FALSE for a
-                                  # panel going into a patchwork grid, so the
-                                  # tiles stretch to fill their cell instead.
-                                  fixed.aspect = TRUE,
-                                  save.dir     = .default_fig_dir(),
-                                  filename     = NULL,
+                                  highlight.at  = NULL,
+                                  order.rows    = c("alpha", "given", "value"),
+                                  title         = NULL,
+                                  x.lab         = "Doxy-PEP Coverage \namong MSM by 2030 (%)",
+                                  fill.lab      = NULL,
+                                  label.digits  = 0,
+                                  label.suffix  = "",
+                                  label.size    = 3.4,
+                                  base.size     = 12,
+                                  legend.dir    = c("horizontal", "vertical"),
+                                  fixed.aspect  = TRUE,
+                                  location.col  = "location",
+                                  col.pattern   = "^(.*)_doxy\\.cov\\.(\\d+)_(\\d+)$",
+                                  cov.pattern   = "doxy\\.cov\\.(\\d+)",
+                                  row.sep       = " — ",
+                                  save.dir      = .default_fig_dir(),
+                                  filename      = NULL,
                                   width = 8, height = 5, dpi = 300) {
 
     order.rows <- match.arg(order.rows)
-    fill.style <- match.arg(fill.style)
-    legend.dir   <- match.arg(legend.dir)
-    squish.marks <- match.arg(squish.marks)
+    legend.dir <- match.arg(legend.dir)
 
+    # 1. The values: one row per location x subgroup x coverage level
     long <- .prep_long(tbl, location.col, locations, subgroup, col.pattern, cov.pattern)
     long <- .require_coverage(long, cov.pattern)
-
     long <- .filter_year(long, year)
-
-    subgroup.order <- subgroup          # shadowed by the column inside dplyr
     long$row.id <- .series_label(long, row.sep)
 
-    # ---- row ordering ------------------------------------------------------
-    # `order.rows` picks WHICH value ranking to use; `order.by` decides whether
-    # a value ranking is used at all (see .series_levels).
-    crossed <- function(v) if (higher.is.better) v >= threshold else v <= threshold
-    ord <- long %>%
-        group_by(row.id) %>%
-        summarise(cross = suppressWarnings(min(coverage[crossed(value)])),
-                  best  = if (higher.is.better) max(value, na.rm = TRUE)
-                          else min(value, na.rm = TRUE),
-                  .groups = "drop")
-    value.order <- switch(order.rows,
-                        threshold = ord %>% arrange(cross, if (higher.is.better) desc(best) else best) %>% pull(row.id),
-                        max       = ord %>% arrange(if (higher.is.better) desc(best) else best) %>% pull(row.id),
-                        alpha     = sort(unique(long$row.id)),
-                        none      = unique(long$row.id))
-    row.order <- .series_levels(
-        dplyr::distinct(long, location, subgroup, series = row.id),
-        locations, subgroup.order, order.by, value.order)
+    # 2. Row order
+    top.cov   <- long[long$coverage == max(long$coverage), ]
+    row.order <- switch(order.rows,
+                        alpha = sort(unique(long$row.id)),
+                        given = unique(long$row.id[order(match(long$location, locations))]),
+                        value = unique(top.cov$row.id[order(top.cov$value)]))
+    long$row.id   <- factor(long$row.id, levels = rev(row.order))     # first row at the top
+    long$coverage <- factor(long$coverage, levels = sort(unique(long$coverage)))
 
-    long <- long %>%
-        mutate(row.id   = factor(row.id, levels = rev(row.order)),
-               coverage = factor(coverage, levels = sort(unique(coverage))))
+    # 3. The colour scale: each colour sits at the value in its name
+    at <- suppressWarnings(as.numeric(names(colours)))
+    if (length(colours) < 2 || anyNA(at))
+        stop("`colours` needs at least two colours, each named by the value it sits at, e.g. ",
+             'c("-100" = "#35978F", "0" = "#F2F2F2")')
+    colours <- unname(colours[order(at)])
+    at      <- sort(at)
+    limits  <- range(at)
+    if (is.null(legend.breaks)) legend.breaks <- seq(limits[1], limits[2], length.out = 5)
+    if (is.null(fill.lab))      fill.lab <- paste(unique(long$outcome), collapse = " / ")
 
-    # ---- fill scale --------------------------------------------------------
-    # "banded" cuts the values at meaningful thresholds instead of shading them
-    # continuously. Two reasons to prefer it here:
-    #
-    #   The default continuous scale runs limits = c(0, 100) with
-    #   oob = squish, so a NEGATIVE value -- the intervention leaving a group
-    #   worse off -- is clamped to 0 and painted the same as no effect at all.
-    #   A band below zero gives that its own colour.
-    #
-    #   The cut points are the ones the figure already reasons about: 0
-    #   separates benefit from harm, and `threshold` is the policy target that
-    #   crossed() and the row ordering already use. Banding makes "did this
-    #   city clear the target" a colour rather than a value to be read off.
-    #
-    # The cost is that magnitude within a band is no longer encoded, which is
-    # why show.labels should stay TRUE (see below -- it is also what makes the
-    # red/green pair legitimate).
-    if (fill.style == "banded") {
-        if (is.null(band.breaks)) band.breaks <- c(0, threshold)
-        band.breaks <- sort(unique(band.breaks))
-        if (length(band.colours) != length(band.breaks) + 1L)
-            stop("band.colours needs one more entry than band.breaks: ",
-                 length(band.breaks) + 1L, " colours for breaks ",
-                 paste(band.breaks, collapse = ", "), ", got ",
-                 length(band.colours), ".")
+    legend.guide <- if (legend.dir == "horizontal")
+                        guide_colourbar(direction = "horizontal", title.position = "top",
+                                        barwidth = unit(7, "cm"), barheight = unit(0.45, "cm"))
+                    else
+                        guide_colourbar(barwidth = unit(0.5, "cm"), barheight = unit(4.5, "cm"))
 
-        # The default limits of c(0, 100) would squish every negative value
-        # onto the bottom of the scale, which is the thing this style exists
-        # to stop -- so span the data instead.
-        if (is.null(limits))
-            limits <- range(c(long$value, band.breaks), na.rm = TRUE)
+    # 4. The cell numbers, and which cells meet the target (judged on the printed number)
+    long$label <- paste0(format(round(long$value, label.digits), nsmall = label.digits, trim = TRUE),
+                         label.suffix)
+    long$meets <- if (is.null(highlight.at)) FALSE else round(long$value, label.digits) <= highlight.at
 
-        if (band.shade) {
-            # A piecewise ramp: the hue changes abruptly at every break, and
-            # within a band the colour runs pale -> saturated so magnitude is
-            # still readable. The bands named in `band.reverse` run the other
-            # way (darkest at their LOW end), so that on both sides of the
-            # neutral value "more extreme" reads as "more intense".
-            edges    <- c(limits[1], band.breaks, limits[2])
-            stop.pos <- numeric(0); stop.col <- character(0)
-            for (k in seq_along(band.colours)) {
-                base <- unname(band.colours[k])
-                pale <- .lighten(base, band.light)
-                stop.col <- c(stop.col, if (k %in% band.reverse) c(base, pale)
-                                        else                     c(pale, base))
-                stop.pos <- c(stop.pos, edges[k], edges[k + 1])
-            }
-            stop.pos <- scales::rescale(stop.pos, from = limits)
-            # gradient_n_pal() needs strictly increasing stops; the duplicated
-            # boundary is what makes the hue change a step rather than a blend
-            for (s in seq_along(stop.pos)[-1])
-                if (stop.pos[s] <= stop.pos[s - 1])
-                    stop.pos[s] <- stop.pos[s - 1] + 1e-6
-
-            # Legend ticks at the band edges, because those are the values
-            # that mean something. Where data is being squished onto an end,
-            # the tick says so -- otherwise "-100" reads as the minimum
-            # observed rather than "everything at or below this".
-            if (is.null(legend.breaks))
-                legend.breaks <- sort(unique(c(limits[1], band.breaks, limits[2])))
-            mark.lo <- switch(squish.marks,
-                              always = TRUE, never = FALSE,
-                              auto   = any(long$value < limits[1], na.rm = TRUE))
-            mark.hi <- switch(squish.marks,
-                              always = TRUE, never = FALSE,
-                              auto   = any(long$value > limits[2], na.rm = TRUE))
-
-            legend.labs <- format(legend.breaks, trim = TRUE)
-            if (mark.lo)
-                legend.labs[legend.breaks == limits[1]] <-
-                    paste0("\u2264 ", format(limits[1], trim = TRUE))
-            if (mark.hi)
-                legend.labs[legend.breaks == limits[2]] <-
-                    paste0("\u2265 ", format(limits[2], trim = TRUE))
-
-            # explicit labels win outright -- the last resort for making
-            # several panels present byte-identical guides
-            if (!is.null(legend.labels)) {
-                if (length(legend.labels) != length(legend.breaks))
-                    stop("legend.labels must have one entry per legend break (",
-                         length(legend.breaks), " needed, got ",
-                         length(legend.labels), ").")
-                legend.labs <- legend.labels
-            }
-
-            band.pal   <- scales::gradient_n_pal(stop.col, values = stop.pos)
-            long$.txt  <- .text_on(band.pal(scales::rescale(
-                              scales::squish(long$value, limits), from = limits)))
-        } else {
-            band.labs <- c(
-                paste0("< ", band.breaks[1]),
-                if (length(band.breaks) > 1)
-                    paste0(utils::head(band.breaks, -1), " to <", band.breaks[-1]),
-                paste0("\u2265 ", band.breaks[length(band.breaks)]))
-            # right = FALSE so the top band is [threshold, Inf), matching the
-            # crossed() test above, which counts v >= threshold as crossed
-            long$.band <- cut(long$value, breaks = c(-Inf, band.breaks, Inf),
-                              labels = band.labs, right = FALSE)
-            names(band.colours) <- band.labs
-        }
-    }
-
-    if (is.null(limits)) limits <- c(0, 100)
-    # RdBu, not red/green: same family as the banded scale above, and legible
-    # under colour-vision deficiency. PAL.WOMEN/PAL.MSM are the same two hexes.
-    pal <- if (higher.is.better) c(PAL.WOMEN, PAL.MSM) else c(PAL.MSM, PAL.WOMEN)
-
-    if (is.null(fill.lab)) fill.lab <- paste(unique(long$outcome), collapse = " / ")
-
-    if (is.null(title) && dplyr::n_distinct(long$year) == 1) {
-        title <- paste0(fill.lab, ", ", unique(long$year))
-        if (!is.null(subgroup) && length(subgroup) == 1)
-            title <- paste0(title, " (", subgroup, ")")
-    }
-
-    banded.flat <- fill.style == "banded" && !band.shade
-    fill.col    <- if (banded.flat) ".band" else "value"
-
-    # Cell label text, e.g. "45%". Added before ggplot() is called: the plot
-    # keeps its own copy of `long`, so a column added afterwards is not seen.
-    long$.lab <- paste0(format(round(long$value, label.digits),
-                               nsmall = label.digits, trim = TRUE),
-                        label.suffix)
-
-    p <- ggplot(long, aes(x = coverage, y = row.id, fill = .data[[fill.col]])) +
-        geom_tile(color = "white", linewidth = 0.6)
-
-    p <- p + if (banded.flat)
-                 scale_fill_manual(values = band.colours, name = fill.lab,
-                                   drop = FALSE, na.value = "grey90")
-             else if (fill.style == "banded")
-                 scale_fill_gradientn(
-                     colours = stop.col,
-                     values  = stop.pos,
-                     limits  = limits,
-                     oob     = scales::squish,
-                     name    = fill.lab,
-                     breaks  = legend.breaks,
-                     labels  = legend.labs,
-                     guide   = if (legend.dir == "horizontal")
-                                   guide_colourbar(direction = "horizontal",
-                                                   title.position = "top",
-                                                   barwidth  = unit(7, "cm"),
-                                                   barheight = unit(0.45, "cm"))
-                               else
-                                   guide_colourbar(barwidth  = unit(0.5, "cm"),
-                                                   barheight = unit(4.5, "cm")))
-             else
-                 scale_fill_gradientn(colours = c(pal[1], "#F7F7F7", pal[2]),
-                                      values  = scales::rescale(
-                                          c(limits[1], midpoint, limits[2]),
-                                          from = limits),
-                                      limits  = limits,
-                                      oob     = scales::squish,
-                                      name    = fill.lab)
-
-    p <- p +
+    # 5. The plot
+    p <- ggplot(long, aes(x = coverage, y = row.id, fill = value)) +
+        geom_tile(colour = "white", linewidth = 0.6) +
+        # black outline on the cells that meet the target (none when highlight.at is NULL)
+        geom_tile(data = long[long$meets, ], fill = NA, colour = "black", linewidth = 0.9) +
+        geom_text(aes(label = label), colour = "black", size = label.size, fontface = "bold") +
+        scale_fill_gradientn(colours = colours,
+                             values  = scales::rescale(at, from = limits),
+                             limits  = limits,
+                             breaks  = legend.breaks,
+                             oob     = scales::squish,
+                             name    = fill.lab,
+                             guide   = legend.guide) +
         scale_x_discrete(expand = c(0, 0)) +
         scale_y_discrete(expand = c(0, 0)) +
         labs(x = x.lab, y = NULL, title = title) +
         theme_minimal(base_size = base.size) +
-        theme(panel.grid = element_blank(),
-              axis.ticks = element_blank(),
-              plot.title = element_text(face = "bold",
-                                        size = if (is.null(title.size)) base.size else title.size),
-              # size = NULL keeps the theme's own size, which follows base.size
-              axis.title   = element_text(size = axis.title.size),
-              axis.text    = element_text(size = axis.text.size),
-              legend.title = element_text(size = legend.title.size),
-              legend.text  = element_text(size = legend.text.size),
-              legend.position = if (legend.dir == "horizontal") "bottom" else "right",
-              # the colourbar guides above set their own size in banded mode;
-              # this stays for the continuous default
-              legend.key.height = if (fill.style == "banded") NULL
-                                  else unit(1.2, "cm"))
+        theme(text            = element_text(colour = "black"),
+              axis.text       = element_text(colour = "black"),
+              legend.text     = element_text(colour = "black"),
+              plot.title      = element_text(colour = "black", face = "bold"),
+              panel.grid      = element_blank(),
+              axis.ticks      = element_blank(),
+              legend.position = if (legend.dir == "horizontal") "bottom" else "right")
 
-    if (show.labels) {
-        val.lab <- aes(label = .lab)
-        if (!is.null(label.colour)) {
-            # One colour for every cell. Mixed black/white labels are chosen
-            # for contrast, but they read as if they encode something, so a
-            # single colour is often the better call -- CHECK IT AGAINST THE
-            # DARKEST FILL FIRST. The old "black is fine everywhere" note was
-            # measured against the legacy red/blue/green bands and does NOT
-            # carry over: on the rdbu bands, black over #2166AC is about 3.5:1.
-            # Pass label.colour = NULL for per-cell contrast instead.
-            p <- p + geom_text(val.lab, colour = label.colour, size = label.size,
-                               fontface = "bold", show.legend = FALSE)
-        } else if (banded.flat) {
-            # NOTE white is hardcoded here, which assumes all three bands are
-            # dark. True of the legacy red/blue/green bands (3.9 / 4.4 / 4.9
-            # against white); NOT true of any palette with a pale middle band,
-            # including the rdbu default, whose #92C5DE mid-band would render
-            # white numbers essentially invisible. Use band.shade = TRUE with
-            # those, or pass an explicit label.colour.
-            p <- p + geom_text(val.lab, colour = "white", size = label.size,
-                               fontface = "bold", show.legend = FALSE)
-        } else if (fill.style == "banded") {
-            # shaded bands run pale -> saturated, so the text colour is chosen
-            # per cell from the actual fill's luminance
-            p <- p + geom_text(aes(label = .lab,
-                                   colour = .txt),
-                               size = label.size, fontface = "bold",
-                               show.legend = FALSE) +
-                     scale_colour_identity()
-        } else {
-            p <- p +
-                geom_text(aes(label = .lab,
-                              color = ifelse(value >= midpoint,
-                                             (value - midpoint) / (limits[2] - midpoint),
-                                             (midpoint - value) / (midpoint - limits[1])) > 0.55),
-                          size = label.size, fontface = "bold", show.legend = FALSE) +
-                scale_color_manual(values = c(`TRUE` = "white", `FALSE` = "grey15"))
-        }
-    }
-
-    n.facet <- dplyr::n_distinct(paste(long$outcome, long$year))
-    if (n.facet > 1)          p <- p + facet_wrap(~ outcome + year, scales = "free_x")
-    else if (fixed.aspect)    p <- p + coord_fixed(ratio = 0.75)
+    # 6. More than one outcome or year: one panel each
+    if (dplyr::n_distinct(paste(long$outcome, long$year)) > 1)
+        p <- p + facet_wrap(~ outcome + year, scales = "free_x")
+    else if (fixed.aspect)
+        p <- p + coord_fixed(ratio = 0.75)
 
     .save_fig(p, save.dir, filename, width, height, dpi)
     p
@@ -2607,7 +2343,7 @@ if (1 == 2) {
     atlanta.tbl <- make_multi_location_table(
         data          = list(total_raw_results, sex_results),
         locations     = "Atlanta",
-        outcomes      = c("pct_incidence_averted"),
+        outcomes      = c("pct_change_incidence_vs_noint"),
         interventions = paste0("doxy.cov.", seq(10, 100, 10)),
         years         = c("2030"),
         stat.type     = "median.ci"
@@ -2616,7 +2352,7 @@ if (1 == 2) {
     ten.city.tbl <- make_multi_location_table(
         data          = list(total_raw_results, sex_results),
         locations     = names(SHIELD.TEN.MSAS),
-        outcomes      = c("pct_incidence_averted"),
+        outcomes      = c("pct_change_incidence_vs_noint"),
         interventions = paste0("doxy.cov.", seq(10, 100, 10)),
         years         = c("2030"),
         stat.type     = "median.ci"
@@ -2665,7 +2401,7 @@ if (1 == 2) {
     traj.tbl <- make_multi_location_table(
         data          = list(total_raw_results, sex_results),
         locations     = names(SHIELD.TEN.MSAS),
-        outcomes      = c("pct_incidence_averted"),
+        outcomes      = c("pct_change_incidence_vs_noint"),
         interventions = paste0("doxy.cov.", seq(10, 100, 10)),
         years         = as.character(2022:2040),
         stat.type     = "median"
@@ -2712,7 +2448,7 @@ if (1 == 2) {
     summary_no_int <- make_multi_location_table(
         data          = list(total_raw_results, total_calc_results, sex_calc_results),
         locations     = names(SHIELD.TEN.MSAS),
-        outcomes      = c("rate_diagnosis_total_per_pop"),
+        outcomes      = c("diagnosis_total_rate"),
         interventions = "noint",
         years         = as.character(2022:2030),
         stat.type     = "median.ci")
@@ -2739,7 +2475,7 @@ if (1 == 2) {
         make_multi_location_table(
             data            = list(total_calc_results, sex_calc_results),
             locations       = names(SHIELD.TEN.MSAS),
-            outcomes        = "rate_diagnosis_total_per_pop",
+            outcomes        = "diagnosis_total_rate",
             interventions   = c("noint", "doxy.cov.50", "doxy.cov.100"),
             years           = as.character(2022:2030),
             stat.type       = "median.ci",
@@ -2751,7 +2487,6 @@ if (1 == 2) {
     # ------------------------------------------------------------------------
     plot_coverage_heatmap(ten.city.tbl,
                           subgroup  = "msm",
-                          midpoint  = 50,
                           filename  = "heatmap_msm_2030")
 
     # ------------------------------------------------------------------------
@@ -2761,7 +2496,7 @@ if (1 == 2) {
     by.year.rows <- make_multi_location_table(
         data          = list(total_raw_results, sex_results),
         locations     = names(SHIELD.TEN.MSAS),
-        outcomes      = c("pct_incidence_averted"),
+        outcomes      = c("pct_change_incidence_vs_noint"),
         interventions = paste0("doxy.cov.", seq(10, 100, 10)),
         years         = as.character(c(2030, 2035)),
         row.vars      = "year",          # year goes down the rows

@@ -1,21 +1,17 @@
 # ****************************************************************************************************
-# 05 CROI ABSTRACT OUTPUTS (OPTIONAL) ----
+# SHIELD / Doxy-PEP -- MANUSCRIPT OUTPUTS
 # ****************************************************************************************************
-# A cut-down copy of 03_manuscript_outputs.R for the CROI abstract: a two-panel heatmap
-# (figures/fig_CROI.png) and Table S1. Run it after 02_generate_custom_outcomes.R.
 #
-# CALIBRATION. Pinned below to the calibration the abstract used, so re-running it gives the
-# submitted numbers. Delete that one line to follow CALIB.NAME in 00_settings.R instead.
-# ****************************************************************************************************
 
 # CONFIGURATION ------------------------------------------------------
 if(1==1){
-    source('../jheem_analyses/applications/SHIELD/analysis/intervention/00_settings.R')
-    source('../jheem_analyses/applications/SHIELD/analysis/intervention/intervention_helper_functions.R')
+    source('../jheem_analyses/commoncode/locations_of_interest.R')
+    # source('../jheem_analyses/applications/SHIELD/shield_specification.R')
+    source('../jheem_analyses/applications/SHIELD/analysis/croi26/intervention_helper_functions.R')
     
     print(paste("Root directory is set to: ",ROOT.DIR))
     
-    # Pinned to the abstract's calibration. Delete this line to use the one in 00_settings.R.
+    # Set the calibration once. The folders and the four result arrays follow from it.
     CALIB.NAME <- "calib.9.23.stage3.pk"
     FIG.DIR    <- shield.fig.path(CALIB.NAME,   create = TRUE)
     TABLE.DIR  <- shield.table.path(CALIB.NAME, create = TRUE)
@@ -34,8 +30,9 @@ if(1==1){
 # FIGURE SETTINGS ------------------------------------------------------
 {
     CCRIT.MS   <- "doxy.cov.20"                        # policy coverage level
-    # EVAL.YEAR and YEAR0 come from 00_settings.R. The coverage levels shown here differ
-    # from the manuscript's, so they are set for this script only.
+    EVAL.YEAR  <- "2030"                               # policy evaluation horizon
+    BASE.YEAR  <- "2022"
+    COVERAGE.LEVELS <- paste0("doxy.cov.", seq(5, 50, 5))
     COVERAGE.LEVELS <- paste0("doxy.cov.", c(10,25,50))
     
     .ccrit     <- as.integer(sub("doxy\\.cov\\.", "", CCRIT.MS))
@@ -62,6 +59,7 @@ if(1==1){
         cell         = 5.6    # numbers inside the tiles
     )
     
+    MSAS <- names(SHIELD.TEN.MSAS)
     PRINT.VERSION = T #
 }
 
@@ -197,7 +195,7 @@ if(1==1){
 # TABLE S1 -- DOXY-PEP IMPACT AT A SINGLE COVERAGE LEVEL, BY POPULATION ----
 # ****************************************************************************************************
 # WHAT   One row per MSA x population (Total / MSM / women / heterosexual men):
-#        incident counts and incidence rates in YEAR0 and EVAL.YEAR under
+#        incident counts and incidence rates in BASE.YEAR and EVAL.YEAR under
 #        `noint` and under CCRIT.MS, then the three impact metrics at EVAL.YEAR.
 #        The numeric backing for Figure 4.
 # INPUT  results, MSAS; medians only -- this is a supporting table, no CrI.
@@ -221,7 +219,7 @@ if(1==1){
         outcomes        = t2.outcomes1,
         interventions   = c("noint",CCRIT.MS),
         filter.by.strat = c("Total", "msm","female","heterosexual_male"),
-        years           = c(YEAR0, EVAL.YEAR),
+        years           = c(BASE.YEAR, EVAL.YEAR),
         stat.type       = "median",
         digits = c(.default                       = 0,
                    pct_incidence_averted          = 1,
@@ -266,13 +264,13 @@ if(1==1){
     
     col.labels.t2 <- stats::setNames(
         c("MSA", "Population",
-          paste0("Incidence ", YEAR0, ", No Intervention"),
+          paste0("Incidence ", BASE.YEAR, ", No Intervention"),
           paste0("Incidence ", EVAL.YEAR, ", No Intervention"),
-          paste0("Incidence ", YEAR0, ", Doxy Coverage ",.t2cov,"%"),
+          paste0("Incidence ", BASE.YEAR, ", Doxy Coverage ",.t2cov,"%"),
           paste0("Incidence ", EVAL.YEAR, ", Doxy Coverage ",.t2cov,"%"),
-          paste0("Incidence Rate (per 100,000 population) ", YEAR0, ", No Intervention"),
+          paste0("Incidence Rate (per 100,000 population) ", BASE.YEAR, ", No Intervention"),
           paste0("Incidence Rate (per 100,000 population) ", EVAL.YEAR, ", No Intervention"),
-          paste0("Incidence Rate (per 100,000 population) ", YEAR0, ", Doxy Coverage ",.t2cov,"%"),
+          paste0("Incidence Rate (per 100,000 population) ", BASE.YEAR, ", Doxy Coverage ",.t2cov,"%"),
           paste0("Incidence Rate (per 100,000 population) ", EVAL.YEAR, ", Doxy Coverage ",.t2cov,"%"),
           
           
@@ -298,7 +296,7 @@ if(1==1){
     
     if(PRINT.VERSION) {
         final2<-.remove.duplicate.rows(final2)
-        file = file.path(TABLE.DIR, paste0("S1-impact-cov", .t2cov, "-", EVAL.YEAR, ".csv"))
+        file = paste0(TABLE.DIR, "S1-impact-cov", .t2cov, "-", EVAL.YEAR, ".csv")
         write.csv(final2,
                   file =file,
                   row.names = FALSE)

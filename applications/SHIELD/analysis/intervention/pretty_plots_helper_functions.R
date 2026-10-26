@@ -631,6 +631,7 @@ shield.plot <- function(simsets           = NULL,
     shape.title <- NULL
     shape.from.data <- FALSE          # TRUE when the shape describes the data, not the model
     scales.added    <- FALSE          # TRUE once the city colour/fill scales are placed
+    fill.is.source  <- FALSE          # TRUE when the point fill shows the data source ("both")
 
     if (!is.null(dat) && nrow(dat) > 0) {
         use <- if (shape.by != "auto") shape.by
@@ -702,8 +703,10 @@ shield.plot <- function(simsets           = NULL,
                 scale_shape_manual(values = rep(c(21, 22, 24, 23, 25),
                                                 length.out = length(areas)),
                                    name = "Reported for") +
-                guides(fill  = guide_legend(override.aes = list(shape = 21, colour = "grey30")),
-                       shape = guide_legend(override.aes = list(fill = "grey40")))
+                # legend order: data source first, then the area reported for; any other
+                # legend (e.g. Location) follows them
+                guides(fill  = guide_legend(order = 1, override.aes = list(shape = 21, colour = "grey30")),
+                       shape = guide_legend(order = 2, override.aes = list(fill = "grey40")))
 
             # Record the shape channel so the legend bookkeeping downstream (titles,
             # vertical stacking, source.legend) sees it. The branch chain has already been
@@ -712,6 +715,7 @@ shield.plot <- function(simsets           = NULL,
             shape.title     <- "Reported for"
             shape.from.data <- TRUE
             scales.added    <- TRUE
+            fill.is.source  <- TRUE
         } else if (is.null(shape.var))
             p <- p + geom_point(data = dat, aes(x = year, y = value, fill = .data[[colour.var]]),
                                 inherit.aes = FALSE, show.legend = FALSE,
@@ -739,6 +743,7 @@ shield.plot <- function(simsets           = NULL,
     shape.in.legend <- !is.null(shape.var)
     if (shape.from.data && !isTRUE(source.legend)) {
         p <- p + guides(shape = "none")
+        if (fill.is.source) p <- p + guides(fill = "none")   # "both": the source is the fill
         shape.in.legend <- FALSE
     }
 
@@ -765,8 +770,13 @@ shield.plot <- function(simsets           = NULL,
     
     # When the panels are cities and the colour is the city, the colour legend repeats the
     # strip labels, so drop it and keep only the legends that add something.
+    # With shape.by = "both" the fill shows the DATA SOURCE, not the city, so the fill legend
+    # ("Data source") is kept.
     redundant.colour <- identical(colour.var, "city") && "city" %in% panel.vars
-    if (redundant.colour) p <- p + guides(colour = "none", fill = "none")
+    if (redundant.colour) {
+        p <- p + guides(colour = "none")
+        if (!fill.is.source) p <- p + guides(fill = "none")
+    }
 
     show.legend <- (!redundant.colour && length(colour.levels) > 1) ||
                    !is.null(linetype.var) || shape.in.legend
@@ -784,7 +794,8 @@ shield.plot <- function(simsets           = NULL,
     colour.name <- if (identical(colour.var, "city")) "Location" else nice(split.by)
 
     n.legends <- sum(!redundant.colour && length(colour.levels) > 1,
-                     !is.null(linetype.var), shape.in.legend)
+                     !is.null(linetype.var), shape.in.legend,
+                     fill.is.source && isTRUE(source.legend))
     if (is.null(legend.titles)) legend.titles <- n.legends > 1
 
     if (isTRUE(legend.titles)) {

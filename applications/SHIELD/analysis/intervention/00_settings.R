@@ -15,9 +15,9 @@
 #   02_generate_custom_outcomes.R      raw arrays -> custom outcomes: cases averted, rates,
 #                                      proportions (total_calc / sex_calc arrays)
 #   02b_compare_results.R              optional: compare the new arrays with an older run
-#   03_manuscript_outputs.R            every manuscript table and figure
+#   03_manuscript_outputs.R            every manuscript table and figure (older, full version)
+#   03b_manuscript_main.R              the main-text Table 1, Figure 3 (heatmap) and Figure 4 (box plots)
 #   04_table_efficiency.R              doxycycline efficiency tables (by MSA and pooled)
-#   05_croi26.R                        optional: CROI abstract figure and table
 #   06_pretty_plots.R                  calibration-fit figures for the manuscript. Has its own
 #                                      settings and reads the calibration simsets, not the arrays
 #
@@ -31,6 +31,7 @@
 #   qc_intervention_plots.R   trajectories read straight from the simsets. Does not need the arrays.
 #
 # Old and exploratory scripts are in archive/. Nothing above sources them.
+# The CROI 2026 abstract analysis is frozen in ../croi26/, separate from this workflow.
 #
 # WHERE THINGS ARE WRITTEN
 #   <root>/shield/outputs/<CALIB.NAME>/            the four result arrays
@@ -60,7 +61,7 @@ MSAS      <- names(SHIELD.TEN.MSAS)   # city names, in the one order every figur
 #    INTERVENTION.CODES -- the arrays stop at 50%, so asking for 60-100% gives NA.
 NOINT              <- "noint"
 INTERVENTION.CODES <- c(NOINT, paste0("doxy.cov.", seq(5, 50, 5)))
-COVERAGE.LEVELS    <- paste0("doxy.cov.", seq(10, 50, 10))
+COVERAGE.LEVELS    <- paste0("doxy.cov.", seq(5, 50, 5))
 
 
 ## Years ----

@@ -349,7 +349,7 @@ save.shield.fig <- function(plot, filename, dir = FIG.DIR,
                             size    = "single",
                             ncol    = NULL,
                             nrow    = NULL,
-                            formats = c("png", "pdf"),
+                            formats = c("png"),
                             dpi     = SHIELD.FIG.DPI)
 {
     dims <- if (is.character(size)) SHIELD.FIG.SIZE[[size]] else size
