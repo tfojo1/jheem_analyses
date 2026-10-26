@@ -47,34 +47,37 @@ calib.simsets <- load.calib.simsets(
 {
     SHIELD.DEFAULT.WINDOW <- "manuscript2000"
     CITIES<- c("Atlanta","Chicago")
- 
-p1<-shield.plot(calib.simsets, "diagnosis.ps", locations = CITIES,overlay.locations = F,
-                log.y = TRUE,
-                show.sources = T,
-                title = "PS Syphilis Diagnoses",
-                titles = c(Atlanta = "A. Atlanta–Sandy Springs",
-                           Chicago = "B. Chicago–Naperville"));p1
-p2<-shield.plot(calib.simsets, "diagnosis.ps", locations = CITIES,split.by = "sex",overlay.locations = F,
-                log.y = TRUE,show.sources = T,
-                title = "PS Syphilis Diagnoses, by Sex",
-                titles = c(Atlanta = "C. Atlanta–Sandy Springs",
-                           Chicago = "D. Chicago–Naperville"));p2
-p3<-shield.plot(calib.simsets, "prop.male.ps.diag.among.msm", locations = CITIES,overlay.locations = F,
-                log.y = TRUE, show.sources = T,
-                shape.by = "both",show.data = T,
-                title = "E. Proportion of Male Diagnosis among MSM");p3
-# p4<-shield.plot(calib.simsets, "incidence", locations = CITIES,
-#                 log.y = TRUE,show.sources = F,
-#                 title = "F. Syphilis Incidence");p4
-
-
-#putting them together
-plt<- (p1/p2/p3);plt
-# plt<- (p0 /p1)/(p2+p3) ;plt
-# +plot_layout(guides = "collect") & theme(legend.position = "bottom");plt
-
-ggsave(file.path(FIG.DIR, "fig2-calibration.png"), plt,
-       width = 9, height = 12, dpi = 300, bg = "white")
+    
+    p1<-shield.plot(calib.simsets, "diagnosis.ps", locations = CITIES,overlay.locations = F,
+                    log.y = TRUE,
+                    show.sources = T,
+                    title = "PS Syphilis Diagnoses",
+                    titles = c(Atlanta = "A. Atlanta–Sandy Springs",
+                               Chicago = "B. Chicago–Naperville"));p1
+    p2<-shield.plot(calib.simsets, "diagnosis.ps", locations = CITIES,split.by = "sex",overlay.locations = F,
+                    log.y = TRUE,show.sources = T,
+                    title = "PS Syphilis Diagnoses, by Sex",
+                    titles = c(Atlanta = "C. Atlanta–Sandy Springs",
+                               Chicago = "D. Chicago–Naperville"));p2
+    p3<-shield.plot(calib.simsets, "prop.male.ps.diag.among.msm", locations = CITIES,overlay.locations = F,
+                    log.y = TRUE, show.sources = T,
+                    shape.by = "both",show.data = T,
+                    title = "E. Proportion of Male Diagnosis among MSM",
+                    titles = c(Atlanta = "E. Atlanta–Sandy Springs",
+                               Chicago = "F. Chicago–Naperville"));p3
+    # p4<-shield.plot(calib.simsets, "incidence", locations = CITIES,
+    #                 log.y = TRUE,show.sources = F,
+    #                 title = "F. Syphilis Incidence");p4
+    
+    
+    #putting them together
+    plt<- (p1/p2/p3)&
+        theme(panel.spacing.x = unit(2, "lines")) ;plt
+    # plt<- (p0 /p1)/(p2+p3) ;plt
+    # +plot_layout(guides = "collect") & theme(legend.position = "bottom");plt
+    
+    ggsave(file.path(FIG.DIR, "fig2-calibration.png"), plt,
+           width = 9, height = 12, dpi = 300, bg = "white")
 }
 
 #historical fit plots for supplement
@@ -104,7 +107,7 @@ SHIELD.DEFAULT.WINDOW <- "history"
                     log.y = F,free.y = T,ncol = 5,
                     show.sources = T,show.proj.line = T,
                     title = "Proportion of PS Diagnosis among MSM");p5
-
+    
     # saving: 10 cities in a 5 x 2 grid, each as png and pdf
     save.shield.fig(p1, "supplement-calibration-diagnosis-total",     size = "panel", ncol = 5, nrow = 2)
     save.shield.fig(p2, "supplement-calibration-diagnosis-ps",        size = "panel", ncol = 5, nrow = 2)

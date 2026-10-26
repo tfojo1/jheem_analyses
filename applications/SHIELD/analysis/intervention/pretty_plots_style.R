@@ -314,7 +314,7 @@ SHIELD.LEGEND.TITLES <- T
 # uses too, and they never change, only their labels do.
 SHIELD.SOURCE.LABELS <- c(
     lhd                          = "Local health department reports",
-    mmwr                         = "MMWR",
+    mmwr                         = "Morbidity and Mortality Weekly Report",
     cdc.sti.surveillance.reports = "CDC STI surveillance reports",
     cdc.aggregated.county        = "CDC aggregated county data"
 )
