@@ -45,8 +45,9 @@ calib.simsets <- load.calib.simsets(
 
 # PLOT CALIBRATIONS----
 {
-    CITIES<- c("Atlanta","Houston")
-
+    SHIELD.DEFAULT.WINDOW <- "manuscript2000"
+    CITIES<- c("Atlanta","Chicago")
+ 
 p1<-shield.plot(calib.simsets, "diagnosis.ps", locations = CITIES,overlay.locations = F,
                 log.y = TRUE,
                 show.sources = T,
@@ -58,19 +59,49 @@ p2<-shield.plot(calib.simsets, "diagnosis.ps", locations = CITIES,split.by = "se
                 title = "PS Syphilis Diagnoses, by Sex",
                 titles = c(Atlanta = "C. Atlanta–Sandy Springs",
                            Chicago = "D. Chicago–Naperville"));p2
-p3<-shield.plot(calib.simsets, "prop.male.ps.diag.among.msm", locations = CITIES,
-                log.y = TRUE, show.sources = F,
-                shape.by = "both",show.data = F,
+p3<-shield.plot(calib.simsets, "prop.male.ps.diag.among.msm", locations = CITIES,overlay.locations = F,
+                log.y = TRUE, show.sources = T,
+                shape.by = "both",show.data = T,
                 title = "E. Proportion of Male Diagnosis among MSM");p3
-p4<-shield.plot(calib.simsets, "incidence", locations = CITIES,
-                log.y = TRUE,show.sources = F,
-                title = "F. Syphilis Incidence");p4
+# p4<-shield.plot(calib.simsets, "incidence", locations = CITIES,
+#                 log.y = TRUE,show.sources = F,
+#                 title = "F. Syphilis Incidence");p4
 
 
 #putting them together
-plt<- (p1 /p2)/(p3+p4) ;plt
+plt<- (p1/p2/p3);plt
+# plt<- (p0 /p1)/(p2+p3) ;plt
 # +plot_layout(guides = "collect") & theme(legend.position = "bottom");plt
 
-ggsave(file.path(FIG.DIR, "fig2-Epi_impact1.png"), plt,
-       width = 12, height = 9, dpi = 300, bg = "white")
+ggsave(file.path(FIG.DIR, "fig2-calibration.png"), plt,
+       width = 9, height = 12, dpi = 300, bg = "white")
 }
+
+#historical fit plots for supplement
+SHIELD.DEFAULT.WINDOW <- "history"
+{
+    CITIES<- SHIELD.TEN.MSAS
+    
+    p1<-shield.plot(calib.simsets, "diagnosis.total", locations = CITIES,overlay.locations = F,
+                    log.y = F,free.y = T,ncol = 5,
+                    show.sources = T,show.proj.line = T,
+                    title = "Total Syphilis Diagnoses");p1
+    p2<-shield.plot(calib.simsets, "diagnosis.ps", locations = CITIES,overlay.locations = F,
+                    log.y = F,free.y = T,ncol = 5,
+                    show.sources = T,show.proj.line = T,
+                    title = "PS Syphilis Diagnoses");p2
+    p3<-shield.plot(calib.simsets, "diagnosis.ps", locations = CITIES,overlay.locations = F,
+                    log.y = F,free.y = T,ncol = 5,
+                    split.by = "sex",
+                    show.sources = T,show.proj.line = T,
+                    title = "PS Syphilis Diagnoses by Sex");p3
+    p4<-shield.plot(calib.simsets, "diagnosis.ps", locations = CITIES,overlay.locations = F,
+                    log.y = F,free.y = T,ncol = 5,
+                    split.by = "race",
+                    show.sources = T,show.proj.line = T,
+                    title = "PS Syphilis Diagnoses by Race");p4
+    p5<-shield.plot(calib.simsets, "prop.male.ps.diag.among.msm", locations = CITIES,overlay.locations = F,
+                    log.y = F,free.y = T,ncol = 5,
+                    show.sources = T,show.proj.line = T,
+                    title = "Proportion of PS Diagnosis among MSM");p5
+    }

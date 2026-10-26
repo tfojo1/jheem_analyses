@@ -47,8 +47,11 @@ SHIELD.OMIT.DATA.YEARS <- 2022:2025
 SHIELD.TIME <- list(
     
     # DEFAULT FOR THIS MANUSCRIPT: calibration fit + baseline projection in one panel.
-    manuscript = list(years    = 2010:2030,
+    manuscript2010 = list(years    = 2010:2030,
                       breaks   = c(2010, 2015, 2020, 2025, 2030),
+                      data.end = SHIELD.DATA.END.YEAR),
+    manuscript2000 = list(years    = 2000:2030,
+                      breaks   = c(2000,2005,2010, 2015, 2020, 2025, 2030),
                       data.end = SHIELD.DATA.END.YEAR),
     
     # Fit period only -- for diagnostic "did we calibrate well" figures.
@@ -57,8 +60,8 @@ SHIELD.TIME <- list(
                        data.end = SHIELD.DATA.END.YEAR),
     
     # Full model history -- for appendix figures showing the epidemic from the start.
-    history = list(years    = 1990:2030,
-                   breaks   = c(1990, 2000, 2010, 2020, 2030),
+    history = list(years    = 1970:2030,
+                   breaks   = c(1970, 1990, 2000, 2010, 2020, 2030),
                    data.end = SHIELD.DATA.END.YEAR),
     
     # Longer horizon, e.g. for intervention papers.
@@ -68,7 +71,7 @@ SHIELD.TIME <- list(
 )
 
 # Which window figures use when nothing is specified.
-SHIELD.DEFAULT.WINDOW <- "manuscript"
+SHIELD.DEFAULT.WINDOW <- "history"
 
 ## shield.time() ----
 # Look up a window by name. Returns the list described above.
