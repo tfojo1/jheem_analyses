@@ -24,8 +24,24 @@ source('../jheem_analyses/applications/SHIELD/analysis/intervention/intervention
 FIG.DIR   <- shield.fig.path(CALIB.NAME,   create = TRUE)
 TABLE.DIR <- shield.table.path(CALIB.NAME, create = TRUE)
 
-# The result arrays. Reused if already in memory; force.reload = TRUE reads them from disk again.
-intervention.results <- load.shield.results(CALIB.NAME)
+# The result arrays: raw (step 01) and calculated (step 02) outcomes, by total, sex and race.
+# Reused if already in memory; force.reload = TRUE reads them from disk again.
+# The race arrays need step 01 run with "race" in RUN.STRATA, then step 02 with "race" in
+# CALC.STRATA. Until both exist, loading stops and names the missing files.
+RESULT.ARRAYS <- c("total_raw", "total_calc",
+                   "sex_raw",   "sex_calc",
+                   "race_raw",  "race_calc")
+intervention.results <- load.shield.results(CALIB.NAME, which = RESULT.ARRAYS)
+
+# MSA names: full ("Atlanta-Sandy Springs-Alpharetta, GA", from the location registry) or short
+# ("Atlanta"). Set each one here:
+FULL.NAMES.IN.TABLE   <- TRUE    # Table 1
+FULL.NAMES.IN.FIGURES <- FALSE   # Figures 3 and 4 (TRUE also widens them to fit the names)
+
+MSA.FULL.NAMES  <- setNames(unname(sapply(LOCATIONS, get.location.name)), names(LOCATIONS))
+MSA.SHORT.NAMES <- setNames(names(LOCATIONS), names(LOCATIONS))
+TABLE.CITY.NAMES  <- if (FULL.NAMES.IN.TABLE)   MSA.FULL.NAMES else MSA.SHORT.NAMES
+FIGURE.CITY.NAMES <- if (FULL.NAMES.IN.FIGURES) MSA.FULL.NAMES else MSA.SHORT.NAMES
 
 
 #to see outcome names:
@@ -34,16 +50,16 @@ dimnames(intervention.results$sex_calc)
 # ****************************************************************************************************
 # TABLE 1 -- THE EPIDEMIC WITHOUT DOXY-PEP ----
 # ****************************************************************************************************
-# One row per MSA, with a row of 95% credible intervals under it. No intervention.
-# Every column is for the total population, except the MSM share of incidence.
+# One row per MSA, with a row of 95% credible intervals under it, and a Total row for the ten MSAs
+# combined. No intervention. Columns are for the total population unless they name a group.
 {
-  # 1. Total population
+  # 1. Total population, from make_multi_location_table()
   t1.total <- make_multi_location_table(
     data            = intervention.results,
     locations       = MSAS,
     outcomes        = c("incidence",
                         "incidence_rate",
-                        "pct_change_incidence_rate_vs_year0",
+                        "diagnosis.total",
                         "diagnosis.ps",
                         "diagnosis_ps_per_incidence"),
     interventions   = "noint",
@@ -67,27 +83,128 @@ dimnames(intervention.results$sex_calc)
                       select(t1.msm, location, stat, starts_with("share_incidence")),
                       by = c("location", "stat"))
 
-  # 4. Pick the columns, in this order, and label them.
-  #    Columns come back named <outcome>_<intervention>_<year>. The names below are written for
-  #    2022 and 2030: if you change YEAR0 or EVAL.YEAR, change them too.
+  # 4. Helpers for the columns built here from the simulations
+  total.calc <- intervention.results$total_calc
+  total.raw  <- intervention.results$total_raw
+  sex.raw    <- intervention.results$sex_raw
+  race.raw   <- intervention.results$race_raw
+
+  # The median, then "[2.5th-97.5th]" underneath: the same format as make_multi_location_table()
+  round_to <- function(x, d) format(round(x, d), nsmall = d, trim = TRUE)
+  median_and_interval <- function(x, d)
+    c(round_to(median(x), d),
+      paste0("[", round_to(quantile(x, 0.025), d), "-", round_to(quantile(x, 0.975), d), "]"))
+
+  # One outcome, no intervention, one year, the given MSAs (summed when there are several), and
+  # optionally one group, e.g. list(sex = "msm"): one value per simulation
+  noint_values <- function(arr, outcome, year, locs, group = list()) {
+    keep <- c(list(outcome = outcome, intervention = "noint", year = year, location = locs), group)
+    apply(subset_array(arr, keep), "sim", sum)
+  }
+
+  # 5. The columns built from the simulations, one MSA at a time:
+  #    1. fold change in the incidence rate, 2022 to 2030, computed within each simulation
+  #       (rate in 2030 / rate in 2022). 1.25 = a 25% increase; 0.85 = a 15% decrease.
+  #    2. P&S diagnoses as a share of total diagnoses in 2030 (%), computed within each simulation
+  #    3. P&S diagnoses in 2030 by sex, and separately by race
+  new.columns <- c("fold_change_incidence_rate",
+                   "ps_share_of_diagnoses_2030",
+                   "ps_msm_2030", "ps_hetero_men_2030", "ps_women_2030",
+                   "ps_black_2030", "ps_hispanic_2030", "ps_other_race_2030")
+  table1[new.columns] <- NA_character_
+
+  for (city in MSAS) {
+    loc  <- LOCATIONS[[city]]
+    rows <- which(table1$location == city)               # the median row, then the interval row
+
+    rate.2022 <- noint_values(total.calc, "incidence_rate", YEAR0,     loc)
+    rate.2030 <- noint_values(total.calc, "incidence_rate", EVAL.YEAR, loc)
+    table1$fold_change_incidence_rate[rows] <- median_and_interval(rate.2030 / rate.2022, 2)
+
+    ps.city <- noint_values(total.raw, "diagnosis.ps",    EVAL.YEAR, loc)
+    dx.city <- noint_values(total.raw, "diagnosis.total", EVAL.YEAR, loc)
+    table1$ps_share_of_diagnoses_2030[rows] <- median_and_interval(100 * ps.city / dx.city, 0)
+
+    table1$ps_msm_2030[rows]        <- median_and_interval(noint_values(sex.raw, "diagnosis.ps", EVAL.YEAR, loc, list(sex = "msm")), 0)
+    table1$ps_hetero_men_2030[rows] <- median_and_interval(noint_values(sex.raw, "diagnosis.ps", EVAL.YEAR, loc, list(sex = "heterosexual_male")), 0)
+    table1$ps_women_2030[rows]      <- median_and_interval(noint_values(sex.raw, "diagnosis.ps", EVAL.YEAR, loc, list(sex = "female")), 0)
+
+    table1$ps_black_2030[rows]      <- median_and_interval(noint_values(race.raw, "diagnosis.ps", EVAL.YEAR, loc, list(race = "black")), 0)
+    table1$ps_hispanic_2030[rows]   <- median_and_interval(noint_values(race.raw, "diagnosis.ps", EVAL.YEAR, loc, list(race = "hispanic")), 0)
+    table1$ps_other_race_2030[rows] <- median_and_interval(noint_values(race.raw, "diagnosis.ps", EVAL.YEAR, loc, list(race = "other")), 0)
+  }
+
+  # 6. Pick the columns, in this order, and label them.
+  #    Columns from make_multi_location_table() are named <outcome>_<intervention>_<year>. The names
+  #    below are written for 2022 and 2030: if you change YEAR0 or EVAL.YEAR, change them too.
   col.labels <- c(
-    location                                      = "MSA",
-    incidence_noint_2022                          = "Incident infections, 2022",
-    incidence_noint_2030                          = "Incident infections, 2030",
-    incidence_rate_noint_2022                     = "Incidence rate (per 100,000 persons), 2022",
-    incidence_rate_noint_2030                     = "Incidence rate (per 100,000 persons), 2030",
-    pct_change_incidence_rate_vs_year0_noint_2030 = "Change in incidence rate, 2022-2030 (%)",
-    diagnosis.ps_noint_2022                       = "P&S diagnoses, 2022",
-    diagnosis.ps_noint_2030                       = "P&S diagnoses, 2030",
-    diagnosis_ps_per_incidence_noint_2022         = "P&S diagnoses per incident infection, 2022",
-    diagnosis_ps_per_incidence_noint_2030         = "P&S diagnoses per incident infection, 2030",
-    share_incidence_noint_2022                    = "MSM share of incidence (%), 2022",
-    share_incidence_noint_2030                    = "MSM share of incidence (%), 2030")
+    location                              = "MSA",
+    incidence_noint_2030                  = "Incident infections, 2030",
+    incidence_rate_noint_2022             = "Incidence rate (per 100,000 persons), 2022",
+    incidence_rate_noint_2030             = "Incidence rate (per 100,000 persons), 2030",
+    fold_change_incidence_rate            = "Fold change in incidence rate, 2022-2030",
+    diagnosis.total_noint_2030            = "Total syphilis diagnoses, 2030",
+    diagnosis.ps_noint_2030               = "P&S diagnoses, 2030",
+    ps_share_of_diagnoses_2030            = "P&S share of total diagnoses (%), 2030",
+    ps_msm_2030                           = "P&S diagnoses, MSM, 2030",
+    ps_hetero_men_2030                    = "P&S diagnoses, heterosexual men, 2030",
+    ps_women_2030                         = "P&S diagnoses, women, 2030",
+    ps_black_2030                         = "P&S diagnoses, Black, 2030",
+    ps_hispanic_2030                      = "P&S diagnoses, Hispanic, 2030",
+    ps_other_race_2030                    = "P&S diagnoses, other race/ethnicity, 2030",
+    diagnosis_ps_per_incidence_noint_2030 = "P&S diagnoses per incident infection, 2030",
+    share_incidence_noint_2022            = "MSM share of incidence (%), 2022",
+    share_incidence_noint_2030            = "MSM share of incidence (%), 2030")
 
   table1 <- table1[names(col.labels)]
+
+  # 7. The Total row: the ten MSAs combined.
+  #    Within each simulation, counts are summed across the MSAs, and the rates, ratios and share
+  #    are recomputed from those sums. The row then shows the median and 95% interval across
+  #    simulations, like the MSA rows.
+  #      e.g. rate = 100,000 x (incidence summed over MSAs) / (population summed over MSAs)
+  inc.2022  <- noint_values(total.raw, "incidence",       YEAR0,     LOCATIONS)
+  inc.2030  <- noint_values(total.raw, "incidence",       EVAL.YEAR, LOCATIONS)
+  pop.2022  <- noint_values(total.raw, "population",      YEAR0,     LOCATIONS)
+  pop.2030  <- noint_values(total.raw, "population",      EVAL.YEAR, LOCATIONS)
+  dx.2030   <- noint_values(total.raw, "diagnosis.total", EVAL.YEAR, LOCATIONS)
+  ps.2030   <- noint_values(total.raw, "diagnosis.ps",    EVAL.YEAR, LOCATIONS)
+  msm.2022  <- noint_values(sex.raw,   "incidence",       YEAR0,     LOCATIONS, list(sex = "msm"))
+  msm.2030  <- noint_values(sex.raw,   "incidence",       EVAL.YEAR, LOCATIONS, list(sex = "msm"))
+  rate.2022 <- 100000 * inc.2022 / pop.2022
+  rate.2030 <- 100000 * inc.2030 / pop.2030
+
+  # P&S diagnoses in 2030 for one group, summed over the MSAs
+  ps_total_for <- function(arr, group)
+    median_and_interval(noint_values(arr, "diagnosis.ps", EVAL.YEAR, LOCATIONS, group), 0)
+
+  total.rows <- data.frame(
+    location                              = c("Total", "Total"),
+    incidence_noint_2030                  = median_and_interval(inc.2030, 0),
+    incidence_rate_noint_2022             = median_and_interval(rate.2022, 0),
+    incidence_rate_noint_2030             = median_and_interval(rate.2030, 0),
+    fold_change_incidence_rate            = median_and_interval(rate.2030 / rate.2022, 2),
+    diagnosis.total_noint_2030            = median_and_interval(dx.2030, 0),
+    diagnosis.ps_noint_2030               = median_and_interval(ps.2030, 0),
+    ps_share_of_diagnoses_2030            = median_and_interval(100 * ps.2030 / dx.2030, 0),
+    ps_msm_2030                           = ps_total_for(sex.raw, list(sex = "msm")),
+    ps_hetero_men_2030                    = ps_total_for(sex.raw, list(sex = "heterosexual_male")),
+    ps_women_2030                         = ps_total_for(sex.raw, list(sex = "female")),
+    ps_black_2030                         = ps_total_for(race.raw, list(race = "black")),
+    ps_hispanic_2030                      = ps_total_for(race.raw, list(race = "hispanic")),
+    ps_other_race_2030                    = ps_total_for(race.raw, list(race = "other")),
+    diagnosis_ps_per_incidence_noint_2030 = median_and_interval(ps.2030 / inc.2030, 2),
+    share_incidence_noint_2022            = median_and_interval(100 * msm.2022 / inc.2022, 0),
+    share_incidence_noint_2030            = median_and_interval(100 * msm.2030 / inc.2030, 0),
+    check.names = FALSE)
+
+  table1 <- rbind(table1, total.rows)
   names(table1) <- col.labels
 
-  # 5. Show each MSA name once (blank on the credible-interval row)
+  # 8. MSA names (full or short: TABLE.CITY.NAMES, set in SETUP), each shown once (blank on the
+  #    credible-interval row)
+  is.msa <- table1$MSA %in% names(TABLE.CITY.NAMES)
+  table1$MSA[is.msa] <- TABLE.CITY.NAMES[table1$MSA[is.msa]]
   table1$MSA[duplicated(table1$MSA)] <- ""
 
   write.csv(table1, file.path(TABLE.DIR, "table1_no_intervention.csv"), row.names = FALSE)
@@ -132,6 +249,7 @@ dimnames(intervention.results$sex_calc)
       colours       = FIG3.COLOURS,
       legend.breaks = seq(-100, 0, 25),
       highlight.at  = TARGET,
+      row.labels    = FIGURE.CITY.NAMES,
       title         = title,
       fill.lab      = "% Incidence Change",
       fixed.aspect  = FALSE)
@@ -151,7 +269,7 @@ dimnames(intervention.results$sex_calc)
     theme(legend.position = "bottom");fig3
 
   ggsave(file.path(FIG.DIR, "fig3_heatmap_vs_noint.png"), fig3,
-         width = 10, height = 5.5, dpi = 300, bg = "white")
+         width = if (FULL.NAMES.IN.FIGURES) 12 else 10, height = 5.5, dpi = 300, bg = "white")
   fig3
 }
 
@@ -252,7 +370,7 @@ dimnames(intervention.results$sex_calc)
                    stat = "identity", orientation = "y", width = 0.6, linewidth = 0.45,
                    fill = F4.FILL[[which.population]], colour = F4.LINE[[which.population]],
                    median.colour = "black", median.linewidth = 0.7) +
-      scale_y_discrete(limits = rev(city.order)) +
+      scale_y_discrete(limits = rev(city.order), labels = FIGURE.CITY.NAMES) +
       labs(title = title, x = x.lab, y = NULL) +
       theme_minimal(base_size = 9) +
       theme(text               = element_text(colour = "black"),
@@ -286,7 +404,7 @@ dimnames(intervention.results$sex_calc)
                fill = F4.FILL[[which.population]], colour = F4.LINE[[which.population]]) +
       geom_errorbar(aes(xmin = lo95, xmax = hi95), orientation = "y", width = 0.25,
                     linewidth = 0.45, colour = "black") +
-      scale_y_discrete(limits = rev(city.order)) +
+      scale_y_discrete(limits = rev(city.order), labels = FIGURE.CITY.NAMES) +
       scale_x_continuous(labels = scales::comma, expand = expansion(mult = c(0, 0.05))) +   # bars start at 0
       labs(title = title, x = x.lab, y = NULL) +
       theme_minimal(base_size = 9) +
@@ -317,7 +435,7 @@ dimnames(intervention.results$sex_calc)
       geom_segment(aes(x = without, xend = with, yend = location), colour = colour, linewidth = 0.8) +
       geom_point(aes(x = without), shape = 21, size = 2.6, stroke = 0.9, colour = colour, fill = "white") +
       geom_point(aes(x = with),    shape = 21, size = 2.6, stroke = 0.9, colour = colour, fill = colour) +
-      scale_y_discrete(limits = rev(city.order)) +
+      scale_y_discrete(limits = rev(city.order), labels = FIGURE.CITY.NAMES) +
       scale_x_continuous(labels = scales::comma) +
       expand_limits(x = 0) +                                      # the axis starts at 0
       labs(title = title, x = x.lab, y = NULL) +
@@ -361,6 +479,6 @@ dimnames(intervention.results$sex_calc)
           plot_layout(heights = c(0.07, 1, 0.07, 1, 0.07, 1));fig4
 
   ggsave(file.path(FIG.DIR, "fig4_impact_boxplots.png"), fig4,
-         width = 13, height = 11, dpi = 300, bg = "white")
+         width = if (FULL.NAMES.IN.FIGURES) 15 else 13, height = 11, dpi = 300, bg = "white")
   fig4
 }

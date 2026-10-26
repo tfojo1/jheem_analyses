@@ -1573,6 +1573,8 @@ plot_trend_by_location <- function(tbl,
 #   base.size, label.size        text size in pt; cell numbers in mm (3.4 mm is about 10 pt)
 #   legend.dir                   "horizontal" (bar under the plot) or "vertical"
 #   fixed.aspect                 FALSE lets the tiles stretch to fill a patchwork cell
+#   row.labels                   names to show for the rows, named by the row: e.g.
+#                                c(Atlanta = "Atlanta-Sandy Springs-Alpharetta, GA"). NULL = as is
 #   save.dir, filename           give a filename to write a PNG; NULL (default) writes nothing
 plot_coverage_heatmap <- function(tbl,
                                   locations     = NULL,
@@ -1595,6 +1597,7 @@ plot_coverage_heatmap <- function(tbl,
                                   col.pattern   = "^(.*)_doxy\\.cov\\.(\\d+)_(\\d+)$",
                                   cov.pattern   = "doxy\\.cov\\.(\\d+)",
                                   row.sep       = " — ",
+                                  row.labels    = NULL,
                                   save.dir      = .default_fig_dir(),
                                   filename      = NULL,
                                   width = 8, height = 5, dpi = 300) {
@@ -1653,7 +1656,7 @@ plot_coverage_heatmap <- function(tbl,
                              name    = fill.lab,
                              guide   = legend.guide) +
         scale_x_discrete(expand = c(0, 0)) +
-        scale_y_discrete(expand = c(0, 0)) +
+        scale_y_discrete(expand = c(0, 0), labels = if (is.null(row.labels)) waiver() else row.labels) +
         labs(x = x.lab, y = NULL, title = title) +
         theme_minimal(base_size = base.size) +
         theme(text            = element_text(colour = "black"),
