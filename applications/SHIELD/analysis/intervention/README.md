@@ -23,6 +23,7 @@ Steps 01 and 02 only need to run again when the simsets change. Steps 03 and 04 
 | 03 | `03_manuscript_outputs.R` | the four arrays | manuscript tables and figures |
 | 04 | `04_table_efficiency.R` | the four arrays | the two efficiency tables |
 | 05 | `05_croi26.R` | the four arrays (CROI calibration) | CROI figure and table |
+| 06 | `06_pretty_plots.R` | baseline calibration simsets | calibration-fit figure for the manuscript |
 | QC | `qc_intervention_plots.R` | intervention simsets | trajectory plots |
 
 ### 00_settings.R
@@ -115,6 +116,13 @@ It then runs five checks and prints them to the console. Run it after step 03 in
 ### Step 05: 05_croi26.R (optional)
 A cut-down copy of step 03 for the CROI abstract: a two-panel heatmap (`figures/fig_CROI.png`) and Table S1. It is pinned to `calib.9.23.stage3.pk`, so re-running it reproduces the submitted numbers. Delete that line to follow `00_settings.R` instead.
 
+### Step 06: 06_pretty_plots.R
+Plots the calibration fit (model against surveillance data) for the manuscript, using `shield.plot()` from `pretty_plots_helper_functions.R`. It currently saves `figures/fig2-Epi_impact1.png`.
+
+1. It has its own settings, `CALIB.NAME` and `N.SIM`, at the top of the file. It does not use `00_settings.R`, because the calibration figures need different settings from the intervention analysis.
+2. It reads the baseline calibration simsets directly, not the result arrays, so it can run at any point.
+3. It saves to the same `figures/` folder as the analysis, as long as its `CALIB.NAME` matches the one in `00_settings.R`.
+
 ### QC: qc_intervention_plots.R (optional)
 Plots trajectories straight from the simsets, without the arrays: one city with interventions overlaid, and a comparison across cities. Run it any time after the simsets exist.
 
@@ -124,6 +132,10 @@ Plots trajectories straight from the simsets, without the arrays: one city with 
    - table builders: `make_multi_location_table()` (a wide table) and `table_to_long()` (the tidy form the figures take)
    - figures: `plot_trend_by_location()`, `plot_coverage_heatmap()`, `plot_coverage_needed()`, `plot_trend_with_ci()`, `plot_impact_over_time()`, `plot_dose_response()`
 2. `int_simset_helper_functions.R`: loads and plots the raw intervention simsets (`load.int.simsets()`, `plot.int.location()`, `plot.int.comparison()`). Used by the QC script.
+3. `pretty_plots_helper_functions.R`: the functions behind step 06's figures: `shield.prepare()` pulls the model and observed data, and `shield.plot()` draws them. Examples are at the bottom of the file. It sources the style file below.
+4. `pretty_plots_style.R`: how those figures look: years and projection line, colours, theme, outcome titles and labels, data-source names, figure sizes, and `save.shield.fig()`, which saves to `FIG.DIR` unless you give it another folder. Edit this file to change a figure's look.
+
+Step 06 also sources `../calibration/calibration_helper_functions.R` for `load.calib.simsets()`. That file stays in the calibration folder because the calibration diagnostics use it too.
 
 Two shared files sit one folder up, in `analysis/`:
 
@@ -145,6 +157,10 @@ simsets ──► raw arrays ──► calc arrays ─────────�
 
 qc_intervention_plots.R ──► int_simset_helper_functions.R ──► ../shield_plot_core.R ──► ../shield_output_paths.R
      (also sources 00_settings.R; reads the simsets, not the arrays)
+
+06_pretty_plots.R ──► pretty_plots_helper_functions.R ──► pretty_plots_style.R
+                  └─► ../calibration/calibration_helper_functions.R ──► ../shield_plot_core.R ──► ../shield_output_paths.R
+     (own settings, not 00_settings.R; reads the baseline calibration simsets)
 ```
 
 Data flow, step by step:

@@ -18,10 +18,14 @@
 #   03_manuscript_outputs.R            every manuscript table and figure
 #   04_table_efficiency.R              doxycycline efficiency tables (by MSA and pooled)
 #   05_croi26.R                        optional: CROI abstract figure and table
+#   06_pretty_plots.R                  calibration-fit figures for the manuscript. Has its own
+#                                      settings and reads the calibration simsets, not the arrays
 #
 # HELPERS (sourced by the scripts above; never run on their own)
 #   intervention_helper_functions.R   table builders, plot_* figures, colour palette
 #   int_simset_helper_functions.R     loading and plotting the raw intervention simsets
+#   pretty_plots_helper_functions.R   shield.plot() and its data layer, used by 06
+#   pretty_plots_style.R              years, colours, theme, labels and sizes for 06's figures
 #
 # OPTIONAL QC
 #   qc_intervention_plots.R   trajectories read straight from the simsets. Does not need the arrays.

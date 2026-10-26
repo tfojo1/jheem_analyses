@@ -69,6 +69,7 @@ run.one <- function(script) {
 }
 
 ## RUN SELECTED ----
+# a script that is set to FALSE or commented out is skipped
 selected <- names(RUN)[RUN]
 cat("Running", length(selected), "scripts for", CALIBRATION.CODE, "\n")
 run.log <- do.call(rbind, lapply(selected, run.one))
@@ -79,7 +80,7 @@ cat("\n\n== Diagnostics run for ", CALIBRATION.CODE, " ==\n", sep = "")
 print(run.log, row.names = FALSE)
 cat("Outputs in", OUT.DIR, "\n")
 review <- file.path(OUT.DIR, paste0("calibration_review_", CALIBRATION.CODE, ".html"))
-if (RUN[["reports/calibration_review.Rmd"]] && file.exists(review)) {
+if ("reports/calibration_review.Rmd" %in% selected && file.exists(review)) {   # works when the line is commented out too
     cat("Review page:", review, "\n")
     if (interactive()) browseURL(review)
 }
