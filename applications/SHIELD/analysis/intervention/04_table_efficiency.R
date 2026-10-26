@@ -1,6 +1,12 @@
 # ****************************************************************************
-# SHIELD / Doxy-PEP -- INCREMENTAL EFFICIENCY OF DOXY-PEP COVERAGE
+# 04 SHIELD / Doxy-PEP -- INCREMENTAL EFFICIENCY OF DOXY-PEP COVERAGE
 # ****************************************************************************
+# Step 4 of the workflow listed in 00_settings.R. Run it after
+# 03_manuscript_outputs.R, in the same R session, or on its own: if `results`
+# is not loaded yet, the block under CONFIGURATION loads it.
+#
+# NOTE 03_manuscript_outputs.R builds a second version of Table 3
+# (tables/3-efficiency.csv). Keep one of the two.
 #
 # A cost-effectiveness style table with PERSON-YEARS OF DOXYCYCLINE as the
 # cost. For each MSA, horizon and coverage level:
@@ -38,9 +44,9 @@
 # rise too. CHECK 1 verifies that premise.
 # ---------------------------------------------------------------------------
 #
-# REQUIRES in the environment (as loaded by eg_tables.R):
-#   results (the list of four arrays), MSAS,
-#   make_multi_location_table(), table_to_long()
+# USES from 00_settings.R: CALIB.NAME, MSAS, COVERAGE.LEVELS, N.SIM
+# USES from intervention_helper_functions.R: make_multi_location_table(),
+#   table_to_long()
 #
 # WRITES to TABLE.DIR:
 #   table_efficiency_pooled.csv     main text, ten MSAs combined
@@ -52,18 +58,24 @@ library(tidyr)
 
 # ---- 0. CONFIGURATION ------------------------------------------------------
 
-EFF.HORIZONS    <- c("2030", "2035")
-COVERAGE.LEVELS <- paste0("doxy.cov.", seq(10, 100, 10))
-DIGITS.RATIO    <- 1
+# Run on its own: load the settings, the helpers and the four arrays.
+# After 03_manuscript_outputs.R they are already in the session.
+if (!exists("results")) {
+    source('../jheem_analyses/applications/SHIELD/analysis/intervention/00_settings.R')
+    source('../jheem_analyses/applications/SHIELD/analysis/intervention/intervention_helper_functions.R')
+    results   <- load.shield.results(CALIB.NAME)
+    TABLE.DIR <- shield.table.path(CALIB.NAME, create = TRUE)
+}
 
-# if (!exists("TABLE.DIR")) TABLE.DIR <- "tables/"
-# if (!dir.exists(TABLE.DIR)) dir.create(TABLE.DIR, recursive = TRUE)
+# COVERAGE.LEVELS comes from 00_settings.R. The rungs of the ladder are those
+# levels, so the arrays must hold every one of them.
+EFF.HORIZONS    <- c("2030", "2035")
+DIGITS.RATIO    <- 1
 
 
 # ---- 1. PULL THE MEDIANS ---------------------------------------------------
 # num_cum_doxy_coverage exists only at the total level, so the sex rows come
-# back NA for it. That is expected; the "Dropped N cell(s)" message is the same
-# one doxy_summary_aug.R already prints.
+# back NA for it. That is expected, and so is the "Dropped N cell(s)" message.
 
 lng <- table_to_long(make_multi_location_table(
     data          = results,
@@ -223,7 +235,7 @@ cat("py_per_inf_*: person-years of doxycycline per ADDITIONAL infection\n")
 cat("         averted by that move, pooled as sum(d_py)/sum(d_averted).\n")
 cat("Same columns as table_efficiency_by_msa.csv -- this is simply the ten\n")
 cat("MSAs treated as one. No intervals anywhere: every value is a median\n")
-cat("across 400 posterior simulations, and the posterior intervals were\n")
+cat("across", N.SIM, "posterior simulations, and the posterior intervals were\n")
 cat("discarded at the make_multi_location_table() step.\n\n")
 print(as.data.frame(pooled.out), row.names = FALSE)
 
@@ -284,23 +296,26 @@ if (all(zv == 0)) cat("   OK - zero in all", length(zv), "cells.\n") else
         "person-years. The lowest rung's increment is wrong.\n")
 
 cat("\n=== CHECK 4: is the person-year denominator plausible? ===\n")
-cat("   cum_py at 100% coverage, divided by (MSM population x years since\n")
-cat("   2022), is the MEAN coverage actually delivered over that window.\n")
+cat("   cum_py at the highest coverage level, divided by (MSM population x\n")
+cat("   years since 2022) and scaled up to 100% coverage, is the MEAN coverage\n")
+cat("   actually delivered over that window, as a share of the target.\n")
 cat("   Coverage ramps linearly 2023-2030 then holds, so the expected value\n")
 cat("   is ~0.56 at the 2030 horizon (4.5 person-year-equivalents over 8\n")
 cat("   years) and ~0.73 at 2035 (9.5 over 13). A value far from those means\n")
 cat("   doxy.coverage is counting the wrong people.\n")
+# the arrays used to run to 100% coverage; they now stop at 50%, so use the top rung
+TOP.COV <- max(step$coverage)
 mp <- table_to_long(make_multi_location_table(
           data = results, locations = MSAS, outcomes = "population.msm",
           interventions = COVERAGE.LEVELS, years = EFF.HORIZONS,
           stat.type = "median")) %>%
-    filter(subgroup == "Total", coverage == 100) %>%
+    filter(subgroup == "Total", coverage == TOP.COV) %>%
     select(location, year, msm_pop = value)
-plaus <- step %>% filter(coverage == 100) %>%
+plaus <- step %>% filter(coverage == TOP.COV) %>%
     select(location, year, cum_py) %>%
     left_join(mp, by = c("location", "year")) %>%
     mutate(n_ramp_years = as.integer(year) - 2022,
-           implied_mean_coverage = round(cum_py / (msm_pop * n_ramp_years), 3))
+           implied_mean_coverage = round(cum_py / (msm_pop * n_ramp_years) / (TOP.COV / 100), 3))
 print(as.data.frame(plaus), row.names = FALSE)
 
 cat("\n=== CHECK 5: pooled ratio lies inside the per-MSA range ===\n")

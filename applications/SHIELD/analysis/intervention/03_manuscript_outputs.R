@@ -6,11 +6,15 @@
 # below. Run CONFIGURATION first, then SHARED INPUTS, then any section on its
 # own -- the sections are independent except for the dependency noted below.
 #
+# Step 3 of the workflow listed in 00_settings.R. Run it after 02_generate_custom_outcomes.R.
+#
 #   BUILD ORDER          R OBJECT       WRITES
 #   Table 1              final          tables/1-notInt.csv
+#   Figure 2             fig.baseline   figures/fig2_noint.png
 #   Figure 3             fig.heatmap    figures/fig3_heatmaps.png
 #   Figure 3a (suppl.)   fig.critcov    figures/fig3a_crit_coverage.png
 #   Figure 4             fig.impact     figures/fig5_impact_boxplots.png    <- see NAMING
+#   Table 3              final3         tables/3-efficiency.csv              [builds `table3`]
 #   Table S1             final2         tables/S1-impact-cov<c>-<yr>.csv
 #   Table S2             final4         tables/S2-spillover-cov<c>.csv      [builds `table4`]
 #   Table S2a            final5         tables/5-spillover-associations-cov<c>.csv
@@ -19,11 +23,8 @@
 #
 # NOT BUILT HERE
 #   Figure 1   model schematic, drawn separately
-#   Figure 2   baseline trends -- see the calibration / pretty-plot script
-#   Table 3    doxycycline efficiency (person-years per infection averted), and
-#              the two reconciliation checks that go with it -- see
-#              table_efficiency.R. `table3` does NOT exist in this file; do not
-#              add checks here that assume it does.
+#   The pooled and by-MSA efficiency tables -- see 04_table_efficiency.R. That is a
+#              second version of Table 3; keep one of the two.
 #
 # NAMING. Object and file names describe CONTENT, not manuscript number, because
 # the manuscript numbering drifts and the code should not have to follow it. Two
@@ -42,13 +43,14 @@
 # each column means, which comparator it uses, what is deliberately absent. It
 # is not duplicated in the CSV, so read it when regenerating.
 #
-# PREREQUISITES. `results` (the four arrays), SHIELD.TEN.MSAS, and the helper
-# functions sourced in the guarded block below. TABLE.DIR / FIG.DIR are set
-# there. Colours come from SHIELD FIGURE PALETTE in
+# PREREQUISITES. The CONFIGURATION block below sources 00_settings.R (calibration,
+# MSAS, COVERAGE.LEVELS, YEAR0, EVAL.YEAR) and the helper functions, sets
+# TABLE.DIR / FIG.DIR, and loads `results` (the four arrays). Set it to
+# if(1==2) to skip the reload when re-running single sections. Colours come from SHIELD FIGURE PALETTE in
 # intervention_helper_functions.R -- not from this file.
 #
 # ----------------------------------------------------------------------------
-# TWO METHOD CHOICES THAT DIFFER FROM THE EXPLORATORY CODE IN doxy_figures.R
+# TWO METHOD CHOICES THAT DIFFER FROM THE EXPLORATORY CODE IN archive/doxy_figures.R
 #
 #   1. HETEROSEXUAL GROWTH IS COMPUTED FROM COUNTS, NOT FROM A SUM OF RATES.
 #      rate_incidence_per_pop for heterosexual_male and for female have
@@ -63,15 +65,13 @@
 #      dividing; at digits = 0 a ratio like 8/29 carried avoidable rounding error.
 # ****************************************************************************************************
 # CONFIGURATION ------------------------------------------------------
-if(1==2){
-  source('../jheem_analyses/commoncode/locations_of_interest.R')
-  source('../jheem_analyses/applications/SHIELD/shield_specification.R')
+if(1==1){
+  # the calibration, MSAS, COVERAGE.LEVELS, YEAR0 and EVAL.YEAR come from 00_settings.R
+  # source('../jheem_analyses/applications/SHIELD/analysis/intervention/00_settings.R')
   source('../jheem_analyses/applications/SHIELD/analysis/intervention/intervention_helper_functions.R')
    
   print(paste("Root directory is set to: ",ROOT.DIR))
   
-  # Set the calibration once. The folders and the four result arrays follow from it.
-  CALIB.NAME <- "calib.8.21.stage3.az"
   FIG.DIR    <- shield.fig.path(CALIB.NAME,   create = TRUE)
   TABLE.DIR  <- shield.table.path(CALIB.NAME, create = TRUE)
   print(paste("Figures/Tables will be written to: ",FIG.DIR," **/tables"))
@@ -88,9 +88,6 @@ if(1==2){
 }
 {
   CCRIT.MS   <- "doxy.cov.30"                        # policy coverage level
-  EVAL.YEAR  <- "2030"                               # policy evaluation horizon
-  BASE.YEAR  <- "2022"
-  COVERAGE.LEVELS <- paste0("doxy.cov.", seq(10, 50, 10))
   .ccrit     <- as.integer(sub("doxy\\.cov\\.", "", CCRIT.MS))
   
   .pos <- function(x) ifelse(!is.na(x) & x > 0, x, NA_real_)
@@ -115,7 +112,6 @@ if(1==2){
   HEAT.MIDPOINT <- 49      # policy target; also the upper break between bands
   HEAT.LABEL    <- NULL    # NULL = per-cell contrast, which shaded bands need
 
-  MSAS <- names(SHIELD.TEN.MSAS)
   PRINT.VERSION = T #
 }
 
@@ -210,11 +206,59 @@ if(1==2){
   
   if(PRINT.VERSION) final<-.remove.duplicate.rows(final)
   
-  write.csv(final,file = paste0(TABLE.DIR,"1-notInt.csv"))
+  write.csv(final,file = file.path(TABLE.DIR, "1-notInt.csv"))
 }
 
 # ****************************************************************************************************
-# FIGURE 2 <NOT BUILT HERE -- see the calibration / pretty-plot script> ----
+# FIGURE 2 -- NO INTERVENTION TRENDS ----
+# ****************************************************************************************************
+# WHAT   Four panels, 2022-2030, no intervention: incident cases (log scale), incidence rate,
+#        P&S diagnosis rate, and the MSM share of incident infections.
+# INPUT  results, MSAS; `noint` only; medians.
+# OUTPUT figures/fig2_noint.png  (object `fig.baseline`)
+{
+baseline.tbl <- make_multi_location_table(
+    data            = results,
+    locations       = MSAS,
+    outcomes        = c("incidence",
+                        "rate_incidence_per_pop",
+                        "pct_incidence_share",
+                        "ratio_ps_diagnosis_to_incidence",
+                        "rate_diagnosis_ps_per_pop"),
+    interventions   = "noint",
+    filter.by.strat = c("Total", "msm"),
+    years           = as.character(2022:2030),
+    digits = c(.default                                 = 2),
+    stat.type       = "median")
+
+p.base.A <- plot_trend_by_location(baseline.tbl, outcome = "incidence",
+                                   subgroup = "Total", 
+                                   # dashed = HL,
+                                   log.y = TRUE,
+                                   y.breaks = c(1000, 5000, 10000,50000,100000),
+                                   y.limits = c(1000,100000),
+                                   y.lab = "Incident cases")
+p.base.B <- plot_trend_by_location(baseline.tbl, outcome = "rate_incidence_per_pop",
+                                   subgroup = "Total", 
+                                   # dashed = HL,
+                                   y.lab = "Incidence rate (per 100,000 person-years)")
+
+
+p.base.C <- plot_trend_by_location(baseline.tbl, outcome = "pct_incidence_share",
+                                   subgroup = "msm", 
+                                   # dashed = HL,
+                                   y.lab = "MSM share of incident infections (%)")
+
+p.base.D <- plot_trend_by_location(baseline.tbl, outcome = "rate_diagnosis_ps_per_pop",
+                                   subgroup = "Total", 
+                                   # dashed = HL,
+                                   y.lab = "PS Diagnosis rate (per 100,000 person-years)")
+
+fig.baseline <- (p.base.A | p.base.B)/( p.base.D | p.base.C) + plot_annotation(tag_levels = "A");fig.baseline
+
+.save_fig(fig.baseline, .default_fig_dir(), "fig2_noint", width = 8, height = 8, dpi = 300)
+}
+
 # ****************************************************************************************************
 # FIGURE 3 -- IMPACT HEATMAPS ----
 # ****************************************************************************************************
@@ -593,10 +637,134 @@ if(1==2){
 }
 
 # ****************************************************************************************************
+# TABLE 3 -- DOXY-PEP EFFICIENCY ----
+# ****************************************************************************************************
+# OUTPUT tables/3-efficiency.csv  (objects `final3`, and `table3` in long form)
+# NOTE   04_table_efficiency.R builds a second version of this table (pooled across MSAs, MSM and
+#        Total only, 2030 and 2035). Keep one of the two.
+#1	Antibiotic cost per infection averted
+# At the total-population level, Doxy-PEP was projected to be most efficient at low coverage and to become progressively less efficient as coverage increased. At 10% coverage, a median of 3.2 person-years of Doxy-PEP (range across MSAs 1.7–14.4) was required per infection averted, rising to 5.3 person-years (2.2–21.0) at 50% coverage (Table 3). The marginal measure deteriorated considerably faster: the first ten percentage points of coverage averted one infection for every 3.2 person-years of drug, whereas the increment from 40% to 50% coverage required 10.1 person-years (3.3–32.7) per additional infection averted. Across the modelled range, average efficiency fell by a factor of 1.7 while marginal efficiency fell by a factor of 3.2, indicating that the aggregate figure understates the antibiotic cost of expanding an existing programme. Pooled across all ten MSAs, 30% coverage corresponded to approximately 1.94 million person-years of doxycycline and 493,000 infections averted, or 3.9 person-years per infection averted.
+# Efficiency differed substantially between populations, but in a stable manner across coverage levels. At 30% coverage, a median of 8.8 person-years of Doxy-PEP (3.8–42.0) was required per infection averted among MSM, compared with 17.5 person-years (6.1–108.7) per infection averted among women. Preventing an infection in a woman therefore required approximately twice as much antibiotic as preventing one among MSM, consistent with the indirect nature of that benefit. This ratio was essentially invariant to coverage.
+# Between-MSA variation in efficiency was considerably larger than variation across coverage levels. At 30% coverage, the total-population cost ranged approximately nine-fold, from 1.9 person-years per infection averted in Houston to 17.7 in Chicago. The same ordering was broadly preserved within each population, and the MSAs in which Doxy-PEP was least efficient were those in which the heterosexual epidemic had grown furthest beyond the MSM epidemic by 2030.
+# 
+# Discussion point: accounting for spillover roughly halves the estimated antibiotic cost per infection averted, This is a structural feature of the modelled transmission networks rather than something that changes with coverage scale up
+
+# Doxy-PEP is delivered only to MSM, so cumulative Doxy-PEP person-years are
+# the SAME denominator for all three populations. That is deliberate and it is
+# what makes the columns comparable:
+#
+#   Total  -- every infection prevented anywhere in the population, per
+#             person-year of drug. The number the AMR trade-off turns on.
+#   MSM    -- the direct effect only.
+#   female -- infections prevented in women per person-year of drug given to
+#             men. The cost, in antibiotic, of the spillover.
+#
+#   py_per_infection(Total) / py_per_infection(MSM) is exactly the inverse of
+#   the spillover multiplier, so Tables 3 and 4 have to agree; CHECK 3b tests
+#   that they do.
+#
+# TWO RATIOS PER POPULATION:
+#   ..._cum   all drug given 2022->horizon over all infections prevented over
+#             the same window. Programme-to-date efficiency.
+#   ..._incr  what the LAST 10 points of coverage bought, per additional
+#             person-year they cost. The decision-relevant number, and the one
+#             that falls as the MSM epidemic saturates.
+#
+# NOTE there is deliberately no single-year version of either. See "WHY THERE
+# IS NO SINGLE-YEAR *_averted_ppy_doxy OUTCOME" at the foot of
+# 02_generate_custom_outcomes.R.
+# ****************************************************************************************************
+{
+    t3.long <- table_to_long(make_multi_location_table(
+        data          = results,
+        locations     = MSAS,
+        outcomes      = c("num_cum_doxy_coverage", "num_cum_incidence_averted"),
+        interventions = COVERAGE.LEVELS,
+        years         = EVAL.YEAR,
+        stat.type     = "median"))
+    
+    t3.py <- t3.long %>%
+        filter(outcome == "num_cum_doxy_coverage", subgroup == "Total") %>%
+        select(location, year, coverage, cum_py = value)
+    
+    t3.av <- t3.long %>%
+        filter(outcome == "num_cum_incidence_averted",
+               subgroup %in% c("Total", "msm", "female")) %>%
+        select(location, year, coverage, subgroup, averted = value)
+    
+    t3.step <- t3.av %>%
+        left_join(t3.py, by = c("location", "year", "coverage")) %>%
+        arrange(location, year, subgroup, coverage) %>%
+        group_by(location, year, subgroup) %>%
+        mutate(d_py      = cum_py  - dplyr::lag(cum_py,  default = 0),
+               d_averted = averted - dplyr::lag(averted, default = 0)) %>%
+        ungroup() %>%
+        mutate(py_per_infection_cum  = cum_py / .pos(averted),
+               py_per_infection_incr = d_py   / .pos(d_averted))
+    
+    # Tidy (long) form for the checks below; `final3` is the wide, labelled
+    # version written to CSV. Both are kept on purpose -- re-deriving one from
+    # the other is how the two drift apart.
+    table3 <- t3.step %>%
+        select(location, year, coverage, subgroup, cum_py, averted,
+               d_py, d_averted, py_per_infection_cum, py_per_infection_incr) %>%
+        arrange(location, year, subgroup, coverage)
+    
+    #reordering the columns to have MSA and Subgroup-similar to other tables
+    t3.step <- t3.step[, c("location", "subgroup",
+                           setdiff(names(t3.step), c("location", "subgroup")))]
+    # names(t3.step)
+    
+    tbl3<-t3.step
+    col.labels.t3 <- stats::setNames(
+        # ORDER MATTERS: these map POSITIONALLY onto names(tbl3)[-3], and the
+        # pipeline creates cum_py, then d_py, then d_averted. Labels 6 and 7
+        # were transposed here, which reported person-years as infections
+        # averted and vice versa.
+        c("MSA", "Population", "Coverage",
+          paste0("Cumulative Incidence Averted, ", YEAR0, "-", EVAL.YEAR),
+          paste0("Cumulative DoxyPEP Person-Years, ", YEAR0, "-", EVAL.YEAR),
+          "Marginal DoxyPEP Person-Years",
+          "Marginal Incidence Averted",
+          "Person-Years of DoxyPEP per Infection Averted (Cumulative)",
+          "Person-Years of DoxyPEP per Infection Averted (Marginal)"
+        ),
+        #
+        names(tbl3)[-3]
+    )
+    
+    hit3 <- names(tbl3) %in% names(col.labels.t3)
+    final3 <- tbl3[names(tbl3)[hit3]]
+    names(final3) <- col.labels.t3[names(final3)]
+    
+    write.csv(final3, file.path(TABLE.DIR, paste0("3-efficiency.csv")),
+              row.names = FALSE)
+}
+cat("\n=== TABLE 3: person-years of doxycycline per infection averted ===\n")
+cat("    Rows       one per MSA x population x coverage level; all of\n")
+cat("              ", paste(sub("doxy\\.cov\\.", "", COVERAGE.LEVELS), collapse = ", "),
+    "% are shown, cumulative", YEAR0, "-", EVAL.YEAR, "\n")
+cat("    Denominator Doxy-PEP person-years are delivered to MSM only, so the\n")
+cat("               SAME denominator applies to all three populations --\n")
+cat("               women included. That is what makes the columns\n")
+cat("               comparable, and it is why the female row reads as the\n")
+cat("               antibiotic cost of the spillover.\n")
+cat("    Cumulative all drug given and all infections prevented over the\n")
+cat("               window; programme-to-date efficiency.\n")
+cat("    Marginal   each coverage level against the one below it (the lowest\n")
+cat("               rung against no intervention); what the last 10 points\n")
+cat("               bought per additional person-year they cost.\n")
+cat("    NOT shown  any single-year efficiency. Drug given in one year keeps\n")
+cat("               preventing infections in later years, so a same-year\n")
+cat("               ratio credits the wrong year -- see the note at the foot\n")
+cat("               of 02_generate_custom_outcomes.R.\n\n")
+print(as.data.frame(table3), digits = 4, row.names = FALSE)
+
+# ****************************************************************************************************
 # TABLE S1 -- DOXY-PEP IMPACT AT A SINGLE COVERAGE LEVEL, BY POPULATION ----
 # ****************************************************************************************************
 # WHAT   One row per MSA x population (Total / MSM / women / heterosexual men):
-#        incident counts and incidence rates in BASE.YEAR and EVAL.YEAR under
+#        incident counts and incidence rates in YEAR0 and EVAL.YEAR under
 #        `noint` and under CCRIT.MS, then the three impact metrics at EVAL.YEAR.
 #        The numeric backing for Figure 4.
 # INPUT  results, MSAS; medians only -- this is a supporting table, no CrI.
@@ -620,7 +788,7 @@ if(1==2){
     outcomes        = t2.outcomes1,
     interventions   = c("noint",CCRIT.MS),
     filter.by.strat = c("Total", "msm","female","heterosexual_male"),
-    years           = c(BASE.YEAR, EVAL.YEAR),
+    years           = c(YEAR0, EVAL.YEAR),
     stat.type       = "median",
     digits = c(.default                       = 0,
                pct_incidence_averted          = 1,
@@ -665,13 +833,13 @@ if(1==2){
   
   col.labels.t2 <- stats::setNames(
     c("MSA", "Population",
-      paste0("Incidence ", BASE.YEAR, ", No Intervention"),
+      paste0("Incidence ", YEAR0, ", No Intervention"),
       paste0("Incidence ", EVAL.YEAR, ", No Intervention"),
-      paste0("Incidence ", BASE.YEAR, ", Doxy Coverage ",.t2cov,"%"),
+      paste0("Incidence ", YEAR0, ", Doxy Coverage ",.t2cov,"%"),
       paste0("Incidence ", EVAL.YEAR, ", Doxy Coverage ",.t2cov,"%"),
-      paste0("Incidence Rate (per 100,000 population) ", BASE.YEAR, ", No Intervention"),
+      paste0("Incidence Rate (per 100,000 population) ", YEAR0, ", No Intervention"),
       paste0("Incidence Rate (per 100,000 population) ", EVAL.YEAR, ", No Intervention"),
-      paste0("Incidence Rate (per 100,000 population) ", BASE.YEAR, ", Doxy Coverage ",.t2cov,"%"),
+      paste0("Incidence Rate (per 100,000 population) ", YEAR0, ", Doxy Coverage ",.t2cov,"%"),
       paste0("Incidence Rate (per 100,000 population) ", EVAL.YEAR, ", Doxy Coverage ",.t2cov,"%"),
       
       
@@ -698,7 +866,7 @@ if(1==2){
   if(PRINT.VERSION) final2<-.remove.duplicate.rows(final2)
   
   write.csv(final2,
-            file = paste0(TABLE.DIR, "S1-impact-cov", .t2cov, "-", EVAL.YEAR, ".csv"),
+            file = file.path(TABLE.DIR, paste0("S1-impact-cov", .t2cov, "-", EVAL.YEAR, ".csv")),
             row.names = FALSE)
 }
 
@@ -707,7 +875,7 @@ if(1==2){
 # ****************************************************************************************************
 # WHAT   One row per MSA: % incidence averted in each population at CCRIT.MS in
 #        EVAL.YEAR, the spillover ratio (women / MSM), and seven candidate
-#        city-level drivers, all measured at BASE.YEAR under NO intervention so
+#        city-level drivers, all measured at YEAR0 under NO intervention so
 #        they describe the epidemic Doxy-PEP is dropped into, not its effects.
 # INPUT  results, MSAS. Percentages pulled at digits = 3 (header, item 2).
 # OUTPUT tables/S2-spillover-cov<c>.csv  (object `final4`)
@@ -726,7 +894,7 @@ av <- t4.impact %>%
 
 t4.share <- table_to_long(make_multi_location_table(
   data = results, locations = MSAS, outcomes = "pct_incidence_share",
-  interventions = "noint", years = c(BASE.YEAR, EVAL.YEAR),
+  interventions = "noint", years = c(YEAR0, EVAL.YEAR),
   stat.type = "median", digits = 3))
 
 sh.msm <- t4.share %>%
@@ -743,7 +911,7 @@ sh.msm <- t4.share %>%
 
 t4.growth <- table_to_long(make_multi_location_table(
   data = results, locations = MSAS, outcomes = "incidence",
-  interventions = "noint", years = c(BASE.YEAR, EVAL.YEAR),
+  interventions = "noint", years = c(YEAR0, EVAL.YEAR),
   stat.type = "median"))
 
 g <- t4.growth %>%
@@ -753,13 +921,13 @@ g <- t4.growth %>%
   summarise(inc = sum(value), .groups = "drop") %>%
   pivot_wider(names_from = year, values_from = inc, names_prefix = "inc_") %>%
   mutate(growth = .data[[paste0("inc_", EVAL.YEAR)]] /
-           .data[[paste0("inc_", BASE.YEAR)]]) %>%
+           .data[[paste0("inc_", YEAR0)]]) %>%
   select(location, grp, growth) %>%
   pivot_wider(names_from = grp, values_from = growth, names_prefix = "growth_") %>%
   mutate(divergence = log(growth_het / growth_msm))
 
 # ---- ADDITIONAL CANDIDATE DRIVERS *********************
-# All measured at BASE.YEAR under no intervention, so they are properties of
+# All measured at YEAR0 under no intervention, so they are properties of
 # the epidemic Doxy-PEP is dropped into rather than consequences of it.
 #
 # Everything below is scale-free ON PURPOSE. Absolute counts (MSM incident
@@ -770,7 +938,7 @@ g <- t4.growth %>%
 #     per capita, in its own denominator
 inc.rate <- table_to_long(make_multi_location_table(
   data = results, locations = MSAS, outcomes = "rate_incidence_per_pop",
-  interventions = "noint", years = BASE.YEAR,
+  interventions = "noint", years = YEAR0,
   stat.type = "median", digits = 3)) %>%
   filter(subgroup %in% c("msm", "female")) %>%
   select(location, subgroup, value) %>%
@@ -785,7 +953,7 @@ inc.rate <- table_to_long(make_multi_location_table(
 #     Share, not headcount, for the reason above.
 msm.pop <- table_to_long(make_multi_location_table(
   data = results, locations = MSAS, outcomes = "population",
-  interventions = "noint", years = BASE.YEAR,
+  interventions = "noint", years = YEAR0,
   stat.type = "median")) %>%
   filter(subgroup %in% c("msm", "heterosexual_male")) %>%
   select(location, subgroup, value) %>%
@@ -802,7 +970,7 @@ msm.pop <- table_to_long(make_multi_location_table(
 detect <- table_to_long(make_multi_location_table(
   data = results, locations = MSAS,
   outcomes = "ratio_ps_diagnosis_to_incidence",
-  interventions = "noint", years = BASE.YEAR,
+  interventions = "noint", years = YEAR0,
   stat.type = "median", digits = 3)) %>%
   filter(subgroup == "msm") %>%
   select(location, ps_detect_msm = value)
@@ -824,8 +992,8 @@ T4.COLS <- c("location",
              # outcome
              "av_msm", "av_heterosexual_male", "av_female", "av_Total",
              "spillover",
-             # candidate drivers, all at BASE.YEAR under no intervention
-             paste0("msm_share_", BASE.YEAR), paste0("msm_share_", EVAL.YEAR),
+             # candidate drivers, all at YEAR0 under no intervention
+             paste0("msm_share_", YEAR0), paste0("msm_share_", EVAL.YEAR),
              "inc_rate_msm", "inc_rate_female", "msm_to_female_rate",
              "msm_pop_share_male", "ps_detect_msm",
              "growth_msm", "growth_het", "divergence")
@@ -837,15 +1005,15 @@ col.labels.t4 <- stats::setNames(
     "Incidence averted, women (%)",
     "Incidence averted, total population (%)",
     "Spillover ratio (women / MSM)",
-    paste0("MSM share of incidence, ", BASE.YEAR, " (%)"),
+    paste0("MSM share of incidence, ", YEAR0, " (%)"),
     paste0("MSM share of incidence, ", EVAL.YEAR, " (%)"),
-    paste0("MSM incidence rate, ", BASE.YEAR, " (per 100,000 MSM)"),
-    paste0("Female incidence rate, ", BASE.YEAR, " (per 100,000 women)"),
+    paste0("MSM incidence rate, ", YEAR0, " (per 100,000 MSM)"),
+    paste0("Female incidence rate, ", YEAR0, " (per 100,000 women)"),
     "MSM : female incidence rate ratio",
-    paste0("MSM share of the male population, ", BASE.YEAR, " (%)"),
-    paste0("P&S diagnoses per incident infection, MSM, ", BASE.YEAR),
-    paste0("MSM incidence fold-change, ", BASE.YEAR, "-", EVAL.YEAR),
-    paste0("Heterosexual incidence fold-change, ", BASE.YEAR, "-", EVAL.YEAR),
+    paste0("MSM share of the male population, ", YEAR0, " (%)"),
+    paste0("P&S diagnoses per incident infection, MSM, ", YEAR0),
+    paste0("MSM incidence fold-change, ", YEAR0, "-", EVAL.YEAR),
+    paste0("Heterosexual incidence fold-change, ", YEAR0, "-", EVAL.YEAR),
     "Divergence: log(het growth / MSM growth)"),
   T4.COLS)
 
@@ -862,7 +1030,7 @@ write.csv(final4, file.path(TABLE.DIR, paste0("S2-spillover-cov", .ccrit, ".csv"
 
 cat("\n\n=== TABLE 4: spillover and its drivers,", CCRIT.MS, "in", EVAL.YEAR, "===\n")
 cat("    Outcome    spillover = % averted in women / % averted in MSM.\n")
-cat("    Drivers    all measured at", BASE.YEAR, "under NO INTERVENTION, so they\n")
+cat("    Drivers    all measured at", YEAR0, "under NO INTERVENTION, so they\n")
 cat("               describe the epidemic Doxy-PEP is dropped into rather than\n")
 cat("               anything it caused. All scale-free: an absolute MSM\n")
 cat("               population or case count is mostly city size in disguise.\n\n")
@@ -911,7 +1079,7 @@ print(as.data.frame(table4[, T4.COLS]), digits = 3, row.names = FALSE)
 }
 
 assoc <- rbind(
-  .assoc("MSM share of incidence, baseline",  paste0("msm_share_", BASE.YEAR),
+  .assoc("MSM share of incidence, baseline",  paste0("msm_share_", YEAR0),
          "+ more of the epidemic sits in the treated group"),
   .assoc("MSM incidence rate, baseline",      "inc_rate_msm",
          "+ a more intense MSM epidemic is a larger source term"),
@@ -944,13 +1112,13 @@ final5 <- table5[, names(col.labels.t5)]
 names(final5) <- col.labels.t5[names(final5)]
 
 write.csv(final5,
-          file = paste0(TABLE.DIR, "5-spillover-associations-cov", .ccrit, ".csv"),
+          file = file.path(TABLE.DIR, paste0("5-spillover-associations-cov", .ccrit, ".csv")),
           row.names = FALSE)
 
 cat("\n\n=== TABLE 5: candidate drivers of the spillover ratio ===\n")
 cat("    Outcome    spillover = % incidence averted in women / % averted in MSM,\n")
 cat("               at", CCRIT.MS, "in", EVAL.YEAR, "\n")
-cat("    Drivers    measured at", BASE.YEAR, "under no intervention\n")
+cat("    Drivers    measured at", YEAR0, "under no intervention\n")
 cat("    Statistic  Spearman rank correlation across the", nrow(table4),
     "MSAs, one row each\n")
 cat("    NOT reported: p-values or confidence intervals. The ten MSAs are the\n")
@@ -968,7 +1136,7 @@ cat("    linked: cases = population x rate, so the MSM SHARE of incidence is\n")
 cat("    determined by the population shares and the rates. Two candidates\n")
 cat("    that move together here are one fact told twice, and ten cities\n")
 cat("    cannot separate them. Read the set as a whole, not column by column.\n\n")
-.cand <- c(paste0("msm_share_", BASE.YEAR), "inc_rate_msm", "inc_rate_female",
+.cand <- c(paste0("msm_share_", YEAR0), "inc_rate_msm", "inc_rate_female",
            "msm_to_female_rate", "msm_pop_share_male", "ps_detect_msm", "divergence")
 print(round(cor(table4[, .cand], method = "spearman", use = "pairwise.complete.obs"), 2))
 
@@ -1004,7 +1172,7 @@ print(as.data.frame(.sp2035), digits = 3, row.names = FALSE)
 # in the script rather than in a commit message: a reviewer may ask.
 .old <- table_to_long(make_multi_location_table(
   data = results, locations = MSAS, outcomes = "rate_incidence_per_pop",
-  interventions = "noint", years = c(BASE.YEAR, EVAL.YEAR),
+  interventions = "noint", years = c(YEAR0, EVAL.YEAR),
   stat.type = "median")) %>%
   filter(subgroup %in% c("msm", "heterosexual_male", "female")) %>%
   mutate(grp = ifelse(subgroup == "msm", "msm", "het")) %>%
@@ -1012,7 +1180,7 @@ print(as.data.frame(.sp2035), digits = 3, row.names = FALSE)
   summarise(inc = sum(value), .groups = "drop") %>%
   pivot_wider(names_from = year, values_from = inc, names_prefix = "inc_") %>%
   mutate(growth = .data[[paste0("inc_", EVAL.YEAR)]] /
-           .data[[paste0("inc_", BASE.YEAR)]]) %>%
+           .data[[paste0("inc_", YEAR0)]]) %>%
   select(location, grp, growth) %>%
   pivot_wider(names_from = grp, values_from = growth, names_prefix = "growth_") %>%
   mutate(divergence.old = log(growth_het / growth_msm)) %>%
@@ -1122,17 +1290,17 @@ cat("   largest per-MSA change in divergence:",
   # a rescaling of A rather than independent evidence. Read A and C as ONE
   # finding, not two.
   p.spill.A <- .panel("inc_rate_female",
-                      paste0("Female incidence rate (per 100,000 women), ", BASE.YEAR),
+                      paste0("Female incidence rate (per 100,000 women), ", YEAR0),
                       "A: How established the female epidemic already was")
-  p.spill.B <- .panel(paste0("msm_share_", BASE.YEAR),
-                      paste0("MSM share of incident infections, ", BASE.YEAR, " (%)"),
+  p.spill.B <- .panel(paste0("msm_share_", YEAR0),
+                      paste0("MSM share of incident infections, ", YEAR0, " (%)"),
                       "B: How much of the epidemic MSM drove at the start")
   p.spill.C <- .panel("msm_to_female_rate",
-                      paste0("MSM : female incidence rate ratio, ", BASE.YEAR),
+                      paste0("MSM : female incidence rate ratio, ", YEAR0),
                       "C: Where the force of infection sat")
   p.spill.D <- .panel("divergence",
                       paste0("Het-MSM divergence factor, ",
-                             BASE.YEAR, "-", EVAL.YEAR, ", no intervention"),
+                             YEAR0, "-", EVAL.YEAR, ", no intervention"),
                       "D: How far the heterosexual epidemic ran ahead")
   
   .no.y.spill <- theme(axis.title.y = element_blank())
@@ -1149,7 +1317,7 @@ cat("   largest per-MSA change in divergence:",
   # plot_annotation(
   #     caption = paste0("Spillover = % incidence averted in women / % averted ",
   #                      "in MSM, at ", CCRIT.MS, " in ", EVAL.YEAR,
-  #                      ". Drivers measured at ", BASE.YEAR,
+  #                      ". Drivers measured at ", YEAR0,
   #                      " under no intervention; growth is the fold-change in ",
   #                      "incident counts. Ten MSAs; descriptive, no inference."));
   fig.spillover
@@ -1175,9 +1343,10 @@ cat("   largest per-MSA change in divergence:",
 #
 # REMOVED: the two efficiency checks that used to live here (Table 3 against the
 # model's own rate_cum_incidence_averted_ppy_doxy, and the Table 3 / Table S2
-# spillover multiplier). Both read `table3`, which is built in
-# table_efficiency.R and not in this file, so both were dead code that would
-# error on a clean run. They belong with the table they check.
+# spillover multiplier). Both read `table3`, which did not exist in this file at
+# the time, so both were dead code that would error on a clean run. `table3` is
+# now built in the TABLE 3 section above, but these two checks have not been
+# brought back.
 
 cat("\n\n=== CHECK 1: decomposition -- do the strata reproduce the total? ===\n")
 cat("   The share-weighted sum of the subgroup effects must equal the model's\n")

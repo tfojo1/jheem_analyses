@@ -18,7 +18,7 @@ Steps 01 and 02 only need to run again when the simsets change. Steps 03 and 04 
 |---|---|---|---|
 | 00 | `00_settings.R` | nothing | nothing; sets the shared settings |
 | 01 | `01_generate_raw_results_arrays.R` | intervention simsets | `total_raw_results`, `sex_raw_results` (and `race_raw_results`, `age_raw_results` if turned on) |
-| 02 | `02_generate_custom_outcomes.R` | the total and sex raw arrays | `total_calc_results`, `sex_calc_results` |
+| 02 | `02_generate_custom_outcomes.R` | the raw arrays listed in `CALC.STRATA` | `total_calc_results`, `sex_calc_results` (and race or age if listed) |
 | 02b | `02b_compare_results.R` | two arrays you pass in | console only |
 | 03 | `03_manuscript_outputs.R` | the four arrays | manuscript tables and figures |
 | 04 | `04_table_efficiency.R` | the four arrays | the two efficiency tables |
@@ -32,7 +32,7 @@ The one place to set what every other script uses:
 2. `LOCATIONS`, `MSAS`: the ten MSAs, with codes and city names.
 3. `INTERVENTION.CODES`: every simset that goes into the arrays (`noint` and 5% to 50% coverage).
 4. `COVERAGE.LEVELS`: the coverage levels the tables and figures show (10% to 50%). Each one must be in `INTERVENTION.CODES`.
-5. `YEARS`, `BASE.YEAR` (2022), `EVAL.YEAR` (2030).
+5. `YEARS`, `YEAR0` (2022: the reference year for the `_vs_year0` outcomes and the start of the cumulative sums), `EVAL.YEAR` (2030).
 
 It also sources `locations_of_interest.R`, `shield_specification.R` and `../shield_output_paths.R`, so the scripts that source it get all three.
 
@@ -51,22 +51,34 @@ You set two things at the top of the file, under SETTINGS FOR THIS STEP:
 Extracts that already exist are skipped, so a re-run only loads the new simsets, and adding a stratification later only builds the new extracts. Set `OVERWRITE = TRUE` to redo everything. Run it from Terminal with `nohup`, not RStudio (parallel runs use forking); the exact commands are in the file's header.
 
 ### Step 02: 02_generate_custom_outcomes.R
-Takes the raw arrays from step 01 and generates a set of custom outcomes from them, saved as `total_calc_results` and `sex_calc_results`. The arrays keep the same dimensions, but the `outcome` dimension holds the custom outcomes instead of the raw ones. They are built for incidence, total diagnoses and P&S diagnoses, from `BASE.YEAR` onward:
+Takes each raw array from step 01 and builds a set of custom outcomes from it: rates, cumulative cases, and the change against two references. The result is saved as `<strat>_calc_results`, with the same dimensions as the raw array from `YEAR0` onward.
 
-1. **Number of cases:** cumulative cases from `BASE.YEAR` (`num_cum_*`), and the doxy-PEP person-years delivered (`num_cum_doxy_coverage`).
-2. **Cases averted:** annual and cumulative, against no intervention (`num_*_averted`, `num_cum_*_averted`).
-3. **Percent averted:** annual and cumulative (`pct_*_averted`, `pct_cum_*_averted`).
-4. **Rates per 100,000:** per population (`rate_*_per_pop`), cases averted per population (`rate_*_averted_per_pop`), and cumulative infections averted per 100,000 doxy person-years (`rate_cum_*_ppy_doxy`).
-5. **Change since baseline:** fold-change (`ratio_*_vs_baseline`) and percent reduction (`pct_*_reduction_vs_baseline`) against `BASE.YEAR`.
-6. **Proportions:** P&S diagnoses per incident infection (`ratio_ps_diagnosis_to_incidence`). At the sex level only, each group's share of incidence (`pct_incidence_share`) and each male group's share of male incidence (`pct_male_incidence_share`).
+`CALC.STRATA` at the top of the file sets which raw arrays to process (default: total and sex). Only those calc files are written, so adding race later leaves the total and sex files alone.
 
-Every outcome is calculated inside each simulation, so each has a full posterior. Summarise it as a median of that outcome, never by combining the medians of its parts. The outcomes compare against one of three things:
+**Naming rule:** `<summary>_<quantity>_vs_<reference>`
 
-1. `*_averted`: no intervention, in the same year.
-2. `*_vs_baseline`, `*_reduction_vs_baseline`: the same arm in `BASE.YEAR`.
-3. `rate_*`, `ratio_*_to_*`: nothing; they are levels.
+1. **Quantity:** `incidence`, `diagnosis_total`, `diagnosis_ps`. Add `_rate` for per 100,000 population, or put `cum_` in front for cumulative from `YEAR0`.
+2. **Summary:** no prefix for the value itself, `abs_change_` for x − reference, `pct_change_` for 100 × (x − reference) / reference.
+3. **Reference:** `vs_year0` for the same intervention in `YEAR0` (2022), and `vs_noint` for no intervention in the same year.
 
-The doxy-PEP outcomes exist only at the total level, because doxy coverage is not split by sex. The naming convention, and why there is no single-year efficiency outcome, are explained at the bottom of the file.
+Change is always x minus the reference, so **a negative change means fewer cases**.
+
+**The four sets of outcomes** (`<q>` = incidence, diagnosis_total or diagnosis_ps):
+
+| Set | What it tells you | Outcomes |
+|---|---|---|
+| 1. Levels | the epidemic in one scenario, no comparison | `<q>_rate`, `cum_<q>` |
+| 2. Change vs YEAR0 | how the epidemic has moved since 2022, within one scenario | `abs_change_<q>_vs_year0`, `pct_change_<q>_vs_year0`, `abs_change_<q>_rate_vs_year0`, `pct_change_<q>_rate_vs_year0` |
+| 3. Change vs no intervention | the effect of doxy-PEP, in the same year or cumulative from 2022 | `abs_change_<q>_vs_noint`, `pct_change_<q>_vs_noint`, `abs_change_<q>_rate_vs_noint`, `abs_change_cum_<q>_vs_noint`, `pct_change_cum_<q>_vs_noint` |
+| 4. Other | detection, doxy-PEP use, and who is getting infected | `diagnosis_ps_per_incidence`, `diagnosis_el_per_incidence` (if the raw array has EL diagnoses), `cum_doxy_coverage` (total only), `share_incidence` and `share_incidence_among_male` (sex only) |
+
+Worked example (Atlanta, incidence, 2030): no intervention 9,117 cases, 30% coverage 6,117 cases, 2022 value 6,098.
+
+1. `pct_change_incidence_vs_year0`, no intervention: 100 × (9,117 − 6,098) / 6,098 = +49.5%
+2. `abs_change_incidence_vs_noint`, 30% coverage: 6,117 − 9,117 = −3,000 cases
+3. `pct_change_incidence_vs_noint`, 30% coverage: 100 × −3,000 / 9,117 = −32.9%
+
+Every outcome is calculated inside each simulation. Report the median of the outcome itself; don't rebuild it from the medians of its parts. The comment block at the top of the file has more detail and examples.
 
 ### Step 02b: 02b_compare_results.R (optional)
 `compare_calc_results(a, b)` reports whether two arrays hold the same numbers. It shows differences in dimensions, levels, attributes and values. Use it after a re-run to see what changed.

@@ -61,5 +61,5 @@ COVERAGE.LEVELS    <- paste0("doxy.cov.", seq(10, 50, 10))
 
 ## Years ----
 YEARS     <- 2000:2040   # years pulled into the raw arrays
-BASE.YEAR <- "2022"      # baseline for the *_vs_baseline outcomes, and start of the cumulative sums
+YEAR0     <- "2022"      # reference year for the *_vs_year0 outcomes, and start of the cumulative sums
 EVAL.YEAR <- "2030"      # policy evaluation horizon
