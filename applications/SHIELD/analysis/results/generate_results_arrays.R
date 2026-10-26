@@ -55,8 +55,8 @@ source('../jheem_analyses/applications/SHIELD/analysis/shield_output_paths.R')
 
 
 # ---- SETTINGS ----
-CALIB.NAME <- "calib.9.23.stage3.pk"
-N.SIM      <- 400
+CALIB.NAME <- "calib.10.20.stage3"
+N.SIM      <- 800
 YEARS      <- 2000:2040
 LOCATIONS  <- SHIELD.TEN.MSAS
 INTERVENTION.CODES <- c("noint",
@@ -90,7 +90,7 @@ STRATA <- list(
     )
 )
 
-N.CORES   <- 1       # 1 = one file at a time. Try 3-4 from Terminal and watch memory.
+N.CORES   <- 8       # 1 = one file at a time. Try 3-4 from Terminal and watch memory.
 OVERWRITE <- FALSE   # TRUE = redo extract files that already exist
 
 

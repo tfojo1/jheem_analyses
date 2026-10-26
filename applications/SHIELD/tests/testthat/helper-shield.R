@@ -75,6 +75,7 @@ skip_unless_slow <- function() {
 SHIELD.SCRATCH.PATTERNS <- c(
     "/untitled folder/",
     "/backups/",
+    "/archive/",
     " copy\\.R$",
     "/CROI/",
     "/Documentation/",

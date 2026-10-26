@@ -9,8 +9,8 @@
 #       figures/                    png written by the figure scripts
 #       tables/                     csv written by the table scripts
 #       total_raw_results.Rdata     the four result arrays, written by
-#       total_calc_results.Rdata    results/generate_total_results_array.R and
-#       sex_raw_results.Rdata       results/generate_custom_outcomes.R
+#       total_calc_results.Rdata    intervention/01_generate_raw_results_arrays.R and
+#       sex_raw_results.Rdata       intervention/02_generate_custom_outcomes.R
 #       sex_calc_results.Rdata
 #
 # HOW TO USE IT
@@ -123,7 +123,7 @@ ensure.shield.dir <- function(path) {
 #    'results' by hand, so figures that index data[[1]] behave as before.
 #
 # 2. ASKING FOR A SUBSET
-#    generate_custom_outcomes.R runs before the calculated arrays exist, so it asks for the
+#    02_generate_custom_outcomes.R runs before the calculated arrays exist, so it asks for the
 #    raw ones only:
 #
 #      RAW <- load.shield.results(CALIB.NAME, which = c("total_raw", "sex_raw"))
@@ -146,15 +146,15 @@ load.shield.results <- function(calibration.code,
     out.dir <- shield.output.path(calibration.code, root.dir = root.dir)
     if (!dir.exists(out.dir))
         stop("No output folder for '", calibration.code, "':\n  ", out.dir,
-             "\nCheck the calibration name, or run results/generate_total_results_array.R first.")
+             "\nCheck the calibration name, or run intervention/01_generate_raw_results_arrays.R first.")
 
     paths   <- file.path(out.dir, files[which])
     missing <- which[!file.exists(paths)]
     if (length(missing) > 0)
         stop("Missing result file(s) in ", out.dir, ":\n  ",
              paste(files[missing], collapse = "\n  "),
-             "\nraw arrays come from results/generate_total_results_array.R,",
-             " calc arrays from results/generate_custom_outcomes.R.")
+             "\nraw arrays come from intervention/01_generate_raw_results_arrays.R,",
+             " calc arrays from intervention/02_generate_custom_outcomes.R.")
 
     setNames(lapply(paths, function(f) get(load(f))), which)
 }

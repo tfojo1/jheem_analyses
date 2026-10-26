@@ -1,8 +1,8 @@
-# source("../jheem_analyses/applications/SHIELD/shield_specification.R")
+source("../jheem_analyses/applications/SHIELD/shield_specification.R")
 # root.dir = "../jheem_analyses/applications/SHIELD/logs/"
 # JHEEM.ANALYSES.PATH="../jheem_analyses/applications/SHIELD/logs/"
 
-calib="calib.10.20.stage3"
+calib="calib.10.20.stage4"
 root.dir = get.jheem.root.directory();root.dir
 
 get.calibration.progress("shield","C.12060",calib,root.dir = root.dir)
