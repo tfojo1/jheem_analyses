@@ -1,10 +1,10 @@
 # ****************************************************************************************************
-# 02 GENERATE CUSTOM OUTCOMES ----
+# 01b GENERATE CUSTOM OUTCOMES ----
 # ****************************************************************************************************
-# Step 2 of the workflow listed in 00_settings.R. Run it after 01_generate_raw_results_arrays.R.
+# Step 01b of the workflow listed in 00_settings.R. Run it after 01a_generate_raw_results_arrays.R.
 #
 # WHAT IT DOES
-#   1. Reads each raw array from step 01 (<strat>_raw_results.Rdata).
+#   1. Reads each raw array from step 01a (<strat>_raw_results.Rdata).
 #   2. Builds the custom outcomes from it: rates, cumulative cases, and the change against two
 #      references (year0 and no intervention).
 #   3. Saves them as <strat>_calc_results.Rdata, next to the raw array.
@@ -77,7 +77,7 @@ source('../jheem_analyses/applications/SHIELD/analysis/intervention/00_settings.
 
 
 # ---- SETTINGS FOR THIS STEP ----
-# Which raw arrays to process: any of the ones step 01 built ("total", "sex", "race", "age")
+# Which raw arrays to process: any of the ones step 01a built ("total", "sex", "race", "age")
 CALC.STRATA <- c("total", "sex","race")
 
 # The quantities: the name used in the outcome names = the outcome name in the raw arrays
@@ -158,7 +158,7 @@ read_rdata <- function(file) get(load(file))
 # BUILD THE CUSTOM OUTCOMES ----
 # ****************************************************************************************************
 ## build_custom_outcomes ----
-# raw: one raw array from step 01. Returns the calc array, from YEAR0 onward:
+# raw: one raw array from step 01a. Returns the calc array, from YEAR0 onward:
 #   year x [stratum] x sim x intervention x location x outcome
 build_custom_outcomes <- function(raw) {
 
@@ -238,7 +238,7 @@ for (strat in CALC.STRATA) {
     raw.file  <- file.path(OUT.DIR, paste0(strat, "_raw_results.Rdata"))
     calc.name <- paste0(strat, "_calc_results")
     if (!file.exists(raw.file))
-        stop("Missing ", raw.file, ". Run 01_generate_raw_results_arrays.R with '", strat,
+        stop("Missing ", raw.file, ". Run 01a_generate_raw_results_arrays.R with '", strat,
              "' in RUN.STRATA first.")
 
     print(paste0("Building ", calc.name, " ..."))

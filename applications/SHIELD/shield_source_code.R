@@ -85,6 +85,7 @@ SHIELD.DATA.MANAGERS <- shield.declared.data.managers(
 SYPHILIS.MANAGER.RELEASE.TAG <- SHIELD.DATA.MANAGERS$syphilis
 CENSUS.MANAGER.RELEASE.TAG <- SHIELD.DATA.MANAGERS$census    # NULL: unpinned
 
+
 # Recorded runs always use their saved configuration, not the declarations.
 if (SHIELD.RECORDED.RUN) {
   SYPHILIS.MANAGER.RELEASE.TAG <- SHIELD.RECORDED.CONFIG$syphilis_tag
@@ -260,6 +261,7 @@ if (!SHIELD.RECORDED.RUN) {
 
 ## --- Census manager ----------------------------------------------------------
 ## Large; only needed to generate the initial population. Not set as default.
+
 if (!exists("CENSUS.MANAGER")) {
   cat("6-Reading census manager ...\n")
   CENSUS.MANAGER <- load.data.manager.from.cache(

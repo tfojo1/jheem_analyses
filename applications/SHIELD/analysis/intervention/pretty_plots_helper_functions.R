@@ -1,7 +1,7 @@
 # ****************************************************************************************************
 # PRETTY PLOTS: HELPER FUNCTIONS ----
 # ****************************************************************************************************
-# The functions behind the calibration figures. 06_pretty_plots.R sources this file.
+# The functions behind the calibration figures. 02_pretty_calibration_plots.R sources this file.
 # It defines functions only; sourcing it draws nothing and writes nothing.
 #
 # HOW TO USE IT

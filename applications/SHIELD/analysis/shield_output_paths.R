@@ -9,8 +9,8 @@
 #       figures/                    png written by the figure scripts
 #       tables/                     csv written by the table scripts
 #       total_raw_results.Rdata     the four result arrays, written by
-#       total_calc_results.Rdata    intervention/01_generate_raw_results_arrays.R and
-#       sex_raw_results.Rdata       intervention/02_generate_custom_outcomes.R
+#       total_calc_results.Rdata    intervention/01a_generate_raw_results_arrays.R and
+#       sex_raw_results.Rdata       intervention/01b_generate_custom_outcomes.R
 #       sex_calc_results.Rdata
 #
 # HOW TO USE IT
@@ -115,10 +115,10 @@ ensure.shield.dir <- function(path) {
 # 1. THE ARRAYS
 #    Each array is one stratification level x one kind, saved as <level>_<kind>_results.Rdata:
 #
-#                      raw outcomes (step 01)   calculated outcomes (step 02)
+#                      raw outcomes (step 01a)  calculated outcomes (step 01b)
 #      total level     total_raw                total_calc
 #      sex level       sex_raw                  sex_calc
-#      race level      race_raw                 race_calc       (only if steps 01-02 built them)
+#      race level      race_raw                 race_calc       (only if steps 01a-01b built them)
 #
 #    By default the four total and sex arrays are loaded, in that order. Ask for others with
 #    `which`, e.g. which = c("total_raw", "total_calc", "race_raw", "race_calc").
@@ -129,7 +129,7 @@ ensure.shield.dir <- function(path) {
 #    reused when all three hold:
 #      1. it was loaded for the same calibration
 #      2. it holds every array you asked for
-#      3. none of its files has changed on disk since it was loaded (e.g. step 02 was re-run)
+#      3. none of its files has changed on disk since it was loaded (e.g. step 01b was re-run)
 #    Otherwise the arrays are read from disk again. This only works if you assign the result to
 #    that same name, as in the example above.
 #
@@ -154,15 +154,15 @@ load.shield.results <- function(calibration.code,
     out.dir <- shield.output.path(calibration.code, root.dir = root.dir)
     if (!dir.exists(out.dir))
         stop("No output folder for '", calibration.code, "':\n  ", out.dir,
-             "\nCheck the calibration name, or run intervention/01_generate_raw_results_arrays.R first.")
+             "\nCheck the calibration name, or run intervention/01a_generate_raw_results_arrays.R first.")
 
     paths   <- setNames(file.path(out.dir, paste0(which, "_results.Rdata")), which)
     missing <- which[!file.exists(paths)]
     if (length(missing) > 0)
         stop("Missing result file(s) in ", out.dir, ":\n  ",
              paste(basename(paths[missing]), collapse = "\n  "),
-             "\nraw arrays come from intervention/01_generate_raw_results_arrays.R,",
-             " calc arrays from intervention/02_generate_custom_outcomes.R.")
+             "\nraw arrays come from intervention/01a_generate_raw_results_arrays.R,",
+             " calc arrays from intervention/01b_generate_custom_outcomes.R.")
     mtimes <- setNames(file.mtime(paths), which)   # file.mtime() drops the names
 
     # 2. Reuse the copy in the workspace if it is still current

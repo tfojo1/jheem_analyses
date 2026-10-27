@@ -1,7 +1,7 @@
 # ****************************************************************************************************
-# 01 GENERATE RESULTS ARRAYS, ONE SIMSET FILE AT A TIME ----
+# 01a GENERATE RAW RESULTS ARRAYS, ONE SIMSET FILE AT A TIME ----
 # ****************************************************************************************************
-# Step 1 of the workflow listed in 00_settings.R. Next: 02_generate_custom_outcomes.R.
+# Step 01a of the workflow listed in 00_settings.R. Next: 01b_generate_custom_outcomes.R.
 # Replaces generate_total_results_array.R (now in archive/).
 #
 # The calibration, number of sims, years, locations and interventions come from 00_settings.R.
@@ -40,11 +40,11 @@
 #   1. Go to the jheem_analyses folder (the source() paths below are relative to it):
 #        cd ~/JHEEM/jheem_analyses
 #   2. Start it. All output goes to the log file, and the command prints the process ID:
-#        nohup Rscript applications/SHIELD/analysis/intervention/01_generate_raw_results_arrays.R > 01_generate_raw_results_arrays.log 2>&1 &
+#        nohup Rscript applications/SHIELD/analysis/intervention/01a_generate_raw_results_arrays.R > 01a_generate_raw_results_arrays.log 2>&1 &
 #   3. Watch progress (Ctrl+C stops watching, not the script):
-#        tail -f 01_generate_raw_results_arrays.log
+#        tail -f 01a_generate_raw_results_arrays.log
 #   4. Check it is still running:
-#        ps aux | grep 01_generate_raw_results_arrays
+#        ps aux | grep 01a_generate_raw_results_arrays
 #   5. Stop it if needed (extract files already saved are kept):
 #        kill <process ID>
 #
