@@ -242,6 +242,13 @@ jobs:
           cat _ci_outputs/CANDIDATE.md >> "$GITHUB_STEP_SUMMARY"
           jq '{needs_review, structural_failures, baseline_release}' _ci_outputs/build_status.json
 
+      - name: Summarize the failure
+        # The error that stopped the build, on the run's summary page.
+        if: failure()
+        run: |
+          bash scripts/summarize_build_failure.sh _ci_outputs/build_log.txt \
+            _ci_outputs/active_baseline_summary.txt _ci_outputs/consumer_summary.txt >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload candidate and evidence for review
         if: always()
         uses: actions/upload-artifact@v4

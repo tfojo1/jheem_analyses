@@ -187,6 +187,13 @@ jobs:
           jheem2: ${{ inputs.jheem2_ref }}"
           git push
 
+      - name: Summarize the failure
+        # The error that stopped the build, on the run's summary page.
+        if: failure()
+        run: |
+          bash scripts/summarize_build_failure.sh _ci_outputs/build_log.txt \
+            _ci_outputs/validation_report.txt >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload build artifacts
         if: always()
         uses: actions/upload-artifact@v4
