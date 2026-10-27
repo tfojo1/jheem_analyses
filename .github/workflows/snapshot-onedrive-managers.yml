@@ -1,0 +1,81 @@
+name: Snapshot OneDrive Managers
+
+# Each update to a manager published through the OneDrive cache replaces the file behind
+# its link. This keeps an immutable release of each version the cache metadata names
+# (see scripts/snapshot_onedrive_managers.R). Versions that already have a release are
+# skipped; a manager that can't be copied is reported in the summary and doesn't fail
+# the run.
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'commoncode/data_manager_cache_metadata.Rdata'
+  workflow_dispatch:
+    inputs:
+      files:
+        description: 'Manager files to copy, separated by spaces (empty: every manager in the cache metadata)'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: snapshot-onedrive-managers
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SNAPSHOT_REPO: ${{ github.repository }}
+      FILES: ${{ inputs.files }}
+
+    steps:
+      - name: Checkout analyses
+        uses: actions/checkout@v4
+        with:
+          # The script tags each copy at the commit that last changed the metadata.
+          fetch-depth: 0
+
+      - name: Checkout jheem2
+        uses: actions/checkout@v4
+        with:
+          repository: CIPHER-Epi/jheem2
+          ref: dev
+          path: _jheem2
+
+      - name: Checkout locations
+        uses: actions/checkout@v4
+        with:
+          repository: tfojo1/locations
+          path: _locations
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.4.2'
+          use-public-rspm: true
+
+      - name: Install system and R dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
+          Rscript -e '
+            install.packages(c("remotes", "R6", "httr2", "jsonlite", "openssl"))
+            remotes::install_local("_locations", upgrade = "never")
+            remotes::install_local("_jheem2", upgrade = "never")
+            needed <- c("jheem2", "httr2", "jsonlite", "openssl")
+            missing <- needed[!vapply(needed, requireNamespace, logical(1), quietly = TRUE)]
+            if (length(missing)) stop("Missing packages: ", paste(missing, collapse = ", "))
+          '
+
+      - name: Copy each manager version that has no release yet
+        run: |
+          set -euo pipefail
+          set -f  # FILES holds file names separated by spaces; split them without globbing
+          SNAPSHOT_SUMMARY="$GITHUB_STEP_SUMMARY" Rscript scripts/snapshot_onedrive_managers.R $FILES
