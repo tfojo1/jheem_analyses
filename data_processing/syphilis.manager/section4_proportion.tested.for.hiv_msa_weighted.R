@@ -1,40 +1,31 @@
-#library(haven)
+#This code processes BRFSS data to create MSA level proportion.tested.for.hiv
+#as well as proportion.tested.for.hiv.n
 
-################################################################################
-###Read in BRFSS .xpt files
-################################################################################
+#This code also creates a dataframe that is later used for 'proportion.msm'
+
+#This code was updated for SHIELD to create a mutually exclusive sex dimension
+#that includes male, female, msm.
+
+#==============================================================================
+#Read in BRFSS Files
+#==============================================================================
 
 DATA.DIR.BRFSS.MSA=file.path(Q_ROOT, "data_raw/brfss/brfss_msa")
 
 brfss_file_msa<- list.files(DATA.DIR.BRFSS.MSA, pattern = ".xpt", full.names = "TRUE")
 
-#\\\\\\To show only individuals at risk of HIV in the denominator///////#
-#Un-comment line 14, comment out line 9
-#Un-comment line 175-178
-#brfss_file_msa <- list.files(DATA.DIR.BRFSS.MSA, pattern = "risk", full.names = "TRUE")
-
 brfss_file_msa_list <- lapply(brfss_file_msa, function(x) {
   list(filename=x, data=read_xpt(x))
 })
 
-################################################################################
-###Create state mapping bc the function isnt working but maybe there's 
-#another way in the locations package that I don't know
-################################################################################
+#==============================================================================
+#Create Mappings
+#==============================================================================
 brfss.sex.mappings = c('1' = 'male',
                        '2' = 'female',
                        '7' = NA,
                        '9' = NA)
 
-brfss.race.mappings= c('1'= "white",
-                       '2'= "black",
-                       '3'= 'american indian/alaska native',
-                       '4'= 'asian',
-                       '5'= 'native hawaiian/other pacific islander',
-                       '6'= 'other race',
-                       '7'= 'multiracial', 
-                       '8'= 'hispanic',
-                       '9'= 'unknown')
 brfss.age.mappings= c('1'= '18-24 years',
                       '2'= '25-29 years',
                       '3'='30-34 years',
@@ -50,10 +41,18 @@ brfss.age.mappings= c('1'= '18-24 years',
                       '13'= '80+ years',
                       '14'= 'Unknown')
 
-################################################################################
-##Creating clean template of BRFSS msa data##
-##Outcome = proportion.tested
-################################################################################
+brfss.race.mappings_RACEGR4= c('1'= 'other',
+                               '2'= 'black',
+                               '3'= 'other',
+                               '4'= 'other',
+                               '5'= 'hispanic',
+                               '9'= NA)
+
+#==============================================================================
+
+#Creating a template of clean BRFSS Data for outcome proportion.tested
+
+#==============================================================================
 data.list.brfss.msa.clean = lapply(brfss_file_msa_list, function(file){
   
   data=file[["data"]] 
@@ -67,81 +66,73 @@ data.list.brfss.msa.clean = lapply(brfss_file_msa_list, function(file){
     mutate(location_check = locations::is.location.valid(location))%>%
     filter(location_check == "TRUE")
   
-  #Create year variable#
-  # if(grepl("2013", filename)) {
-  #   data$year = as.numeric("2013")
-  #   data$sex = as.character(data$SEX)
-  #   data$race = data$`_RACE`
-  #   data$age = data$`_AGEG5YR`
-  #   data$ever.tested = HIVTST6
-  # }
   if(grepl("2014", filename)) {
     data$year = as.numeric("2014")
     data$sex = as.character(data$SEX)
-    data$race = data$`_RACE`
+    data$race = data$`_RACEGR3`
     data$age = data$`_AGEG5YR`
     data$ever.tested = data$HIVTST6
   }
   if(grepl("2015", filename)) {
     data$year = as.numeric("2015")
     data$sex = as.character(data$SEX)
-    data$race = data$`_RACE`
+    data$race = data$`_RACEGR3`
     data$age = data$`_AGEG5YR`
     data$ever.tested = data$HIVTST6
   }
   if(grepl("2016", filename)) {
     data$year = as.numeric("2016")
     data$sex = as.character(data$SEX)
-    data$race = data$`_RACE`
+    data$race = data$`_RACEGR3`
     data$age = data$`_AGEG5YR`
     data$ever.tested = data$HIVTST6
   }
   if(grepl("2017", filename)) {
     data$year = as.numeric("2017")
     data$sex = as.character(data$SEX)
-    data$race = data$`_RACE`
+    data$race = data$`_RACEGR3`
     data$age = data$`_AGEG5YR`
     data$ever.tested = data$HIVTST6
   }
   if(grepl("2018", filename)) {
     data$year = as.numeric("2018")
     data$sex = as.character(data$SEX1)
-    data$race = data$`_RACE`
+    data$race = data$`_RACEGR3`
     data$age = data$`_AGEG5YR`
     data$ever.tested = data$HIVTST6
   }
   if(grepl("2019", filename)) {
     data$year = as.numeric("2019")
     data$sex = as.character(data$`_SEX`)
-    data$race = data$`_RACE`
+    data$race = data$`_RACEGR3`
     data$age = data$`_AGEG5YR`
     data$ever.tested = data$HIVTST7
   }
   if(grepl("2020", filename)) {
     data$year = as.numeric("2020")
     data$sex = as.character(data$`_SEX`)
-    data$race = data$`_RACE`
+    data$race = data$`_RACEGR3`
     data$age = data$`_AGEG5YR`
     data$ever.tested = data$HIVTST7
   }
   if(grepl("2021", filename)) {
     data$year = as.numeric("2021")
     data$sex = as.character(data$`_SEX`)
-    data$race = data$`_RACE`
+    data$race = data$`_RACEGR3`
     data$age = data$`_AGEG5YR`
     data$ever.tested = data$HIVTST7
   }
   if(grepl("2022", filename)) {
     data$year = as.numeric("2022")
     data$sex = as.character(data$`_SEX`)
-    data$race = data$`_RACE1`
+    data$race = data$`_RACEGR4`
     data$age = data$`_AGEG5YR`
     data$ever.tested = data$HIVTST7
   }
   if(grepl("2023", filename)) {
       data$year = as.numeric("2023")
       data$sex = as.character(data$`_SEX`)
-      data$race = data$`_RACE`
+      data$race = data$`_RACEGR3`
       data$age = data$`_AGEG5YR`
       data$ever.tested = data$HIVTST7
   }
@@ -149,24 +140,17 @@ data.list.brfss.msa.clean = lapply(brfss_file_msa_list, function(file){
   if(grepl("2024", filename)) {
       data$year = as.numeric("2024")
       data$sex = as.character(data$`_SEX`)
-      data$race = data$`_RACE`
+      data$race = data$`_RACEGR3`
       data$age = data$`_AGEG5YR`
       data$ever.tested = data$HIVTST7
   }
   
-  #Create outcome#
   data$outcome = "proportion.tested.for.hiv"  
   
   data$sex = brfss.sex.mappings[data$sex]
   data$age = brfss.age.mappings[data$age]
-  data$race = brfss.race.mappings[data$race]
   
-  data = subset(data, data$race != 'multiracial') #Removing multiracial, unknown 1-14-24
-  data = subset(data, data$race != 'unknown')
-  
-  # Estimate Who Was Tested in the Past Year ------------------------------------
-  #HIVTSTD3 = date of last test
-  #HIVTST7 (renamed 'ever.tested') = ever tested for HIV
+   data$race = brfss.race.mappings_RACEGR4[data$race]
   
   data = subset(data, is.na(data$HIVTSTD3) | data$HIVTSTD3 != 999999) #Remove date of last HIV is refused- *this is the issue*
   
@@ -201,22 +185,16 @@ data.list.brfss.msa.clean = lapply(brfss_file_msa_list, function(file){
     filter(tested != "drop")
   
   data$tested = as.numeric(data$tested)
-  
-  
-  #\\\\\\To show only individuals at risk of HIV in the denominator///////#
-  #Un-comment line 175-178
-  # brfss_risk_var = c(HIVRISK5= "HIVRISK4")
-  # data <- data %>%
-  #   rename(any_of(brfss_risk_var))
-  # data = subset(data, HIVRISK5 == "1" ) #select only those at risk#
-  
-  
+ 
   list(filename, data) 
 })
-################################################################################
-##Total-by msa##
-#WEIGHTED#
-################################################################################
+#==============================================================================
+
+#Outcome: proportion.tested
+#Strata: Total (weighted)
+#Location: MSA
+
+#==============================================================================
 data.list.brfss.msa.totals = lapply(data.list.brfss.msa.clean, function(file){
   
   data=file[[2]] 
@@ -245,12 +223,27 @@ data.list.brfss.msa.totals = lapply(data.list.brfss.msa.clean, function(file){
   list(filename, data) 
 })
 
-################################################################################
-##Sex-by msa##
-#WEIGHTED#
-################################################################################
+#Put
+msa.total.num = lapply(data.list.brfss.msa.totals, `[[`, 2)  
+
+for (data in msa.total.num) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss.shield',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+#==============================================================================
+
+#Outcome: proportion.tested
+#Strata: Sex (weighted)
+#Location: MSA
+
+#==============================================================================
 data.list.brfss.msa.sex = lapply(data.list.brfss.msa.clean, function(file){
-  
   
   data=file[[2]] 
   filename = file[[1]] 
@@ -293,10 +286,27 @@ data.list.brfss.msa.sex = lapply(data.list.brfss.msa.clean, function(file){
   
   list(filename, data) 
 })
-################################################################################
-##Age-by msa##
-#WEIGHTED#
-################################################################################
+
+#Put
+msa.sex.num = lapply(data.list.brfss.msa.sex, `[[`, 2)  
+
+for (data in msa.sex.num) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss.shield',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+#==============================================================================
+
+#Outcome: proportion.tested
+#Strata: Age (weighted)
+#Location: MSA
+
+#==============================================================================
 data.list.brfss.msa.age = lapply(data.list.brfss.msa.clean, function(file){
   
   data=file[[2]] 
@@ -333,10 +343,27 @@ data.list.brfss.msa.age = lapply(data.list.brfss.msa.clean, function(file){
   
   list(filename, data) 
 })
-################################################################################
-##Race-by msa##
-#WEIGHTED#
-################################################################################
+
+#Put
+msa.age.num = lapply(data.list.brfss.msa.age, `[[`, 2)  
+
+for (data in msa.age.num) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss.shield',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+#==============================================================================
+
+#Outcome: proportion.tested
+#Strata: Race (weighted)
+#Location: MSA
+
+#==============================================================================
 data.list.brfss.msa.race = lapply(data.list.brfss.msa.clean, function(file){
   
   data=file[[2]] 
@@ -367,19 +394,27 @@ data.list.brfss.msa.race = lapply(data.list.brfss.msa.clean, function(file){
   
   list(filename, data) 
 })
-################################################################################
-################################################################################
 
+#Put
+msa.race.num = lapply(data.list.brfss.msa.race, `[[`, 2)  
 
-##Create outcome for the denominator value -> proportion.tested.n##
-#WEIGHTED#
+for (data in msa.race.num) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss.shield',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+#==============================================================================
 
+#Outcome: proportion.tested.n
+#Strata: Total (weighted)
+#Location: MSA
 
-################################################################################
-#Total
-##Outcome = proportion.tested.n
-#WEIGHTED#
-################################################################################
+#==============================================================================
 data.list.brfss.msa.n = lapply(data.list.brfss.msa.totals, function(file){
   
   data=file[[2]] 
@@ -394,11 +429,27 @@ data.list.brfss.msa.n = lapply(data.list.brfss.msa.totals, function(file){
   data= as.data.frame(data)
   list(filename, data) 
 })
-################################################################################
-##Sex
-##Outcome = proportion.tested.n
-#WEIGHTED#
-################################################################################
+
+#Put
+msa.total.denom = lapply(data.list.brfss.msa.n, `[[`, 2)  
+
+for (data in msa.total.denom) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss.shield',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+#==============================================================================
+
+#Outcome: proportion.tested.n
+#Strata: Sex (weighted)
+#Location: MSA
+
+#==============================================================================
 data.list.brfss.msa.sex.n = lapply(data.list.brfss.msa.sex, function(file){
   
   data=file[[2]] 
@@ -413,11 +464,27 @@ data.list.brfss.msa.sex.n = lapply(data.list.brfss.msa.sex, function(file){
   data= as.data.frame(data)
   list(filename, data) 
 })
-################################################################################
-##age
-##Outcome = proportion.tested.n
-#WEIGHTED#
-################################################################################
+
+#Put
+msa.sex.denom = lapply(data.list.brfss.msa.sex.n, `[[`, 2)  
+
+for (data in msa.sex.denom) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss.shield',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+#==============================================================================
+
+#Outcome: proportion.tested.n
+#Strata: Age (weighted)
+#Location: MSA
+
+#==============================================================================
 data.list.brfss.msa.age.n = lapply(data.list.brfss.msa.age, function(file){
   
   data=file[[2]] 
@@ -432,10 +499,27 @@ data.list.brfss.msa.age.n = lapply(data.list.brfss.msa.age, function(file){
   data= as.data.frame(data)
   list(filename, data) 
 })
-################################################################################
-##race
-##Outcome = proportion.tested.n
-################################################################################
+
+#Put
+msa.age.denom = lapply(data.list.brfss.msa.age.n, `[[`, 2)  
+
+for (data in msa.age.denom) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss.shield',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+#==============================================================================
+
+#Outcome: proportion.tested.n
+#Strata: Race (weighted)
+#Location: MSA
+
+#==============================================================================
 data.list.brfss.msa.race.n = lapply(data.list.brfss.msa.race, function(file){
   
   data=file[[2]] 
@@ -451,119 +535,26 @@ data.list.brfss.msa.race.n = lapply(data.list.brfss.msa.race, function(file){
   list(filename, data) 
 })
 
-################################################################################
-##PUT INTO THE DATA MANAGER###
-#8 put statements#
-################################################################################
-##msa-TOTAL-proportion.tested
-msa.total.num = lapply(data.list.brfss.msa.totals, `[[`, 2)  
-
-for (data in msa.total.num) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'brfss.shield',
-    source = 'brfss',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/brfss/index.html',
-    details = 'Behavioral Risk Factor Surveillance System')
-}
-
-##msa-SEX-proportion.tested
-msa.sex.num = lapply(data.list.brfss.msa.sex, `[[`, 2)  
-
-for (data in msa.sex.num) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'brfss.shield',
-    source = 'brfss',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/brfss/index.html',
-    details = 'Behavioral Risk Factor Surveillance System')
-}
-##msa-AGE-proportion.tested
-msa.age.num = lapply(data.list.brfss.msa.age, `[[`, 2)  
-
-for (data in msa.age.num) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'brfss.shield',
-    source = 'brfss',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/brfss/index.html',
-    details = 'Behavioral Risk Factor Surveillance System')
-}
-##msa-RACE-proportion.tested
-msa.race.num = lapply(data.list.brfss.msa.race, `[[`, 2)  
-
-for (data in msa.race.num) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'brfss.shield',
-    source = 'brfss',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/brfss/index.html',
-    details = 'Behavioral Risk Factor Surveillance System')
-}
-
-#####msa-TOTAL-proportion.tested.N
-msa.total.denom = lapply(data.list.brfss.msa.n, `[[`, 2)  
-
-for (data in msa.total.denom) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'brfss.shield',
-    source = 'brfss',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/brfss/index.html',
-    details = 'Behavioral Risk Factor Surveillance System')
-}
-######msa-SEX-proportion.tested.N
-msa.sex.denom = lapply(data.list.brfss.msa.sex.n, `[[`, 2)  
-
-for (data in msa.sex.denom) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'brfss.shield',
-    source = 'brfss',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/brfss/index.html',
-    details = 'Behavioral Risk Factor Surveillance System')
-}
-######msa-AGE-proportion.tested.n
-msa.age.denom = lapply(data.list.brfss.msa.age.n, `[[`, 2)  
-
-for (data in msa.age.denom) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'brfss.shield',
-    source = 'brfss',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/brfss/index.html',
-    details = 'Behavioral Risk Factor Surveillance System')
-}
-######msa-RACE-proportion.tested.n
+#PUt
 msa.race.denom = lapply(data.list.brfss.msa.race.n, `[[`, 2)  
 
 for (data in msa.race.denom) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'brfss.shield',
-    source = 'brfss',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/brfss/index.html',
-    details = 'Behavioral Risk Factor Surveillance System')
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss.shield',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
 }
 
 
-# Create Variance for proportion.tested.n (Added April 2024) --------
+#==============================================================================
+
+# Create Variance for proportion.tested.n (Added April 2024) 
+
+#==============================================================================
 
 #Variance- Total -----------------------------------------------------
 variance.total = lapply(data.list.brfss.msa.totals, function(file){
