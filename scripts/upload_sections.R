@@ -17,7 +17,7 @@
 #
 # Add --dry-run to check the files and print what would be uploaded.
 #
-# Requires: gh CLI installed and authenticated; the digest R package
+# Requires: gh CLI installed and authenticated; the digest and jsonlite R packages
 
 REPO <- "tfojo1/jheem_analyses"
 LATEST_TAG <- "syphilis-sections-latest"
@@ -42,9 +42,14 @@ section_dir <- if (length(args) >= 2) {
     file.path(nas_root, "data_managers", "data.manager.merge")
 }
 
-if (!requireNamespace("digest", quietly = TRUE)) {
-    stop("The 'digest' package is required: install.packages('digest')")
+for (package in c("digest", "jsonlite")) {
+    if (!requireNamespace(package, quietly = TRUE)) {
+        stop("The '", package, "' package is required: install.packages('", package, "')")
+    }
 }
+# provenance.json: where this upload ran from (scripts/section_provenance.R)
+script_dir <- dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))
+source(file.path(script_dir, "section_provenance.R"))
 
 # --- Check gh CLI ---
 if (!dry.run && system2("gh", "--version", stdout = FALSE, stderr = FALSE) != 0) {
@@ -80,6 +85,9 @@ dir.create(staging_dir, showWarnings = FALSE)
 manifest_file <- file.path(staging_dir, "SHA256SUMS.txt")
 writeLines(paste(digests, SECTION_FILES, sep = "  "), manifest_file)
 manifest_sha <- digest::digest(file = manifest_file, algo = "sha256")
+provenance_file <- file.path(staging_dir, "provenance.json")
+provenance_line <- write.section.provenance("syphilis", section_dir, SECTION_FILES, digests,
+                                            provenance_file, repo = file.path(script_dir, ".."))
 
 # --- Choose the dated tag ---
 release.exists <- function(tag) {
@@ -101,19 +109,24 @@ common_notes <- c(
     paste0("**Source:** `", section_dir, "`"),
     paste0("**Uploaded:** ", format(Sys.time(), "%Y-%m-%d %H:%M %Z")),
     paste0("**Manifest SHA-256:** `", manifest_sha, "`"),
+    provenance_line,
     "",
     "### Section files",
     file_lines,
     "",
     "These files are consumed by the **Build Syphilis Manager** workflow.",
-    "Processing revisions and raw inputs for each section are not recorded here."
+    paste("`provenance.json` records the checkout and packages this upload ran from.",
+          "The sections may have been built earlier, as their modified times show;",
+          "raw inputs are not recorded.")
 )
 
 cat("\nDated release:  ", version_tag, "\n")
 cat("Latest pointer: ", LATEST_TAG, "\n")
 cat("Manifest SHA-256:", manifest_sha, "\n")
+cat(sub("^[*]+Uploaded from:[*]+", "Uploaded from:  ", provenance_line), "\n")
 
 if (dry.run) {
+    cat("\nprovenance.json:\n", paste(readLines(provenance_file), collapse = "\n"), "\n", sep = "")
     cat("\nDry run: nothing uploaded.\n")
     quit(status = 0)
 }
@@ -127,7 +140,7 @@ create.release <- function(tag, title, notes) {
         "--title", shQuote(title),
         "--notes-file", notes_file,
         "--latest=false",
-        full_paths, manifest_file
+        full_paths, manifest_file, provenance_file
     ))
     if (result != 0) stop("Failed to create release ", tag, ". Check gh CLI authentication.")
 }
