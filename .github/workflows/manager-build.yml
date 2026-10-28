@@ -131,13 +131,16 @@ jobs:
           mkdir -p _ci_inputs/sections _ci_outputs
           gh release download "$SECTIONS_RELEASE" --repo "$REPO" --dir _ci_inputs/sections
           # The manifest must name exactly the manager's section files, each with a digest.
+          # Uploads from Windows write it with CRLF line endings, so check a copy without them.
           manifest=_ci_inputs/sections/SHA256SUMS.txt
-          if grep -qvE '^[0-9a-f]{64}  [A-Za-z0-9._-]+$' "$manifest"; then
+          checked="$RUNNER_TEMP/sections_manifest.txt"
+          tr -d '\r' < "$manifest" > "$checked"
+          if grep -qvE '^[0-9a-f]{64}  [A-Za-z0-9._-]+$' "$checked"; then
             echo "Malformed $manifest"; exit 1
           fi
-          [[ "$(sed -E 's/^[0-9a-f]{64}  //' "$manifest" | sort)" == \
+          [[ "$(sed -E 's/^[0-9a-f]{64}  //' "$checked" | sort)" == \
              "$(printf '%s\n' $SECTION_FILES | sort)" ]]
-          (cd _ci_inputs/sections && sha256sum -c SHA256SUMS.txt)
+          (cd _ci_inputs/sections && sha256sum -c "$checked")
 
           # A mutable pointer must name a dated snapshot with the same manifest.
           SNAPSHOT=$(dated_release "$SECTIONS_RELEASE" Snapshot)
