@@ -235,6 +235,26 @@ To use a new census in SHIELD, change its line in `data_managers.csv` to the new
 
 More detail on the census build: `data_processing/census.manager/README.md`.
 
+## Copies of OneDrive Managers
+
+Managers published through the OneDrive cache (census, Ryan White, Medicaid) are replaced
+in place by each update. The **Snapshot OneDrive Managers** workflow keeps a copy of each
+version: whenever `commoncode/data_manager_cache_metadata.Rdata` changes on master, it
+downloads each manager the metadata names, checks it is the version the metadata describes,
+and publishes it as an immutable release named after the file and its last-modified date,
+e.g. `census-manager-onedrive-v2026.10.26`. Versions already kept are skipped. Nothing
+changes in how managers are published or loaded.
+
+To load a kept census version:
+
+```r
+CENSUS.MANAGER <- load.data.manager.from.cache(
+  "census.manager.rdata", release.tag = "census-manager-onedrive-v2026.10.26")
+```
+
+The workflow can also be run by hand (**Actions > Snapshot OneDrive Managers**), and the
+script directly: `Rscript scripts/snapshot_onedrive_managers.R [--dry-run] [file ...]`.
+
 ## Uploading New Raw Data
 
 When new data files are added to the NAS:
@@ -265,5 +285,6 @@ Rscript scripts/upload_manager_deps.R /mnt/jheem_nas_share
 | `upload_hiv_sections.R` | 5 HIV section .rdata files + `SHA256SUMS.txt` | `hiv-sections-v{date}` (immutable) and `hiv-sections-latest` (mutable) |
 | `upload_census_sections.R` | 3 census section .rdata files + `SHA256SUMS.txt` | `census-sections-v{date}` (immutable) and `census-sections-latest` (mutable) |
 | `upload_manager_deps.R` | surveillance + census managers + strat results | `data-managers-v{date}` (immutable) |
+| `snapshot_onedrive_managers.R` | each OneDrive manager version (run by its workflow) | `{file}-onedrive-v{date}` (immutable) |
 
-All scripts take the NAS root as their first argument and require the `gh` CLI.
+The upload scripts take the NAS root as their first argument. All of these scripts require the `gh` CLI.
