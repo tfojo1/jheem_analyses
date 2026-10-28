@@ -34,8 +34,7 @@ shared-write contract without loading real manager files.
 ## What a build checks
 
 - **Structure and values against the promoted census** (`validate_candidate.R` and the
-  value-delta and reproduction tools in `../hiv.surveillance.manager/`, shared with the
-  HIV build): removed or added outcomes, sources, ontologies, and dimension values, and
+  value-delta and reproduction tools in `../validation/`, shared with the HIV build): removed or added outcomes, sources, ontologies, and dimension values, and
   which arrays' values changed.
 - **SHIELD starts** (`check_consumers.R`): the SHIELD model is started in recorded mode,
   offline, with the candidate census and the syphilis release in

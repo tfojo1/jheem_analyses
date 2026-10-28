@@ -92,8 +92,8 @@ jobs:
       - name: Verify merge path contract and comparison tools
         run: |
           Rscript data_processing/census.manager/test_merge_paths.R
-          Rscript data_processing/hiv.surveillance.manager/test_manager_value_delta.R
-          Rscript data_processing/hiv.surveillance.manager/test_manager_reproduction.R
+          Rscript data_processing/validation/test_manager_value_delta.R
+          Rscript data_processing/validation/test_manager_reproduction.R
 
       - name: Download and verify section inputs
         run: |
@@ -192,7 +192,7 @@ jobs:
           # comparison's own exit status is collected explicitly.)
           rm -f _ci_outputs/active_baseline_report.json
           set +e
-          Rscript data_processing/hiv.surveillance.manager/validate_candidate.R \
+          Rscript data_processing/validation/validate_candidate.R \
             _ci_inputs/baseline/census.manager.rdata \
             _ci_outputs/census.manager.rdata \
             _ci_outputs/active_baseline_report.json \
