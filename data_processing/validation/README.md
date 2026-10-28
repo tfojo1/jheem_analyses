@@ -120,10 +120,12 @@ The spec should only change when the structure changes. If it drifts without a c
 
 Validation runs automatically in the **Build Syphilis Manager** workflow (`.github/workflows/build-syphilis-manager.yml`). Structural validation gates the build — failures prevent release publication.
 
-When the workflow runs with `update_spec=true`, it:
-1. Validates against the **old** spec to capture what changed (the "spec diff")
+When validation finds only additions (exit code 2), or finds regressions and the workflow
+runs with `force_update_spec=true`, a build on `master`:
+1. Keeps the report against the **old** spec as the "spec diff"
 2. Regenerates the spec from the new manager
-3. Validates against the **new** spec to confirm it passes
-4. Commits the updated spec and includes the diff summary in the release notes
+3. Commits the updated spec and includes the diff summary in the release notes
+
+Builds from other branches validate but don't change the spec or publish.
 
 See `scripts/README.md` for the full pipeline reference.

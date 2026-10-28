@@ -29,6 +29,14 @@ on:
         default: false
         type: boolean
 
+permissions:
+  contents: write
+
+# One build at a time: builds number their tags by date and may push a spec commit.
+concurrency:
+  group: build-syphilis-manager
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -43,7 +51,7 @@ jobs:
       - name: Checkout jheem2
         uses: actions/checkout@v4
         with:
-          repository: tfojo1/jheem2
+          repository: CIPHER-Epi/jheem2
           ref: ${{ inputs.jheem2_ref }}
           path: _jheem2
 
@@ -51,6 +59,7 @@ jobs:
         run: ln -s "$GITHUB_WORKSPACE/_jheem2" "$GITHUB_WORKSPACE/../jheem2"
 
       - name: Set up R
+        id: setup-r
         uses: r-lib/actions/setup-r@v2
         with:
           r-version: 'release'
@@ -64,8 +73,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.R_LIBS_USER }}
-          key: r-packages-${{ hashFiles('**/DESCRIPTION') }}
-          restore-keys: r-packages-
+          # Packages built under one R version can't be restored into another.
+          key: r-packages-${{ runner.os }}-r${{ steps.setup-r.outputs.installed-r-version }}-${{ hashFiles('**/DESCRIPTION') }}
+          restore-keys: r-packages-${{ runner.os }}-r${{ steps.setup-r.outputs.installed-r-version }}-
 
       - name: Install R dependencies
         env:
@@ -113,6 +123,65 @@ jobs:
           echo "Dependency files:"
           ls -lh _ci_inputs/deps/
 
+      - name: Verify downloads and record exact inputs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SECTIONS_RELEASE: ${{ inputs.sections_release_tag }}
+          RAW_RELEASE: ${{ inputs.raw_data_release_tag }}
+          DEPS_RELEASE: ${{ inputs.deps_release_tag }}
+          JHEEM2_REF: ${{ inputs.jheem2_ref }}
+        run: |
+          set -euo pipefail
+          mkdir -p _ci_outputs
+
+          # Check each downloaded file against the SHA-256 digest GitHub publishes for it.
+          verify_release() {  # <tag> <dir>
+            local assets name digest checked=0
+            assets=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$1" \
+              --jq '.assets[] | "\(.name) \(.digest // "none")"')
+            while read -r name digest; do
+              [[ -f "$2/$name" ]] || continue
+              if [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+                echo "${digest#sha256:}  $2/$name" | sha256sum -c --quiet -
+                checked=$((checked + 1))
+              else
+                echo "::warning::$1 publishes no digest for $name"
+              fi
+            done <<< "$assets"
+            echo "$1: $checked file(s) match their published digests"
+          }
+          verify_release "$SECTIONS_RELEASE" _ci_inputs/sections
+          verify_release "$RAW_RELEASE" _ci_inputs/raw
+          verify_release "$DEPS_RELEASE" _ci_inputs/deps
+
+          # The dated release a *-latest alias points to (raw data and dependencies).
+          exact() {  # <tag>
+            if [[ "$1" != *latest* ]]; then echo "$1"; return; fi
+            local dated
+            dated=$(gh release view "$1" --repo "$GITHUB_REPOSITORY" --json body -q .body \
+              | sed -n 's/^\*\*Points to:\*\* `\([^`]*\)`.*/\1/p' | head -1)
+            echo "${dated:-unresolved}"
+          }
+
+          {
+            echo "analyses_commit=$GITHUB_SHA"
+            echo "jheem2_ref=$JHEEM2_REF"
+            echo "jheem2_commit=$(git -C _jheem2 rev-parse HEAD)"
+            echo "locations_commit=$(Rscript -e 'x <- packageDescription("locations")$RemoteSha; cat(if (is.null(x)) "unknown" else x)')"
+            echo "r_version=$(Rscript -e 'cat(R.version$major, R.version$minor, sep = ".")')"
+            # Syphilis section uploads replace one mutable release, so the files' digests
+            # are the record of which sections were used.
+            echo "sections_release=$SECTIONS_RELEASE"
+            echo "sections_published_at=$(gh release view "$SECTIONS_RELEASE" --repo "$GITHUB_REPOSITORY" --json publishedAt -q .publishedAt)"
+            echo "sections_files_sha256=$(cd _ci_inputs/sections && sha256sum syphilis.manager_section*.rdata | sha256sum | cut -d' ' -f1)"
+            echo "raw_data_release=$RAW_RELEASE"
+            echo "raw_data_exact=$(exact "$RAW_RELEASE")"
+            echo "deps_release=$DEPS_RELEASE"
+            echo "deps_exact=$(exact "$DEPS_RELEASE")"
+            sha256sum _ci_inputs/sections/*.rdata _ci_inputs/raw/*.tar.gz _ci_inputs/deps/*
+          } > _ci_outputs/input_identity.txt
+          cat _ci_outputs/input_identity.txt
+
       - name: Arrange CI inputs into Q_ROOT layout
         run: |
           mkdir -p _ci_root/data_managers/data.manager.merge
@@ -141,6 +210,7 @@ jobs:
             library(stringr)
             library(tidyr)
             source('data_processing/syphilis.manager/syphilis.processing.for.merging/syphilis.manager.merge.R')
+            writeLines(capture.output(sessionInfo()), '_ci_outputs/session_info.txt')
           " 2>&1 | tee _ci_outputs/build_log.txt
 
       - name: Validate structure
@@ -167,7 +237,11 @@ jobs:
           fi
 
       - name: Auto-update spec
-        if: steps.validation.outputs.spec_action == 'auto_update' || steps.validation.outputs.spec_action == 'force_update'
+        # Only master builds change the spec; builds from other branches are checks.
+        if: >-
+          github.ref == 'refs/heads/master' &&
+          (steps.validation.outputs.spec_action == 'auto_update' ||
+          steps.validation.outputs.spec_action == 'force_update')
         run: |
           # Save current report as the diff (shows what changed before regeneration)
           cp _ci_outputs/validation_report.txt _ci_outputs/spec_diff.txt
@@ -203,9 +277,12 @@ jobs:
             _ci_outputs/build_log.txt
             _ci_outputs/validation_report.txt
             _ci_outputs/spec_diff.txt
+            _ci_outputs/input_identity.txt
+            _ci_outputs/session_info.txt
 
       - name: Create versioned release
-        if: success()
+        # Runs from other branches are checks only and never publish.
+        if: success() && github.ref == 'refs/heads/master'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -228,15 +305,21 @@ jobs:
           else
             SPEC_NOTE="Validation: PASSED"
           fi
+          id() { grep "^$1=" _ci_outputs/input_identity.txt | cut -d= -f2; }
+          digest() { grep "  $1\$" _ci_outputs/input_identity.txt | cut -c1-12; }
           NOTES="## Build Info
-          | | |
-          |---|---|
-          | **Sections** | \`${{ inputs.sections_release_tag }}\` |
-          | **Raw Data** | \`${{ inputs.raw_data_release_tag }}\` |
-          | **Dependencies** | \`${{ inputs.deps_release_tag }}\` |
-          | **jheem2** | \`${{ inputs.jheem2_ref }}\` |
-          | **Commit** | \`${GITHUB_SHA:0:7}\` |
-          | **Status** | $SPEC_NOTE |
+          | Input | Release | Exact version |
+          |---|---|---|
+          | **Sections** | \`${{ inputs.sections_release_tag }}\` | uploaded $(id sections_published_at), files \`$(id sections_files_sha256 | cut -c1-12)\` |
+          | **Raw Data** | \`${{ inputs.raw_data_release_tag }}\` | \`$(id raw_data_exact)\` |
+          | **Dependencies** | \`${{ inputs.deps_release_tag }}\` | \`$(id deps_exact)\`, census \`$(digest _ci_inputs/deps/census.manager.rdata)\` |
+          | **jheem2** | \`${{ inputs.jheem2_ref }}\` | \`$(id jheem2_commit | cut -c1-8)\` |
+          | **locations** | default branch | \`$(id locations_commit | cut -c1-8)\` |
+          | **R** | release | $(id r_version) |
+          | **Commit** | | \`${GITHUB_SHA:0:7}\` |
+          | **Status** | | $SPEC_NOTE |
+
+          Full digests are in \`input_identity.txt\`.
 
           > To promote this build to \`latest\`, run the **Promote Syphilis Manager** workflow with tag \`$VERSION_TAG\`."
 
@@ -270,7 +353,7 @@ jobs:
           </details>"
           fi
 
-          ASSETS="_ci_outputs/syphilis.manager.rdata"
+          ASSETS="_ci_outputs/syphilis.manager.rdata _ci_outputs/input_identity.txt"
           if [ -f _ci_outputs/validation_report.txt ]; then
             ASSETS="$ASSETS _ci_outputs/validation_report.txt"
           fi
