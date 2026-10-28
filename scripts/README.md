@@ -37,7 +37,7 @@ as a dated, immutable release (`syphilis-sections-vYYYY.MM.DD`) with a `SHA256SU
 manifest, and points `syphilis-sections-latest` at it. The merge workflow will pick them up
 and record which dated release it used. Add `--dry-run` to check the files first.
 
-**Requires:** `gh` CLI installed and authenticated (`gh auth login`); the `digest` R package.
+**Requires:** `gh` CLI installed and authenticated (`gh auth login`); the `digest` and `jsonlite` R packages.
 
 ### Triggering a Syphilis Build
 
@@ -288,11 +288,18 @@ Rscript scripts/upload_manager_deps.R /mnt/jheem_nas_share
 
 | Script | What it uploads | Release tag |
 |--------|----------------|-------------|
-| `upload_sections.R` | 4 syphilis section .rdata files + `SHA256SUMS.txt` | `syphilis-sections-v{date}` (immutable) and `syphilis-sections-latest` (mutable) |
+| `upload_sections.R` | 4 syphilis section .rdata files + `SHA256SUMS.txt`, `provenance.json` | `syphilis-sections-v{date}` (immutable) and `syphilis-sections-latest` (mutable) |
 | `upload_raw_data.R` | All of `data_raw/` (per-subdir archives) | `data-raw-v{date}` (immutable) |
-| `upload_hiv_sections.R` | 5 HIV section .rdata files + `SHA256SUMS.txt` | `hiv-sections-v{date}` (immutable) and `hiv-sections-latest` (mutable) |
-| `upload_census_sections.R` | 3 census section .rdata files + `SHA256SUMS.txt` | `census-sections-v{date}` (immutable) and `census-sections-latest` (mutable) |
+| `upload_hiv_sections.R` | 5 HIV section .rdata files + `SHA256SUMS.txt`, `provenance.json` | `hiv-sections-v{date}` (immutable) and `hiv-sections-latest` (mutable) |
+| `upload_census_sections.R` | 3 census section .rdata files + `SHA256SUMS.txt`, `provenance.json` | `census-sections-v{date}` (immutable) and `census-sections-latest` (mutable) |
 | `upload_manager_deps.R` | surveillance + census managers + strat results | `data-managers-v{date}` (immutable) |
 | `snapshot_onedrive_managers.R` | each OneDrive manager version (run by its workflow) | `{file}-onedrive-v{date}` (immutable) |
 
 The upload scripts take the NAS root as their first argument. All of these scripts require the `gh` CLI.
+
+Each section upload also attaches `provenance.json`, recording where the upload ran from:
+the commit and branch of the jheem_analyses checkout, its uncommitted changes under
+`data_processing/` and `commoncode/`, and the R, jheem2, locations, and distributions
+versions installed. Run the upload from the checkout that built the sections. The record
+describes the upload; a section built earlier, with other code, shows that only in its
+modified time. Nothing is enforced.
