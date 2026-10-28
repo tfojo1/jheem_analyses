@@ -19,6 +19,12 @@ same NAS folder (`data_managers/data.manager.merge/`) but take only their own fi
 | Promote workflow | Promote Syphilis Manager | Promote HIV Surveillance Manager | Promote Census Manager |
 | Steps | [Syphilis manager](#syphilis-manager) | [HIV surveillance manager](#hiv-surveillance-manager) | [Census manager](#census-manager) |
 
+Build Census Manager runs the shared **Manager Build** (`.github/workflows/manager-build.yml`).
+What differs by manager is in `data_processing/<manager>/ci/`: `config.sh` (names, section
+files, packages), `inputs.sh` (inputs beyond the sections and the baseline), `merge.sh`, and
+`consumers.sh`. Each release it publishes records its exact inputs in `input_identity.txt`
+and, for scripts, `release.json`.
+
 ## Syphilis Manager
 
 ### Uploading Syphilis Sections After a Local Rebuild
