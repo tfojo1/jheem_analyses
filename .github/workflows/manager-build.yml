@@ -1,0 +1,329 @@
+name: Manager Build (shared)
+
+# The section-to-final build that each Build * Manager workflow calls: download and
+# verify the section release and the baseline, merge in an isolated directory, compare
+# with the baseline, run the manager's consumer checks, and (from master only) publish a
+# dated release for review and promotion.
+#
+# What differs by manager lives in data_processing/<manager_dir>/ci/:
+#   config.sh     names, section files, packages, tag patterns
+#   inputs.sh     inputs beyond the sections and baseline
+#   merge.sh      the merge itself
+#   consumers.sh  checks that the manager's consumers still work with the candidate
+# along with the manager's quality_report.R and summarize_candidate.R. Shared shell
+# functions are in scripts/ci/manager_build.sh.
+
+on:
+  workflow_call:
+    inputs:
+      manager_dir:
+        description: 'Directory under data_processing/, e.g. census.manager'
+        required: true
+        type: string
+      sections_release_tag:
+        required: true
+        type: string
+      baseline_release_tag:
+        required: true
+        type: string
+      jheem2_ref:
+        required: true
+        type: string
+      raw_data_release_tag:
+        description: 'For managers whose inputs.sh uses raw data'
+        required: false
+        default: ''
+        type: string
+      deps_release_tag:
+        description: 'For managers whose inputs.sh uses the dependency bundle'
+        required: false
+        default: ''
+        type: string
+
+jobs:
+  build:
+    name: Build, compare, and publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      MANAGER_DIR: ${{ inputs.manager_dir }}
+      SECTIONS_RELEASE: ${{ inputs.sections_release_tag }}
+      BASELINE_TAG: ${{ inputs.baseline_release_tag }}
+      JHEEM2_REF: ${{ inputs.jheem2_ref }}
+      RAW_RELEASE: ${{ inputs.raw_data_release_tag }}
+      DEPS_RELEASE: ${{ inputs.deps_release_tag }}
+
+    steps:
+      - name: Checkout analyses
+        uses: actions/checkout@v4
+
+      - name: Read the manager's build settings and check inputs
+        run: |
+          set -euo pipefail
+          [[ "$MANAGER_DIR" =~ ^[a-z.]+\.manager$ && -f "data_processing/$MANAGER_DIR/ci/config.sh" ]]
+          source "data_processing/$MANAGER_DIR/ci/config.sh"
+          for name in MANAGER_NAME MANAGER_FILE RELEASE_STEM BASELINE_PATTERN SECTIONS_STEM \
+                      SECTION_FILES R_PACKAGES CHECKS PROMOTE_WORKFLOW NEEDS_REVIEW_TEXT; do
+            [[ -n "${!name:-}" ]] || { echo "config.sh does not set $name"; exit 1; }
+            echo "$name=${!name}" >> "$GITHUB_ENV"
+          done
+          [[ "$SECTIONS_RELEASE" =~ ^${SECTIONS_STEM}-[a-zA-Z0-9._-]+$ ]]
+          [[ "$BASELINE_TAG" =~ ^${RELEASE_STEM}-[a-zA-Z0-9._-]+$ ]]
+          # The SHIELD consumer check requires the checkout directory to be named jheem_analyses.
+          [[ "$(basename "$GITHUB_WORKSPACE")" == jheem_analyses ]]
+          # One date for the candidate's labels and its release tag.
+          echo "BUILD_DATE=$(date -u +%Y.%m.%d)" >> "$GITHUB_ENV"
+
+      - name: Checkout jheem2
+        uses: actions/checkout@v4
+        with:
+          repository: CIPHER-Epi/jheem2
+          ref: ${{ inputs.jheem2_ref }}
+          path: _jheem2
+
+      - name: Checkout locations
+        uses: actions/checkout@v4
+        with:
+          repository: tfojo1/locations
+          path: _locations
+
+      - name: Checkout distributions
+        uses: actions/checkout@v4
+        with:
+          repository: tfojo1/distributions
+          path: _distributions
+
+      - name: Provide the sibling jheem2 path some merges use
+        run: ln -s "$GITHUB_WORKSPACE/_jheem2" "$GITHUB_WORKSPACE/../jheem2"
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.4.2'
+          use-public-rspm: true
+
+      - name: Install system and R dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev time
+          Rscript -e '
+            packages <- strsplit(Sys.getenv("R_PACKAGES"), " ")[[1]]
+            install.packages(c("remotes", packages))
+            remotes::install_local("_locations", upgrade = "never")
+            remotes::install_local("_distributions", upgrade = "never")
+            remotes::install_local("_jheem2", upgrade = "never")
+            needed <- c("jheem2", "locations", "distributions", packages)
+            missing <- needed[!vapply(needed, requireNamespace, logical(1), quietly = TRUE)]
+            if (length(missing)) stop("Missing packages: ", paste(missing, collapse = ", "))
+          '
+
+      - name: Verify merge path contract and comparison tools
+        run: |
+          set -euo pipefail
+          for check in $CHECKS; do Rscript "$check"; done
+
+      - name: Download and verify section inputs
+        run: |
+          set -euo pipefail
+          source scripts/ci/manager_build.sh
+          mkdir -p _ci_inputs/sections _ci_outputs
+          gh release download "$SECTIONS_RELEASE" --repo "$REPO" --dir _ci_inputs/sections
+          # The manifest must name exactly the manager's section files, each with a digest.
+          manifest=_ci_inputs/sections/SHA256SUMS.txt
+          if grep -qvE '^[0-9a-f]{64}  [A-Za-z0-9._-]+$' "$manifest"; then
+            echo "Malformed $manifest"; exit 1
+          fi
+          [[ "$(sed -E 's/^[0-9a-f]{64}  //' "$manifest" | sort)" == \
+             "$(printf '%s\n' $SECTION_FILES | sort)" ]]
+          (cd _ci_inputs/sections && sha256sum -c SHA256SUMS.txt)
+
+          # A mutable pointer must name a dated snapshot with the same manifest.
+          SNAPSHOT=$(dated_release "$SECTIONS_RELEASE" Snapshot)
+          [[ "$SNAPSHOT" =~ ^${SECTIONS_STEM}-[a-zA-Z0-9._-]+$ && "$SNAPSHOT" != *latest* ]]
+          if [[ "$SNAPSHOT" != "$SECTIONS_RELEASE" ]]; then
+            mkdir -p _ci_inputs/snapshot
+            gh release download "$SNAPSHOT" --repo "$REPO" --pattern SHA256SUMS.txt --dir _ci_inputs/snapshot
+            cmp "$manifest" _ci_inputs/snapshot/SHA256SUMS.txt
+          fi
+          echo "SECTIONS_SNAPSHOT=$SNAPSHOT" >> "$GITHUB_ENV"
+
+      - name: Download and verify the baseline and other inputs
+        run: |
+          set -euo pipefail
+          source scripts/ci/manager_build.sh
+          # Compare against the promoted manager, or a dated release named directly.
+          BASELINE=$(dated_release "$BASELINE_TAG" "Promoted from")
+          [[ "$BASELINE" =~ $BASELINE_PATTERN ]] || { echo "Baseline '$BASELINE' is not a $RELEASE_STEM release"; exit 1; }
+          download_verified "$BASELINE_TAG" "$MANAGER_FILE" _ci_inputs/baseline
+          echo "BASELINE_RELEASE=$BASELINE" >> "$GITHUB_ENV"
+
+          {
+            echo "analyses_commit=$(git rev-parse HEAD)"
+            echo "jheem2_ref=$JHEEM2_REF"
+            echo "jheem2_commit=$(git -C _jheem2 rev-parse HEAD)"
+            echo "locations_commit=$(git -C _locations rev-parse HEAD)"
+            echo "distributions_commit=$(git -C _distributions rev-parse HEAD)"
+            echo "r_version=$(Rscript -e 'cat(R.version$major, R.version$minor, sep = ".")')"
+            echo "sections_release=$SECTIONS_RELEASE"
+            echo "sections_snapshot=$SECTIONS_SNAPSHOT"
+            echo "sections_manifest_sha256=$(sha256sum _ci_inputs/sections/SHA256SUMS.txt | cut -d' ' -f1)"
+            echo "baseline_release=$BASELINE"
+          } > _ci_outputs/input_identity.txt
+          record_digests _ci_inputs/sections/*.rdata _ci_inputs/baseline/"$MANAGER_FILE"
+          : > _ci_outputs/build_info_rows.md
+
+          # Inputs particular to this manager
+          bash "data_processing/$MANAGER_DIR/ci/inputs.sh"
+          cat _ci_outputs/input_identity.txt
+          df -h . > _ci_outputs/disk_before.txt
+
+      - name: Build isolated candidate and measure Linux resources
+        run: |
+          set -euo pipefail
+          export SECTION_DIR="$GITHUB_WORKSPACE/_ci_inputs/sections"
+          export CACHED_DIR="$GITHUB_WORKSPACE/_ci_outputs"
+          export WRITE_SHARED_OUTPUT=false
+          /usr/bin/time -v -o _ci_outputs/resource_metrics.txt \
+            bash "data_processing/$MANAGER_DIR/ci/merge.sh" 2>&1 | tee _ci_outputs/build_log.txt
+          df -h . > _ci_outputs/disk_after.txt
+          sha256sum "_ci_outputs/$MANAGER_FILE" > _ci_outputs/candidate_sha256.txt
+
+      - name: Compare with the baseline
+        run: |
+          # Exit 1 with a report means structural removals: flag for review, don't fail.
+          # No report means the comparison itself failed. (Steps run with bash -e, so the
+          # comparison's own exit status is collected explicitly.)
+          rm -f _ci_outputs/active_baseline_report.json
+          set +e
+          Rscript data_processing/validation/validate_candidate.R \
+            "_ci_inputs/baseline/$MANAGER_FILE" \
+            "_ci_outputs/$MANAGER_FILE" \
+            _ci_outputs/active_baseline_report.json \
+            2>&1 | tee _ci_outputs/active_baseline_summary.txt
+          status=${PIPESTATUS[0]}
+          set -e
+          echo "Comparison exit status: $status (1 means structural removals, flagged for review)"
+          jq -e '.n_checks' _ci_outputs/active_baseline_report.json > /dev/null
+          [[ $status -eq 0 || $status -eq 1 ]]
+
+      - name: Check the manager's consumers
+        run: bash "data_processing/$MANAGER_DIR/ci/consumers.sh"
+
+      - name: Data quality report
+        # Informational; never fails the build.
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          Rscript "data_processing/$MANAGER_DIR/quality_report.R" \
+            "_ci_outputs/$MANAGER_FILE" \
+            _ci_outputs/quality_report.txt 2>&1 | tee _ci_outputs/quality_summary.txt
+
+      - name: Summarize candidate for review
+        run: |
+          set -euo pipefail
+          Rscript "data_processing/$MANAGER_DIR/summarize_candidate.R" _ci_outputs "$BASELINE_RELEASE"
+          cat _ci_outputs/CANDIDATE.md >> "$GITHUB_STEP_SUMMARY"
+          jq '{needs_review, structural_failures, baseline_release}' _ci_outputs/build_status.json
+
+      - name: Summarize the failure
+        # The error that stopped the build, on the run's summary page.
+        if: failure()
+        run: |
+          shopt -s nullglob
+          bash scripts/summarize_build_failure.sh _ci_outputs/build_log.txt \
+            _ci_outputs/active_baseline_summary.txt _ci_outputs/consumer*_summary.txt \
+            >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload candidate and evidence for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.RELEASE_STEM }}-build
+          path: _ci_outputs/
+          if-no-files-found: warn
+          retention-days: 30
+          compression-level: 0
+
+      - name: Create versioned release
+        # Runs from other branches are checks only and never publish.
+        if: success() && github.ref == 'refs/heads/master'
+        run: |
+          set -euo pipefail
+          VERSION_TAG="$RELEASE_STEM-v$BUILD_DATE"
+          # Append sequence number if tag already exists (multiple builds in a day)
+          if gh release view "$VERSION_TAG" --repo "$REPO" &>/dev/null; then
+            SEQ=2
+            while gh release view "${VERSION_TAG}.${SEQ}" --repo "$REPO" &>/dev/null; do
+              SEQ=$((SEQ + 1))
+            done
+            VERSION_TAG="${VERSION_TAG}.${SEQ}"
+          fi
+
+          NEEDS_REVIEW=$(jq -r '.needs_review' _ci_outputs/build_status.json)
+          RUN_URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          # The same facts for scripts: the inputs as recorded, the candidate's digest,
+          # and the review status.
+          jq -n --rawfile identity _ci_outputs/input_identity.txt \
+             --arg tag "$VERSION_TAG" --arg asset "$MANAGER_FILE" \
+             --arg sha256 "$(cut -d' ' -f1 _ci_outputs/candidate_sha256.txt)" \
+             --argjson needs_review "$NEEDS_REVIEW" --arg run_url "$RUN_URL" '
+            ($identity | split("\n") | map(select(length > 0))) as $lines |
+            {schema_version: 1, tag: $tag, asset: $asset, sha256: $sha256,
+             needs_review: $needs_review, run_url: $run_url,
+             inputs: ($lines | map(select(test("^[a-z0-9_]+="))
+                                   | capture("^(?<k>[^=]+)=(?<v>.*)$") | {(.k): .v}) | add),
+             input_files: ($lines | map(select(test("^[0-9a-f]{64}  "))
+                                        | capture("^(?<v>[0-9a-f]{64})  (?<k>.*)$") | {(.k): .v}) | add)}
+          ' > _ci_outputs/release.json
+
+          mkdir -p _release
+          cp "_ci_outputs/$MANAGER_FILE" _ci_outputs/CANDIDATE.md _ci_outputs/input_identity.txt \
+            _ci_outputs/build_status.json _ci_outputs/release.json _release/
+          # The evidence archive holds the build's logs and reports (text, JSON, Markdown).
+          (cd _ci_outputs && find . -maxdepth 1 -type f \( -name '*.txt' -o -name '*.json' -o -name '*.md' \) \
+            -printf '%f\n' | sort) > "$RUNNER_TEMP/evidence_files.txt"
+          tar -czf _release/validation-evidence.tar.gz -C _ci_outputs -T "$RUNNER_TEMP/evidence_files.txt"
+          (cd _release && sha256sum "$MANAGER_FILE" CANDIDATE.md input_identity.txt \
+            build_status.json release.json validation-evidence.tar.gz > SHA256SUMS.txt)
+
+          id() { grep "^$1=" _ci_outputs/input_identity.txt | cut -d= -f2; }
+          {
+            if [[ "$NEEDS_REVIEW" == "true" ]]; then
+              echo "> **Needs review:** $NEEDS_REVIEW_TEXT"
+              echo "> Promoting it requires ticking the review box in the promote workflow."
+              echo
+            fi
+            echo "## Build Info"
+            echo "| Input | Release | Exact version |"
+            echo "|---|---|---|"
+            echo "| **Sections** | \`$(id sections_release)\` | \`$(id sections_snapshot)\`, manifest \`$(id sections_manifest_sha256 | cut -c1-12)\` |"
+            cat _ci_outputs/build_info_rows.md
+            echo "| **jheem2** | \`$(id jheem2_ref)\` | \`$(id jheem2_commit | cut -c1-8)\` |"
+            echo "| **locations** | default branch | \`$(id locations_commit | cut -c1-8)\` |"
+            echo "| **distributions** | default branch | \`$(id distributions_commit | cut -c1-8)\` |"
+            echo "| **R** | | $(id r_version) |"
+            echo "| **jheem_analyses** | | \`${GITHUB_SHA:0:8}\` |"
+            echo "| **Compared against** | \`$BASELINE_TAG\` | \`$(id baseline_release)\` |"
+            echo
+            echo "Run: [$GITHUB_RUN_ID]($RUN_URL). Full digests are in \`input_identity.txt\`; \`release.json\` holds the same facts for scripts."
+            echo
+            echo "> To promote this build to \`$RELEASE_STEM-latest\`, run the **$PROMOTE_WORKFLOW** workflow with tag \`$VERSION_TAG\`."
+            echo
+            cat _ci_outputs/CANDIDATE.md
+          } > _release/RELEASE_NOTES.md
+
+          PRERELEASE=()
+          [[ "$NEEDS_REVIEW" == "true" ]] && PRERELEASE=(--prerelease)
+          gh release create "$VERSION_TAG" \
+            --repo "$REPO" \
+            --target "$GITHUB_SHA" \
+            --title "$MANAGER_NAME $VERSION_TAG" \
+            --notes-file _release/RELEASE_NOTES.md \
+            --latest=false "${PRERELEASE[@]}" \
+            "_release/$MANAGER_FILE" _release/CANDIDATE.md \
+            _release/input_identity.txt _release/build_status.json _release/release.json \
+            _release/validation-evidence.tar.gz _release/SHA256SUMS.txt
+          echo "Published release: $VERSION_TAG"
+          echo "Published release: \`$VERSION_TAG\`" >> "$GITHUB_STEP_SUMMARY"
