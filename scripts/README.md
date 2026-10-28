@@ -33,9 +33,11 @@ Rscript scripts/upload_sections.R /Volumes/jheem$          # macOS
 ```
 
 This uploads the 4 syphilis section files from `{nas}/data_managers/data.manager.merge/`
-to the `syphilis-sections-latest` release. The merge workflow will pick them up.
+as a dated, immutable release (`syphilis-sections-vYYYY.MM.DD`) with a `SHA256SUMS.txt`
+manifest, and points `syphilis-sections-latest` at it. The merge workflow will pick them up
+and record which dated release it used. Add `--dry-run` to check the files first.
 
-**Requires:** `gh` CLI installed and authenticated (`gh auth login`).
+**Requires:** `gh` CLI installed and authenticated (`gh auth login`); the `digest` R package.
 
 ### Triggering a Syphilis Build
 
@@ -286,7 +288,7 @@ Rscript scripts/upload_manager_deps.R /mnt/jheem_nas_share
 
 | Script | What it uploads | Release tag |
 |--------|----------------|-------------|
-| `upload_sections.R` | 4 section .rdata files | `syphilis-sections-latest` (mutable) |
+| `upload_sections.R` | 4 syphilis section .rdata files + `SHA256SUMS.txt` | `syphilis-sections-v{date}` (immutable) and `syphilis-sections-latest` (mutable) |
 | `upload_raw_data.R` | All of `data_raw/` (per-subdir archives) | `data-raw-v{date}` (immutable) |
 | `upload_hiv_sections.R` | 5 HIV section .rdata files + `SHA256SUMS.txt` | `hiv-sections-v{date}` (immutable) and `hiv-sections-latest` (mutable) |
 | `upload_census_sections.R` | 3 census section .rdata files + `SHA256SUMS.txt` | `census-sections-v{date}` (immutable) and `census-sections-latest` (mutable) |

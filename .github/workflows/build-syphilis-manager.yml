@@ -154,14 +154,20 @@ jobs:
           verify_release "$RAW_RELEASE" _ci_inputs/raw
           verify_release "$DEPS_RELEASE" _ci_inputs/deps
 
-          # The dated release a *-latest alias points to (raw data and dependencies).
+          # The dated release a *-latest alias copies, named on its "Points to" line (raw
+          # data, dependencies) or "Snapshot" line (sections uploaded since 2026-10-28).
           exact() {  # <tag>
             if [[ "$1" != *latest* ]]; then echo "$1"; return; fi
             local dated
             dated=$(gh release view "$1" --repo "$GITHUB_REPOSITORY" --json body -q .body \
-              | sed -n 's/^\*\*Points to:\*\* `\([^`]*\)`.*/\1/p' | head -1)
-            echo "${dated:-unresolved}"
+              | sed -E -n 's/^\*\*(Points to|Snapshot):\*\* `([^`]*)`.*/\2/p' | head -1)
+            echo "${dated:-none}"
           }
+          SECTIONS_EXACT=$(exact "$SECTIONS_RELEASE")
+          # Sections taken through the alias must also match the snapshot it names.
+          if [[ "$SECTIONS_EXACT" != none && "$SECTIONS_EXACT" != "$SECTIONS_RELEASE" ]]; then
+            verify_release "$SECTIONS_EXACT" _ci_inputs/sections
+          fi
 
           {
             echo "analyses_commit=$GITHUB_SHA"
@@ -169,9 +175,10 @@ jobs:
             echo "jheem2_commit=$(git -C _jheem2 rev-parse HEAD)"
             echo "locations_commit=$(Rscript -e 'x <- packageDescription("locations")$RemoteSha; cat(if (is.null(x)) "unknown" else x)')"
             echo "r_version=$(Rscript -e 'cat(R.version$major, R.version$minor, sep = ".")')"
-            # Syphilis section uploads replace one mutable release, so the files' digests
-            # are the record of which sections were used.
+            # Sections uploaded before 2026-10-28 have no dated snapshot; the files'
+            # digests are then the record of which sections were used.
             echo "sections_release=$SECTIONS_RELEASE"
+            echo "sections_exact=$SECTIONS_EXACT"
             echo "sections_published_at=$(gh release view "$SECTIONS_RELEASE" --repo "$GITHUB_REPOSITORY" --json publishedAt -q .publishedAt)"
             echo "sections_files_sha256=$(cd _ci_inputs/sections && sha256sum syphilis.manager_section*.rdata | sha256sum | cut -d' ' -f1)"
             echo "raw_data_release=$RAW_RELEASE"
@@ -307,10 +314,12 @@ jobs:
           fi
           id() { grep "^$1=" _ci_outputs/input_identity.txt | cut -d= -f2; }
           digest() { grep "  $1\$" _ci_outputs/input_identity.txt | cut -c1-12; }
+          SECTIONS_VERSION="uploaded $(id sections_published_at)"
+          [[ "$(id sections_exact)" != none ]] && SECTIONS_VERSION="\`$(id sections_exact)\`"
           NOTES="## Build Info
           | Input | Release | Exact version |
           |---|---|---|
-          | **Sections** | \`${{ inputs.sections_release_tag }}\` | uploaded $(id sections_published_at), files \`$(id sections_files_sha256 | cut -c1-12)\` |
+          | **Sections** | \`${{ inputs.sections_release_tag }}\` | $SECTIONS_VERSION, files \`$(id sections_files_sha256 | cut -c1-12)\` |
           | **Raw Data** | \`${{ inputs.raw_data_release_tag }}\` | \`$(id raw_data_exact)\` |
           | **Dependencies** | \`${{ inputs.deps_release_tag }}\` | \`$(id deps_exact)\`, census \`$(digest _ci_inputs/deps/census.manager.rdata)\` |
           | **jheem2** | \`${{ inputs.jheem2_ref }}\` | \`$(id jheem2_commit | cut -c1-8)\` |
