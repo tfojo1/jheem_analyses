@@ -87,7 +87,7 @@ for (data in state.imm.data.clean.put) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'census', #Note: the census.immigration ontology has year ranges (MSA data) but this data has single years (state data)
+    ontology.name = 'census.adults', #Note: the census.immigration ontology has year ranges (MSA data) but this data has single years (state data)
     source = 'census.population',
     dimension.values = list(),
     url = 'https://www.census.gov/data/tables/2015/demo/geographic-mobility/metro-to-metro-migration.html',
@@ -100,7 +100,7 @@ for (data in state.emm.data.clean.put) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'census', 
+    ontology.name = 'census.adults', 
     source = 'census.population',
     dimension.values = list(),
     url = 'https://www.census.gov/data/tables/2015/demo/geographic-mobility/metro-to-metro-migration.html',
@@ -203,7 +203,7 @@ for (data in state.imm.data.05.09.clean.put) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'census', #Note: the census.immigration ontology has year ranges (MSA data) but this data has single years (state data)
+    ontology.name = 'census.adults', #Note: the census.immigration ontology has year ranges (MSA data) but this data has single years (state data)
     source = 'census.population',
     dimension.values = list(),
     url = 'https://www.census.gov/data/tables/2015/demo/geographic-mobility/metro-to-metro-migration.html',
@@ -216,7 +216,7 @@ for (data in state.emm.data.05.09.clean.put) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'census', 
+    ontology.name = 'census.adults', 
     source = 'census.population',
     dimension.values = list(),
     url = 'https://www.census.gov/data/tables/2015/demo/geographic-mobility/metro-to-metro-migration.html',

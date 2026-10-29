@@ -243,7 +243,7 @@ for (data in estimated.adult.pop.stratified.put) {
     
     data.manager$put.long.form(
         data = data,
-        ontology.name = 'census', 
+        ontology.name = 'census.adults', 
         source = 'census.population',
         dimension.values = list(),
         url = 'www.census.gov',

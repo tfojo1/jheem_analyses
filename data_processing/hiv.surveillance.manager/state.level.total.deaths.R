@@ -60,7 +60,7 @@ for (data in state.death.data.clean.put) {
 
     data.manager$put.long.form(
         data = data,
-        ontology.name = 'census',
+        ontology.name = 'census.adults',
         source = 'census.population',
         dimension.values = list(),
         url = 'https://www.census.gov/data/datasets/time-series/demo/popest/2020s-state-total.html',
