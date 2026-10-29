@@ -10,7 +10,7 @@ DEFAULT.POPULATION.YEARS = 2007
 
 
 
-CENSUS.AGES = as.character(sort( parse.age.strata.names(CENSUS.MANAGER$ontologies$census$age)$lower ))
+CENSUS.AGES = as.character(sort( parse.age.strata.names(CENSUS.MANAGER$ontologies$single.year.age.census$age)$lower ))
 
 ##-----------##
 ##-- Aging --##
@@ -63,7 +63,7 @@ do.get.empiric.aging.rates <- function(location, specification.metadata,
                               dimension.values = list(location = counties,
                                                       year = as.character(years.to.pull)),
                               keep.dimensions = c('year','age','race','ethnicity','sex'),
-                              from.ontology.names = 'census')
+                              from.ontology.names = 'single.year.age.census')
     
     if (is.null(pop))
         stop("There was no population data at all for location ", location, " between ", min(years), " and ", max(years))
@@ -416,7 +416,7 @@ get.fraction.over.age <- function(location,
                                                               year=years,
                                                               age=paste0(ages, ' years')),
                                       keep.dimensions = c('age','sex','race','ethnicity'),
-                                      from.ontology.names = 'census')
+                                      from.ontology.names = 'single.year.age.census')
             
             age.brackets = make.age.strata.names(endpoints = c(ages[1], 18, ages[length(ages)]))
             
@@ -496,7 +496,7 @@ get.best.guess.msm.proportions <- function(location,
                                 dimension.values = list(location = counties,
                                                         year = years,
                                                         sex = 'male'),
-                                from.ontology.names = 'census')[,,,,1,drop=F]
+                                from.ontology.names = 'single.year.age.census')[,,,,1,drop=F]
     
     dim.names = dimnames(males)[-length(dim(males))]
     dim(males) = sapply(dim.names, length)
@@ -658,7 +658,7 @@ get.best.guess.msm.proportions.by.race <- function(location,
                                       dimension.values = list(location = fips,
                                                               year = years,
                                                               sex = 'male'),
-                                from.ontology.names = 'census')
+                                from.ontology.names = 'single.year.age.census')
     if (is.null(males))
         stop(paste0("Cannot get best-guess msm proportions: no population data for location '", location, "' are available"))
     
@@ -778,7 +778,7 @@ get.location.birth.rates <- function(location,
                                          location = counties, 
                                          year = years, 
                                          keep.dimensions = c('age', 'race', 'ethnicity', 'sex'), 
-                                         from.ontology.names = 'census',
+                                         from.ontology.names = 'single.year.age.census',
                                          na.rm=TRUE)
     if (is.null(population))
         stop(paste0("Cannot get.location.birth.rates() - no 'population' data are available in the SURVEILLANCE.MANAGER for location '", location, "' (",
@@ -915,7 +915,7 @@ get.location.mortality.rates <- function(location,
             county.populations = CENSUS.MANAGER$pull(outcome = 'population',
                                                      dimension.values = list(location=counties,
                                                                              year=year.ranges),
-                                                     from.ontology.names = 'census')
+                                                     from.ontology.names = 'single.year.age.census')
             
             if (is.null(county.populations))
                 stop("Error in get.location.mortality.rates(): cannot get populations for the component counties")
@@ -989,7 +989,7 @@ get.geographically.aggregated.race.oes <- function(location,
     population = CENSUS.MANAGER$pull(outcome='population', 
                                      dimension.values = list(location=counties, year=years),
                                      keep.dimensions = c('location','age','race','ethnicity', 'sex'),
-                                     from.ontology.names = 'census')
+                                     from.ontology.names = 'single.year.age.census')
     
     if (is.null(population))
         stop(paste0("Cannot get.geographically.aggregated.race.oes() - no census data were available for the counties of '", location, "'"))
@@ -1239,7 +1239,7 @@ get.base.initial.population.for.sex <- function(location, specification.metadata
     counties = locations::get.contained.locations(location, 'county')
     pop = CENSUS.MANAGER$pull(outcome='population', dimension.values = list(year=years, location=counties, sex=sex),
                               keep.dimensions = c('age','race','ethnicity','sex'),
-                              from.ontology.names = 'census') / length(years)
+                              from.ontology.names = 'single.year.age.census') / length(years)
     
     mapping = get.ontology.mapping(from.ontology = dimnames(pop),
                                    to.ontology = specification.metadata$dim.names[c('age','race')])
@@ -1498,7 +1498,7 @@ get.race.population.counts <- function(location,
     population = CENSUS.MANAGER$pull(outcome='population', 
                                      dimension.values = list(location=counties, year=years),
                                      keep.dimensions = c('location','age','race','ethnicity', 'sex'),
-                                     from.ontology.names = 'census')
+                                     from.ontology.names = 'single.year.age.census')
     
     if (is.null(population))
       stop(paste0("Cannot get.race.population.counts() - no census data were available for the counties of '", location, "'"))
@@ -1520,7 +1520,7 @@ get.female.single.year.age.counts <- function(location, population.years=DEFAULT
 {
     counties = get.contained.locations(location, 'county')
     pop = CENSUS.MANAGER$pull(outcome='population', dimension.values = list(year=population.years, location=counties, sex='female'),
-                              keep.dimensions = c('age','race','sex','ethnicity'), from.ontology.names = 'census') / length(population.years)
+                              keep.dimensions = c('age','race','sex','ethnicity'), from.ontology.names = 'single.year.age.census') / length(population.years)
     
     array(apply(pop, 'age', sum), dim=c(age=length(CENSUS.AGES)), dimnames=list(age=CENSUS.AGES))
 }
@@ -1529,7 +1529,7 @@ get.male.single.year.age.counts <- function(location, population.years=DEFAULT.P
 {
     counties = get.contained.locations(location, 'county')
     pop = CENSUS.MANAGER$pull(outcome='population', dimension.values = list(year=population.years, location=counties, sex='male'),
-                              keep.dimensions = c('age','race','sex','ethnicity'), from.ontology.names = 'census') / length(population.years)
+                              keep.dimensions = c('age','race','sex','ethnicity'), from.ontology.names = 'single.year.age.census') / length(population.years)
     
     array(apply(pop, 'age', sum), dim=c(age=length(CENSUS.AGES)), dimnames=list(age=CENSUS.AGES))
 }

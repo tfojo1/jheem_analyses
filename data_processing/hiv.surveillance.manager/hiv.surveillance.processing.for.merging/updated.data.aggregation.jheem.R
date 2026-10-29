@@ -465,11 +465,11 @@ las.vegas.msa <- c("NV.2")
 
 san.diego.msa <- c("CA.16R")
 
-la.cocaine.aggregated = surveillance.manager$pull(outcome = "cocaine",
-                                                  metric = "estimate",
-                                                  dimension.values=list(location=los.angeles.msa),
-                                                  keep.dimensions='year')
-
+# la.cocaine.aggregated = surveillance.manager$pull(outcome = "cocaine",
+#                                                   metric = "estimate",
+#                                                   dimension.values=list(location=los.angeles.msa),
+#                                                   keep.dimensions='year')
+# 
 # la.heroin.aggregated = surveillance.manager$pull(outcome = "heroin",
 #                                                  metric = "estimate",
 #                                                  dimension.values=list(location=los.angeles.msa),
@@ -495,11 +495,11 @@ vegas.heroin.aggregated = surveillance.manager$pull(outcome = "heroin",
                                                     dimension.values=list(location=las.vegas.msa),
                                                     keep.dimensions='year')
 
-la.cocaine = as.data.frame.table(la.cocaine.aggregated)%>%
-    mutate(year = as.character(year))%>%
-    mutate(value = as.numeric(Freq))%>%
-    mutate(outcome = "cocaine")%>%
-    mutate(location = 'C.31080')
+# la.cocaine = as.data.frame.table(la.cocaine.aggregated)%>%
+#     mutate(year = as.character(year))%>%
+#     mutate(value = as.numeric(Freq))%>%
+#     mutate(outcome = "cocaine")%>%
+#     mutate(location = 'C.31080')
 
 sd.cocaine = as.data.frame.table(sd.cocaine.aggregated)%>%
     mutate(year = as.character(year))%>%
@@ -533,13 +533,13 @@ vegas.heroin = as.data.frame.table(vegas.heroin.aggregated)%>%
 
 #aggregated.nsduh.data <- rbind(la.cocaine, sd.cocaine, vegas.cocaine, la.heroin, sd.heroin, vegas.heroin)
 
-aggregated.nsduh.data <- rbind(la.cocaine, sd.cocaine, vegas.cocaine, sd.heroin, vegas.heroin)
+#aggregated.nsduh.data <- rbind(la.cocaine, sd.cocaine, vegas.cocaine, sd.heroin, vegas.heroin)
 
 
-surveillance.manager$put.long.form(
-    data = aggregated.nsduh.data,
-    ontology.name = 'nsduh',
-    source = 'nsduh',
-    dimension.values = list(),
-    url = 'https://pdas.samhsa.gov/saes/substate',
-    details = 'NSDUH Substate Estimates, aggregated from substate to MSA')
+# surveillance.manager$put.long.form(
+#     data = aggregated.nsduh.data,
+#     ontology.name = 'nsduh',
+#     source = 'nsduh',
+#     dimension.values = list(),
+#     url = 'https://pdas.samhsa.gov/saes/substate',
+#     details = 'NSDUH Substate Estimates, aggregated from substate to MSA')
