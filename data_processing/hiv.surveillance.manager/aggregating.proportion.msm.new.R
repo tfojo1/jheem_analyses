@@ -24,7 +24,7 @@ put.msa.data.as.new.source.NEW(outcome = 'proportion.msm',
                                source.for.relative.contribution = 'census.population',
                                ontology.for.relative.contribution = 'census',
                                source.for.denominator='census.population',
-                               ontology.for.denominator='census',
+                               ontology.for.denominator='census.adults',
                                details.for.new.data= "aggregated from 2013 Emory estimates")
 
 put.msa.data.as.new.source.NEW(outcome = 'proportion.msm',
@@ -40,5 +40,5 @@ put.msa.data.as.new.source.NEW(outcome = 'proportion.msm',
                                source.for.relative.contribution = 'census.population',
                                ontology.for.relative.contribution = 'census',
                                source.for.denominator='census.population',
-                               ontology.for.denominator='census',
+                               ontology.for.denominator='census.adults',
                                details.for.new.data = "aggregated from 2013 Emory estimates")
