@@ -2262,7 +2262,7 @@ proportion.msm.likelihood.instructions = create.custom.likelihood.instructions(
                                     dimension.values = list(location = counties,
                                                             year = total.years,
                                                             sex = 'male'),
-                                    from.ontology.names = 'census')[,,,,1,drop=F]
+                                    from.ontology.names = 'single.year.age.census')[,,,,1,drop=F]
         
         if (length(total.years)==1)
         {
