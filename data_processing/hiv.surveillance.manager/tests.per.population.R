@@ -19,7 +19,7 @@ hiv.tests.clean = subset(hiv.tests.raw, location %in% hiv.test.locations.of.inte
 # get adult.population ----------------------------------------------------
 
 #census (2000-2025 here are estimated from age groups)
-adult.pop.source.one = (as.data.frame.table(surveillance.manager$data$adult.population$estimate$census.aggregated.adult.population$census$year__location)) %>% rename(adult.pop.value = Freq) %>% mutate(year = as.character(year))
+adult.pop.source.one = (as.data.frame.table(surveillance.manager$data$adult.population$estimate$census.aggregated.adult.population$census.adults$year__location)) %>% rename(adult.pop.value = Freq) %>% mutate(year = as.character(year))
 adult.pop.source.one.clean = subset(adult.pop.source.one,  location %in% hiv.test.locations.of.interest)
 adult.pop.source.one.final = subset(adult.pop.source.one.clean,  year %in% hiv.tests.years.of.interest) 
 
