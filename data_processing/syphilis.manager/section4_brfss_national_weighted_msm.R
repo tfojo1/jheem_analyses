@@ -31,7 +31,7 @@ data.list.brfss.national.sex.for.msm = lapply(data.list.brfss.national.msm.uncle
   data$value = data$proportion_tested
   
   data <- data %>%
-    select(outcome, year, location, sum_tested, n_weighted, value, sex, `_LLCPWT`, race, msm, age)
+    select(outcome, year, location, sum_tested, n_weighted, value, sex, `_LLCPWT`, race, age, risk)
   
   data= as.data.frame(data)
   
@@ -51,12 +51,7 @@ data.list.brfss.national.msm = lapply(data.list.brfss.national.sex.for.msm, func
   data$outcome= "proportion.msm"
   
 data <- data %>%
-    filter(!is.na(msm))%>%
-    mutate(msm.numeric = ifelse(msm == "msm", 1, NA))%>%
-    select(-msm)%>%
-    rename(msm = msm.numeric)
-
-  data<- data %>%
+    mutate(msm = ifelse(risk == "msm", 1, 0))%>%
     group_by(location, msm) %>%
     mutate(msm_total = sum(msm*`_LLCPWT`))%>%
     ungroup()
@@ -127,12 +122,7 @@ data.list.brfss.national.msm.race = lapply(data.list.race.male.denom, function(f
   data$outcome= "proportion.msm"
   
   data<-data%>%
-  filter(!is.na(msm))%>%
-      mutate(msm.numeric = ifelse(msm == "msm", 1, NA))%>%
-      select(-msm)%>%
-      rename(msm = msm.numeric)
-  
-  data<- data %>%
+      mutate(msm = ifelse(risk == "msm", 1, 0))%>%
     group_by(location,msm, race) %>%
     mutate(msm_total = sum(msm*`_LLCPWT`))%>% 
     ungroup()
@@ -169,12 +159,7 @@ data.list.brfss.national.msm.age = lapply(data.list.age.male.denom, function(fil
   data$outcome= "proportion.msm"
   
   data<-data%>%
-      filter(!is.na(msm))%>%
-      mutate(msm.numeric = ifelse(msm == "msm", 1, NA))%>%
-      select(-msm)%>%
-      rename(msm = msm.numeric)
-  
-  data<- data %>%
+      mutate(msm = ifelse(risk == "msm", 1, 0))%>%
     group_by(location,msm,age) %>%
     mutate(msm_total = sum(msm*`_LLCPWT`))%>% 
     ungroup()
