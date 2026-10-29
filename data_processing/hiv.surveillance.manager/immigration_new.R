@@ -1,18 +1,19 @@
-#library(readxl)
-################################################################################
-##read in immigration/emigration##
-################################################################################
 
+#===============================================================================
+
+#This Code processes immigration and emigration data
+
+#===============================================================================
+
+#Read:
 DATA.DIR.MOVEMENT="Q:/data_raw/movement"
-
 movement_files <- Sys.glob(paste0(DATA.DIR.MOVEMENT, '/*.xlsx'))
-
 data.list.move <- lapply(movement_files, function(x){
   skip=1
   list(filename=file_path_sans_ext(basename(x), compression=FALSE), data=read_excel(x, sheet= 1, skip=skip))
 })
 
-################################################################################
+#Create Mappings:
 age.mappings.immigration = c('01' = '1-4 years',
                              '02' = '5-17 years',
                              '03' = '18-19 years',
@@ -34,15 +35,8 @@ race.mappings.immigration = c('02' = 'black')
 ethnicity.mappings.immigration = c( '01' = 'white, non-hispanic',
                                     '03' = 'hispanic or latino')
 
-################################################################################
-#Clean
-#BY SEX
-#outcome=immigration
-#outcome=emigration
-################################################################################
-
+#Clean:
 data.list.move.clean = lapply(data.list.move, function(file){
-  
   
   data=file[["data"]]
   filename = file[["filename"]]
@@ -66,7 +60,7 @@ data.list.move.clean = lapply(data.list.move, function(file){
     data$year = "2016-2020"
   }
   
-  ##TOTAL##
+  #Total:
   if(grepl("immigration_total", filename)) {
     data$location = data$`Current Residence Metro Code1`
     data$location = paste("C", data$location, sep=".")
@@ -91,8 +85,7 @@ data.list.move.clean = lapply(data.list.move, function(file){
     data<- data[!duplicated(data), ]
   }
   
-  
-  ###BY SEX##
+  #Sex:
   if(grepl("immigration_sex", filename)) {
     data$location = data$`Current Residence Metro Code1`
     data$location = paste("C", data$location, sep=".")
@@ -121,7 +114,7 @@ data.list.move.clean = lapply(data.list.move, function(file){
     data<- data[!duplicated(data), ]
   }
   
-  ##BY AGE##
+  #Age:
   if(grepl("immigration_age", filename)) {
     data$location = data$`Current Residence Metro Code1`
     data$location = paste("C", data$location, sep=".")
@@ -157,7 +150,7 @@ data.list.move.clean = lapply(data.list.move, function(file){
     data<- data[!duplicated(data), ]
   }
   
-  ##Race File, race=black##
+  #Race (race = black, additional race processing at end of code)
   if(grepl("immigration_race", filename)) {
     data$location = data$`Current Residence Metro Code1`
     data$location = paste("C", data$location, sep=".")
@@ -194,8 +187,7 @@ data.list.move.clean = lapply(data.list.move, function(file){
     
     data<- data[!duplicated(data), ]
   }
-  ##Ethnicity File; eth=white; hispanic##
-  
+  #Ethnicity (ethnicity = white, hispanic):
   if(grepl("immigration_eth", filename)) {
     data$location = data$`Current Residence Metro Code1`
     data$location = paste("C", data$location, sep=".")
@@ -230,12 +222,12 @@ data.list.move.clean = lapply(data.list.move, function(file){
     data<- data[!duplicated(data), ]
   }
   
-  #remove invalid locations?
+  #Remove any invalid locations:
   data$location_test = locations::get.location.code(data$location, "CBSA")
   data = subset(data, data$location_test != "FALSE")
   data = subset(data, !is.na(data$location_test))
   
-  #Removing any negative values- this was relevant for PR msas only#
+  #Remove any negative values (This came up for PR only):
   data = subset(data, data$value >0)
   
   data= as.data.frame(data)
@@ -247,26 +239,35 @@ data.list.move.clean = lapply(data.list.move, function(file){
   
 })
 
-###############################################################################
-#Calculate the 'other' race category
-#Pulling the individual variables from the other dfs to make one df
-#Note that 2011-2015 is the only stratified immigration data so this only applies to datasets from that year range
-###############################################################################
-#Pulled from cdc wonder
+#===============================================================================
+
+#Calculation of Other Race:
+
+#We manually estimate the 'other' race category for this data using
+#estimates pulled from CDC Wonder.  This is done because the immigration
+#data only has certain combinations of race/ethnicity available.  
+
+#This is only for 2011-2015 because this is the only year range with data
+#stratified by race/ethnicity.
+
+#This estimation is based on values pulled from CDC Wonder:
+
 #Proportion of Black who are Hispanic: 14,568,073 / 218,869,956 = 0.067
 #Proportion of Hispanic who are Black:  14,568,073 / 269,697,533 = 0.054
 
 #Final race categories will be: Black Non Hispanic, Hispanic, and Other.
-###############################################################################
+
+
+#===============================================================================
 
 prop.black.hisp <- 0.067
 prop.hisp.black <-0.054
 
-#SET UP FILES, assign file names
+#Set up files:
 movement.file.names = file_path_sans_ext(basename(movement_files), compression = FALSE)
 names(data.list.move.clean) = movement.file.names
 
-##IMMIGRATION##
+#Immigration:
 immigration_total <- data.list.move.clean[grep("immigration_total", names(data.list.move.clean))] 
 immigration_total <- as.data.frame(immigration_total$msa_immigration_total_11.15)
 
@@ -275,7 +276,6 @@ immigration_total <- immigration_total %>%
 
 imm_black <- data.list.move.clean[grep("immigration_race", names(data.list.move.clean))] 
 imm_black <- as.data.frame(imm_black$msa_immigration_race_11.15) 
-
 
 imm_black <- imm_black%>%
   rename(black = race)%>%
@@ -299,8 +299,7 @@ imm_combo <- imm_combo %>%
   mutate(black.nh = black.value-(sqrt(prop.black.hisp*prop.hisp.black*hispanic.value*black.value)))%>% 
   mutate(other.race = (total - (hispanic.value + black.nh)))
 
-##EMIGRATION
-
+#Emigration:
 emigration_total <- data.list.move.clean[grep("emigration_total", names(data.list.move.clean))] 
 emigration_total <- as.data.frame(emigration_total$msa_emigration_total_11.15)
 
@@ -330,9 +329,7 @@ em_combo <- em_combo %>%
   mutate(black.nh = black.value-(sqrt(prop.black.hisp*prop.hisp.black*hispanic.value*black.value)))%>% 
   mutate(other.race = total - (hispanic.value + black.nh))    #I didn't put white here but I did above
 
-######
-#Reformat for put
-
+#Reformat data prior to putting into the data manager:
 imm_combo_other <- imm_combo %>%
   rename(value = other.race)%>%
   select(location, outcome, year, value)%>%
@@ -346,7 +343,6 @@ em_combo_other <- em_combo %>%
   filter(value > 0)
 
 other_race <- list(imm_combo_other, em_combo_other)
-
 
 imm_combo_black_nh <- imm_combo %>%
   rename(value = black.nh)%>%
@@ -369,7 +365,7 @@ names(other_race) = other.race.file.names
 black.nh.race.file.names = c("black.nh.race.immigration", "black.nh.race.emigration") #This is giving names to the file you created above
 names(black_nh_race) = black.nh.race.file.names
 
-# Remove racial groups that are no longer needed, they will be replaced by the calculated categories --------------------------
+# Remove racial groups that are no longer needed, they will be replaced by the calculated categories:
 data.list.move.clean.one = lapply(data.list.move.clean, function(file){
   
   data=file[[2]]
@@ -392,7 +388,7 @@ data.list.move.clean.one = lapply(data.list.move.clean, function(file){
   
 })
 
-# 10-15-24: Updating Put to Distribute Other Race -------------------------
+#Put:
 
 movement_data = lapply(data.list.move.clean.one, `[[`, 2) 
 
