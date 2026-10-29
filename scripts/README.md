@@ -33,9 +33,11 @@ Rscript scripts/upload_sections.R /Volumes/jheem$          # macOS
 ```
 
 This uploads the 4 syphilis section files from `{nas}/data_managers/data.manager.merge/`
-to the `syphilis-sections-latest` release. The merge workflow will pick them up.
+as a dated, immutable release (`syphilis-sections-vYYYY.MM.DD`) with a `SHA256SUMS.txt`
+manifest, and points `syphilis-sections-latest` at it. The merge workflow will pick them up
+and record which dated release it used. Add `--dry-run` to check the files first.
 
-**Requires:** `gh` CLI installed and authenticated (`gh auth login`).
+**Requires:** `gh` CLI installed and authenticated (`gh auth login`); the `digest` R package.
 
 ### Triggering a Syphilis Build
 
@@ -49,16 +51,22 @@ gh workflow run "Build Syphilis Manager" \
   -f deps_release_tag=data-managers-v2026.03.10
 ```
 
-If the structure has changed intentionally (new outcomes, removed stratifications, etc.),
-set `update_spec=true` to regenerate the spec. The release notes will include a
-summary of what changed.
+Additive structure changes (new outcomes, years, or stratifications) regenerate the spec
+automatically. If the validation reports a regression (something removed or changed) and
+the change is intentional, re-run with `force_update_spec=true`. Either way, the updated
+spec is committed and the release notes include a summary of what changed. Only builds
+run from `master` publish a release or change the spec; a build from another branch is a
+check.
 
 ### Reading the Build Results
 
 Each successful build creates a release like `syphilis-manager-v2026.03.11`.
 The release notes contain:
 
-- **Build Info** — which inputs were used (sections, raw data, deps, jheem2 version)
+- **Build Info** — which inputs were used: the release each input was taken from and the
+  exact version it resolved to (the dated raw-data and dependency releases, the section
+  files' digest, the jheem2 and locations commits, the R version). Every input file's
+  SHA-256 is in the `input_identity.txt` asset.
 - **Spec Changes** (if spec was updated) — what structural changes occurred vs the previous spec
 - **Validation Report** — structural check results + data quality summary
 
@@ -280,7 +288,7 @@ Rscript scripts/upload_manager_deps.R /mnt/jheem_nas_share
 
 | Script | What it uploads | Release tag |
 |--------|----------------|-------------|
-| `upload_sections.R` | 4 section .rdata files | `syphilis-sections-latest` (mutable) |
+| `upload_sections.R` | 4 syphilis section .rdata files + `SHA256SUMS.txt` | `syphilis-sections-v{date}` (immutable) and `syphilis-sections-latest` (mutable) |
 | `upload_raw_data.R` | All of `data_raw/` (per-subdir archives) | `data-raw-v{date}` (immutable) |
 | `upload_hiv_sections.R` | 5 HIV section .rdata files + `SHA256SUMS.txt` | `hiv-sections-v{date}` (immutable) and `hiv-sections-latest` (mutable) |
 | `upload_census_sections.R` | 3 census section .rdata files + `SHA256SUMS.txt` | `census-sections-v{date}` (immutable) and `census-sections-latest` (mutable) |
