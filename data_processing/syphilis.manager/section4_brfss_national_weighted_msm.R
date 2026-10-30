@@ -64,6 +64,9 @@ data <- data %>%
   data$value = round(data$value, digits=2)
 
   data<- data[!duplicated(data), ]
+  
+  #Need to add sex column in for put statment dimensions
+  data$sex = "male"
 
   data= as.data.frame(data)
   list(filename, data)
@@ -101,6 +104,7 @@ data.list.age.male.denom = lapply(data.list.brfss.national.sex.for.msm, function
     mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
     ungroup()
   
+  
   data= as.data.frame(data)
   list(filename, data) 
 })
@@ -137,6 +141,8 @@ data.list.brfss.national.msm.race = lapply(data.list.race.male.denom, function(f
   
   data<- data[!duplicated(data), ]
  
+  #Need to add sex column in for put statment dimensions
+  data$sex = "male"
   
   data= as.data.frame(data)
   list(filename, data) 
@@ -173,6 +179,8 @@ data.list.brfss.national.msm.age = lapply(data.list.age.male.denom, function(fil
   
   data<- data[!duplicated(data), ]
  
+  #Need to add sex column in for put statment dimensions
+  data$sex = "male"
   
   data= as.data.frame(data)
   list(filename, data) 
