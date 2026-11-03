@@ -81,7 +81,7 @@ put.msa.data.as.new.source.NEW(outcome = 'adult.population',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census')
+                               ontology.for.relative.contribution = 'census.adults')
 
 put.msa.data.as.new.source.NEW(outcome = 'adult.population',
                                from.source.name = 'census.population',
@@ -94,7 +94,7 @@ put.msa.data.as.new.source.NEW(outcome = 'adult.population',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
 
 
 put.msa.data.as.new.source.NEW(outcome = 'diagnoses',
@@ -108,7 +108,7 @@ put.msa.data.as.new.source.NEW(outcome = 'diagnoses',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census')
+                               ontology.for.relative.contribution = 'census.adults')
 
 put.msa.data.as.new.source.NEW(outcome = 'diagnoses',
                                from.source.name = 'cdc.hiv',
@@ -121,7 +121,7 @@ put.msa.data.as.new.source.NEW(outcome = 'diagnoses',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
 
 put.msa.data.as.new.source.NEW(outcome = 'diagnosed.prevalence',
                                from.source.name = 'cdc.hiv',
@@ -134,7 +134,7 @@ put.msa.data.as.new.source.NEW(outcome = 'diagnosed.prevalence',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census')
+                               ontology.for.relative.contribution = 'census.adults')
 
 put.msa.data.as.new.source.NEW(outcome = 'diagnosed.prevalence',
                                from.source.name = 'cdc.hiv',
@@ -147,7 +147,7 @@ put.msa.data.as.new.source.NEW(outcome = 'diagnosed.prevalence',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
 
 put.msa.data.as.new.source.NEW(outcome = 'suppression',
                                from.source.name = 'cdc.hiv',
@@ -160,7 +160,7 @@ put.msa.data.as.new.source.NEW(outcome = 'suppression',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census',
+                               ontology.for.relative.contribution = 'census.adults',
                                source.for.denominator='cdc.hiv',
                                ontology.for.denominator='cdc')
 
@@ -175,7 +175,7 @@ put.msa.data.as.new.source.NEW(outcome = 'suppression',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age',
+                               ontology.for.relative.contribution = 'single.year.age.census',
                                source.for.denominator='cdc.hiv',
                                ontology.for.denominator='cdc')
 
@@ -190,7 +190,7 @@ put.msa.data.as.new.source.NEW(outcome = 'prep',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census')
+                               ontology.for.relative.contribution = 'census.adults')
 
 put.msa.data.as.new.source.NEW(outcome = 'prep',
                                from.source.name = 'aidsvu',
@@ -203,7 +203,7 @@ put.msa.data.as.new.source.NEW(outcome = 'prep',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
 
 put.msa.data.as.new.source.NEW(outcome = 'prep',
                                from.source.name = 'cdc.prep',
@@ -216,7 +216,7 @@ put.msa.data.as.new.source.NEW(outcome = 'prep',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census')
+                               ontology.for.relative.contribution = 'census.adults')
 
 put.msa.data.as.new.source.NEW(outcome = 'prep',
                                from.source.name = 'cdc.prep',
@@ -229,7 +229,7 @@ put.msa.data.as.new.source.NEW(outcome = 'prep',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
 
 put.msa.data.as.new.source.NEW(outcome = 'prep.indications',
                                from.source.name = 'cdc.prep.indications',
@@ -242,7 +242,7 @@ put.msa.data.as.new.source.NEW(outcome = 'prep.indications',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census')
+                               ontology.for.relative.contribution = 'census.adults')
 
 put.msa.data.as.new.source.NEW(outcome = 'prep.indications',
                                from.source.name = 'cdc.prep.indications',
@@ -255,7 +255,7 @@ put.msa.data.as.new.source.NEW(outcome = 'prep.indications',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
 
 put.msa.data.as.new.source.NEW(outcome = 'linkage_1mo',
                                from.source.name = 'cdc.hiv',
@@ -268,7 +268,7 @@ put.msa.data.as.new.source.NEW(outcome = 'linkage_1mo',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census')
+                               ontology.for.relative.contribution = 'census.adults')
 
 put.msa.data.as.new.source.NEW(outcome = 'linkage_1mo',
                                from.source.name = 'cdc.hiv',
@@ -281,7 +281,7 @@ put.msa.data.as.new.source.NEW(outcome = 'linkage_1mo',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
 
 put.msa.data.as.new.source.NEW(outcome = 'engagement',
                                from.source.name = 'cdc.hiv',
@@ -294,7 +294,7 @@ put.msa.data.as.new.source.NEW(outcome = 'engagement',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census')
+                               ontology.for.relative.contribution = 'census.adults')
 
 put.msa.data.as.new.source.NEW(outcome = 'engagement',
                                from.source.name = 'cdc.hiv',
@@ -307,7 +307,7 @@ put.msa.data.as.new.source.NEW(outcome = 'engagement',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
 
 put.msa.data.as.new.source.NEW(outcome = 'gonorrhea',
                                from.source.name = 'cdc.sti',
@@ -320,7 +320,7 @@ put.msa.data.as.new.source.NEW(outcome = 'gonorrhea',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census')
+                               ontology.for.relative.contribution = 'census.adults')
 
 put.msa.data.as.new.source.NEW(outcome = 'gonorrhea',
                                from.source.name = 'cdc.sti',
@@ -333,7 +333,7 @@ put.msa.data.as.new.source.NEW(outcome = 'gonorrhea',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
 
 put.msa.data.as.new.source.NEW(outcome = 'ps.syphilis',
                                from.source.name = 'cdc.sti',
@@ -346,7 +346,7 @@ put.msa.data.as.new.source.NEW(outcome = 'ps.syphilis',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census')
+                               ontology.for.relative.contribution = 'census.adults')
 
 put.msa.data.as.new.source.NEW(outcome = 'ps.syphilis',
                                from.source.name = 'cdc.sti',
@@ -359,7 +359,7 @@ put.msa.data.as.new.source.NEW(outcome = 'ps.syphilis',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
 
 put.msa.data.as.new.source.NEW(outcome = 'early.syphilis',
                                from.source.name = 'cdc.sti',
@@ -372,7 +372,7 @@ put.msa.data.as.new.source.NEW(outcome = 'early.syphilis',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census')
+                               ontology.for.relative.contribution = 'census.adults')
 
 put.msa.data.as.new.source.NEW(outcome = 'early.syphilis',
                                from.source.name = 'cdc.sti',
@@ -385,7 +385,7 @@ put.msa.data.as.new.source.NEW(outcome = 'early.syphilis',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age')
+                               ontology.for.relative.contribution = 'single.year.age.census')
 
 
 # Aggregate proportion.msm to MSA ---------------------------------------
@@ -400,9 +400,9 @@ put.msa.data.as.new.source.NEW(outcome = 'proportion.msm',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age',
+                               ontology.for.relative.contribution = 'census.adults',
                                source.for.denominator='census.population',
-                               ontology.for.denominator='census.grouped.age',
+                               ontology.for.denominator='census.adults',
                                details.for.new.data= "aggregated from 2013 Emory estimates")
 
 put.msa.data.as.new.source.NEW(outcome = 'proportion.msm',
@@ -415,7 +415,7 @@ put.msa.data.as.new.source.NEW(outcome = 'proportion.msm',
                                required.coverage=0.95,
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
-                               ontology.for.relative.contribution = 'census.grouped.age',
+                               ontology.for.relative.contribution = 'single.year.age.census',
                                source.for.denominator='census.population',
-                               ontology.for.denominator='census.grouped.age',
+                               ontology.for.denominator='single.year.age.census',
                                details.for.new.data = "aggregated from 2013 Emory estimates")

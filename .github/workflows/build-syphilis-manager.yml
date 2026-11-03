@@ -287,6 +287,15 @@ jobs:
             _ci_outputs/input_identity.txt
             _ci_outputs/session_info.txt
 
+      # A check from another branch publishes nothing, so keep its manager to compare.
+      - name: Upload candidate manager
+        if: success() && github.ref != 'refs/heads/master'
+        uses: actions/upload-artifact@v4
+        with:
+          name: syphilis-manager-candidate
+          path: _ci_outputs/syphilis.manager.rdata
+          retention-days: 14
+
       - name: Create versioned release
         # Runs from other branches are checks only and never publish.
         if: success() && github.ref == 'refs/heads/master'

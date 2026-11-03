@@ -10,8 +10,8 @@ if (!all(file.exists(args[1:2]))) stop("Baseline and candidate files must exist"
 
 library(jheem2)
 source("data_processing/validation/manager_spec_tools.R")
-source("data_processing/hiv.surveillance.manager/manager_value_delta.R")
-source("data_processing/hiv.surveillance.manager/manager_reproduction.R")
+source("data_processing/validation/manager_value_delta.R")
+source("data_processing/validation/manager_reproduction.R")
 
 baseline <- load.data.manager(file = args[[1]])
 candidate <- load.data.manager(file = args[[2]])

@@ -6,11 +6,15 @@ library(haven)
 
 Q_ROOT <- Sys.getenv("Q_ROOT", "Q:")
 
-###############################################################################
+#==============================================================================
 
-#####SECTION 4#####
 
-###############################################################################
+#SHIELD Syphilis Manager
+
+#Section 4
+
+#==============================================================================
+
 
 data.manager = create.data.manager('syphilis', description='syphilis data manager')
 
@@ -32,6 +36,15 @@ data.manager$register.outcome(
     axis.name = 'Proportion of MSM',
     units = '%',
     description = "Proportion of Men who have sex with Men"), denominator.outcome = 'population') 
+
+data.manager$register.outcome( #Represents 2020 Emory Estimates
+    'proportion.msm.last.year', 
+    metadata = create.outcome.metadata(
+        scale = 'proportion',
+        display.name = 'Proportion of MSM Last Year',
+        axis.name = 'Proportion of MSM Last Year',
+        units = '%',
+        description = "Proportion of Men who have sex with Men Last Year Estimate"), denominator.outcome = 'population') 
 
 data.manager$register.outcome(
   'proportion.tested.for.hiv.n',       
@@ -107,16 +120,16 @@ data.manager$register.ontology(
     sex=c('male', 'female') #needs to have male and female here to represent all possible outcomes
   ))
 
-data.manager$register.ontology(
-  'brfss',
-  ont = ontology(
-    year= NULL,
-    location= NULL,
-    age=c('18-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65+ years'),
-    race=c('white', 'black', 'american indian/alaska native', 'asian', 'native hawaiian/other pacific islander', 'other race', 'hispanic'),
-    sex=c('male','female'),
-    risk=c('msm', 'not_msm')
-  ))
+# data.manager$register.ontology(
+#   'brfss',
+#   ont = ontology(
+#     year= NULL,
+#     location= NULL,
+#     age=c('18-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65+ years'),
+#     race=c('black', 'other', 'hispanic'),
+#     sex=c('male','female'),
+#     risk=c('msm', 'not_msm')
+#   ))
 
 data.manager$register.ontology(
   'brfss.msm',
@@ -124,7 +137,7 @@ data.manager$register.ontology(
     year= NULL,
     location= NULL,
     age=c('18-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', '75-79 years', '80+ years'),
-    race=c('white', 'black', 'american indian/alaska native', 'asian', 'native hawaiian/other pacific islander', 'other race', 'hispanic'),
+    race=c('black', 'other', 'hispanic'),
     sex=c('male','female'),
     risk=c('msm', 'not_msm')
   ))
@@ -135,7 +148,7 @@ data.manager$register.ontology( #This ontology removes the risk category and reo
         year= NULL,
         location= NULL,
         age=c('18-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65+ years'),
-        race=c('white', 'black', 'american indian/alaska native', 'asian', 'native hawaiian/other pacific islander', 'other race', 'hispanic'),
+        race=c('black', 'other', 'hispanic'),
         sex=c('msm', 'male', 'female')
     ))
 
@@ -151,12 +164,14 @@ data.manager$register.ontology(
     ))
 
 #Codes:
-source('data_processing/syphilis.manager/cached.proportion.msm.R')
-source('data_processing/syphilis.manager/brfss_national_weighted_tested.R') #This is used for national level proportion.tested.for.hiv
-source('data_processing/syphilis.manager/proportion.tested.for.hiv_state_weighted.R') #This is used for state level proportion.tested.for.hiv
-source('data_processing/syphilis.manager/proportion.tested.for.hiv_msa_weighted.R') #This is used for msa level proportion.tested.for.hiv
-source('data_processing/syphilis.manager/brfss_national_weighted_msm.R') #This is used for national level proportion.msm
-source('data_processing/syphilis.manager/nhbs.testing.tables.R') #This is used for proportion.tested.for.hiv.high.risk (and syphilis)
+source('data_processing/syphilis.manager/section4_proportion.tested.for.hiv_state_weighted.R') #This is used for state level proportion.tested.for.hiv; creates dataframe for proportion.msm
+source('data_processing/syphilis.manager/section4_proportion.tested.for.hiv_msa_weighted.R') #This is used for msa level proportion.tested.for.hiv; creates dataframe for proportion.msm
+
+source('data_processing/syphilis.manager/section4_proportion.msm.brfss.emory.R')#Calculates proportion.msm from BRFSS and Emory
+source('data_processing/syphilis.manager/section4_brfss_national_weighted_tested.R') #This is used for national level proportion.tested.for.hiv
+
+source('data_processing/syphilis.manager/section4_brfss_national_weighted_msm.R') #This is used for national level proportion.msm
+source('data_processing/syphilis.manager/section4_nhbs.testing.tables.R') #This is used for proportion.tested.for.hiv.high.risk (and syphilis)
 
 #Save:
 save(data.manager, file=Sys.getenv("SECTION_OUTPUT", file.path(Q_ROOT, "data_managers/data.manager.merge/syphilis.manager_section4.rdata")))

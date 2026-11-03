@@ -1,22 +1,22 @@
-# library(jheem2)
-# library(tidyverse)
-# library(stringr)
-# library(haven)
 
-################################################################################
-###Read in NSDUH Data###
-################################################################################ 
+
+#===============================================================================
+
+#This code processes data from NSDUH for outcomes: 
+#heroin, cocaine, and depression
+
+#===============================================================================
+
+#Read:
 DATA.DIR.NSDUH="Q:/data_raw/nsduh"
 
 nsduh_files <- Sys.glob(paste0(DATA.DIR.NSDUH, '/*.csv'))
 
-#creating a list with sublists of filename, data#
 data.list.nsduh <- lapply(nsduh_files, function(x){
   list(filename=x, data=read.csv(x, header=TRUE))
 })
-################################################################################
-#Create template for NSDUH data
-################################################################################
+
+#clean - create a template:
 nsduh.clean= lapply(data.list.nsduh, function(file){
   
   data=file[["data"]]
@@ -66,9 +66,8 @@ nsduh.clean= lapply(data.list.nsduh, function(file){
   
   list(filename, data)
 })
-################################################################################
-###REGION### (total and age)
-################################################################################
+
+#Substate Region - (total and age):
 nsduh.region.total = lapply(nsduh.clean, function(file){
   
   data=file[[2]]

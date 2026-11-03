@@ -1,4 +1,4 @@
-source("data_processing/hiv.surveillance.manager/manager_value_delta.R")
+source("data_processing/validation/manager_value_delta.R")
 
 old.nsduh <- matrix(c(0.1, 0.2), nrow = 2,
                     dimnames = list(year = c("2020", "2021"),
