@@ -104,10 +104,10 @@ Run from the repository root:
 
 ```sh
 Rscript data_processing/hiv.surveillance.manager/test_merge_paths.R
-Rscript data_processing/hiv.surveillance.manager/test_manager_value_delta.R
-Rscript data_processing/hiv.surveillance.manager/test_manager_reproduction.R
+Rscript data_processing/validation/test_manager_value_delta.R
+Rscript data_processing/validation/test_manager_reproduction.R
 Rscript data_processing/hiv.surveillance.manager/test_summarize_candidate.R
-Rscript data_processing/hiv.surveillance.manager/validate_candidate.R baseline.rdata candidate.rdata report.json
+Rscript data_processing/validation/validate_candidate.R baseline.rdata candidate.rdata report.json
 Rscript data_processing/hiv.surveillance.manager/check_consumers.R candidate.rdata active-baseline.rdata syphilis.rdata consumers.json
 ```
 

@@ -1,4 +1,4 @@
-source("data_processing/hiv.surveillance.manager/manager_reproduction.R")
+source("data_processing/validation/manager_reproduction.R")
 baseline <- list(data = list(x = array(1:4, c(2, 2))), name = "manager",
                  description = "baseline", ontologies = list(cdc = "race"),
                  outcome.info = list(x = list(metadata = list(unit = "count"))),
