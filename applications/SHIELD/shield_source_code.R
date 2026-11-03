@@ -327,7 +327,7 @@ cat("PAIRING.INPUT.MANAGER created\n")
 
 ## Census age strata, as lower bounds (character), ascending
 CENSUS.AGES <- as.character(sort(
-  parse.age.strata.names(CENSUS.MANAGER$ontologies$census$age)$lower))
+  parse.age.strata.names(CENSUS.MANAGER$ontologies$single.year.age.census$age)$lower))
 cat("CENSUS.AGES set to ", paste(CENSUS.AGES, collapse = ", "), "\n", sep = "")
 
 ## --- Simulation timeline -----------------------------------------------------

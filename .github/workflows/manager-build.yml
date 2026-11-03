@@ -43,9 +43,13 @@ on:
 jobs:
   build:
     name: Build, compare, and publish
-    runs-on: ubuntu-latest
+    # The environment is pinned: this Ubuntu, R 4.4.2 (below), and CRAN packages as
+    # Posit Package Manager served them on CRAN_SNAPSHOT_DATE. Change any of them in a
+    # commit of its own, so a build's differences can be traced to it.
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
+      CRAN_SNAPSHOT_DATE: '2026-10-27'
       GH_TOKEN: ${{ github.token }}
       REPO: ${{ github.repository }}
       MANAGER_DIR: ${{ inputs.manager_dir }}
@@ -104,16 +108,27 @@ jobs:
           r-version: '4.4.2'
           use-public-rspm: true
 
+      - name: Restore R packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: r-packages-ubuntu-24.04-r4.4.2-cran${{ env.CRAN_SNAPSHOT_DATE }}-${{ hashFiles(format('data_processing/{0}/ci/config.sh', inputs.manager_dir)) }}
+
       - name: Install system and R dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev time
           Rscript -e '
+            options(repos = c(CRAN = paste0(
+              "https://packagemanager.posit.co/cran/__linux__/noble/", Sys.getenv("CRAN_SNAPSHOT_DATE"))))
             packages <- strsplit(Sys.getenv("R_PACKAGES"), " ")[[1]]
-            install.packages(c("remotes", packages))
-            remotes::install_local("_locations", upgrade = "never")
-            remotes::install_local("_distributions", upgrade = "never")
-            remotes::install_local("_jheem2", upgrade = "never")
+            # A restored cache holds these already, from the same snapshot.
+            missing <- setdiff(c("remotes", packages), rownames(installed.packages()))
+            if (length(missing)) install.packages(missing)
+            # The local checkouts are reinstalled every time.
+            remotes::install_local("_locations", upgrade = "never", force = TRUE)
+            remotes::install_local("_distributions", upgrade = "never", force = TRUE)
+            remotes::install_local("_jheem2", upgrade = "never", force = TRUE)
             needed <- c("jheem2", "locations", "distributions", packages)
             missing <- needed[!vapply(needed, requireNamespace, logical(1), quietly = TRUE)]
             if (length(missing)) stop("Missing packages: ", paste(missing, collapse = ", "))
@@ -169,6 +184,8 @@ jobs:
             echo "locations_commit=$(git -C _locations rev-parse HEAD)"
             echo "distributions_commit=$(git -C _distributions rev-parse HEAD)"
             echo "r_version=$(Rscript -e 'cat(R.version$major, R.version$minor, sep = ".")')"
+            echo "cran_snapshot=$CRAN_SNAPSHOT_DATE"
+            echo "runner_image=$ImageOS ${ImageVersion:-}"
             echo "sections_release=$SECTIONS_RELEASE"
             echo "sections_snapshot=$SECTIONS_SNAPSHOT"
             echo "sections_manifest_sha256=$(sha256sum _ci_inputs/sections/SHA256SUMS.txt | cut -d' ' -f1)"
@@ -306,7 +323,7 @@ jobs:
             echo "| **jheem2** | \`$(id jheem2_ref)\` | \`$(id jheem2_commit | cut -c1-8)\` |"
             echo "| **locations** | default branch | \`$(id locations_commit | cut -c1-8)\` |"
             echo "| **distributions** | default branch | \`$(id distributions_commit | cut -c1-8)\` |"
-            echo "| **R** | | $(id r_version) |"
+            echo "| **R** | | $(id r_version), CRAN packages as of $(id cran_snapshot) |"
             echo "| **jheem_analyses** | | \`${GITHUB_SHA:0:8}\` |"
             echo "| **Compared against** | \`$BASELINE_TAG\` | \`$(id baseline_release)\` |"
             echo
