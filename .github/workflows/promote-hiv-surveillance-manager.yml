@@ -1,11 +1,13 @@
 name: Promote HIV Surveillance Manager
+run-name: Promote HIV surveillance manager ${{ inputs.release_tag || '(newest build)' }}
 
 on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: 'Release tag to promote to latest (e.g. hiv-surveillance-manager-v2026.09.25)'
-        required: true
+        description: 'Release tag to promote to latest (leave blank for the newest hiv-surveillance-manager-v* build)'
+        required: false
+        default: ''
         type: string
       reviewed_removals:
         description: 'I have reviewed this build''s structural removals and they are intended (only needed when the release says "Needs review")'
@@ -21,13 +23,21 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      RELEASE_TAG: ${{ inputs.release_tag }}
+      REQUESTED_TAG: ${{ inputs.release_tag }}
       REVIEWED_REMOVALS: ${{ inputs.reviewed_removals }}
       LATEST_TAG: hiv-surveillance-manager-latest
     steps:
       - name: Validate release exists
         run: |
           set -euo pipefail
+          RELEASE_TAG="${REQUESTED_TAG//[[:space:]]/}"
+          # No tag given: the newest build, by the date in its tag. Baseline
+          # snapshots are promoted only by name.
+          if [[ -z "$RELEASE_TAG" ]]; then
+            RELEASE_TAG=$(gh api --paginate "repos/$GITHUB_REPOSITORY/releases" --jq '.[] | select(.draft | not) | .tag_name' \
+              | grep -E '^hiv-surveillance-manager-v[0-9][0-9.]*$' | sort -V | tail -n 1 || true)
+            echo "No tag given; the newest build is ${RELEASE_TAG:-missing}"
+          fi
           # Built managers, or a recorded baseline snapshot, can be promoted.
           if [[ ! "$RELEASE_TAG" =~ ^hiv-surveillance-(manager-v|baseline-)[0-9][0-9.]*$ ]]; then
             echo "ERROR: '$RELEASE_TAG' is not an hiv-surveillance-manager-v* or hiv-surveillance-baseline-* tag"
@@ -38,6 +48,7 @@ jobs:
             exit 1
           fi
           echo "Found release: $RELEASE_TAG"
+          echo "RELEASE_TAG=$RELEASE_TAG" >> "$GITHUB_ENV"
 
       - name: Download and verify release assets
         run: |
@@ -95,3 +106,4 @@ jobs:
             --latest=false \
             _assets/*
           echo "Promoted $RELEASE_TAG to latest"
+          echo "Promoted \`$RELEASE_TAG\` to \`$LATEST_TAG\`." >> "$GITHUB_STEP_SUMMARY"

@@ -100,7 +100,8 @@ gh workflow run "Promote Syphilis Manager" \
 ```
 
 This copies the manager to `syphilis-manager-latest`, which provides a
-stable download URL for the team.
+stable download URL for the team. Leave out `release_tag` (or leave the box blank) to
+promote the newest build; the run's title and summary name the release it promoted.
 
 ## HIV Surveillance Manager
 
@@ -163,7 +164,8 @@ so there's no need to run `hiv.surveillance.manager.merge.R` locally.
    sources `source_code.R`, their `SURVEILLANCE.MANAGER` updates automatically,
    the same way the syphilis manager does. For a **Needs review** build, tick the
    review box (or add `-f reviewed_removals=true`) once you've confirmed the
-   removals are intended.
+   removals are intended. Leave out `release_tag` to promote the newest build; the
+   run's title and summary name the release it promoted.
 
 5. **Refresh the shared copy.** Syphilis section builds and the syphilis merge read
    the HIV manager from `Q:/data_managers/`, and CI doesn't write there:
@@ -240,6 +242,8 @@ merge runs in CI, so there's no need to run `census.manager.merge.R` locally.
 
    This copies the build to `census-manager-latest`. For a **Needs review** build, tick the
    review box (or add `-f reviewed_changes=true`) once you've confirmed the changes are intended.
+   Leave out `release_tag` to promote the newest build; the run's title and summary name the
+   release it promoted.
 
 **What this changes for people using census, for now.** Nothing loads `census-manager-latest`
 automatically yet. SHIELD loads the dated census named in `applications/SHIELD/data_managers.csv`;
