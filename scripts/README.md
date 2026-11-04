@@ -246,8 +246,9 @@ merge runs in CI, so there's no need to run `census.manager.merge.R` locally.
    release it promoted.
 
 **What this changes for people using census, for now.** Nothing loads `census-manager-latest`
-automatically yet. SHIELD loads the dated census named in `applications/SHIELD/data_managers.csv`;
-other applications load census through the cached-metadata (OneDrive) path; and the syphilis and
+automatically yet. SHIELD loads the census its line in `applications/SHIELD/data_managers.csv`
+names: a dated release, or, when the line says `unpinned`, the census the cached-metadata (OneDrive)
+file points to. Other applications load census through the cached-metadata path, and the syphilis and
 HIV builds take census from the `data-managers-*` dependency bundle. So after promoting, update
 those as before (the cached-metadata file, and `upload_manager_deps.R` if the builds should use it).
 To use a new census in SHIELD, change its line in `data_managers.csv` to the new dated release.
