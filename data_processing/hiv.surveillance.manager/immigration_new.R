@@ -230,6 +230,11 @@ data.list.move.clean = lapply(data.list.move, function(file){
   #Remove any negative values (This came up for PR only):
   data = subset(data, data$value >0)
   
+  #Update: The Immigration data represents an average of the year range. 
+  #In November 2026, we decided to multiple the value by 5 to get make the
+  #data actually represent a year range.
+  data$value = data$value * 5
+  
   data= as.data.frame(data)
   
   data <- data %>%
@@ -399,6 +404,8 @@ movement_data[[length(movement_data)+1]]<-em_combo_other
 movement_data[[length(movement_data)+1]]<-imm_combo_black_nh #adding the black nh race to the movement data
 
 movement_data[[length(movement_data)+1]]<-em_combo_black_nh
+
+
 
 for (data in movement_data) {
   
