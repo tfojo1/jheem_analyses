@@ -243,6 +243,17 @@ register.initial.population(SHIELD.SPECIFICATION,
 ##---- Fix Strata Sizes----
 #Set Whether to Fix Strata Sizes During a Time Period # a simplifying assumption to avoid modeling population demographic dynamics before year X
 # 2007 earliest year for complete census data. we fix strata to 2010
+# group = one location x age x race x sex combination (this is what stays fixed)
+# compartments = the 14 boxes inside each group:
+#   uninfected (2): profile = susceptible, diagnosed.treated
+#   infected (12):  continuum (undiagnosed, diagnosed.untreated) x stage (primary, secondary, early.latent, late.latent, tertiary, cns)
+# How it works (1970 to 2010):
+# 1. the model runs all processes as usual (births, deaths, aging, migration, infection, diagnosis, treatment)
+# 2. for each group, it adds up the net change across its 14 compartments
+# 3. it removes that net change, split across the 14 compartments by their current size
+# 4. so each group's size stays at its 2010 census value, and the total population stays fixed too
+# 5. but compartment sizes inside each group can still change (e.g., more people move from susceptible to primary)
+# After 2010, group sizes can change too
 register.fixed.model.strata(SHIELD.SPECIFICATION,
                             applies.after.time = -Inf,
                             applies.before.time = DEFAULT.FIX.STRATA.YEAR,
