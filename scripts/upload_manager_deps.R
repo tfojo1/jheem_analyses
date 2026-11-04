@@ -2,11 +2,11 @@
 #
 # These are managers and build artifacts that section builds or merge
 # pipelines depend on, but that don't yet have their own CI pipelines.
-# As managers get their own pipelines, they graduate out of this release.
+# As managers get their own pipelines, they graduate out of this release; census
+# did on 2026-11-04 (builds take it from census-manager-* releases).
 #
 # Current contents:
 #   - surveillance.manager.rdata (used by sections 1, 4 and merge)
-#   - census.manager.rdata (used by section 3)
 #   - stratification_analysis_results_county_based.rdata (used by merge)
 #
 # Usage:
@@ -25,7 +25,6 @@ TAG_PREFIX <- "data-managers"
 # Files to include (paths relative to NAS root)
 DEP_FILES <- c(
     "data_managers/surveillance.manager.rdata",
-    "data_managers/census.manager.rdata",
     "data_managers/stratification_analysis_results_county_based.rdata"
 )
 

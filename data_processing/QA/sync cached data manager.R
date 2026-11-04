@@ -27,14 +27,8 @@ get.data.manager.cache.metadata()
 
 # CENSUS MANAGER ----------------------------------------------------------
 
-census.manager = load.data.manager(name="census.manager", file="Q:/data_managers/census.manager.rdata")
-
-#You have to change the link everytime
-sync.cached.data.manager("census.manager.rdata",
-                         "https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/tfojo1_jh_edu/EajriZ0H1v9Nrh6yTjt177ABl43ytsqv9mfgRVLX2aDPBA?e=rGjTWR",
-                         allow.flag = T)
-
-get.data.manager.cache.metadata()
+#Census is no longer synced to the OneDrive. Promoting a census build (Actions > Promote Census Manager)
+#publishes it, and load.data.manager.from.cache("census.manager.rdata") loads the promoted census.
 
 
 # SYPHILIS MANAGER --------------------------------------------------------

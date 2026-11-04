@@ -3,8 +3,10 @@
 The section-to-final merge is
 `hiv.surveillance.processing.for.merging/hiv.surveillance.manager.merge.R`.
 Its default paths preserve the existing interactive workflow: load five sections
-and the census manager from the usual `Q:`/`cached/` locations, then write the
-local cached result, shared current manager, and dated shared archive.
+from `Q:` and the census manager from `cached/` (the copy that
+`load.data.manager.from.cache("census.manager.rdata")` refreshes from the
+promoted census), then write the local cached result, shared current manager,
+and dated shared archive.
 
 An isolated candidate build sets `WRITE_SHARED_OUTPUT=false` and all five
 explicit paths below before sourcing the merge. The candidate mode refuses to
@@ -35,7 +37,7 @@ The **Build HIV Surveillance Manager** workflow
 (`.github/workflows/build-hiv-surveillance-manager.yml`) runs manually. Its inputs
 are the sections release (default `hiv-sections-latest`), the raw-data release
 (`data-raw-latest`; only the county-to-county movement workbooks are used), the
-dependencies release (`data-managers-latest`; the census manager), and the `jheem2`
+census release (`census-manager-latest`, the promoted census), and the `jheem2`
 ref (`dev`). `locations` comes from its default branch.
 
 Inputs can move; builds are traceable anyway. A `*-latest` sections release must

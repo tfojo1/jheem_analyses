@@ -17,10 +17,10 @@ on:
         required: true
         default: 'data-raw-latest'
         type: string
-      deps_release_tag:
-        description: 'Release tag for manager dependencies (census manager)'
+      census_release_tag:
+        description: 'Release tag for the census manager'
         required: true
-        default: 'data-managers-latest'
+        default: 'census-manager-latest'
         type: string
       jheem2_ref:
         description: 'jheem2 branch, tag, or commit to use'
@@ -45,4 +45,4 @@ jobs:
       baseline_release_tag: hiv-surveillance-manager-latest
       jheem2_ref: ${{ inputs.jheem2_ref || 'dev' }}
       raw_data_release_tag: ${{ inputs.raw_data_release_tag || 'data-raw-latest' }}
-      deps_release_tag: ${{ inputs.deps_release_tag || 'data-managers-latest' }}
+      census_release_tag: ${{ inputs.census_release_tag || 'census-manager-latest' }}

@@ -2,7 +2,7 @@
     "census.manager.rdata": {
         "source": "github-release",
         "repo": "tfojo1/jheem_analyses",
-        "latest_tag": "data-managers-latest",
+        "latest_tag": "census-manager-latest",
         "asset": "census.manager.rdata"
     },
     "syphilis.manager.rdata": {

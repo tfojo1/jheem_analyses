@@ -6,7 +6,7 @@ SHIELD.DATA.MANAGER.FILES <- c(census = "census.manager.rdata",
                                syphilis = "syphilis.manager.rdata")
 
 # list(census = <release or NULL>, syphilis = <release>), where NULL means
-# "unpinned": census then follows the shared cached-metadata file, as before.
+# "unpinned": census then loads the promoted census (census-manager-latest).
 shield.declared.data.managers <- function(path) {
     error.prefix <- paste0("Cannot read ", basename(path), ": ")
     if (!file.exists(path)) stop(error.prefix, "the file does not exist", call. = FALSE)
