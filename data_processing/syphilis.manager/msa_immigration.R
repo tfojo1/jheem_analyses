@@ -238,6 +238,11 @@ data.list.move.clean = lapply(data.list.move, function(file){
   #Removing any negative values- this was relevant for PR msas only#
   data = subset(data, data$value >0)
   
+  #Update: The Immigration data represents an average of the year range. 
+  #In November 2026, we decided to multiple the value by 5 to get make the
+  #data actually represent a year range.
+  data$value = data$value * 5
+  
   data= as.data.frame(data)
   
   data <- data %>%
