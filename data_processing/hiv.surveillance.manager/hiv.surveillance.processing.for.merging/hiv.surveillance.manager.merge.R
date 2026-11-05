@@ -70,7 +70,7 @@ source('data_processing/hiv.surveillance.manager/add.oakland.tga.migration.value
 #Update for 7-30-26: Oakland TGA adding HIV and population data-----------
 source('data_processing/hiv.surveillance.manager/add.oakland.tga.hiv.data.R')
 #Add STI ratios for Oakland-----------
-source('data_processing/hiv.surveillance.manager/add.oakland.sti.ratios.data.R')
+source('data_processing/hiv.surveillance.manager/oakland.tga.sti.ratios.R')
 
 
 ###Save surveillance manager####
