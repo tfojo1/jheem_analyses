@@ -24,51 +24,11 @@ oakland <- c('TGA.OAKLAND')
 # source('commoncode/locations_of_interest.R') #Source locations of interest to create MSA vectors
 
 
-###############################################################################
+#===============================================================================
 
-#Add Population Data First 
-#This will be the relative contribution outcome
-#which will allow aggregation of other outcomes
+#Add adult.population
 
-###############################################################################
-
-# ###ONCE YOU FIX THE POPULATION ISSUE YOU CAN TAKE THIS OUT AND AGGREGATE POPULATION FIRST
-# 
-# #2020-2023
-# alameda.20.23 <- enframe(surveillance.manager$data$adult.population$estimate$census.population$census$year__location[, "06001"], name = "year", value = "value")
-# contra.20.23 <- enframe(surveillance.manager$data$adult.population$estimate$census.population$census$year__location[, "06013"], name = "year", value = "value")
-# 
-# #2010-2019
-# alameda.10.19 <-enframe(surveillance.manager$data$adult.population$estimate$census.population$census.grouped.age$year__location[, "06001"], name = "year", value = "value")
-# contra.10.19 <- enframe(surveillance.manager$data$adult.population$estimate$census.population$census.grouped.age$year__location[, "06013"], name = "year", value = "value")
-# 
-# oakland.tga.population <- rbind(alameda.20.23, contra.20.23, alameda.10.19, contra.10.19)
-# 
-# oakland.tga.population <- oakland.tga.population %>%
-#     mutate(value = as.numeric(value))%>%
-#     group_by(year)%>%
-#     mutate(summed.population = sum(value))%>%
-#     select(-value)%>%
-#     rename(value = summed.population)%>%
-#     distinct()%>%
-#     mutate(outcome = "adult.population")%>%
-#     mutate(location = "TGA.OAKLAND")
-# 
-# oakland.tga.population <- as.data.frame(oakland.tga.population)
-# 
-# surveillance.manager$put.long.form(
-#     data = oakland.tga.population,
-#     ontology.name = 'census', 
-#     source = 'census.population',
-#     dimension.values = list(),
-#     url = 'www.census.gov',
-#     details = 'Census Reporting')
-
-###############################################################################
-
-#Add HIV Outcomes
-
-###############################################################################
+#===============================================================================
 
 put.msa.data.as.new.source.NEW(outcome = 'adult.population',
                                from.source.name = 'census.population',
@@ -95,6 +55,25 @@ put.msa.data.as.new.source.NEW(outcome = 'adult.population',
                                outcome.for.relative.contribution = 'adult.population',
                                source.for.relative.contribution = 'census.population',
                                ontology.for.relative.contribution = 'single.year.age.census')
+
+put.msa.data.as.new.source.NEW(outcome = 'deaths',
+                               from.source.name = 'census.deaths',
+                               to.source.name = 'census.deaths.aggregated',
+                               to.locations =  oakland, 
+                               geographic.type.from = 'COUNTY',
+                               geographic.type.to = 'TGA',
+                               details.for.new.data = 'estimated from county data',
+                               data.manager = surveillance.manager,
+                               required.coverage=0.95,
+                               outcome.for.relative.contribution = 'adult.population',
+                               source.for.relative.contribution = 'census.population',
+                               ontology.for.relative.contribution = 'census.adults')
+
+#===============================================================================
+
+#Add HIV Outcomes and STIs
+
+#===============================================================================
 
 
 put.msa.data.as.new.source.NEW(outcome = 'diagnoses',
@@ -387,9 +366,12 @@ put.msa.data.as.new.source.NEW(outcome = 'early.syphilis',
                                source.for.relative.contribution = 'census.population',
                                ontology.for.relative.contribution = 'single.year.age.census')
 
+#===============================================================================
 
-# Aggregate proportion.msm to MSA ---------------------------------------
-    
+# Aggregate proportion.msm to MSA 
+
+#===============================================================================
+
 put.msa.data.as.new.source.NEW(outcome = 'proportion.msm',
                                from.source.name = 'emory',
                                to.source.name = 'emory.aggregated',
@@ -419,3 +401,47 @@ put.msa.data.as.new.source.NEW(outcome = 'proportion.msm',
                                source.for.denominator='census.population',
                                ontology.for.denominator='single.year.age.census',
                                details.for.new.data = "aggregated from 2013 Emory estimates")
+#===============================================================================
+
+# Add NSDUH data for Oakland substate regions 
+
+#===============================================================================
+
+oakland.counties <- c('06001', '06013')
+
+oakland.nsduh = locations::get.containing.locations(oakland.counties, 'NSDUH') # NSDUH substate regions
+
+
+oakland.cocaine.aggregated = surveillance.manager$pull(outcome = "cocaine",
+                                                       metric = "estimate",
+                                                       dimension.values=list(location=oakland.nsduh),
+                                                       keep.dimensions='year')
+
+oakland.heroin.aggregated = surveillance.manager$pull(outcome = "heroin",
+                                                      metric = "estimate",
+                                                      dimension.values=list(location=oakland.nsduh),
+                                                      keep.dimensions='year')
+
+
+oakland.cocaine = as.data.frame.table(oakland.cocaine.aggregated)%>%
+    mutate(year = as.character(year))%>%
+    mutate(value = as.numeric(Freq))%>%
+    mutate(outcome = "cocaine")%>%
+    mutate(location = 'TGA.OAKLAND')
+
+oakland.heroin = as.data.frame.table(oakland.heroin.aggregated)%>%
+    mutate(year = as.character(year))%>%
+    mutate(value = as.numeric(Freq))%>%
+    mutate(outcome = "heroin")%>%
+    mutate(location = 'TGA.OAKLAND')
+
+aggregated.nsduh.data.oakland <- rbind(oakland.heroin, oakland.cocaine)
+
+surveillance.manager$put.long.form(
+    data = aggregated.nsduh.data.oakland,
+    ontology.name = 'nsduh',
+    source = 'nsduh',
+    dimension.values = list(),
+    url = 'https://pdas.samhsa.gov/saes/substate',
+    details = 'NSDUH Substate Estimates, aggregated from substate to MSA')
+

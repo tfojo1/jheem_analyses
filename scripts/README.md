@@ -19,7 +19,8 @@ same NAS folder (`data_managers/data.manager.merge/`) but take only their own fi
 | Promote workflow | Promote Syphilis Manager | Promote HIV Surveillance Manager | Promote Census Manager |
 | Steps | [Syphilis manager](#syphilis-manager) | [HIV surveillance manager](#hiv-surveillance-manager) | [Census manager](#census-manager) |
 
-Build Census Manager runs the shared **Manager Build** (`.github/workflows/manager-build.yml`).
+Build Census Manager and Build HIV Surveillance Manager run the shared **Manager Build**
+(`.github/workflows/manager-build.yml`).
 What differs by manager is in `data_processing/<manager>/ci/`: `config.sh` (names, section
 files, packages), `inputs.sh` (inputs beyond the sections and the baseline), `merge.sh`, and
 `consumers.sh`. Each release it publishes records its exact inputs in `input_identity.txt`
@@ -39,9 +40,11 @@ Rscript scripts/upload_sections.R /Volumes/jheem$          # macOS
 ```
 
 This uploads the 4 syphilis section files from `{nas}/data_managers/data.manager.merge/`
-to the `syphilis-sections-latest` release. The merge workflow will pick them up.
+as a dated, immutable release (`syphilis-sections-vYYYY.MM.DD`) with a `SHA256SUMS.txt`
+manifest, and points `syphilis-sections-latest` at it. The merge workflow will pick them up
+and record which dated release it used. Add `--dry-run` to check the files first.
 
-**Requires:** `gh` CLI installed and authenticated (`gh auth login`).
+**Requires:** `gh` CLI installed and authenticated (`gh auth login`); the `digest` and `jsonlite` R packages.
 
 ### Triggering a Syphilis Build
 
@@ -55,16 +58,22 @@ gh workflow run "Build Syphilis Manager" \
   -f deps_release_tag=data-managers-v2026.03.10
 ```
 
-If the structure has changed intentionally (new outcomes, removed stratifications, etc.),
-set `update_spec=true` to regenerate the spec. The release notes will include a
-summary of what changed.
+Additive structure changes (new outcomes, years, or stratifications) regenerate the spec
+automatically. If the validation reports a regression (something removed or changed) and
+the change is intentional, re-run with `force_update_spec=true`. Either way, the updated
+spec is committed and the release notes include a summary of what changed. Only builds
+run from `master` publish a release or change the spec; a build from another branch is a
+check.
 
 ### Reading the Build Results
 
 Each successful build creates a release like `syphilis-manager-v2026.03.11`.
 The release notes contain:
 
-- **Build Info** — which inputs were used (sections, raw data, deps, jheem2 version)
+- **Build Info** — which inputs were used: the release each input was taken from and the
+  exact version it resolved to (the dated raw-data and dependency releases, the section
+  files' digest, the jheem2 and locations commits, the R version). Every input file's
+  SHA-256 is in the `input_identity.txt` asset.
 - **Spec Changes** (if spec was updated) — what structural changes occurred vs the previous spec
 - **Validation Report** — structural check results + data quality summary
 
@@ -91,7 +100,8 @@ gh workflow run "Promote Syphilis Manager" \
 ```
 
 This copies the manager to `syphilis-manager-latest`, which provides a
-stable download URL for the team.
+stable download URL for the team. Leave out `release_tag` (or leave the box blank) to
+promote the newest build; the run's title and summary name the release it promoted.
 
 ## HIV Surveillance Manager
 
@@ -154,7 +164,8 @@ so there's no need to run `hiv.surveillance.manager.merge.R` locally.
    sources `source_code.R`, their `SURVEILLANCE.MANAGER` updates automatically,
    the same way the syphilis manager does. For a **Needs review** build, tick the
    review box (or add `-f reviewed_removals=true`) once you've confirmed the
-   removals are intended.
+   removals are intended. Leave out `release_tag` to promote the newest build; the
+   run's title and summary name the release it promoted.
 
 5. **Refresh the shared copy.** Syphilis section builds and the syphilis merge read
    the HIV manager from `Q:/data_managers/`, and CI doesn't write there:
@@ -231,10 +242,13 @@ merge runs in CI, so there's no need to run `census.manager.merge.R` locally.
 
    This copies the build to `census-manager-latest`. For a **Needs review** build, tick the
    review box (or add `-f reviewed_changes=true`) once you've confirmed the changes are intended.
+   Leave out `release_tag` to promote the newest build; the run's title and summary name the
+   release it promoted.
 
 **What this changes for people using census, for now.** Nothing loads `census-manager-latest`
-automatically yet. SHIELD loads the dated census named in `applications/SHIELD/data_managers.csv`;
-other applications load census through the cached-metadata (OneDrive) path; and the syphilis and
+automatically yet. SHIELD loads the census its line in `applications/SHIELD/data_managers.csv`
+names: a dated release, or, when the line says `unpinned`, the census the cached-metadata (OneDrive)
+file points to. Other applications load census through the cached-metadata path, and the syphilis and
 HIV builds take census from the `data-managers-*` dependency bundle. So after promoting, update
 those as before (the cached-metadata file, and `upload_manager_deps.R` if the builds should use it).
 To use a new census in SHIELD, change its line in `data_managers.csv` to the new dated release.
@@ -286,11 +300,18 @@ Rscript scripts/upload_manager_deps.R /mnt/jheem_nas_share
 
 | Script | What it uploads | Release tag |
 |--------|----------------|-------------|
-| `upload_sections.R` | 4 section .rdata files | `syphilis-sections-latest` (mutable) |
+| `upload_sections.R` | 4 syphilis section .rdata files + `SHA256SUMS.txt`, `provenance.json` | `syphilis-sections-v{date}` (immutable) and `syphilis-sections-latest` (mutable) |
 | `upload_raw_data.R` | All of `data_raw/` (per-subdir archives) | `data-raw-v{date}` (immutable) |
-| `upload_hiv_sections.R` | 5 HIV section .rdata files + `SHA256SUMS.txt` | `hiv-sections-v{date}` (immutable) and `hiv-sections-latest` (mutable) |
-| `upload_census_sections.R` | 3 census section .rdata files + `SHA256SUMS.txt` | `census-sections-v{date}` (immutable) and `census-sections-latest` (mutable) |
+| `upload_hiv_sections.R` | 5 HIV section .rdata files + `SHA256SUMS.txt`, `provenance.json` | `hiv-sections-v{date}` (immutable) and `hiv-sections-latest` (mutable) |
+| `upload_census_sections.R` | 3 census section .rdata files + `SHA256SUMS.txt`, `provenance.json` | `census-sections-v{date}` (immutable) and `census-sections-latest` (mutable) |
 | `upload_manager_deps.R` | surveillance + census managers + strat results | `data-managers-v{date}` (immutable) |
 | `snapshot_onedrive_managers.R` | each OneDrive manager version (run by its workflow) | `{file}-onedrive-v{date}` (immutable) |
 
 The upload scripts take the NAS root as their first argument. All of these scripts require the `gh` CLI.
+
+Each section upload also attaches `provenance.json`, recording where the upload ran from:
+the commit and branch of the jheem_analyses checkout, its uncommitted changes under
+`data_processing/` and `commoncode/`, and the R, jheem2, locations, and distributions
+versions installed. Run the upload from the checkout that built the sections. The record
+describes the upload; a section built earlier, with other code, shows that only in its
+modified time. Nothing is enforced.

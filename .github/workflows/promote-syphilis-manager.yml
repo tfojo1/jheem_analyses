@@ -1,66 +1,96 @@
 name: Promote Syphilis Manager
+run-name: Promote syphilis manager ${{ inputs.release_tag || '(newest build)' }}
 
 on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: 'Release tag to promote to latest (e.g. syphilis-manager-v2026.02.24)'
-        required: true
+        description: 'Release tag to promote to latest (leave blank for the newest syphilis-manager-v* build)'
+        required: false
+        default: ''
         type: string
+
+permissions:
+  contents: write
 
 jobs:
   promote:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REQUESTED_TAG: ${{ inputs.release_tag }}
+      LATEST_TAG: syphilis-manager-latest
     steps:
       - name: Validate release exists
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if ! gh release view "${{ inputs.release_tag }}" --repo "$GITHUB_REPOSITORY" &>/dev/null; then
-            echo "ERROR: Release '${{ inputs.release_tag }}' not found"
+          set -euo pipefail
+          RELEASE_TAG="${REQUESTED_TAG//[[:space:]]/}"
+          # No tag given: the newest build, by the date in its tag.
+          if [[ -z "$RELEASE_TAG" ]]; then
+            RELEASE_TAG=$(gh api --paginate "repos/$GITHUB_REPOSITORY/releases" --jq '.[] | select(.draft | not) | .tag_name' \
+              | grep -E '^syphilis-manager-v[0-9][0-9.]*$' | sort -V | tail -n 1 || true)
+            echo "No tag given; the newest build is ${RELEASE_TAG:-missing}"
+          fi
+          if [[ ! "$RELEASE_TAG" =~ ^syphilis-manager-v[0-9][0-9.]*$ ]]; then
+            echo "ERROR: '$RELEASE_TAG' is not a syphilis-manager-v* tag"
             exit 1
           fi
-          echo "Found release: ${{ inputs.release_tag }}"
+          if ! gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" &>/dev/null; then
+            echo "ERROR: Release '$RELEASE_TAG' not found"
+            exit 1
+          fi
+          echo "Found release: $RELEASE_TAG"
+          echo "RELEASE_TAG=$RELEASE_TAG" >> "$GITHUB_ENV"
 
-      - name: Download release assets
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download and verify release assets
         run: |
+          set -euo pipefail
           mkdir -p _assets
-          gh release download "${{ inputs.release_tag }}" \
-            --repo "$GITHUB_REPOSITORY" \
-            --dir _assets
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir _assets
+          # Every asset must match the SHA-256 digest GitHub publishes for it.
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" \
+            --jq '.assets[] | "\(.digest | sub("^sha256:"; ""))  _assets/\(.name)"' > _published.txt
+          if [[ ! -s _published.txt ]] || grep -qv '^[0-9a-f]\{64\}  ' _published.txt; then
+            echo "ERROR: $RELEASE_TAG has an asset without a published SHA-256 digest"
+            exit 1
+          fi
+          sha256sum -c _published.txt
+          [[ -f _assets/syphilis.manager.rdata ]]
           echo "Downloaded assets:"
           ls -lh _assets/
 
       - name: Update latest release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          LATEST_TAG="syphilis-manager-latest"
-          # Delete existing latest release if it exists
+          set -euo pipefail
           gh release delete "$LATEST_TAG" --repo "$GITHUB_REPOSITORY" --cleanup-tag --yes 2>/dev/null || true
 
-          # Get the source release notes to extract build info
-          SOURCE_NOTES=$(gh release view "${{ inputs.release_tag }}" --repo "$GITHUB_REPOSITORY" --json body -q .body)
+          SOURCE_NOTES=$(gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json body -q .body)
+          MANAGER_SHA=$(sha256sum _assets/syphilis.manager.rdata | cut -d' ' -f1)
 
-          NOTES="## Latest Syphilis Manager
+          # Builds and loaders read the "Promoted from" line as the version.
+          {
+            echo "## Latest Syphilis Manager"
+            echo
+            echo "**Promoted from:** \`$RELEASE_TAG\`"
+            echo "**Promoted at:** $(date -u +%Y-%m-%d\ %H:%M\ UTC)"
+            echo "**SHA-256:** \`$MANAGER_SHA\`"
+            echo
+            echo "**Stable download URL:**"
+            echo '```'
+            echo "https://github.com/${GITHUB_REPOSITORY}/releases/download/$LATEST_TAG/syphilis.manager.rdata"
+            echo '```'
+            echo
+            echo "---"
+            echo
+            echo "$SOURCE_NOTES"
+          } > _notes.md
 
-          **Promoted from:** \`${{ inputs.release_tag }}\`
-          **Promoted at:** $(date -u +%Y-%m-%d\ %H:%M\ UTC)
-
-          **Stable download URL:**
-          \`\`\`
-          https://github.com/${GITHUB_REPOSITORY}/releases/download/syphilis-manager-latest/syphilis.manager.rdata
-          \`\`\`
-
-          ---
-
-          $SOURCE_NOTES"
-
+          # Not the repository's "Latest" release: that badge would point at one manager.
           gh release create "$LATEST_TAG" \
             --repo "$GITHUB_REPOSITORY" \
             --title "Syphilis Manager (Latest)" \
-            --notes "$NOTES" \
+            --notes-file _notes.md \
+            --latest=false \
             _assets/*
-          echo "Promoted ${{ inputs.release_tag }} to latest"
+          echo "Promoted $RELEASE_TAG to latest"
+          echo "Promoted \`$RELEASE_TAG\` to \`$LATEST_TAG\`." >> "$GITHUB_STEP_SUMMARY"

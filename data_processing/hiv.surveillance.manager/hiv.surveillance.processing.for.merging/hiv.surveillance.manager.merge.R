@@ -69,6 +69,9 @@ source('data_processing/outliers/outlier.remover.two.way.strata.R')
 source('data_processing/hiv.surveillance.manager/add.oakland.tga.migration.values.R')
 #Update for 7-30-26: Oakland TGA adding HIV and population data-----------
 source('data_processing/hiv.surveillance.manager/add.oakland.tga.hiv.data.R')
+#Add STI ratios for Oakland-----------
+source('data_processing/hiv.surveillance.manager/add.oakland.sti.ratios.data.R')
+
 
 ###Save surveillance manager####
 save(surveillance.manager, file=file.path(CACHED_DIR, "surveillance.manager.rdata"))

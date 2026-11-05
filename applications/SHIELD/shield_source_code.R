@@ -327,7 +327,11 @@ cat("PAIRING.INPUT.MANAGER created\n")
 
 ## Census age strata, as lower bounds (character), ascending
 CENSUS.AGES <- as.character(sort(
-  parse.age.strata.names(CENSUS.MANAGER$ontologies$single.year.age.census$age)$lower))
+  if(!is.null(CENSUS.MANAGER$ontologies$single.year.age.census))
+    parse.age.strata.names(CENSUS.MANAGER$ontologies$single.year.age.census$age)$lower #new census manager
+  else
+    parse.age.strata.names(CENSUS.MANAGER$ontologies$census$age)$lower #old census manager 10.8 and prior
+  ))
 cat("CENSUS.AGES set to ", paste(CENSUS.AGES, collapse = ", "), "\n", sep = "")
 
 ## --- Simulation timeline -----------------------------------------------------
@@ -338,12 +342,20 @@ DEFAULT.START.YEAR            <- 1970   # simulation start
 DEFAULT.FIX.STRATA.YEAR       <- 2010   # full population breakdown available post-2010
 # (also used for proportion-MSM estimation)
 DEFAULT.POPULATION.YEARS      <- 2010   # initial population + sexual contact O/E by race
-DEFAULT.AGING.START.YEAR      <- 2005
-DEFAULT.MIGRATION.START.YEAR  <- 2005
+DEFAULT.AGING.START.YEAR      <- 2005   # aging rates before 2005 stay at the 2005 value
+DEFAULT.MIGRATION.START.YEAR  <- 2005   # migration rates before 2005 stay at the 2005 value
+# Mortality (general, not syphilis-related):
+# 1. deaths run for all years, from the 1970 start
+# 2. the death rate is static: one rate per age x race x sex, the same in every year (no time trend)
+# 3. the rate = deaths / population, pooled over the years below
+# 4. MSA models: rates come from state-level data, weighted by how much of the MSA's population is in each state
+# 5. national (US) model: uses all years available in the data, not only the years below
+# 6. calibration can scale the rate by race and by sex (see shield_calib_parameters.R)
+# 7. before DEFAULT.FIX.STRATA.YEAR, deaths are cancelled out by the fixed-strata step, so they don't change group sizes
 DEFAULT.MORTALITY.RATE.YEARS  <- c("2001-2010", "2011-2020")
 
 ## --- Fertility ---------------------------------------------------------------
-DEFAULT.FERTILITY.START.YEARS <- 2005
+DEFAULT.FERTILITY.START.YEARS <- 2005   # fertility rates before 2005 stay at the 2005 value
 DEFAULT.FERTILITY.RATE.YEARS  <- 2007:2023
 FERTILE.AGES     <- c("15-19 years", "20-24 years", "25-29 years",
                       "30-34 years", "35-39 years", "40-44 years")
