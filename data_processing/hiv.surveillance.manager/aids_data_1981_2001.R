@@ -74,39 +74,31 @@ aids.data.clean = lapply(data.list.aids, function(file){
   
   if(grepl("deceased", filename)) {
     data= subset(data, data$Location != "San Juan, PR")
-    
-    #Decided 2/2/24: There are old locations that do not map to a current MSA.  Because this is older data I"m going to manually add those in so we have more AIDS data.
-    data$Location <- gsub("Bergen-Passaic, NJ", "New York, NY",
-                             gsub("Greenvile, SC", "Greenville, SC",
-                              gsub("Middlesex, NJ", "New York, NY",
-                              gsub("Orange County, CA", "Los Angeles, CA",
-                              gsub("West Palm Beach, FL", "Miami, FL",
-                              gsub("Middlesex, NJ", "New York, NY",
-                              gsub("Nassau-Suffolk, NY", "New York, NY",
-                              gsub("Monmouth-Ocean City, NJ", "New York, NY",
-                              gsub("Gary, IN", "Chicago, IL", data$Location)))))))))
-
-    data$location = locations::get.cbsa.for.msa.name(data$Location)
     data$outcome= "aids.diagnoses.deceased.by.2001"
   }
   
   if(grepl("all", filename)) {
-    data= subset(data, data$Location != "San Juan, PR")
-    
-    #Decided 2/2/24: There are old locations that do not map to a current MSA.  Because this is older data I"m going to manually add those in so we have more AIDS data.
-    data$Location <- gsub("Bergen-Passaic, NJ", "New York, NY",
-                          gsub("Greenvile, SC", "Greenville, SC",
-                          gsub("Middlesex, NJ", "New York, NY",
-                          gsub("Orange County, CA", "Los Angeles, CA",
-                          gsub("West Palm Beach, FL", "Miami, FL",
-                          gsub("Middlesex, NJ", "New York, NY",
-                          gsub("Nassau-Suffolk, NY", "New York, NY",
-                          gsub("Monmouth-Ocean City, NJ", "New York, NY",
-                         gsub("Gary, IN", "Chicago, IL", data$Location)))))))))
-    
-    data$location = locations::get.cbsa.for.msa.name(data$Location)
     data$outcome= "aids.diagnoses"
-    
+  }
+  
+  if(grepl("_oakland", filename)) {
+      data$location = "TGA.OAKLAND"
+  }
+  
+  if(grepl("_msa", filename)) {
+      data= subset(data, data$Location != "San Juan, PR")
+      #Decided 2/2/24: There are old locations that do not map to a current MSA.  Because this is older data I"m going to manually add those in so we have more AIDS data.
+      data$Location <- gsub("Bergen-Passaic, NJ", "New York, NY",
+                            gsub("Greenvile, SC", "Greenville, SC",
+                                 gsub("Middlesex, NJ", "New York, NY",
+                                      gsub("Orange County, CA", "Los Angeles, CA",
+                                           gsub("West Palm Beach, FL", "Miami, FL",
+                                                gsub("Middlesex, NJ", "New York, NY",
+                                                     gsub("Nassau-Suffolk, NY", "New York, NY",
+                                                          gsub("Monmouth-Ocean City, NJ", "New York, NY",
+                                                               gsub("Gary, IN", "Chicago, IL", data$Location)))))))))
+      
+      data$location = locations::get.cbsa.for.msa.name(data$Location)
   }
 
   ##Demographic conditionals##
@@ -224,20 +216,26 @@ aids.deaths.clean = lapply(data.list.aids.deaths, function(file){
   data$Cases[data$Cases %in% c("Data not available")] = NA  
   data$value = as.numeric(gsub(",", '', data$Cases)) 
   
-  data= subset(data, data$Location != "San Juan, PR")
-    
-    #Decided 2/2/24: There are old locations that do not map to a current MSA.  Because this is older data I"m going to manually add those in so we have more AIDS data.
-    data$Location <- gsub("Bergen-Passaic, NJ", "New York, NY",
-                      gsub("Greenvile, SC", "Greenville, SC",
-                      gsub("Middlesex, NJ", "New York, NY",
-                      gsub("Orange County, CA", "Los Angeles, CA",
-                      gsub("West Palm Beach, FL", "Miami, FL", 
-                      gsub("Middlesex, NJ", "New York, NY",
-                      gsub("Nassau-Suffolk, NY", "New York, NY",
-                      gsub("Monmouth-Ocean City, NJ", "New York, NY",
-                      gsub("Gary, IN", "Chicago, IL", data$Location)))))))))
-    
-    data$location = locations::get.cbsa.for.msa.name(data$Location)
+
+  if(grepl("_oakland", filename)) {
+      data$location = "TGA.OAKLAND"
+  }
+  
+  if(grepl("_msa", filename)) {
+      data= subset(data, data$Location != "San Juan, PR")
+      #Decided 2/2/24: There are old locations that do not map to a current MSA.  Because this is older data I"m going to manually add those in so we have more AIDS data.
+      data$Location <- gsub("Bergen-Passaic, NJ", "New York, NY",
+                            gsub("Greenvile, SC", "Greenville, SC",
+                                 gsub("Middlesex, NJ", "New York, NY",
+                                      gsub("Orange County, CA", "Los Angeles, CA",
+                                           gsub("West Palm Beach, FL", "Miami, FL",
+                                                gsub("Middlesex, NJ", "New York, NY",
+                                                     gsub("Nassau-Suffolk, NY", "New York, NY",
+                                                          gsub("Monmouth-Ocean City, NJ", "New York, NY",
+                                                               gsub("Gary, IN", "Chicago, IL", data$Location)))))))))
+      
+      data$location = locations::get.cbsa.for.msa.name(data$Location)
+  }
   
   ##Demographic conditionals##
   
