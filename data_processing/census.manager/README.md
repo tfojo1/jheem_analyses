@@ -17,7 +17,9 @@ in `census.processing.for.merging/`:
 Its default paths keep the interactive workflow: load the sections from
 `Q:/data_managers/data.manager.merge/`, then write `../../cached/census.manager.rdata`,
 the shared `Q:/data_managers/census.manager.rdata`, and a dated copy in
-`Q:/data_managers/Archive/`.
+`Q:/data_managers/Archive/`. Those copies are for local checks only: since 2026-11-04
+census loads and builds take the promoted census (`census-manager-latest`), so a
+census reaches its users only by being built and promoted in CI.
 
 A CI build sets `WRITE_SHARED_OUTPUT=false` with explicit paths, so it reads the given
 sections and writes only the candidate:

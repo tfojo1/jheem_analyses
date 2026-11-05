@@ -18,9 +18,10 @@ Sys.setenv(SHIELD_RECORDED_RUN = "true",
 source("commoncode/cache_manager.R")
 
 census.source <- get.github.release.source("census.manager.rdata")
-stopifnot(identical(census.source$asset, "census.manager.rdata"))
+stopifnot(identical(census.source$asset, "census.manager.rdata"),
+          identical(census.source$latest_tag, "census-manager-latest"))
 Sys.setenv(SHIELD_RECORDED_RUN = "false")
-stopifnot(is.null(get.github.release.source("census.manager.rdata")))
+stopifnot(identical(get.github.release.source("census.manager.rdata"), census.source))
 Sys.setenv(SHIELD_RECORDED_RUN = "true")
 
 resolution <- list(

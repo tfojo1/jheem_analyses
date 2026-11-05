@@ -330,7 +330,7 @@ jobs:
           |---|---|---|
           | **Sections** | \`${{ inputs.sections_release_tag }}\` | $SECTIONS_VERSION, files \`$(id sections_files_sha256 | cut -c1-12)\` |
           | **Raw Data** | \`${{ inputs.raw_data_release_tag }}\` | \`$(id raw_data_exact)\` |
-          | **Dependencies** | \`${{ inputs.deps_release_tag }}\` | \`$(id deps_exact)\`, census \`$(digest _ci_inputs/deps/census.manager.rdata)\` |
+          | **Dependencies** | \`${{ inputs.deps_release_tag }}\` | \`$(id deps_exact)\`, surveillance \`$(digest _ci_inputs/deps/surveillance.manager.rdata)\` |
           | **jheem2** | \`${{ inputs.jheem2_ref }}\` | \`$(id jheem2_commit | cut -c1-8)\` |
           | **locations** | default branch | \`$(id locations_commit | cut -c1-8)\` |
           | **R** | release | $(id r_version) |

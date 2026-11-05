@@ -34,8 +34,8 @@ on:
         required: false
         default: ''
         type: string
-      deps_release_tag:
-        description: 'For managers whose inputs.sh uses the dependency bundle'
+      census_release_tag:
+        description: 'For managers whose inputs.sh uses the census manager'
         required: false
         default: ''
         type: string
@@ -57,7 +57,7 @@ jobs:
       BASELINE_TAG: ${{ inputs.baseline_release_tag }}
       JHEEM2_REF: ${{ inputs.jheem2_ref }}
       RAW_RELEASE: ${{ inputs.raw_data_release_tag }}
-      DEPS_RELEASE: ${{ inputs.deps_release_tag }}
+      CENSUS_RELEASE: ${{ inputs.census_release_tag }}
 
     steps:
       - name: Checkout analyses

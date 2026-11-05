@@ -206,7 +206,7 @@ jobs:
           gh release download "$MANAGER_TAG" \
             --dir "cached/data-managers/syphilis.manager.rdata/$MANAGER_TAG" \
             --pattern "syphilis.manager.rdata"
-          gh release download "data-managers-latest" \
+          gh release download "census-manager-latest" \
             --dir cached \
             --pattern "census.manager.rdata"
           gh release download "data-managers-latest" \

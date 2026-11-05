@@ -112,7 +112,7 @@ put.msa.data.as.new.source.NEW(outcome = 'adult.population',
                                ontology.for.relative.contribution = 'single.year.age.census')
 
 #Deaths county --> MSA
-census.manager = load.data.manager(name="census.manager", file=Sys.getenv("CENSUS_MANAGER_SHARED_FILE", "Q:/data_managers/census.manager.rdata"))
+census.manager = load.data.manager(name="census.manager", file=Sys.getenv("CENSUS_MANAGER_SHARED_FILE", "../../cached/census.manager.rdata"))
 
 census.deaths.by.county <- as.data.frame.table(census.manager$data$deaths$estimate$census.deaths$census$year__location)%>%
     mutate(outcome = 'deaths',

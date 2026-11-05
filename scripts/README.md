@@ -128,8 +128,8 @@ so there's no need to run `hiv.surveillance.manager.merge.R` locally.
    ```
 
    The inputs work like the syphilis build: sections (default `hiv-sections-latest`),
-   raw data (`data-raw-latest`), dependencies (`data-managers-latest`, for the census
-   manager), and the jheem2 ref (`dev`). Change any of them to build from a specific
+   raw data (`data-raw-latest`), the census (`census-manager-latest`, the promoted
+   census), and the jheem2 ref (`dev`). Change any of them to build from a specific
    release or branch. Whatever you choose, the release notes record the exact
    version and SHA-256 of every input.
 
@@ -245,19 +245,19 @@ merge runs in CI, so there's no need to run `census.manager.merge.R` locally.
    Leave out `release_tag` to promote the newest build; the run's title and summary name the
    release it promoted.
 
-**What this changes for people using census, for now.** Nothing loads `census-manager-latest`
-automatically yet. SHIELD loads the census its line in `applications/SHIELD/data_managers.csv`
-names: a dated release, or, when the line says `unpinned`, the census the cached-metadata (OneDrive)
-file points to. Other applications load census through the cached-metadata path, and the syphilis and
-HIV builds take census from the `data-managers-*` dependency bundle. So after promoting, update
-those as before (the cached-metadata file, and `upload_manager_deps.R` if the builds should use it).
-To use a new census in SHIELD, change its line in `data_managers.csv` to the new dated release.
+**Promoting publishes the census.** Every census load that names no release gets the promoted
+census, `census-manager-latest`, verified against its SHA-256: ordinary sessions through
+`load.data.manager.from.cache("census.manager.rdata")`, and SHIELD when its line in
+`applications/SHIELD/data_managers.csv` says `unpinned`. The HIV build takes census from a census
+release too (default `census-manager-latest`). There is no OneDrive copy, cached-metadata entry, or
+dependency-bundle copy to update. SHIELD's line can instead name a dated release; to move SHIELD to a
+new census then, change the line to the new dated release.
 
 More detail on the census build: `data_processing/census.manager/README.md`.
 
 ## Copies of OneDrive Managers
 
-Managers published through the OneDrive cache (census, Ryan White, Medicaid) are replaced
+Managers published through the OneDrive cache (Ryan White, Medicaid) are replaced
 in place by each update. The **Snapshot OneDrive Managers** workflow keeps a copy of each
 version: whenever `commoncode/data_manager_cache_metadata.Rdata` changes on master, it
 downloads each manager the metadata names, checks it is the version the metadata describes,
@@ -265,7 +265,8 @@ and publishes it as an immutable release named after the file and its last-modif
 e.g. `census-manager-onedrive-v2026.10.26`. Versions already kept are skipped. Nothing
 changes in how managers are published or loaded.
 
-To load a kept census version:
+Census was published this way until 2026-11-04; it is now published by promotion
+([above](#census-manager)). Its kept OneDrive versions still load by tag:
 
 ```r
 CENSUS.MANAGER <- load.data.manager.from.cache(
@@ -290,7 +291,7 @@ workflow's default `raw_data_release_tag` to use the new version.
 
 ## Uploading Manager Dependencies
 
-When surveillance.manager or census.manager are rebuilt:
+When surveillance.manager is rebuilt:
 
 ```bash
 Rscript scripts/upload_manager_deps.R /mnt/jheem_nas_share
@@ -304,7 +305,7 @@ Rscript scripts/upload_manager_deps.R /mnt/jheem_nas_share
 | `upload_raw_data.R` | All of `data_raw/` (per-subdir archives) | `data-raw-v{date}` (immutable) |
 | `upload_hiv_sections.R` | 5 HIV section .rdata files + `SHA256SUMS.txt`, `provenance.json` | `hiv-sections-v{date}` (immutable) and `hiv-sections-latest` (mutable) |
 | `upload_census_sections.R` | 3 census section .rdata files + `SHA256SUMS.txt`, `provenance.json` | `census-sections-v{date}` (immutable) and `census-sections-latest` (mutable) |
-| `upload_manager_deps.R` | surveillance + census managers + strat results | `data-managers-v{date}` (immutable) |
+| `upload_manager_deps.R` | surveillance manager + strat results | `data-managers-v{date}` (immutable) |
 | `snapshot_onedrive_managers.R` | each OneDrive manager version (run by its workflow) | `{file}-onedrive-v{date}` (immutable) |
 
 The upload scripts take the NAS root as their first argument. All of these scripts require the `gh` CLI.

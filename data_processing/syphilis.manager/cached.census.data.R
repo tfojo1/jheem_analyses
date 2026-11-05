@@ -1,7 +1,9 @@
 #Note: This is data being pulled from the Census Manager (not exclusively data from the Census)
 
 #Load the census manager to get population data that is clean and processed
-census.manager = load.data.manager(name="census.manager", file=file.path(Q_ROOT, "data_managers/census.manager.rdata"))
+#This is the promoted census (census-manager-latest); add release.tag = "census-manager-v..." to use another
+if (!exists("load.data.manager.from.cache")) source('commoncode/cache_manager.R')
+census.manager = load.data.manager.from.cache("census.manager.rdata")
 
 
 # THESE ARE ONTOLOGY = single.year.age.census ----------------------------------------

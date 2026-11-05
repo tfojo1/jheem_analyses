@@ -150,24 +150,24 @@ test.environment$get.github.release.source <- original.get.source
 test.environment$load.data.manager.from.github <- original.load.latest
 test.environment$load.data.manager.from.github.release <- original.load.release
 
-## Census keeps its OneDrive path unless a release is named; a named release
-## comes from GitHub Releases, in ordinary sessions too.
+## Census follows its promoted release, census-manager-latest, and never the
+## OneDrive path; a named release loads that release.
 local({
-    saved.recorded <- Sys.getenv("SHIELD_RECORDED_RUN", unset = NA_character_)
     original.load.onedrive <- test.environment$load.data.manager.from.onedrive.cache
     on.exit({
-        if (is.na(saved.recorded)) Sys.unsetenv("SHIELD_RECORDED_RUN")
-        else Sys.setenv(SHIELD_RECORDED_RUN = saved.recorded)
         test.environment$load.data.manager.from.github <- original.load.latest
         test.environment$load.data.manager.from.github.release <- original.load.release
         test.environment$load.data.manager.from.onedrive.cache <- original.load.onedrive
     }, add = TRUE)
-    Sys.setenv(SHIELD_RECORDED_RUN = "false")
-    stopifnot(is.null(test.environment$get.github.release.source("census.manager.rdata")),
-              identical(test.environment$get.github.release.source(
-                  "census.manager.rdata", explicit.release = TRUE)$asset, "census.manager.rdata"))
-    test.environment$load.data.manager.from.github <- function(...) list(route = "latest")
-    test.environment$load.data.manager.from.onedrive.cache <- function(...) list(route = "onedrive")
+    census.source <- test.environment$get.github.release.source("census.manager.rdata")
+    stopifnot(identical(census.source$latest_tag, "census-manager-latest"),
+              identical(census.source$asset, "census.manager.rdata"))
+    test.environment$load.data.manager.from.github <- function(file, gh.source, ...) {
+        list(route = "latest", latest.tag = gh.source$latest_tag)
+    }
+    test.environment$load.data.manager.from.onedrive.cache <- function(...) {
+        stop("census must not load from OneDrive")
+    }
     test.environment$load.data.manager.from.github.release <- function(file, gh.source, release.tag, ...) {
         list(route = "release", release.tag = release.tag, repo = gh.source$repo)
     }
@@ -176,7 +176,7 @@ local({
     unpinned <- test.environment$load.data.manager.from.cache("census.manager.rdata", FALSE, TRUE)
     stopifnot(identical(pinned, list(route = "release", release.tag = "census-manager-v2026.10.08",
                                      repo = "tfojo1/jheem_analyses")),
-              identical(unpinned$route, "onedrive"))
+              identical(unpinned, list(route = "latest", latest.tag = "census-manager-latest")))
 })
 
 ## Resolve an immutable tag and a mutable alias using deterministic fixtures.
