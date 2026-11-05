@@ -18,10 +18,16 @@
 #   - Intra-area moves are excluded automatically by the filter (no subtraction).
 #
 # SCOPE: total population only (the county-to-county files carry no age/sex/race).
+# Given a census manager, adult (13+) immigration and emigration are estimated
+# from the totals with the census age distribution of the area's counties.
 #
 # OUTPUT: area.migration.long.form() returns a long-form data frame
-# (outcome, year, location, value) suitable for the `census.immigration`
-# ontology / `census.population` source in the HIV surveillance manager.
+# (outcome, year, location, value). Values are 5-year window totals: the flow
+# files give annual movers averaged over the 5-year ACS window, so, like the MSA
+# data in immigration_new.R (since November 2026), they are multiplied by 5.
+# immigration/emigration suit the `census.immigration` ontology and
+# adult.immigration/adult.emigration the `census.immigration.adults` ontology,
+# both under the `census.population` source in the HIV surveillance manager.
 #
 # REQUIRES: readxl; the `locations` package (>= 0.4.0) for area -> county lookup.
 # =============================================================================
@@ -111,6 +117,42 @@ DATA.DIR.COUNTY.TO.COUNTY <- Sys.getenv(
   }))
 }
 
+# The flow files give annual movers averaged over a 5-year ACS window; the
+# manager holds window totals.
+.WINDOW.YEARS <- 5
+
+# Share of the area's population aged 1+ that is aged 13+, by year, from census
+# single-year ages. The flow files cover movers aged 1+ and carry no ages, so
+# adult movers are estimated with this share. Same method as the Oakland
+# in-session patch (applications/EHE/calibration_runs/oakland_add_missing_data.R).
+.adult.share.by.year <- function(area.counties, census.manager, years = 2005:2020) {
+  pop <- census.manager$pull(outcome = "population",
+                             dimension.values = list(location = area.counties,
+                                                     year = as.character(years)),
+                             keep.dimensions = c("year", "age"),
+                             from.ontology.names = "single.year.age.census")
+  if (is.null(pop) || !all(c("year", "age") %in% names(dimnames(pop))))
+    stop("No single-year-age census population for counties ",
+         paste(area.counties, collapse = ", "))
+  extra.dims <- setdiff(names(dimnames(pop)), c("year", "age"))
+  if (length(extra.dims)) {   # e.g. a source dimension: take the first along each
+    first.only <- setNames(as.list(rep(1, length(extra.dims))), extra.dims)
+    pop <- apply(array.access(pop, first.only, drop = FALSE), c("year", "age"), sum)
+  }
+  lower <- parse.age.strata.names(dimnames(pop)$age)$lower
+  share <- rowSums(pop[, lower >= 13, drop = FALSE], na.rm = TRUE) /
+           rowSums(pop[, lower >= 1, drop = FALSE], na.rm = TRUE)
+  share[is.finite(share) & share > 0]
+}
+
+# The adult share for a window ("2011-2015"): the mean over the window's years
+# that have census data, or over all years if none do.
+.adult.share.for.window <- function(share.by.year, year.label) {
+  bounds <- as.numeric(strsplit(year.label, "-")[[1]])
+  years <- intersect(as.character(bounds[1]:bounds[2]), names(share.by.year))
+  if (length(years)) mean(share.by.year[years]) else mean(share.by.year)
+}
+
 # --- core ------------------------------------------------------------------
 
 # Compute immigration/emigration for an explicit set of county FIPS.
@@ -158,11 +200,14 @@ compute.area.migration <- function(area.counties,
 }
 
 # Take an area location CODE (e.g. a TGA), resolve its member counties via the
-# locations package, and return the manager-ready long-form data frame.
+# locations package, and return the manager-ready long-form data frame: 5-year
+# immigration and emigration totals, and, given a census manager, their adult
+# (13+) estimates.
 area.migration.long.form <- function(area.code,
                                      window,
                                      year.label,
                                      data.dir = DATA.DIR.COUNTY.TO.COUNTY,
+                                     census.manager = NULL,
                                      verbose = TRUE) {
   area.counties <- unname(locations::get.contained.locations(area.code, "COUNTY"))
   if (!length(area.counties) || all(is.na(area.counties)))
@@ -170,12 +215,25 @@ area.migration.long.form <- function(area.code,
          "'. Is it registered in the `locations` package?")
 
   res <- compute.area.migration(area.counties, window, data.dir, verbose)
+  totals <- c(immigration = res$immigration, emigration = res$emigration) * .WINDOW.YEARS
 
-  data.frame(
-    outcome  = c("immigration", "emigration"),
+  long.form <- data.frame(
+    outcome  = names(totals),
     year     = year.label,
     location = area.code,
-    value    = c(res$immigration, res$emigration),
+    value    = unname(totals),
     stringsAsFactors = FALSE
   )
+  if (!is.null(census.manager)) {
+    share <- .adult.share.for.window(.adult.share.by.year(area.counties, census.manager),
+                                     year.label)
+    long.form <- rbind(long.form, data.frame(
+      outcome  = paste0("adult.", names(totals)),
+      year     = year.label,
+      location = area.code,
+      value    = round(unname(totals) * share),
+      stringsAsFactors = FALSE
+    ))
+  }
+  long.form
 }

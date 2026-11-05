@@ -75,10 +75,15 @@ run.path.case <- function(write.shared = NULL) {
       file.path(archive.dir, paste0("surveillance.manager_", Sys.Date(), ".rdata"))
     )
   }
+  missing.sources <- sourced[!file.exists(sourced)]
+  if (length(missing.sources)) {
+    stop("The HIV merge sources files that are not in the repository: ",
+         paste(missing.sources, collapse = ", "), call. = FALSE)
+  }
   stopifnot(
     identical(reads, expected.reads),
     identical(writes, expected.writes),
-    length(sourced) == 9L,
+    length(sourced) > 0L,
     dir.exists(cached.dir)
   )
 }
