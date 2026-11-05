@@ -379,23 +379,43 @@ calculate.error.terms.pop = function(stratification,
     
     # anything other than age alone, sex alone, and age-sex
     
-    if(stratification=="age-ethnicity"){
-        data1 = CENSUS.MANAGER$data$population$estimate$census.population$census$year__location__age__ethnicity["2019",,,]
-        data2 = CENSUS.MANAGER$data$population$estimate$census.population$census$year__location__age__ethnicity["2020",,,]  
-    } else if(stratification=="ethnicity"){
-        data1 = CENSUS.MANAGER$data$population$estimate$census.population$census$year__location__ethnicity["2019",,]
-        data2 = CENSUS.MANAGER$data$population$estimate$census.population$census$year__location__ethnicity["2020",,]
-    } else if(stratification=="age-race"){
-        data1 = CENSUS.MANAGER$data$population$estimate$census.population$census$year__location__age__race["2019",,,]
-        data2 = CENSUS.MANAGER$data$population$estimate$census.population$census$year__location__age__race["2020",,,]
-    } else if(stratification=="race"){
-        data1 = CENSUS.MANAGER$data$population$estimate$census.population$census$year__location__race["2019",,]
-        data2 = CENSUS.MANAGER$data$population$estimate$census.population$census$year__location__race["2020",,]
-    } else if(stratification=="all"){
-        data1 = CENSUS.MANAGER$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2019",,,,,]
-        data2 = CENSUS.MANAGER$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2020",,,,,]
-    } else
-        stop("right now only set up for age-ethnicity, ethnicity, age-race, race, or all")
+    if(!is.null(CENSUS.MANAGER$ontologies$single.year.age.census)) {
+        if(stratification=="age-ethnicity"){
+            data1 = CENSUS.MANAGER$data$population$estimate$census.population$census$year__location__age__ethnicity["2019",,,]
+            data2 = CENSUS.MANAGER$data$population$estimate$census.population$census$year__location__age__ethnicity["2020",,,]  
+        } else if(stratification=="ethnicity"){
+            data1 = CENSUS.MANAGER$data$population$estimate$census.population$census$year__location__ethnicity["2019",,]
+            data2 = CENSUS.MANAGER$data$population$estimate$census.population$census$year__location__ethnicity["2020",,]
+        } else if(stratification=="age-race"){
+            data1 = CENSUS.MANAGER$data$population$estimate$census.population$census$year__location__age__race["2019",,,]
+            data2 = CENSUS.MANAGER$data$population$estimate$census.population$census$year__location__age__race["2020",,,]
+        } else if(stratification=="race"){
+            data1 = CENSUS.MANAGER$data$population$estimate$census.population$census$year__location__race["2019",,]
+            data2 = CENSUS.MANAGER$data$population$estimate$census.population$census$year__location__race["2020",,]
+        } else if(stratification=="all"){
+            data1 = CENSUS.MANAGER$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2019",,,,,]
+            data2 = CENSUS.MANAGER$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2020",,,,,]
+        } else
+            stop("right now only set up for age-ethnicity, ethnicity, age-race, race, or all")
+    } else {
+        if(stratification=="age-ethnicity"){
+            data1 = CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__age__ethnicity["2019",,,]
+            data2 = CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__age__ethnicity["2020",,,]  
+        } else if(stratification=="ethnicity"){
+            data1 = CENSUS.MANAGER$data$population$estimate$census.population$stratified.censusyear__location__ethnicity["2019",,]
+            data2 = CENSUS.MANAGER$data$population$estimate$census.population$stratified.censusyear__location__ethnicity["2020",,]
+        } else if(stratification=="age-race"){
+            data1 = CENSUS.MANAGER$data$population$estimate$census.population$stratified.censusyear__location__age__race["2019",,,]
+            data2 = CENSUS.MANAGER$data$population$estimate$census.population$stratified.censusyear__location__age__race["2020",,,]
+        } else if(stratification=="race"){
+            data1 = CENSUS.MANAGER$data$population$estimate$census.population$stratified.censusyear__location__race["2019",,]
+            data2 = CENSUS.MANAGER$data$population$estimate$census.population$stratified.censusyear__location__race["2020",,]
+        } else if(stratification=="all"){
+            data1 = CENSUS.MANAGER$data$population$estimate$census.population$stratified.censusyear__location__age__race__ethnicity__sex["2019",,,,,]
+            data2 = CENSUS.MANAGER$data$population$estimate$census.population$stratified.censusyear__location__age__race__ethnicity__sex["2020",,,,,]
+        } else
+            stop("right now only set up for age-ethnicity, ethnicity, age-race, race, or all")
+    }
     
     all.values1 = data1
     all.values2 = data2

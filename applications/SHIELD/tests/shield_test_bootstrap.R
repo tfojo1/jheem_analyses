@@ -308,9 +308,16 @@ shield.test.stage("has.shield.helpers", {
            envir = globalenv())
 
     ## Global constants (section 8 of shield_source_code.R)
-    assign("CENSUS.AGES", as.character(sort(
-        parse.age.strata.names(CENSUS.MANAGER$ontologies$single.year.age.census$age)$lower)),
-        envir = globalenv())
+    if(!is.null(CENSUS.MANAGER$ontologies$single.year.age.census)) {
+        assign("CENSUS.AGES", as.character(sort(
+            parse.age.strata.names(CENSUS.MANAGER$ontologies$single.year.age.census$age)$lower)),
+            envir = globalenv())
+    } else {
+        assign("CENSUS.AGES", as.character(sort(
+            parse.age.strata.names(CENSUS.MANAGER$ontologies$census$age)$lower)),
+            envir = globalenv())
+    }
+    
 
     assign("DEFAULT.START.YEAR",            1970, envir = globalenv())
     assign("DEFAULT.FIX.STRATA.YEAR",       2010, envir = globalenv())
