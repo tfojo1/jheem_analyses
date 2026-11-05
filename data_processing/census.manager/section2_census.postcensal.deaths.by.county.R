@@ -52,7 +52,10 @@ census.deaths.clean = lapply(census.deaths, function(file){
     
     data = subset(data, data$location != "51515") #Removing county we took out of locations package (invalid location)
     
+    data = subset(data, data$year != "2000") #Removing 2000 deaths because it doesn't represent a full year of data
     data = subset(data, data$year != "2010") #Removing 2010 deaths because it doesn't represent a full year of data
+    data = subset(data, data$year != "2020") #Removing 2020 deaths because it doesn't represent a full year of data
+    
     
     data= as.data.frame(data)
     
