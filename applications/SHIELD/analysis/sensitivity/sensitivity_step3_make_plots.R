@@ -5,123 +5,22 @@ library(tidyverse)
 library(abind)
 
 # SETTINGS ----
-CALIB.CODE = "calib.10.20.stage3"
+CALIB.CODE = "calib.10.20.stage4"
 locations <- setNames(SHIELD.TEN.MSAS, SHIELD.TEN.MSAS)
 
 BASE.PATH <- paste0(ROOT.DIR,"/shield/outputs/", CALIB.CODE, "/")
 
 # what fraction of all the simsets will count as "top __" or bottom __" set, each?
 TOP_BOTTOM_FRAC <- 0.2
-N_SIM = 800
-N_PARAMS = 5
+N_SIM = 1000
+MIN_N_PARAMS = 5
+P.VALUE.THRESHOLD = 0.05
 
-ALL_PARAM_TITLES <- c(
-    "age14.black.aging.rate.multiplier.1"                     = "Age-Out Rate Multiplier\nBlack Age 14, 2010",
-    "age14.black.aging.rate.multiplier.2"                     = "Age-Out Rate Multiplier\nBlack Age 14, 2020",
-    "age14.hispanic.aging.rate.multiplier.1"                  = "Age-Out Rate Multiplier\nHispanic Age 14, 2010",
-    "age14.hispanic.aging.rate.multiplier.2"                  = "Age-Out Rate Multiplier\nHispanic Age 14, 2020",
-    "age15.19.fertility.rate.multiplier"                      = "Fertility Rate Multiplier\nAges 15-19",
-    "age19.black.aging.rate.multiplier.1"                     = "Age-Out Rate Multiplier\nBlack Age 19, 2010",
-    "age19.black.aging.rate.multiplier.2"                     = "Age-Out Rate Multiplier\nBlack Age 19, 2020",
-    "age19.hispanic.aging.rate.multiplier.2"                  = "Age-Out Rate Multiplier\nHispanic Age 19, 2020",
-    "age19.other.aging.rate.multiplier.1"                     = "Age-Out Rate Multiplier\nOther Race Age 19, 2010",
-    "age20.24.fertility.rate.multiplier"                      = "Fertility Rate Multiplier\nAges 20-24",
-    "age24.black.aging.rate.multiplier.1"                     = "Age-Out Rate Multiplier\nBlack Age 24, 2010",
-    "age24.black.aging.rate.multiplier.2"                     = "Age-Out Rate Multiplier\nBlack Age 24, 2020",
-    "age24.other.aging.rate.multiplier.1"                     = "Age-Out Rate Multiplier\nOther Race Age 24, 2010",
-    "age29.hispanic.aging.rate.multiplier.1"                  = "Age-Out Rate Multiplier\nHispanic Age 29, 2010",
-    "age34.hispanic.aging.rate.multiplier.2"                  = "Age-Out Rate Multiplier\nHispanic Age 34, 2020",
-    "age34.other.aging.rate.multiplier.1"                     = "Age-Out Rate Multiplier\nOther Race Age 34, 2010",
-    "age35.39.fertility.rate.multiplier"                      = "Fertility Rate Multiplier\nAges 35-39",
-    "age39.black.aging.rate.multiplier.1"                     = "Age-Out Rate Multiplier\nBlack Age 39, 2010",
-    "age39.hispanic.aging.rate.multiplier.1"                  = "Age-Out Rate Multiplier\nHispanic Age 39, 2010",
-    "age44.black.aging.rate.multiplier.1"                     = "Age-Out Rate Multiplier\nBlack Age 44, 2010",
-    "age44.black.aging.rate.multiplier.2"                     = "Age-Out Rate Multiplier\nBlack Age 44, 2020",
-    "age44.other.aging.rate.multiplier.1"                     = "Age-Out Rate Multiplier\nOther Race Age 44, 2010",
-    "age44.other.aging.rate.multiplier.2"                     = "Age-Out Rate Multiplier\nOther Race Age 44, 2020",
-    "age49.black.aging.rate.multiplier.2"                     = "Age-Out Rate Multiplier\nBlack Age 49, 2020",
-    "age49.hispanic.aging.rate.multiplier.2"                  = "Age-Out Rate Multiplier\nHispanic Age 49, 2020",
-    "age49.other.aging.rate.multiplier.2"                     = "Age-Out Rate Multiplier\nOther Race Age 49, 2020",
-    "age54.black.aging.rate.multiplier.1"                     = "Age-Out Rate Multiplier\nBlack Age 54, 2010",
-    "age54.hispanic.aging.rate.multiplier.1"                  = "Age-Out Rate Multiplier\nHispanic Age 54, 2010",
-    "age54.hispanic.aging.rate.multiplier.2"                  = "Age-Out Rate Multiplier\nHispanic Age 54, 2020",
-    "age54.other.aging.rate.multiplier.1"                     = "Age-Out Rate Multiplier\nOther Race Age 54, 2010",
-    "age64.black.aging.rate.multiplier.1"                     = "Age-Out Rate Multiplier\nBlack Age 64, 2010",
-    "age64.hispanic.aging.rate.multiplier.1"                  = "Age-Out Rate Multiplier\nHispanic Age 64, 2010",
-    "age64.other.aging.rate.multiplier.1"                     = "Age-Out Rate Multiplier\nOther Race Age 64, 2010",
-    "black.black.sexual.multi"                                = "Sexual Mixing Multiplier\nBlack-Black",
-    "black.general.mortality.rate.multiplier"                 = "General Mortality Rate\nMultiplier Black",
-    "black.sti.screening.covid.multiplier"                    = "STI Screening COVID-Year\nMultiplier Black",
-    "el.rel.secondary.transmissibility"                       = "Early Latent-to-Secondary\nRelative Transmissibility",
-    "female.general.mortality.rate.multiplier"                = "General Mortality Rate\nMultiplier Female",
-    "first.trimester.slope.mult"                              = "First Trimester\nSlope Multiplier",
-    "fraction.el.misclassified.ll"                            = "Fraction Early Latent\nMisclassified as Late Latent",
-    "fraction.msm.pairings.with.female"                       = "Fraction of MSM\nPairings with Females",
-    "global.transmission.rate.het"                            = "Global Transmission Rate\nHeterosexual",
-    "global.transmission.rate.msm"                            = "Global Transmission Rate\nMSM",
-    "hispanic.general.mortality.rate.multiplier"              = "General Mortality Rate\nMultiplier Hispanic",
-    "hispanic.hispanic.sexual.multi"                          = "Sexual Mixing Multiplier\nHispanic-Hispanic",
-    "hispanic.immigration.rate.multiplier.1"                  = "Immigration Rate Multiplier\nHispanic, 2010",
-    "oe.female.pairings.with.msm"                             = "Observed vs. Expected\nFemale Pairings with MSM",
-    "or.careseeking.symptomatic.ps.black"                     = "Odds Ratio of Careseeking,\nSymptomatic P/S Black",
-    "or.careseeking.symptomatic.ps.female"                    = "Odds Ratio of Careseeking,\nSymptomatic P/S Female",
-    "or.careseeking.symptomatic.ps.heterosexual_male"         = "Odds Ratio of Careseeking,\nSymptomatic P/S Heterosexual Male",
-    "or.careseeking.symptomatic.ps.hispanic"                  = "Odds Ratio of Careseeking,\nSymptomatic P/S Hispanic",
-    "or.careseeking.symptomatic.ps.msm"                       = "Odds Ratio of Careseeking,\nSymptomatic P/S MSM",
-    "or.slope.careseeking.symptomatic.ps"                     = "Odds Ratio Slope of Careseeking,\nSymptomatic P/S",
-    "or.slope.syphilis.to.hiv.testing"                        = "Odds Ratio Slope of\nSyphilis-to-HIV Testing",
-    "other.fertility.rate.multiplier"                         = "Fertility Rate Multiplier\nOther Race",
-    "other.general.mortality.rate.multiplier"                 = "General Mortality Rate\nMultiplier Other Race",
-    "other.other.sexual.multi"                                = "Sexual Mixing Multiplier\nOther-Other",
-    "other.proportion.msm.of.male.mult"                       = "Proportion MSM of Male\nMultiplier, Other Race",
-    "other.sti.screening.covid.multiplier"                    = "STI Screening COVID-Year\nMultiplier Other Race",
-    "prop.early.latent.to.secondary"                          = "Proportion Early Latent\nRelapsing to Secondary",
-    "prp.infections.among.msm.1970"                           = "Proportion of Infections\namong MSM in 1970",
-    "prp.symptomatic.secondary"                               = "Proportion Symptomatic\nin Secondary Stage",
-    "ratio.of.undiagnosed.to.diagnosed.1970"                  = "Ratio of Undiagnosed\nto Diagnosed in 1970",
-    "rr.prp.symptomatic.primary.female"                       = "RR for Proportion Symptomatic in\nPrimary Stage, Female",
-    "rr.prp.symptomatic.primary.heterosexual_male"            = "RR for Proportion Symptomatic in\nPrimary Stage, Heterosexual Male",
-    "screening.rate.future.change.mult"                       = "Screening Rate Future\nChange Multiplier",
-    "screening.rate.multiplier.female.2000"                   = "Screening Rate Multiplier\nFemale 2000 Spline Value",
-    "screening.rate.multiplier.female.2010"                   = "Screening Rate Multiplier\nFemale 2010 Spline Value",
-    "screening.rate.multiplier.female.2020"                   = "Screening Rate Multiplier\nFemale 2020 Spline Value",
-    "screening.rate.multiplier.heterosexual_male.rel.female"  = "Screening Rate Multiplier,\nHeterosexual Male Relative to Female",
-    "screening.rate.multiplier.hispanic"                      = "Screening Rate Multiplier\nHispanic",
-    "screening.rate.multiplier.msm.1990"                      = "Screening Rate Multiplier\nMSM 1990 Spline Value",
-    "screening.rate.multiplier.msm.2010"                      = "Screening Rate Multiplier\nMSM 2010 Spline Value",
-    "screening.rate.multiplier.msm.2020"                      = "Screening Rate Multiplier\nMSM 2020 Spline Value",
-    "transmission.rate.future.change.mult"                    = "Transmission Rate Future\nChange Multiplier",
-    "transmission.rate.multiplier.age14.msm"                  = "Transmission Rate Multiplier\nAge 14 MSM",
-    "transmission.rate.multiplier.age19.heterosexual"         = "Transmission Rate Multiplier\nAge 19 Heterosexual",
-    "transmission.rate.multiplier.age19.msm"                  = "Transmission Rate Multiplier\nAge 19 MSM",
-    "transmission.rate.multiplier.age24.heterosexual"         = "Transmission Rate Multiplier\nAge 24 Heterosexual",
-    "transmission.rate.multiplier.age29.heterosexual"         = "Transmission Rate Multiplier\nAge 29 Heterosexual",
-    "transmission.rate.multiplier.age29.msm"                  = "Transmission Rate Multiplier\nAge 29 MSM",
-    "transmission.rate.multiplier.age34.heterosexual"         = "Transmission Rate Multiplier\nAge 34 Heterosexual",
-    "transmission.rate.multiplier.age34.msm"                  = "Transmission Rate Multiplier\nAge 34 MSM",
-    "transmission.rate.multiplier.age39.heterosexual"         = "Transmission Rate Multiplier\nAge 39 Heterosexual",
-    "transmission.rate.multiplier.age44.heterosexual"         = "Transmission Rate Multiplier\nAge 44 Heterosexual",
-    "transmission.rate.multiplier.age44.msm"                  = "Transmission Rate Multiplier\nAge 44 MSM",
-    "transmission.rate.multiplier.age49.msm"                  = "Transmission Rate Multiplier\nAge 49 MSM",
-    "transmission.rate.multiplier.age54.heterosexual"         = "Transmission Rate Multiplier\nAge 54 Heterosexual",
-    "transmission.rate.multiplier.age64.heterosexual"         = "Transmission Rate Multiplier\nAge 64 Heterosexual",
-    "transmission.rate.multiplier.age65.msm"                  = "Transmission Rate Multiplier\nAge 65+ MSM",
-    "transmission.rate.multiplier.heterosexual1990"           = "Transmission Rate Multiplier\nHeterosexual 1990 Spline Value",
-    "transmission.rate.multiplier.heterosexual1995"           = "Transmission Rate Multiplier\nHeterosexual 1995 Spline Value",
-    "transmission.rate.multiplier.heterosexual2000"           = "Transmission Rate Multiplier\nHeterosexual 2000 Spline Value",
-    "transmission.rate.multiplier.heterosexual2010"           = "Transmission Rate Multiplier\nHeterosexual 2010 Spline Value",
-    "transmission.rate.multiplier.heterosexual2022"           = "Transmission Rate Multiplier\nHeterosexual 2022 Spline Value",
-    "transmission.rate.multiplier.hispanic"                   = "Transmission Rate Multiplier\nHispanic",
-    "transmission.rate.multiplier.msm1970"                    = "Transmission Rate Multiplier\nMSM 1970 Spline Value",
-    "transmission.rate.multiplier.msm2000"                    = "Transmission Rate Multiplier\nMSM 2000 Spline Value",
-    "transmission.rate.multiplier.msm2010"                    = "Transmission Rate Multiplier\nMSM 2010 Spline Value",
-    "transmission.rate.multiplier.msm2022"                    = "Transmission Rate Multiplier\nMSM 2022 Spline Value",
-    "transmission.rate.multiplier.other"                      = "Transmission Rate Multiplier\nOther Race"
-)
 
 # LOAD OBJECTS ----
-params_ranked <- get(load(paste0(BASE.PATH, "params_ranked.Rdata")))
+prccs <- get(load(paste0(BASE.PATH, "prccs.Rdata")))
 sorted_arrs <- get(load(paste0(BASE.PATH, "sorted_arrs.Rdata")))
+ALL_PARAMS_TITLES <- get(load(paste0(BASE.PATH, "ALL_PARAM_TITLES.Rdata")))
 
 # prccs_outcome1 <- get(load(paste0(BASE.PATH, "prccs_outcome1.Rdata")))
 # prccs_outcome2 <- get(load(paste0(BASE.PATH, "prccs_outcome2.Rdata")))
@@ -151,17 +50,21 @@ sorted_arrs <- get(load(paste0(BASE.PATH, "sorted_arrs.Rdata")))
 
 make_prcc_plot <- function(outcome, location) {
     # browser()
-    params <- params_ranked[[outcome]][[location]][["var"]][1:N_PARAMS]
-    ests <- setNames(params_ranked[[outcome]][[location]][["est"]][1:N_PARAMS],
-                     params)
+    prccs_filtered <- filter(prccs[[outcome]][[location]], p.value <= P.VALUE.THRESHOLD)
+    params <- prccs_filtered$var
+    ests <- setNames(prccs_filtered$est, params)
     
     sim_values <- apply(sorted_arrs[[location]][,params], 2, function(sim_order) {
         if (outcome == 1) {
             # Multiply by negative once since is a "reduction"
             -1 * total_calc_results["2030", sim_order, "doxy.cov.20", location, "pct_change_incidence_vs_noint"]
         } else {
-            sex_calc_results["2030", "female", sim_order, "doxy.cov.20", location, "pct_change_incidence_vs_noint"] /
+            rv <-
+                sex_calc_results["2030", "female", sim_order, "doxy.cov.20", location, "pct_change_incidence_vs_noint"] /
                 sex_calc_results["2030", "msm", sim_order, "doxy.cov.20", location, "pct_change_incidence_vs_noint"]
+            # Correct NAs to zero, I guess?
+            rv[is.na(rv)] <- 0
+            rv
         }
     })
     
@@ -185,22 +88,42 @@ make_prcc_plot <- function(outcome, location) {
                   `Max.` = max(value)) %>%
         mutate(topOrBottom = "top")
     
-    param_order <- order(abs(top_df$Median - bottom_df$Median), decreasing=F)
+    
+    # Now prune to only those with a difference large enough
+    diff_df <- merge(select(bottom_df, parameter, Median),
+                     select(top_df, parameter, Median),
+                     by = "parameter") %>%
+        mutate(diff_Median = abs(Median.x - Median.y)) %>%
+        arrange(desc(diff_Median))
+    
+    THRESHOLD <- if (outcome == 1) 5 else 0.05
+    
+    if (sum(diff_df$diff_Median >= THRESHOLD) >= MIN_N_PARAMS) {
+        diff_df <- filter(diff_df, diff_Median >= THRESHOLD)
+    } else {
+        diff_df <- diff_df[1:MIN_N_PARAMS,]
+    }
+    
+    # Now we reverse the sort because the factor needs to be reversed
+    # to have the widest gap at the top
+    diff_df <- arrange(diff_df, diff_Median)
+    params <- as.vector(diff_df$parameter)
     params_formatted <- setNames(paste0(ALL_PARAM_TITLES[params],
                                         " (", round(ests[params], digits=3),
-                                        ")")[param_order],
-                                   params[param_order])
+                                        ")"),
+                                 params)
+    num_params <- length(params)
     
     boxplot_df <- rbind(
-        bottom_df,
-        top_df,
+        filter(bottom_df, parameter %in% params),
+        filter(top_df, parameter %in% params),
         tibble(parameter = params,
-               `Min.` = rep(NA, N_PARAMS),
-               `1st Qu.` = rep(NA, N_PARAMS),
-               Median = rep(NA, N_PARAMS),
-               Mean = rep(NA, N_PARAMS),
-               `3rd Qu.` = rep(NA, N_PARAMS),
-               `Max.` = rep(NA, N_PARAMS),
+               `Min.` = rep(NA, num_params),
+               `1st Qu.` = rep(NA, num_params),
+               Median = rep(NA, num_params),
+               Mean = rep(NA, num_params),
+               `3rd Qu.` = rep(NA, num_params),
+               `Max.` = rep(NA, num_params),
                topOrBottom = "ZZZ")
     ) %>%
         mutate(
@@ -238,15 +161,22 @@ make_prcc_plot <- function(outcome, location) {
         guides(fill = guide_legend(ncol = 1)) +
         geom_vline(xintercept = median(sim_values[,1]), linetype = "dashed")
     
+    output <- list(
+        plot = plot,
+        num_params = num_params
+    )
+    
 }
 
 for (city in SHIELD.TEN.MSAS) {
     cat(paste0("City: ", city, "\n"))
     for (outcome in 1:2) {
-        plot <- make_prcc_plot(outcome, city)
+        tmp <- make_prcc_plot(outcome, city)
+        plot <- tmp$plot
+        num_params <- tmp$num_params
         ggsave(plot = plot,
                filename = paste0(BASE.PATH, "figures/PRCC plots/", city, "__outcome", outcome, ".png"),
-               dpi = 300, width = 6.5, height = 4)
+               dpi = 300, width = 6.5, height = 1 + num_params / 2)
     }
 }
 

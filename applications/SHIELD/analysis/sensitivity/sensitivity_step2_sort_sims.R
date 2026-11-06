@@ -4,39 +4,11 @@ library(tidyverse)
 library(abind)
 
 # SETTINGS ----
-CALIB.CODE = "calib.10.20.stage3"
+CALIB.CODE = "calib.10.20.stage4"
 locations <- setNames(SHIELD.TEN.MSAS, SHIELD.TEN.MSAS)
 
 BASE.PATH <- paste0(ROOT.DIR,"/shield/outputs/", CALIB.CODE, "/")
-# 
-# # These were the 10 that were shared amongst the most cities' top 15 most significant params
-# PLOT_1_PARAMS <- c(
-#     "transmission.rate.future.change.mult" = "Transmission Rate Future Change Multiplier",
-#     "transmission.rate.multiplier.heterosexual2022" = "Transmission Rate Multiplier Heterosexual 2022 Spline Value",
-#     "global.transmission.rate.het" = "Global Transmission Rate Heterosexual",
-#     "screening.rate.future.change.mult" = "Screening Rate Future Change Multiplier",
-#     "transmission.rate.multiplier.age29.heterosexual" = "Transmission Rate Multiplier Heterosexual Ages 25-29",
-#     "transmission.rate.multiplier.heterosexual2010" = "Transmission Rate Multiplier Heterosexual 2010 Spline Value",
-#     "screening.rate.multiplier.female.2020" = "Screening Rate Multiplier Female 2020 Spline Value",
-#     "transmission.rate.multiplier.age34.heterosexual" = "Transmission Rate Multiplier Heterosexual Ages 30-34",
-#     "transmission.rate.multiplier.age24.heterosexual" = "Transmission Rate Multiplier Heterosexual Ages 20-24",
-#     "age54.black.aging.rate.multiplier.1" = "Age-Out Rate Multiplier Black Age 54"
-# )
-# 
-# PLOT_2_PARAMS <- c(
-#     "transmission.rate.future.change.mult" = "Transmission Rate Future Change Multiplier",
-#     "transmission.rate.multiplier.heterosexual2022" = "Transmission Rate Multiplier Heterosexual 2022 Spline Value",
-#     "transmission.rate.multiplier.heterosexual2010" = "Transmission Rate Multiplier Heterosexual 2010 Spline Value",
-#     "global.transmission.rate.het" = "Global Transmission Rate Heterosexual",
-#     "screening.rate.future.change.mult" = "Screening Rate Future Change Multiplier",
-#     "transmission.rate.multiplier.age34.heterosexual" = "Transmission Rate Multiplier Heterosexual Ages 30-34",
-#     "screening.rate.multiplier.female.2020" = "Screening Rate Multiplier Female 2020 Spline Value",
-#     "transmission.rate.multiplier.age24.heterosexual" = "Transmission Rate Multiplier Heterosexual Ages 20-24",
-#     "transmission.rate.multiplier.age29.heterosexual" = "Transmission Rate Multiplier Heterosexual Ages 25-29",
-#     "female.general.mortality.rate.multiplier" = "Female General Mortality Rate Multiplier"
-# )
 
-                     
 # Sort simulations by parameter value ----
 
 arrs <- lapply(locations, function(city) {
@@ -44,7 +16,7 @@ arrs <- lapply(locations, function(city) {
     all_params <- t(simset$parameters)
 })
 
-# In this array, whatever is in the 400th row is the number of the sim with the
+# In this array, whatever is in the last row is the number of the sim with the
 # largest value for that parameter. So if "357" is in that row, it means that
 # sim #357 for that location has the largest value for that parameter (in "arrs")
 sorted_arrs <- lapply(arrs, function(x) {
