@@ -10,6 +10,16 @@ source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibra
 
 LOCATION = 'TGA.OAKLAND'
 
+# Components of joint.pop.migration.total.trans.likelihood.instructions (pop.ehe.oakland)
+POP.COMPONENTS = c(
+    'population.likelihood.instructions.pop',
+    'immigration.likelihood.instructions.pop',
+    'emigration.likelihood.instructions.pop',
+    'general.mortality.likelihood.instructions.pop',
+    'total.prevalence.likelihood.instructions',
+    'total.new.diagnoses.likelihood.instructions'
+)
+
 # Components of transmission.oakland.likelihood.instructions
 # (see ehe_likelihoods_oakland.R)
 TRANS.COMPONENTS = c(
@@ -17,9 +27,11 @@ TRANS.COMPONENTS = c(
     'race.risk.halfx.cv.expv.prevalence.likelihood.instructions',
     'total.new.diagnoses.8x.cv.expv.likelihood.instructions',
     'total.prevalence.8x.cv.expv.likelihood.instructions',
+    'non.age.aids.diagnoses.likelihood.instructions.trans',
     'population.likelihood.instructions.trans',
     'heroin.likelihood.instructions.trans',
     'cocaine.likelihood.instructions.trans',
+    'aids.deaths.likelihood.instructions.trans',
     'idu.active.prior.ratio.likelihood.instructions'
 )
 
@@ -50,6 +62,8 @@ FULL.COMPONENTS = c(
     'total.prevalence.16x.cv.expv.likelihood.instructions',
     'prevalence.halfx.cv.and.exp.v.likelihood.instructions',
     'general.mortality.likelihood.instructions.full',
+    'aids.deaths.likelihood.instructions.full',
+    'non.age.aids.diagnoses.likelihood.instructions.full',
     'proportion.tested.likelihood.instructions',
     'hiv.test.positivity.likelihood.instructions',
     'awareness.likelihood.instructions',
@@ -74,8 +88,10 @@ report.check = function(check, label)
         cat("\n--", check$likelihood[i], "--\n", check$message[i], "\n")
 }
 
-CHECK.STAGES = c('full')   # any of 'trans', 'full'
+CHECK.STAGES = c('pop', 'trans', 'full')   # any of 'pop', 'trans', 'full'
 
+if ('pop' %in% CHECK.STAGES)
+    report.check(check.likelihood.components(POP.COMPONENTS), 'POP')
 if ('trans' %in% CHECK.STAGES)
     report.check(check.likelihood.components(TRANS.COMPONENTS), 'TRANS')
 if ('full' %in% CHECK.STAGES)

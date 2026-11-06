@@ -4,27 +4,18 @@
 # the limited data available for TGA.OAKLAND.
 #
 # Changes from ehe_likelihoods.R:
-#   1. Immigration/emigration (pop, pop.state, full): calibrate to TOTAL
-#      'immigration'/'emigration' (Census county-to-county flows aggregated to
-#      the TGA) instead of 'adult.immigration'/'adult.emigration' by age & race.
-#      NOTE: the county-to-county totals cover ALL ages (1+), whereas the old
-#      adult.* data were 13+ -- the sim outcome only covers model ages (13+),
-#      so the data will run somewhat higher than the sim.
-#      -> calibration_runs/oakland_add_missing_data.R replaces Oakland's values
-#         (in memory) with annual ACS movers x 5 (the likelihood compares a
-#         5-year window to the sim's 5-year total) x the share of the 1+
-#         population aged 13+.
-#
-#   2. Heroin/cocaine (trans, full): TGA.OAKLAND added to the locations that use
+#   (2026-11-06: with surveillance.manager_11.6.26, migration is back to the main
+#    model's adult.immigration / adult.emigration by age and race -- Zoe added
+#    Oakland adult migration and multiplied all migration by 5 -- and the AIDS
+#    diagnoses / AIDS deaths likelihoods are back in trans and full.)
+#   1. Heroin/cocaine (trans, full): TGA.OAKLAND added to the locations that use
 #      the BASIC likelihood -- the TGA is exactly NSDUH Regions 7R + 8R, so the
-#      data are aggregated to the TGA (oakland_add_missing_data.R) and the nested
-#      likelihood is not allowed.
-#   3. transmission.oakland.likelihood.instructions: the transmission joint minus
-#      the AIDS-diagnoses, AIDS-deaths and HIV-mortality likelihoods (no data).
-#   4. Suppression: TGA.OAKLAND added to the locations that use the BASIC likelihood
+#      nested likelihood is not allowed.
+#   2. Suppression: TGA.OAKLAND added to the locations that use the BASIC likelihood
 #      (Oakland suppression is aggregated from its counties in add.oakland.tga.hiv.data.R).
-#   5. FULL.oakland.likelihood.instructions: the full joint (32x new/prev) minus the
-#      HIV-mortality, AIDS-deaths and AIDS-diagnoses likelihoods (no data).
+#   3. transmission.oakland.likelihood.instructions / FULL.oakland.likelihood.instructions:
+#      the main transmission / full (32x new/prev) joints minus the HIV-mortality
+#      likelihood (no Oakland hiv.deaths data).
 #
 # Object names are identical to ehe_likelihoods.R, so sourcing this file
 # AFTER ehe_likelihoods.R overwrites the main likelihood objects.
@@ -233,9 +224,10 @@ population.likelihood.instructions.full =
 
 #-- IMMIGRATION  ----
 immigration.likelihood.instructions.pop = 
-  create.basic.likelihood.instructions(outcome.for.data = "immigration", 
+  create.basic.likelihood.instructions(outcome.for.data = "adult.immigration", 
                                        outcome.for.sim = "immigration",
-                                       levels.of.stratification = c(0),
+                                       dimensions = c("age","race"), 
+                                       levels.of.stratification = c(0,1),
                                        from.year = 2011, 
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
@@ -246,9 +238,10 @@ immigration.likelihood.instructions.pop =
 
 # state-level: downweighted (1/8) for pop only
 immigration.likelihood.instructions.pop.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "immigration", 
+    create.basic.likelihood.instructions(outcome.for.data = "adult.immigration", 
                                          outcome.for.sim = "immigration",
-                                         levels.of.stratification = c(0),
+                                         dimensions = c("age","race"), 
+                                         levels.of.stratification = c(0,1),
                                          from.year = 2011, 
                                          observation.correlation.form = 'compound.symmetry',
                                          error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
@@ -258,9 +251,10 @@ immigration.likelihood.instructions.pop.state =
     )
 
 immigration.likelihood.instructions.full = 
-  create.basic.likelihood.instructions(outcome.for.data = "immigration", 
+  create.basic.likelihood.instructions(outcome.for.data = "adult.immigration", 
                                        outcome.for.sim = "immigration",
-                                       levels.of.stratification = c(0),
+                                       dimensions = c("age","race"), 
+                                       levels.of.stratification = c(0,1),
                                        from.year = 2011, 
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
@@ -271,9 +265,10 @@ immigration.likelihood.instructions.full =
 
 #-- EMIGRATION  ----
 emigration.likelihood.instructions.pop = 
-  create.basic.likelihood.instructions(outcome.for.data = "emigration", 
+  create.basic.likelihood.instructions(outcome.for.data = "adult.emigration", 
                                        outcome.for.sim = "emigration",
-                                       levels.of.stratification = c(0),
+                                       dimensions = c("age","race"), 
+                                       levels.of.stratification = c(0,1),
                                        from.year = 2011, 
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
@@ -284,9 +279,10 @@ emigration.likelihood.instructions.pop =
 
 # state-level: downweighted (1/8) for pop only
 emigration.likelihood.instructions.pop.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "emigration", 
+    create.basic.likelihood.instructions(outcome.for.data = "adult.emigration", 
                                          outcome.for.sim = "emigration",
-                                         levels.of.stratification = c(0),
+                                         dimensions = c("age","race"), 
+                                         levels.of.stratification = c(0,1),
                                          from.year = 2011, 
                                          observation.correlation.form = 'compound.symmetry', 
                                          error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
@@ -296,9 +292,10 @@ emigration.likelihood.instructions.pop.state =
     )
 
 emigration.likelihood.instructions.full = 
-  create.basic.likelihood.instructions(outcome.for.data = "emigration", 
+  create.basic.likelihood.instructions(outcome.for.data = "adult.emigration", 
                                        outcome.for.sim = "emigration",
-                                       levels.of.stratification = c(0),
+                                       dimensions = c("age","race"), 
+                                       levels.of.stratification = c(0,1),
                                        from.year = 2011, 
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
@@ -2535,17 +2532,18 @@ transmission.pop.idu.aware.aids.testing.likelihood.instructions =
   )
 
 # OAKLAND: transmission likelihoods with data for TGA.OAKLAND. Dropped (no Oakland data):
-#   non.age.aids.diagnoses.likelihood.instructions.trans (aids.diagnoses 1985-1993)
-#   aids.deaths.likelihood.instructions.trans (aids.deaths 1981-2001)
 #   hiv.mortality.likelihood.instructions.trans (hiv.deaths 2008-2019)
+# (AIDS diagnoses / AIDS deaths added back 2026-11-06: CDC WONDER Oakland data in surveillance.manager_11.6.26)
 transmission.oakland.likelihood.instructions = 
   join.likelihood.instructions(race.risk.halfx.cv.expv.new.diagnoses.likelihood.instructions, 
                                race.risk.halfx.cv.expv.prevalence.likelihood.instructions, 
                                total.new.diagnoses.8x.cv.expv.likelihood.instructions,
                                total.prevalence.8x.cv.expv.likelihood.instructions,
+                               non.age.aids.diagnoses.likelihood.instructions.trans,
                                population.likelihood.instructions.trans,
                                heroin.likelihood.instructions.trans,
                                cocaine.likelihood.instructions.trans,
+                               aids.deaths.likelihood.instructions.trans,
                                idu.active.prior.ratio.likelihood.instructions
   )
 
@@ -2658,8 +2656,7 @@ FULL.likelihood.instructions.32x.new.prev = join.likelihood.instructions(
 
 # OAKLAND: full likelihoods with data for TGA.OAKLAND. Dropped (no Oakland data):
 #   hiv.mortality.likelihood.instructions.full (hiv.deaths 2008-2019)
-#   aids.deaths.likelihood.instructions.full (aids.deaths 1981-2001)
-#   non.age.aids.diagnoses.likelihood.instructions.full (aids.diagnoses 1985-1993)
+# (AIDS diagnoses / AIDS deaths added back 2026-11-06: CDC WONDER Oakland data in surveillance.manager_11.6.26)
 FULL.oakland.likelihood.instructions = join.likelihood.instructions(
   # POPULATION LIKELIHOODS
   population.likelihood.instructions.full, 
@@ -2674,6 +2671,10 @@ FULL.oakland.likelihood.instructions = join.likelihood.instructions(
   
   # MORTALITY LIKELIHOODS
   general.mortality.likelihood.instructions.full,
+  aids.deaths.likelihood.instructions.full,
+  
+  # AIDS DIAGNOSES LIKELIHOOD
+  non.age.aids.diagnoses.likelihood.instructions.full,
   
   # CONTINUUM LIKELIHOODS
   proportion.tested.likelihood.instructions,

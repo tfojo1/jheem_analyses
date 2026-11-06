@@ -15,7 +15,7 @@ print(paste0("Running for ", LOCATION, " - ", locations::get.location.name(LOCAT
 CALIBRATION.CODES.TO.RUN = c(CALIBRATION.CODE.POPULATION.OAKLAND,     # 1
                              CALIBRATION.CODE.TRANSMISSION.OAKLAND,   # 2
                              CALIBRATION.CODE.FULL.PLUS.COVID.OAKLAND # 3
-                             )[c(3)]
+                             )[c(1,2,3)]
 
 
 RESUME.FIRST = F # T = skip setup for the first code if its cache already exists

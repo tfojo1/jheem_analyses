@@ -8,7 +8,38 @@
 print("SOURCING CODE")
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
 source('../jheem_analyses/applications/EHE/ehe_likelihoods_oakland.R')
-source('../jheem_analyses/applications/EHE/calibration_runs/oakland_add_missing_data.R') # in-memory data patches for TGA.OAKLAND
+
+#-- SURVEILLANCE MANAGER ----
+# Zoe's manually built manager (2026-11-06) includes all the Oakland data we were
+# patching in-session, plus the shared fixes (partial-year deaths removed, migration x5).
+# It is not in the cached-manager registry, so load it directly. Set
+# OAKLAND.SURVEILLANCE.MANAGER.FILE before sourcing this file to use a different path,
+# or to NULL to keep the default manager.
+if (!exists('OAKLAND.SURVEILLANCE.MANAGER.FILE'))
+    OAKLAND.SURVEILLANCE.MANAGER.FILE = file.path(JHEEM.CACHE.DIR, 'surveillance.manager_11.6.26.rdata')
+
+if (!is.null(OAKLAND.SURVEILLANCE.MANAGER.FILE))
+{
+    if (!file.exists(OAKLAND.SURVEILLANCE.MANAGER.FILE))
+        stop("Cannot find the Oakland surveillance manager at '", OAKLAND.SURVEILLANCE.MANAGER.FILE,
+             "'. Set OAKLAND.SURVEILLANCE.MANAGER.FILE to its path before sourcing this file.")
+    if (!exists('OAKLAND.LOADED.MANAGER.FILE') || !identical(OAKLAND.LOADED.MANAGER.FILE, OAKLAND.SURVEILLANCE.MANAGER.FILE))
+    {
+        cat("Loading Oakland surveillance manager from '", OAKLAND.SURVEILLANCE.MANAGER.FILE, "'...", sep = '')
+        SURVEILLANCE.MANAGER = load.data.manager(OAKLAND.SURVEILLANCE.MANAGER.FILE, set.as.default = T)
+        OAKLAND.LOADED.MANAGER.FILE = OAKLAND.SURVEILLANCE.MANAGER.FILE
+        cat("Done!\n")
+    }
+}
+
+#-- IN-SESSION DATA PATCHES ----
+# OFF with surveillance.manager_11.6.26, which already has every patched outcome.
+# Only turn on with an older manager -- the migration patch would otherwise
+# multiply by 5 a second time.
+if (!exists('OAKLAND.APPLY.DATA.PATCHES'))
+    OAKLAND.APPLY.DATA.PATCHES = F
+if (OAKLAND.APPLY.DATA.PATCHES)
+    source('../jheem_analyses/applications/EHE/calibration_runs/oakland_add_missing_data.R') # in-memory data patches for TGA.OAKLAND
 
 CALIBRATION.CODE.POPULATION.OAKLAND = 'pop.ehe.oakland'
 CALIBRATION.CODE.TRANSMISSION.OAKLAND = 'trans.ehe.oakland'
