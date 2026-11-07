@@ -1,0 +1,83 @@
+name: Check jheem2 dev
+
+# The manager builds use jheem2 dev by default, so a jheem2 change can break the next
+# contributor build. Every six hours, if dev has moved since the last check, this runs the
+# HIV surveillance manager build on the new dev commit, with the same inputs and checks as
+# Build HIV Surveillance Manager. It publishes nothing. Dispatch it to check any jheem2
+# branch, tag, or commit.
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      jheem2_ref:
+        description: 'jheem2 branch, tag, or commit to check'
+        required: true
+        default: 'dev'
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: check-jheem2-dev
+  cancel-in-progress: false
+
+jobs:
+  decide:
+    name: Find the jheem2 commit to check
+    runs-on: ubuntu-24.04
+    outputs:
+      commit: ${{ steps.decide.outputs.commit }}
+      build: ${{ steps.decide.outputs.build }}
+    steps:
+      - name: Resolve the jheem2 ref and compare with the last check
+        id: decide
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          EVENT: ${{ github.event_name }}
+          JHEEM2_REF: ${{ inputs.jheem2_ref || 'dev' }}
+        run: |
+          set -euo pipefail
+          commit=$(gh api "repos/CIPHER-Epi/jheem2/commits/$JHEEM2_REF" --jq .sha)
+          build=true
+          if [[ "$EVENT" != workflow_dispatch ]]; then
+            # The commit the last scheduled check on this branch built, from its marker artifact.
+            last_run=$(gh api "repos/$REPO/actions/artifacts?name=jheem2-checked-commit&per_page=100" --jq "
+              [.artifacts[] | select(.expired | not) | select(.workflow_run.head_branch == \"$GITHUB_REF_NAME\")]
+              | sort_by(.created_at) | last | .workflow_run.id // empty")
+            if [[ -n "$last_run" ]]; then
+              gh run download "$last_run" --repo "$REPO" --name jheem2-checked-commit --dir "$RUNNER_TEMP/last"
+              last=$(cat "$RUNNER_TEMP/last/commit.txt")
+              echo "Last checked: $last (run $last_run)"
+              [[ "$last" == "$commit" ]] && build=false
+            fi
+          fi
+          echo "jheem2 $JHEEM2_REF is $commit; build: $build" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "commit=$commit" >> "$GITHUB_OUTPUT"
+          echo "build=$build" >> "$GITHUB_OUTPUT"
+          echo "$commit" > "$RUNNER_TEMP/commit.txt"
+
+      - name: Record the commit as checked
+        if: steps.decide.outputs.build == 'true' && github.event_name != 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: jheem2-checked-commit
+          path: ${{ runner.temp }}/commit.txt
+          retention-days: 90
+
+  build:
+    needs: decide
+    if: needs.decide.outputs.build == 'true'
+    uses: ./.github/workflows/manager-build.yml
+    with:
+      manager_dir: hiv.surveillance.manager
+      sections_release_tag: hiv-sections-latest
+      baseline_release_tag: hiv-surveillance-manager-latest
+      jheem2_ref: ${{ needs.decide.outputs.commit }}
+      raw_data_release_tag: data-raw-latest
+      census_release_tag: census-manager-latest
+      publish: false

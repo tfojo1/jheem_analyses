@@ -2,8 +2,8 @@ name: Manager Build (shared)
 
 # The section-to-final build that each Build * Manager workflow calls: download and
 # verify the section release and the baseline, merge in an isolated directory, compare
-# with the baseline, run the manager's consumer checks, and (from master only) publish a
-# dated release for review and promotion.
+# with the baseline, run the manager's consumer checks, and (from master only, unless the
+# caller turns publishing off) publish a dated release for review and promotion.
 #
 # What differs by manager lives in data_processing/<manager_dir>/ci/:
 #   config.sh     names, section files, packages, tag patterns
@@ -39,6 +39,11 @@ on:
         required: false
         default: ''
         type: string
+      publish:
+        description: 'Publish a dated release from master; false for checks'
+        required: false
+        default: true
+        type: boolean
 
 jobs:
   build:
@@ -210,6 +215,17 @@ jobs:
           df -h . > _ci_outputs/disk_after.txt
           sha256sum "_ci_outputs/$MANAGER_FILE" > _ci_outputs/candidate_sha256.txt
 
+      - name: Report peak memory
+        # Informational: the runner's memory is the merge's hard limit. /usr/bin/time
+        # records the peak even when the merge fails.
+        if: always() && hashFiles('_ci_outputs/resource_metrics.txt') != ''
+        run: |
+          peak_kib=$(awk -F': ' '/Maximum resident set size/ {print $2}' _ci_outputs/resource_metrics.txt)
+          total_kib=$(awk '/^MemTotal:/ {print $2}' /proc/meminfo)
+          awk -v p="$peak_kib" -v t="$total_kib" 'BEGIN {
+            printf "Merge peak memory: %.1f GiB of %.1f GiB on the runner (%d%%)\n", p / 1048576, t / 1048576, 100 * p / t
+          }' | tee -a "$GITHUB_STEP_SUMMARY"
+
       - name: Compare with the baseline
         run: |
           # Exit 1 with a report means structural removals: flag for review, don't fail.
@@ -268,7 +284,7 @@ jobs:
 
       - name: Create versioned release
         # Runs from other branches are checks only and never publish.
-        if: success() && github.ref == 'refs/heads/master'
+        if: success() && inputs.publish && github.ref == 'refs/heads/master'
         run: |
           set -euo pipefail
           VERSION_TAG="$RELEASE_STEM-v$BUILD_DATE"
