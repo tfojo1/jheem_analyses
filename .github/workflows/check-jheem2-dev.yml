@@ -7,6 +7,8 @@ name: Check jheem2 dev
 # branch, tag, or commit.
 
 on:
+  push:
+    branches: [jheem2-dev-check-test]
   schedule:
     - cron: '17 */6 * * *'
   workflow_dispatch:
