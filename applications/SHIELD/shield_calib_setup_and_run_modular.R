@@ -45,6 +45,7 @@ source(file.path(SHIELD.DIR, "shield_specification.R"))
 source(file.path(SHIELD.DIR, "shield_likelihoods.R"))
 source(file.path(SHIELD.DIR, "shield_calib_register.R"))
 source(file.path(JHEEM.ANALYSES.PATH, "commoncode", "locations_of_interest.R"))
+source(file.path(SHIELD.DIR, "R", "shield_run_record.R"))
 
 VERSION<- 'shield'
 CACHE.FREQ= 500 # how often should write the results to disk (Default: 100)
@@ -52,7 +53,8 @@ UPDATE.FREQ= 50 # how often to print messages (Default: 50)
 
 #SECTION1: SETUP ----
 if (RUN.STAGE == 'setup' | RUN.STAGE == 'all') {
-    set.seed(00000)
+    SETUP.SEED <- 00000
+    set.seed(SETUP.SEED)
     #
     print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
     #
@@ -66,6 +68,8 @@ if (RUN.STAGE == 'setup' | RUN.STAGE == 'all') {
                        location=LOCATION,
                        calibration.code = CALIBRATION.NAME,
                        cache.frequency = CACHE.FREQ )
+    # What each step ran with (R/shield_run_record.R), in the calibration's run_records/
+    shield.write.run.record(LOCATION, CALIBRATION.NAME, "setup", seed = SETUP.SEED, version = VERSION)
     print(paste0("Setup complete for ", LOCATION))
 }
 
@@ -75,6 +79,7 @@ if (RUN.STAGE == 'run'| RUN.STAGE == 'all') {
     start.time <- Sys.time()
     print(paste0("STARTING CHAIN ", CHAIN, " FROM ", CALIBRATION.NAME, " CODE FOR ", LOCATION,
                  " (", locations::get.location.name(LOCATION), ") AT ", Sys.time()))
+    shield.write.run.record(LOCATION, CALIBRATION.NAME, "run", chain = CHAIN, version = VERSION)
     #
     # *****************************************************************************
     # RUN THE CHAIN, RETRYING IF THE NAS DRIVE DROPS OUT
@@ -229,6 +234,7 @@ if (RUN.STAGE == 'run'| RUN.STAGE == 'all') {
 if (RUN.STAGE == 'assemble'| RUN.STAGE == 'all') {
     print(paste0("Assembling all chains from ", CALIBRATION.NAME, " code for ", LOCATION,
                  " (", locations::get.location.name(LOCATION), ")"))
+    shield.write.run.record(LOCATION, CALIBRATION.NAME, "assemble", version = VERSION)
     # Save simset
     simset <- assemble.simulations.from.calibration(version = VERSION,
                                                     location = LOCATION,
