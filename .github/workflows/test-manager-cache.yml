@@ -9,6 +9,9 @@ on:
       - 'commoncode/tests/test_data_manager_release_selection.R'
       - 'applications/SHIELD/shield_source_code.R'
       - 'applications/SHIELD/tests/test-manager-selection.R'
+      - 'applications/SHIELD/shield_calib_setup_and_run_modular.R'
+      - 'applications/SHIELD/R/shield_run_record.R'
+      - 'applications/SHIELD/tests/test-run-record.R'
       - '.github/workflows/test-manager-cache.yml'
   pull_request:
     paths:
@@ -17,6 +20,9 @@ on:
       - 'commoncode/tests/test_data_manager_release_selection.R'
       - 'applications/SHIELD/shield_source_code.R'
       - 'applications/SHIELD/tests/test-manager-selection.R'
+      - 'applications/SHIELD/shield_calib_setup_and_run_modular.R'
+      - 'applications/SHIELD/R/shield_run_record.R'
+      - 'applications/SHIELD/tests/test-run-record.R'
       - '.github/workflows/test-manager-cache.yml'
   workflow_dispatch:
 
@@ -43,3 +49,5 @@ jobs:
         run: Rscript commoncode/tests/test_data_manager_release_selection.R
       - name: Check SHIELD ordinary and recorded manager selection
         run: Rscript applications/SHIELD/tests/test-manager-selection.R
+      - name: Check SHIELD run records
+        run: Rscript applications/SHIELD/tests/test-run-record.R
