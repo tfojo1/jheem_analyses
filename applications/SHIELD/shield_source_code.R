@@ -311,8 +311,7 @@ for (f in c("shield_calib_parameters.R",
             "R/shield_specification_helpers.R",
             "R/shield_inputManager_pairing.R",
             "R/shield_inputManager_helpers.R",
-            "R/shield_inputManager_covid.R",
-            "R/shield_run_record.R")) {
+            "R/shield_inputManager_covid.R")) {
   source(file.path(SHIELD.DIR, f))
   cat(basename(f), " sourced\n", sep = "")
 }

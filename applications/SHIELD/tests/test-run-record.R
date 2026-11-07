@@ -103,14 +103,13 @@ result <- withCallingHandlers(shield.write.run.record("C.12580", "calib.test", "
                               })
 stopifnot(is.null(result), grepl("Could not write the run record", warned, fixed = TRUE))
 
-#-- The modular launcher records each step, and the SHIELD bootstrap sources the writer --#
+#-- The modular launcher sources the writer and records each step --#
 modular <- readLines(file.path(shield.dir, "shield_calib_setup_and_run_modular.R"))
 calls <- grep("shield.write.run.record(", modular, fixed = TRUE, value = TRUE)
 stopifnot(length(calls) == 3L,
           any(grepl('"setup"', calls)), any(grepl('"run", chain = CHAIN', calls)),
           any(grepl('"assemble"', calls)),
-          any(grepl('"R/shield_run_record.R"', readLines(file.path(shield.dir, "shield_source_code.R")),
-                    fixed = TRUE)))
+          any(grepl('source(file.path(SHIELD.DIR, "R", "shield_run_record.R"))', modular, fixed = TRUE)))
 
 unlink(root, recursive = TRUE)
 cat("Run record tests passed\n")

@@ -45,6 +45,7 @@ source(file.path(SHIELD.DIR, "shield_specification.R"))
 source(file.path(SHIELD.DIR, "shield_likelihoods.R"))
 source(file.path(SHIELD.DIR, "shield_calib_register.R"))
 source(file.path(JHEEM.ANALYSES.PATH, "commoncode", "locations_of_interest.R"))
+source(file.path(SHIELD.DIR, "R", "shield_run_record.R"))
 
 VERSION<- 'shield'
 CACHE.FREQ= 500 # how often should write the results to disk (Default: 100)
