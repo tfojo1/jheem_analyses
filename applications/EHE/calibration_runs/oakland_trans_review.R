@@ -25,7 +25,7 @@ stratum.style.manager = create.style.manager(color.data.by = "stratum", alpha.li
 
 LOCATION = 'TGA.OAKLAND'
 
-load("prelim_results/trans.ehe.oakland_simset_2026-10-30_TGA.OAKLAND.Rdata")
+load("prelim_results/trans.ehe.oakland_simset_2026-11-06_TGA.OAKLAND.Rdata")
 sim.first = simset$first.sim()
 sim.last = simset$last.sim()
 

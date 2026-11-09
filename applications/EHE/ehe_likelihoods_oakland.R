@@ -363,6 +363,21 @@ race.risk.halfx.cv.expv.new.diagnoses.likelihood.instructions =
                                          equalize.weight.by.year = T
     )
 
+race.risk.cv.expv.new.diagnoses.likelihood.instructions = 
+    create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
+                                         outcome.for.sim = "new",
+                                         dimensions = c("race","risk"),
+                                         levels.of.stratification = c(0,1,2), 
+                                         from.year = 2008, 
+                                         observation.correlation.form = 'compound.symmetry', 
+                                         error.variance.term = list(DIAGNOSES.CV, DIAGNOSES.EXP.OF.VAR), 
+                                         error.variance.type = c('cv','exp.of.variance'),
+                                         minimum.error.sd = 1,
+                                         weights = (1), # trying out 11/9
+                                         correlation.different.strata = 0, # added 11/9
+                                         equalize.weight.by.year = T
+    )
+
 race.risk.halfx.cv.new.diagnoses.likelihood.instructions = 
     create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
                                          outcome.for.sim = "new",
@@ -599,6 +614,22 @@ new.diagnoses.halfx.cv.expv.likelihood.instructions =
                                        equalize.weight.by.year = T
   )
 
+new.diagnoses.cv.expv.likelihood.instructions = 
+    create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
+                                         outcome.for.sim = "new",
+                                         dimensions = c("age","sex","race","risk"),
+                                         levels.of.stratification = c(0,1,2), 
+                                         from.year = 2008, 
+                                         observation.correlation.form = 'compound.symmetry', 
+                                         error.variance.term = list(DIAGNOSES.CV, DIAGNOSES.EXP.OF.VAR), 
+                                         error.variance.type = c('cv','exp.of.variance'),
+                                         minimum.error.sd = 1,
+                                         weights = (1), # trying out 11/9
+                                         correlation.different.strata = 0, # trying out 11/9
+                                         equalize.weight.by.year = T
+    )
+
+
 new.diagnoses.cv.likelihood.instructions.state = 
     create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
                                          outcome.for.sim = "new",
@@ -754,6 +785,21 @@ race.risk.halfx.cv.expv.prevalence.likelihood.instructions =
                                          error.variance.type = c('cv','exp.of.variance'),
                                          minimum.error.sd = 1,
                                          weights = (0.5), #list(0.3), # see prev_new_aware_weighting.R 
+                                         equalize.weight.by.year = T
+    )
+
+race.risk.cv.expv.prevalence.likelihood.instructions = 
+    create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
+                                         outcome.for.sim = "diagnosed.prevalence",
+                                         dimensions = c("race","risk"),
+                                         levels.of.stratification = c(0,1,2), 
+                                         from.year = 2008, 
+                                         observation.correlation.form = 'compound.symmetry', 
+                                         error.variance.term = list(PREVALENCE.CV, PREVALENCE.EXP.OF.VAR), 
+                                         error.variance.type = c('cv','exp.of.variance'),
+                                         minimum.error.sd = 1,
+                                         weights = (1), # trying out 11/9
+                                         correlation.different.strata = 0, # trying out 11/9
                                          equalize.weight.by.year = T
     )
 
@@ -1022,6 +1068,21 @@ prevalence.halfx.cv.and.exp.v.likelihood.instructions =
                                        weights = (1/2), #list(0.3), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T
   )
+
+prevalence.cv.and.exp.v.likelihood.instructions = 
+    create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
+                                         outcome.for.sim = "diagnosed.prevalence",
+                                         dimensions = c("age","sex","race","risk"),
+                                         levels.of.stratification = c(0,1,2), 
+                                         from.year = 2008, 
+                                         observation.correlation.form = 'compound.symmetry', 
+                                         error.variance.term = list(PREVALENCE.CV, PREVALENCE.EXP.OF.VAR), 
+                                         error.variance.type = c('cv','exp.of.variance'),
+                                         minimum.error.sd = 1,
+                                         weights = (1), # trying out 11/9
+                                         correlation.different.strata = 0, # trying out 11/9
+                                         equalize.weight.by.year = T
+    )
 
 prevalence.halfx.cv.likelihood.instructions = 
     create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
@@ -2535,17 +2596,22 @@ transmission.pop.idu.aware.aids.testing.likelihood.instructions =
 #   hiv.mortality.likelihood.instructions.trans (hiv.deaths 2008-2019)
 # (AIDS diagnoses / AIDS deaths added back 2026-11-06: CDC WONDER Oakland data in surveillance.manager_11.6.26)
 transmission.oakland.likelihood.instructions = 
-  join.likelihood.instructions(race.risk.halfx.cv.expv.new.diagnoses.likelihood.instructions, 
-                               race.risk.halfx.cv.expv.prevalence.likelihood.instructions, 
-                               total.new.diagnoses.8x.cv.expv.likelihood.instructions,
-                               total.prevalence.8x.cv.expv.likelihood.instructions,
-                               non.age.aids.diagnoses.likelihood.instructions.trans,
-                               population.likelihood.instructions.trans,
-                               heroin.likelihood.instructions.trans,
-                               cocaine.likelihood.instructions.trans,
-                               aids.deaths.likelihood.instructions.trans,
-                               idu.active.prior.ratio.likelihood.instructions
-  )
+    join.likelihood.instructions(
+        # race.risk.halfx.cv.expv.new.diagnoses.likelihood.instructions, 
+        #                          race.risk.halfx.cv.expv.prevalence.likelihood.instructions, 
+        #                          total.new.diagnoses.8x.cv.expv.likelihood.instructions,
+        #                          total.prevalence.8x.cv.expv.likelihood.instructions,
+        
+        race.risk.cv.expv.new.diagnoses.likelihood.instructions, # switching to these two 119
+        race.risk.cv.expv.prevalence.likelihood.instructions,
+        
+        non.age.aids.diagnoses.likelihood.instructions.trans,
+        population.likelihood.instructions.trans,
+        heroin.likelihood.instructions.trans,
+        cocaine.likelihood.instructions.trans,
+        aids.deaths.likelihood.instructions.trans,
+        idu.active.prior.ratio.likelihood.instructions
+    )
 
 # special case for C.31080
 transmission.pop.idu.aware.aids.testing.likelihood.instructions.4x.aids = 
@@ -2664,10 +2730,13 @@ FULL.oakland.likelihood.instructions = join.likelihood.instructions(
   emigration.likelihood.instructions.full,
   
   # TRANSMISSION LIKELIHOODS
-  total.new.diagnoses.16x.cv.expv.likelihood.instructions,
-  new.diagnoses.halfx.cv.expv.likelihood.instructions,
-  total.prevalence.16x.cv.expv.likelihood.instructions,
-  prevalence.halfx.cv.and.exp.v.likelihood.instructions,
+  # total.new.diagnoses.16x.cv.expv.likelihood.instructions,
+  # new.diagnoses.halfx.cv.expv.likelihood.instructions,
+  # total.prevalence.16x.cv.expv.likelihood.instructions,
+  # prevalence.halfx.cv.and.exp.v.likelihood.instructions,
+  
+  new.diagnoses.cv.expv.likelihood.instructions, # trying these out instead 11/9
+  prevalence.cv.and.exp.v.likelihood.instructions,
   
   # MORTALITY LIKELIHOODS
   general.mortality.likelihood.instructions.full,
