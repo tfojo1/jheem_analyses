@@ -46,7 +46,7 @@ PLOT.OUTCOMES <- "diagnosis.ps"                   # can add any of names(OUTCOME
 PLOT.YEARS    <- 2010:2025
 
 ## LOAD SIMSETS ----
-calib.simsets <- load.calib.simsets(locations = LOCATIONS, calibration.codes = CALIBRATION.CODE)
+calib.simsets <- load.calib.simsets(locations = LOCATIONS, calibration.codes = CALIBRATION.CODE, n.sim = N.SIM)
 entries <- Filter(function(e) e$calib.code == CALIBRATION.CODE, calib.simsets)
 if (length(entries) == 0) stop("No simsets loaded for ", CALIBRATION.CODE)
 names(entries) <- sapply(entries, `[[`, "location.name")

@@ -32,8 +32,8 @@ RUN <- c(
     "prior/check_prior_position.R"              = TRUE,
     # MCMC mixing: loads the raw MCMC; slow. mixing_check.R runs every step, including the
     # HTML report and the likelihood breakdown (step 8, the slowest)
-    "mcmc/mixing_check.R"                       = FALSE,
-    "mcmc/mixing_correlated_parameter_pairs.R"  = FALSE,
+    "mcmc/mixing_check.R"                       = TRUE,
+    "mcmc/mixing_correlated_parameter_pairs.R"  = TRUE,
     # reports: knitted to HTML next to the .Rmd (section 6 of msm_share loads simsets)
     "reports/msm_share_emory_vs_brfss.Rmd"      = FALSE,
     # review page: reads what the scripts above saved; knitted into the calibration folder. Keep it last.

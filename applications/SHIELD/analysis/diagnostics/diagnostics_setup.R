@@ -18,8 +18,11 @@
 # ****************************************************************************************************
 
 ## SETTINGS ----
-CALIBRATION.CODE <- "calib.10.20.stage3"
+CALIBRATION.CODE <- "calib.10.20.stage4"
 LOCATIONS        <- NULL                         # NULL = all 10 cities; or e.g. c(Baltimore = "C.12580")
+# Which saved simsets to read; change these with CALIBRATION.CODE. Every code a script loads must have them.
+N.SIM            <- 1000                         # fit and prior scripts: burned + thinned
+N.SIM.NO.BURN    <- 2000                         # likelihood breakdown: thinned only, so it still has the start of each chain
 
 ## SOURCES ----
 # 1. specification: also sources shield_source_code.R (data managers, jheem root directory,

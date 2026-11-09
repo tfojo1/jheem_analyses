@@ -10,7 +10,14 @@
 # How to use:
 #  1. Set CALIBRATION.CODE and LOCATIONS in diagnostics_setup.R
 #     (start with one city to test, then switch to all 10)
-#  2. Source the file up to "RUN", then run the RUN section line by line
+#  2. For a long calibration (stage 4: about 84 GB of chunks per city), build the MCMC cache first
+#     with mcmc/build_mcmc_cache.R in the background; this script then reads the cache
+#  3. Source the file up to "RUN", then run the RUN section line by line
+#
+# Which part of each chain:
+#  1. MIXING.BURN.KEEP (helpers/mcmc_helpers.R, default 0.5): the statistics, plots and leave-one-chain-out
+#     use the last half of each chain, the same simulations as the burned simset (N.SIM)
+#  2. burn.in.check() always uses the whole chain
 #
 # What each statistic tells you:
 #  1. Acceptance rate       - how often proposals are accepted. Target 0.238; ~0.15-0.35 is fine.
@@ -34,6 +41,7 @@ source("../jheem_analyses/applications/SHIELD/analysis/diagnostics/diagnostics_s
 # Outputs are saved on the server (shared with the team): <jheem root>/shield/calibration_diagnostics/<code>/mixing/
 # To change the PASS / CHECK / FAIL cut-offs, edit MIXING.THRESHOLDS here after sourcing the helpers,
 # e.g. MIXING.THRESHOLDS$ess.min <- 200
+# To use the whole chain instead of the last half: MIXING.BURN.KEEP <- 1
 
 
 # ****************************************************************************************************
@@ -55,7 +63,7 @@ head(d$by.parameter, 15)    # worst-mixing parameters first
 d$accept.by.block           # acceptance per parameter block, lowest first
 d$accept.block.by.chain     # block x chain
 
-# 3. Is one chain the problem? Would more burn-in help?
+# 3. Is one chain the problem? (last half of each chain) Would more burn-in help? (whole chain)
 drop.one.chain.check(m)
 burn.in.check(m)
 
@@ -73,7 +81,9 @@ plot.mcmc.diagnostics(m, d, title = .city.name(loc))
 write.mixing.report(LOCATIONS, CALIBRATION.CODE)
 
 # 8. Likelihood breakdown (slow: loads each city's simset and likelihood, one city at a time)
-lik.by.city <- run.likelihood.breakdown(LOCATIONS, CALIBRATION.CODE)
+#    Reads the simset with no burn, so the change during the run starts at the start of each chain.
+#    A city without that simset is reported and skipped.
+lik.by.city <- run.likelihood.breakdown(LOCATIONS, CALIBRATION.CODE, n.sim.saved = N.SIM.NO.BURN)
 lik.by.city                                                         # posterior.sd: likelihood x city
 lik.breakdown.list[[.mcmc.key(loc, CALIBRATION.CODE)]]$by.component  # one city: change + spread per likelihood
 lik.breakdown.list[[.mcmc.key(loc, CALIBRATION.CODE)]]$conflicts     # one city: likelihoods that pull against each other

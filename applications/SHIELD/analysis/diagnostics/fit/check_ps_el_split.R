@@ -25,7 +25,8 @@ YEARS             <- as.character(2015:2021)    # years for the PS:EL check
 
 ## LOAD SIMSETS ----
 calib.simsets <- load.calib.simsets(locations         = LOCATIONS,
-                                    calibration.codes = CALIBRATION.CODES)
+                                    calibration.codes = CALIBRATION.CODES,
+                                    n.sim             = N.SIM)
 
 ## observed.by.year ----
 # observed yearly counts for one outcome and city, averaged over data sources

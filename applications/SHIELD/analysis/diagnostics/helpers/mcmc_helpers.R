@@ -43,6 +43,13 @@ MIXING.THRESHOLDS <- list(
     loglik.gap      = 10      # a chain this far below the best chain -> FAIL (stuck in a worse spot)
 )
 
+# Share of each chain the diagnostics use (the last part), to match the simset the fit uses
+#  1. 0.5 = second half of each chain, the same as the burned simset from shield_assemble_and_thin.R
+#  2. 1   = the whole chain (no burn)
+#  The cache and mcmc.list keep the whole chain; the burn is applied when the statistics are computed.
+#  burn.in.check() always looks at the whole chain.
+MIXING.BURN.KEEP <- 0.5
+
 # Results are kept in these lists, keyed "location | calibration.code",
 # so nothing is overwritten when you move to the next city
 if (!exists("mcmc.list")) mcmc.list <- list()
@@ -62,10 +69,51 @@ if (!exists("diag.list")) diag.list <- list()
 # PART 1: LOADING
 # ****************************************************************************************************
 
+# TRUE when every chain of a calibration has finished
+.calibration.complete <- function(loc, calibration.code) {
+    pct <- tryCatch(get.calibration.progress("shield", loc, calibration.code),
+                    error = function(e) NA)
+    all(!is.na(pct) & pct == 100)
+}
+
+# An MCMC without its simulations, which the diagnostics do not need
+# 1. Finished calibration: drops the simulations as each chunk is read, so one chunk's worth is in
+#    memory at a time. Every chunk is still read from disk.
+# 2. Unfinished calibration: assembles what is there, with all its simulations, then drops them.
+# In case 1 @simulation.indices no longer lines up across chunks; nothing in the diagnostics uses it.
+.assemble.mcmc.without.sims <- function(loc, calibration.code) {
+    if (!.calibration.complete(loc, calibration.code)) {
+        m <- assemble.mcmc.from.calibration(version = "shield", location = loc,
+                                            calibration.code = calibration.code, allow.incomplete = TRUE)
+        m@simulations <- list()
+        return(m)
+    }
+
+    dir <- jheem2:::get.calibration.dir(version = "shield", location = loc, calibration.code = calibration.code,
+                                        root.dir = get.jheem.root.directory())
+    global.control <- bayesian.simulations:::get.cache.global.control(dir)
+    chunk.dir      <- bayesian.simulations:::get.cache.subdirectory(dir)
+
+    one.chain <- function(chain) {
+        chain.control <- bayesian.simulations:::get.cache.chain.control(dir, global.control, chain)
+        chunks <- lapply(chain.control@chunk.filenames[global.control@save.chunk], function(filename) {
+            load(file.path(chunk.dir, chain.control@chain.dir, filename))
+            mcmc@simulations <- list()
+            mcmc
+        })
+        do.call(mcmc.merge.serial, chunks)
+    }
+
+    chains <- lapply(seq_len(global.control@n.chains), one.chain)
+    m <- if (length(chains) == 1) chains[[1]] else mcmc.merge.parallel(chains)
+    m@simulations <- list()
+    m
+}
+
 # Cached MCMC loader
 # 1. Looks in mcmc.list (memory) first
 # 2. Then looks for a saved .rds file in cache.dir
-# 3. Otherwise assembles from the calibration, drops the simulations, and saves it
+# 3. Otherwise assembles from the calibration without the simulations, and saves it
 #    (only saved to disk if all chains are complete, so a partial run is not reused later)
 load.mcmc <- function(locations, calibration.code,
                       cache.dir = .cache.dir(),
@@ -83,18 +131,11 @@ load.mcmc <- function(locations, calibration.code,
         file <- file.path(cache.dir, paste0(calibration.code, "_", loc, ".rds"))
         if (!force.reload && file.exists(file)) return(readRDS(file))
 
-        m <- tryCatch(assemble.mcmc.from.calibration(version = "shield",
-                                                     location = loc,
-                                                     calibration.code = calibration.code,
-                                                     allow.incomplete = TRUE),
+        m <- tryCatch(.assemble.mcmc.without.sims(loc, calibration.code),
                       error = function(e) { message(loc, ": ", e$message); NULL })
         if (is.null(m)) return(NULL)
 
-        m@simulations <- list()   # not needed for diagnostics
-
-        pct <- tryCatch(get.calibration.progress("shield", loc, calibration.code),
-                        error = function(e) NA)
-        if (all(!is.na(pct) & pct == 100)) saveRDS(m, file)
+        if (.calibration.complete(loc, calibration.code)) saveRDS(m, file)
         else message(loc, ": calibration not complete - kept in memory only, not saved to disk")
         m
     }
@@ -121,6 +162,26 @@ load.mcmc <- function(locations, calibration.code,
 # ****************************************************************************************************
 
 # ---- helpers ----
+
+# keep the last `keep` share of each chain's saved draws
+# subset.mcmc(additional.burn = ) cannot be used: in bayesian.simulations it fails whenever
+# additional.thin = 1 (its first.in.thin.group mask is all FALSE). With no extra thinning a burn
+# only drops iterations, so this slices every slot that has one column per saved draw (chain x iteration [x ...]).
+.burn.mcmc <- function(m, keep = MIXING.BURN.KEEP) {
+    n.burn <- floor((1 - keep) * m@n.iter)
+    if (n.burn <= 0) return(m)
+    k <- (n.burn + 1):m@n.iter
+    m@samples            <- m@samples[, k, , drop = FALSE]
+    m@log.likelihoods    <- m@log.likelihoods[, k, drop = FALSE]
+    m@log.priors         <- m@log.priors[, k, drop = FALSE]
+    m@n.accepted         <- m@n.accepted[, k, , drop = FALSE]
+    m@run.times          <- m@run.times[, k, drop = FALSE]
+    m@first.step.for.iter <- m@first.step.for.iter[, k, drop = FALSE]
+    m@simulation.indices <- m@simulation.indices[, k, drop = FALSE]
+    m@burn               <- as.integer(m@burn + n.burn * m@thin)
+    m@n.iter             <- length(k)
+    m
+}
 
 # samples as a 3D array: iteration x chain x variable
 .get.samples <- function(m) {
@@ -177,7 +238,9 @@ load.mcmc <- function(locations, calibration.code,
 
 
 # ---- main function ----
-mcmc.diagnostics <- function(m, stuck.tolerance = 0) {
+# m is the whole chain; only the last burn.keep share of each chain is used
+mcmc.diagnostics <- function(m, stuck.tolerance = 0, burn.keep = MIXING.BURN.KEEP) {
+    m        <- .burn.mcmc(m, burn.keep)
     s        <- .get.samples(m)          # iteration x chain x variable
     n.chains <- dim(s)[2]
     vars     <- dimnames(s)[[3]]
@@ -248,7 +311,8 @@ mcmc.diagnostics <- function(m, stuck.tolerance = 0) {
         n.ess.under.100     = sum(per.param$ess.total < 100),
         n.geweke.over.2     = sum(per.param$geweke.max.abs > 2, na.rm = TRUE),
         max.loglik.gap      = max(by.chain$loglik.gap.from.best),
-        run.time.hours      = round(sum(m@total.run.time) / 3600, 1)
+        run.time.hours      = round(sum(m@total.run.time) / 3600, 1),
+        burn.keep           = burn.keep                      # share of each chain used
     )
 
     list(summary               = summary,
@@ -261,7 +325,10 @@ mcmc.diagnostics <- function(m, stuck.tolerance = 0) {
 
 
 # ---- plots for one MCMC ----
+# m is the whole chain; the plots use the same share of each chain as d
 plot.mcmc.diagnostics <- function(m, d = mcmc.diagnostics(m), n.worst = 9, title = "") {
+    force(d)                                   # computed from the whole chain, before m is burned below
+    m  <- .burn.mcmc(m, d$summary$burn.keep)
     ll <- d$loglik
     matplot(ll, type = "l", lty = 1, col = seq_len(ncol(ll)),
             xlab = "saved iteration", ylab = "log-likelihood",
@@ -310,7 +377,9 @@ run.mixing.diagnostics <- function(locations, calibration.code, n.cores = 4, for
         m   <- mcmc.list[[key]]
         if (is.null(m)) return(data.frame(city = .city.name(loc), location = loc, verdict = "NOT LOADED"))
 
-        if (force.recompute || is.null(diag.list[[key]]))
+        # recompute when MIXING.BURN.KEEP has changed since the last run
+        if (force.recompute || is.null(diag.list[[key]]) ||
+            !identical(diag.list[[key]]$summary$burn.keep, MIXING.BURN.KEEP))
             diag.list[[key]] <<- mcmc.diagnostics(m)
         d <- diag.list[[key]]
 
@@ -351,10 +420,11 @@ params.failing.across.cities <- function(locations, calibration.code, rhat.cutof
 
 
 # ---- 3d. Is one chain the problem? ----
-# Recomputes R-hat leaving out each chain in turn.
+# Recomputes R-hat leaving out each chain in turn, on the last burn.keep share of each chain.
 # If dropping one chain brings R-hat down a lot, that chain is stuck somewhere else.
-drop.one.chain.check <- function(m) {
+drop.one.chain.check <- function(m, burn.keep = MIXING.BURN.KEEP) {
     if (m@n.chains < 3) stop("Need at least 3 chains to drop one and still compute R-hat")
+    m <- .burn.mcmc(m, burn.keep)
     base <- max(get.rhats(m))
     rv <- do.call(rbind, lapply(seq_len(m@n.chains), function(ch) {
         keep <- setdiff(seq_len(m@n.chains), ch)
@@ -371,14 +441,17 @@ drop.one.chain.check <- function(m) {
 
 # ---- 3e. Would more burn-in help? ----
 # Recomputes R-hat after throwing away the first 0%, 25%, 50% of each chain.
+# Always on the whole chain (m as loaded, not burned by MIXING.BURN.KEEP).
 # If R-hat drops a lot with more burn-in, the chains were still converging early on
 # (so a longer run, or a later start, would help).
+# Burns with .burn.mcmc(), not get.rhats(additional.burn = ): get.rhats() drops the burned draws but
+# still uses the whole chain's length as N, which inflates R-hat.
 burn.in.check <- function(m, fractions = c(0, 0.25, 0.5)) {
     do.call(rbind, lapply(fractions, function(f) {
-        burn <- floor(f * m@n.iter)
-        r <- get.rhats(m, additional.burn = burn)
+        b <- .burn.mcmc(m, keep = 1 - f)
+        r <- get.rhats(b)
         data.frame(burn.fraction   = f,
-                   samples.left    = m@n.iter - burn,
+                   samples.left    = b@n.iter,
                    max.rhat        = round(max(r), 3),
                    n.rhat.over.1.1 = sum(r > 1.1),
                    n.rhat.over.1.05= sum(r > 1.05))
@@ -550,8 +623,9 @@ write.mixing.report <- function(locations, calibration.code,
     # ---- run settings (from the registration) ----
     info <- tryCatch(get.calibration.info(calibration.code), error = function(e) NULL)
     settings <- data.frame(
-        setting = c("calibration code", "report date", "cities", "chains", "iterations", "thin", "preceded by"),
-        value   = c(calibration.code, format(Sys.time(), "%Y-%m-%d %H:%M"), length(locations),
+        setting = c("calibration code", "report date", "cities", "share of each chain used (last part)",
+                    "chains", "iterations", "thin", "preceded by"),
+        value   = c(calibration.code, format(Sys.time(), "%Y-%m-%d %H:%M"), length(locations), MIXING.BURN.KEEP,
                     if (!is.null(info)) info$n.chains else NA,
                     if (!is.null(info)) info$n.iter else NA,
                     if (!is.null(info)) info$thin else NA,
@@ -591,8 +665,9 @@ write.mixing.report <- function(locations, calibration.code,
         v <- mixing.verdict(d$summary)
         accept.block <- data.frame(block = names(d$accept.by.block),
                                    acceptance = round(as.numeric(d$accept.by.block), 3))
-        drop.chain <- tryCatch(drop.one.chain.check(m), error = function(e) NULL)
-        burn       <- tryCatch(burn.in.check(m),        error = function(e) NULL)
+        drop.chain <- tryCatch(drop.one.chain.check(m, d$summary$burn.keep), error = function(e) NULL)
+        burn       <- tryCatch(burn.in.check(m),        error = function(e) NULL)   # whole chain
+        m.used     <- .burn.mcmc(m, d$summary$burn.keep)                            # for the plots
 
         plots <- if (include.plots) paste0(
             "<h3>Log-likelihood by chain</h3>",
@@ -604,9 +679,9 @@ write.mixing.report <- function(locations, calibration.code,
                        col = seq_len(ncol(ll)), lty = 1, bty = "n")
             }),
             "<h3>Acceptance over time, by chain</h3>",
-            img(function() print(acceptance.plot(m))),
+            img(function() print(acceptance.plot(m.used))),
             "<h3>Trace plots: worst-mixing parameters</h3>",
-            img(function() print(trace.plot(m, var.names = head(d$by.parameter$parameter, n.trace.params),
+            img(function() print(trace.plot(m.used, var.names = head(d$by.parameter$parameter, n.trace.params),
                                             exact.var.names = TRUE)), height = 900)
         ) else ""
 

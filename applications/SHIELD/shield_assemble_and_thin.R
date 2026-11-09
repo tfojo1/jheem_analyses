@@ -125,6 +125,18 @@ if (need.burned) {
     print(paste0("Keeping the last ", BURN.KEEP, " of each chain: ", N.BURNED, " simulations"))
     burned <- thinned$burn(keep = BURN.KEEP)
     save.simset(burned, N.BURNED)
-} else print(paste0("Burned simset already saved: ", simset.file(N.BURNED)))
+} else {
+    print(paste0("Burned simset already saved: ", simset.file(N.BURNED)))
+    # 4. Consistency check, when the thinned simset was made after the burned one ----
+    # The burned simset on disk is not overwritten (interventions may be built on it), so check that
+    # burning the new thinned simset gives the same simulations: MATCH = same parameters, in the same order
+    if (need.thinned) {
+        saved <- load.simset(N.BURNED)
+        new   <- thinned$burn(keep = BURN.KEEP)
+        same  <- saved$n.sim == new$n.sim && isTRUE(all.equal(saved$parameters, new$parameters, check.attributes = FALSE))
+        print(paste0("Burned simset on disk vs burn of the new thinned simset: ", if (same) "MATCH" else "DIFFERENT"))
+        if (!same) print("The burned simset on disk was not made from this thinned simset. Check before using the thinned one with it.")
+    }
+}
 
 print(paste0("Assemble and thin complete for ", LOCATION))

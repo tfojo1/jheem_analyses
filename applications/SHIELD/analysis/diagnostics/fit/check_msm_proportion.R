@@ -31,7 +31,8 @@ YEARS            <- 2000:2030  # model years to plot
 
 ## LOAD SIMSETS ----
 calib.simsets <- load.calib.simsets(locations         = LOCATIONS,
-                                    calibration.codes = CALIBRATION.CODE)
+                                    calibration.codes = CALIBRATION.CODE,
+                                    n.sim             = N.SIM)
 
 ## men.15plus ----
 # men aged 15+ in the given sex groups, as year x race x sim

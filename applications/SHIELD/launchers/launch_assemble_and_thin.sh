@@ -44,7 +44,7 @@ export MKL_NUM_THREADS=1
 
 # ── config: EDIT THESE for each run ───────────────────────────────────────────
 CITIES=(
-   C.26420 C.31080  C.33100 
+   C.37980 C.38060 C.42660   # stage 4: these three are missing the thinned (2,000) simset
 )
 CALIB_CODE=calib.10.20.stage4
 THIN_EVERY=500   # iterations between kept simulations

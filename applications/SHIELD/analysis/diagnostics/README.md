@@ -17,6 +17,9 @@ Outputs:
 2. `mcmc/` writes to `calibration_diagnostics/<calibration code>/mixing/` (plots in `mixing/plots/`);
    only its MCMC cache stays in `<jheem root>/shield/mcmc_diagnostics/mcmc_cache/`
 
+Simsets read: set `N.SIM` (fit and prior scripts) and `N.SIM.NO.BURN` (likelihood breakdown) in
+`diagnostics_setup.R`, along with `CALIBRATION.CODE`. Neither should be the full simset, which is 85 GB per city in stage 4.
+
 ## Files
 
 | Folder | File | What it does | Needs simsets? |
@@ -24,7 +27,8 @@ Outputs:
 | | `diagnostics_setup.R` | calibration code, locations, sources, output folder | – |
 | helpers | `mcmc_helpers.R` | functions for the mixing checks (R-hat, ESS, acceptance, report) | – |
 | helpers | `fit_helpers.R` | `observed.by.sex()`, `check.session()` | – |
-| mcmc | `mixing_check.R` | MCMC mixing and acceptance, per city; HTML report | raw MCMC |
+| mcmc | `build_mcmc_cache.R` | reads each city's raw MCMC once and saves the slimmed copy to `mcmc_cache/`; run it in the background first for long calibrations (stage 4: about 84 GB of chunks per city) | raw MCMC |
+| mcmc | `mixing_check.R` | MCMC mixing and acceptance, per city; HTML report. Uses the last `MIXING.BURN.KEEP` (0.5) of each chain, the same simulations as `N.SIM` | raw MCMC |
 | mcmc | `mixing_correlated_parameter_pairs.R` | strongly correlated parameter pairs, and whether they share a sampling block | raw MCMC |
 | fit | `check_fit_by_sex_over_time.R` | diagnoses by sex, model / data by period; plots; transmission multipliers; incidence and share diagnosed | yes |
 | fit | `check_fit_by_age.R` | diagnoses by age, model / data, 2019-2021; plots | yes |

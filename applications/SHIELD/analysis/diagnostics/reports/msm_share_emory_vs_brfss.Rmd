@@ -262,7 +262,7 @@ This section shows the model's MSM share of men aged 15+ for calibration ``r CAL
 
 ```{r model, eval = params$run.model, fig.height = 9}
 YEARS <- 2000:2030
-calib.simsets <- load.calib.simsets(locations = SHIELD.TEN.MSAS, calibration.codes = CALIBRATION.CODE)
+calib.simsets <- load.calib.simsets(locations = SHIELD.TEN.MSAS, calibration.codes = CALIBRATION.CODE, n.sim = N.SIM)
 
 ## model.total ----
 # share of men aged 15+ who are MSM: median and 95% interval across sims, by year

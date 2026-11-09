@@ -68,16 +68,14 @@ if (!exists("pair.corr.list")) pair.corr.list <- list()    # per-city results, k
 
 # Load one slimmed MCMC: memory (mcmc.list from mixing_check.R) -> disk cache -> assemble
 # one city at a time and not kept in mcmc.list, so 10 cities do not all sit in memory at once
+# Assembling here is not saved to the cache: build the cache first (mcmc/build_mcmc_cache.R)
 .load.one.mcmc <- function(loc, calibration.code, cache.dir = MCMC.CACHE.DIR) {
     key <- .mcmc.key(loc, calibration.code)
     if (exists("mcmc.list") && !is.null(mcmc.list[[key]])) return(mcmc.list[[key]])
     file <- file.path(cache.dir, paste0(calibration.code, "_", loc, ".rds"))
     if (file.exists(file)) return(readRDS(file))
     message(.city.name(loc), ": no cache found - assembling from the calibration (slower)")
-    m <- assemble.mcmc.from.calibration(version = "shield", location = loc,
-                                        calibration.code = calibration.code, allow.incomplete = TRUE)
-    m@simulations <- list()
-    m
+    .assemble.mcmc.without.sims(loc, calibration.code)
 }
 
 # logit for proportions, log for other positive parameters
@@ -114,8 +112,9 @@ if (!exists("pair.corr.list")) pair.corr.list <- list()    # per-city results, k
 # PART 2: ONE CITY -> all pairs with their r.within
 # ****************************************************************************************************
 
-pair.correlations <- function(m, city = "") {
-    s    <- .transform.samples(.get.samples(m))
+# uses the last MIXING.BURN.KEEP share of each chain, like mixing_check.R
+pair.correlations <- function(m, city = "", burn.keep = MIXING.BURN.KEEP) {
+    s    <- .transform.samples(.get.samples(.burn.mcmc(m, burn.keep)))
     vars <- dimnames(s)[[3]]
     r    <- .within.chain.cor(s)
     ut   <- which(upper.tri(r), arr.ind = TRUE)

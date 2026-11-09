@@ -33,7 +33,7 @@ OUTCOMES <- c(diagnosis.total              = "total.syphilis.diagnoses",        
 
 ## LOAD SIMSETS ----
 # load.calib.simsets() finds calib.simsets in the session, reuses those entries and reads only the missing ones from file
-calib.simsets <- load.calib.simsets(locations = LOCATIONS, calibration.codes = CALIBRATION.CODE)
+calib.simsets <- load.calib.simsets(locations = LOCATIONS, calibration.codes = CALIBRATION.CODE, n.sim = N.SIM)
 entries <- Filter(function(e) e$calib.code == CALIBRATION.CODE, calib.simsets)
 if (length(entries) == 0) stop("No simsets loaded for ", CALIBRATION.CODE)
 

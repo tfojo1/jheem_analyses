@@ -26,7 +26,8 @@ N.PRIOR.DRAWS     <- 10000
 ## LOAD SIMSETS ----
 # load.calib.simsets() finds calib.simsets in the session, reuses those entries and reads only the missing ones from file
 calib.simsets <- load.calib.simsets(locations         = LOCATIONS,
-                                    calibration.codes = CALIBRATION.CODES)
+                                    calibration.codes = CALIBRATION.CODES,
+                                    n.sim             = N.SIM)
 
 ## PRIOR DRAWS ----
 # draws from the full prior, one row per draw, one column per parameter
