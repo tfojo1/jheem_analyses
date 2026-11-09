@@ -3,6 +3,9 @@
 # ****************************************************************************************************
 # Runs the diagnostic scripts you switch on below, one after another, for the calibration set in
 # diagnostics_setup.R.
+# For the calibration diagnostics, use the two runners instead (they check their inputs first):
+#   run_mcmc_diagnostics.R        step 1: do the chains mix?
+#   run_likelihood_diagnostics.R  step 2: what does each likelihood contribute?
 # 1. TRUE = run, FALSE = skip
 # 2. a script that fails is reported and skipped; the rest still run
 # 3. at the end: one row per script with its status, minutes and error (if any)
@@ -19,27 +22,34 @@ source("../jheem_analyses/applications/SHIELD/analysis/diagnostics/diagnostics_s
 
 ## RUN ----
 # script (path inside diagnostics/) = TRUE to run
+# RUN <- c(
+#     # data only: quick, no simsets
+#     "prior/check_spline_prior_against_data.R"   = TRUE,
+#     "prior/check_diagnosis_shifts_by_sex.R"     = TRUE,
+#     # fit to data: loads one simset per city (slow the first time; reused after)
+#     "fit/check_fit_by_sex_over_time.R"          = TRUE,
+#     "fit/check_fit_by_age.R"                    = TRUE,
+#     "fit/check_fit_by_race.R"                   = TRUE,
+#     "fit/check_ps_el_split.R"                   = TRUE,
+#     "fit/check_msm_proportion.R"                = TRUE,
+#     "prior/check_prior_position.R"              = TRUE,
+#     # MCMC mixing: reads the raw MCMC (build the cache first: mcmc/build_mcmc_cache.R)
+#     "mcmc/mixing_check.R"                       = TRUE,
+#     "mcmc/mixing_correlated_parameter_pairs.R"  = TRUE,
+#     # likelihoods: loads the N.SIM.NO.BURN simset and the likelihood, one city at a time; slow
+#     "likelihood/likelihood_breakdown.R"         = TRUE,
+#     # reports: knitted to HTML next to the .Rmd (section 6 of msm_share loads simsets)
+#     "reports/msm_share_emory_vs_brfss.Rmd"      = FALSE,
+#     # review page: reads what the scripts above saved; knitted into the calibration folder. Keep it last.
+#     "reports/calibration_review.Rmd"            = TRUE
+# )
 RUN <- c(
-    # data only: quick, no simsets
-    "prior/check_spline_prior_against_data.R"   = TRUE,
-    "prior/check_diagnosis_shifts_by_sex.R"     = TRUE,
-    # fit to data: loads one simset per city (slow the first time; reused after)
-    "fit/check_fit_by_sex_over_time.R"          = TRUE,
-    "fit/check_fit_by_age.R"                    = TRUE,
-    "fit/check_fit_by_race.R"                   = TRUE,
-    "fit/check_ps_el_split.R"                   = TRUE,
-    "fit/check_msm_proportion.R"                = TRUE,
-    "prior/check_prior_position.R"              = TRUE,
-    # MCMC mixing: loads the raw MCMC; slow. mixing_check.R runs every step, including the
-    # HTML report and the likelihood breakdown (step 8, the slowest)
+    # 1. MCMC mixing: reads the raw MCMC, no simsets (build the cache first: mcmc/build_mcmc_cache.R)
     "mcmc/mixing_check.R"                       = TRUE,
     "mcmc/mixing_correlated_parameter_pairs.R"  = TRUE,
-    # reports: knitted to HTML next to the .Rmd (section 6 of msm_share loads simsets)
-    "reports/msm_share_emory_vs_brfss.Rmd"      = FALSE,
-    # review page: reads what the scripts above saved; knitted into the calibration folder. Keep it last.
-    "reports/calibration_review.Rmd"            = TRUE
+    # 2. likelihoods: once the chains mix. Loads the N.SIM.NO.BURN simset and the likelihood, one city at a time; slow
+    "likelihood/likelihood_breakdown.R"         = FALSE
 )
-
 ## run.one ----
 # source an .R script (printing what it prints when run by hand), or knit an .Rmd
 # returns status, minutes and the error message

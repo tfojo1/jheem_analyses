@@ -47,7 +47,7 @@
 
 # ****************************************************************************************************
 
-# specification (SHIELD.FULL.PARAMETERS.SAMPLING.BLOCKS), dplyr and helpers/mcmc_helpers.R
+# specification (SHIELD.FULL.PARAMETERS.SAMPLING.BLOCKS), dplyr and mcmc/mcmc_helpers.R
 # (.mcmc.key, .city.name, .get.samples, .cache.dir, .mixing.dir)
 source("../jheem_analyses/applications/SHIELD/analysis/diagnostics/diagnostics_setup.R")
 

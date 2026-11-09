@@ -10,7 +10,7 @@
 #    all read from the shared drive. That takes hours, so run it unattended.
 # 2. each city's cache is saved as soon as that city is done, so a crash loses only the cities in progress
 # 3. a city that is already cached is read from the cache (quick), so a rerun picks up where it stopped
-# 4. a city with an unfinished chain is not saved to the cache (see load.mcmc in helpers/mcmc_helpers.R)
+# 4. a city with an unfinished chain is not saved to the cache (see load.mcmc in mcmc/mcmc_helpers.R)
 #
 # Settings: CALIBRATION.CODE and LOCATIONS come from diagnostics_setup.R
 #

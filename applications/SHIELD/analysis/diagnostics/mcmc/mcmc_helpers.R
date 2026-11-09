@@ -4,11 +4,13 @@
 # Functions only. Sourcing this file does not load the specification, data managers or calibrations,
 # so you can source it from any script and use the functions on their own.
 # To run the full diagnostics on a calibration, use mcmc/mixing_check.R (diagnostics_setup.R sources this file).
+# Uses only the raw MCMC (parameter draws, log-likelihood, log-prior, acceptance), never the simsets.
+# The likelihood breakdown, which needs the simsets, is in likelihood/likelihood_helpers.R.
 #
 # What the functions need when you call them:
-#  1. jheem2 loaded and the jheem root directory set - for loading MCMCs / simsets and the default folders
+#  1. jheem2 loaded and the jheem root directory set - for loading MCMCs and the default folders
 #  2. The calibration registered (shield_calib_register.R) - for get.calibration.info():
-#     the run settings in the report and the likelihood breakdown (3i)
+#     the run settings in the report
 #  3. Optional: SHIELD.TEN.MSAS (commoncode/locations_of_interest.R) - to show city names instead of codes
 #
 # Contents:
@@ -16,7 +18,7 @@
 #  PART 2: one MCMC          - mcmc.diagnostics(), plot.mcmc.diagnostics()
 #  PART 3: extensions        - 3a verdict, 3b many cities, 3c params failing across cities,
 #                              3d drop one chain, 3e burn-in, 3f save plots, 3g compare calibrations,
-#                              3i likelihood breakdown, 3h HTML report
+#                              3h HTML report
 # ****************************************************************************************************
 
 library(bayesian.simulations)
@@ -34,21 +36,30 @@ library(bayesian.simulations)
 .cache.dir  <- function() file.path(get.jheem.root.directory(), "shield", "mcmc_diagnostics", "mcmc_cache")
 
 # Thresholds used to flag a city (used by mixing.verdict)
+# R-hat is the rank-normalized split R-hat; ESS is the bulk ESS across all chains (see PART 2)
 MIXING.THRESHOLDS <- list(
-    rhat.fail       = 1.1,    # any parameter above this -> FAIL
-    rhat.check      = 1.05,   # any parameter above this -> CHECK
-    ess.min         = 100,    # any parameter below this -> CHECK
-    accept.low      = 0.10,   # any chain below this     -> FAIL (stuck)
-    accept.high     = 0.50,   # any chain above this     -> CHECK (steps too small)
-    loglik.gap      = 10      # a chain this far below the best chain -> FAIL (stuck in a worse spot)
+    rhat.fail        = 1.1,    # any parameter, or the log-posterior, above this -> FAIL
+    rhat.check       = 1.05,   # any parameter, or the log-posterior, above this -> CHECK
+    ess.min          = 400,    # any parameter below this (about 100 per chain)   -> CHECK
+    accept.low       = 0.10,   # any chain below this                             -> FAIL (stuck)
+    accept.high      = 0.50,   # any chain above this                             -> CHECK (steps too small)
+    block.accept.low = 0.05    # any block below this in any chain                -> CHECK (block stuck in that chain)
 )
+# Shown in the tables but not in the verdict:
+#  1. Geweke z: one test per parameter per chain (692 for 173 parameters x 4 chains), so about 5% pass |z| > 2
+#     by chance and every city would get CHECK. The split R-hat already catches drift within a chain.
+#  2. Log-likelihood gap between chains: the cut-off depends on the scale of the likelihood.
+#     R-hat of the log-posterior answers the same question without a scale.
 
-# Share of each chain the diagnostics use (the last part), to match the simset the fit uses
-#  1. 0.5 = second half of each chain, the same as the burned simset from shield_assemble_and_thin.R
-#  2. 1   = the whole chain (no burn)
+# Version of the statistics; diag.list results made with another version are recomputed
+.MIXING.METHOD <- "rank-split-rhat, bulk-ess (2026-11)"
+
+# Share of each chain the diagnostics use (the last part). Default only; it is set in diagnostics_setup.R
+#  1. 0.5 = second half of each chain, the same stretch as the burned simset (N.SIM) - recommended
+#  2. 1   = the whole chain, including its start (not recommended: see mixing_check.R)
 #  The cache and mcmc.list keep the whole chain; the burn is applied when the statistics are computed.
 #  burn.in.check() always looks at the whole chain.
-MIXING.BURN.KEEP <- 0.5
+if (!exists("MIXING.BURN.KEEP")) MIXING.BURN.KEEP <- 0.5
 
 # Results are kept in these lists, keyed "location | calibration.code",
 # so nothing is overwritten when you move to the next city
@@ -198,7 +209,7 @@ load.mcmc <- function(locations, calibration.code,
     x
 }
 
-# ESS for one chain (Geyer initial positive sequence)
+# ESS for one chain (Geyer initial positive sequence); used for ess.min.chain and Geweke
 .ess.one.chain <- function(x) {
     n <- length(x)
     if (n < 4 || var(x) == 0) return(0)
@@ -212,17 +223,85 @@ load.mcmc <- function(locations, calibration.code,
     min(n, n / max(tau, 1e-8))
 }
 
-# Rank-normalized R-hat for one parameter (x = iteration x chain)
-# (get.rhats(rank.normalize = TRUE) in bayesian.simulations errors, so we compute it here)
-.rank.rhat <- function(x) {
-    n <- nrow(x)
+# ---- R-hat and ESS (Vehtari et al. 2021, as in Stan and the posterior package) ----
+# The posterior package is not installed, so these are written out here.
+# x is always one parameter as iteration x chain.
+
+# split each chain in half: iteration x chain -> (iteration / 2) x (2 x chain)
+# A trend inside a chain then shows up as two halves that disagree. The middle draw is dropped if odd.
+.split.chains <- function(x) {
+    half <- floor(nrow(x) / 2)
+    cbind(x[seq_len(half), , drop = FALSE], x[nrow(x) - half + seq_len(half), , drop = FALSE])
+}
+
+# replace each draw by the normal quantile of its rank among all draws (all chains together)
+# so skewed or heavy-tailed parameters behave like normal ones
+.rank.normalize <- function(x) {
     z <- qnorm((rank(x) - 3/8) / (length(x) + 1/4))
     dim(z) <- dim(x)
-    W <- mean(apply(z, 2, var))
-    B <- n * var(colMeans(z))
-    if (W == 0) return(NA)
+    z
+}
+
+# Gelman-Rubin R-hat: spread of all draws vs spread within chains
+.rhat.basic <- function(x) {
+    n <- nrow(x)
+    W <- mean(apply(x, 2, var))
+    if (!is.finite(W) || W == 0) return(NA_real_)
+    B <- n * var(colMeans(x))
     sqrt(((n - 1) / n * W + B / n) / W)
 }
+
+# Rank-normalized split R-hat, the one used in the verdict
+#  1. bulk: R-hat of the rank-normalized split chains (do the centres agree?)
+#  2. tail: the same on the distance from the median (do the spreads agree?)
+#  returns the larger of the two.
+# Not get.rhats() from bayesian.simulations: it does not split the chains, so a drift shared by all
+# chains is missed (and get.rhats(rank.normalize = TRUE) errors).
+.rhat.rank.split <- function(x) {
+    r <- c(.rhat.basic(.split.chains(.rank.normalize(x))),
+           .rhat.basic(.split.chains(.rank.normalize(abs(x - median(x))))))
+    if (all(is.na(r))) NA_real_ else max(r, na.rm = TRUE)
+}
+
+# R-hat for every parameter, worst first (s = iteration x chain x variable)
+.rhats <- function(s, chains = seq_len(dim(s)[2])) {
+    r <- sapply(dimnames(s)[[3]], function(v) .rhat.rank.split(matrix(s[, chains, v], ncol = length(chains))))
+    sort(r, decreasing = TRUE, na.last = TRUE)
+}
+
+# autocovariance of one series at lags 0 to n-1 (divided by n), by FFT
+.autocovariance <- function(y) {
+    n  <- length(y)
+    m2 <- 2 * nextn(n)
+    f  <- fft(c(y - mean(y), rep(0, m2 - n)))
+    Re(fft(Conj(f) * f, inverse = TRUE))[seq_len(n)] / (m2 * n)
+}
+
+# ESS across all chains
+# 1. autocorrelation is worked out with all chains together, against the variance of all draws
+#    (within and between chains), so chains that sit in different places give a low ESS.
+#    Adding up the ESS of each chain would not: each chain can look well mixed on its own.
+# 2. lags are summed in pairs while the pair sum is positive, and the pair sums are kept from going up
+.ess.multi.chain <- function(x) {
+    n <- nrow(x); k <- ncol(x)
+    if (n < 4) return(NA_real_)
+    acov <- apply(x, 2, .autocovariance)                      # lag x chain
+    W    <- mean(acov[1, ]) * n / (n - 1)                     # mean variance within chains
+    if (!is.finite(W)) return(NA_real_)
+    if (W == 0) return(0)                                     # nothing moves within the chains
+    var.plus <- W * (n - 1) / n + if (k > 1) var(colMeans(x)) else 0
+    rho  <- 1 - (W - rowMeans(acov)) / var.plus               # autocorrelation by lag, all chains
+    rho[1] <- 1
+    n.pairs <- floor(n / 2)
+    pair <- rho[2 * seq_len(n.pairs) - 1] + rho[2 * seq_len(n.pairs)]
+    stop.at <- which(pair <= 0)[1]
+    if (!is.na(stop.at)) pair <- pair[seq_len(stop.at - 1)]
+    tau <- max(-1 + 2 * sum(cummin(pair)), 1 / log10(n * k))
+    n * k / tau
+}
+
+# bulk ESS: ESS of the rank-normalized split chains, the one used in the verdict
+.ess.bulk <- function(x) .ess.multi.chain(.split.chains(.rank.normalize(x)))
 
 # Geweke z: mean of first 10% vs last 50%
 .geweke.z <- function(x, first = 0.1, last = 0.5) {
@@ -239,62 +318,73 @@ load.mcmc <- function(locations, calibration.code,
 
 # ---- main function ----
 # m is the whole chain; only the last burn.keep share of each chain is used
-mcmc.diagnostics <- function(m, stuck.tolerance = 0, burn.keep = MIXING.BURN.KEEP) {
+# No "stuck fraction" (share of saved draws with no change): the sampler proposes one block per iteration
+# and there are about 70 blocks, so a block is proposed less than once per saved draw (thin = 50). No change
+# between saved draws is then the normal case, not a sign of a stuck chain (stage 3: all 173 parameters
+# "stuck" in every chain). Acceptance by block and chain (1) is the check for that.
+mcmc.diagnostics <- function(m, burn.keep = MIXING.BURN.KEEP, th = MIXING.THRESHOLDS) {
     m        <- .burn.mcmc(m, burn.keep)
     s        <- .get.samples(m)          # iteration x chain x variable
     n.chains <- dim(s)[2]
     vars     <- dimnames(s)[[3]]
 
-    # 1. Acceptance
+    # 1. Acceptance: total, by chain, by block, and block x chain
     accept.total    <- get.total.acceptance.rate(m)
     accept.by.chain <- get.total.acceptance.rate(m, aggregate.chains = FALSE)
     accept.by.block <- get.total.acceptance.rate(m, by.block = TRUE)
-    accept.block.by.chain <- get.total.acceptance.rate(m, by.block = TRUE, aggregate.chains = FALSE)
+    accept.block.by.chain <- get.total.acceptance.rate(m, by.block = TRUE, aggregate.chains = FALSE)   # chain x block
 
-    # 2-3. R-hat (plain and rank-normalized)
-    if (n.chains > 1) {
-        rhat      <- get.rhats(m, sort = FALSE)
-        rhat.rank <- sapply(vars, function(v) .rank.rhat(matrix(s[, , v], ncol = n.chains)))
-    } else {
-        rhat <- rhat.rank <- setNames(rep(NA_real_, length(vars)), vars)
-    }
+    # blocks almost never accepted in at least one chain: their parameters barely move in that chain
+    abc <- matrix(accept.block.by.chain, nrow = n.chains,
+                  dimnames = list(chain = seq_len(n.chains), block = names(accept.by.block)))
+    low <- which(abc < th$block.accept.low, arr.ind = TRUE)
+    blocks.low <- data.frame(block      = colnames(abc)[low[, "block"]],
+                             chain      = as.integer(low[, "chain"]),
+                             acceptance = round(abc[low], 3))
+    blocks.low <- blocks.low[order(blocks.low$acceptance), ]
+    rownames(blocks.low) <- NULL
 
-    # 4-7. Per-parameter statistics
+    # 2. R-hat: rank-normalized split (verdict), and the classic one from get.rhats() to compare with older reports
+    rhat <- .rhats(s)
+    rhat.classic <- if (n.chains > 1) get.rhats(m, sort = FALSE) else setNames(rep(NA_real_, length(vars)), vars)
+
+    # 3-6. Per-parameter statistics
     per.param <- do.call(rbind, lapply(vars, function(v) {
         x <- s[, , v, drop = FALSE]; dim(x) <- dim(x)[1:2]   # iteration x chain
         ess.per.chain <- apply(x, 2, .ess.one.chain)
         lag1 <- apply(x, 2, function(y) if (var(y) == 0) 1 else acf(y, lag.max = 1, plot = FALSE)$acf[2])
         gz   <- apply(x, 2, .geweke.z)
-        stuck <- apply(x, 2, function(y) mean(abs(diff(y)) <= stuck.tolerance))
         data.frame(
             parameter      = v,
-            rhat           = unname(rhat[v]),
-            rhat.rank      = unname(rhat.rank[v]),
-            ess.total      = round(sum(ess.per.chain)),
+            rhat           = round(unname(rhat[v]), 3),
+            rhat.classic   = round(unname(rhat.classic[v]), 3),
+            ess.bulk       = round(.ess.bulk(x)),
             ess.min.chain  = round(min(ess.per.chain)),
             lag1.acf.max   = round(max(lag1), 3),
             geweke.max.abs = suppressWarnings(round(max(abs(gz), na.rm = TRUE), 2)),
-            stuck.max      = round(max(stuck), 3),
             chain.means.sd.ratio = round(sd(colMeans(x)) / sqrt(mean(apply(x, 2, var))), 2),
             stringsAsFactors = FALSE
         )
     }))
-    per.param <- per.param[order(-per.param$rhat, per.param$ess.total), ]
+    per.param <- per.param[order(-per.param$rhat, per.param$ess.bulk), ]
     rownames(per.param) <- NULL
 
-    # 8. Log-likelihood / log-prior by chain
+    # 7. Log-likelihood / log-posterior: by chain, and R-hat / ESS of the whole model in one number each
     ll <- .get.by.chain(m@log.likelihoods, n.chains)
     lp <- .get.by.chain(m@log.priors,      n.chains)
     by.chain <- data.frame(
         chain            = seq_len(n.chains),
         accept           = round(as.numeric(accept.by.chain), 3),
+        min.block.accept = round(apply(abc, 1, min), 3),
         mean.loglik      = round(colMeans(ll), 1),
         last.loglik      = round(ll[nrow(ll), ], 1),
-        mean.logpost     = round(colMeans(ll + lp), 1),
-        n.params.stuck50 = sapply(seq_len(n.chains), function(ch)
-            sum(apply(s[, ch, , drop = FALSE], 3, function(y) mean(abs(diff(y)) <= stuck.tolerance)) > 0.5))
+        mean.logpost     = round(colMeans(ll + lp), 1)
     )
     by.chain$loglik.gap.from.best <- round(max(by.chain$mean.loglik) - by.chain$mean.loglik, 1)
+    log.density <- data.frame(
+        quantity = c("log-likelihood", "log-posterior"),
+        rhat     = round(c(.rhat.rank.split(ll), .rhat.rank.split(ll + lp)), 3),
+        ess.bulk = round(c(.ess.bulk(ll), .ess.bulk(ll + lp))))
 
     # overall summary (one row)
     summary <- data.frame(row.names = NULL,
@@ -303,14 +393,18 @@ mcmc.diagnostics <- function(m, stuck.tolerance = 0, burn.keep = MIXING.BURN.KEE
         accept.total        = round(as.numeric(accept.total), 3),
         accept.min.chain    = round(min(accept.by.chain), 3),
         accept.max.chain    = round(max(accept.by.chain), 3),
-        max.rhat            = round(max(rhat), 3),
-        n.rhat.over.1.05    = sum(rhat > 1.05),
-        n.rhat.over.1.1     = sum(rhat > 1.1),
-        max.rhat.rank       = round(max(rhat.rank), 3),
-        min.ess             = min(per.param$ess.total),
-        n.ess.under.100     = sum(per.param$ess.total < 100),
-        n.geweke.over.2     = sum(per.param$geweke.max.abs > 2, na.rm = TRUE),
-        max.loglik.gap      = max(by.chain$loglik.gap.from.best),
+        min.block.accept    = round(min(abc), 3),                         # any block, any chain
+        n.blocks.low        = length(unique(blocks.low$block)),           # blocks < th$block.accept.low in a chain
+        max.rhat            = round(max(rhat, na.rm = TRUE), 3),
+        n.rhat.over.1.05    = sum(rhat > 1.05, na.rm = TRUE),
+        n.rhat.over.1.1     = sum(rhat > 1.1,  na.rm = TRUE),
+        rhat.logpost        = log.density$rhat[2],
+        max.rhat.classic    = round(max(rhat.classic), 3),
+        min.ess             = min(per.param$ess.bulk, na.rm = TRUE),
+        n.ess.low           = sum(per.param$ess.bulk < th$ess.min, na.rm = TRUE),
+        ess.logpost         = log.density$ess.bulk[2],
+        n.geweke.over.2     = sum(per.param$geweke.max.abs > 2, na.rm = TRUE),   # not in the verdict
+        max.loglik.gap      = max(by.chain$loglik.gap.from.best),                # not in the verdict
         run.time.hours      = round(sum(m@total.run.time) / 3600, 1),
         burn.keep           = burn.keep                      # share of each chain used
     )
@@ -318,9 +412,12 @@ mcmc.diagnostics <- function(m, stuck.tolerance = 0, burn.keep = MIXING.BURN.KEE
     list(summary               = summary,
          by.chain              = by.chain,
          by.parameter          = per.param,
+         log.density           = log.density,
          accept.by.block       = sort(accept.by.block),
          accept.block.by.chain = accept.block.by.chain,
-         loglik                = ll)
+         blocks.low            = blocks.low,
+         loglik                = ll,
+         method                = .MIXING.METHOD)
 }
 
 
@@ -348,18 +445,24 @@ plot.mcmc.diagnostics <- function(m, d = mcmc.diagnostics(m), n.worst = 9, title
 # ****************************************************************************************************
 
 # ---- 3a. Verdict: PASS / CHECK / FAIL for one city, with the reasons ----
+# Geweke and the log-likelihood gap are not used (see MIXING.THRESHOLDS)
 mixing.verdict <- function(summary, th = MIXING.THRESHOLDS) {
+    above <- function(x, cut) !is.na(x) && x > cut
     fail <- c(
-        if (summary$max.rhat > th$rhat.fail)          paste0("R-hat ", summary$max.rhat, " > ", th$rhat.fail),
-        if (summary$accept.min.chain < th$accept.low) paste0("a chain has acceptance ", summary$accept.min.chain),
-        if (summary$max.loglik.gap > th$loglik.gap)   paste0("a chain is ", summary$max.loglik.gap, " log-lik below the best")
+        if (above(summary$max.rhat, th$rhat.fail))     paste0("R-hat ", summary$max.rhat, " > ", th$rhat.fail,
+                                                              " (", summary$n.rhat.over.1.1, " params)"),
+        if (above(summary$rhat.logpost, th$rhat.fail)) paste0("log-posterior R-hat ", summary$rhat.logpost, " > ", th$rhat.fail),
+        if (summary$accept.min.chain < th$accept.low)  paste0("a chain has acceptance ", summary$accept.min.chain)
     )
     check <- c(
-        if (summary$max.rhat > th$rhat.check && summary$max.rhat <= th$rhat.fail)
+        if (above(summary$max.rhat, th$rhat.check) && !above(summary$max.rhat, th$rhat.fail))
             paste0("R-hat ", summary$max.rhat, " > ", th$rhat.check),
-        if (summary$min.ess < th$ess.min)              paste0(summary$n.ess.under.100, " params with ESS < ", th$ess.min),
+        if (above(summary$rhat.logpost, th$rhat.check) && !above(summary$rhat.logpost, th$rhat.fail))
+            paste0("log-posterior R-hat ", summary$rhat.logpost, " > ", th$rhat.check),
+        if (summary$min.ess < th$ess.min)              paste0(summary$n.ess.low, " params with ESS < ", th$ess.min),
         if (summary$accept.max.chain > th$accept.high) paste0("a chain has acceptance ", summary$accept.max.chain),
-        if (summary$n.geweke.over.2 > 0)               paste0(summary$n.geweke.over.2, " params still drifting (Geweke)")
+        if (summary$min.block.accept < th$block.accept.low)
+            paste0(summary$n.blocks.low, " blocks with acceptance < ", th$block.accept.low, " in a chain")
     )
     data.frame(verdict = if (length(fail)) "FAIL" else if (length(check)) "CHECK" else "PASS",
                reasons = paste(c(fail, check), collapse = "; "))
@@ -377,9 +480,10 @@ run.mixing.diagnostics <- function(locations, calibration.code, n.cores = 4, for
         m   <- mcmc.list[[key]]
         if (is.null(m)) return(data.frame(city = .city.name(loc), location = loc, verdict = "NOT LOADED"))
 
-        # recompute when MIXING.BURN.KEEP has changed since the last run
+        # recompute when MIXING.BURN.KEEP or the statistics have changed since the last run
         if (force.recompute || is.null(diag.list[[key]]) ||
-            !identical(diag.list[[key]]$summary$burn.keep, MIXING.BURN.KEEP))
+            !identical(diag.list[[key]]$summary$burn.keep, MIXING.BURN.KEEP) ||
+            !identical(diag.list[[key]]$method, .MIXING.METHOD))
             diag.list[[key]] <<- mcmc.diagnostics(m)
         d <- diag.list[[key]]
 
@@ -401,13 +505,14 @@ run.mixing.diagnostics <- function(locations, calibration.code, n.cores = 4, for
 # ---- 3c. Which parameters mix badly in more than one city? ----
 # Useful to find parameters that are a problem everywhere (prior / model issue),
 # rather than a single city that needs more iterations
-params.failing.across.cities <- function(locations, calibration.code, rhat.cutoff = 1.1, ess.cutoff = 100) {
+params.failing.across.cities <- function(locations, calibration.code,
+                                         rhat.cutoff = MIXING.THRESHOLDS$rhat.fail, ess.cutoff = MIXING.THRESHOLDS$ess.min) {
     per.city <- do.call(rbind, lapply(unname(locations), function(loc) {
         d <- diag.list[[.mcmc.key(loc, calibration.code)]]
         if (is.null(d)) return(NULL)
-        bad <- d$by.parameter[d$by.parameter$rhat > rhat.cutoff | d$by.parameter$ess.total < ess.cutoff, ]
+        bad <- d$by.parameter[which(d$by.parameter$rhat > rhat.cutoff | d$by.parameter$ess.bulk < ess.cutoff), ]
         if (nrow(bad) == 0) return(NULL)
-        data.frame(parameter = bad$parameter, city = .city.name(loc), rhat = round(bad$rhat, 2), ess = bad$ess.total)
+        data.frame(parameter = bad$parameter, city = .city.name(loc), rhat = round(bad$rhat, 2), ess = bad$ess.bulk)
     }))
     if (is.null(per.city)) return(data.frame())
 
@@ -422,16 +527,17 @@ params.failing.across.cities <- function(locations, calibration.code, rhat.cutof
 # ---- 3d. Is one chain the problem? ----
 # Recomputes R-hat leaving out each chain in turn, on the last burn.keep share of each chain.
 # If dropping one chain brings R-hat down a lot, that chain is stuck somewhere else.
+# R-hat is the rank-normalized split R-hat, as in the verdict.
 drop.one.chain.check <- function(m, burn.keep = MIXING.BURN.KEEP) {
     if (m@n.chains < 3) stop("Need at least 3 chains to drop one and still compute R-hat")
-    m <- .burn.mcmc(m, burn.keep)
-    base <- max(get.rhats(m))
+    s <- .get.samples(.burn.mcmc(m, burn.keep))
+    base <- max(.rhats(s), na.rm = TRUE)
     rv <- do.call(rbind, lapply(seq_len(m@n.chains), function(ch) {
         keep <- setdiff(seq_len(m@n.chains), ch)
-        r <- get.rhats(m, chains = keep)
+        r <- .rhats(s, chains = keep)
         data.frame(dropped.chain   = ch,
-                   max.rhat        = round(max(r), 3),
-                   n.rhat.over.1.1 = sum(r > 1.1),
+                   max.rhat        = round(max(r, na.rm = TRUE), 3),
+                   n.rhat.over.1.1 = sum(r > 1.1, na.rm = TRUE),
                    worst.parameter = names(r)[1])
     }))
     rv$improvement <- round(base - rv$max.rhat, 3)
@@ -440,21 +546,26 @@ drop.one.chain.check <- function(m, burn.keep = MIXING.BURN.KEEP) {
 
 
 # ---- 3e. Would more burn-in help? ----
-# Recomputes R-hat after throwing away the first 0%, 25%, 50% of each chain.
+# Recomputes R-hat after throwing away the first 0%, 25%, 50%, 75% of each chain.
 # Always on the whole chain (m as loaded, not burned by MIXING.BURN.KEEP).
-# If R-hat drops a lot with more burn-in, the chains were still converging early on
-# (so a longer run, or a later start, would help).
+# 1. R-hat drops a lot from 0% to 50%: the chains were still converging early on
+#    (so a longer run, or a later start, would help)
+# 2. R-hat still drops from 50% to 75%: the half that is kept is itself still settling
+# R-hat is the rank-normalized split R-hat, as in the verdict.
 # Burns with .burn.mcmc(), not get.rhats(additional.burn = ): get.rhats() drops the burned draws but
 # still uses the whole chain's length as N, which inflates R-hat.
-burn.in.check <- function(m, fractions = c(0, 0.25, 0.5)) {
+burn.in.check <- function(m, fractions = c(0, 0.25, 0.5, 0.75)) {
     do.call(rbind, lapply(fractions, function(f) {
-        b <- .burn.mcmc(m, keep = 1 - f)
-        r <- get.rhats(b)
-        data.frame(burn.fraction   = f,
-                   samples.left    = b@n.iter,
-                   max.rhat        = round(max(r), 3),
-                   n.rhat.over.1.1 = sum(r > 1.1),
-                   n.rhat.over.1.05= sum(r > 1.05))
+        b  <- .burn.mcmc(m, keep = 1 - f)
+        r  <- .rhats(.get.samples(b))
+        ll <- .get.by.chain(b@log.likelihoods, b@n.chains)
+        lp <- .get.by.chain(b@log.priors,      b@n.chains)
+        data.frame(burn.fraction    = f,
+                   samples.left     = b@n.iter,
+                   max.rhat         = round(max(r, na.rm = TRUE), 3),
+                   n.rhat.over.1.1  = sum(r > 1.1,  na.rm = TRUE),
+                   n.rhat.over.1.05 = sum(r > 1.05, na.rm = TRUE),
+                   rhat.logpost     = round(.rhat.rank.split(ll + lp), 3))
     }))
 }
 
@@ -482,96 +593,8 @@ compare.calibration.mixing <- function(locations, calibration.codes, n.cores = 4
     all <- do.call(rbind, lapply(calibration.codes, function(cc)
         run.mixing.diagnostics(locations, cc, n.cores = n.cores)))
     all[order(all$city, all$calibration.code),
-        c("city", "calibration.code", "verdict", "accept.total", "max.rhat", "n.rhat.over.1.1", "min.ess", "max.loglik.gap")]
-}
-
-
-# ---- 3i. Likelihood breakdown: what each likelihood contributes ----
-# Uses the saved simset (not the raw MCMC), because the likelihood needs the simulations.
-# For each city:
-#  1. change.during.run - how much each likelihood improved from the start of each chain to its end
-#                         (averaged over chains). Shows which targets the chains worked on.
-#  2. posterior.sd      - how much each likelihood varies across the kept sims.
-#                         Large = it drives which sims are kept. Near zero = it barely constrains anything.
-#  3. conflicts         - pairs of likelihoods that pull against each other (correlation < -0.5)
-# Raw values are not comparable between likelihoods (constants, number of data points), so look at changes.
-if (!exists("lik.list"))           lik.list           <- list()
-if (!exists("lik.breakdown.list")) lik.breakdown.list <- list()
-
-# Same likelihood the calibration used for this city (slow to build, so kept in lik.list)
-.get.calibration.likelihood <- function(loc, calibration.code) {
-    key <- .mcmc.key(loc, calibration.code)
-    if (is.null(lik.list[[key]])) {
-        info  <- get.calibration.info(calibration.code)
-        instr <- info$special.case.likelihood.instructions[[loc]]
-        if (is.null(instr)) instr <- info$likelihood.instructions
-        lik.list[[key]] <<- instr$instantiate.likelihood(version = "shield", location = loc,
-                                                         data.manager = info$data.manager)
-    }
-    lik.list[[key]]
-}
-
-likelihood.breakdown <- function(loc, calibration.code, n.sims = 50, burn.keep = 0.5, n.sim.saved = NULL) {
-    info <- get.calibration.info(calibration.code)
-    if (is.null(n.sim.saved))   # e.g. 4 chains x 30000 / 80 = 1500
-        n.sim.saved <- info$n.chains * floor((info$n.iter - info$n.burn) / info$thin)
-
-    simset <- retrieve.simulation.set(version = "shield", location = loc,
-                                      calibration.code = calibration.code, n.sim = n.sim.saved)
-    lik    <- .get.calibration.likelihood(loc, calibration.code)
-    score  <- function(i) lik$compute.piecewise(simset$subset(i))
-
-    # 1. start vs end of each chain, averaged over chains
-    chains <- simset$simulation.chain
-    change <- rowMeans(sapply(unique(chains), function(ch) {
-        i <- which(chains == ch)
-        score(max(i)) - score(min(i))
-    }))
-
-    # 2. spread across the kept sims (second half of each chain by default)
-    kept   <- simset$burn(keep = burn.keep)
-    idx    <- round(seq(1, kept$n.sim, length.out = min(n.sims, kept$n.sim)))
-    pieces <- t(sapply(idx, function(i) lik$compute.piecewise(kept$subset(i))))
-
-    by.component <- data.frame(component         = colnames(pieces),
-                               change.during.run = round(change[colnames(pieces)], 1),
-                               posterior.sd      = round(apply(pieces, 2, sd), 2))
-    by.component <- by.component[order(-by.component$posterior.sd), ]
-    rownames(by.component) <- NULL
-
-    # 3. pairs that pull against each other
-    cm    <- suppressWarnings(cor(pieces))
-    pairs <- which(upper.tri(cm) & cm < -0.5, arr.ind = TRUE)
-    conflicts <- data.frame(component.1 = rownames(cm)[pairs[, 1]],
-                            component.2 = colnames(cm)[pairs[, 2]],
-                            correlation = round(cm[pairs], 2))
-    conflicts <- conflicts[order(conflicts$correlation), ]
-
-    list(by.component = by.component, conflicts = conflicts, pieces = pieces)
-}
-
-# Many cities, one at a time (each simset is large). Returns posterior.sd: likelihood x city
-run.likelihood.breakdown <- function(locations, calibration.code, force.recompute = FALSE, ...) {
-    locations <- unname(locations)
-    for (loc in locations) {
-        key <- .mcmc.key(loc, calibration.code)
-        if (!force.recompute && !is.null(lik.breakdown.list[[key]])) next
-        message("Likelihood breakdown: ", .city.name(loc))
-        res <- tryCatch(likelihood.breakdown(loc, calibration.code, ...),
-                        error = function(e) { message(loc, ": ", e$message); NULL })
-        if (!is.null(res)) lik.breakdown.list[[key]] <<- res
-    }
-    sds <- lapply(locations, function(loc) {
-        r <- lik.breakdown.list[[.mcmc.key(loc, calibration.code)]]
-        if (!is.null(r)) setNames(r$by.component$posterior.sd, r$by.component$component)
-    })
-    names(sds) <- .city.name(locations)
-    sds <- sds[!sapply(sds, is.null)]
-    if (length(sds) == 0) return(NULL)
-    comps <- unique(unlist(lapply(sds, names)))
-    out <- sapply(sds, function(s) s[comps])
-    out <- matrix(out, nrow = length(comps), dimnames = list(comps, names(sds)))
-    out
+        c("city", "calibration.code", "verdict", "accept.total", "max.rhat", "n.rhat.over.1.1", "rhat.logpost",
+          "min.ess", "max.loglik.gap")]
 }
 
 
@@ -581,19 +604,17 @@ run.likelihood.breakdown <- function(locations, calibration.code, force.recomput
 #  2. Overview: one row per city with PASS / CHECK / FAIL and the reasons
 #  3. Parameters that mix badly in several cities
 #  4. Per city: chains, worst parameters, acceptance by block, drop-one-chain, burn-in, plots
-#  5. If include.likelihood = TRUE: the likelihood breakdown from 3i (slow, so off by default)
 # Also writes the overview and all per-parameter stats as CSV files next to it.
+# (The likelihood breakdown has its own script and outputs: likelihood/likelihood_breakdown.R)
 write.mixing.report <- function(locations, calibration.code,
                                 folder = .mixing.dir(calibration.code),
                                 n.worst.params = 15,
                                 n.trace.params = 9,
-                                include.plots = TRUE,
-                                include.likelihood = FALSE) {
+                                include.plots = TRUE) {
     dir.create(folder, showWarnings = FALSE, recursive = TRUE)
     locations <- unname(locations)
 
     overview <- run.mixing.diagnostics(locations, calibration.code)
-    lik.by.city <- if (include.likelihood) run.likelihood.breakdown(locations, calibration.code) else NULL
 
     # ---- small HTML helpers ----
     esc <- function(x) htmltools::htmlEscape(as.character(x))
@@ -633,20 +654,26 @@ write.mixing.report <- function(locations, calibration.code,
 
     th <- MIXING.THRESHOLDS
     how.to.read <- data.frame(
-        statistic = c("Acceptance", "R-hat / rank R-hat", "ESS", "Lag-1 autocorrelation", "Geweke z",
-                      "Stuck fraction", "Log-lik gap by chain", "Chain-means spread ratio"),
+        statistic = c("Acceptance", "Block acceptance by chain", "R-hat (rank-normalized, split)",
+                      "R-hat of the log-posterior", "ESS (bulk, all chains)", "R-hat classic",
+                      "Lag-1 autocorrelation", "Geweke z", "Log-lik gap by chain", "Chain-means spread ratio"),
         meaning   = c("how often proposals are accepted",
-                      "do the chains agree?",
-                      "how many independent draws the samples are worth",
+                      "is a block stuck in one chain?",
+                      "do the chains, and the two halves of each chain, agree?",
+                      "the same for the whole model in one number",
+                      "how many independent draws the samples are worth, counting disagreement between chains",
+                      "get.rhats(), not split; to compare with older reports",
                       "how similar each draw is to the previous one",
                       "does the start of a chain match its end?",
-                      "share of saved draws with no change",
                       "is one chain stuck in a worse spot?",
                       "spread of chain means vs spread within chains"),
-        good      = c("0.15-0.35 (target 0.238)", "< 1.05", "> 400", "< 0.7", "|z| < 2", "low", "small", "< 0.1"),
+        good      = c("0.15-0.35 (target 0.238)", "> 0.1", "< 1.05", "< 1.05", paste0("> ", th$ess.min),
+                      "< 1.05", "< 0.7", "|z| < 2", "small", "< 0.1"),
         worry     = c(paste0("< ", th$accept.low, " stuck; > ", th$accept.high, " steps too small"),
-                      paste0("> ", th$rhat.fail), paste0("< ", th$ess.min), "close to 1",
-                      "|z| > 2 (still drifting)", "> 0.5", paste0("> ", th$loglik.gap), "> 0.3"))
+                      paste0("< ", th$block.accept.low), paste0("> ", th$rhat.fail), paste0("> ", th$rhat.fail),
+                      paste0("< ", th$ess.min), "not in the verdict", "close to 1",
+                      "not in the verdict: about 5% of tests pass |z| > 2 by chance",
+                      "not in the verdict: depends on the likelihood scale", "> 0.3"))
 
     # ---- verdict counts ----
     counts <- table(factor(overview$verdict, levels = c("PASS", "CHECK", "FAIL", "NOT LOADED")))
@@ -685,41 +712,31 @@ write.mixing.report <- function(locations, calibration.code,
                                             exact.var.names = TRUE)), height = 900)
         ) else ""
 
-        lb <- lik.breakdown.list[[key]]
-        lik.html <- if (include.likelihood) {
-            if (is.null(lb)) "<h3>Likelihood breakdown</h3><p><em>Not computed.</em></p>"
-            else paste0(
-                "<h3>Likelihood breakdown</h3>",
-                "<p class='note'>change.during.run: how much each likelihood improved from the start to the end of each chain (averaged over chains). ",
-                "posterior.sd: how much it varies across the kept sims; large = it drives which sims are kept. ",
-                "Raw values are not comparable between likelihoods, so only changes are shown.</p>",
-                tbl(lb$by.component),
-                "<h3>Likelihoods that pull against each other (correlation &lt; -0.5)</h3>",
-                tbl(lb$conflicts))
-        } else ""
-
         paste0(
             "<h2 id='", esc(loc), "'>", esc(name), " <span class='pill ", tolower(v$verdict), "'>",
             v$verdict, "</span></h2>",
             if (nzchar(v$reasons)) paste0("<p>", esc(v$reasons), "</p>") else "",
             "<h3>Chains</h3>", tbl(d$by.chain),
+            "<h3>Log-likelihood and log-posterior: R-hat and ESS</h3>", tbl(d$log.density),
             "<h3>Worst ", n.worst.params, " parameters</h3>", tbl(head(d$by.parameter, n.worst.params)),
+            "<h3>Blocks with acceptance &lt; ", th$block.accept.low, " in a chain</h3>", tbl(d$blocks.low),
             "<h3>Acceptance by block (lowest first)</h3>", tbl(accept.block),
             "<h3>Leave one chain out</h3>",
             "<p class='note'>If dropping one chain brings R-hat down a lot, that chain is stuck somewhere else.</p>",
             tbl(drop.chain),
             "<h3>Burn-in check</h3>",
-            "<p class='note'>If R-hat drops a lot as early samples are removed, the chains were still converging.</p>",
+            "<p class='note'>If R-hat drops a lot as early samples are removed, the chains were still converging. ",
+            "If it still drops from 0.5 to 0.75, the half that is kept is still settling.</p>",
             tbl(burn),
-            lik.html,
             plots)
     }, "")
 
     failing <- params.failing.across.cities(locations, calibration.code)
 
     ov.cols <- intersect(c("city", "verdict", "reasons", "accept.total", "accept.min.chain", "accept.max.chain",
-                           "max.rhat", "n.rhat.over.1.1", "max.rhat.rank", "min.ess", "n.ess.under.100",
-                           "n.geweke.over.2", "max.loglik.gap", "run.time.hours"), names(overview))
+                           "min.block.accept", "max.rhat", "n.rhat.over.1.1", "rhat.logpost", "min.ess", "n.ess.low",
+                           "ess.logpost", "max.rhat.classic", "n.geweke.over.2", "max.loglik.gap", "run.time.hours"),
+                         names(overview))
 
     css <- "
       :root { --bg:#fff; --fg:#1d1d1f; --muted:#666; --line:#ddd; --head:#f4f4f6;
@@ -755,19 +772,16 @@ write.mixing.report <- function(locations, calibration.code,
         "<nav>", paste0("<a href='#", esc(locations), "'>", esc(.city.name(locations)), "</a>", collapse = ""), "</nav>",
         "<h2>Run settings</h2>", tbl(settings),
         "<h2>How to read this report</h2>", tbl(how.to.read),
-        "<p class='note'>Verdict: FAIL if R-hat &gt; ", th$rhat.fail, ", a chain's acceptance &lt; ", th$accept.low,
-        ", or a chain's log-likelihood is &gt; ", th$loglik.gap, " below the best chain. ",
-        "CHECK if R-hat &gt; ", th$rhat.check, ", ESS &lt; ", th$ess.min, ", acceptance &gt; ", th$accept.high,
-        ", or any |Geweke z| &gt; 2.</p>",
+        "<p class='note'>Verdict: FAIL if R-hat of any parameter or of the log-posterior &gt; ", th$rhat.fail,
+        ", or a chain's acceptance &lt; ", th$accept.low, ". ",
+        "CHECK if R-hat &gt; ", th$rhat.check, ", ESS &lt; ", th$ess.min, ", a chain's acceptance &gt; ", th$accept.high,
+        ", or a block's acceptance &lt; ", th$block.accept.low, " in a chain. ",
+        "R-hat is the rank-normalized split R-hat; ESS is the bulk ESS across all chains.</p>",
         "<h2>Overview</h2>", tbl(overview.for.table, verdict.col = "verdict"),
         "<h2>Parameters that mix badly, and in how many cities</h2>",
-        "<p class='note'>R-hat &gt; 1.1 or ESS &lt; 100. A parameter that fails in many cities points to a prior or model issue, not just run length.</p>",
+        "<p class='note'>R-hat &gt; ", th$rhat.fail, " or ESS &lt; ", th$ess.min,
+        ". A parameter that fails in many cities points to a prior or model issue, not just run length.</p>",
         tbl(failing),
-        if (!is.null(lik.by.city)) paste0(
-            "<h2>Likelihood breakdown across cities</h2>",
-            "<p class='note'>posterior.sd of each likelihood, by city. A likelihood that is large in every city ",
-            "may be weighted too heavily; one near zero everywhere barely constrains the fit.</p>",
-            tbl(cbind(likelihood = rownames(lik.by.city), as.data.frame(lik.by.city)))) else "",
         paste(city.sections, collapse = ""),
         "</body></html>")
 
