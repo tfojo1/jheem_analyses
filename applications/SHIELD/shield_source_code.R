@@ -94,10 +94,9 @@ if (SHIELD.RECORDED.RUN) {
 
 cat("1-Requesting syphilis manager release: ", SYPHILIS.MANAGER.RELEASE.TAG,
     "\n", sep = "")
-if (!is.null(CENSUS.MANAGER.RELEASE.TAG)) {
-  cat("1-Requesting census manager release: ", CENSUS.MANAGER.RELEASE.TAG,
-      "\n", sep = "")
-}
+cat("1-Requesting census manager release: ",
+    if (is.null(CENSUS.MANAGER.RELEASE.TAG)) "unpinned (the promoted census)" else CENSUS.MANAGER.RELEASE.TAG,
+    "\n", sep = "")
 
 ## =============================================================================
 ## 1. PACKAGES
@@ -180,12 +179,30 @@ require.repo.branch <- function(repo.path, branch, pull = TRUE)
 ## =============================================================================
 
 ## --- jheem_analyses: plain pull on whatever branch is checked out ------------
+## This file, the specification, and data_managers.csv were read before the
+## pull. If the pull moves the checkout, stop rather than continue with files
+## from two commits; sourcing again then reads everything from the new one.
 cat("3-Checking JHEEM_ANALYSES repository status....\n")
 if (SHIELD.RECORDED.RUN) {
   cat("  recorded mode: source and package mutation disabled\n")
 } else if (dir.exists(JHEEM.ANALYSES.PATH)) {
-  if (PULL.GIT.UPDATES)
-    system2("git", c("-C", shQuote(normalizePath(JHEEM.ANALYSES.PATH)), "pull"))
+  if (PULL.GIT.UPDATES) local({
+    repo <- shQuote(normalizePath(JHEEM.ANALYSES.PATH))
+    checkout.head <- function() {
+      out <- suppressWarnings(system2("git", c("-C", repo, "rev-parse", "HEAD"),
+                                      stdout = TRUE, stderr = FALSE))
+      if (length(out) == 1L && is.null(attr(out, "status"))) out else NA_character_
+    }
+    before <- checkout.head()
+    system2("git", c("-C", repo, "pull"))
+    after <- checkout.head()
+    if (!is.na(before) && !is.na(after) && !identical(before, after))
+      stop("\ngit pull updated jheem_analyses from ", substr(before, 1, 8), " to ",
+           substr(after, 1, 8), " while SHIELD was being set up.\n",
+           "Files read before the pull, including applications/SHIELD/data_managers.csv, ",
+           "came from the old version.\n",
+           "Source the specification again to set up from the updated code.", call. = FALSE)
+  })
   else
     cat("  pull skipped\n")
 } else {
