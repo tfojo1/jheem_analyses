@@ -10,13 +10,13 @@ source('../jheem_analyses/applications/EHE/ehe_specification.R')
 source('../jheem_analyses/applications/EHE/ehe_likelihoods_oakland.R')
 
 #-- SURVEILLANCE MANAGER ----
-# Zoe's manually built manager (2026-11-06) includes all the Oakland data we were
-# patching in-session, plus the shared fixes (partial-year deaths removed, migration x5).
-# It is not in the cached-manager registry, so load it directly. Set
-# OAKLAND.SURVEILLANCE.MANAGER.FILE before sourcing this file to use a different path,
-# or to NULL to keep the default manager.
+# Default (NULL): use the GitHub-release surveillance manager loaded by source_code.R.
+# To use a specific manager file instead (e.g. Zoe's manually built
+# 'surveillance.manager_11.6.26.rdata'), set OAKLAND.SURVEILLANCE.MANAGER.FILE to its
+# path before sourcing this file:
+#   OAKLAND.SURVEILLANCE.MANAGER.FILE = file.path(JHEEM.CACHE.DIR, 'surveillance.manager_11.6.26.rdata')
 if (!exists('OAKLAND.SURVEILLANCE.MANAGER.FILE'))
-    OAKLAND.SURVEILLANCE.MANAGER.FILE = file.path(JHEEM.CACHE.DIR, 'surveillance.manager_11.6.26.rdata')
+    OAKLAND.SURVEILLANCE.MANAGER.FILE = NULL
 
 if (!is.null(OAKLAND.SURVEILLANCE.MANAGER.FILE))
 {
@@ -33,8 +33,8 @@ if (!is.null(OAKLAND.SURVEILLANCE.MANAGER.FILE))
 }
 
 #-- IN-SESSION DATA PATCHES ----
-# OFF with surveillance.manager_11.6.26, which already has every patched outcome.
-# Only turn on with an older manager -- the migration patch would otherwise
+# OFF: the surveillance manager now has every patched outcome (Zoe, 2026-11-06).
+# Only turn on with a manager from before that -- the migration patch would otherwise
 # multiply by 5 a second time.
 if (!exists('OAKLAND.APPLY.DATA.PATCHES'))
     OAKLAND.APPLY.DATA.PATCHES = F

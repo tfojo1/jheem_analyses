@@ -23,10 +23,8 @@ POP.COMPONENTS = c(
 # Components of transmission.oakland.likelihood.instructions
 # (see ehe_likelihoods_oakland.R)
 TRANS.COMPONENTS = c(
-    'race.risk.halfx.cv.expv.new.diagnoses.likelihood.instructions',
-    'race.risk.halfx.cv.expv.prevalence.likelihood.instructions',
-    'total.new.diagnoses.8x.cv.expv.likelihood.instructions',
-    'total.prevalence.8x.cv.expv.likelihood.instructions',
+    'race.risk.cv.expv.new.diagnoses.likelihood.instructions',
+    'race.risk.cv.expv.prevalence.likelihood.instructions',
     'non.age.aids.diagnoses.likelihood.instructions.trans',
     'population.likelihood.instructions.trans',
     'heroin.likelihood.instructions.trans',
@@ -57,10 +55,8 @@ FULL.COMPONENTS = c(
     'population.likelihood.instructions.full',
     'immigration.likelihood.instructions.full',
     'emigration.likelihood.instructions.full',
-    'total.new.diagnoses.16x.cv.expv.likelihood.instructions',
-    'new.diagnoses.halfx.cv.expv.likelihood.instructions',
-    'total.prevalence.16x.cv.expv.likelihood.instructions',
-    'prevalence.halfx.cv.and.exp.v.likelihood.instructions',
+    'new.diagnoses.cv.expv.likelihood.instructions',
+    'prevalence.cv.and.exp.v.likelihood.instructions',
     'general.mortality.likelihood.instructions.full',
     'aids.deaths.likelihood.instructions.full',
     'non.age.aids.diagnoses.likelihood.instructions.full',
