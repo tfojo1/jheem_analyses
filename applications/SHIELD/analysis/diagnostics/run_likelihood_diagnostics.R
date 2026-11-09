@@ -17,7 +17,9 @@
 # USAGE (from jheem_analyses)
 #   1. set CALIBRATION.CODE, LOCATIONS and N.SIM.NO.BURN in diagnostics_setup.R
 #   2. in R:          source("applications/SHIELD/analysis/diagnostics/run_likelihood_diagnostics.R")
-#      or unattended: nohup Rscript applications/SHIELD/analysis/diagnostics/run_likelihood_diagnostics.R > run_likelihood_diagnostics.out 2>&1 &
+#      or unattended (log in the shared logs folder, not in jheem_analyses):
+#        LOG=${JHEEM_LOG_DIR:-/home/jheem-shared/logs}/run_likelihood_diagnostics_$(date +%Y%m%d_%H%M).out
+#        nohup Rscript applications/SHIELD/analysis/diagnostics/run_likelihood_diagnostics.R > "$LOG" 2>&1 &
 # Outputs: <jheem root>/shield/calibration_diagnostics/<code>/likelihood/ (CSVs)
 # ****************************************************************************************************
 

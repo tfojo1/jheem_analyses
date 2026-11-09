@@ -14,11 +14,14 @@
 #
 # Settings: CALIBRATION.CODE and LOCATIONS come from diagnostics_setup.R
 #
-# USAGE (from jheem_analyses)
-#   nohup Rscript applications/SHIELD/analysis/diagnostics/mcmc/build_mcmc_cache.R 4 > build_mcmc_cache.out 2>&1 &
+# USAGE (from jheem_analyses). The log goes to the shared logs folder, like the launchers' logs
+# (JHEEM_LOG_DIR if set, else /home/jheem-shared/logs), not into jheem_analyses:
+#   LOG=${JHEEM_LOG_DIR:-/home/jheem-shared/logs}/build_mcmc_cache_$(date +%Y%m%d_%H%M).out
+#   nohup Rscript applications/SHIELD/analysis/diagnostics/mcmc/build_mcmc_cache.R 4 > "$LOG" 2>&1 &
 #   The number is how many cities to read at the same time (default 4). Memory per city is small;
 #   the limit is how fast the drive can be read.
-#   Monitor: tail -f build_mcmc_cache.out
+#   Monitor: tail -f "$LOG"
+# The cache files themselves are saved on the shared drive: <jheem root>/shield/mcmc_diagnostics/mcmc_cache/
 # ****************************************************************************************************
 
 ## SETTINGS ----
@@ -35,8 +38,10 @@ cat("Cache folder:", .cache.dir(), "\n")
 one.city <- function(loc) {
     start <- Sys.time()
     cat(format(start, "%F %T"), "START", .city.name(loc), "\n")
-    m <- tryCatch(load.mcmc(loc, CALIBRATION.CODE, n.cores = 1)[[1]],
+    # load.mcmc() prints why a city failed and returns an empty list
+    m <- tryCatch(load.mcmc(loc, CALIBRATION.CODE, n.cores = 1),
                   error = function(e) { cat(.city.name(loc), "FAILED:", conditionMessage(e), "\n"); NULL })
+    m <- if (length(m)) m[[1]] else NULL
     minutes <- round(as.numeric(difftime(Sys.time(), start, units = "mins")), 1)
     cat(format(Sys.time(), "%F %T"), "DONE ", .city.name(loc), "|", minutes, "min\n")
     file <- file.path(.cache.dir(), paste0(CALIBRATION.CODE, "_", loc, ".rds"))

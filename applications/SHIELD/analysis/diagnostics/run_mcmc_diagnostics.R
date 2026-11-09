@@ -17,7 +17,9 @@
 #   1. set CALIBRATION.CODE, LOCATIONS and MIXING.BURN.KEEP in diagnostics_setup.R
 #   2. build the cache first if needed (see mcmc/build_mcmc_cache.R)
 #   3. in R:          source("applications/SHIELD/analysis/diagnostics/run_mcmc_diagnostics.R")
-#      or unattended: nohup Rscript applications/SHIELD/analysis/diagnostics/run_mcmc_diagnostics.R > run_mcmc_diagnostics.out 2>&1 &
+#      or unattended (log in the shared logs folder, not in jheem_analyses):
+#        LOG=${JHEEM_LOG_DIR:-/home/jheem-shared/logs}/run_mcmc_diagnostics_$(date +%Y%m%d_%H%M).out
+#        nohup Rscript applications/SHIELD/analysis/diagnostics/run_mcmc_diagnostics.R > "$LOG" 2>&1 &
 # Outputs: <jheem root>/shield/calibration_diagnostics/<code>/mixing/ (report, CSVs, plots/)
 # ****************************************************************************************************
 

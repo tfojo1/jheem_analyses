@@ -100,8 +100,12 @@ if (!exists("diag.list")) diag.list <- list()
         return(m)
     }
 
-    dir <- jheem2:::get.calibration.dir(version = "shield", location = loc, calibration.code = calibration.code,
-                                        root.dir = get.jheem.root.directory())
+    # the jheem2 in use: when SHIELD sources jheem2 from the repo, jheem2::: would reach an older installed
+    # package with the old folder order (<location>/<calibration code>); runs are now <calibration code>/<location>
+    calibration.dir <- if (exists("get.calibration.dir", mode = "function")) get.calibration.dir
+                       else jheem2:::get.calibration.dir
+    dir <- calibration.dir(version = "shield", location = loc, calibration.code = calibration.code,
+                           root.dir = get.jheem.root.directory())
     global.control <- bayesian.simulations:::get.cache.global.control(dir)
     chunk.dir      <- bayesian.simulations:::get.cache.subdirectory(dir)
 
