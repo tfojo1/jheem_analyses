@@ -9,7 +9,7 @@
 # (and so the coverage fractions) are fixed and don't depend on the version of the locations package. It is restored at the end.
 
 if (!exists('FUNCTION.FILE'))
-    FUNCTION.FILE = '../jheem_analyses/data_processing/put_msa_data_as_new_source_NEW.R'
+    FUNCTION.FILE = '../jheem_analyses/data_processing/aggregate_county_to_msa_new.R'
 source(FUNCTION.FILE)
 
 if (!exists('apply.robust'))
