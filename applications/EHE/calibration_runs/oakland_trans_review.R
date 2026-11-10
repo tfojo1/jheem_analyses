@@ -25,7 +25,7 @@ stratum.style.manager = create.style.manager(color.data.by = "stratum", alpha.li
 
 LOCATION = 'TGA.OAKLAND'
 
-load("prelim_results/trans.ehe.oakland_simset_2026-11-06_TGA.OAKLAND.Rdata")
+load("prelim_results/trans.ehe.oakland_simset_2026-11-09_TGA.OAKLAND.Rdata")
 sim.first = simset$first.sim()
 sim.last = simset$last.sim()
 
@@ -118,11 +118,13 @@ simplot(sim.last,
         style.manager = source.style.manager, # DATA: total - yes
         dimension.values = list(year = 1980:2030)) 
 
-simplot(sim.last,
-        simset,
+simplot(#simset.trans.old,
+        sim.last,    
+        simset.trans.new,
         facet.by = "race", # DATA: race - yes
         outcomes = c("diagnosed.prevalence"), 
         style.manager = stratum.style.manager,
+        #summary.type = "median.and.interval",
         dimension.values = list(year = 1980:2030)) 
 
 simplot(sim.last,

@@ -18,8 +18,7 @@
 # (deaths, migration, heroin/cocaine, STI ratios), so the data show up on the plots
 source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations_oakland.R')
 
-# alpha.line = NULL: line transparency follows line width (the pre-June-2026 jheem2 default),
-# so a simset draws as many thin, faint lines and a single sim stands out on top of it
+
 location.style.manager = create.style.manager(color.data.by = "location.type", alpha.line = NULL) 
 source.style.manager = create.style.manager(color.data.by = "source", alpha.line = NULL) 
 stratum.style.manager = create.style.manager(color.data.by = "stratum", alpha.line = NULL) # this is the default right now 
@@ -38,28 +37,10 @@ sim.last = simset$last.sim()
 ## --- LIKELIHOOD ---- ## 
 full.lik = FULL.oakland.likelihood.instructions$instantiate.likelihood('ehe', LOCATION)
 full.lik$compare.sims(sim.first, sim.last)   # >1 = last fits that component better
-full.lik$compute.piecewise(sim.first)
-full.lik$compute.piecewise(sim.last)
 
-# Which breakdowns of Oakland's data exist? (prep/prep.indications not yet checked)
-oak.data.strata = function(outcome, location = LOCATION)
-{
-    d = SURVEILLANCE.MANAGER$data[[outcome]]$estimate
-    res = character()
-    for (src in names(d)) for (ont in names(d[[src]])) for (st in names(d[[src]][[ont]]))
-    {
-        arr = d[[src]][[ont]][[st]]
-        if (location %in% dimnames(arr)$location &&
-            any(!is.na(array.access(arr, location = location))))
-            res = c(res, paste0(sub('year__location__?', '', st), ' [', src, ']'))
-    }
-    if (length(res) == 0) 'NO DATA' else sort(unique(sub('^ \\[', 'total [', res)))
-}
-for (o in c('prep', 'prep.indications', 'suppression', 'gonorrhea.ratio', 'ps.syphilis.ratio'))
-{
-    cat('\n==', o, '==\n')
-    print(oak.data.strata(o))
-}
+
+
+cbind(head(simset$get.mcmc.mixing.statistic(NULL),20))
 
 ## --- STANDARD PLOTS ---- ## 
 
@@ -325,3 +306,29 @@ simplot(sim.last,
         outcomes = c("new", "incidence"), 
         style.manager = source.style.manager,
         dimension.values = list(year = 2010:2040)) 
+
+
+
+if(1==2){
+    
+    # Which breakdowns of Oakland's data exist? (prep/prep.indications not yet checked)
+    oak.data.strata = function(outcome, location = LOCATION)
+    {
+        d = SURVEILLANCE.MANAGER$data[[outcome]]$estimate
+        res = character()
+        for (src in names(d)) for (ont in names(d[[src]])) for (st in names(d[[src]][[ont]]))
+        {
+            arr = d[[src]][[ont]][[st]]
+            if (location %in% dimnames(arr)$location &&
+                any(!is.na(array.access(arr, location = location))))
+                res = c(res, paste0(sub('year__location__?', '', st), ' [', src, ']'))
+        }
+        if (length(res) == 0) 'NO DATA' else sort(unique(sub('^ \\[', 'total [', res)))
+    }
+    for (o in c('prep', 'prep.indications', 'suppression', 'gonorrhea.ratio', 'ps.syphilis.ratio'))
+    {
+        cat('\n==', o, '==\n')
+        print(oak.data.strata(o))
+    }
+    
+}

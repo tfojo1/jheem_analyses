@@ -2763,10 +2763,10 @@ FULL.oakland.likelihood.instructions = join.likelihood.instructions(
   # COVID LIKELIHOODS
   number.of.tests.year.on.year.change.likelihood.instructions,
   gonorrhea.year.on.year.change.likelihood.instructions,
-  ps.syphilis.year.on.year.change.likelihood.instructions,
+  ps.syphilis.year.on.year.change.likelihood.instructions
   
   # FUTURE INCIDENCE PENALTY
-  future.new.incidence.change.likelihood.instructions
+  #future.new.incidence.change.likelihood.instructions # removing 11/9
 )
 
 #-- STATE FULL --#
