@@ -21,6 +21,18 @@ make.checkout <- function(name) {
 }
 JHEEM.ANALYSES.PATH <- make.checkout("jheem_analyses")
 JHEEM2.PATH <- make.checkout("jheem2")
+# jheem2 is pushed to a remote; jheem_analyses is pushed, then has one local commit on top.
+remote <- file.path(root, "remote.git")
+stopifnot(system2("git", c("init", "-q", "--bare", shQuote(remote)), stdout = FALSE) == 0L)
+for (checkout in c(JHEEM2.PATH, JHEEM.ANALYSES.PATH)) {
+    stopifnot(system2("git", c("-C", shQuote(checkout), "remote", "add", "origin", shQuote(remote)), stdout = FALSE) == 0L,
+              system2("git", c("-C", shQuote(checkout), "push", "-q", "-u", "origin",
+                               paste0("dev:", basename(checkout))), stdout = FALSE, stderr = FALSE) == 0L)
+}
+writeLines("b", file.path(JHEEM.ANALYSES.PATH, "local.R"))
+stopifnot(system2("git", c("-C", shQuote(JHEEM.ANALYSES.PATH), "add", "local.R"), stdout = FALSE) == 0L,
+          system2("git", c("-C", shQuote(JHEEM.ANALYSES.PATH), "-c", "user.name=test", "-c",
+                           "user.email=test@example.com", "commit", "-q", "-m", "local"), stdout = FALSE) == 0L)
 writeLines("changed", file.path(JHEEM.ANALYSES.PATH, "tracked.R"))
 writeLines("untracked", file.path(JHEEM.ANALYSES.PATH, "untracked.R"))
 USE.JHEEM2.PACKAGE <- FALSE
@@ -68,7 +80,23 @@ stopifnot(setequal(sources$name, c("jheem_analyses", "jheem2", "bayesian.simulat
           sources["jheem2", "commit"] == git.head(JHEEM2.PATH),
           sources["jheem2", "changed"] == "0",
           is.na(sources["jheem2", "changed.files"]),
+          sources["jheem2", "on.remote"] == "yes", sources["jheem2", "ahead"] == "0",
+          sources["jheem_analyses", "on.remote"] == "no",       # the local commit is on no remote
+          sources["jheem_analyses", "ahead"] == "1",
           all(sources[c("bayesian.simulations", "distributions", "locations"), "kind"] == "package"))
+
+# The platform, and every non-base package loaded in the session
+stopifnot(nrow(record$platform) == 1L, !is.na(record$platform$os), !is.na(record$platform$lapack.version))
+loaded <- record$`loaded package`
+expected <- setdiff(loadedNamespaces(), c("base", "compiler", "datasets", "graphics", "grDevices", "grid",
+                                          "methods", "parallel", "splines", "stats", "stats4", "tcltk",
+                                          "tools", "utils"))
+stopifnot(setequal(if (is.null(loaded)) character() else loaded$name, expected))
+if (requireNamespace("MASS", quietly = TRUE)) {
+    entries <- shield.run.record("C.12580", "calib.test", "run", 3L, NA)
+    mass <- Filter(function(e) e$record == "loaded package" && e$name == "MASS", entries)
+    stopifnot(length(mass) == 1L, mass[[1L]]$version == utils::packageDescription("MASS")$Version)
+}
 
 managers <- record$`data manager`
 rownames(managers) <- managers$name

@@ -23,7 +23,8 @@ shield.write.run.record <- function(location, calibration.code, step, chain = NA
     })
 }
 
-# One entry for the step, one per source checkout or package, one per data manager.
+# One entry for the step, one per source checkout or package, one per data manager, one for
+# the platform, and one per other package loaded in the session.
 shield.run.record <- function(location, calibration.code, step, chain, seed) {
     info <- Sys.info()
     run <- list(record = "run", format = SHIELD.RUN.RECORD.FORMAT, step = step,
@@ -46,13 +47,17 @@ shield.run.record <- function(location, calibration.code, step, chain, seed) {
            jheem2),
       lapply(c("bayesian.simulations", "distributions", "locations"), shield.run.record.package),
       list(shield.run.record.manager("census", "CENSUS.MANAGER"),
-           shield.run.record.manager("syphilis", "SURVEILLANCE.MANAGER")))
+           shield.run.record.manager("syphilis", "SURVEILLANCE.MANAGER"),
+           shield.run.record.platform()),
+      shield.run.record.loaded.packages())
 }
 
-# A git checkout: its commit and branch, and tracked files with uncommitted changes.
+# A git checkout: its commit and branch, whether the commit is on a remote (anyone else can
+# fetch it) and how far it is ahead of its upstream, and tracked files with uncommitted changes.
 shield.run.record.checkout <- function(name, path) {
     entry <- list(record = "source", name = name, kind = "checkout",
                   path = NA_character_, commit = NA_character_, branch = NA_character_,
+                  on.remote = NA_character_, ahead = NA_integer_,
                   changed = NA_integer_, changed.files = NA_character_)
     if (is.na(path) || !dir.exists(path) || !nzchar(Sys.which("git"))) return(entry)
     entry$path <- normalizePath(path)
@@ -66,6 +71,11 @@ shield.run.record.checkout <- function(name, path) {
     entry$commit <- commit
     branch <- git("rev-parse", "--abbrev-ref", "HEAD")
     if (length(branch) == 1L) entry$branch <- branch
+    # Remote-tracking branches are as fresh as the checkout's last fetch or pull.
+    remote <- git("branch", "-r", "--contains", commit)
+    if (!is.null(remote)) entry$on.remote <- if (length(remote) > 0L) "yes" else "no"
+    ahead <- git("rev-list", "--count", "@{upstream}..HEAD")
+    if (length(ahead) == 1L) entry$ahead <- as.integer(ahead)
     status <- git("status", "--porcelain", "--untracked-files=no")
     if (!is.null(status)) {
         entry$changed <- length(status)
@@ -84,6 +94,31 @@ shield.run.record.package <- function(name) {
          path = find.package(name),
          version = description$Version,
          commit = if (is.null(description$RemoteSha)) NA_character_ else description$RemoteSha)
+}
+
+# Every package loaded in the session when the record is written, beyond R's base packages
+# (for example deSolve and Rcpp, whose versions differ between servers): its version, the
+# library it was loaded from, and its commit when installed from GitHub.
+shield.run.record.loaded.packages <- function() {
+    base <- c("base", "compiler", "datasets", "graphics", "grDevices", "grid", "methods",
+              "parallel", "splines", "stats", "stats4", "tcltk", "tools", "utils")
+    lapply(sort(setdiff(loadedNamespaces(), base)), function(name) {
+        path <- tryCatch(getNamespaceInfo(name, "path"), error = function(e) NA_character_)
+        description <- if (is.na(path)) NULL else
+            suppressWarnings(utils::packageDescription(name, lib.loc = dirname(path)))
+        list(record = "loaded package", name = name,
+             version = as.character(getNamespaceVersion(name)), path = path,
+             commit = if (!is.list(description) || is.null(description$RemoteSha)) NA_character_
+                      else description$RemoteSha)
+    })
+}
+
+# The machine's operating system and linear algebra libraries.
+shield.run.record.platform <- function() {
+    info <- utils::sessionInfo()
+    field <- function(x) if (is.null(x) || !nzchar(x)) NA_character_ else as.character(x)
+    list(record = "platform", os = field(info$running), blas = field(info$BLAS),
+         lapack = field(info$LAPACK), lapack.version = field(La_version()))
 }
 
 # A data manager: the release SHIELD declares, and the release and digests it loaded.
