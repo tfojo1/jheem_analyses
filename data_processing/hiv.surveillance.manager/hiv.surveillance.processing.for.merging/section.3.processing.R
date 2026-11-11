@@ -69,7 +69,7 @@ data.manager$register.outcome( #Represents 2020 Emory Estimates
         display.name = 'Proportion of MSM Last Year',
         axis.name = 'Proportion of MSM Last Year',
         units = '%',
-        description = "Proportion of Men who have sex with Men Last Year Estimate"), denominator.outcome = 'population') 
+        description = "Proportion of Men who have sex with Men Last Year Estimate"), denominator.outcome = 'adult.population') 
 
 data.manager$register.outcome(
   'unweighted.denominator',

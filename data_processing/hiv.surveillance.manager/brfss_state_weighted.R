@@ -8,7 +8,7 @@
 #Read in BRFSS Files
 #==============================================================================
 
-DATA.DIR.BRFSS.STATE=file.path(Q_ROOT, "data_raw/brfss/brfss_state")
+DATA.DIR.BRFSS.STATE="Q:/data_raw/brfss/brfss_state"
 
 brfss_file_state <- list.files(DATA.DIR.BRFSS.STATE, pattern = ".XPT", full.names = "TRUE")
 
@@ -265,7 +265,7 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
     }
     
     data$location = state.to.fips.mappings[data$state_fips]
-    data$outcome = "proportion.tested.for.hiv" 
+    data$outcome = "proportion.tested" 
     
     data$sex = brfss.sex.mappings[data$sex]
     data$age = brfss.age.mappings[data$age]
@@ -349,7 +349,7 @@ for (data in state.total.num) {
     
     data.manager$put.long.form(
         data = data,
-        ontology.name = 'brfss.shield',
+        ontology.name = 'brfss',
         source = 'brfss',
         dimension.values = list(),
         url = 'https://www.cdc.gov/brfss/index.html',
@@ -453,7 +453,7 @@ for (data in state.age.num) {
     
     data.manager$put.long.form(
         data = data,
-        ontology.name = 'brfss.shield',
+        ontology.name = 'brfss',
         source = 'brfss',
         dimension.values = list(),
         url = 'https://www.cdc.gov/brfss/index.html',
@@ -506,7 +506,7 @@ for (data in state.race.num) {
     
     data.manager$put.long.form(
         data = data,
-        ontology.name = 'brfss.shield',
+        ontology.name = 'brfss',
         source = 'brfss',
         dimension.values = list(),
         url = 'https://www.cdc.gov/brfss/index.html',
@@ -587,7 +587,7 @@ data.list.brfss.state.n = lapply(data.list.brfss.state.totals, function(file){
     data=file[[2]] 
     filename = file[[1]] 
     
-    data$outcome = "proportion.tested.for.hiv.n"
+    data$outcome = "proportion.tested.n"
     data$value = data$n_weighted #replace the "population" calculated above as the outcome value
     
     data <- data %>%
@@ -603,7 +603,7 @@ for (data in state.total.denom) {
     
     data.manager$put.long.form(
         data = data,
-        ontology.name = 'brfss.shield',
+        ontology.name = 'brfss',
         source = 'brfss',
         dimension.values = list(),
         url = 'https://www.cdc.gov/brfss/index.html',
@@ -690,7 +690,7 @@ data.list.brfss.state.race.n = lapply(data.list.brfss.state.race, function(file)
     data=file[[2]] 
     filename = file[[1]] 
     
-    data$outcome = "proportion.tested.for.hiv.n"
+    data$outcome = "proportion.tested.n"
     data$value = data$n_weighted #replace the "population" calculated above as the outcome value
     
     data <- data %>%
@@ -707,7 +707,7 @@ for (data in state.race.denom) {
     
     data.manager$put.long.form(
         data = data,
-        ontology.name = 'brfss.shield',
+        ontology.name = 'brfss',
         source = 'brfss',
         dimension.values = list(),
         url = 'https://www.cdc.gov/brfss/index.html',

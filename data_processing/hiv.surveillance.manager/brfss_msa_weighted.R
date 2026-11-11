@@ -9,7 +9,7 @@
 #Read in BRFSS Files
 #==============================================================================
 
-DATA.DIR.BRFSS.MSA=file.path(Q_ROOT, "data_raw/brfss/brfss_msa")
+DATA.DIR.BRFSS.MSA="Q:/data_raw/brfss/brfss_msa"
 
 brfss_file_msa<- list.files(DATA.DIR.BRFSS.MSA, pattern = ".xpt", full.names = "TRUE")
 
@@ -143,7 +143,7 @@ data.list.brfss.msa.clean = lapply(brfss_file_msa_list, function(file){
         data$ever.tested = data$HIVTST7
     }
     
-    data$outcome = "proportion.tested.for.hiv"  
+    data$outcome = "proportion.tested"  
     
     data$sex = brfss.sex.mappings[data$sex]
     data$age = brfss.age.mappings[data$age]
@@ -228,7 +228,7 @@ for (data in msa.total.num) {
     
     data.manager$put.long.form(
         data = data,
-        ontology.name = 'brfss.shield',
+        ontology.name = 'brfss',
         source = 'brfss',
         dimension.values = list(),
         url = 'https://www.cdc.gov/brfss/index.html',
@@ -381,7 +381,7 @@ for (data in msa.race.num) {
     
     data.manager$put.long.form(
         data = data,
-        ontology.name = 'brfss.shield',
+        ontology.name = 'brfss',
         source = 'brfss',
         dimension.values = list(),
         url = 'https://www.cdc.gov/brfss/index.html',
@@ -399,7 +399,7 @@ data.list.brfss.msa.n = lapply(data.list.brfss.msa.totals, function(file){
     data=file[[2]] 
     filename = file[[1]] 
     
-    data$outcome = "proportion.tested.for.hiv.n"
+    data$outcome = "proportion.tested.n"
     data$value = data$n_weighted #replace the "population" calculated above as the outcome value
     
     data <- data %>%
@@ -416,7 +416,7 @@ for (data in msa.total.denom) {
     
     data.manager$put.long.form(
         data = data,
-        ontology.name = 'brfss.shield',
+        ontology.name = 'brfss',
         source = 'brfss',
         dimension.values = list(),
         url = 'https://www.cdc.gov/brfss/index.html',
@@ -504,7 +504,7 @@ data.list.brfss.msa.race.n = lapply(data.list.brfss.msa.race, function(file){
     data=file[[2]] 
     filename = file[[1]] 
     
-    data$outcome = "proportion.tested.for.hiv.n"
+    data$outcome = "proportion.tested.n"
     data$value = data$n_weighted #replace the "population" calculated above as the outcome value
     
     data <- data %>%
@@ -521,7 +521,7 @@ for (data in msa.race.denom) {
     
     data.manager$put.long.form(
         data = data,
-        ontology.name = 'brfss.shield',
+        ontology.name = 'brfss',
         source = 'brfss',
         dimension.values = list(),
         url = 'https://www.cdc.gov/brfss/index.html',
