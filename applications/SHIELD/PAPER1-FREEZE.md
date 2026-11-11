@@ -31,10 +31,11 @@ the 1,000-simulation set is the last half of each stage 4 chain, every 10th samp
 - **Code:** the tags above, on GitHub.
 - **Data:** the two GitHub releases above, which never change. Each has a SHA-256 checksum that loading verifies.
 - **Results:** on the NAS, under `mcmc_runs/shield/calib.10.20.stage1` to `stage4`, `mcmc_summaries/shield/`,
-  `simulations/shield/calib.10.20.stage3-800` and `calib.10.20.stage4-1000`, and `shield/outputs/`. A manifest lists
-  every file with its SHA-256 checksum, so any later change can be detected.
+  `simulations/shield/calib.10.20.stage3-800` and `calib.10.20.stage4-1000`, and `shield/outputs/`. A checksum list,
+  `shield/paper1-freeze/MANIFEST.sha256`, gives every file's SHA-256, so any later change can be detected.
 - **Run records:** beside each output, in a `run_records/` folder (below).
-- **Software:** each server's R version and full package list, captured in November 2026, are kept with the manifest.
+- **Software:** each server's R version and full package list, captured in November 2026, are in
+  `shield/paper1-freeze/env/`. That folder also holds a copy of this page and the list of tags.
 
 ## Run records
 
