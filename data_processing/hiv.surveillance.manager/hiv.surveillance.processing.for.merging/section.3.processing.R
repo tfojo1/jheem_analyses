@@ -62,6 +62,15 @@ data.manager$register.outcome(
         units = '%',
         description = "Proportion of Men who have sex with Men"), denominator.outcome = 'adult.population')
 
+data.manager$register.outcome( #Represents 2020 Emory Estimates
+    'proportion.msm.last.year', 
+    metadata = create.outcome.metadata(
+        scale = 'proportion',
+        display.name = 'Proportion of MSM Last Year',
+        axis.name = 'Proportion of MSM Last Year',
+        units = '%',
+        description = "Proportion of Men who have sex with Men Last Year Estimate"), denominator.outcome = 'population') 
+
 data.manager$register.outcome(
   'unweighted.denominator',
   metadata = create.outcome.metadata(

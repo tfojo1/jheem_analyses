@@ -428,7 +428,7 @@ for (data in prop.msm.variance.age.state) {
 
 
 ###############################################################################
-            ##Emory MSM Data by County for 2013#
+            ##Emory MSM Data by County for 2013# (2011)
 ###############################################################################
 DATA.DIR.MSM="Q:/data_raw/emory"
 
@@ -501,7 +501,7 @@ data.list.emory.msm.county = lapply(data.list.emory.msm, function(file){
   data=file[["data"]]
   filename = file[["filename"]]
   
-  data$year = "2013"
+  data$year = "2011"  #Parastu wanted this year change to represent the midpoint of this estimate range (changed from 2013)
   data$outcome= "proportion.msm"
 
   data$value = as.numeric(data$MSM5YEAR/data$ADULTMEN)
@@ -529,7 +529,7 @@ data.list.emory.msm.msa = lapply(data.list.emory.msm, function(file){
   data=file[["data"]]
   filename = file[["filename"]]
   
-  data$year = "2013"
+  data$year = "2011"  #Parastu wanted this year change to represent the midpoint of this estimate range (changed from 2013)
   data$outcome= "proportion.msm"
   
   #To create location- for MSA use 'CBSACODE' and also 'METMICSA' ==1 for metropolitian statistical area
@@ -570,7 +570,7 @@ data.list.emory.msm.state = lapply(data.list.emory.msm, function(file){
   data=file[["data"]]
   filename = file[["filename"]]
   
-  data$year = "2013"
+  data$year = "2011"  #Parastu wanted this year change to represent the midpoint of this estimate range (changed from 2013)
   data$outcome= "proportion.msm"
   
   #To create location- combine state and county FIPS
@@ -682,7 +682,7 @@ emory.new.data.clean = lapply(emory.new.data, function(file){
     filename = file[["filename"]]
     
     data$year = "2020"
-    data$outcome= "proportion.msm"
+    data$outcome= "proportion.msm.last.year" #Make separate outcomes for each year of emory estimates
     data$value = data$`MSM (%)` / 100
     
     if(grepl("state", filename)) {
