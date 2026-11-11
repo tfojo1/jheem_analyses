@@ -3,6 +3,10 @@
 # each source the checkouts and load the data managers again, so each step writes its own
 # record: a small DCF file under run_records/ in the calibration's directory. Read one with
 # read.dcf(file, all = TRUE). Writing a record never stops a run: a failure is a warning.
+#
+# A step's record is written when the step starts. When the step finishes, the record gains an
+# end entry and one output entry per file the step saved, so a step that stopped early (an error,
+# or the process killed, for example for memory) is the one whose record has no end entry.
 
 SHIELD.RUN.RECORD.FORMAT <- "shield run record 1"
 
@@ -150,14 +154,81 @@ shield.write.run.record.file <- function(record, dir) {
     run <- record[[1L]]
     name <- paste0(run$step, if (!is.na(run$chain)) paste0("-chain", run$chain),
                    "-", gsub("[-:]", "", run$recorded.at), "-", run$host, "-", run$pid, ".dcf")
-    # Fields that are NA are left out. (A wide width keeps each value on one line.)
-    lines <- unlist(lapply(record, function(entry) {
+    path <- file.path(dir, name)
+    shield.replace.file(path, shield.run.record.lines(record))
+    path
+}
+
+# Fields that are NA are left out. (A wide width keeps each value on one line.)
+shield.run.record.lines <- function(entries) {
+    unlist(lapply(entries, function(entry) {
         c(utils::capture.output(write.dcf(as.data.frame(entry, stringsAsFactors = FALSE),
                                           width = 10000)), "")
     }))
-    path <- file.path(dir, name)
+}
+
+# Readers never see a half-written record: write beside it, then rename over it.
+shield.replace.file <- function(path, lines) {
     partial <- paste0(path, ".partial")
     writeLines(lines, partial)
     if (!file.rename(partial, path)) stop("could not rename ", partial)
-    path
+}
+
+# Called at the end of a step with the record's path (what shield.write.run.record returned)
+# and the files the step saved. Each output entry gives the file's path, size, time, and
+# SHA-256; files over SHIELD_RUN_RECORD_HASH_LIMIT_GB (default 20) get no digest, since hashing
+# an 80 GB simulation set takes over ten minutes.
+shield.finish.run.record <- function(path, outputs = character()) {
+    if (is.null(path) || !file.exists(path)) return(invisible(NULL))
+    tryCatch({
+        limit <- as.numeric(Sys.getenv("SHIELD_RUN_RECORD_HASH_LIMIT_GB", unset = "20")) * 1e9
+        outputs <- unique(outputs[!is.na(outputs) & file.exists(outputs)])
+        end <- list(record = "end", ended.at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
+                    outcome = "completed")
+        entries <- c(list(end), lapply(outputs, shield.run.record.output, limit = limit))
+        shield.replace.file(path, c(readLines(path), shield.run.record.lines(entries)))
+        cat("Run record finished: ", path, "\n", sep = "")
+        invisible(path)
+    }, error = function(e) {
+        warning("Could not finish the run record: ", conditionMessage(e), call. = FALSE)
+        invisible(NULL)
+    })
+}
+
+shield.run.record.output <- function(file, limit) {
+    info <- file.info(file)
+    list(record = "output", path = normalizePath(file), size = info$size,
+         modified = format(info$mtime, "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
+         sha256 = if (info$size <= limit) shield.sha256(file) else NA_character_)
+}
+
+# A file's SHA-256 from the system tool (sha256sum on Linux, shasum on macOS); NA without one.
+shield.sha256 <- function(file) {
+    tools <- Sys.which(c("sha256sum", "shasum"))
+    tools <- tools[nzchar(tools)]
+    if (length(tools) == 0L) return(NA_character_)
+    args <- if (names(tools)[1L] == "shasum") c("-a", "256", shQuote(file)) else shQuote(file)
+    out <- suppressWarnings(system2(tools[[1L]], args, stdout = TRUE, stderr = FALSE))
+    if (!is.null(attr(out, "status")) || length(out) != 1L) return(NA_character_)
+    sub(" .*$", "", out)
+}
+
+# The files each step of the modular launcher saves. NULL entries (a path jheem2 can't give,
+# for example) are dropped; a missing file is skipped when the record is finished.
+shield.step.outputs <- function(step, location, calibration.code, chain = NA_integer_,
+                                simset = NULL, version = "shield") {
+    tryCatch({
+        cache <- file.path(get.calibration.dir(version = version, location = location,
+                                               calibration.code = calibration.code), "cache")
+        switch(step,
+               setup = list.files(cache, pattern = "control\\.Rdata$", full.names = TRUE),
+               run = file.path(cache, paste0("chain", chain, "_control.Rdata")),
+               assemble = c(get.mcmc.summary.file(version, location, calibration.code),
+                            if (!is.null(simset)) with(get.simset.filename.and.dir(
+                                version = simset$version, sub.version = simset$sub.version,
+                                calibration.code = simset$calibration.code, n.sim = simset$n.sim,
+                                location = simset$location, intervention.code = simset$intervention.code),
+                                file.path(dir, filename))),
+               character())
+    }, error = function(e) character())
 }
