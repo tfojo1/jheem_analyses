@@ -118,9 +118,9 @@ simplot(sim.last,
         style.manager = source.style.manager, # DATA: total - yes
         dimension.values = list(year = 1980:2030)) 
 
-simplot(#simset.trans.old,
-        sim.last,    
-        simset.trans.new,
+simplot(simset.trans.old,
+        #sim.last,    
+        #simset.trans.new,
         facet.by = "race", # DATA: race - yes
         outcomes = c("diagnosed.prevalence"), 
         style.manager = stratum.style.manager,

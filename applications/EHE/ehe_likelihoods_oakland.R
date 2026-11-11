@@ -171,31 +171,6 @@ population.likelihood.instructions.pop =
                                        equalize.weight.by.year = F
   )
 
-# state-level: downweighted (1/8) for pop only
-population.likelihood.instructions.pop.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "adult.population", 
-                                         outcome.for.sim = "population",
-                                         dimensions = c("age","sex","race"),
-                                         levels.of.stratification = c(0,1,2), # 0 = totals, 1 = 1-way stratification
-                                         from.year = 2010,
-                                         correlation.different.years = 0.5, # this is the default
-                                         correlation.different.strata = 0.1, # this is the default
-                                         correlation.different.sources = 0.3, # default
-                                         correlation.same.source.different.details = 0.3, # default
-                                         
-                                         observation.correlation.form = 'autoregressive.1', 
-                                         
-                                         error.variance.term = population.error.sd.fn,
-                                         error.variance.type = 'function.sd',
-                                         
-                                         weights = ((1/8)*POPULATION.WEIGHT),
-                                         
-                                         # if there are more datapoints for certain years, this will normalize
-                                         # e.g., if there are a few years with only the totals 
-                                         # before the stratifications are available
-                                         equalize.weight.by.year = F
-    )
-
 population.likelihood.instructions.trans = 
   create.basic.likelihood.instructions(outcome.for.data = "adult.population", 
                                        outcome.for.sim = "population",
@@ -236,20 +211,6 @@ immigration.likelihood.instructions.pop =
                                        equalize.weight.by.year = T
   )
 
-# state-level: downweighted (1/8) for pop only
-immigration.likelihood.instructions.pop.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "adult.immigration", 
-                                         outcome.for.sim = "immigration",
-                                         dimensions = c("age","race"), 
-                                         levels.of.stratification = c(0,1),
-                                         from.year = 2011, 
-                                         observation.correlation.form = 'compound.symmetry',
-                                         error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
-                                         error.variance.type = 'cv',
-                                         weights = ((1/8)*POPULATION.WEIGHT),
-                                         equalize.weight.by.year = T
-    )
-
 immigration.likelihood.instructions.full = 
   create.basic.likelihood.instructions(outcome.for.data = "adult.immigration", 
                                        outcome.for.sim = "immigration",
@@ -276,20 +237,6 @@ emigration.likelihood.instructions.pop =
                                        weights = (1*POPULATION.WEIGHT),
                                        equalize.weight.by.year = T
   )
-
-# state-level: downweighted (1/8) for pop only
-emigration.likelihood.instructions.pop.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "adult.emigration", 
-                                         outcome.for.sim = "emigration",
-                                         dimensions = c("age","race"), 
-                                         levels.of.stratification = c(0,1),
-                                         from.year = 2011, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
-                                         error.variance.type = 'cv',
-                                         weights = ((1/8)*POPULATION.WEIGHT),
-                                         equalize.weight.by.year = T
-    )
 
 emigration.likelihood.instructions.full = 
   create.basic.likelihood.instructions(outcome.for.data = "adult.emigration", 
@@ -321,34 +268,6 @@ total.new.diagnoses.likelihood.instructions =
                                        name = 'total.new'
   )
 
-race.risk.new.diagnoses.likelihood.instructions = 
-  create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                       outcome.for.sim = "new",
-                                       dimensions = c("race","risk"),
-                                       levels.of.stratification = c(0,1,2), 
-                                       from.year = 2008, 
-                                       observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = DIAGNOSES.ERROR.TERM, 
-                                       error.variance.type = 'cv',
-                                       minimum.error.sd = 1,
-                                       weights = (1*TRANSMISSION.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = T
-  )
-
-race.risk.new.diagnoses.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                         outcome.for.sim = "new",
-                                         dimensions = c("race","risk"),
-                                         levels.of.stratification = c(0,1,2), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = DIAGNOSES.CV.STATE, 
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (1*TRANSMISSION.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T
-    )
-
 race.risk.halfx.cv.expv.new.diagnoses.likelihood.instructions = 
     create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
                                          outcome.for.sim = "new",
@@ -378,47 +297,6 @@ race.risk.cv.expv.new.diagnoses.likelihood.instructions =
                                          equalize.weight.by.year = T
     )
 
-race.risk.halfx.cv.new.diagnoses.likelihood.instructions = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                         outcome.for.sim = "new",
-                                         dimensions = c("race","risk"),
-                                         levels.of.stratification = c(0,1,2), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = DIAGNOSES.ERROR.TERM,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (0.5), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T
-    )
-
-race.risk.halfx.cv.new.diagnoses.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                         outcome.for.sim = "new",
-                                         dimensions = c("race","risk"),
-                                         levels.of.stratification = c(0,1,2), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = DIAGNOSES.CV.STATE,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (0.5), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T
-    )
-
-new.diagnoses.1x.likelihood.instructions = 
-  create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                       outcome.for.sim = "new",
-                                       dimensions = c("age","sex","race","risk"),
-                                       levels.of.stratification = c(0,1,2), 
-                                       from.year = 2008, 
-                                       observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = DIAGNOSES.ERROR.TERM, 
-                                       error.variance.type = 'cv',
-                                       minimum.error.sd = 1,
-                                       weights = (1), #list(0.3), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = T
-  )
 
 total.new.diagnoses.16x.cv.expv.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
@@ -435,96 +313,6 @@ total.new.diagnoses.16x.cv.expv.likelihood.instructions =
                                        name = 'total.new'
   )
 
-total.new.diagnoses.cv.likelihood.instructions = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                         outcome.for.sim = "new",
-                                         dimensions = character(),
-                                         levels.of.stratification = c(0), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = DIAGNOSES.ERROR.TERM,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (1), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T,
-                                         name = 'total.new'
-    )
-
-total.new.diagnoses.24x.cv.likelihood.instructions = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                         outcome.for.sim = "new",
-                                         dimensions = character(),
-                                         levels.of.stratification = c(0), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = DIAGNOSES.ERROR.TERM,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (24), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T,
-                                         name = 'total.new'
-    )
-
-total.new.diagnoses.24x.cv.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                         outcome.for.sim = "new",
-                                         dimensions = character(),
-                                         levels.of.stratification = c(0), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = DIAGNOSES.CV.STATE,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (24), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T,
-                                         name = 'total.new'
-    )
-
-total.new.diagnoses.84x.cv.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                         outcome.for.sim = "new",
-                                         dimensions = character(),
-                                         levels.of.stratification = c(0), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = DIAGNOSES.CV.STATE,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (84), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T,
-                                         name = 'total.new'
-    )
-
-total.new.diagnoses.cv.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                         outcome.for.sim = "new",
-                                         dimensions = character(),
-                                         levels.of.stratification = c(0), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = DIAGNOSES.CV.STATE,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (1), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T,
-                                         name = 'total.new'
-    )
-
-total.new.diagnoses.4x.cv.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                         outcome.for.sim = "new",
-                                         dimensions = character(),
-                                         levels.of.stratification = c(0), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = DIAGNOSES.CV.STATE,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (4), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T,
-                                         name = 'total.new'
-    )
-
 total.new.diagnoses.8x.cv.expv.likelihood.instructions = 
     create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
                                          outcome.for.sim = "new",
@@ -540,65 +328,6 @@ total.new.diagnoses.8x.cv.expv.likelihood.instructions =
                                          name = 'total.new'
     )
 
-total.new.diagnoses.10x.cv.likelihood.instructions = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                         outcome.for.sim = "new",
-                                         dimensions = character(),
-                                         levels.of.stratification = c(0), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = DIAGNOSES.ERROR.TERM, 
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (10), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T,
-                                         name = 'total.new'
-    )
-
-total.new.diagnoses.10x.cv.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                         outcome.for.sim = "new",
-                                         dimensions = character(),
-                                         levels.of.stratification = c(0), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = DIAGNOSES.CV.STATE, 
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (10), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T,
-                                         name = 'total.new'
-    )
-
-total.new.diagnoses.4x.cv.expv.likelihood.instructions = 
-  create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                       outcome.for.sim = "new",
-                                       dimensions = character(),
-                                       levels.of.stratification = c(0), 
-                                       from.year = 2008, 
-                                       observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = list(DIAGNOSES.CV, DIAGNOSES.EXP.OF.VAR), 
-                                       error.variance.type = c('cv','exp.of.variance'),
-                                       minimum.error.sd = 1,
-                                       weights = (4), #list(0.3), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = T,
-                                       name = 'total.new'
-  )
-
-total.new.diagnoses.cv.expv.likelihood.instructions = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                         outcome.for.sim = "new",
-                                         dimensions = character(),
-                                         levels.of.stratification = c(0), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = list(DIAGNOSES.CV, DIAGNOSES.EXP.OF.VAR), 
-                                         error.variance.type = c('cv','exp.of.variance'),
-                                         minimum.error.sd = 1,
-                                         weights = c(1), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T,
-                                         name = 'total.new'
-    )
 
 new.diagnoses.halfx.cv.expv.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
@@ -630,106 +359,6 @@ new.diagnoses.cv.expv.likelihood.instructions =
     )
 
 
-new.diagnoses.cv.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                         outcome.for.sim = "new",
-                                         dimensions = c("age","sex","race","risk"),
-                                         levels.of.stratification = c(0,1,2), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = DIAGNOSES.CV.STATE, 
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (1), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T
-    )
-
-new.diagnoses.halfx.cv.likelihood.instructions = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                         outcome.for.sim = "new",
-                                         dimensions = c("age","sex","race","risk"),
-                                         levels.of.stratification = c(0,1,2), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = DIAGNOSES.ERROR.TERM, 
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (1/2), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T
-    )
-
-
-new.diagnoses.halfx.cv.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                         outcome.for.sim = "new",
-                                         dimensions = c("age","sex","race","risk"),
-                                         levels.of.stratification = c(0,1,2), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = DIAGNOSES.CV.STATE, 
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (1/2), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T
-    )
-
-new.diagnoses.2x.one.way.cv.expv.likelihood.instructions = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                         outcome.for.sim = "new",
-                                         dimensions = c("age","sex","race","risk"),
-                                         levels.of.stratification = c(0,1), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = list(DIAGNOSES.CV, DIAGNOSES.EXP.OF.VAR), 
-                                         error.variance.type = c('cv','exp.of.variance'),
-                                         minimum.error.sd = 1,
-                                         weights = (2), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T
-    )
-
-new.diagnoses.1.5x.one.way.cv.likelihood.instructions = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                         outcome.for.sim = "new",
-                                         dimensions = c("age","sex","race","risk"),
-                                         levels.of.stratification = c(0,1), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = DIAGNOSES.ERROR.TERM, 
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (1.5), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T
-    )
-
-new.diagnoses.1.5x.one.way.cv.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                         outcome.for.sim = "new",
-                                         dimensions = c("age","sex","race","risk"),
-                                         levels.of.stratification = c(0,1), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = DIAGNOSES.CV.STATE, 
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (1.5), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T
-    )
-
-new.diagnoses.7.8x.cv.expv.likelihood.instructions = 
-  create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                       outcome.for.sim = "new",
-                                       dimensions = c("age","sex","race","risk"),
-                                       levels.of.stratification = c(0,1,2), 
-                                       from.year = 2008, 
-                                       observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = list(DIAGNOSES.CV, DIAGNOSES.EXP.OF.VAR), 
-                                       error.variance.type = c('cv','exp.of.variance'),
-                                       minimum.error.sd = 1,
-                                       weights = (7/8), #list(0.3), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = T
-  )
-
-
 #-- PREVALENCE  ----
 total.prevalence.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
@@ -745,34 +374,6 @@ total.prevalence.likelihood.instructions =
                                        equalize.weight.by.year = T,
                                        name = 'total.prevalence'
   )
-
-race.risk.prevalence.likelihood.instructions = 
-  create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                       outcome.for.sim = "diagnosed.prevalence",
-                                       dimensions = c("race","risk"),
-                                       levels.of.stratification = c(0,1,2), 
-                                       from.year = 2008, 
-                                       observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = list(PREVALENCE.ERROR.TERM), 
-                                       error.variance.type = c('cv'),
-                                       minimum.error.sd = 1,
-                                       weights = (1*TRANSMISSION.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = T
-  )
-
-race.risk.prevalence.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                         outcome.for.sim = "diagnosed.prevalence",
-                                         dimensions = c("race","risk"),
-                                         levels.of.stratification = c(0,1,2), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = list(PREVALENCE.CV.STATE), 
-                                         error.variance.type = c('cv'),
-                                         minimum.error.sd = 1,
-                                         weights = (1*TRANSMISSION.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T
-    )
 
 race.risk.halfx.cv.expv.prevalence.likelihood.instructions = 
     create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
@@ -803,49 +404,6 @@ race.risk.cv.expv.prevalence.likelihood.instructions =
                                          equalize.weight.by.year = T
     )
 
-race.risk.halfx.cv.prevalence.likelihood.instructions = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                         outcome.for.sim = "diagnosed.prevalence",
-                                         dimensions = c("race","risk"),
-                                         levels.of.stratification = c(0,1,2), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = DIAGNOSES.ERROR.TERM,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (0.5), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T
-    )
-
-race.risk.halfx.cv.prevalence.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                         outcome.for.sim = "diagnosed.prevalence",
-                                         dimensions = c("race","risk"),
-                                         levels.of.stratification = c(0,1,2), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = DIAGNOSES.CV.STATE,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (0.5), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T
-    )
-
-total.prevalence.cv.expv.likelihood.instructions = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                         outcome.for.sim = "diagnosed.prevalence",
-                                         dimensions = character(),
-                                         levels.of.stratification = 0, 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = list(PREVALENCE.CV, PREVALENCE.EXP.OF.VAR), 
-                                         error.variance.type = c('cv','exp.of.variance'),
-                                         minimum.error.sd = 1,
-                                         weights = c(1), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T,
-                                         name = 'total.prevalence'
-    )
-
 total.prevalence.16x.cv.expv.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
                                        outcome.for.sim = "diagnosed.prevalence",
@@ -861,98 +419,6 @@ total.prevalence.16x.cv.expv.likelihood.instructions =
                                        name = 'total.prevalence'
   )
 
-total.prevalence.cv.likelihood.instructions = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                         outcome.for.sim = "diagnosed.prevalence",
-                                         dimensions = character(),
-                                         levels.of.stratification = 0, 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = PREVALENCE.ERROR.TERM,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (1), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T,
-                                         name = 'total.prevalence'
-    )
-
-
-total.prevalence.24x.cv.likelihood.instructions = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                         outcome.for.sim = "diagnosed.prevalence",
-                                         dimensions = character(),
-                                         levels.of.stratification = 0, 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = PREVALENCE.ERROR.TERM,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (24), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T,
-                                         name = 'total.prevalence'
-    )
-
-total.prevalence.cv.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                         outcome.for.sim = "diagnosed.prevalence",
-                                         dimensions = character(),
-                                         levels.of.stratification = 0, 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = PREVALENCE.CV.STATE,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (1), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T,
-                                         name = 'total.prevalence'
-    )
-
-total.prevalence.4x.cv.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                         outcome.for.sim = "diagnosed.prevalence",
-                                         dimensions = character(),
-                                         levels.of.stratification = 0, 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = PREVALENCE.CV.STATE,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (4), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T,
-                                         name = 'total.prevalence'
-    )
-
-total.prevalence.84x.cv.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                         outcome.for.sim = "diagnosed.prevalence",
-                                         dimensions = character(),
-                                         levels.of.stratification = 0, 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = PREVALENCE.CV.STATE,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (84), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T,
-                                         name = 'total.prevalence'
-    )
-
-
-total.prevalence.24x.cv.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                         outcome.for.sim = "diagnosed.prevalence",
-                                         dimensions = character(),
-                                         levels.of.stratification = 0, 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = PREVALENCE.CV.STATE,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (24), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T,
-                                         name = 'total.prevalence'
-    )
-
 total.prevalence.8x.cv.expv.likelihood.instructions = 
     create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
                                          outcome.for.sim = "diagnosed.prevalence",
@@ -966,93 +432,6 @@ total.prevalence.8x.cv.expv.likelihood.instructions =
                                          weights = (8), #list(0.3), # see prev_new_aware_weighting.R 
                                          equalize.weight.by.year = T,
                                          name = 'total.prevalence'
-    )
-
-total.prevalence.10x.cv.instructions = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                         outcome.for.sim = "diagnosed.prevalence",
-                                         dimensions = character(),
-                                         levels.of.stratification = 0, 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = PREVALENCE.ERROR.TERM,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (10), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T,
-                                         name = 'total.prevalence'
-    )
-
-total.prevalence.10x.cv.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                         outcome.for.sim = "diagnosed.prevalence",
-                                         dimensions = character(),
-                                         levels.of.stratification = 0, 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = PREVALENCE.CV.STATE,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (10), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T,
-                                         name = 'total.prevalence'
-    )
-
-total.prevalence.4x.cv.expv.likelihood.instructions = 
-  create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                       outcome.for.sim = "diagnosed.prevalence",
-                                       dimensions = character(),
-                                       levels.of.stratification = 0, 
-                                       from.year = 2008, 
-                                       observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = list(PREVALENCE.CV, PREVALENCE.EXP.OF.VAR), 
-                                       error.variance.type = c('cv','exp.of.variance'),
-                                       minimum.error.sd = 1,
-                                       weights = (4), #list(0.3), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = T,
-                                       name = 'total.prevalence'
-  )
-
-prevalence.2x.one.way.cv.and.exp.v.likelihood.instructions = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                         outcome.for.sim = "diagnosed.prevalence",
-                                         dimensions = c("age","sex","race","risk"),
-                                         levels.of.stratification = c(0,1), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = list(PREVALENCE.CV, PREVALENCE.EXP.OF.VAR), 
-                                         error.variance.type = c('cv','exp.of.variance'),
-                                         minimum.error.sd = 1,
-                                         weights = (2), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T
-    )
-
-prevalence.1.5x.one.way.cv.likelihood.instructions = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                         outcome.for.sim = "diagnosed.prevalence",
-                                         dimensions = c("age","sex","race","risk"),
-                                         levels.of.stratification = c(0,1), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = PREVALENCE.ERROR.TERM,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (1.5), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T
-    )
-
-prevalence.1.5x.one.way.cv.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                         outcome.for.sim = "diagnosed.prevalence",
-                                         dimensions = c("age","sex","race","risk"),
-                                         levels.of.stratification = c(0,1), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = PREVALENCE.CV.STATE,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (1.5), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T
     )
 
 prevalence.halfx.cv.and.exp.v.likelihood.instructions = 
@@ -1084,78 +463,6 @@ prevalence.cv.and.exp.v.likelihood.instructions =
                                          equalize.weight.by.year = T
     )
 
-prevalence.halfx.cv.likelihood.instructions = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                         outcome.for.sim = "diagnosed.prevalence",
-                                         dimensions = c("age","sex","race","risk"),
-                                         levels.of.stratification = c(0,1,2), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = PREVALENCE.ERROR.TERM,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (1/2), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T
-    )
-
-prevalence.cv.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                         outcome.for.sim = "diagnosed.prevalence",
-                                         dimensions = c("age","sex","race","risk"),
-                                         levels.of.stratification = c(0,1,2), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = PREVALENCE.CV.STATE,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (1), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T
-    )
-
-
-prevalence.halfx.cv.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                         outcome.for.sim = "diagnosed.prevalence",
-                                         dimensions = c("age","sex","race","risk"),
-                                         levels.of.stratification = c(0,1,2), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = PREVALENCE.CV.STATE,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (1/2), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T
-    )
-
-prevalence.7.8x.cv.and.exp.v.likelihood.instructions = 
-  create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                       outcome.for.sim = "diagnosed.prevalence",
-                                       dimensions = c("age","sex","race","risk"),
-                                       levels.of.stratification = c(0,1,2), 
-                                       from.year = 2008, 
-                                       observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = list(PREVALENCE.CV, PREVALENCE.EXP.OF.VAR), 
-                                       error.variance.type = c('cv','exp.of.variance'),
-                                       minimum.error.sd = 1,
-                                       weights = (7/8), #list(0.3), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = T
-  )
-
-prevalence.1x.likelihood.instructions = 
-  create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                       outcome.for.sim = "diagnosed.prevalence",
-                                       dimensions = c("age","sex","race","risk"),
-                                       levels.of.stratification = c(0,1,2), 
-                                       from.year = 2008, 
-                                       observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = list(PREVALENCE.ERROR.TERM), 
-                                       error.variance.type = c('cv'),
-                                       minimum.error.sd = 1,
-                                       weights = (1),
-                                       equalize.weight.by.year = T
-  )
-
-
 #-- AIDS DIAGNOSES  ----
 non.age.aids.diagnoses.likelihood.instructions.trans =
   create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
@@ -1170,89 +477,6 @@ non.age.aids.diagnoses.likelihood.instructions.trans =
                                        error.variance.term = DIAGNOSES.ERROR.TERM,
                                        error.variance.type = 'cv',
                                        weights = (1*TRANSMISSION.WEIGHT),
-                                       equalize.weight.by.year = T
-  )
-
-# state-level aids diagnoses - through 1994
-non.age.aids.diagnoses.likelihood.instructions.trans.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
-                                         outcome.for.sim = "aids.diagnoses",
-                                         dimensions = c("sex","race","risk"),
-                                         levels.of.stratification = c(0,1),
-                                         from.year = 1985,
-                                         to.year = 1994, 
-                                         correlation.different.years = 0.3,
-                                         #observation.correlation.form = 'compound.symmetry',
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = DIAGNOSES.ERROR.TERM,
-                                         error.variance.type = 'cv',
-                                         weights = (1*TRANSMISSION.WEIGHT),
-                                         equalize.weight.by.year = T
-    )
-
-# total aids diagnoses - for adding to state population calibration (testing this out 4/11)
-total.aids.diagnoses.likelihood.instructions = 
-    create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
-                                         outcome.for.sim = "aids.diagnoses",
-                                         dimensions = character(),
-                                         levels.of.stratification = 0, 
-                                         from.year = 1985,
-                                         to.year = 1994, 
-                                         correlation.different.years = 0.3,
-                                         #observation.correlation.form = 'compound.symmetry',
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = DIAGNOSES.ERROR.TERM,
-                                         error.variance.type = 'cv',
-                                         weights = (1*TRANSMISSION.WEIGHT),
-                                         equalize.weight.by.year = T
-    )
-
-total.aids.diagnoses.cv.expv.likelihood.instructions = 
-    create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
-                                         outcome.for.sim = "aids.diagnoses",
-                                         dimensions = character(),
-                                         levels.of.stratification = 0, 
-                                         from.year = 1985,
-                                         to.year = 1994, 
-                                         correlation.different.years = 0.3,
-                                         #observation.correlation.form = 'compound.symmetry',
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = list(DIAGNOSES.CV, DIAGNOSES.EXP.OF.VAR), 
-                                         error.variance.type = c('cv','exp.of.variance'),
-                                         weights = (1*TRANSMISSION.WEIGHT),
-                                         equalize.weight.by.year = T
-    )
-
-total.aids.diagnoses.4x.cv.expv.likelihood.instructions = 
-    create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
-                                         outcome.for.sim = "aids.diagnoses",
-                                         dimensions = character(),
-                                         levels.of.stratification = 0, 
-                                         from.year = 1985,
-                                         to.year = 1994, 
-                                         correlation.different.years = 0.3,
-                                         #observation.correlation.form = 'compound.symmetry',
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = list(DIAGNOSES.CV, DIAGNOSES.EXP.OF.VAR), 
-                                         error.variance.type = c('cv','exp.of.variance'),
-                                         weights = c(4),
-                                         equalize.weight.by.year = T
-    )
-
-# special case for C.31080
-non.age.aids.diagnoses.4x.likelihood.instructions.trans =
-  create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
-                                       outcome.for.sim = "aids.diagnoses",
-                                       dimensions = c("sex","race","risk"),
-                                       levels.of.stratification = c(0,1),
-                                       from.year = 1985,
-                                       to.year = 1993,
-                                       correlation.different.years = 0.3,
-                                       #observation.correlation.form = 'compound.symmetry',
-                                       observation.correlation.form = 'autoregressive.1',
-                                       error.variance.term = DIAGNOSES.ERROR.TERM,
-                                       error.variance.type = 'cv',
-                                       weights = (4*TRANSMISSION.WEIGHT),
                                        equalize.weight.by.year = T
   )
 
@@ -1272,135 +496,6 @@ non.age.aids.diagnoses.likelihood.instructions.full =
                                        equalize.weight.by.year = T
   )
 
-# state-level aids diagnoses - through 1994
-non.age.aids.diagnoses.likelihood.instructions.full.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
-                                         outcome.for.sim = "aids.diagnoses",
-                                         dimensions = c("sex","race","risk"),
-                                         levels.of.stratification = c(0,1),
-                                         from.year = 1985,
-                                         to.year = 1994, # to 1994
-                                         correlation.different.years = 0.3,
-                                         #observation.correlation.form = 'compound.symmetry',
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = DIAGNOSES.ERROR.TERM,
-                                         error.variance.type = 'cv',
-                                         weights = (1*FULL.WEIGHT),
-                                         equalize.weight.by.year = T
-    )
-
-non.age.aids.diagnoses.cv.expv.likelihood.instructions.full.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
-                                         outcome.for.sim = "aids.diagnoses",
-                                         dimensions = c("sex","race","risk"),
-                                         levels.of.stratification = c(0,1),
-                                         from.year = 1985,
-                                         to.year = 1994, # to 1994
-                                         correlation.different.years = 0.3,
-                                         #observation.correlation.form = 'compound.symmetry',
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = list(DIAGNOSES.CV, DIAGNOSES.EXP.OF.VAR), 
-                                         error.variance.type = c('cv','exp.of.variance'),
-                                         weights = (4),
-                                         equalize.weight.by.year = T
-    )
-
-non.age.aids.diagnoses.4x.cv.expv.likelihood.instructions.full.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
-                                         outcome.for.sim = "aids.diagnoses",
-                                         dimensions = c("sex","race","risk"),
-                                         levels.of.stratification = c(0,1),
-                                         from.year = 1985,
-                                         to.year = 1994, # to 1994
-                                         correlation.different.years = 0.3,
-                                         #observation.correlation.form = 'compound.symmetry',
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = list(DIAGNOSES.CV, DIAGNOSES.EXP.OF.VAR), 
-                                         error.variance.type = c('cv','exp.of.variance'),
-                                         weights = (4),
-                                         equalize.weight.by.year = T
-    )
-# not used? 
-non.age.aids.diagnoses.cv.and.exp.v.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
-                                       outcome.for.sim = "aids.diagnoses",
-                                       dimensions = c("sex","race","risk"),
-                                       levels.of.stratification = c(0,1),
-                                       from.year = 1985,
-                                       to.year = 1993,
-                                       correlation.different.years = 0.3,
-                                       #observation.correlation.form = 'compound.symmetry',
-                                       observation.correlation.form = 'autoregressive.1',
-                                       error.variance.term = list(DIAGNOSES.CV, DIAGNOSES.EXP.OF.VAR), 
-                                       error.variance.type = c('cv','exp.of.variance'),
-                                       weights = (1),
-                                       equalize.weight.by.year = T
-  )
-
-non.age.aids.diagnoses.16x.likelihood.instructions =
-    create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
-                                         outcome.for.sim = "aids.diagnoses",
-                                         dimensions = c("sex","race","risk"),
-                                         levels.of.stratification = c(0,1),
-                                         from.year = 1985,
-                                         to.year = 1995,
-                                         correlation.different.years = 0.3,
-                                         #observation.correlation.form = 'compound.symmetry',
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = DIAGNOSES.ERROR.TERM, 
-                                         error.variance.type = 'cv',
-                                         weights = (16),
-                                         equalize.weight.by.year = T
-    )
-
-non.age.aids.diagnoses.16x.likelihood.instructions.state =
-    create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
-                                         outcome.for.sim = "aids.diagnoses",
-                                         dimensions = c("sex","race","risk"),
-                                         levels.of.stratification = c(0,1),
-                                         from.year = 1985,
-                                         to.year = 1995,
-                                         correlation.different.years = 0.3,
-                                         #observation.correlation.form = 'compound.symmetry',
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = DIAGNOSES.CV.STATE, 
-                                         error.variance.type = 'cv',
-                                         weights = (16),
-                                         equalize.weight.by.year = T
-    )
-
-total.aids.diagnoses.cv.likelihood.instructions =
-    create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
-                                         outcome.for.sim = "aids.diagnoses",
-                                         dimensions = character(),
-                                         levels.of.stratification = c(0),
-                                         from.year = 1985,
-                                         to.year = 1995,
-                                         correlation.different.years = 0.3,
-                                         #observation.correlation.form = 'compound.symmetry',
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = DIAGNOSES.ERROR.TERM, 
-                                         error.variance.type = 'cv',
-                                         weights = (1),
-                                         equalize.weight.by.year = T
-    )
-
-total.aids.diagnoses.cv.likelihood.instructions.state =
-    create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
-                                         outcome.for.sim = "aids.diagnoses",
-                                         dimensions = character(),
-                                         levels.of.stratification = c(0),
-                                         from.year = 1985,
-                                         to.year = 1995,
-                                         correlation.different.years = 0.3,
-                                         #observation.correlation.form = 'compound.symmetry',
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = DIAGNOSES.CV.STATE, 
-                                         error.variance.type = 'cv',
-                                         weights = (1),
-                                         equalize.weight.by.year = T
-    )
-
 
 #-- HIV-MORTALITY  ----
 # all-cause mortality among pwh
@@ -1418,20 +513,6 @@ hiv.mortality.likelihood.instructions.trans =
                                        equalize.weight.by.year = T
   )
 
-hiv.mortality.likelihood.instructions.trans.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "hiv.deaths",
-                                         outcome.for.sim = "hiv.mortality", 
-                                         dimensions = c("sex"),
-                                         levels.of.stratification = c(0,1), 
-                                         from.year = 2008, 
-                                         to.year = 2019, # added 4/11
-                                         observation.correlation.form = 'compound.symmetry',
-                                         error.variance.term = PREVALENCE.ERROR.TERM, 
-                                         error.variance.type = 'cv',
-                                         weights = ((1/16)*TRANSMISSION.WEIGHT),
-                                         equalize.weight.by.year = T
-    )
-
 hiv.mortality.likelihood.instructions.full = 
   create.basic.likelihood.instructions(outcome.for.data = "hiv.deaths",
                                        outcome.for.sim = "hiv.mortality", 
@@ -1445,22 +526,6 @@ hiv.mortality.likelihood.instructions.full =
                                        weights = (1*FULL.WEIGHT),
                                        equalize.weight.by.year = T
   )
-
-MORTALITY.CV = sqrt(PREVALENCE.CV^2 + ( (458 / (1926 + 12219)) / 2 )^2)
-MORTALITY.EXP.OF.VAR = PREVALENCE.EXP.OF.VAR
-biased.hiv.mortality.likelihood.instructions.full = 
-    create.basic.likelihood.instructions(outcome.for.data = "hiv.deaths",
-                                         outcome.for.sim = "hiv.mortality", 
-                                         dimensions = c("sex"),
-                                         levels.of.stratification = c(0,1), 
-                                         from.year = 2008, 
-                                         to.year = 2019, # added 4/11
-                                         observation.correlation.form = 'compound.symmetry',
-                                         error.variance.term = list(PREVALENCE.CV, PREVALENCE.EXP.OF.VAR), 
-                                         error.variance.type = c('cv','exp.of.variance'),
-                                         weights = (1),
-                                         equalize.weight.by.year = T
-    )
 
 #-- GENERAL MORTALITY  ----
 # everyone in the population, regardless of HIV 
@@ -1477,21 +542,6 @@ general.mortality.likelihood.instructions.pop =
                                        weights = (POPULATION.WEIGHT), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T
   )
-
-# state-level: downweighted (1/8) for pop only
-general.mortality.likelihood.instructions.pop.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "deaths",
-                                         outcome.for.sim = "total.mortality", 
-                                         dimensions = character(),
-                                         levels.of.stratification = c(0), 
-                                         from.year = 2007, 
-                                         to.year = 2019,
-                                         observation.correlation.form = 'compound.symmetry',
-                                         error.variance.term = 0.03, # look into source and see if they have estimate 
-                                         error.variance.type = 'cv',
-                                         weights = ((1/8)*POPULATION.WEIGHT), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T
-    )
 
 general.mortality.likelihood.instructions.full = 
   create.basic.likelihood.instructions(outcome.for.data = "deaths",
@@ -1524,41 +574,6 @@ suppression.basic.likelihood.instructions =
                                        weights = (1*FULL.WEIGHT),
                                        equalize.weight.by.year = T
   )
-
-suppression.basic.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "suppression",
-                                         outcome.for.sim = "suppression",
-                                         
-                                         dimensions = c("age","sex","race","risk"),
-                                         
-                                         levels.of.stratification = c(0,1), 
-                                         from.year = 2008, 
-                                         
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = 0.01, # round up of 0.00645909, from calculating_error_terms_for_ehe_likelihoods.R
-                                         error.variance.type = 'sd',
-                                         
-                                         weights = (1*FULL.WEIGHT),
-                                         equalize.weight.by.year = T
-    )
-
-
-race.risk.suppression.basic.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "suppression",
-                                         outcome.for.sim = "suppression",
-                                         
-                                         dimensions = c("race","risk"),
-                                         
-                                         levels.of.stratification = c(0,1), 
-                                         from.year = 2008, 
-                                         
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = 0.01, # round up of 0.00645909, from calculating_error_terms_for_ehe_likelihoods.R
-                                         error.variance.type = 'sd',
-                                         
-                                         weights = (1*FULL.WEIGHT),
-                                         equalize.weight.by.year = T
-    )
 
 suppression.nested.likelihood.instructions = 
   create.nested.proportion.likelihood.instructions(outcome.for.data = "suppression",
@@ -1791,23 +806,6 @@ heroin.likelihood.instructions.trans =
                             'TGA.OAKLAND'))  # anything not in this list will use second instructions
   )
 
-heroin.basic.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "heroin",
-                                         outcome.for.sim = "proportion.using.heroin",
-                                         
-                                         dimensions = c("age"),
-                                         levels.of.stratification = c(0,1), 
-                                         from.year = 2008, 
-                                         
-                                         observation.correlation.form = 'compound.symmetry',
-                                         error.variance.term = 0.54, # NSDUH calcs; doubled value (0.27); see NSDUH IDU Data_updated.xlsx in input_managers
-                                         error.variance.type = "cv",
-                                         
-                                         weights = 8,
-                                         equalize.weight.by.year = T
-    )
-
-
 heroin.basic.likelihood.instructions.full = 
   create.basic.likelihood.instructions(outcome.for.data = "heroin",
                                        outcome.for.sim = "proportion.using.heroin",
@@ -1924,22 +922,6 @@ cocaine.likelihood.instructions.trans =
                             SAN.DIEGO.MSA,
                             'TGA.OAKLAND')) # anything not in this list will use second instructions
   )
-
-cocaine.basic.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "cocaine",
-                                         outcome.for.sim = "proportion.using.cocaine",
-                                         
-                                         dimensions = c("age"),
-                                         levels.of.stratification = c(0,1), 
-                                         from.year = 2008, 
-                                         
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = 0.42, # NSDUH calcs doubled value (0.21); see NSDUH IDU Data_updated.xlsx in input_managers
-                                         error.variance.type = "cv",
-                                         
-                                         weights = 8,
-                                         equalize.weight.by.year = T
-    )
 
 cocaine.basic.likelihood.instructions.full = 
   create.basic.likelihood.instructions(outcome.for.data = "cocaine",
@@ -2188,26 +1170,6 @@ number.of.tests.year.on.year.change.likelihood.instructions =
 
 
 #-- YEAR-ON-YEAR GONORRHEA CHANGE ----
-# gonorrhea.year.on.year.change.likelihood.instructions = 
-#   create.basic.ratio.likelihood.instructions(outcome.for.data = "gonorrhea.ratio",  # can add name = gonorrhea here
-#                                              outcome.for.sim = "sexual.transmission.rates", 
-#                                              # (2020 gon diagnoses / 2019 gon diagnoses) proportional to 
-#                                              # (2020 sexual transmission/2019 sexual transmission)
-#                                              levels.of.stratification = c(0,1), 
-#                                              dimensions = c("sex","race","age"),
-#                                              from.year = 2018, 
-#                                              to.year = 2022,
-#                                              observation.correlation.form = 'compound.symmetry', 
-#                                              error.variance.term = 0.03, # if we can't find something better, use diagnoses estimate from above (0.07425679)
-#                                              error.variance.type = 'cv',
-#                                              correlation.different.years = 0.5,
-#                                              
-#                                              ratio.cv = 1.5,
-#                                              # ratio.correlation = , # NULL will enter default of 0
-#                                              
-#                                              weights = (1*FULL.WEIGHT),
-#                                              equalize.weight.by.year = T 
-#   )
 gonorrhea.year.on.year.change.likelihood.instructions = 
   create.time.lagged.comparison.likelihood.instructions(outcome.for.data = "gonorrhea.ratio",  # can add name = gonorrhea here
                                              outcome.for.sim = "sexual.transmission.rates", 
@@ -2230,26 +1192,6 @@ gonorrhea.year.on.year.change.likelihood.instructions =
                                              equalize.weight.by.year = T 
   )
 #-- YEAR-ON-YEAR SYPHILIS CHANGE ----
-# ps.syphilis.year.on.year.change.likelihood.instructions = 
-#   create.basic.ratio.likelihood.instructions(outcome.for.data = "ps.syphilis.ratio", # can add name = syphilis here
-#                                              outcome.for.sim = "sexual.transmission.rates", 
-#                                              # (2020 ps diagnoses / 2019 ps diagnoses) proportional to 
-#                                              # (2020 sexual transmisson/2019 sexual transmission)
-#                                              levels.of.stratification = c(0,1), 
-#                                              dimensions = c("sex","race","age"),
-#                                              from.year = 2018, 
-#                                              to.year = 2022,
-#                                              observation.correlation.form = 'compound.symmetry', 
-#                                              error.variance.term = 0.03, # if we can't find something better, use diagnoses estimate from above (0.07425679)
-#                                              error.variance.type = 'cv',
-#                                              correlation.different.years = 0.5,
-#                                              
-#                                              ratio.cv = 1.5,
-#                                              # ratio.correlation = , # NULL will enter default of 0
-#                                              
-#                                              weights = (1*FULL.WEIGHT),
-#                                              equalize.weight.by.year = T 
-#   )
 ps.syphilis.year.on.year.change.likelihood.instructions = 
   create.time.lagged.comparison.likelihood.instructions(outcome.for.data = "ps.syphilis.ratio", # can add name = syphilis here
                                                         outcome.for.sim = "sexual.transmission.rates", 
@@ -2305,175 +1247,7 @@ future.new.incidence.change.likelihood.instructions = join.likelihood.instructio
     future.incidence.new.10y.likelihood.instructions
 )
 
-#-- PROPORTION MSM --#
-
-proportion.msm.likelihood.instructions = create.custom.likelihood.instructions(
-    name = 'idu.active.prior.ratio',
-    
-    compute.function = function(sim, data, log=T, weights)
-    {
-        sim.total = sim$optimized.get(data$total.optimized.get.instr)
-        total.d = dnorm(data$totals, sim.total, data$total.sd)
-        
-        if (is.null(data$by.race))
-            race.d = 0
-        else
-        {
-            sim.by.race = sim$optimized.get(data$race.optimized.get.instr)
-            race.d = dnorm(data$by.race, sim.by.race, data$race.sd)
-        }
-        
-        d = sum(total.d, na.rm=T) + sum(race.d, na.rm=T)
-        
-        if (log)
-            sum(d)
-        else
-            prod(d)
-    },
-    
-    get.data.function = function(version, location)
-    {
-        sim.metadata = get.simulation.metadata(version=version, location=location)
-        spec.metadata = get.specification.metadata(version=version, location=location)
-        
-        counties = get.contained.locations(location, 'county')
-        
-        #-- Pull the total data --#
-        total.data = SURVEILLANCE.MANAGER$pull('proportion.msm',
-                                                  dimension.values = list(location=counties,
-                                                                          sex='male'))[,,1,drop=F]
-        if (is.null(total.data))
-            stop(paste0("Could not pull data on 'proportion.msm' totals for location '", location, "'"))
-        
-        total.years = dimnames(total.data)$year
-        males = CENSUS.MANAGER$pull(outcome = 'population',
-                                    keep.dimensions = c('location', 'age','race','ethnicity'),
-                                    dimension.values = list(location = counties,
-                                                            year = total.years,
-                                                            sex = 'male'),
-                                    from.ontology.names = 'single.year.age.census')[,,,,1,drop=F]
-        
-        if (length(total.years)==1)
-        {
-            dim.names = c(list(year=total.years),
-                          dimnames(males))
-            
-            dim(males) = sapply(dim.names, length)
-            dimnames(males) = dim.names
-        }
-        
-        males = apply(males, c('year','location'), sum)
-        
-        total.proportion.msm = rowSums(total.data * as.numeric(males)) / rowSums(males)
-            
-        #-- Pull the race data, map it, and aggregated it --#
-        race.data = SURVEILLANCE.MANAGER$pull('proportion.msm',
-                                              dimension.values = list(location=location, sex='male'),
-                                              keep.dimensions = c('year','race'))       
-        
-        if (is.null(race.data))
-        {
-#            stop(paste0("Could not pull race-specific data on 'proportion.msm' for location '", location, "'"))
-            proportion.msm.by.race = NULL
-        }
-        else
-        {
-            race.years = dimnames(race.data)$year
-            
-            males = SURVEILLANCE.MANAGER$pull('adult.population',
-                                              dimension.values = list(location=location, sex='male', year=race.years),
-                                              keep.dimensions = c('year','race','ethnicity'))[,,,1]
-            
-            if (is.null(males))
-                stop(paste0("Could not pull population data for location '", location, "'"))
-            
-            dim.names = list(year = race.years,
-                             race = spec.metadata$dim.names$race)
-            
-            proportion.msm.by.race = array(NA, dim = sapply(dim.names, length), dimnames = dim.names)
-            
-            proportion.msm.by.race[,'hispanic'] = race.data[,'hispanic',1]
-            proportion.msm.by.race[,'black'] = race.data[,'black',1]
-            
-            p.white = race.data[,'white',1]
-            n.white = males[,'white','not hispanic']
-            
-            p.aapi = 0.9 * race.data[,'asian',1] + 0.1 * race.data[,'native hawaiian/other pacific islander',1]
-            n.aapi = males[,'asian or pacific islander', 'not hispanic']
-            
-            p.aian = race.data[,'american indian/alaska native',1]
-            n.aian = males[,'american indian or alaska native', 'not hispanic']
-            
-            p.other = cbind(p.white, p.aapi, p.aian)
-            n.other = cbind(n.white, n.aapi, n.aian)
-            n.other[is.na(p.other)] = NA
-            
-            proportion.msm.by.race[,'other'] = rowSums(p.other * n.other, na.rm=T) / rowSums(n.other, na.rm=T)
-        }
-        
-        #-- Set up optimized get instructions --#
-        
-        total.optimized.get.instr = sim.metadata$prepare.optimized.get.instructions(
-            'proportion.msm', 
-            dimension.values=list(year = total.years),
-            keep.dimensions = c('year'),
-            drop.single.sim.dimension = T
-        )
-        
-        if (is.null(proportion.msm.by.race))
-            race.optimized.get.instr = NULL
-        else
-        {
-            race.optimized.get.instr = sim.metadata$prepare.optimized.get.instructions(
-                'proportion.msm', 
-                dimension.values=list(year = total.years, race=dimnames(proportion.msm.by.race)$race),
-                keep.dimensions = c('year','race'),
-                drop.single.sim.dimension = T
-            )
-        }
-        
-        #-- Package it up --#
-        
-        
-        list(
-            totals = total.proportion.msm,
-            by.race = proportion.msm.by.race,
-            
-            total.optimized.get.instr = total.optimized.get.instr,
-            race.optimized.get.instr = race.optimized.get.instr,
-            
-            total.sd = 0.005,
-            race.sd = 0.025
-        )
-    }
-)
-
-# proportion.msm.basic.likelihood.instructions = create.basic.likelihood.instructions(
-#     outcome.for.data = "proportion.msm", 
-#     outcome.for.sim = "proportion.msm",
-#     dimensions = c("race"),
-#     levels.of.stratification = c(0,1), # 0 = totals, 1 = 1-way stratification
-#     from.year = 2010,
-#     correlation.different.years = 0.5, # this is the default
-#     correlation.different.strata = 0.1, # this is the default
-#     correlation.different.sources = 0.3, # default
-#     correlation.same.source.different.details = 0.3, # default
-#     
-#     observation.correlation.form = 'autoregressive.1', 
-#     
-#     error.variance.term = 0.005,
-#     error.variance.type = 'cv',
-#     
-#     weights = 1,
-#     
-#     # if there are more datapoints for certain years, this will normalize
-#     # e.g., if there are a few years with only the totals 
-#     # before the stratifications are available
-#     equalize.weight.by.year = F
-# )
-
 #-- IDU Active/Prior Ratio --#
-
 idu.active.prior.ratio.likelihood.instructions = create.custom.likelihood.instructions(
     name = 'idu.active.prior.ratio',
     
@@ -2537,64 +1311,10 @@ joint.pop.migration.total.trans.likelihood.instructions =
                                #weight = POPULATION.WEIGHT
                                ) 
 
-# state-level pop likelihood
-pop.state.likelihood.instructions = 
-    join.likelihood.instructions(population.likelihood.instructions.pop.state,
-                                 immigration.likelihood.instructions.pop.state, 
-                                 emigration.likelihood.instructions.pop.state,
-                                 general.mortality.likelihood.instructions.pop.state,
-                                 total.prevalence.cv.likelihood.instructions.state, 
-                                 total.new.diagnoses.cv.likelihood.instructions.state,
-                                 total.aids.diagnoses.cv.likelihood.instructions.state,
-                                 proportion.msm.likelihood.instructions
-                                 #weight = POPULATION.WEIGHT
-    ) 
-
-pop.state.upweighted.new.prev.likelihood.instructions = 
-    join.likelihood.instructions(population.likelihood.instructions.pop.state,
-                                 immigration.likelihood.instructions.pop.state, 
-                                 emigration.likelihood.instructions.pop.state,
-                                 general.mortality.likelihood.instructions.pop.state,
-                                 total.prevalence.4x.cv.likelihood.instructions.state, 
-                                 total.new.diagnoses.4x.cv.likelihood.instructions.state,
-                                 total.aids.diagnoses.cv.likelihood.instructions.state,
-                                 proportion.msm.likelihood.instructions
-                                 #weight = POPULATION.WEIGHT
-    ) 
-
-
-pop.state.likelihood.instructions.2 = 
-    join.likelihood.instructions(population.likelihood.instructions.pop.state,
-                                 immigration.likelihood.instructions.pop.state, 
-                                 emigration.likelihood.instructions.pop.state,
-                                 general.mortality.likelihood.instructions.pop.state,
-                                 total.prevalence.cv.likelihood.instructions.state, 
-                                 total.new.diagnoses.cv.likelihood.instructions.state,
-                                 total.aids.diagnoses.cv.likelihood.instructions.state,
-                                 proportion.msm.likelihood.instructions
-                                 #weight = POPULATION.WEIGHT
-    ) 
 
 #-- JOIN THE TRANSMISSION-RELATED AND POPULATION LIKELIHOODS --#  ----
-transmission.pop.idu.aware.aids.testing.likelihood.instructions = 
-  join.likelihood.instructions(race.risk.halfx.cv.expv.new.diagnoses.likelihood.instructions, 
-                               race.risk.halfx.cv.expv.prevalence.likelihood.instructions, 
-                               total.new.diagnoses.8x.cv.expv.likelihood.instructions,
-                               total.prevalence.8x.cv.expv.likelihood.instructions,
-                               non.age.aids.diagnoses.likelihood.instructions.trans,
-                               population.likelihood.instructions.trans,
-                               heroin.likelihood.instructions.trans,
-                               cocaine.likelihood.instructions.trans,
-                               aids.deaths.likelihood.instructions.trans,
-                               hiv.mortality.likelihood.instructions.trans,
-                               idu.active.prior.ratio.likelihood.instructions#,
-                               #weight = TRANSMISSION.WEIGHT
-
-  )
-
 # OAKLAND: transmission likelihoods with data for TGA.OAKLAND. Dropped (no Oakland data):
 #   hiv.mortality.likelihood.instructions.trans (hiv.deaths 2008-2019)
-# (AIDS diagnoses / AIDS deaths added back 2026-11-06: CDC WONDER Oakland data in surveillance.manager_11.6.26)
 transmission.oakland.likelihood.instructions = 
     join.likelihood.instructions(
         # race.risk.halfx.cv.expv.new.diagnoses.likelihood.instructions, 
@@ -2602,7 +1322,7 @@ transmission.oakland.likelihood.instructions =
         #                          total.new.diagnoses.8x.cv.expv.likelihood.instructions,
         #                          total.prevalence.8x.cv.expv.likelihood.instructions,
         
-        race.risk.cv.expv.new.diagnoses.likelihood.instructions, # switching to these two 119
+        race.risk.cv.expv.new.diagnoses.likelihood.instructions, # switching to these two 11/9
         race.risk.cv.expv.prevalence.likelihood.instructions,
         
         non.age.aids.diagnoses.likelihood.instructions.trans,
@@ -2613,116 +1333,12 @@ transmission.oakland.likelihood.instructions =
         idu.active.prior.ratio.likelihood.instructions
     )
 
-# special case for C.31080
-transmission.pop.idu.aware.aids.testing.likelihood.instructions.4x.aids = 
-  join.likelihood.instructions(race.risk.new.diagnoses.likelihood.instructions, 
-                               race.risk.prevalence.likelihood.instructions, 
-                               non.age.aids.diagnoses.4x.likelihood.instructions.trans,
-                               population.likelihood.instructions.trans,
-                               heroin.likelihood.instructions.trans,
-                               cocaine.likelihood.instructions.trans,
-                               aids.deaths.likelihood.instructions.trans,
-                               hiv.mortality.likelihood.instructions.trans,
-                               idu.active.prior.ratio.likelihood.instructions#,
-                               #weight = TRANSMISSION.WEIGHT
-                               
-  )
+ 
+ 
 
-# state-level transmission calibration 
-trans.state.likelihood.instructions = 
-    join.likelihood.instructions(race.risk.halfx.cv.new.diagnoses.likelihood.instructions.state,
-                                 race.risk.halfx.cv.prevalence.likelihood.instructions.state,
-                                 total.new.diagnoses.10x.cv.likelihood.instructions.state,
-                                 total.prevalence.10x.cv.instructions.state,
-                                 #race.risk.suppression.basic.likelihood.instructions.state,
-                                 non.age.aids.diagnoses.16x.likelihood.instructions.state,
-                                 population.likelihood.instructions.trans,
-                                 heroin.basic.likelihood.instructions.state,
-                                 cocaine.basic.likelihood.instructions.state,
-                                 biased.hiv.mortality.likelihood.instructions.full,
-                                 future.new.incidence.change.likelihood.instructions,
-                                 idu.active.prior.ratio.likelihood.instructions,
-                                 proportion.msm.likelihood.instructions
-                                 
-    )
-
-trans.state.halfx.likelihood.instructions = 
-    join.likelihood.instructions(trans.state.likelihood.instructions,
-                                 additional.weights = 0.5
-                                 
-    )
-
-trans.state.overweighted.prevalence.likelihood.instructions = 
-    join.likelihood.instructions(race.risk.halfx.cv.new.diagnoses.likelihood.instructions.state,
-                                 race.risk.halfx.cv.prevalence.likelihood.instructions.state,
-                                 total.new.diagnoses.10x.cv.likelihood.instructions.state,
-                                 join.likelihood.instructions(total.prevalence.10x.cv.instructions.state, additional.weights = 4),
-                                 #race.risk.suppression.basic.likelihood.instructions.state,
-                                 non.age.aids.diagnoses.16x.likelihood.instructions.state,
-                                 population.likelihood.instructions.trans,
-                                 heroin.basic.likelihood.instructions.state,
-                                 cocaine.basic.likelihood.instructions.state,
-                                 biased.hiv.mortality.likelihood.instructions.full,
-                                 future.new.incidence.change.likelihood.instructions,
-                                 idu.active.prior.ratio.likelihood.instructions,
-                                 proportion.msm.likelihood.instructions
-                                 
-    )
-
-    
-# For backward compatibility in registration
-trans.state.likelihood.instructions.2 = trans.state.likelihood.instructions
-        
-
-#-- FULL LIKELIHOOD WITH THREE COVID LIKELIHOODS --# ---- 
-FULL.likelihood.instructions.32x.new.prev = join.likelihood.instructions(
-  # POPULATION LIKELIHOODS
-  population.likelihood.instructions.full, 
-  immigration.likelihood.instructions.full, 
-  emigration.likelihood.instructions.full,
-  
-  # TRANSMISSION LIKELIHOODS
-  total.new.diagnoses.16x.cv.expv.likelihood.instructions,
-  new.diagnoses.halfx.cv.expv.likelihood.instructions,
-  total.prevalence.16x.cv.expv.likelihood.instructions,
-  prevalence.halfx.cv.and.exp.v.likelihood.instructions,
-  
-  # MORTALITY LIKELIHOODS
-  hiv.mortality.likelihood.instructions.full,
-  general.mortality.likelihood.instructions.full,
-  aids.deaths.likelihood.instructions.full,
-  
-  # AIDS DIAGNOSES LIKELIHOOD
-  non.age.aids.diagnoses.likelihood.instructions.full,
-  
-  # CONTINUUM LIKELIHOODS
-  proportion.tested.likelihood.instructions,
-  hiv.test.positivity.likelihood.instructions, 
-  awareness.likelihood.instructions,
-  suppression.likelihood.instructions,
-  
-  # PREP LIKELIHOODS
-  prep.uptake.likelihood.instructions,
-  prep.indications.likelihood.instructions,
-  
-  # IDU LIKELIHOODS
-  heroin.likelihood.instructions.full,
-  cocaine.likelihood.instructions.full,
-  idu.active.prior.ratio.likelihood.instructions,
-  
-  # COVID LIKELIHOODS
-  number.of.tests.year.on.year.change.likelihood.instructions,
-  gonorrhea.year.on.year.change.likelihood.instructions,
-  ps.syphilis.year.on.year.change.likelihood.instructions,
-  
-  # FUTURE INCIDENCE PENALTY
-  future.new.incidence.change.likelihood.instructions
-)
-
-
+#-- FULL LIKELIHOOD WITH THREE COVID LIKELIHOODS --# ----
 # OAKLAND: full likelihoods with data for TGA.OAKLAND. Dropped (no Oakland data):
 #   hiv.mortality.likelihood.instructions.full (hiv.deaths 2008-2019)
-# (AIDS diagnoses / AIDS deaths added back 2026-11-06: CDC WONDER Oakland data in surveillance.manager_11.6.26)
 FULL.oakland.likelihood.instructions = join.likelihood.instructions(
   # POPULATION LIKELIHOODS
   population.likelihood.instructions.full, 
@@ -2767,179 +1383,5 @@ FULL.oakland.likelihood.instructions = join.likelihood.instructions(
   
   # FUTURE INCIDENCE PENALTY
   #future.new.incidence.change.likelihood.instructions # removing 11/9
-)
-
-#-- STATE FULL --#
-
-# state-level full calibration 
-full.state.likelihood.instructions = join.likelihood.instructions(
-    # POPULATION LIKELIHOODS
-    # join.likelihood.instructions(
-    #     population.likelihood.instructions.full, 
-    #     additional.weights = 1/16),
-    # 
-    # join.likelihood.instructions(
-    #     immigration.likelihood.instructions.full, 
-    #     emigration.likelihood.instructions.full,
-    #     additional.weights = 1/4),
-    
-    population.likelihood.instructions.full,
-    immigration.likelihood.instructions.full,
-    emigration.likelihood.instructions.full,
-    
-    # TRANSMISSION LIKELIHOODS
-    total.new.diagnoses.84x.cv.likelihood.instructions.state,
-    new.diagnoses.halfx.cv.likelihood.instructions.state,
-    
-    total.prevalence.84x.cv.likelihood.instructions.state,
-    prevalence.halfx.cv.likelihood.instructions.state,
-    
-    # MORTALITY LIKELIHOODS
-    biased.hiv.mortality.likelihood.instructions.full,
-    general.mortality.likelihood.instructions.full,
-    
-    # AIDS DIAGNOSES LIKELIHOOD
-    non.age.aids.diagnoses.16x.likelihood.instructions.state,
-    # state.aids.diagnoses.proportions.instructions,
-    
-    # CONTINUUM LIKELIHOODS
-    proportion.tested.basic.likelihood.instructions,
-    hiv.test.positivity.basic.likelihood.instructions, 
-    awareness.basic.likelihood.instructions,
-    suppression.basic.likelihood.instructions.state,
-    
-    # PREP LIKELIHOODS
-    prep.uptake.likelihood.instructions,
-    prep.indications.likelihood.instructions,
-    
-    # IDU LIKELIHOODS
-    heroin.basic.likelihood.instructions.state,
-    cocaine.basic.likelihood.instructions.state,
-    idu.active.prior.ratio.likelihood.instructions,
-    
-    # COVID LIKELIHOODS
-    number.of.tests.year.on.year.change.likelihood.instructions,
-    gonorrhea.year.on.year.change.likelihood.instructions,
-    ps.syphilis.year.on.year.change.likelihood.instructions,
-    
-    # FUTURE INCIDENCE PENALTY
-    future.new.incidence.change.likelihood.instructions,
-    
-    # PROPORTION MSM
-    proportion.msm.likelihood.instructions
-)
-
-full.state.overweighted.prev.vs.new.likelihood.instructions = join.likelihood.instructions(
-    # POPULATION LIKELIHOODS
-    # join.likelihood.instructions(
-    #     population.likelihood.instructions.full, 
-    #     additional.weights = 1/16),
-    # 
-    # join.likelihood.instructions(
-    #     immigration.likelihood.instructions.full, 
-    #     emigration.likelihood.instructions.full,
-    #     additional.weights = 1/4),
-    
-    population.likelihood.instructions.full,
-    immigration.likelihood.instructions.full,
-    emigration.likelihood.instructions.full,
-    
-    # TRANSMISSION LIKELIHOODS
-    join.likelihood.instructions(
-        total.new.diagnoses.84x.cv.likelihood.instructions.state,
-        new.diagnoses.halfx.cv.likelihood.instructions.state,
-        additional.weights = 1/4),
-    
-    join.likelihood.instructions(
-        total.prevalence.84x.cv.likelihood.instructions.state,
-        prevalence.halfx.cv.likelihood.instructions.state,
-        additional.weights = 4),
-    
-    # MORTALITY LIKELIHOODS
-    biased.hiv.mortality.likelihood.instructions.full,
-    general.mortality.likelihood.instructions.full,
-    
-    # AIDS DIAGNOSES LIKELIHOOD
-    non.age.aids.diagnoses.16x.likelihood.instructions.state,
-    # state.aids.diagnoses.proportions.instructions,
-    
-    # CONTINUUM LIKELIHOODS
-    proportion.tested.basic.likelihood.instructions,
-    hiv.test.positivity.basic.likelihood.instructions, 
-    awareness.basic.likelihood.instructions,
-    suppression.basic.likelihood.instructions.state,
-    
-    # PREP LIKELIHOODS
-    prep.uptake.likelihood.instructions,
-    prep.indications.likelihood.instructions,
-    
-    # IDU LIKELIHOODS
-    heroin.basic.likelihood.instructions.state,
-    cocaine.basic.likelihood.instructions.state,
-    idu.active.prior.ratio.likelihood.instructions,
-    
-    # COVID LIKELIHOODS
-    number.of.tests.year.on.year.change.likelihood.instructions,
-    gonorrhea.year.on.year.change.likelihood.instructions,
-    ps.syphilis.year.on.year.change.likelihood.instructions,
-    
-    # FUTURE INCIDENCE PENALTY
-    future.new.incidence.change.likelihood.instructions,
-    
-    # PROPORTION MSM
-    proportion.msm.likelihood.instructions
-)
-
-# For backward compatibility for now
-full.state.weighted.likelihood.instructions.2 = full.state.likelihood.instructions
-
-full.state.likelihood.instructions.half.weight = join.likelihood.instructions(
-    full.state.likelihood.instructions, 
-    additional.weights = 1/2)
-
-full.state.overweighted.prev.vs.new.likelihood.instructions.half.weight = join.likelihood.instructions(
-    full.state.overweighted.prev.vs.new.likelihood.instructions,
-    additional.weights = 1/2
-)
-
-FULL.likelihood.instructions.8x.new.prev = join.likelihood.instructions(
-  # POPULATION LIKELIHOODS
-  population.likelihood.instructions.full, 
-  immigration.likelihood.instructions.full, 
-  emigration.likelihood.instructions.full,
-  
-  # TRANSMISSION LIKELIHOODS
-  total.new.diagnoses.4x.cv.expv.likelihood.instructions,
-  new.diagnoses.7.8x.cv.expv.likelihood.instructions,
-  total.prevalence.4x.cv.expv.likelihood.instructions,
-  prevalence.7.8x.cv.and.exp.v.likelihood.instructions,
-  
-  # MORTALITY LIKELIHOODS
-  hiv.mortality.likelihood.instructions.full,
-  general.mortality.likelihood.instructions.full,
-  aids.deaths.likelihood.instructions.full,
-  
-  # AIDS DIAGNOSES LIKELIHOOD
-  non.age.aids.diagnoses.likelihood.instructions.full,
-  
-  # CONTINUUM LIKELIHOODS
-  proportion.tested.likelihood.instructions,
-  hiv.test.positivity.likelihood.instructions, 
-  awareness.likelihood.instructions,
-  suppression.likelihood.instructions,
-  
-  # PREP LIKELIHOODS
-  prep.uptake.likelihood.instructions,
-  prep.indications.likelihood.instructions,
-  
-  # IDU LIKELIHOODS
-  heroin.likelihood.instructions.full,
-  cocaine.likelihood.instructions.full,
-  idu.active.prior.ratio.likelihood.instructions,
-  
-  # COVID LIKELIHOODS
-  number.of.tests.year.on.year.change.likelihood.instructions,
-  gonorrhea.year.on.year.change.likelihood.instructions,
-  ps.syphilis.year.on.year.change.likelihood.instructions
 )
 

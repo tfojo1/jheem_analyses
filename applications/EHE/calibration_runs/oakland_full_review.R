@@ -35,9 +35,8 @@ sim.first = simset$first.sim()
 sim.last = simset$last.sim()
 
 ## --- LIKELIHOOD ---- ## 
-full.lik = FULL.oakland.likelihood.instructions$instantiate.likelihood('ehe', LOCATION)
-full.lik$compare.sims(sim.first, sim.last)   # >1 = last fits that component better
-
+#full.lik = FULL.oakland.likelihood.instructions$instantiate.likelihood('ehe', LOCATION)
+#full.lik$compare.sims(sim.first, sim.last)   # >1 = last fits that component better
 
 
 cbind(head(simset$get.mcmc.mixing.statistic(NULL),20))
@@ -52,31 +51,31 @@ simplot(sim.last,
         style.manager = stratum.style.manager,
         dimension.values = list(year = 2000:2030)) 
 
-simplot(sim.last,
-        simset,
-        facet.by = "age", split.by = "sex", # DATA: age x sex - yes
-        outcomes = c("population"), 
-        style.manager = stratum.style.manager,
-        dimension.values = list(year = 2000:2030)) 
+# simplot(sim.last,
+#         simset,
+#         facet.by = "age", split.by = "sex", # DATA: age x sex - yes
+#         outcomes = c("population"), 
+#         style.manager = stratum.style.manager,
+#         dimension.values = list(year = 2000:2030)) 
 
-simplot(sim.last,
-        simset,
-        facet.by = "race", split.by = "sex", # DATA: sex x race - yes
-        outcomes = c("population"), 
-        style.manager = stratum.style.manager,
-        dimension.values = list(year = 2000:2030)) 
+# simplot(sim.last,
+#         simset,
+#         facet.by = "race", split.by = "sex", # DATA: sex x race - yes
+#         outcomes = c("population"), 
+#         style.manager = stratum.style.manager,
+#         dimension.values = list(year = 2000:2030)) 
 
-simplot(sim.last,
-        simset,
-        outcomes = c("population"), 
-        style.manager = source.style.manager, # DATA: total - yes
-        dimension.values = list(year = 2000:2030)) 
+# simplot(sim.last,
+#         simset,
+#         outcomes = c("population"), 
+#         style.manager = source.style.manager, # DATA: total - yes
+#         dimension.values = list(year = 2000:2030)) 
 
-simplot(sim.last,
-        simset,
-        outcomes = c("immigration","emigration"), # DATA: totals only (patched: x5, ages 13+); no age/race
-        style.manager = location.style.manager,
-        dimension.values = list(year = 2000:2030)) 
+# simplot(sim.last,
+#         simset,
+#         outcomes = c("immigration","emigration"), # DATA: totals only (patched: x5, ages 13+); no age/race
+#         style.manager = location.style.manager,
+#         dimension.values = list(year = 2000:2030)) 
 
 # NEW DIAGNOSES -- DATA: total; age, sex, race, risk (1-way) - yes; 2-way - NO (skipped)
 simplot(sim.last,
@@ -149,29 +148,36 @@ simplot(sim.last,
         dimension.values = list(year = 1980:2030)) 
 
 # MORTALITY
+# simplot(sim.last,
+#         simset,
+#         facet.by = "sex", # DATA: NO hiv.deaths for Oakland (likelihood dropped) - check the shape
+#         outcomes = c("hiv.mortality"),
+#         style.manager = source.style.manager,
+#         dimension.values = list(year = 1980:2030)) 
+
+# simplot(sim.last,
+#         simset,
+#         outcomes = c("total.mortality"), # DATA: total - yes (patched: county -> TGA, partial years removed)
+#         style.manager = location.style.manager,
+#         dimension.values = list(year = 2000:2030)) 
+
+# AIDS DIAGNOSES --
 simplot(sim.last,
         simset,
-        facet.by = "sex", # DATA: NO hiv.deaths for Oakland (likelihood dropped) - check the shape
-        outcomes = c("hiv.mortality"),
+        outcomes = c("aids.diagnoses"), # DATA: total - yes 
         style.manager = source.style.manager,
         dimension.values = list(year = 1980:2030)) 
 
 simplot(sim.last,
         simset,
-        outcomes = c("total.mortality"), # DATA: total - yes (patched: county -> TGA, partial years removed)
-        style.manager = location.style.manager,
-        dimension.values = list(year = 2000:2030)) 
-
-# AIDS DIAGNOSES -- DATA: NO aids.diagnoses for Oakland (likelihood dropped) - check the shape
-simplot(sim.last,
-        simset,
+        facet.by = "race", # DATA: race - yes 
         outcomes = c("aids.diagnoses"), 
-        style.manager = source.style.manager,
+        style.manager = location.style.manager,
         dimension.values = list(year = 1980:2030)) 
 
 simplot(sim.last,
         simset,
-        facet.by = "race", # DATA: NO - check the shape
+        facet.by = "sex", # DATA: sex - yes 
         outcomes = c("aids.diagnoses"), 
         style.manager = location.style.manager,
         dimension.values = list(year = 1980:2030)) 
