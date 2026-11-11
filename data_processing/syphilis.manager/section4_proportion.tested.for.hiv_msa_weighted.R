@@ -6,6 +6,8 @@
 #This code was updated for SHIELD to create a mutually exclusive sex dimension
 #that includes male, female, msm.
 
+#Note that the BRFSS age groups and sex/risk dimensions are different for JHEEM vs. SHIELD
+
 #==============================================================================
 #Read in BRFSS Files
 #==============================================================================
