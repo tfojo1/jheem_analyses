@@ -51,10 +51,15 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
     scale <- data.manager$outcome.info[[outcome]]$metadata$scale
 
     outcome_data_all_ontologies <- data.manager$data[[outcome]][[metric]][[from.source.name]]
-    # Metadata record IDs, one per data point, with the same structure as the data
-    outcome_metadata_all_ontologies <- data.manager$metadata[[outcome]][[metric]][[from.source.name]]
-    if (is.null(outcome_metadata_all_ontologies) && !is.null(outcome_data_all_ontologies))
-        stop(paste0(error_prefix, "the data manager has no metadata records. Was it created (or copied) with a version of jheem2 that has metadata records?"))
+    # IDs, one per data point and with the same structure as the data, that tell us where each point came from.
+    # Data managers with metadata records store record IDs. A data manager made before metadata records existed, and not
+    # passed through load.data.manager() or copy.data.manager(), is still the old R6 object: it has no 'metadata' and its
+    # put() takes no 'metadata' argument. For those we use the hashed url IDs instead, which index into data.manager$url.list
+    use_metadata_records <- !is.null(data.manager$metadata) && ("metadata" %in% names(formals(data.manager$put)))
+    if (use_metadata_records)
+        outcome_ids_all_ontologies <- data.manager$metadata[[outcome]][[metric]][[from.source.name]]
+    else
+        outcome_ids_all_ontologies <- data.manager$url[[outcome]][[metric]][[from.source.name]]
 
     if (scale %in% c("proportion", "rate")) {
         # Need to have these arguments supplied, or use same as proportion
@@ -113,8 +118,8 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
                 if (scale %in% c("proportion", "rate") && !(strat_name %in% names(denominator_data_for_ontology))) next
 
                 strat_data <- outcome_data_all_ontologies[[ont_name]][[strat_name]]
-                strat_ids <- outcome_metadata_all_ontologies[[ont_name]][[strat_name]]
-                # Removed points keep their record ID, so drop the IDs of points with no data
+                strat_ids <- outcome_ids_all_ontologies[[ont_name]][[strat_name]]
+                # Removed points keep their ID, so drop the IDs of points with no data
                 strat_ids[is.na(strat_data)] <- NA
 
                 from_locations_present <- intersect(from_locations, dimnames(strat_data)$location)
@@ -247,15 +252,25 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
                 if (length(ids_used)==0) next
 
                 # Put the data
-                data.manager$put(data = aggregated_data,
-                                 outcome = outcome,
-                                 source = to.source.name,
-                                 ontology.name = ont_name,
-                                 dimension.values = c(list(location=to_location), post_aggregation_dimnames),
-                                 metadata = get_metadata_for_put(data.manager,
-                                                                 ids_used,
-                                                                 details.for.new.data),
-                                 allow.na.to.overwrite = F)
+                if (use_metadata_records)
+                    data.manager$put(data = aggregated_data,
+                                     outcome = outcome,
+                                     source = to.source.name,
+                                     ontology.name = ont_name,
+                                     dimension.values = c(list(location=to_location), post_aggregation_dimnames),
+                                     metadata = get_metadata_for_put(data.manager,
+                                                                     ids_used,
+                                                                     details.for.new.data),
+                                     allow.na.to.overwrite = F)
+                else
+                    data.manager$put(data = aggregated_data,
+                                     outcome = outcome,
+                                     source = to.source.name,
+                                     ontology.name = ont_name,
+                                     dimension.values = c(list(location=to_location), post_aggregation_dimnames),
+                                     url = get_urls_from_hashes(data.manager, ids_used),
+                                     details = details.for.new.data,
+                                     allow.na.to.overwrite = F)
 
                 cat(paste0("put data for ", to_location, " at stratification '", strat_name,"'\n"))
 
@@ -398,6 +413,17 @@ get_metadata_for_put <- function(data.manager,
     })
     metadata$details <- details.for.new.data
     metadata
+}
+
+#' @description
+#' For data managers made before metadata records existed: get every url
+#' behind the given hashed url IDs. Each entry of data.manager$url.list is one
+#' put's urls, sorted and pasted together with "__".
+#'
+get_urls_from_hashes <- function(data.manager,
+                                 url.ids) {
+    hashed_urls <- data.manager$url.list[url.ids]
+    sort(unique(unlist(strsplit(hashed_urls, "__", fixed = TRUE))))
 }
 
 #' @description
