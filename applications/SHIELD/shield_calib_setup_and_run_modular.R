@@ -69,7 +69,8 @@ if (RUN.STAGE == 'setup' | RUN.STAGE == 'all') {
                        calibration.code = CALIBRATION.NAME,
                        cache.frequency = CACHE.FREQ )
     # What each step ran with (R/shield_run_record.R), in the calibration's run_records/
-    shield.write.run.record(LOCATION, CALIBRATION.NAME, "setup", seed = SETUP.SEED, version = VERSION)
+    RUN.RECORD <- shield.write.run.record(LOCATION, CALIBRATION.NAME, "setup", seed = SETUP.SEED, version = VERSION)
+    shield.finish.run.record(RUN.RECORD, shield.step.outputs("setup", LOCATION, CALIBRATION.NAME, version = VERSION))
     print(paste0("Setup complete for ", LOCATION))
 }
 
@@ -79,7 +80,7 @@ if (RUN.STAGE == 'run'| RUN.STAGE == 'all') {
     start.time <- Sys.time()
     print(paste0("STARTING CHAIN ", CHAIN, " FROM ", CALIBRATION.NAME, " CODE FOR ", LOCATION,
                  " (", locations::get.location.name(LOCATION), ") AT ", Sys.time()))
-    shield.write.run.record(LOCATION, CALIBRATION.NAME, "run", chain = CHAIN, version = VERSION)
+    RUN.RECORD <- shield.write.run.record(LOCATION, CALIBRATION.NAME, "run", chain = CHAIN, version = VERSION)
     #
     # *****************************************************************************
     # RUN THE CHAIN, RETRYING IF THE NAS DRIVE DROPS OUT
@@ -225,6 +226,8 @@ if (RUN.STAGE == 'run'| RUN.STAGE == 'all') {
     }
     #
     end.time <- Sys.time()
+    shield.finish.run.record(RUN.RECORD, shield.step.outputs("run", LOCATION, CALIBRATION.NAME, chain = CHAIN,
+                                                             version = VERSION))
     #
     print(paste0("CHAIN ", CHAIN, " DONE: took ",
                  round(as.numeric(end.time - start.time) / 60, 1), " minutes"))
@@ -234,13 +237,15 @@ if (RUN.STAGE == 'run'| RUN.STAGE == 'all') {
 if (RUN.STAGE == 'assemble'| RUN.STAGE == 'all') {
     print(paste0("Assembling all chains from ", CALIBRATION.NAME, " code for ", LOCATION,
                  " (", locations::get.location.name(LOCATION), ")"))
-    shield.write.run.record(LOCATION, CALIBRATION.NAME, "assemble", version = VERSION)
+    RUN.RECORD <- shield.write.run.record(LOCATION, CALIBRATION.NAME, "assemble", version = VERSION)
     # Save simset
     simset <- assemble.simulations.from.calibration(version = VERSION,
                                                     location = LOCATION,
                                                     calibration.code = CALIBRATION.NAME,
                                                     allow.incomplete = T)
     save.simulation.set(simset)
+    shield.finish.run.record(RUN.RECORD, shield.step.outputs("assemble", LOCATION, CALIBRATION.NAME,
+                                                             simset = simset, version = VERSION))
     print(paste0("Assembly complete for ", LOCATION))
 }
 
