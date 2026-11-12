@@ -122,8 +122,8 @@ stopifnot(jheem2$name == "jheem2", jheem2$kind == "package")
 USE.JHEEM2.PACKAGE <- FALSE
 
 #-- Finishing a step: an end entry, then the files it saved --#
-small <- file.path(root, "small.Rdata"); writeLines("abc", small)           # 4 bytes
-large <- file.path(root, "large.Rdata"); writeLines(strrep("x", 20), large)  # 21 bytes
+small <- file.path(root, "small.Rdata"); writeBin(charToRaw("abc\n"), small)                  # 4 bytes
+large <- file.path(root, "large.Rdata"); writeBin(charToRaw(paste0(strrep("x", 20), "\n")), large)  # 21 bytes
 Sys.setenv(SHIELD_RUN_RECORD_HASH_LIMIT_GB = "1e-8")                         # 10 bytes
 started <- shield.write.run.record("C.12580", "calib.test", "assemble")
 stopifnot(is.null(read.record(started)$end))                                 # not finished yet
@@ -139,8 +139,7 @@ stopifnot(identical(finished, started), nrow(record$run) == 1L,
           is.na(outputs["large.Rdata", "sha256"]),                               # over the hashing limit
           length(list.files(dirname(started), pattern = "partial")) == 0L,
           is.null(shield.finish.run.record(NULL, small)))
-if (any(nzchar(Sys.which(c("sha256sum", "shasum")))))
-    stopifnot(outputs["small.Rdata", "sha256"] == "edeaaff3f1774ad2888673770c6d64097e391bc362d7d6fb34982ddf0efd18cb")
+stopifnot(outputs["small.Rdata", "sha256"] == "edeaaff3f1774ad2888673770c6d64097e391bc362d7d6fb34982ddf0efd18cb")
 
 #-- The files each step saves --#
 cache <- file.path(calibration.dir, "cache")

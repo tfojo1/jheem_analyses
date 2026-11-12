@@ -202,15 +202,15 @@ shield.run.record.output <- function(file, limit) {
          sha256 = if (info$size <= limit) shield.sha256(file) else NA_character_)
 }
 
-# A file's SHA-256 from the system tool (sha256sum on Linux, shasum on macOS); NA without one.
+# A file's SHA-256, read in binary as sha256.file() in commoncode/cache_manager.R does, so it
+# is the same on every platform; NA when openssl isn't installed or the file can't be read.
 shield.sha256 <- function(file) {
-    tools <- Sys.which(c("sha256sum", "shasum"))
-    tools <- tools[nzchar(tools)]
-    if (length(tools) == 0L) return(NA_character_)
-    args <- if (names(tools)[1L] == "shasum") c("-a", "256", shQuote(file)) else shQuote(file)
-    out <- suppressWarnings(system2(tools[[1L]], args, stdout = TRUE, stderr = FALSE))
-    if (!is.null(attr(out, "status")) || length(out) != 1L) return(NA_character_)
-    sub(" .*$", "", out)
+    if (!requireNamespace("openssl", quietly = TRUE)) return(NA_character_)
+    tryCatch({
+        connection <- file(file, open = "rb")
+        on.exit(close(connection), add = TRUE)
+        as.vector(as.character(openssl::sha256(connection)))
+    }, error = function(e) NA_character_)
 }
 
 # The files each step of the modular launcher saves. NULL entries (a path jheem2 can't give,
