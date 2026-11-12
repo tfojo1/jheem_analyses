@@ -2521,6 +2521,10 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
 
 ##** REGISTER THE SPECIFICATION ----
 register.model.specification(SHIELD.SPECIFICATION)
+# The data managers the specification's functions read, by their names in the
+# session's data binding (R/shield_data_managers.R)
+if (exists("declare.data.managers", mode = "function"))
+    declare.data.managers(SHIELD.SPECIFICATION, c("census", "syphilis"))
 #
 
 register.calibrated.parameters.for.version('shield',

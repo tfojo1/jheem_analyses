@@ -309,11 +309,10 @@ if (!exists("SURVEILLANCE.MANAGER")) {
                                    SYPHILIS.MANAGER.RELEASE.TAG)
 }
 
-## Code can refer to these managers by name: get.data.manager("census").
-if (exists("register.data.manager", mode = "function")) {
-  register.data.manager("census", CENSUS.MANAGER)
-  register.data.manager("syphilis", SURVEILLANCE.MANAGER)
-}
+## Code can refer to these managers by name: get.data.manager("census"). With
+## jheem2's data bindings, they are the session's binding, and model objects
+## record the releases they were built with (R/shield_data_managers.R).
+shield.bind.data.managers(CENSUS.MANAGER, SURVEILLANCE.MANAGER)
 
 
 ## =============================================================================
