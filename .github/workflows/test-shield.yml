@@ -194,7 +194,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: cached
-          key: shield-managers-${{ inputs.manager_release_tag || 'syphilis-manager-v2026.07.27' }}
+          key: shield-managers-loader-${{ inputs.manager_release_tag || 'syphilis-manager-v2026.07.27' }}
 
       - name: Download data managers
         if: steps.manager-cache.outputs.cache-hit != 'true'
@@ -202,18 +202,18 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MANAGER_TAG: ${{ inputs.manager_release_tag || 'syphilis-manager-v2026.07.27' }}
         run: |
-          mkdir -p "cached/data-managers/syphilis.manager.rdata/$MANAGER_TAG"
-          gh release download "$MANAGER_TAG" \
-            --dir "cached/data-managers/syphilis.manager.rdata/$MANAGER_TAG" \
-            --pattern "syphilis.manager.rdata"
+          mkdir -p cached
+          # The release loader verifies the syphilis manager and writes the metadata
+          # the suite's offline load requires; a plain download has none, so every
+          # model test would skip.
+          Rscript -e 'suppressMessages(library(jheem2)); source("commoncode/cache_manager.R"); tag <- Sys.getenv("MANAGER_TAG"); invisible(load.data.manager.from.cache("syphilis.manager.rdata", release.tag = if (tag == "latest") NULL else tag))'
           gh release download "census-manager-latest" \
             --dir cached \
             --pattern "census.manager.rdata"
-          gh release download "data-managers-latest" \
+          gh release download "google-mobility-v2026.11.12" \
             --dir cached \
-            --pattern "google_mobility_data.Rdata" || \
-            echo "google_mobility_data.Rdata not published; the mobility stage will skip"
-          ls -lh cached cached/data-managers/syphilis.manager.rdata/"$MANAGER_TAG"
+            --pattern "google_mobility_data.Rdata"
+          ls -lhR cached
 
       - name: Run the full suite
         env:
