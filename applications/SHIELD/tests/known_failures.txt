@@ -1,0 +1,70 @@
+# Findings the SHIELD suite reports on master, one per line: test file | test | detail.
+# run_tests.R fails on a finding not listed here. Add new ones with --update-known;
+# delete a line by hand when a fix removes the finding.
+test-integration-likelihoods.R | likelihood dimension lists use a consistent dimension order
+test-integration-likelihoods.R | likelihood dimension lists use a consistent dimension order | inconsistent dimension orders in shield_likelihoods.R
+test-static-hygiene.R | Monte Carlo draws in the intervention pipeline are seeded | applications/SHIELD/intervention/doxy_effectiveness.R draws random numbers (lines 40) but never calls set.seed(); intervention runs are not reproducible and parallel jobs disagree with each other.
+test-static-hygiene.R | no credentials or pre-signed URLs are committed | applications/SHIELD/inputs/input_untreated_syphilis_progression_rates.R:9 (pre-signed S3 URL)
+test-static-hygiene.R | no credentials or pre-signed URLs are committed | possible secrets in source:
+test-static-hygiene.R | no model code hardcodes a developer's absolute path | absolute paths in SHIELD model code:
+test-static-hygiene.R | no model code hardcodes a developer's absolute path | applications/SHIELD/analysis/calibration/extra/x_calibration_sample_code.R
+test-static-hygiene.R | sourcing the model never mutates a git repository | "    git checkout ", branch, "\n")
+test-static-hygiene.R | sourcing the model never mutates a git repository | The test suite works around this with its own bootstrap; a real run has no such protection.
+test-static-hygiene.R | sourcing the model never mutates a git repository | after <- checkout.head()
+test-static-hygiene.R | sourcing the model never mutates a git repository | before <- checkout.head()
+test-static-hygiene.R | sourcing the model never mutates a git repository | checkout.head <- function() {
+test-static-hygiene.R | sourcing the model never mutates a git repository | if (git("pull", "--ff-only", "origin", branch) != 0L)
+test-static-hygiene.R | sourcing the model never mutates a git repository | shield_source_code.R performs mutating git operations that are not gated off by default or by an environment variable:
+test-static-hygiene.R | sourcing the model never mutates a git repository | system2("git", c("-C", repo, "pull"))
+test-static-hygiene.R | the repo does not track large binary scratch files | .RDataTmp
+test-static-hygiene.R | the repo does not track large binary scratch files | applications/SHIELD/analysis/intervention/archive/backups/intervention_helper_functions_BACKUP_2026-09-10_2019_prepalette.R
+test-static-hygiene.R | the repo does not track large binary scratch files | applications/SHIELD/analysis/intervention/archive/backups/intervention_helper_functions_BACKUP_2026-09-12_1343_preframe.R
+test-static-hygiene.R | the repo does not track large binary scratch files | applications/SHIELD/analysis/intervention/archive/backups/manuscript_outputs_BACKUP_2026-09-09_1755_prerename.R
+test-static-hygiene.R | the repo does not track large binary scratch files | applications/SHIELD/analysis/intervention/archive/backups/manuscript_outputs_BACKUP_2026-09-09_1925_prefig5.R
+test-static-hygiene.R | the repo does not track large binary scratch files | applications/SHIELD/analysis/intervention/archive/backups/manuscript_outputs_BACKUP_2026-09-09_1929_pre3x3.R
+test-static-hygiene.R | the repo does not track large binary scratch files | applications/SHIELD/analysis/intervention/archive/backups/manuscript_outputs_BACKUP_2026-09-10_1958_predoc.R
+test-static-hygiene.R | the repo does not track large binary scratch files | applications/SHIELD/analysis/intervention/archive/backups/manuscript_outputs_BACKUP_2026-09-10_2019_prepalette.R
+test-static-hygiene.R | the repo does not track large binary scratch files | applications/SHIELD/analysis/intervention/archive/backups/manuscript_outputs_BACKUP_2026-09-10_2031_presize.R
+test-static-hygiene.R | the repo does not track large binary scratch files | applications/SHIELD/analysis/intervention/archive/backups/manuscript_outputs_BACKUP_2026-09-12_1343_preframe.R
+test-static-hygiene.R | the repo does not track large binary scratch files | applications/SHIELD/analysis/intervention/archive/backups/pretty_plots_BACKUP_2026-09-10_1551_ryanwhite.R
+test-static-hygiene.R | the repo does not track large binary scratch files | applications/SHIELD/analysis/intervention/archive/backups/x-analysis_helper_functions.R
+test-static-hygiene.R | the repo does not track large binary scratch files | applications/SHIELD/intervention/untitled folder/doxy_interventions_CROI.R
+test-static-hygiene.R | the repo does not track large binary scratch files | applications/SHIELD/intervention/untitled folder/doxy_interventions_april.R
+test-static-hygiene.R | the repo does not track large binary scratch files | applications/SHIELD/intervention/untitled folder/input_doxy_pep_parameters.R
+test-static-hygiene.R | the repo does not track large binary scratch files | applications/SHIELD/intervention/untitled folder/intervention_helper_functions.R
+test-static-hygiene.R | the repo does not track large binary scratch files | applications/SHIELD/intervention/untitled folder/intervention_plots.R
+test-static-hygiene.R | the repo does not track large binary scratch files | applications/SHIELD/intervention/untitled folder/intervention_plotting_collection.R
+test-static-hygiene.R | the repo does not track large binary scratch files | applications/SHIELD/intervention/untitled folder/rapidScaleup-seattle.R
+test-static-hygiene.R | the repo does not track large binary scratch files | data_files/.DS_Store
+test-static-hygiene.R | the repo does not track large binary scratch files | scratch/backup files tracked in git:
+test-static-parse.R | every SHIELD .R file parses | applications/SHIELD/analysis/intervention/archive/doxy_summary_aug.R
+test-static-parse.R | every SHIELD .R file parses | applications/SHIELD/intervention/untitled folder/doxy_interventions_april.R
+test-static-parse.R | every SHIELD .R file parses | files that do not parse:
+test-static-parse.R | every literal source() target exists | applications/SHIELD/analysis/calibration/extra/x_calibration_sample_code.R -> applications/SHIELD/debug_likelihoods.R
+test-static-parse.R | every literal source() target exists | source() targets that do not exist:
+test-static-penalties.R | the growth penalty does not add 1 to the denominator | At a 2020 count of 2 this understates the ratio by 33%, at 5 by 17%, and at 2000 by ~0%. Use pmax(denominator, eps) or skip empty strata instead.
+test-static-penalties.R | the growth penalty does not add 1 to the denominator | race_vals[as.character(end_year),] / (race_vals[as.character(start_year),] + 1),
+test-static-penalties.R | the growth penalty does not add 1 to the denominator | sex_vals[as.character(end_year),] / (sex_vals[as.character(start_year),] + 1)
+test-static-penalties.R | the growth penalty does not add 1 to the denominator | the growth penalty still adds 1 to the 10-year denominator:
+test-static-penalties.R | the growth penalty does not add 1 to the denominator | total_vals[as.character(end_year)] / (total_vals[as.character(start_year)] + 1),
+test-static-penalties.R | the historical-penalty guard actually guards | shield_likelihoods.R:148 returns a character string when the national series is missing, and line 149 divides by it without checking. The tryCatch changes the error message and nothing else - either stop() with a clear message or fall back to a usable default.
+test-static-wiring.R | every calibration code a launcher runs is registered | launch_assemble.sh -> calib.9.19.stage3
+test-static-wiring.R | every calibration code a launcher runs is registered | launch_interventions.sh -> calib.10.20.stage3.pk
+test-static-wiring.R | every calibration code a launcher runs is registered | launch_multiChain_stage3.sh -> calib.10.5.stage3
+test-static-wiring.R | every calibration code a launcher runs is registered | launch_parallel_stages.sh -> calib.7.30.stage2.LA.PA
+test-static-wiring.R | every calibration code a launcher runs is registered | launch_resume_chain.sh -> calib.7.30.stage2.az, calib.10.5.stage0.1x
+test-static-wiring.R | every calibration code a launcher runs is registered | launch_run_chains.sh -> calib.9.19.stage3
+test-static-wiring.R | every calibration code a launcher runs is registered | launch_setup.sh -> calib.9.22.stage3
+test-static-wiring.R | every calibration code a launcher runs is registered | launchers referencing unregistered calibration codes:
+test-static-wiring.R | the intervention runner does not swallow failed runs | intervention_run.R sets stop.for.errors = FALSE and never checks that the requested interventions actually ran.
+test-unit-base-parameters.R | stated confidence intervals actually bracket their value
+test-unit-base-parameters.R | stated confidence intervals actually bracket their value | prp.msm.sex.with.female: value 0.18 lies outside its stated CI [0.9, 0.36]
+test-unit-doxy-effectiveness.R | the fitted lognormal reproduces the published confidence interval | fitted 2.5% limit is 0.07355, published limit is 0.08
+test-unit-doxy-effectiveness.R | the fitted lognormal reproduces the published confidence interval | fitted 97.5% limit is 0.4413, published limit is 0.48
+test-unit-doxy-effectiveness.R | the point estimate is recovered as the distribution's centre | median of the fitted distribution is 0.1802 but the published RR is 0.2
+test-unit-pairing.R | a larger sd multiplier spreads contacts away from the diagonal | error: object 'DEFAULT.SEXUAL.DEBUT.AGE' not found
+test-unit-pairing.R | a positive mean age delta shifts partners older | error: object 'DEFAULT.SEXUAL.DEBUT.AGE' not found
+test-unit-pairing.R | age mixing is concentrated on the diagonal with no age preference | error: object 'DEFAULT.SEXUAL.DEBUT.AGE' not found
+test-unit-pairing.R | age mixing proportions have columns summing to 1 | error: object 'DEFAULT.SEXUAL.DEBUT.AGE' not found
+test-unit-spline-prior.R | correlation = 0 does not produce a NaN covariance | Either guard the zero case or reject it in validation.
+test-unit-spline-prior.R | correlation = 0 does not produce a NaN covariance | correlation = 0 is accepted by validation but divides the covariance diagonal by zero, giving NaN. Error was: sigma cannot contain NA values
