@@ -148,7 +148,7 @@ finding.lines <- function(results, repo.root) {
             ## "file.R: detail" keeps the file: R shortens long paths in parse errors.
             lines <- sub("^(\\S[^:]*\\.[Rr]): .*$", "\\1", lines)
             lines <- lines[nzchar(lines) & !grepl("`", lines, fixed = TRUE) &
-                           !grepl("^(Expected |Differences:)", lines) &
+                           !grepl("^(Expected |Differences?:|Actual( [a-z]+)*:)", lines) &
                            !grepl(" is not (TRUE|FALSE)$", lines)]
             out <- c(out, if (length(lines)) paste(test, lines, sep = " | ") else test)
         }
