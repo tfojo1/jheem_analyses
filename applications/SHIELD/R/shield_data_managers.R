@@ -58,3 +58,43 @@ shield.check.loaded.data.manager <- function(manager, variable, declared) {
             call. = FALSE)
     invisible(NULL)
 }
+
+# Makes SHIELD's two managers jheem2's session data binding, when jheem2 has
+# bindings (CIPHER-Epi/jheem2 #25): kernels, likelihoods, and calibrations then
+# record the releases they were built with; CENSUS.MANAGER and
+# SURVEILLANCE.MANAGER become aliases that read through the binding, so code that
+# uses them is unchanged; and rebuild.data.binding() can reload a recorded
+# binding from its releases. With an earlier jheem2, the managers are only
+# registered by name, as before.
+shield.bind.data.managers <- function(census, syphilis, envir = parent.frame()) {
+    if (!exists("create.data.binding", mode = "function")) {
+        if (exists("register.data.manager", mode = "function")) {
+            register.data.manager("census", census)
+            register.data.manager("syphilis", syphilis)
+        }
+        return(invisible(FALSE))
+    }
+    # The binding first: a variable reloaded after rm() is then the manager its
+    # name is bound to, which is what create.data.manager.alias() requires.
+    set.data.binding(create.data.binding(census = census, syphilis = syphilis))
+    create.data.manager.alias("CENSUS.MANAGER", "census", envir = envir)
+    create.data.manager.alias("SURVEILLANCE.MANAGER", "syphilis", envir = envir)
+    set.data.release.resolver(shield.load.data.manager.release)
+    invisible(TRUE)
+}
+
+# The release resolver for rebuild.data.binding(): loads a recorded release
+# through the verified loader. jheem2 then checks it against the recorded digests.
+shield.load.data.manager.release <- function(identity) {
+    source <- get.github.release.source(identity$file)
+    if (is.null(source) || is.na(identity$release) ||
+        !identical(identity$repository, source$repo)) {
+        stop("Cannot load the data manager '", identity$file, "': only releases of ",
+             if (is.null(source)) "a GitHub-backed manager" else source$repo,
+             " can be loaded, and the record has ",
+             if (is.na(identity$release)) "no release" else
+                 paste0(identity$release, " from ", identity$repository), call. = FALSE)
+    }
+    load.data.manager.from.cache(identity$file, set.as.default = FALSE,
+                                 release.tag = identity$release)
+}

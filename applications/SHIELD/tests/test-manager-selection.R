@@ -150,4 +150,30 @@ stopifnot(!is.null(moved),
 stopifnot(is.null(sync.in(checkout)))                    # sourcing again goes through
 commit.to(upstream, "third")
 stopifnot(is.null(sync.in(checkout, pull = FALSE)))      # pulls off: unchanged behavior
+
+#-- The managers as jheem2's session data binding (stand-ins for jheem2) --#
+calls <- character()
+helpers$register.data.manager <- function(name, manager) calls <<- c(calls, paste("register", name, manager))
+stopifnot(identical(helpers$shield.bind.data.managers("C", "S"), FALSE),          # earlier jheem2
+          identical(calls, c("register census C", "register syphilis S")))
+calls <- character()
+helpers$create.data.binding <- function(...) list(...)
+helpers$set.data.binding <- function(binding) calls <<- c(calls, paste("bind", paste(names(binding), unlist(binding), collapse = " ")))
+helpers$create.data.manager.alias <- function(variable, name, envir) calls <<- c(calls, paste("alias", variable, name))
+helpers$set.data.release.resolver <- function(resolver) calls <<- c(calls, if (identical(resolver, helpers$shield.load.data.manager.release)) "resolver")
+stopifnot(identical(helpers$shield.bind.data.managers("C", "S"), TRUE),
+          identical(calls, c("bind census C syphilis S",                          # the binding before the aliases
+                             "alias CENSUS.MANAGER census", "alias SURVEILLANCE.MANAGER syphilis", "resolver")))
+helpers$get.github.release.source <- function(file) if (file == "syphilis.manager.rdata") list(repo = "tfojo1/jheem_analyses")
+helpers$load.data.manager.from.cache <- function(file, set.as.default, release.tag) paste(file, release.tag, set.as.default)
+identity <- list(file = "syphilis.manager.rdata", release = "syphilis-manager-v2026.10.09",
+                 repository = "tfojo1/jheem_analyses")
+stopifnot(identical(helpers$shield.load.data.manager.release(identity),
+                    "syphilis.manager.rdata syphilis-manager-v2026.10.09 FALSE"))
+expect.error(helpers$shield.load.data.manager.release(modifyList(identity, list(repository = "someone/else"))),
+             "only releases of tfojo1/jheem_analyses")
+expect.error(helpers$shield.load.data.manager.release(modifyList(identity, list(release = NA_character_))),
+             "the record has no release")
+expect.error(helpers$shield.load.data.manager.release(modifyList(identity, list(file = "other.rdata"))),
+             "only releases of a GitHub-backed manager")
 cat("SHIELD manager selection tests passed\n")
