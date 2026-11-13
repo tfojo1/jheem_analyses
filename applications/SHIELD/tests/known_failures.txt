@@ -1,8 +1,8 @@
 # Findings the SHIELD suite reports on master, one per line: test file | test | detail.
 # run_tests.R fails on a finding not listed here. Add new ones with --update-known;
 # delete a line by hand when a fix removes the finding.
+test-integration-likelihoods.R | likelihood dimension lists use a consistent dimension order
 test-integration-likelihoods.R | likelihood dimension lists use a consistent dimension order | inconsistent dimension orders in shield_likelihoods.R
-test-integration-likelihoods.R | likelihood dimension lists use a consistent dimension order | unique(demographic) has length 3, not length 1.
 test-static-hygiene.R | Monte Carlo draws in the intervention pipeline are seeded | applications/SHIELD/intervention/doxy_effectiveness.R draws random numbers (lines 40) but never calls set.seed(); intervention runs are not reproducible and parallel jobs disagree with each other.
 test-static-hygiene.R | no credentials or pre-signed URLs are committed | applications/SHIELD/inputs/input_untreated_syphilis_progression_rates.R:9 (pre-signed S3 URL)
 test-static-hygiene.R | no credentials or pre-signed URLs are committed | possible secrets in source:

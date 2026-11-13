@@ -126,8 +126,9 @@ cat(strrep("=", 70), "\n", sep = "")
 
 ## ---- Known findings ----
 ## One line per finding: "test file | test | detail", for failures and errors.
-## testthat's comparison lines differ between versions, so only the test's own
-## info text is kept, without the checkout's path.
+## testthat's comparison lines differ between versions (3.2 and 3.3 word them
+## differently), so only the test's own info text is kept, without the
+## checkout's path.
 finding.lines <- function(results, repo.root) {
     roots <- unique(c(repo.root, normalizePath(repo.root, mustWork = FALSE)))
     out <- character()
@@ -149,6 +150,7 @@ finding.lines <- function(results, repo.root) {
             lines <- sub("^(\\S[^:]*\\.[Rr]): .*$", "\\1", lines)
             lines <- lines[nzchar(lines) & !grepl("`", lines, fixed = TRUE) &
                            !grepl("^(Expected |Differences?:|Actual( [a-z]+)*:)", lines) &
+                           !grepl(" has length [0-9]+, not length [0-9]+\\.$| is not (strictly )?(less|more) than | not (equal|identical) to ", lines) &
                            !grepl(" is not (TRUE|FALSE)$", lines)]
             out <- c(out, if (length(lines)) paste(test, lines, sep = " | ") else test)
         }
