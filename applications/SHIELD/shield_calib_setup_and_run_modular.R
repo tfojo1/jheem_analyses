@@ -44,6 +44,12 @@ cat("Repo root:", JHEEM.ANALYSES.PATH, "\n")
 source(file.path(SHIELD.DIR, "shield_specification.R"))
 source(file.path(SHIELD.DIR, "shield_likelihoods.R"))
 source(file.path(SHIELD.DIR, "shield_calib_register.R"))
+# SHIELD's two-iteration smoke calibrations, for exercising the launcher end to end. Opt-in, as in
+# shield_calib_setup_and_run.R.
+if (identical(tolower(trimws(Sys.getenv("SHIELD_ENABLE_CONTAINER_SMOKE", unset = "false"))), "true")) {
+    source(file.path(SHIELD.DIR, "R", "shield_recorded_runtime.R"))  # helpers the registration uses
+    source(file.path(SHIELD.DIR, "shield_calib_register_container_smoke.R"))
+}
 source(file.path(JHEEM.ANALYSES.PATH, "commoncode", "locations_of_interest.R"))
 source(file.path(SHIELD.DIR, "R", "shield_run_record.R"))
 
