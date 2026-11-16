@@ -314,6 +314,12 @@ if (!exists("SURVEILLANCE.MANAGER")) {
 ## record the releases they were built with (R/shield_data_managers.R).
 shield.bind.data.managers(CENSUS.MANAGER, SURVEILLANCE.MANAGER)
 
+## Saved calibration controls keep only what a chain uses (engine, likelihood and
+## prior), not the data managers: about 20 MB instead of 140 MB on disk, and about
+## 4 GB less memory per chain. Chains are unchanged. jheem2 1.13.0 and later; earlier
+## versions ignore the option.
+options(jheem2.lean.calibration.controls = TRUE)
+
 
 ## =============================================================================
 ## 7. SHIELD-SPECIFIC CODE
