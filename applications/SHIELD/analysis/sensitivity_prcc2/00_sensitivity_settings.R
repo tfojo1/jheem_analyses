@@ -13,14 +13,32 @@
 #   female : women
 # Positive values = fewer cases with doxy-PEP. Backup of v2: 00_sensitivity_settings_backup.R
 
+# SETUP ----
+# Not needed when these are already loaded in the R session; uncomment to run a step on its own.
+# source('../jheem_analyses/commoncode/locations_of_interest.R')                                       # SHIELD.TEN.MSAS
+# source('../jheem_analyses/applications/SHIELD/shield_specification.R')                                # ROOT.DIR
+# source('../jheem_analyses/applications/SHIELD/analysis/calibration/calibration_helper_functions.R')   # load/extract simsets
+
 library(tidyverse)
 
 # SETTINGS ----
 CALIB.CODE   <- "calib.10.20.stage4"
-locations    <- setNames(SHIELD.TEN.MSAS, SHIELD.TEN.MSAS)
+
+# TEST MODE: NULL = all 10 MSAs. To test, give one MSA name or code, e.g.
+#   TEST.MSA <- names(SHIELD.TEN.MSAS)[1]
+# Test outputs go to a separate "_test" folder, so they never mix with the full run.
+TEST.MSA <- names(SHIELD.TEN.MSAS)[1]
+# TEST.MSA <- NULL
+
+msas <- if (is.null(TEST.MSA)) SHIELD.TEN.MSAS else
+    SHIELD.TEN.MSAS[names(SHIELD.TEN.MSAS) %in% TEST.MSA | SHIELD.TEN.MSAS %in% TEST.MSA]
+if (length(msas) == 0) stop("TEST.MSA '", TEST.MSA, "' is not in SHIELD.TEN.MSAS")
+locations    <- setNames(unname(msas), unname(msas))      # MSA codes
+FILE.SUFFIX  <- if (is.null(TEST.MSA)) "" else "_test"
+# locations    <- setNames(SHIELD.TEN.MSAS, SHIELD.TEN.MSAS)
 BASE.PATH    <- paste0(ROOT.DIR, "/shield/outputs/", CALIB.CODE, "/")    # inputs (results arrays)
 V2.PATH      <- paste0(BASE.PATH, "sensitivity_v2/")                     # v2 outputs (param_matrices.Rdata is reused if present)
-OUT.PATH     <- paste0(BASE.PATH, "sensitivity_v3_3out/")                # v3 outputs (v2 outputs are not overwritten)
+OUT.PATH     <- paste0(BASE.PATH, "sensitivity_v3_3out", FILE.SUFFIX, "/")                # v3 outputs (v2 outputs are not overwritten)
 # OUT.PATH     <- paste0(BASE.PATH, "sensitivity_v2/")                     # v2 outputs (originals are not overwritten)
 dir.create(paste0(OUT.PATH, "figures/tornado"), recursive = TRUE, showWarnings = FALSE)
 

@@ -10,9 +10,9 @@ source('../jheem_analyses/applications/SHIELD/analysis/sensitivity_prcc2/00_sens
 pm_file <- paste0(V2.PATH, "param_matrices.Rdata")
 if (file.exists(pm_file)) {
     cat("Reusing", pm_file, "\n")
-    param_matrices <- get(load(pm_file))
+    param_matrices <- get(load(pm_file))[unname(locations)]    # keep the MSAs in locations only
 } else {
-    calib.simsets  <- load.calib.simsets(SHIELD.TEN.MSAS, CALIB.CODE, 1000)
+    calib.simsets  <- load.calib.simsets(unname(locations), CALIB.CODE, 1000)
     param_matrices <- lapply(locations, function(city) {
         simset <- extract.calib.simsets(calib.simsets, city, CALIB.CODE, exact = T)[[1]]$full_simset
         all_params <- t(simset$parameters)

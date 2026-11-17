@@ -70,7 +70,7 @@ make_tornado <- function(city) {
         guides(fill = guide_legend(ncol = 1))
 }
 
-for (city in SHIELD.TEN.MSAS) {
+for (city in locations) {
     cat(paste0("City: ", city, "\n"))
     ggsave(plot = make_tornado(city),
            filename = paste0(OUT.PATH, "figures/tornado/", city, "__tornado.png"),
