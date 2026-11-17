@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
 # KING COUNTY-ALIGNED DOXY-PEP SCENARIOS — SEATTLE (C.42660) ONLY
-#   Runs intervention/intervention_run_KC.R, which runs the four scenarios in
-#   intervention/intervention_definitions-kc.R (doxy.kc.30.flat, doxy.kc.30.to50,
+#   Runs intervention/intervention_run_KC_parallel.R, which runs the four scenarios in
+#   intervention/intervention_definitions_KC.R (doxy.kc.30.flat, doxy.kc.30.to50,
 #   doxy.kc.45.flat, doxy.kc.45.to50) on the stage 4 posterior (1,000 sims).
 #   noint and doxy.cov.5-50 already exist for Seattle and are not rerun.
 #   Seattle's stage 4 interventions ran on shield2 (tag shield-paper1-interventions-stage4-run1):
@@ -10,7 +10,7 @@
 #
 # USAGE
 #   Launch over SSH (survives logout):
-#       nohup bash applications/SHIELD/launchers/launch_interventions_KC.sh > /dev/null 2>&1 &
+#       nohup bash applications/SHIELD/launchers/launch_interventions_parallel_KC.sh > /dev/null 2>&1 &
 #   Kill Runs:
 #       pkill -u pkasaie1 -x R
 #       pkill -u pkasaie1 -f "Rscript"
@@ -24,12 +24,12 @@
 #       tail -f /home/jheem-shared/logs/<the file you want>
 #
 #   Check a specific city+calibration log:
-#       tail -f /home/jheem-shared/logs/<loc>_<calib_code>_interventions_KC.out
+#       tail -f /home/jheem-shared/logs/<loc>_<calib_code>_<intervention>_interventions_KC.out
 #
 # ON FAILURE
 #   The failed city prints to stderr and releases its slot.
 #   All other cities keep running.
-#   Check /home/jheem-shared/logs/<loc>_<calibration_code>_interventions_KC.out for the R-level error message.
+#   Check /home/jheem-shared/logs/<loc>_<calibration_code>_<intervention>_interventions_KC.out for the R-level error message.
 
 # ── shell options ──────────────────────────────────────────────────────────────
 set -uo pipefail   # `set -e` deliberately omitted: one failed city must not abort the launcher
@@ -73,7 +73,7 @@ RUN_ID="${USER:-$(id -un)}_$(date +%Y%m%d_%H%M%S)"
 
 # ── shared helpers ─────────────────────────────────────────────────────────────
 source "$SCRIPT_DIR/_shield_slots.sh"
-SCRIPT="$PARENT_DIR/intervention/intervention_run_KC.R"   # King County scenarios, Seattle only
+SCRIPT="$PARENT_DIR/intervention/intervention_run_KC_parallel.R"   # King County scenarios, Seattle only
 
 # ── thread settings ────────────────────────────────────────────────────────────
 export OPENBLAS_NUM_THREADS=1
@@ -81,11 +81,20 @@ export OMP_NUM_THREADS=1
 export MKL_NUM_THREADS=1
 
 # ── config ─────────────────────────────────────────────────────────────────────
-# Seattle only: intervention_run_KC.R stops for any other location
+# Seattle only: intervention_run_KC_parallel.R stops for any other location
 CITIES=(C.42660)
 
-# One city x one calibration = one Rscript process (it runs the four scenarios in turn)
-MAX_JOBS=1
+# One Rscript process per scenario: the four scenarios run in parallel (1 core each).
+# Each process loads the Seattle base simset, so memory use is about 4 simsets.
+MAX_JOBS=4
+
+# Scenario codes, as defined in intervention/intervention_definitions_KC.R
+INTERVENTIONS=(
+    doxy.kc.30.flat
+    doxy.kc.30.to50
+    doxy.kc.45.flat
+    doxy.kc.45.to50
+)
 
 CALIBRATION_CODES=(
     calib.10.20.stage4
@@ -108,35 +117,42 @@ if (( ${#CITIES[@]} == 0 )); then
     echo "Error: CITIES is empty — check the array name in the config block above" >&2
     exit 1
 fi
+if (( ${#INTERVENTIONS[@]} == 0 )); then
+    echo "Error: INTERVENTIONS is empty — check the array name in the config block above" >&2
+    exit 1
+fi
 if (( ${#CALIBRATION_CODES[@]} == 0 )); then
     echo "Error: CALIBRATION_CODES is empty — check the array name in the config block above" >&2
     exit 1
 fi
 
-# ── per city+calibration code runner ──────────────────────────────────────────
-run_calib_code() {
+# ── per city + calibration + scenario runner ──────────────────────────────────
+run_one_scenario() {
     local loc="$1"
     local calib_code="$2"
-    echo "[$(date '+%F %T')] START   INTERV $loc :: $calib_code"
-    Rscript "$SCRIPT" "$loc" "$calib_code" "$N_SIM" "$FIRST_YEAR" "$LAST_YEAR" \
-        > "$LOG_DIR/${loc}_${calib_code}_interventions_KC.out" 2>&1
+    local int_code="$3"
+    echo "[$(date '+%F %T')] START   INTERV $loc :: $calib_code :: $int_code"
+    Rscript "$SCRIPT" "$loc" "$calib_code" "$N_SIM" "$FIRST_YEAR" "$LAST_YEAR" "$int_code" \
+        > "$LOG_DIR/${loc}_${calib_code}_${int_code}_interventions_KC.out" 2>&1
     local rc=$?
     if (( rc != 0 )); then
-        echo "[$(date '+%F %T')] FAILED  INTERV $loc :: $calib_code (exit $rc)" >&2
+        echo "[$(date '+%F %T')] FAILED  INTERV $loc :: $calib_code :: $int_code (exit $rc)" >&2
         return 1
     fi
-    echo "[$(date '+%F %T')] DONE    INTERV $loc :: $calib_code"
+    echo "[$(date '+%F %T')] DONE    INTERV $loc :: $calib_code :: $int_code"
 }
 
 # ── job-slot manager ───────────────────────────────────────────────────────────
 for loc in "${CITIES[@]}"; do
     for calib_code in "${CALIBRATION_CODES[@]}"; do
+        for int_code in "${INTERVENTIONS[@]}"; do
 
-        wait_for_slot "$MAX_JOBS" jobs
+            wait_for_slot "$MAX_JOBS" jobs
 
-        run_calib_code "$loc" "$calib_code" &
-        echo "[$(date '+%F %T')] LAUNCHED INTERV $loc :: $calib_code (PID $!, running_jobs=$(running_slots))"
+            run_one_scenario "$loc" "$calib_code" "$int_code" &
+            echo "[$(date '+%F %T')] LAUNCHED INTERV $loc :: $calib_code :: $int_code (PID $!, running_jobs=$(running_slots))"
 
+        done
     done
 done
 

@@ -12,7 +12,7 @@ LAST.YEAR <- as.numeric(args[5])
 RUN.ONE <- if (length(args) >= 6) as.character(args[6]) else NA_character_
 
 # These scenarios are calibrated to King County uptake: Seattle MSA only
-if (LOCATION != "C.42660") stop("intervention_run_KC.R is for Seattle (C.42660) only; got ", LOCATION)
+if (LOCATION != "C.42660") stop("intervention_run_KC_parallel.R is for Seattle (C.42660) only; got ", LOCATION)
 
 # ****************************************************************************
 # DoxyPEP Intervention Analysis
@@ -41,7 +41,7 @@ source(file.path(JHEEM.ANALYSES.PATH, "commoncode", "locations_of_interest.R"))
 source(file.path(JHEEM.ANALYSES.PATH, "applications", "SHIELD", "shield_specification.R"))
 # King County-aligned doxy-PEP scenarios (Menza et al. 2026, PMID 41885610)
 # source(file.path(JHEEM.ANALYSES.PATH, "applications", "SHIELD", "intervention", "intervention_definitions.R"))
-source(file.path(JHEEM.ANALYSES.PATH, "applications", "SHIELD", "intervention", "intervention_definitions-kc.R"))
+source(file.path(JHEEM.ANALYSES.PATH, "applications", "SHIELD", "intervention", "intervention_definitions_KC.R"))
 
 
 # source("../jheem_analyses/applications/SHIELD/intervention/intervention_helper_functions.R")
@@ -49,7 +49,7 @@ source(file.path(JHEEM.ANALYSES.PATH, "applications", "SHIELD", "intervention", 
 # *****************************************************************************
 # SECTION 1: Configuration
 # *****************************************************************************
-# King County-aligned scenarios (defined in intervention_definitions-kc.R).
+# King County-aligned scenarios (defined in intervention_definitions_KC.R).
 # noint and doxy.cov.5-50 already exist for Seattle (stage 4 run), so they are not rerun here.
 INTERVENTION.LABELS <- c(
     doxy.kc.30.flat = "KC uptake: 15% mid-2023, 30% May 2024, flat",
