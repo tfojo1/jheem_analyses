@@ -31,8 +31,9 @@ TABLE.DIR <- shield.table.path(CALIB.NAME, create = TRUE)
 # The race arrays need step 01a run with "race" in RUN.STRATA, then step 01b with "race" in
 # CALC.STRATA. Until both exist, loading stops and names the missing files.
 RESULT.ARRAYS <- c("total_raw", "total_calc",
-                   "sex_raw",   "sex_calc",
-                   "race_raw",  "race_calc")
+                   "sex_raw",   "sex_calc"
+                   # "race_raw",  "race_calc"
+                   )
 intervention.results <- load.shield.results(CALIB.NAME, which = RESULT.ARRAYS)
 
 # MSA names: full ("Atlanta-Sandy Springs-Alpharetta, GA", from the location registry) or short
@@ -40,15 +41,23 @@ intervention.results <- load.shield.results(CALIB.NAME, which = RESULT.ARRAYS)
 FULL.NAMES.IN.TABLE   <- TRUE    # Table 1
 FULL.NAMES.IN.FIGURES <- FALSE   # Figures 3 and 4 (TRUE also widens them to fit the names)
 
+# Printed wherever a 95% interval or a within-simulation rho is reported
+PAIRING.NOTE <- paste0(
+  "NOTE on simulation pairing: simulations are paired within each MSA across scenarios ",
+  "(sim i with and without Doxy-PEP share the same parameters), but NOT across MSAs ",
+  "(sim 1 in Baltimore is unrelated to sim 1 in Atlanta). Quantities that combine MSAs within a ",
+  "simulation (Total-row sums, within-simulation rho across MSAs) therefore pair independent ",
+  "draws arbitrarily; their 95% intervals assume independence across MSAs.")
+
 MSA.FULL.NAMES  <- setNames(unname(sapply(LOCATIONS, get.location.name)), names(LOCATIONS))
-MSA.SHORT.NAMES <- setNames(names(LOCATIONS), names(LOCATIONS))
+MSA.SHORT.NAMES <- MSA.DISPLAY.NAMES   # short names, with LA and NYC spelled out (00_settings.R)
 TABLE.CITY.NAMES  <- if (FULL.NAMES.IN.TABLE)   MSA.FULL.NAMES else MSA.SHORT.NAMES
 FIGURE.CITY.NAMES <- if (FULL.NAMES.IN.FIGURES) MSA.FULL.NAMES else MSA.SHORT.NAMES
 
 
 #to see outcome names:
 # dimnames(intervention.results$total_calc)
-dimnames(intervention.results$sex_calc)
+# dimnames(intervention.results$sex_calc)
 # ****************************************************************************************************
 # TABLE 1 -- THE EPIDEMIC WITHOUT DOXY-PEP ----
 # ****************************************************************************************************
@@ -95,7 +104,12 @@ dimnames(intervention.results$sex_calc)
     pop.2030 <- noint_count(total.raw, "population",      EVAL.YEAR, locs)
     dx.2030  <- noint_count(total.raw, "diagnosis.total", EVAL.YEAR, locs)
     ps.2030  <- noint_count(total.raw, "diagnosis.ps",    EVAL.YEAR, locs)
-
+    #pop by sex
+    pop.2030.msm <- noint_count(sex.raw, "population", EVAL.YEAR, locs, group = list(sex = "msm"))
+    pop.2030.heterosexual_male <- noint_count(sex.raw, "population", EVAL.YEAR, locs, group = list(sex = "heterosexual_male"))
+    pop.2030.female <- noint_count(sex.raw, "population", EVAL.YEAR, locs, group = list(sex = "female"))
+    
+    
     # 2b. Incidence among MSM, for the MSM share of incidence
     inc.msm.2022 <- noint_count(sex.raw, "incidence", YEAR0,     locs, list(sex = "msm"))
     inc.msm.2030 <- noint_count(sex.raw, "incidence", EVAL.YEAR, locs, list(sex = "msm"))
@@ -104,23 +118,39 @@ dimnames(intervention.results$sex_calc)
     # ps.black    <- noint_count(race.raw, "diagnosis.ps", EVAL.YEAR, locs, list(race = "black"))
     # ps.hispanic <- noint_count(race.raw, "diagnosis.ps", EVAL.YEAR, locs, list(race = "hispanic"))
     # ps.other    <- noint_count(race.raw, "diagnosis.ps", EVAL.YEAR, locs, list(race = "other"))
-
-    # 2d. The columns: median and interval of each quantity, with the number of decimals
+    
+    # 2d. P&S diagnoses by sex
+    ps.msm    <- noint_count(sex.raw, "diagnosis.ps", EVAL.YEAR, locs, list(sex = "msm"))
+    ps.heterosexual_male <- noint_count(sex.raw, "diagnosis.ps", EVAL.YEAR, locs, list(sex = "heterosexual_male"))
+    ps.women    <- noint_count(sex.raw, "diagnosis.ps", EVAL.YEAR, locs, list(sex = "female"))
+    
+    # 2e. The columns: median and interval of each quantity, with the number of decimals
     #     (counts are rounded to the nearest 10: d = -1)
     data.frame(
       "Incident infections, 2030"                         = median_and_interval(inc.2030, -1),
       "Incidence rate (per 100,000 persons), 2022"         = median_and_interval(per_100k(inc.2022, pop.2022), 0),
       "Incidence rate (per 100,000 persons), 2030"         = median_and_interval(per_100k(inc.2030, pop.2030), 0),
       "Fold change in incidence rate, 2022-2030"           = median_and_interval(per_100k(inc.2030, pop.2030) / per_100k(inc.2022, pop.2022), 2),
+      "MSM share of incidence (%), 2022"                   = median_and_interval(100 * inc.msm.2022 / inc.2022, 0),
+      "MSM share of incidence (%), 2030"                   = median_and_interval(100 * inc.msm.2030 / inc.2030, 0),
+      #
       "Total syphilis diagnoses, 2030"                     = median_and_interval(dx.2030, -1),
       "P&S diagnoses, 2030"                                = median_and_interval(ps.2030, -1),
       "P&S diagnosis rate (per 100,000), 2030"             = median_and_interval(per_100k(ps.2030, pop.2030), 0),
       "P&S share of total diagnoses (%), 2030"             = median_and_interval(100 * ps.2030 / dx.2030, 0),
-      # "P&S diagnoses, Black, 2030"                       = median_and_interval(ps.black, 0),
+      #
+      "P&S diagnosis among MSM, 2030"                           = median_and_interval(ps.msm,  0),
+      "P&S diagnosis among Heterosexual Men, 2030"              = median_and_interval(ps.heterosexual_male,  0),
+      "P&S diagnosis among Women, 2030"                        = median_and_interval(ps.women,  0),
+      #
+      "P&S diagnosis rate (per 100,000) MSM, 2030"                           = median_and_interval(per_100k(ps.msm, pop.2030.msm), 0),
+      "P&S diagnosis rate (per 100,000) Heterosexual Men, 2030"              = median_and_interval(per_100k(ps.heterosexual_male, pop.2030.heterosexual_male), 0),
+      "P&S diagnosis rate (per 100,000) Women, 2030"                        = median_and_interval(per_100k(ps.women, pop.2030.female), 0),
+      
+       # "P&S diagnoses, Black, 2030"                       = median_and_interval(ps.black, 0),
       # "P&S diagnoses, Hispanic, 2030"                    = median_and_interval(ps.hispanic, 0),
       # "P&S diagnoses, other race/ethnicity, 2030"        = median_and_interval(ps.other, 0),
-      "MSM share of incidence (%), 2022"                   = median_and_interval(100 * inc.msm.2022 / inc.2022, 0),
-      "MSM share of incidence (%), 2030"                   = median_and_interval(100 * inc.msm.2030 / inc.2030, 0),
+     
       check.names = FALSE)
   }
 
@@ -144,7 +174,8 @@ dimnames(intervention.results$sex_calc)
   rownames(table1.one.cell) <- NULL
 
   write.csv(table1.one.cell, file.path(TABLE.DIR, "table1_no_intervention_one_cell.csv"), row.names = FALSE)
-  table1.one.cell
+  message(PAIRING.NOTE)
+  # table1.one.cell
 }
 
 
@@ -157,8 +188,8 @@ dimnames(intervention.results$sex_calc)
 #
 # Colours: which value gets which colour. Colours in between are blended.
 #   1. 0 to -49%      near white to light blue: fewer infections, short of the target
-#   2. -50% or lower  light teal to teal: target met, darker = larger reduction
-#   The switch sits at -49.5 because the cell numbers are rounded: a cell showing "-50" is teal.
+#   2. -50% or lower  mid blue to blue: target met, darker = larger reduction
+#   The switch sits at -49.5 because the cell numbers are rounded: a cell showing "-50" is blue.
 # Cells at TARGET (-50%) or lower also get a black outline, so the target still shows in
 # black-and-white print. All text is black.
 {
@@ -216,7 +247,7 @@ dimnames(intervention.results$sex_calc)
 # ****************************************************************************************************
 # Nine panels at CCRIT in EVAL.YEAR:
 #
-#                          Total   MSM   Women
+#                          MSM   Women   Total
 #   relative change          A      B      C     box plots: % change in incidence vs no Doxy-PEP
 #   infections averted       D      E      F     bars: infections averted, 2022 to 2030
 #   incidence rate           G      H      I     per 100,000 of that population in 2030:
@@ -229,10 +260,10 @@ dimnames(intervention.results$sex_calc)
 # 3. Cities run down the side, in the same order in every panel: smallest projected reduction
 #    (total) at the top, largest at the bottom. Each city sits on the same row in all three
 #    columns, and grey stripes on every other city help follow a row across the figure.
-# 5. Colour shows the population (column): cyan = total, blue = MSM, red = women.
+# 5. Colour shows the population (column): blue = MSM, red = women, cyan = total.
 # 4. Heterosexual men have no column, so MSM + women do not add up to the total.
 {
-  CCRIT  <- "doxy.cov.20"   # doxy coverage providing over 50% deduction among MSM across all cities
+  CCRIT  <- "doxy.cov.20"   # doxy coverage providing over 50% reduction among MSM across all cities
   total.calc <- intervention.results$total_calc
   sex.calc   <- intervention.results$sex_calc
 
@@ -392,15 +423,15 @@ dimnames(intervention.results$sex_calc)
 
   # 7. The nine panels
   # Each row has one title (row_title below); each panel's title names only its population
-  pA <- box_panel("relative",   "Total", "A. Total population", "Change in incidence, 2030 (%)",   show.cities = TRUE)
-  pB <- box_panel("relative",   "MSM",   "B. MSM",              "Change in incidence, 2030 (%)",   show.cities = FALSE)
-  pC <- box_panel("relative",   "Women", "C. Women",            "Change in incidence, 2030 (%)",   show.cities = FALSE)
-  pD <- bar_panel(              "Total", "D. Total population", "Infections averted, 2022-2030",   show.cities = TRUE)
-  pE <- bar_panel(              "MSM",   "E. MSM",              "Infections averted, 2022-2030",   show.cities = FALSE)
-  pF <- bar_panel(              "Women", "F. Women",            "Infections averted, 2022-2030",   show.cities = FALSE)
-  pG <- rate_panel(             "Total", "G. Total population",        "Per 100,000 population, 2030\n\u25CB without   \u25CF with Doxy-PEP", show.cities = TRUE)
-  pH <- rate_panel(             "MSM",   "H. MSM",              "Per 100,000 MSM, 2030\n\u25CB without   \u25CF with Doxy-PEP",        show.cities = FALSE)
-  pI <- rate_panel(             "Women", "I. Women",            "Per 100,000 women, 2030\n\u25CB without   \u25CF with Doxy-PEP",      show.cities = FALSE)
+  pA <- box_panel("relative",   "MSM",   "A. MSM",              "Change in incidence, 2030 (%)",   show.cities = TRUE)
+  pB <- box_panel("relative",   "Women", "B. Women",            "Change in incidence, 2030 (%)",   show.cities = FALSE)
+  pC <- box_panel("relative",   "Total", "C. Total population", "Change in incidence, 2030 (%)",   show.cities = FALSE)
+  pD <- bar_panel(              "MSM",   "D. MSM",              "Infections averted, 2022-2030",   show.cities = TRUE)
+  pE <- bar_panel(              "Women", "E. Women",            "Infections averted, 2022-2030",   show.cities = FALSE)
+  pF <- bar_panel(              "Total", "F. Total population", "Infections averted, 2022-2030",   show.cities = FALSE)
+  pG <- rate_panel(             "MSM",   "G. MSM",              "Per 100,000 MSM, 2030\n\u25CB without   \u25CF with Doxy-PEP",        show.cities = TRUE)
+  pH <- rate_panel(             "Women", "H. Women",            "Per 100,000 women, 2030\n\u25CB without   \u25CF with Doxy-PEP",      show.cities = FALSE)
+  pI <- rate_panel(             "Total", "I. Total population", "Per 100,000 population, 2030\n\u25CB without   \u25CF with Doxy-PEP", show.cities = FALSE)
 
   # 8. Put the rows together, each under its own title
   row_title <- function(text)
@@ -417,6 +448,7 @@ dimnames(intervention.results$sex_calc)
 
   ggsave(file.path(FIG.DIR, "fig4_impact_boxplots.png"), fig4,
          width = if (FULL.NAMES.IN.FIGURES) 15 else 13, height = 11, dpi = 300, bg = "white")
+  message(PAIRING.NOTE)
   fig4
 }
 
@@ -501,5 +533,19 @@ dimnames(intervention.results$sex_calc)
   table2 <- rbind(table2, cbind(MSA = c("Total", ""), table2_rows(LOCATIONS)))
 
   write.csv(table2, file.path(TABLE.DIR, paste0("table2_fig4_values_", CCRIT, ".csv")), row.names = FALSE)
-  table2
+  message(PAIRING.NOTE)
+  # table2
+  # 
+  # 4. The same table with the interval in the same cell as the median: "median [lo-hi]".
+  #    The median rows are the odd rows of table2, the interval rows the even rows.
+  median.rows   <- seq(1, nrow(table2), 2) 
+  interval.rows <- seq(2, nrow(table2), 2)
+  table2.one.cell <- table2[median.rows, ]
+  for (col in names(table2)[-1])
+    table2.one.cell[[col]] <- paste(table2[[col]][median.rows], table2[[col]][interval.rows])
+  rownames(table2.one.cell) <- NULL
+  
+  write.csv(table2.one.cell, file.path(TABLE.DIR, "table2_fig4_values_one_cell.csv"), row.names = FALSE)
+  message(PAIRING.NOTE)
+  # table2.one.cell
 }

@@ -69,6 +69,7 @@ RUN.STRATA <- c("race")
 
 N.CORES   <- 8
 OVERWRITE <- FALSE   # TRUE = redo extract files that already exist
+MANUSCRIPT.RUN <- TRUE   # TRUE = stop if any simset is missing, instead of saving arrays with NA blocks
 
 # For each stratification:
 #   by       = the dimension to keep besides year (NULL for total)
@@ -242,6 +243,11 @@ if (nrow(bad) > 0) {
     cat(paste0("  rm '", bad$file, "'"), sep = "\n")
     stop(nrow(bad), " bad extract file(s), listed above. No arrays were saved.")
 }
+
+# 5. For a manuscript run, every simset must be there: a missing one would become NA in the arrays
+if (MANUSCRIPT.RUN && nrow(PROBLEMS) > 0)
+    stop(nrow(PROBLEMS), " missing extract file(s), listed above. No arrays were saved. ",
+         "Run the missing simsets, or set MANUSCRIPT.RUN <- FALSE to save arrays with NA blocks.")
 
 
 # ---- STEP 3: STACK THE EXTRACTS INTO ONE ARRAY PER STRATIFICATION ----

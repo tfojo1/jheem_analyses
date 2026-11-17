@@ -1,7 +1,7 @@
 # ****************************************************************************************************
 # BUILD THE MCMC CACHE ----
 # ****************************************************************************************************
-# Reads each city's raw MCMC once, drops the simulations, and saves the slimmed MCMC (about 1 MB) to
+# Reads each city's raw MCMC once (expensive), drops the simulations, and saves the slimmed MCMC (about 1 MB) to
 #   <jheem root>/shield/mcmc_diagnostics/mcmc_cache/<calibration code>_<location>.rds
 # mixing_check.R and mixing_correlated_parameter_pairs.R then read the cache instead of the chunks.
 #

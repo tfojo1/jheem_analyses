@@ -5,11 +5,22 @@
 # 03_manuscript_main.R, but uses its intervention.results if that is already in memory.
 #
 # WHAT IT BUILDS (<cov> = the coverage, e.g. 20pct)
-#   1. tables/4-impact_ratio_values_at_<cov>_doxy.csv         both ratios and the baseline characteristics, per MSA
-#   2. tables/4-impact_ratio_associations_at_<cov>_doxy.csv   Spearman correlation of each ratio with each characteristic
-#      tables/4-reduction_women_associations_at_<cov>_doxy.csv   the same for the % reduction in incidence among women
-#   3. figures/4-impact_ratio_vs_drivers_at_<cov>_doxy.png    the women-to-MSM ratio only, against each characteristic
-#                                                             with |rho| > RHO.CUTOFF, one panel each
+#   1. tables/4-RIR_and_characteristics_summary_by_MSA_at_<cov>_doxy.csv   both ratios and the baseline characteristics, per MSA
+#   2. tables/4-association_RIR_vs_characteristics_by_MSA_at_<cov>_doxy.csv   Spearman rho of each RIR with each
+#                                                             characteristic. Women rows select Figure 5 panels
+#                                                             D onward; heterosexual men rows are for reference
+#      tables/4-unused_associations_at_<cov>_doxy.csv         NOT USED by any figure or table: the same for the
+#                                                             % reduction in incidence among women
+#   3. figures/Fig5-impact_ratio_vs_drivers_at_<cov>_doxy.png   Figure 5, assembled in section 10:
+#                                                             A. % reduction in total-population incidence vs women RIR
+#                                                             B. women RIR in each MSA, median and 95% interval
+#                                                             C, D, E, ... women RIR vs each characteristic
+#                                                                with |rho| > RHO.CUTOFF, one panel each,
+#                                                                two per row
+#                                                             (heterosexual men RIR vs women RIR is built but
+#                                                              left out of the figure for now)
+#   4. tables/4-population_reduction_vs_RIR_at_<cov>_doxy.csv   Spearman rho between the % reduction in
+#                                                             total-population incidence and each RIR (Fig 5B)
 #
 # DEFINITIONS
 #   1. Relative reduction in incidence, 2030 = 100 x (without Doxy-PEP - with) / without
@@ -24,10 +35,16 @@
 #        c. population size: the whole MSA, and MSM
 #        d. total syphilis diagnosis rate (all stages, per 100,000): everyone, women, MSM
 #        e. P&S syphilis diagnosis rate (per 100,000): everyone, women, MSM
-#        f. past incidence change = log(fold change among women / fold change among MSM),
+#        f. past incidence change = fold change among women / fold change among MSM (a ratio of
+#           fold changes; 1 = the same growth, > 1 = faster growth among women),
 #           where fold change = incident infections in 2022 / in PAST.YEAR (2018)
 #        g. past diagnosis change: the same as f., with total syphilis diagnoses (all stages) in
 #           place of incident infections. Unlike incidence, diagnoses are observed in surveillance.
+#        h. past P&S diagnosis change: the same as f., with P&S syphilis diagnoses in place of
+#           incident infections.
+#        i. proportion of male P&S diagnoses among MSM (%): the share of the male epidemic that is
+#           among MSM. Observed in surveillance. Also correlated with the % reduction in
+#           total-population incidence (section 8).
 #      For the heterosexual men ratio, everything about women uses heterosexual men instead
 #      (HETMALE.DRIVERS); the rest is the same.
 #      To add or drop one: compute it in section 3, add it to `sims` and COLUMNS (section 4), and
@@ -37,12 +54,19 @@
 #   1. Everything is computed within each simulation.
 #   2. Each MSA is summarised as median [2.5th to 97.5th percentile] across simulations.
 #   3. Correlations are Spearman, across the ten MSAs. No p-values.
+#
+# FIGURE RULE
+#   The figure shows only the characteristics with |rho| between the MSA medians > RHO.CUTOFF,
+#   and never the incidence-based ones (incidence rates and the past incidence change): incidence
+#   is not observed, so it is not used in the figure. They stay in the tables.
 # ****************************************************************************************************
 
 
 # ---- SETUP ----
+# message("04 needs the settings from 00_settings.R (CALIB.NAME, LOCATIONS, MSAS, YEAR0, EVAL.YEAR). ",
+        # "Run 03_manuscript_main.R first in this session, or source 00_settings.R yourself.")
 # source('../jheem_analyses/applications/SHIELD/analysis/intervention/00_settings.R')
-source('../jheem_analyses/applications/SHIELD/analysis/intervention/intervention_helper_functions.R')
+# source('../jheem_analyses/applications/SHIELD/analysis/intervention/intervention_helper_functions.R')
 
 FIG.DIR   <- shield.fig.path(CALIB.NAME,   create = TRUE)
 TABLE.DIR <- shield.table.path(CALIB.NAME, create = TRUE)
@@ -61,6 +85,15 @@ if (!exists("intervention.results") ||
 
 total.raw <- intervention.results$total_raw
 sex.raw   <- intervention.results$sex_raw
+
+
+# Printed wherever a 95% interval or a within-simulation rho is reported
+PAIRING.NOTE <- paste0(
+  "NOTE on simulation pairing: simulations are paired within each MSA across scenarios ",
+  "(sim i with and without Doxy-PEP share the same parameters), but NOT across MSAs ",
+  "(sim 1 in Baltimore is unrelated to sim 1 in Atlanta). Quantities that combine MSAs within a ",
+  "simulation (Total-row sums, within-simulation rho across MSAs) therefore pair independent ",
+  "draws arbitrarily; their 95% intervals assume independence across MSAs.")
 
 
 # ---- 1. HELPER ----
@@ -97,17 +130,22 @@ msm.ps.2022      <- sim_values(sex.raw,   "diagnosis.ps",    "noint", YEAR0, "ms
 women.ps.2022    <- sim_values(sex.raw,   "diagnosis.ps",    "noint", YEAR0, "female")
 hetmale.ps.2022  <- sim_values(sex.raw,   "diagnosis.ps",    "noint", YEAR0, "heterosexual_male")
 total.pop.2022   <- sim_values(total.raw, "population",      "noint", YEAR0)
+# share of male P&S diagnoses that are among MSM (observed in surveillance; a calibration target)
+prop.msm.2022    <- sim_values(total.raw, "prop.male.ps.diag.among.msm", "noint", YEAR0)
 msm.pop.2022     <- sim_values(sex.raw,   "population",      "noint", YEAR0, "msm")
 women.pop.2022   <- sim_values(sex.raw,   "population",      "noint", YEAR0, "female")
 hetmale.pop.2022 <- sim_values(sex.raw,   "population",      "noint", YEAR0, "heterosexual_male")
 
-# 2c. Incident infections and total syphilis diagnoses in PAST.YEAR (2018), for the past change
+# 2c. Incident infections, total and P&S syphilis diagnoses in PAST.YEAR (2018), for the past change
 msm.inc.2018     <- sim_values(sex.raw, "incidence",       "noint", PAST.YEAR, "msm")
 women.inc.2018   <- sim_values(sex.raw, "incidence",       "noint", PAST.YEAR, "female")
 hetmale.inc.2018 <- sim_values(sex.raw, "incidence",       "noint", PAST.YEAR, "heterosexual_male")
 msm.dx.2018      <- sim_values(sex.raw, "diagnosis.total", "noint", PAST.YEAR, "msm")
 women.dx.2018    <- sim_values(sex.raw, "diagnosis.total", "noint", PAST.YEAR, "female")
 hetmale.dx.2018  <- sim_values(sex.raw, "diagnosis.total", "noint", PAST.YEAR, "heterosexual_male")
+msm.ps.2018      <- sim_values(sex.raw, "diagnosis.ps",    "noint", PAST.YEAR, "msm")
+women.ps.2018    <- sim_values(sex.raw, "diagnosis.ps",    "noint", PAST.YEAR, "female")
+hetmale.ps.2018  <- sim_values(sex.raw, "diagnosis.ps",    "noint", PAST.YEAR, "heterosexual_male")
 
 
 # ---- 3. THE QUANTITIES, WITHIN EACH SIMULATION (each is MSA x simulation) ----
@@ -116,14 +154,17 @@ reduction.msm.inc   <- 100 * (msm.inc.2030.without   - msm.inc.2030.with)   / ms
 reduction.women.inc <- 100 * (women.inc.2030.without - women.inc.2030.with) / women.inc.2030.without
 reduction.hetmale.inc   <- 100 * (hetmale.inc.2030.without   - hetmale.inc.2030.with)   / hetmale.inc.2030.without
 
-ratio.inc <- reduction.women.inc / reduction.msm.inc        # women to MSM
-ratio.inc[reduction.msm.inc <= 0] <- NA
+rir.women <- reduction.women.inc / reduction.msm.inc        # women to MSM
+rir.women[reduction.msm.inc <= 0] <- NA
 
-ratio.hetmale.inc <- reduction.hetmale.inc / reduction.msm.inc      # heterosexual men to MSM
-ratio.hetmale.inc[reduction.msm.inc <= 0] <- NA
+rir.hetmale <- reduction.hetmale.inc / reduction.msm.inc      # heterosexual men to MSM
+rir.hetmale[reduction.msm.inc <= 0] <- NA
 
 # 3b. The baseline characteristics: rates per 100,000 of each group, and past change
 per_100k <- function(count, pop) 100000 * count / pop
+
+# proportion of male P&S diagnoses among MSM, as a % (the array may hold it as 0-1)
+prop.msm.pct.2022 <- if (max(prop.msm.2022, na.rm = TRUE) <= 1) 100 * prop.msm.2022 else prop.msm.2022
 
 women.inc.rate.2022   <- per_100k(women.inc.2022,   women.pop.2022)     # incidence rate
 msm.inc.rate.2022     <- per_100k(msm.inc.2022,     msm.pop.2022)
@@ -139,25 +180,30 @@ women.ps.rate.2022    <- per_100k(women.ps.2022,    women.pop.2022)
 msm.ps.rate.2022      <- per_100k(msm.ps.2022,      msm.pop.2022)
 hetmale.ps.rate.2022  <- per_100k(hetmale.ps.2022,  hetmale.pop.2022)
 
-past.change            <- log((women.inc.2022   / women.inc.2018)   / (msm.inc.2022 / msm.inc.2018))   # log ratio of incidence change 2018-2022, women to MSM
-past.change.hetmale    <- log((hetmale.inc.2022 / hetmale.inc.2018) / (msm.inc.2022 / msm.inc.2018))   # the same, heterosexual men to MSM
-past.dx.change         <- log((women.dx.2022    / women.dx.2018)    / (msm.dx.2022  / msm.dx.2018))    # log ratio of diagnosis change 2018-2022, women to MSM
-past.dx.change.hetmale <- log((hetmale.dx.2022  / hetmale.dx.2018)  / (msm.dx.2022  / msm.dx.2018))    # the same, heterosexual men to MSM
+# ratio of fold changes, 2018-2022: 1 = the same growth in both groups, > 1 = faster growth in the first
+# (no log: earlier versions used log(); Spearman rho, and so the panel selection, does not change)
+past.change.women      <- (women.inc.2022   / women.inc.2018)   / (msm.inc.2022 / msm.inc.2018)   # incidence, women to MSM
+past.change.hetmale    <- (hetmale.inc.2022 / hetmale.inc.2018) / (msm.inc.2022 / msm.inc.2018)   # incidence, heterosexual men to MSM
+past.dx.change.women   <- (women.dx.2022    / women.dx.2018)    / (msm.dx.2022  / msm.dx.2018)    # total diagnoses, women to MSM
+past.dx.change.hetmale <- (hetmale.dx.2022  / hetmale.dx.2018)  / (msm.dx.2022  / msm.dx.2018)    # total diagnoses, heterosexual men to MSM
+past.ps.change.women   <- (women.ps.2022    / women.ps.2018)    / (msm.ps.2022  / msm.ps.2018)    # P&S diagnoses, women to MSM
+past.ps.change.hetmale <- (hetmale.ps.2022  / hetmale.ps.2018)  / (msm.ps.2022  / msm.ps.2018)    # P&S diagnoses, heterosexual men to MSM
 
 
 # ---- 4. ONE DATA FRAME: one row per MSA and simulation ----
-sims <- data.frame(location               = rep(MSAS, times = ncol(ratio.inc)),
-                   sim                    = rep(colnames(ratio.inc), each = length(MSAS)),
+sims <- data.frame(location               = rep(unname(MSA.DISPLAY.NAMES[MSAS]), times = ncol(rir.women)),   # display names (00_settings.R)
+                   sim                    = rep(colnames(rir.women), each = length(MSAS)),
                    reduction_msm          = as.vector(reduction.msm.inc),
                    reduction_women        = as.vector(reduction.women.inc),
                    reduction_hetmale      = as.vector(reduction.hetmale.inc),
-                   ratio                  = as.vector(ratio.inc),
-                   ratio_hetmale          = as.vector(ratio.hetmale.inc),
+                   rir_women              = as.vector(rir.women),
+                   rir_hetmale            = as.vector(rir.hetmale),
                    rate_women             = as.vector(women.inc.rate.2022),
                    rate_hetmale           = as.vector(hetmale.inc.rate.2022),
                    rate_msm               = as.vector(msm.inc.rate.2022),
                    population             = as.vector(total.pop.2022),
                    population_msm         = as.vector(msm.pop.2022),
+                   prop_male_ps_msm       = as.vector(prop.msm.pct.2022),
                    dx_rate_total          = as.vector(total.dx.rate.2022),
                    dx_rate_women          = as.vector(women.dx.rate.2022),
                    dx_rate_hetmale        = as.vector(hetmale.dx.rate.2022),
@@ -166,10 +212,12 @@ sims <- data.frame(location               = rep(MSAS, times = ncol(ratio.inc)),
                    ps_rate_women          = as.vector(women.ps.rate.2022),
                    ps_rate_hetmale        = as.vector(hetmale.ps.rate.2022),
                    ps_rate_msm            = as.vector(msm.ps.rate.2022),
-                   past_change            = as.vector(past.change),
+                   past_change_women      = as.vector(past.change.women),
                    past_change_hetmale    = as.vector(past.change.hetmale),
-                   past_dx_change         = as.vector(past.dx.change),
-                   past_dx_change_hetmale = as.vector(past.dx.change.hetmale))
+                   past_dx_change_women   = as.vector(past.dx.change.women),
+                   past_dx_change_hetmale = as.vector(past.dx.change.hetmale),
+                   past_ps_change_women   = as.vector(past.ps.change.women),
+                   past_ps_change_hetmale = as.vector(past.ps.change.hetmale))
 
 # Every column of `sims`: its label in the tables and figure, and the decimals shown in the
 # values table. This is the only place the labels are written. The row order here is the column
@@ -179,13 +227,14 @@ COLUMNS <- rbind(
   column("reduction_msm",          "Reduction in incidence among MSM (%), 2030",                                 1),
   column("reduction_women",        "Reduction in incidence among women (%), 2030",                               1),
   column("reduction_hetmale",      "Reduction in incidence among heterosexual men (%), 2030",                    1),
-  column("ratio",                  "Women-to-MSM Relative Impact Ratio, 2030",                                   2),
-  column("ratio_hetmale",          "Heterosexual men-to-MSM Relative Impact Ratio, 2030",                        2),
+  column("rir_women",              "Women-to-MSM Relative Impact Ratio, 2030",                                   2),
+  column("rir_hetmale",            "Heterosexual men-to-MSM Relative Impact Ratio, 2030",                        2),
   column("rate_women",             "Incidence rate among women (per 100,000), 2022",                             1),
   column("rate_hetmale",           "Incidence rate among heterosexual men (per 100,000), 2022",                  1),
   column("rate_msm",               "Incidence rate among MSM (per 100,000), 2022",                               0),
   column("population",             "Population size, 2022",                                                      0),
   column("population_msm",         "MSM population size, 2022",                                                  0),
+  column("prop_male_ps_msm",       "Proportion of male P&S diagnoses among MSM (%), 2022",                       1),
   column("dx_rate_total",          "Total syphilis diagnosis rate (per 100,000), 2022",                          1),
   column("dx_rate_women",          "Total syphilis diagnosis rate among women (per 100,000), 2022",              1),
   column("dx_rate_hetmale",        "Total syphilis diagnosis rate among heterosexual men (per 100,000), 2022",   1),
@@ -194,25 +243,27 @@ COLUMNS <- rbind(
   column("ps_rate_women",          "P&S syphilis diagnosis rate among women (per 100,000), 2022",                1),
   column("ps_rate_hetmale",        "P&S syphilis diagnosis rate among heterosexual men (per 100,000), 2022",     1),
   column("ps_rate_msm",            "P&S syphilis diagnosis rate among MSM (per 100,000), 2022",                  0),
-  column("past_change",            "Past relative incidence change, women to MSM, 2018-2022",                    2),
+  column("past_change_women",      "Past relative incidence change, women to MSM, 2018-2022",                    2),
   column("past_change_hetmale",    "Past relative incidence change, heterosexual men to MSM, 2018-2022",         2),
-  column("past_dx_change",         "Past relative diagnosis change, women to MSM, 2018-2022",                    2),
-  column("past_dx_change_hetmale", "Past relative diagnosis change, heterosexual men to MSM, 2018-2022",         2))
+  column("past_dx_change_women",   "Past relative diagnosis change, women to MSM, 2018-2022",                    2),
+  column("past_dx_change_hetmale", "Past relative diagnosis change, heterosexual men to MSM, 2018-2022",         2),
+  column("past_ps_change_women",   "Past relative P&S diagnosis change, women to MSM, 2018-2022",                2),
+  column("past_ps_change_hetmale", "Past relative P&S diagnosis change, heterosexual men to MSM, 2018-2022",     2))
 LABELS <- setNames(COLUMNS$label, COLUMNS$name)
 
 # The characteristics we test against the women's outcomes. The order here is the order of the
 # rows in the associations tables and of the figure panels.
-DRIVERS <- LABELS[c("rate_women", "rate_msm", "population", "population_msm",
+DRIVERS <- LABELS[c("rate_women", "rate_msm", "population", "population_msm", "prop_male_ps_msm",
                     "dx_rate_total", "dx_rate_women", "dx_rate_msm",
                     "ps_rate_total", "ps_rate_women", "ps_rate_msm",
-                    "past_change", "past_dx_change")]
+                    "past_change_women", "past_dx_change_women", "past_ps_change_women")]
 
 # The same for the heterosexual men-to-MSM ratio: heterosexual men in place of women; the other
 # characteristics are the same as above.
-HETMALE.DRIVERS <- LABELS[c("rate_hetmale", "rate_msm", "population", "population_msm",
+HETMALE.DRIVERS <- LABELS[c("rate_hetmale", "rate_msm", "population", "population_msm", "prop_male_ps_msm",
                             "dx_rate_total", "dx_rate_hetmale", "dx_rate_msm",
                             "ps_rate_total", "ps_rate_hetmale", "ps_rate_msm",
-                            "past_change_hetmale", "past_dx_change_hetmale")]
+                            "past_change_hetmale", "past_dx_change_hetmale", "past_ps_change_hetmale")]
 
 
 
@@ -228,16 +279,17 @@ values.table <- sims %>%
   group_by(location) %>%
   summarise(across(all_of(COLUMNS$name), ~ show(.x, COLUMNS$digits[COLUMNS$name == cur_column()])),
             # checks the "bounded below by 0" statement: a ratio < 0 means that group's incidence rose
-            below0_women   = round(100 * mean(ratio         < 0, na.rm = TRUE), 1),
-            below0_hetmale = round(100 * mean(ratio_hetmale < 0, na.rm = TRUE), 1))
+            below0_women   = round(100 * mean(rir_women   < 0, na.rm = TRUE), 1),
+            below0_hetmale = round(100 * mean(rir_hetmale < 0, na.rm = TRUE), 1))
 
 # 5b. Column names -> labels
 names(values.table) <- c("MSA", LABELS,
                          "Simulations with women-to-MSM ratio below 0 (%)",
                          "Simulations with heterosexual men-to-MSM ratio below 0 (%)")
 
-write.csv(values.table, file.path(TABLE.DIR, paste0("4-impact_ratio_values_at_", COV.LABEL, "_doxy.csv")), row.names = FALSE)
+write.csv(values.table, file.path(TABLE.DIR, paste0("4-RIR_and_characteristics_summary_by_MSA_at_", COV.LABEL, "_doxy.csv")), row.names = FALSE)
 values.table
+message(PAIRING.NOTE)
 
 
 # ---- 6. TABLE: CORRELATIONS ----
@@ -266,25 +318,44 @@ association_table <- function(outcome.label, outcome.col, drivers) {
              check.names = FALSE, row.names = NULL)
 }
 
-# 6d. The two ratios, in one file, women first
-associations         <- association_table("Women-to-MSM Relative Impact Ratio",            "ratio",         DRIVERS)          # used by the figure
-hetmale.associations <- association_table("Heterosexual men-to-MSM Relative Impact Ratio", "ratio_hetmale", HETMALE.DRIVERS)  # table only
+# 6d. Both RIRs against the characteristics, in one file, women first.
+#     Only the women rows are used: their |rho| picks Figure 5 panels C onward. The heterosexual
+#     men rows (against HETMALE.DRIVERS) are for reference.
+associations         <- association_table("Women-to-MSM Relative Impact Ratio",            "rir_women",   DRIVERS)          # used by Figure 5
+hetmale.associations <- association_table("Heterosexual men-to-MSM Relative Impact Ratio", "rir_hetmale", HETMALE.DRIVERS)  # reference only
 
 write.csv(rbind(associations, hetmale.associations),
-          file.path(TABLE.DIR, paste0("4-impact_ratio_associations_at_", COV.LABEL, "_doxy.csv")), row.names = FALSE)
+          file.path(TABLE.DIR, paste0("4-association_RIR_vs_characteristics_by_MSA_at_", COV.LABEL, "_doxy.csv")), row.names = FALSE)
 rbind(associations, hetmale.associations)
+message("6d: only the women-to-MSM RIR rows are used (Figure 5 panels C onward); ",
+        "the heterosexual men-to-MSM RIR rows are for reference.")
+message(PAIRING.NOTE)
 
-# 6e. Separately: the % reduction in incidence among women itself (the numerator of the women-to-MSM
-#     ratio), against the same characteristics. Its own file; not in the figure.
+# 6e. NOT USED for anything at the moment: no figure or table reads this. Kept for reference only:
+#     the % reduction in incidence among women itself (the numerator of the women-to-MSM RIR)
+#     against the characteristics.
 women.associations <- association_table("Reduction in incidence among women (%), 2030", "reduction_women", DRIVERS)
 
-write.csv(women.associations,
-          file.path(TABLE.DIR, paste0("4-reduction_women_associations_at_", COV.LABEL, "_doxy.csv")), row.names = FALSE)
+con <- file(file.path(TABLE.DIR, paste0("4-unused_associations_at_", COV.LABEL, "_doxy.csv")), "w")
+writeLines(c(
+  '"# NOT USED by any figure or table. Spearman rho of the % reduction in incidence among women (2030, with vs without Doxy-PEP) with each baseline characteristic."',
+  '"# MSA medians: rho across the 10 MSA medians. Within simulations: rho across the 10 MSAs in each simulation, median [2.5th to 97.5th percentile]; simulations are not paired across MSAs."'),
+  con)
+write.csv(women.associations, con, row.names = FALSE)
+close(con)
 women.associations
+message("6e: the women-reduction association table is NOT USED for anything at the moment ",
+        "(no figure or table reads it). Saved for reference only.")
+message(PAIRING.NOTE)
 
 
 # ---- 7. FIGURE ----
-# The women-to-MSM ratio only. One panel per characteristic, in the order of DRIVERS. One point per MSA, at the medians. The
+# The women-to-MSM ratio only.
+# Figure 5 panel B: the projected ratio in 2030 in each MSA. Point = median, line = 2.5th to 97.5th
+# percentile across simulations (simulations where MSM incidence did not fall are NA and left
+# out, as in the tables). MSAs ordered from lowest to highest median. Dotted line at 1 = the same
+# relative reduction among women as among MSM.
+# Panels D onward (B and C are built in sections 8 and 9): one panel per characteristic, in the order of DRIVERS. One point per MSA, at the medians. The
 # dashed line is a least-squares fit, only to guide the eye. The subtitle is rho between the
 # medians (6a).
 #
@@ -294,9 +365,12 @@ RHO.CUTOFF <- 0.5
 
 strong.associations <- associations[abs(associations$`Spearman rho, MSA medians`) > RHO.CUTOFF, ]
 strong.DRIVERS      <- DRIVERS[DRIVERS %in% strong.associations$`Baseline characteristic`]
-# remove incidences
-strong.DRIVERS      <- strong.DRIVERS[-grep("incidence",strong.DRIVERS)]
-strong.DRIVERS      <- strong.DRIVERS[-grep("Incidence",strong.DRIVERS)]
+# remove incidences (see FIGURE RULE in the header). grepl(), not -grep(): -grep() with no match
+# returns an empty vector and would drop every characteristic
+strong.DRIVERS      <- strong.DRIVERS[!grepl("incidence", strong.DRIVERS, ignore.case = TRUE)]
+# the proportion of male P&S diagnoses among MSM goes last (the last panel), after the women's
+# diagnosis measures; the order of the other panels follows DRIVERS
+strong.DRIVERS      <- strong.DRIVERS[order(names(strong.DRIVERS) == "prop_male_ps_msm")]
 
 if (length(strong.DRIVERS) == 0)
   stop("No characteristic has |rho| > ", RHO.CUTOFF, ", so there is nothing to plot. Lower RHO.CUTOFF.")
@@ -305,8 +379,8 @@ if (length(strong.DRIVERS) == 0)
 LOG.SCALE <- c("population", "population_msm")
 
 panel <- function(x.col, letter) {
-  rho <- spearman(medians[[x.col]], medians$ratio)
-  p <- ggplot(medians, aes(x = .data[[x.col]], y = ratio)) +
+  rho <- spearman(medians[[x.col]], medians$rir_women)
+  p <- ggplot(medians, aes(x = .data[[x.col]], y = rir_women)) +
     geom_smooth(method = "lm", formula = y ~ x, se = FALSE, linetype = "dashed", colour = PAL.FIT) +
     geom_point(size = 3, colour = PAL.POINT) +
     ggrepel::geom_text_repel(aes(label = location), size = 3) +
@@ -319,18 +393,195 @@ panel <- function(x.col, letter) {
   p
 }
 
-N.COL <- 2   # panels per row
+N.COL <- 2   # panels per row of characteristics in Figure 5
 
-panels <- lapply(seq_along(strong.DRIVERS), function(i) panel(names(strong.DRIVERS)[i], LETTERS[i]))
+# Figure 5 panel B: the projected ratio in each MSA, median and 95% interval
+rir.by.msa <- sims %>%
+  group_by(location) %>%
+  summarise(median = median(rir_women, na.rm = TRUE),
+            lo95   = quantile(rir_women, 0.025, na.rm = TRUE),
+            hi95   = quantile(rir_women, 0.975, na.rm = TRUE),
+            .groups = "drop") %>%
+  arrange(median) %>%
+  mutate(location = factor(location, levels = location))
+
+rir.panel <- ggplot(rir.by.msa, aes(x = location, y = median)) +
+  geom_hline(yintercept = 1, linetype = "dotted", colour = PAL.FIT) +
+  geom_errorbar(aes(ymin = lo95, ymax = hi95), width = 0.25, colour = PAL.POINT) +
+  geom_point(size = 3, colour = PAL.POINT) +
+  labs(x = NULL,
+       y = "Women-to-MSM Relative Impact Ratio",   # the definition is in Figure 5's row title
+       title = "B",
+       subtitle = paste0("Projected in ", EVAL.YEAR, ", median and 95% interval")) +
+  theme_minimal(base_size = 10) +
+  theme(plot.title  = element_text(face = "bold"),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Figure 5, panel B
+fig5.pB <- rir.panel
+
+# Figure 5, panels C, D, E, ...: one panel per characteristic (A and B are the top row)
+driver.panels <- lapply(seq_along(strong.DRIVERS), function(i)
+  panel(names(strong.DRIVERS)[i], LETTERS[2 + i]))
 
 # y-axis title only on the left column (panels 1, 4, 7, ...); the others share it
-for (i in seq_along(panels))
+for (i in seq_along(driver.panels))
   if ((i - 1) %% N.COL != 0)
-    panels[[i]] <- panels[[i]] + theme(axis.title.y = element_blank())
+    driver.panels[[i]] <- driver.panels[[i]] + theme(axis.title.y = element_blank())
 
-impact.fig <- wrap_plots(panels, ncol = N.COL)
-impact.fig
+# Figure 5 is put together and saved in section 10, after panels B and C (sections 8 and 9)
 
-# 5 inches of height per row of panels
-ggsave(file.path(FIG.DIR, paste0("Fig5-impact_ratio_vs_drivers_at_", COV.LABEL, "_doxy.png")), impact.fig,
-       width = 10, height = 4 * ceiling(length(panels) / N.COL), dpi = 300, bg = "white")
+
+# ---- 8. POPULATION-LEVEL IMPACT AGAINST THE RIRs ----
+# How much the reduction in the total population depends on the impact among women relative to
+# MSM. Builds Figure 5 panel B (% reduction in incidence, total population, 2030, against the
+# women-to-MSM RIR; one point per MSA) and a rho table for both RIRs.
+# Point = MSA median of each axis; lines = 2.5th to 97.5th percentile across simulations on each
+# axis. Dashed line = least-squares fit of the medians, to guide the eye only. Subtitle = Spearman
+# rho between the MSA medians. The table also gives rho within each simulation across the ten MSAs.
+
+# 8a. % reduction in incidence in the total population, within each simulation (MSA x simulation)
+total.inc.2030.without <- sim_values(total.raw, "incidence", "noint",  EVAL.YEAR)
+total.inc.2030.with    <- sim_values(total.raw, "incidence", COVERAGE, EVAL.YEAR)
+reduction.total.inc    <- 100 * (total.inc.2030.without - total.inc.2030.with) / total.inc.2030.without
+
+# same row order as `sims` (MSA fastest, then simulation)
+pop.sims <- sims %>% mutate(reduction_total = as.vector(reduction.total.inc))
+
+# 8b. Median and 95% interval of each axis, per MSA
+pop.by.msa <- pop.sims %>%
+  group_by(location) %>%
+  summarise(across(c(reduction_total, rir_women, rir_hetmale, prop_male_ps_msm),
+                   list(median = ~ median(.x, na.rm = TRUE),
+                        lo95   = ~ quantile(.x, 0.025, na.rm = TRUE),
+                        hi95   = ~ quantile(.x, 0.975, na.rm = TRUE))),
+            .groups = "drop")
+
+# 8c. Spearman rho: between the MSA medians, and within each simulation across the ten MSAs
+pop.by.sim <- split(pop.sims, pop.sims$sim)
+pop_rho_row <- function(rir.col, rir.label) {
+  data.frame("Outcome"                               = "Reduction in incidence, total population (%), 2030",
+             "Compared with"                         = rir.label,
+             "Spearman rho, MSA medians"             = round(spearman(pop.by.msa[[paste0(rir.col, "_median")]],
+                                                                      pop.by.msa$reduction_total_median), 2),
+             "Spearman rho within simulations [95%]" = show(sapply(pop.by.sim, function(d)
+                                                          spearman(d[[rir.col]], d$reduction_total)), 2),
+             check.names = FALSE)
+}
+pop.rho <- rbind(pop_rho_row("rir_women",        "Women-to-MSM RIR"),
+                 pop_rho_row("rir_hetmale",      "Heterosexual men-to-MSM RIR"),
+                 # baseline epidemic composition: the same characteristic as in the RIR association table
+                 pop_rho_row("prop_male_ps_msm", "Proportion of male P&S diagnoses among MSM (%), 2022"))
+
+# The table starts with two description rows, then the results
+pop.rho.file <- file.path(TABLE.DIR, paste0("4-population_reduction_vs_RIR_at_", COV.LABEL, "_doxy.csv"))
+con <- file(pop.rho.file, "w")
+writeLines(c(
+  paste0('"# Spearman rho between the % reduction in incidence in the total population (2030, ',
+         COVERAGE, ' vs no Doxy-PEP) and each RIR (% reduction in that group / % reduction among MSM), and the 2022 proportion of male P&S diagnoses among MSM."'),
+  paste0('"# MSA medians: rho across the 10 MSA medians. Within simulations: rho across the 10 MSAs in each ',
+         'simulation, shown as median [2.5th to 97.5th percentile]; simulations are not paired across MSAs."')),
+  con)
+write.csv(pop.rho, con, row.names = FALSE)
+close(con)
+pop.rho
+message(PAIRING.NOTE)
+
+# 8d. The figure
+pop_panel <- function(rir.col, x.lab, letter) {
+  d <- data.frame(location = pop.by.msa$location,
+                  x    = pop.by.msa[[paste0(rir.col, "_median")]],
+                  x.lo = pop.by.msa[[paste0(rir.col, "_lo95")]],
+                  x.hi = pop.by.msa[[paste0(rir.col, "_hi95")]],
+                  y    = pop.by.msa$reduction_total_median,
+                  y.lo = pop.by.msa$reduction_total_lo95,
+                  y.hi = pop.by.msa$reduction_total_hi95)
+  rho <- spearman(d$x, d$y)
+  ggplot(d, aes(x = x, y = y)) +
+    geom_linerange(aes(ymin = y.lo, ymax = y.hi), colour = PAL.POINT, alpha = 0.5) +
+    geom_linerange(aes(xmin = x.lo, xmax = x.hi), colour = PAL.POINT, alpha = 0.5) +
+    geom_smooth(method = "lm", formula = y ~ x, se = FALSE, linetype = "dashed", colour = PAL.FIT) +
+    geom_point(size = 3, colour = PAL.POINT) +
+    ggrepel::geom_text_repel(aes(label = location), size = 3) +
+    labs(x = x.lab, y = paste0("Reduction in incidence, total population (%), ", EVAL.YEAR),
+         title = letter, subtitle = paste0("Spearman rho = ", round(rho, 2))) +
+    theme_minimal(base_size = 10) +
+    theme(plot.title = element_text(face = "bold"))
+}
+
+# Figure 5, panel A
+fig5.pA <- pop_panel("rir_women", "Women-to-MSM Relative Impact Ratio, 2030", "A")
+
+
+# ---- 9. HETEROSEXUAL MEN-TO-MSM RIR AGAINST WOMEN-TO-MSM RIR ----
+# Are the two RIRs separate signals? Heterosexual men are infected mostly through women, and both
+# RIRs share the same denominator (the % reduction among MSM), so they may move together.
+# One point per MSA: x = women-to-MSM RIR, y = heterosexual men-to-MSM RIR, at the MSA medians;
+# lines = 2.5th to 97.5th percentile across simulations on each axis. Dashed line = least-squares
+# fit of the medians (guide only). Dotted line = y = x (the same RIR in both groups).
+# Subtitle: Spearman rho between the MSA medians, and within each simulation across the ten MSAs
+# as median [95% interval].
+
+# 9a. Median and 95% interval of each RIR, per MSA
+rir.both.by.msa <- sims %>%
+  group_by(location) %>%
+  summarise(across(c(rir_women, rir_hetmale),
+                   list(median = ~ median(.x, na.rm = TRUE),
+                        lo95   = ~ quantile(.x, 0.025, na.rm = TRUE),
+                        hi95   = ~ quantile(.x, 0.975, na.rm = TRUE))),
+            .groups = "drop")
+
+# 9b. Spearman rho: between the MSA medians, and within each simulation
+rho.rir.medians <- spearman(rir.both.by.msa$rir_women_median, rir.both.by.msa$rir_hetmale_median)
+rho.rir.sims    <- show(sapply(split(sims, sims$sim), function(d) spearman(d$rir_women, d$rir_hetmale)), 2)
+message("Spearman rho, RIR heterosexual men vs RIR women: MSA medians = ", round(rho.rir.medians, 2),
+        "; within simulations = ", rho.rir.sims)
+message(PAIRING.NOTE)
+
+# 9c. The figure
+rir.scatter <- ggplot(rir.both.by.msa, aes(x = rir_women_median, y = rir_hetmale_median)) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dotted", colour = PAL.FIT) +
+  geom_linerange(aes(ymin = rir_hetmale_lo95, ymax = rir_hetmale_hi95), colour = PAL.POINT, alpha = 0.5) +
+  geom_linerange(aes(xmin = rir_women_lo95,   xmax = rir_women_hi95),   colour = PAL.POINT, alpha = 0.5) +
+  geom_smooth(method = "lm", formula = y ~ x, se = FALSE, linetype = "dashed", colour = PAL.FIT) +
+  geom_point(size = 3, colour = PAL.POINT) +
+  ggrepel::geom_text_repel(aes(label = location), size = 3) +
+  labs(x = paste0("Women-to-MSM Relative Impact Ratio, ", EVAL.YEAR),
+       y = paste0("Heterosexual men-to-MSM Relative Impact Ratio, ", EVAL.YEAR),
+       subtitle = paste0("Spearman rho = ", round(rho.rir.medians, 2), " (MSA medians); ",
+                         rho.rir.sims, " (within simulations)")) +
+  theme_minimal(base_size = 10)
+
+# Heterosexual men RIR vs women RIR as a figure panel. NOT in Figure 5 at the moment (see section 10);
+# kept so it can be put back
+fig5.pC <- rir.scatter + labs(title = "C") + theme(plot.title = element_text(face = "bold"))
+
+
+# ---- 10. FIGURE 5 ----
+# Two columns. Top row, left to right:
+#   A. % reduction in total-population incidence vs women RIR         (section 8)
+#   B. women RIR in each MSA, median and 95% interval                 (section 7)
+#   (heterosexual men RIR vs women RIR, section 9, is left out for now: fig5.pC, commented out below)
+# Following rows: women RIR vs each baseline characteristic with |rho| > RHO.CUTOFF, C, D, E, ...
+#   (section 7), two per row. The cutoff is on the size of rho, not a significance test.
+# Each row has a title; the first one defines the RIR
+row_title <- function(text)
+  wrap_elements(full = grid::textGrob(text, x = 0, hjust = 0,
+                                      gp = grid::gpar(fontsize = 11, fontface = "bold", col = "black")))
+
+n.rows.drivers <- ceiling(length(driver.panels) / N.COL)
+
+fig5 <- row_title(paste0("Population-level impact and the women-to-MSM Relative Impact Ratio (RIR)\n",
+                         "RIR = % reduction in incidence among women \u00F7 % reduction among MSM (",
+                         EVAL.YEAR, ", with vs. without Doxy-PEP)")) /
+        (fig5.pA | fig5.pB) /
+        # (fig5.pA | fig5.pB | fig5.pC) /     # with the heterosexual men RIR panel
+        row_title(paste0("Baseline characteristics associated with the women-to-MSM RIR (|Spearman rho| > ",
+                         RHO.CUTOFF, ")")) /
+        wrap_plots(driver.panels, ncol = N.COL) +
+        plot_layout(heights = c(0.12, 1.2, 0.08, n.rows.drivers))
+fig5
+
+# 1 inch for the row titles, 5 for the top row, 4 per row of characteristics
+ggsave(file.path(FIG.DIR, paste0("Fig5-impact_ratio_vs_drivers_at_", COV.LABEL, "_doxy.png")), fig5,
+       width = 10, height = 1 + 5 + 4 * n.rows.drivers, dpi = 300, bg = "white")

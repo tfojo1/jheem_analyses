@@ -44,13 +44,18 @@ source('../jheem_analyses/applications/SHIELD/analysis/shield_output_paths.R')
 
 
 ## Calibration ----
-CALIB.NAME <- "calib.10.20.stage3"
-N.SIM      <- 800
+CALIB.NAME <- "calib.10.20.stage4"
+N.SIM      <- 1000
 
 
 ## Locations ----
 LOCATIONS <- SHIELD.TEN.MSAS          # names = city, values = location code
 MSAS      <- names(SHIELD.TEN.MSAS)   # city names, in the one order every figure uses
+
+# How each city is SHOWN in figures and tables. MSAS stays the lookup key (the arrays use it);
+# only the displayed text changes. Cities not listed here keep their own name.
+MSA.DISPLAY.NAMES <- setNames(MSAS, MSAS)
+MSA.DISPLAY.NAMES[c("LA", "NYC")] <- c("Los Angeles", "New York")
 
 
 ## Interventions ----
@@ -66,3 +71,4 @@ COVERAGE.LEVELS    <- paste0("doxy.cov.", seq(5, 50, 5))
 YEARS     <- 2000:2040   # years pulled into the raw arrays
 YEAR0     <- "2022"      # reference year for the *_vs_year0 outcomes, and start of the cumulative sums
 EVAL.YEAR <- "2030"      # policy evaluation horizon
+

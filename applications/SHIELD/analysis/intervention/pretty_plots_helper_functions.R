@@ -235,6 +235,10 @@ shield.prepare <- function(simsets,
         if (!is.null(pp$df.truth)) pp$df.truth$city <- loc
         pp
     })
+    failed <- names(sims)[vapply(parts, is.null, logical(1))]
+    if (length(failed) > 0)
+        message("*** ", length(failed), " of ", length(sims), " cities FAILED and are missing from this figure: ",
+                paste(failed, collapse = ", "), " (see the warnings for why) ***")
     parts <- Filter(Negate(is.null), parts)
     if (length(parts) == 0) stop("prepare.plot() returned nothing for any location.")
     

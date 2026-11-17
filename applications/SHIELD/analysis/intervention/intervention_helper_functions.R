@@ -83,7 +83,7 @@ source('../jheem_analyses/applications/SHIELD/analysis/shield_output_paths.R')
 # individual MSAs, reference lines.
 #
 #   red   #B2182B   women; and, on the heat scale, harm (below zero)
-#   tint  #92C5DE   the light step: benefit that does not reach the target
+#   tint  #D9D9D9   the light step: benefit that does not reach the target
 #   blue  #2166AC   MSM; and, on the heat scale, benefit that meets the target
 #   grey  #4D4D4D   total population, single MSAs, neutral marks
 #
@@ -1690,6 +1690,9 @@ plot_coverage_heatmap <- function(tbl,
 #' LOCATION regardless, which silently took the best stratum.)
 #'
 #' @param target Impact threshold, e.g. 50 for a 50% reduction.
+#'   For pct_change_*_vs_noint outcomes, which are NEGATIVE when Doxy-PEP
+#'   lowers incidence, use target = -50 and higher.is.better = FALSE;
+#'   the defaults would mark every location "not reached".
 #' @param year Which year to evaluate. Defaults to the latest in the data.
 #' @param subgroup Optional stratum filter, e.g. "msm".
 #' @param higher.is.better TRUE if larger values are the goal (e.g. % averted).
@@ -2370,7 +2373,8 @@ if (1 == 2) {
     # Strata are selected with subgroup =, not by globbing the location name.
     f1 <- plot_coverage_needed(
         ten.city.tbl,
-        target    = 50,
+        target    = -50,              # pct_change is negative: -50 = halved
+        higher.is.better = FALSE,
         subgroup  = "msm",
         title     = "Doxy coverage needed to reach 50% incidence reduction among MSM by 2030",
         filename  = "fig1_coverage_needed")
@@ -2504,7 +2508,8 @@ if (1 == 2) {
         years         = as.character(c(2030, 2035)),
         row.vars      = "year",          # year goes down the rows
         stat.type     = "median")
-    plot_coverage_needed(by.year.rows, subgroup = "msm", year = 2035)
+    plot_coverage_needed(by.year.rows, target = -50, higher.is.better = FALSE,
+                         subgroup = "msm", year = 2035)
 }
 
 ## .remove.duplicate.rows ----

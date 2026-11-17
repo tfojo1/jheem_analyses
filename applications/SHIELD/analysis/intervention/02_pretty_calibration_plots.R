@@ -27,8 +27,8 @@ source('../jheem_analyses/applications/SHIELD/analysis/intervention/pretty_plots
 # ---- SETTINGS ----
 # 1. CALIB.NAME: the calibration to plot. It also names the output folder.
 # 2. N.SIM: how many sims the calibration run kept (the "-800" in the simset folder name).
-CALIB.NAME <- "calib.10.20.stage3"
-N.SIM      <- 800
+CALIB.NAME <- "calib.10.20.stage4"
+N.SIM      <- 1000
 
 # ---- OUTPUT FOLDER ----
 print(paste("Root directory is set to: ", ROOT.DIR))
@@ -82,28 +82,30 @@ calib.simsets <- load.calib.simsets(
 
 #historical fit plots for supplement
 SHIELD.DEFAULT.WINDOW <- "history"
+# panel titles: spell out LA and NYC (the same display names as 00_settings.R); others unchanged
+CITY.TITLES <- c(LA = "Los Angeles", NYC = "New York")
 {
     CITIES<- SHIELD.TEN.MSAS
     ncol=5
-    p1<-shield.plot(calib.simsets, "diagnosis.total", locations = CITIES,overlay.locations = F,
+    p1<-shield.plot(calib.simsets, "diagnosis.total", locations = CITIES,overlay.locations = F, titles = CITY.TITLES,
                     log.y = F,free.y = T,ncol = ncol,
                     show.sources = T,show.proj.line = T,
                     title = "Total Syphilis Diagnoses");p1
-    p2<-shield.plot(calib.simsets, "diagnosis.ps", locations = CITIES,overlay.locations = F,
+    p2<-shield.plot(calib.simsets, "diagnosis.ps", locations = CITIES,overlay.locations = F, titles = CITY.TITLES,
                     log.y = F,free.y = T,ncol = ncol,
                     show.sources = T,show.proj.line = T,
                     title = "P&S Syphilis Diagnoses");p2
-    p3<-shield.plot(calib.simsets, "diagnosis.ps", locations = CITIES,overlay.locations = F,
+    p3<-shield.plot(calib.simsets, "diagnosis.ps", locations = CITIES,overlay.locations = F, titles = CITY.TITLES,
                     log.y = F,free.y = T,ncol = ncol,
                     split.by = "sex",
                     show.sources = T,show.proj.line = T,
                     title = "P&S Syphilis Diagnoses by Sex");p3
-    p4<-shield.plot(calib.simsets, "diagnosis.ps", locations = CITIES,overlay.locations = F,
+    p4<-shield.plot(calib.simsets, "diagnosis.ps", locations = CITIES,overlay.locations = F, titles = CITY.TITLES,
                     log.y = F,free.y = T,ncol = ncol,
                     split.by = "race",
                     show.sources = T,show.proj.line = T,
                     title = "P&S Syphilis Diagnoses by Race");p4
-    p5<-shield.plot(calib.simsets, "prop.male.ps.diag.among.msm", locations = CITIES,overlay.locations = F,
+    p5<-shield.plot(calib.simsets, "prop.male.ps.diag.among.msm", locations = CITIES,overlay.locations = F, titles = CITY.TITLES,
                     log.y = F,free.y = T,ncol = ncol,
                     show.sources = T,show.proj.line = T,
                     shape.by = "both",show.data = T,

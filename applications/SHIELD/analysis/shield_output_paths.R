@@ -98,7 +98,9 @@ shield.table.path <- function(calibration.code, root.dir = NULL, create = FALSE)
 ensure.shield.dir <- function(path) {
 
     if (!dir.exists(path)) {
-        dir.create(path, recursive = TRUE, showWarnings = FALSE)
+        ok <- dir.create(path, recursive = TRUE, showWarnings = TRUE)
+        if (!ok) stop("Could not create ", path,
+                      " -- is the jheem$ share mounted and writable?")
         message("Created directory: ", path)
     }
     invisible(path)
