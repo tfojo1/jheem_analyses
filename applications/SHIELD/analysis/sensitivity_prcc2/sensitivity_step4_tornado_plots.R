@@ -13,7 +13,9 @@ source('../jheem_analyses/applications/SHIELD/analysis/sensitivity_prcc2/00_sens
 load(paste0(OUT.PATH, "top_bottom_ranking.Rdata"))          # tails (and rank_df without PRCC)
 rank_df          <- get(load(paste0(OUT.PATH, "rank_df_with_prcc.Rdata")))
 titles_file      <- paste0(OUT.PATH, "ALL_PARAM_TITLES.Rdata")
-if (!file.exists(titles_file)) titles_file <- paste0(V2.PATH, "ALL_PARAM_TITLES.Rdata")
+# if (!file.exists(titles_file)) titles_file <- paste0(V2.PATH, "ALL_PARAM_TITLES.Rdata")
+if (!file.exists(titles_file))    # create it: all_param_titles.R defines ALL_PARAM_TITLES and saves it to OUT.PATH
+    source('../jheem_analyses/applications/SHIELD/analysis/sensitivity_prcc2/all_param_titles.R')
 ALL_PARAM_TITLES <- get(load(titles_file))
 
 # TORNADO PLOT ----
