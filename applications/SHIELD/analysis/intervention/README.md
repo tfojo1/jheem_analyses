@@ -19,7 +19,7 @@ Steps 01a and 01b only need to run again when the simsets change. Steps 02 to 04
 | Step | File | Reads | Writes |
 |---|---|---|---|
 | 00 | `00_settings.R` | nothing | nothing; sets the shared settings |
-| 01a | `01a_generate_raw_results_arrays.R` | intervention simsets | `total_raw_results`, `sex_raw_results` (and `race_raw_results`, `age_raw_results` if turned on) |
+| 01a | `01a_generate_raw_results_arrays.R` | intervention simsets | `total_raw_results`, `sex_raw_results` (and `race_raw_results`, `age_raw_results` if turned on); calibrated parameters per location in `extracts/params/` (from the no-intervention simset; used by `analysis/sensitivity_analyses/`). `RUN.STRATA <- character(0)` extracts parameters only and saves no arrays |
 | 01b | `01b_generate_custom_outcomes.R` | the raw arrays listed in `CALC.STRATA` | `total_calc_results`, `sex_calc_results` (and race or age if listed) |
 | 02 | `02_pretty_calibration_plots.R` | baseline calibration simsets | calibration-fit figures for the manuscript and supplement |
 | 03 | `03_manuscript_main.R` | the raw and calc arrays (total, sex, race) | Table 1, Figure 3, Figure 4, Table 2 |

@@ -64,7 +64,14 @@ source('../jheem_analyses/applications/SHIELD/analysis/intervention/00_settings.
 #    below). Each one is saved as <strat>_raw_results.Rdata.
 # 2. N.CORES: how many simsets are loaded at once, one per worker. Memory use is about N.CORES
 #    simsets, so start with 3-4 and watch memory. 1 = one file at a time.
+# 3. Parameters: for each location, the no-intervention simset's calibrated parameters are saved to
+#    extracts/params/<location>.Rdata (object x: sim x parameter) whenever that file is missing (or
+#    OVERWRITE = TRUE). Sensitivity analyses (analysis/sensitivity_analyses/) read them from there.
+#    PARAMETERS ONLY: set RUN.STRATA <- character(0). Only no-intervention simsets whose parameter
+#    file is missing are loaded, and Steps 2-3 are skipped, so no existing array is re-saved
+#    (the paper 1 arrays in shield/outputs/ are frozen).
 # RUN.STRATA <- c("total", "sex")
+# RUN.STRATA <- character(0)    # parameters only
 RUN.STRATA <- c("race")
 
 N.CORES   <- 8
@@ -111,6 +118,8 @@ OUT.DIR     <- shield.output.path(CALIB.NAME, create = TRUE)
 EXTRACT.DIR <- file.path(OUT.DIR, "extracts")
 for (strat in RUN.STRATA)
     dir.create(file.path(EXTRACT.DIR, strat), recursive = TRUE, showWarnings = FALSE)
+PARAM.DIR   <- file.path(EXTRACT.DIR, "params")    # calibrated parameters, one file per location
+dir.create(PARAM.DIR, recursive = TRUE, showWarnings = FALSE)
 
 # One row per simset, ordered location 1 / all interventions, location 2 / all interventions, ...
 # This order matches the intervention x location dimensions of the final arrays.
@@ -130,9 +139,11 @@ extract.one.simset <- function(i) {
     sim.file      <- file.path(SIM.DIR, loc, paste0("shield_", CALIB.NAME, "-", N.SIM, "_", loc, "_", int, ".Rdata"))
     extract.files <- setNames(file.path(EXTRACT.DIR, RUN.STRATA, paste0(loc, "_", int, ".Rdata")), RUN.STRATA)
 
-    # 1. Work out which stratifications still need extracting
+    # 1. Work out which stratifications (and, for no intervention, the parameters) still need extracting
     todo <- RUN.STRATA[OVERWRITE | !file.exists(extract.files)]
-    if (length(todo) == 0)      return(paste0("already done    : ", label))
+    param.file  <- file.path(PARAM.DIR, paste0(loc, ".Rdata"))
+    need.params <- int == NOINT && (OVERWRITE || !file.exists(param.file))
+    if (length(todo) == 0 && !need.params) return(paste0("already done    : ", label))
     if (!file.exists(sim.file)) return(paste0("NO SIMSET FILE  : ", label))
 
     message("Loading ", label)
@@ -140,6 +151,16 @@ extract.one.simset <- function(i) {
     tryCatch({
         # 2. Load the simset
         simset <- load.simulation.set(sim.file)
+
+        # 2b. No intervention only: save the calibrated parameters (sim x parameter), in the
+        #     same sim order as the outcome extracts
+        if (need.params) {
+            if (is.null(simset$parameters)) stop("simset has no $parameters")
+            x <- t(simset$parameters)
+            colnames(x) <- simset$parameter.names
+            if (nrow(x) != N.SIM) stop("parameters have ", nrow(x), " sims, expected ", N.SIM)
+            save(x, file = param.file)
+        }
 
         # 3. Pull out each stratification and save it
         for (strat in todo) {
@@ -159,11 +180,12 @@ extract.one.simset <- function(i) {
         }
 
         # 4. Free the memory before the next file
-        rm(simset, rv, x)
+        rm(list = intersect(c("simset", "rv", "x"), ls()))
+        # rm(simset, rv, x)
         gc()
 
         mins <- round(as.numeric(difftime(Sys.time(), start, units = "mins")), 1)
-        paste0("extracted       : ", label, " [", paste(todo, collapse = ", "), "] in ", mins, " min")
+        paste0("extracted       : ", label, " [", paste(c(todo, if (need.params) "params"), collapse = ", "), "] in ", mins, " min")
     },
     error = function(e) paste0("ERROR           : ", label, " -- ", conditionMessage(e)))
 }
@@ -181,106 +203,113 @@ cat("\n---- STEP 1 SUMMARY ----\n")
 cat(unlist(status), sep = "\n")
 
 
-# ---- STEP 2: CHECK EVERY EXTRACT FILE BEFORE MERGING ----
-# Reads every extract file and gives each one a status:
-#   ok           loaded, with the expected years, sims and outcomes
-#   missing      no file: the simset has not been run yet, or Step 1 failed for it
-#   empty        zero-byte file: the save was cut off
-#   unreadable   the file is there but load() fails: the save was cut off partway
-#   wrong shape  loads, but its years / sims / outcomes / groups differ from the settings or
-#                from the other extracts. Usually it was made before the outcome list changed.
-# Missing extracts become NA in the arrays (Step 3). Any other problem stops the script here,
-# before anything is saved, and prints the files to delete. Re-running then re-extracts just those.
-CITY     <- names(LOCATIONS)[match(JOBS$location, LOCATIONS)]
-EXTRACTS <- list()
-PROBLEMS <- NULL
+# Parameters only (RUN.STRATA empty): stop after Step 1, so no array is rebuilt or re-saved
+if (length(RUN.STRATA) == 0) {
+    cat("\nRUN.STRATA is empty: parameters only. Steps 2-3 skipped; no arrays were saved.\n")
+} else {
 
-cat("\n---- STEP 2: CHECKING EXTRACT FILES ----\n")
-for (strat in RUN.STRATA) {
-    files  <- file.path(EXTRACT.DIR, strat, paste0(JOBS$location, "_", JOBS$intervention, ".Rdata"))
-    status <- rep("ok", length(files))
-    blocks <- vector("list", length(files))
+    # ---- STEP 2: CHECK EVERY EXTRACT FILE BEFORE MERGING ----
+    # Reads every extract file and gives each one a status:
+    #   ok           loaded, with the expected years, sims and outcomes
+    #   missing      no file: the simset has not been run yet, or Step 1 failed for it
+    #   empty        zero-byte file: the save was cut off
+    #   unreadable   the file is there but load() fails: the save was cut off partway
+    #   wrong shape  loads, but its years / sims / outcomes / groups differ from the settings or
+    #                from the other extracts. Usually it was made before the outcome list changed.
+    # Missing extracts become NA in the arrays (Step 3). Any other problem stops the script here,
+    # before anything is saved, and prints the files to delete. Re-running then re-extracts just those.
+    CITY     <- names(LOCATIONS)[match(JOBS$location, LOCATIONS)]
+    EXTRACTS <- list()
+    PROBLEMS <- NULL
 
-    # 1. Check each file on its own
-    for (i in seq_along(files)) {
-        if (!file.exists(files[i]))    { status[i] <- "missing"; next }
-        if (file.size(files[i]) == 0)  { status[i] <- "empty";   next }
+    cat("\n---- STEP 2: CHECKING EXTRACT FILES ----\n")
+    for (strat in RUN.STRATA) {
+        files  <- file.path(EXTRACT.DIR, strat, paste0(JOBS$location, "_", JOBS$intervention, ".Rdata"))
+        status <- rep("ok", length(files))
+        blocks <- vector("list", length(files))
 
-        x <- tryCatch(get(load(files[i])), error = function(e) NULL)
-        if (is.null(x))                { status[i] <- "unreadable"; next }
+        # 1. Check each file on its own
+        for (i in seq_along(files)) {
+            if (!file.exists(files[i]))    { status[i] <- "missing"; next }
+            if (file.size(files[i]) == 0)  { status[i] <- "empty";   next }
 
-        if (!identical(dimnames(x)$year, as.character(YEARS)) ||
-            length(dimnames(x)$sim) != N.SIM ||
-            !identical(dimnames(x)$outcome, STRATA[[strat]]$outcomes)) {
-            status[i] <- "wrong shape"; next
+            x <- tryCatch(get(load(files[i])), error = function(e) NULL)
+            if (is.null(x))                { status[i] <- "unreadable"; next }
+
+            if (!identical(dimnames(x)$year, as.character(YEARS)) ||
+                length(dimnames(x)$sim) != N.SIM ||
+                !identical(dimnames(x)$outcome, STRATA[[strat]]$outcomes)) {
+                status[i] <- "wrong shape"; next
+            }
+            blocks[[i]] <- x
         }
-        blocks[[i]] <- x
+
+        # 2. Every good extract must also match the first good one (e.g. same sex or age groups)
+        good <- which(status == "ok")
+        for (i in good[-1])
+            if (!identical(dimnames(blocks[[i]]), dimnames(blocks[[good[1]]]))) status[i] <- "wrong shape"
+
+        EXTRACTS[[strat]] <- list(blocks = blocks, status = status)
+        PROBLEMS <- rbind(PROBLEMS,
+                          data.frame(stratification = strat, city = CITY, intervention = JOBS$intervention,
+                                     status = status, file = files)[status != "ok", ])
+        cat(strat, ": ", sum(status == "ok"), " of ", length(files), " extracts ok\n", sep = "")
     }
 
-    # 2. Every good extract must also match the first good one (e.g. same sex or age groups)
-    good <- which(status == "ok")
-    for (i in good[-1])
-        if (!identical(dimnames(blocks[[i]]), dimnames(blocks[[good[1]]]))) status[i] <- "wrong shape"
-
-    EXTRACTS[[strat]] <- list(blocks = blocks, status = status)
-    PROBLEMS <- rbind(PROBLEMS,
-                      data.frame(stratification = strat, city = CITY, intervention = JOBS$intervention,
-                                 status = status, file = files)[status != "ok", ])
-    cat(strat, ": ", sum(status == "ok"), " of ", length(files), " extracts ok\n", sep = "")
-}
-
-# 3. Report problems, by city and intervention
-if (nrow(PROBLEMS) > 0) {
-    cat("\nProblems found:\n")
-    print(PROBLEMS[, c("stratification", "city", "intervention", "status")], row.names = FALSE)
-}
-
-# 4. Stop if any file is damaged or out of date. Missing files alone do not stop the script.
-bad <- PROBLEMS[PROBLEMS$status != "missing", ]
-if (nrow(bad) > 0) {
-    cat("\nThese extract files are damaged or out of date. Delete them, then re-run this script.\n",
-        "Step 1 will re-extract just these simsets:\n", sep = "")
-    cat(paste0("  rm '", bad$file, "'"), sep = "\n")
-    stop(nrow(bad), " bad extract file(s), listed above. No arrays were saved.")
-}
-
-# 5. For a manuscript run, every simset must be there: a missing one would become NA in the arrays
-if (MANUSCRIPT.RUN && nrow(PROBLEMS) > 0)
-    stop(nrow(PROBLEMS), " missing extract file(s), listed above. No arrays were saved. ",
-         "Run the missing simsets, or set MANUSCRIPT.RUN <- FALSE to save arrays with NA blocks.")
-
-
-# ---- STEP 3: STACK THE EXTRACTS INTO ONE ARRAY PER STRATIFICATION ----
-for (strat in RUN.STRATA) {
-    blocks <- EXTRACTS[[strat]]$blocks
-    found  <- EXTRACTS[[strat]]$status == "ok"
-    if (!any(found)) {
-        warning("No extract files for '", strat, "', skipping")
-        next
+    # 3. Report problems, by city and intervention
+    if (nrow(PROBLEMS) > 0) {
+        cat("\nProblems found:\n")
+        print(PROBLEMS[, c("stratification", "city", "intervention", "status")], row.names = FALSE)
     }
 
-    # 1. A missing extract becomes a block of NA, the same shape as the others
-    template <- blocks[[which(found)[1]]]
-    blocks[!found] <- list(array(NA_real_, dim(template)))
-
-    # 2. Stack them. Intervention and location are the last two dimensions.
-    # Keep the city names on the location codes (Atlanta = "C.12060"): the table and plot
-    # helpers look cities up by these names
-    dn  <- c(dimnames(template), list(intervention = INTERVENTION.CODES, location = LOCATIONS))
-    res <- array(unlist(blocks), dim = sapply(dn, length), dimnames = dn)
-
-    # 3. Total keeps the old layout, with outcome last
-    if (strat == "total")
-        res <- aperm(res, c("year", "sim", "intervention", "location", "outcome"))
-
-    # 4. Save as total_raw_results / sex_raw_results / age_raw_results
-    name <- paste0(strat, "_raw_results")
-    assign(name, res)
-    save(list = name, file = file.path(OUT.DIR, paste0(name, ".Rdata")))
-
-    cat("\nSaved ", name, " (", sum(found), " of ", length(found), " simsets)\n", sep = "")
-    if (any(!found)) {
-        cat("  Missing (filled with NA):\n")
-        cat(paste0("    ", CITY[!found], " / ", JOBS$intervention[!found]), sep = "\n")
+    # 4. Stop if any file is damaged or out of date. Missing files alone do not stop the script.
+    bad <- PROBLEMS[PROBLEMS$status != "missing", ]
+    if (nrow(bad) > 0) {
+        cat("\nThese extract files are damaged or out of date. Delete them, then re-run this script.\n",
+            "Step 1 will re-extract just these simsets:\n", sep = "")
+        cat(paste0("  rm '", bad$file, "'"), sep = "\n")
+        stop(nrow(bad), " bad extract file(s), listed above. No arrays were saved.")
     }
-}
+
+    # 5. For a manuscript run, every simset must be there: a missing one would become NA in the arrays
+    if (MANUSCRIPT.RUN && nrow(PROBLEMS) > 0)
+        stop(nrow(PROBLEMS), " missing extract file(s), listed above. No arrays were saved. ",
+             "Run the missing simsets, or set MANUSCRIPT.RUN <- FALSE to save arrays with NA blocks.")
+
+
+    # ---- STEP 3: STACK THE EXTRACTS INTO ONE ARRAY PER STRATIFICATION ----
+    for (strat in RUN.STRATA) {
+        blocks <- EXTRACTS[[strat]]$blocks
+        found  <- EXTRACTS[[strat]]$status == "ok"
+        if (!any(found)) {
+            warning("No extract files for '", strat, "', skipping")
+            next
+        }
+
+        # 1. A missing extract becomes a block of NA, the same shape as the others
+        template <- blocks[[which(found)[1]]]
+        blocks[!found] <- list(array(NA_real_, dim(template)))
+
+        # 2. Stack them. Intervention and location are the last two dimensions.
+        # Keep the city names on the location codes (Atlanta = "C.12060"): the table and plot
+        # helpers look cities up by these names
+        dn  <- c(dimnames(template), list(intervention = INTERVENTION.CODES, location = LOCATIONS))
+        res <- array(unlist(blocks), dim = sapply(dn, length), dimnames = dn)
+
+        # 3. Total keeps the old layout, with outcome last
+        if (strat == "total")
+            res <- aperm(res, c("year", "sim", "intervention", "location", "outcome"))
+
+        # 4. Save as total_raw_results / sex_raw_results / age_raw_results
+        name <- paste0(strat, "_raw_results")
+        assign(name, res)
+        save(list = name, file = file.path(OUT.DIR, paste0(name, ".Rdata")))
+
+        cat("\nSaved ", name, " (", sum(found), " of ", length(found), " simsets)\n", sep = "")
+        if (any(!found)) {
+            cat("  Missing (filled with NA):\n")
+            cat(paste0("    ", CITY[!found], " / ", JOBS$intervention[!found]), sep = "\n")
+        }
+    }
+
+}    # end of: if (length(RUN.STRATA) == 0) ... else
