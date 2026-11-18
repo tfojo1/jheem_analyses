@@ -5,7 +5,7 @@
 # adjust for every other parameter); it is then reported for the top-ranked
 # parameters from step 2. PRCC is not used to select or rank parameters.
 
-# library(epiR)    # now loaded and checked in 00_sensitivity_settings.R
+# library(epiR)    # replaced by calc_prcc_base() in 00_sensitivity_settings.R
 
 # SETTINGS ----
 source('../jheem_analyses/applications/SHIELD/analysis/sensitivity_prcc2/00_sensitivity_settings.R')
@@ -31,7 +31,8 @@ calc_prcc <- function(outcome, city) {
     if (n_dropped > 0) cat(city, outcome, ": dropped", n_dropped, "sims with NA outcome\n")
     df <- df[!is.na(df$outcome), ]
 
-    epi.prcc(df, sided.test = 2, conf.level = 0.95) %>%
+    # epi.prcc(df, sided.test = 2, conf.level = 0.95) %>%
+    calc_prcc_base(df, conf.level = 0.95) %>%
         mutate(p.adj = p.adjust(p.value, method = P.ADJUST.METHOD)) %>%
         arrange(p.value)
 }

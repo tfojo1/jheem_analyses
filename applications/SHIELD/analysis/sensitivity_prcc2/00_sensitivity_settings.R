@@ -23,14 +23,14 @@
 # Checked once here, before anything runs, so a missing package or object stops the
 # pipeline at the start instead of partway through a step.
 #   tidyverse : dplyr, tidyr, purrr, ggplot2 (all steps)
-#   epiR      : epi.prcc() (step 3); version >= 2.0 for the var/est/lower/upper columns
-REQUIRED.PACKAGES <- c("tidyverse", "epiR")
+#   PRCC (step 3) uses calc_prcc_base() below: base R only, no epiR needed
+REQUIRED.PACKAGES <- c("tidyverse")
 missing.packages  <- REQUIRED.PACKAGES[!vapply(REQUIRED.PACKAGES, requireNamespace, logical(1), quietly = TRUE)]
 if (length(missing.packages) > 0)
     stop("Missing R package(s): ", paste(missing.packages, collapse = ", "),
          "\n  Install with: install.packages(c(", paste0('"', missing.packages, '"', collapse = ", "), "))")
-if (packageVersion("epiR") < "2.0.0")
-    stop("epiR >= 2.0.0 is needed (installed: ", packageVersion("epiR"), ")")
+# if (packageVersion("epiR") < "2.0.0")
+#     stop("epiR >= 2.0.0 is needed (installed: ", packageVersion("epiR"), ")")
 
 # Objects that must already be in the session (see SETUP above)
 REQUIRED.OBJECTS <- c("ROOT.DIR", "SHIELD.TEN.MSAS", "load.calib.simsets", "extract.calib.simsets")
@@ -40,7 +40,7 @@ if (length(missing.objects) > 0)
          "\n  Source the three SETUP files above first.")
 
 library(tidyverse)
-library(epiR)
+# library(epiR)    # replaced by calc_prcc_base() below
 
 # SETTINGS ----
 CALIB.CODE   <- "calib.10.20.stage4"
@@ -93,6 +93,40 @@ write_csv_with_notes <- function(df, file, notes) {
     writeLines(paste0("# ", notes), file)
     suppressWarnings(write.table(df, file, sep = ",", row.names = FALSE,
                                  append = TRUE, col.names = TRUE))
+}
+
+# PRCC (base R; replaces epiR::epi.prcc) ----
+# Partial rank correlation coefficient of each parameter with the outcome, adjusting
+# for all other parameters. Same method as epi.prcc: rank-transform every column,
+# then PRCC_j = -P[j, y] / sqrt(P[j, j] * P[y, y]), with P = inverse of the rank
+# correlation matrix (identical to correlating the residuals of rank(x_j) and rank(y)
+# after regressing each on the ranks of the other parameters).
+# Test: t = r * sqrt(df / (1 - r^2)), df = n - 2 - q (q = number of other parameters);
+# 95% CI by Fisher z with SE = 1 / sqrt(n - 3 - q).
+# Input: data frame of parameters with the outcome as the LAST column (as epi.prcc).
+# Output columns match epi.prcc 2.x: var, est, lower, upper, test.statistic, df, p.value.
+calc_prcc_base <- function(dat, conf.level = 0.95) {
+    ranks <- apply(as.matrix(dat), 2, rank, ties.method = "average")
+    n     <- nrow(ranks)
+    k     <- ncol(ranks) - 1                  # number of parameters
+    y     <- k + 1
+    P     <- tryCatch(solve(cor(ranks)),
+                      error = function(e) stop("Rank correlation matrix is singular (perfectly collinear ",
+                                               "parameters?): ", e$message))
+    est   <- -P[1:k, y] / sqrt(diag(P)[1:k] * P[y, y])
+    q     <- k - 1
+    df    <- n - 2 - q
+    tstat <- est * sqrt(df / (1 - est^2))
+    zcrit <- qnorm(1 - (1 - conf.level) / 2)
+    se.z  <- 1 / sqrt(n - 3 - q)
+    data.frame(var            = colnames(dat)[1:k],
+               est            = unname(est),
+               lower          = tanh(atanh(unname(est)) - zcrit * se.z),
+               upper          = tanh(atanh(unname(est)) + zcrit * se.z),
+               test.statistic = unname(tstat),
+               df             = df,
+               p.value        = 2 * pt(-abs(unname(tstat)), df),
+               row.names      = NULL)
 }
 
 # V2 SETTINGS AND OUTCOMES (kept for reference) ----
