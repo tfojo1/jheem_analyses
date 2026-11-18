@@ -11,7 +11,7 @@
 #   total  : total population
 #   msm    : MSM
 #   female : women
-# Positive values = fewer cases with doxy-PEP. Backup of v2: 00_sensitivity_settings_backup.R
+# Positive values = fewer cases with doxy-PEP.
 
 # SETUP ----
 # Not needed when these are already loaded in the R session; uncomment to run a step on its own.
@@ -19,7 +19,28 @@
 # source('../jheem_analyses/applications/SHIELD/shield_specification.R')                                # ROOT.DIR
 # source('../jheem_analyses/applications/SHIELD/analysis/calibration/calibration_helper_functions.R')   # load/extract simsets
 
+# DEPENDENCIES (all steps 1-4) ----
+# Checked once here, before anything runs, so a missing package or object stops the
+# pipeline at the start instead of partway through a step.
+#   tidyverse : dplyr, tidyr, purrr, ggplot2 (all steps)
+#   epiR      : epi.prcc() (step 3); version >= 2.0 for the var/est/lower/upper columns
+REQUIRED.PACKAGES <- c("tidyverse", "epiR")
+missing.packages  <- REQUIRED.PACKAGES[!vapply(REQUIRED.PACKAGES, requireNamespace, logical(1), quietly = TRUE)]
+if (length(missing.packages) > 0)
+    stop("Missing R package(s): ", paste(missing.packages, collapse = ", "),
+         "\n  Install with: install.packages(c(", paste0('"', missing.packages, '"', collapse = ", "), "))")
+if (packageVersion("epiR") < "2.0.0")
+    stop("epiR >= 2.0.0 is needed (installed: ", packageVersion("epiR"), ")")
+
+# Objects that must already be in the session (see SETUP above)
+REQUIRED.OBJECTS <- c("ROOT.DIR", "SHIELD.TEN.MSAS", "load.calib.simsets", "extract.calib.simsets")
+missing.objects  <- REQUIRED.OBJECTS[!vapply(REQUIRED.OBJECTS, exists, logical(1))]
+if (length(missing.objects) > 0)
+    stop("Not found in the R session: ", paste(missing.objects, collapse = ", "),
+         "\n  Source the three SETUP files above first.")
+
 library(tidyverse)
+library(epiR)
 
 # SETTINGS ----
 CALIB.CODE   <- "calib.10.20.stage4"

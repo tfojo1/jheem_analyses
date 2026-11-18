@@ -5,7 +5,7 @@
 # adjust for every other parameter); it is then reported for the top-ranked
 # parameters from step 2. PRCC is not used to select or rank parameters.
 
-library(epiR)
+# library(epiR)    # now loaded and checked in 00_sensitivity_settings.R
 
 # SETTINGS ----
 source('../jheem_analyses/applications/SHIELD/analysis/sensitivity_prcc2/00_sensitivity_settings.R')

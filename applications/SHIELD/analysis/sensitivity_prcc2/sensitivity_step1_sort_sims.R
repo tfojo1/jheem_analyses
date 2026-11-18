@@ -1,6 +1,5 @@
 # Sensitivity analysis step 1: Build parameter matrices and sort simulations by parameter value (v3)
 # Pipeline (v3): step1 sort sims -> step2 top/bottom 20% ranking -> step3 PRCC -> step4 tornado plots
-# v2 versions: sensitivity_step1_find_prccs_backup.R, sensitivity_step2_sort_sims_backup.R
 
 # SETTINGS ----
 source('../jheem_analyses/applications/SHIELD/analysis/sensitivity_prcc2/00_sensitivity_settings.R')
@@ -12,7 +11,7 @@ if (file.exists(pm_file)) {
     cat("Reusing", pm_file, "\n")
     param_matrices <- get(load(pm_file))[unname(locations)]    # keep the MSAs in locations only
 } else {
-    calib.simsets  <- load.calib.simsets(unname(locations), CALIB.CODE, 1000)
+    calib.simsets  <- load.calib.simsets(msas, CALIB.CODE, 1000)    # named vector: names must match extract.calib.simsets()
     param_matrices <- lapply(locations, function(city) {
         simset <- extract.calib.simsets(calib.simsets, city, CALIB.CODE, exact = T)[[1]]$full_simset
         all_params <- t(simset$parameters)
