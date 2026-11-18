@@ -18,6 +18,8 @@ source('../jheem_analyses/applications/SHIELD/analysis/sensitivity_prcc2/00_sens
 
 # SETTINGS ----
 CALIB.CODE   <- "calib.10.20.stage4"
+N.SIM        <- 1000
+REBUILD.PARAM.CACHE <- FALSE    # TRUE = re-extract parameters from the simsets (e.g., after recalibration)
 
 # TEST MODE: NULL = all 10 MSAs. To test, give one MSA name or code, e.g.
 #   TEST.MSA <- names(SHIELD.TEN.MSAS)[1]
@@ -32,7 +34,7 @@ locations    <- setNames(unname(msas), unname(msas))      # MSA codes
 FILE.SUFFIX  <- if (is.null(TEST.MSA)) "" else "_test"
 # locations    <- setNames(SHIELD.TEN.MSAS, SHIELD.TEN.MSAS)
 BASE.PATH    <- paste0(ROOT.DIR, "/shield/outputs/", CALIB.CODE, "/")    # inputs (results arrays)
-V2.PATH      <- paste0(BASE.PATH, "sensitivity_v2/")                     # v2 outputs (param_matrices.Rdata is reused if present)
+V2.PATH      <- paste0(BASE.PATH, "sensitivity_v2/")                     # v2 outputs (no longer used: parameters come from the shared param_cache/)
 OUT.PATH     <- paste0(BASE.PATH, "sensitivity_prcc2/", if (is.null(TEST.MSA)) "" else "test/")   # test runs go to a test/ subfolder
 # OUT.PATH     <- paste0(BASE.PATH, "sensitivity_v3_3out", FILE.SUFFIX, "/")                # v3 outputs (v2 outputs are not overwritten)
 # OUT.PATH     <- paste0(BASE.PATH, "sensitivity_v2/")                     # v2 outputs (originals are not overwritten)

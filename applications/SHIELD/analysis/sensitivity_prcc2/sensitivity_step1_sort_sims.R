@@ -5,21 +5,29 @@
 source('../jheem_analyses/applications/SHIELD/analysis/sensitivity_prcc2/00_sensitivity_settings.R')
 
 # Parameter matrices (n.sim x n.params), one per MSA ----
-# Reuses the v2 file if it exists, so calib.simsets does not have to be loaded again
-pm_file <- paste0(V2.PATH, "param_matrices.Rdata")
-if (file.exists(pm_file)) {
-    cat("Reusing", pm_file, "\n")
-    param_matrices <- get(load(pm_file))[unname(locations)]    # keep the MSAs in locations only
-} else {
-    calib.simsets  <- load.calib.simsets(msas, CALIB.CODE, 1000)    # named vector: names must match extract.calib.simsets()
-    param_matrices <- lapply(locations, function(city) {
-        simset <- extract.calib.simsets(calib.simsets, city, CALIB.CODE, exact = T)[[1]]$full_simset
-        all_params <- t(simset$parameters)
-        colnames(all_params) <- simset$parameter.names
-        all_params
-    })
-    rm(calib.simsets)
-}
+# From the shared cache <BASE.PATH>/param_cache/ (analysis/shield_param_cache.R);
+# a simset is loaded only for MSAs that are not cached yet, one MSA at a time.
+param_matrices <- lapply(locations, get_param_matrix,
+                         calib.code = CALIB.CODE, n.sim = N.SIM, rebuild = REBUILD.PARAM.CACHE)
+
+# PREVIOUS VERSION (kept for reference) ----
+# # Parameter matrices (n.sim x n.params), one per MSA ----
+# # Reuses the v2 file if it exists, so calib.simsets does not have to be loaded again
+# pm_file <- paste0(V2.PATH, "param_matrices.Rdata")
+# if (file.exists(pm_file)) {
+#     cat("Reusing", pm_file, "\n")
+#     param_matrices <- get(load(pm_file))[unname(locations)]    # keep the MSAs in locations only
+# } else {
+#     calib.simsets  <- load.calib.simsets(msas, CALIB.CODE, 1000)    # named vector: names must match extract.calib.simsets()
+#     param_matrices <- lapply(locations, function(city) {
+#         simset <- extract.calib.simsets(calib.simsets, city, CALIB.CODE, exact = T)[[1]]$full_simset
+#         all_params <- t(simset$parameters)
+#         colnames(all_params) <- simset$parameter.names
+#         all_params
+#     })
+#     rm(calib.simsets)
+# }
+#
 
 # Sort simulations by parameter value ----
 # In each matrix, the last row holds the number of the sim with the largest

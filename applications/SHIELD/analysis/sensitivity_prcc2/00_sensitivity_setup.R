@@ -28,7 +28,9 @@ SETUP.FILES <- list(
     list(file    = '../jheem_analyses/applications/SHIELD/shield_specification.R',
          objects = c("SHIELD.SPECIFICATION", "ROOT.DIR")),
     list(file    = '../jheem_analyses/applications/SHIELD/analysis/calibration/calibration_helper_functions.R',
-         objects = c("load.calib.simsets", "extract.calib.simsets"))
+         objects = c("load.calib.simsets", "extract.calib.simsets")),
+    list(file    = '../jheem_analyses/applications/SHIELD/analysis/shield_param_cache.R',    # shared with the GAM analysis
+         objects = c("get_param_matrix"))
 )
 
 if (!exists(".SENS.SETUP.MTIMES")) .SENS.SETUP.MTIMES <- list()   # file -> modification time when loaded
