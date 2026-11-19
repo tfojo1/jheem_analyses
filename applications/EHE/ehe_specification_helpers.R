@@ -1109,7 +1109,7 @@ get.immigration.rates <- function(location, specification.metadata, population.y
       immigration.numbers = sum(SURVEILLANCE.MANAGER$pull(outcome = "immigration",
                                                       location = location,
                                                       year = as.character(2011:2015),
-                                                      from.ontology.names = 'census'
+                                                      from.ontology.names = 'census.adults'
       )) / 5 # because it's 5-year aggregate data    
   }
   
@@ -1161,7 +1161,7 @@ get.emigration.rates <- function(location, specification.metadata, population.ye
     emigration.numbers = sum(SURVEILLANCE.MANAGER$pull(outcome = "emigration",
                                                    location = location,
                                                         year = as.character(2011:2015),
-                                                        from.ontology.names = 'census'
+                                                        from.ontology.names = 'census.adults'
     )) / 5 # because it's 5-year aggregate data    
   }
     
