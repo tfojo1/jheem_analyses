@@ -1,13 +1,18 @@
 # Sensitivity analysis step 2: Top vs. bottom 20% comparison and parameter ranking (v3)
 # Pipeline (v3): step1 sort sims -> step2 top/bottom 20% ranking -> step3 PRCC -> step4 tornado plots
 #
-# Outcomes: % reduction in 2030 incidence, doxy.cov.20 vs. no intervention, for the
-# total population, MSM and women (see 00_prcc_settings.R).
+# Outcomes (see OUTCOMES in 00_prcc_settings.R): % reduction in 2030 incidence for the total
+# population, MSM and women, the women-to-MSM relative impact ratio and women minus MSM.
+# Sims with an NA outcome (RIR when MSM incidence did not fall) are left out of the medians.
 # For each MSA x outcome x parameter: the outcome in sims with the lowest vs. highest
 # TOP_BOTTOM_FRAC of that parameter's values.
 # Baseline projection = primary-analysis estimate = median across all sims in the MSA
 # (same statistic as analysis/intervention/03_manuscript_main.R).
-# Ranking: largest deviation from baseline, max(|median top - baseline|, |median bottom - baseline|).
+# Ranking: standardized difference std_diff = |median top - median bottom| / SD of the outcome
+# (see 00_prcc_settings.R); large_std_diff = std_diff >= MIN_STD_DIFF. The final "stands out"
+# also needs |PRCC| >= MIN_ABS_PRCC, so it is set in step 3.
+
+cat("\n==== PRCC step 2/4: top vs. bottom 20% comparison and parameter ranking (started ", format(Sys.time(), "%H:%M:%S"), ") ====\n", sep = "")
 
 # SETTINGS ----
 source('../jheem_analyses/applications/SHIELD/analysis/sensitivity_analyses/prcc/00_prcc_settings.R')
@@ -49,7 +54,8 @@ summarize_tails <- function(outcome, city) {
     }) %>%
         mutate(location = city,
                outcome  = outcome,
-               baseline = median(y, na.rm = TRUE))
+               baseline = median(y, na.rm = TRUE),
+               outcome_sd = sd(y, na.rm = TRUE))      # for the standardized difference
 }
 
 tails <- map_dfr(names(OUTCOMES), function(o) {
@@ -58,14 +64,16 @@ tails <- map_dfr(names(OUTCOMES), function(o) {
 
 # RANKING ----
 rank_df <- tails %>%
-    select(location, outcome, parameter, baseline, topOrBottom, Median) %>%
+    select(location, outcome, parameter, baseline, outcome_sd, topOrBottom, Median) %>%
     pivot_wider(names_from = topOrBottom, values_from = Median, names_prefix = "median_") %>%
     mutate(top_minus_baseline    = median_top - baseline,
            bottom_minus_baseline = median_bottom - baseline,
            max_abs_dev_baseline  = pmax(abs(top_minus_baseline), abs(bottom_minus_baseline)),
-           top_minus_bottom      = median_top - median_bottom) %>%
+           top_minus_bottom      = median_top - median_bottom,
+           std_diff              = abs(top_minus_bottom) / outcome_sd,     # in SDs of the outcome
+           large_std_diff        = std_diff >= MIN_STD_DIFF) %>%
     group_by(location, outcome) %>%
-    arrange(desc(max_abs_dev_baseline), .by_group = TRUE) %>%
+    arrange(desc(std_diff), .by_group = TRUE) %>%
     mutate(rank = row_number()) %>%
     ungroup() %>%
     relocate(rank, .after = parameter)

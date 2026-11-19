@@ -1,7 +1,7 @@
 # SHIELD sensitivity analyses: shared session setup (used by prcc/ and gam/)
 #
 # Sourced by the first line of each analysis's settings file (prcc/00_prcc_settings.R,
-# gam/gam_settings.R), so every script runs it. It:
+# gam/00_gam_settings.R), so every script runs it. It:
 #   1. checks that every package the analysis needs is installed, then attaches them
 #      (the settings file sets SENS.PACKAGES before sourcing this file);
 #   2. sources the SHIELD base files ONLY when their objects are not already in the

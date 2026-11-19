@@ -1,6 +1,8 @@
 # Sensitivity analysis step 1: Build parameter matrices and sort simulations by parameter value (v3)
 # Pipeline (v3): step1 sort sims -> step2 top/bottom 20% ranking -> step3 PRCC -> step4 tornado plots
 
+cat("\n==== PRCC step 1/4: load parameters and sort simulations by parameter value (started ", format(Sys.time(), "%H:%M:%S"), ") ====\n", sep = "")
+
 # SETTINGS ----
 source('../jheem_analyses/applications/SHIELD/analysis/sensitivity_analyses/prcc/00_prcc_settings.R')
 
@@ -9,8 +11,6 @@ source('../jheem_analyses/applications/SHIELD/analysis/sensitivity_analyses/prcc
 # no-intervention simset, in the same sim order as the outcome arrays. get_param_matrix()
 # (shared/sensitivity_setup.R) stops if a file is missing: run 01a first.
 param_matrices <- lapply(locations, get_param_matrix)
-# param_matrices <- lapply(locations, get_param_matrix,
-#                          calib.code = CALIB.CODE, n.sim = N.SIM, rebuild = REBUILD.PARAM.CACHE)
 
 # PREVIOUS VERSION (kept for reference) ----
 # # Parameter matrices (n.sim x n.params), one per MSA ----

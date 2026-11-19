@@ -1,3 +1,5 @@
+cat("\n==== PRCC: parameter titles for plot labels (started ", format(Sys.time(), "%H:%M:%S"), ") ====\n", sep = "")
+
 # SETTINGS ----
 source('../jheem_analyses/applications/SHIELD/analysis/sensitivity_analyses/prcc/00_prcc_settings.R')
 

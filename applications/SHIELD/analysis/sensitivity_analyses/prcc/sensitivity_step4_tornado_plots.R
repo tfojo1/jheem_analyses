@@ -1,10 +1,18 @@
 # Sensitivity analysis step 4: Tornado plots (v3)
 # Pipeline (v3): step1 sort sims -> step2 top/bottom 20% ranking -> step3 PRCC -> step4 tornado plots
 #
-# One figure per MSA with three panels (total, MSM, women): the top TOP_N_PARAMS
-# parameters from step 2, as paired boxplots of the outcome in sims with the lowest
-# vs. highest TOP_BOTTOM_FRAC of each parameter's values, labelled with the PRCC (step 3).
+# One figure per MSA with one panel per outcome (OUTCOMES, FACET_NCOL panels per row). Which
+# parameters each panel shows depends on PLOT.FILTER (00_prcc_settings.R):
+#   "sd"    : every parameter that stands out for that MSA x outcome (std_diff >= MIN_STD_DIFF
+#             and |PRCC| >= MIN_ABS_PRCC, step 3)
+#   "top_n" : the TOP_N_PARAMS parameters with the largest std_diff
+# Ordered by std_diff (largest on top), as paired boxplots of the outcome in sims with the lowest
+# vs. highest TOP_BOTTOM_FRAC of the parameter's values, labelled with the PRCC (step 3).
+# Panels with no parameter to show say so. Figure height follows the number of parameters.
+# File names end in __sd<threshold> or __top<N>, so the two options do not overwrite each other.
 # Dashed vertical line = baseline projection (median across all sims in the MSA).
+
+cat("\n==== PRCC step 4/4: tornado plots (started ", format(Sys.time(), "%H:%M:%S"), ") ====\n", sep = "")
 
 # SETTINGS ----
 source('../jheem_analyses/applications/SHIELD/analysis/sensitivity_analyses/prcc/00_prcc_settings.R')
@@ -12,34 +20,44 @@ source('../jheem_analyses/applications/SHIELD/analysis/sensitivity_analyses/prcc
 # LOAD OBJECTS ----
 load(paste0(OUT.PATH, "top_bottom_ranking.Rdata"))          # tails (and rank_df without PRCC)
 rank_df          <- get(load(paste0(OUT.PATH, "rank_df_with_prcc.Rdata")))
-titles_file      <- paste0(OUT.PATH, "ALL_PARAM_TITLES.Rdata")
-# if (!file.exists(titles_file)) titles_file <- paste0(V2.PATH, "ALL_PARAM_TITLES.Rdata")
-if (!file.exists(titles_file))    # create it: all_param_titles.R defines ALL_PARAM_TITLES and saves it to OUT.PATH
-    source('../jheem_analyses/applications/SHIELD/analysis/sensitivity_analyses/prcc/all_param_titles.R')
-ALL_PARAM_TITLES <- get(load(titles_file))
+ALL_PARAM_TITLES <- get_param_titles()    # 00_prcc_settings.R; creates the titles file if needed
 
 # TORNADO PLOT ----
+# Returns the plot and its height (inches)
 make_tornado <- function(city) {
     keys <- rank_df %>%
-        filter(location == city, rank <= TOP_N_PARAMS) %>%
+        filter(location == city, outcome %in% names(OUTCOMES)) %>%
+        filter(if (PLOT.FILTER == "sd") stands_out %in% TRUE else rank <= TOP_N_PARAMS) %>%
         mutate(title = ifelse(is.na(ALL_PARAM_TITLES[parameter]), parameter, ALL_PARAM_TITLES[parameter]),
                label = paste0(title, " (PRCC = ", sprintf("%.2f", prcc), ")"),
                key   = paste0(outcome, "___", label)) %>%                    # unique per panel
         arrange(factor(outcome, levels = names(OUTCOMES)), desc(rank))     # rank 1 at the top
+
+    # Outcomes with no parameter above the threshold get one empty labelled row
+    none <- setdiff(names(OUTCOMES), keys$outcome)
+    empty <- tibble(outcome = none, parameter = NA_character_,
+                    key = paste0(none, "___(no parameter ", if (PLOT.FILTER == "sd") paste0(">= ", MIN_STD_DIFF, " SD and |PRCC| >= ", MIN_ABS_PRCC) else "to show", ")"))
 
     plot_df <- bind_rows(
         semi_join(filter(tails, location == city), keys, by = c("outcome", "parameter")),
         tibble(outcome = keys$outcome, parameter = keys$parameter, topOrBottom = "ZZZ")   # NA rows add spacing
     ) %>%
         left_join(select(keys, outcome, parameter, key), by = c("outcome", "parameter")) %>%
-        mutate(key           = factor(key, levels = unique(keys$key)),
+        bind_rows(mutate(empty, topOrBottom = "ZZZ")) %>%
+        mutate(key           = factor(key, levels = c(empty$key, unique(keys$key))),
                outcome_label = factor(OUTCOMES[outcome], levels = OUTCOMES))
 
-    baseline_df <- keys %>%
+    baseline_df <- rank_df %>%
+        filter(location == city, outcome %in% names(OUTCOMES)) %>%
         distinct(outcome, baseline) %>%
         mutate(outcome_label = factor(OUTCOMES[outcome], levels = OUTCOMES))
 
-    ggplot(plot_df) +
+    # Height: for each row of panels, the panel with the most parameters sets the row height
+    n_per_outcome <- sapply(names(OUTCOMES), function(o) max(1, sum(keys$outcome == o)))
+    panel_row     <- ceiling(seq_along(n_per_outcome) / FACET_NCOL)
+    height        <- 1.5 + sum(tapply(n_per_outcome, panel_row, max) * FIG_IN_PER_PARAM + 0.5)
+
+    plot <- ggplot(plot_df) +
         geom_boxplot(aes(xmin = `Min.`,
                          xlower = `1st Qu.`,
                          xmiddle = Median,
@@ -51,11 +69,16 @@ make_tornado <- function(city) {
                      position = "dodge",
                      na.rm = TRUE) +
         geom_vline(data = baseline_df, aes(xintercept = baseline), linetype = "dashed") +
-        facet_wrap(~ outcome_label, nrow = 1, scales = "free") +
-        scale_y_discrete(labels = function(x) sub("^[a-z]+___", "", x)) +
-        labs(x = paste0("Reduction in ", YEAR, " Incidence vs. No Intervention (%)"), y = NULL,
-             caption = "Dashed line: baseline projection (median across all simulations).") +
-        ggtitle(setNames(names(SHIELD.TEN.MSAS), SHIELD.TEN.MSAS)[city]) +
+        facet_wrap(~ outcome_label, ncol = FACET_NCOL, scales = "free") +
+        scale_y_discrete(labels = function(x) sub("^.*?___", "", x, perl = TRUE)) +
+        labs(x = paste0("Outcome in ", YEAR, ", doxy-PEP at ", sub("doxy.cov.", "", INTERVENTION, fixed = TRUE),
+                        "% coverage vs. no doxy-PEP (units in panel titles)"), y = NULL,
+             caption = paste0(if (PLOT.FILTER == "sd")
+                                  paste0("Parameters shown: |median top - median bottom| >= ", MIN_STD_DIFF, " SD of the outcome in this MSA and |PRCC| >= ", MIN_ABS_PRCC, ". ")
+                              else
+                                  paste0("Parameters shown: the ", TOP_N_PARAMS, " with the largest |median top - median bottom| / SD of the outcome. "),
+                              "Dashed line: baseline projection (median across all simulations).")) +
+        ggtitle(MSA.LABELS[city]) +
         scale_fill_manual(name = NULL,
                           breaks = c("top", "bottom"),
                           labels = c(top = paste0("Simulations with the highest ",
@@ -70,13 +93,17 @@ make_tornado <- function(city) {
               legend.text = element_text(size = 10),
               strip.text = element_text(size = 11, face = "bold")) +
         guides(fill = guide_legend(ncol = 1))
+
+    list(plot = plot, height = height)
 }
 
 for (city in locations) {
     cat(paste0("City: ", city, "\n"))
-    ggsave(plot = make_tornado(city),
-           filename = paste0(OUT.PATH, "figures/tornado/", city, "__tornado.png"),
-           dpi = 300, width = FIG_WIDTH, height = FIG_HEIGHT)
+    tmp <- make_tornado(city)
+    ggsave(plot = tmp$plot,
+           filename = paste0(OUT.PATH, "figures/tornado/", city, "__tornado",
+                             if (PLOT.FILTER == "sd") paste0("__sd", MIN_STD_DIFF, "_prcc", MIN_ABS_PRCC) else paste0("__top", TOP_N_PARAMS), ".png"),
+           dpi = 300, width = FIG_WIDTH, height = tmp$height, limitsize = FALSE)
 }
 
 # V2 PLOTTING CODE (one plot per MSA x outcome; kept for reference) ----

@@ -7,7 +7,7 @@ The original PRCC code (v1) is in `analysis/sensitivity/` and is not changed.
 | Folder | Analysis | Run |
 |---|---|---|
 | `prcc/` | Top vs. bottom 20% of simulations by each parameter (deviation from the baseline median), partial rank correlation coefficients (PRCC), tornado plots per MSA | `run_prcc_all.R` (steps 1-4) |
-| `gam/` | Share of each outcome's posterior variance explained by each parameter group (GAM / MARS, `voi`) | scripts `00`-`02`; see `gam/README.md` |
+| `gam/` | Share of each outcome's posterior variance explained by each parameter group (GAM / MARS, `voi`) | `run_gam_all.R` (steps 1-3); see `gam/README.md` |
 | `shared/` | `sensitivity_setup.R`: package checks, SHIELD base files loaded once per session, `get_param_matrix()` | sourced by each settings file |
 
 ## Before the first run
@@ -20,7 +20,7 @@ The original PRCC code (v1) is in `analysis/sensitivity/` and is not changed.
 
 ## Running
 
-- Each script sources its settings file (`prcc/00_prcc_settings.R`, `gam/gam_settings.R`), which sources
+- Each script sources its settings file (`prcc/00_prcc_settings.R`, `gam/00_gam_settings.R`), which sources
   `shared/sensitivity_setup.R`. The setup checks every package the analysis needs, then loads
   `locations_of_interest.R` and `shield_specification.R` only if they are not already in the session (or
   changed since loaded). Running the next script in the same session skips them.
@@ -32,4 +32,4 @@ The original PRCC code (v1) is in `analysis/sensitivity/` and is not changed.
 | Analysis | Folder |
 |---|---|
 | PRCC | `sensitivity_prcc2/` (test runs: `sensitivity_prcc2/test/`) |
-| GAM | `sensitivity_analysis_GAM/` (test runs: `_test` file suffix) |
+| GAM | `sensitivity_analysis_GAM/` (test runs: `sensitivity_analysis_GAM/test/`) |

@@ -40,9 +40,16 @@
 #   1. Go to the jheem_analyses folder (the source() paths below are relative to it):
 #        cd ~/JHEEM/jheem_analyses
 #   2. Start it. All output goes to the log file, and the command prints the process ID:
-#        nohup Rscript applications/SHIELD/analysis/intervention/01a_generate_raw_results_arrays.R > 01a_generate_raw_results_arrays.log 2>&1 &
+#      The log goes to the shared log folder, like the SHIELD launchers
+#      (/home/jheem-shared/logs, or $JHEEM_LOG_DIR if set), with a time stamp so runs do not overwrite each other:
+#        LOG_DIR="${JHEEM_LOG_DIR:-/home/jheem-shared/logs}"; mkdir -p "$LOG_DIR"
+#        LOG="$LOG_DIR/01a_generate_raw_results_arrays_$(date +%Y%m%dT%H%M%S).log"
+#        nohup Rscript applications/SHIELD/analysis/intervention/01a_generate_raw_results_arrays.R > "$LOG" 2>&1 &
+#        echo "$LOG"
+#      # previous: log in the working folder
+#      # nohup Rscript applications/SHIELD/analysis/intervention/01a_generate_raw_results_arrays.R > 01a_generate_raw_results_arrays.log 2>&1 &
 #   3. Watch progress (Ctrl+C stops watching, not the script):
-#        tail -f 01a_generate_raw_results_arrays.log
+#        tail -f "$LOG"          # in a new terminal: ls -t /home/jheem-shared/logs/01a_* | head -1
 #   4. Check it is still running:
 #        ps aux | grep 01a_generate_raw_results_arrays
 #   5. Stop it if needed (extract files already saved are kept):

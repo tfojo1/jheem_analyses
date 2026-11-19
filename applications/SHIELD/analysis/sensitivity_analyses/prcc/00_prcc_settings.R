@@ -7,12 +7,9 @@
 # they are not already in the session (re-sourcing this file is cheap).
 # Calibrated parameters come from intervention/01a_generate_raw_results_arrays.R (extracts/params/).
 #
-# v3 (2026-11-17): three outcomes, all = % reduction in 2030 incidence with
-# doxy-PEP at 20% coverage vs. no doxy-PEP, within the same simulation:
-#   total  : total population
-#   msm    : MSM
-#   female : women
-# Positive values = fewer cases with doxy-PEP.
+# v3: five outcomes in 2030, doxy-PEP at 20% coverage vs. no doxy-PEP, within the same
+# simulation: % reduction in incidence (total, MSM, women), the women-to-MSM relative
+# impact ratio (rir) and women minus MSM (percentage points). See OUTCOMES below.
 
 # SETUP (packages and SHIELD base files; loads only what is not already in the session) ----
 # All packages used by steps 1-4 (PRCC is base R: calc_prcc_base() below)
@@ -22,50 +19,105 @@ source('../jheem_analyses/applications/SHIELD/analysis/sensitivity_analyses/shar
 # SETTINGS ----
 CALIB.CODE   <- "calib.10.20.stage4"
 N.SIM        <- 1000
-# REBUILD.PARAM.CACHE <- FALSE    # TRUE = re-extract parameters from the simsets (e.g., after recalibration)
+YEAR         <- "2030"
+INTERVENTION <- "doxy.cov.20"    # compared with no intervention ("noint") only
 
 # TEST MODE: NULL = all 10 MSAs. To test, give one MSA name or code, e.g.
 #   TEST.MSA <- names(SHIELD.TEN.MSAS)[1]
 # Test outputs go to OUT.PATH/test/, so they never mix with the full run.
-TEST.MSA <- names(SHIELD.TEN.MSAS)[1]
-# TEST.MSA <- NULL
+TEST.MSA <- NULL
 
 msas <- if (is.null(TEST.MSA)) SHIELD.TEN.MSAS else
     SHIELD.TEN.MSAS[names(SHIELD.TEN.MSAS) %in% TEST.MSA | SHIELD.TEN.MSAS %in% TEST.MSA]
 if (length(msas) == 0) stop("TEST.MSA '", TEST.MSA, "' is not in SHIELD.TEN.MSAS")
 locations    <- setNames(unname(msas), unname(msas))      # MSA codes
-FILE.SUFFIX  <- if (is.null(TEST.MSA)) "" else "_test"
-# locations    <- setNames(SHIELD.TEN.MSAS, SHIELD.TEN.MSAS)
-BASE.PATH    <- paste0(ROOT.DIR, "/shield/outputs/", CALIB.CODE, "/")    # inputs (results arrays)
-# V2.PATH      <- paste0(BASE.PATH, "sensitivity_v2/")                     # v2 outputs (no longer used)
-OUT.PATH     <- paste0(BASE.PATH, "sensitivity_prcc2/", if (is.null(TEST.MSA)) "" else "test/")   # test runs go to a test/ subfolder
-# OUT.PATH     <- paste0(BASE.PATH, "sensitivity_v3_3out", FILE.SUFFIX, "/")                # v3 outputs (v2 outputs are not overwritten)
-# OUT.PATH     <- paste0(BASE.PATH, "sensitivity_v2/")                     # v2 outputs (originals are not overwritten)
+
+# How each MSA is shown in tables and figures: code -> name, as in intervention/00_settings.R
+# (MSA.DISPLAY.NAMES: LA and NYC are written out, the others keep their name)
+MSA.LABELS <- setNames(names(SHIELD.TEN.MSAS), unname(SHIELD.TEN.MSAS))
+MSA.LABELS[MSA.LABELS == "LA"]  <- "Los Angeles"
+MSA.LABELS[MSA.LABELS == "NYC"] <- "New York"
+
+BASE.PATH    <- paste0(ROOT.DIR, "/shield/outputs/", CALIB.CODE, "/")    # inputs (results arrays, extracts/params)
+OUT.PATH     <- paste0(BASE.PATH, "sensitivity_prcc2/", if (is.null(TEST.MSA)) "" else "test/")
 dir.create(paste0(OUT.PATH, "figures/tornado"), recursive = TRUE, showWarnings = FALSE)
 
-YEAR         <- "2030"
-INTERVENTION <- "doxy.cov.20"    # compared with no intervention ("noint") only
+# INFLUENTIAL PARAMETERS ----
+# Top / bottom groups: sims with the highest / lowest TOP_BOTTOM_FRAC of each parameter's values.
+# Standardized difference (std_diff) = |median top - median bottom| / SD of the outcome across all
+# sims in that MSA (no units, so it compares across outcomes).
+# A parameter stands out for an MSA x outcome when BOTH:
+#   std_diff >= MIN_STD_DIFF   (large difference between top and bottom quintiles; marginal)
+#   |PRCC| >= MIN_ABS_PRCC     (independent association after adjusting for all other parameters).
+#   The PRCC criterion drops parameters whose quintile difference only reflects other, correlated
+#   parameters (e.g., simulations clustered by chain). PRCC^2 = share of the outcome's rank
+#   variance left after the other parameters that this parameter explains (0.2 -> 4%).
+#   MIN_ABS_PRCC <- 0 turns the PRCC criterion off.
+TOP_BOTTOM_FRAC <- 0.2
+MIN_STD_DIFF    <- 1
+MIN_ABS_PRCC    <- 0.2
 
-# PRCC: p-values are adjusted for the number of parameters tested (per MSA and
-# outcome) and saved in the tables only; they do NOT filter or flag parameters.
-P.ADJUST.METHOD   <- "BH"
-
-# Plot settings
-TOP_BOTTOM_FRAC <- 0.2    # share of sims in the "top" and "bottom" groups
-TOP_N_PARAMS    <- 10     # parameters shown per outcome panel
-FIG_WIDTH       <- 18     # inches (three panels side by side)
-FIG_HEIGHT      <- 1.5 + TOP_N_PARAMS * 0.6
+# PLOTS ----
+# Which parameters each tornado panel shows (ordered by std_diff in both cases):
+#   "sd"    : every parameter that stands out (std_diff >= MIN_STD_DIFF and |PRCC| >= MIN_ABS_PRCC);
+#             the number varies by panel
+#   "top_n" : a fixed number per panel, the TOP_N_PARAMS parameters with the largest std_diff
+PLOT.FILTER      <- "sd"
+TOP_N_PARAMS     <- 10     # used only when PLOT.FILTER == "top_n"
+if (!PLOT.FILTER %in% c("sd", "top_n")) stop("PLOT.FILTER must be \"sd\" or \"top_n\"")
+FACET_NCOL       <- 4      # panels per row (one panel per outcome)
+FIG_WIDTH        <- 18     # inches
+FIG_IN_PER_PARAM <- 0.5    # figure height (inches) per parameter, in the tallest panel of each row
 
 # OUTCOMES ----
-OUTCOMES <- c(total = "Total population", msm = "MSM", female = "Women")
+# Names = outcome codes used in files and tables; values = panel titles (with units).
+# All in YEAR, INTERVENTION vs. no intervention, within the same simulation:
+#   total, msm, female : % reduction in incidence (positive = fewer cases with doxy-PEP)
+#   rir                : women-to-MSM relative impact ratio = women % reduction / MSM % reduction;
+#                        NA when MSM incidence did not fall (as in intervention/04_women_to_msm_impact_ratio.R)
+#   women_minus_msm    : women % reduction - MSM % reduction (percentage points; negative = women
+#                        benefit less than MSM), as in the GAM analysis
+OUTCOMES <- c(total           = "Total population: % reduction",
+              msm             = "MSM: % reduction",
+              female          = "Women: % reduction",
+              rir             = "Women-to-MSM relative impact ratio"
+              # women_minus_msm = "Women minus MSM (percentage points)"
+              )
+
+# Short outcome names for tables
+OUTCOME.LABELS <- c(total = "Total population", msm = "MSM", female = "Women",
+                    rir = "Women-to-MSM RIR", women_minus_msm = "Women minus MSM")
+
+# Include the fifth outcome (women minus MSM)? FALSE drops it from every step
+INCLUDE.WOMEN.MINUS.MSM <- TRUE
+if (!INCLUDE.WOMEN.MINUS.MSM) OUTCOMES <- OUTCOMES[names(OUTCOMES) != "women_minus_msm"]
 
 # Returns one value per simulation (original sim order) for one MSA.
 get_outcome <- function(outcome, city, total_calc_results, sex_calc_results) {
+    reduction <- function(sex) -1 * sex_calc_results[YEAR, sex, , INTERVENTION, city, "pct_change_incidence_vs_noint"]
     if (outcome == "total") {
         -1 * total_calc_results[YEAR, , INTERVENTION, city, "pct_change_incidence_vs_noint"]
+    } else if (outcome %in% c("msm", "female")) {
+        reduction(outcome)
+    } else if (outcome == "rir") {
+        msm <- reduction("msm")
+        rir <- reduction("female") / msm
+        rir[msm <= 0] <- NA        # MSM incidence did not fall (as in 04_women_to_msm_impact_ratio.R)
+        rir
+    } else if (outcome == "women_minus_msm") {
+        reduction("female") - reduction("msm")
     } else {
-        -1 * sex_calc_results[YEAR, outcome, , INTERVENTION, city, "pct_change_incidence_vs_noint"]
+        stop("Unknown outcome: ", outcome)
     }
+}
+
+# Readable parameter names (parameter code -> title; titles contain line breaks for plots).
+# Creates ALL_PARAM_TITLES.Rdata from all_param_titles.R the first time.
+get_param_titles <- function() {
+    titles.file <- paste0(OUT.PATH, "ALL_PARAM_TITLES.Rdata")
+    if (!file.exists(titles.file))
+        source('../jheem_analyses/applications/SHIELD/analysis/sensitivity_analyses/prcc/all_param_titles.R')
+    get(load(titles.file))
 }
 
 # Writes a CSV whose first rows describe the columns, then the results
@@ -81,10 +133,11 @@ write_csv_with_notes <- function(df, file, notes) {
 # then PRCC_j = -P[j, y] / sqrt(P[j, j] * P[y, y]), with P = inverse of the rank
 # correlation matrix (identical to correlating the residuals of rank(x_j) and rank(y)
 # after regressing each on the ranks of the other parameters).
-# Test: t = r * sqrt(df / (1 - r^2)), df = n - 2 - q (q = number of other parameters);
-# 95% CI by Fisher z with SE = 1 / sqrt(n - 3 - q).
+# 95% CI by Fisher z with SE = 1 / sqrt(n - 3 - q) (q = number of other parameters).
+# PRCCs are not tested against 0 (no p-values): with 1,000 sims almost any PRCC would be
+# "significant"; parameters are selected by effect sizes (MIN_STD_DIFF, MIN_ABS_PRCC) instead.
 # Input: data frame of parameters with the outcome as the LAST column (as epi.prcc).
-# Output columns match epi.prcc 2.x: var, est, lower, upper, test.statistic, df, p.value.
+# Output columns: var, est (PRCC), lower, upper (95% CI).
 calc_prcc_base <- function(dat, conf.level = 0.95) {
     ranks <- apply(as.matrix(dat), 2, rank, ties.method = "average")
     n     <- nrow(ranks)
@@ -95,17 +148,12 @@ calc_prcc_base <- function(dat, conf.level = 0.95) {
                                                "parameters?): ", e$message))
     est   <- -P[1:k, y] / sqrt(diag(P)[1:k] * P[y, y])
     q     <- k - 1
-    df    <- n - 2 - q
-    tstat <- est * sqrt(df / (1 - est^2))
     zcrit <- qnorm(1 - (1 - conf.level) / 2)
     se.z  <- 1 / sqrt(n - 3 - q)
     data.frame(var            = colnames(dat)[1:k],
                est            = unname(est),
                lower          = tanh(atanh(unname(est)) - zcrit * se.z),
                upper          = tanh(atanh(unname(est)) + zcrit * se.z),
-               test.statistic = unname(tstat),
-               df             = df,
-               p.value        = 2 * pt(-abs(unname(tstat)), df),
                row.names      = NULL)
 }
 
