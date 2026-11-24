@@ -131,6 +131,11 @@ get.best.guess.msm.proportions <- function(location,
                                            keep.race = T,
                                            return.proportions = T)
 {
+    
+    # NOTES FROM ANDREW, NOV 24TH, 2026:
+    # TO USE THE NEWER ONTOLOGIES, THE MAPPING STEP IN THE MIDDLE HAD TO BE REVERSED,
+    # SO CENSUS IS MAPPED TO BRFSS, NOW THAT BRFSS IS THE SHIELD 3 RACES
+    
     if (location=='US'){
         counties='US'
         states='US'
@@ -140,23 +145,13 @@ get.best.guess.msm.proportions <- function(location,
     }
     #step1: Get county-level proportions of male who are MSM (available from EMORY)
     # this is the total count for each county-not broken down by age/race
-    # browser()
     
     # NEW
-    if (SURVEILLANCE.MANAGER$last.modified.date >= as.POSIXct("2026-08-01"))
-    {
-        proportion.msm.by.county <- SURVEILLANCE.MANAGER$pull(outcome = "proportion.msm",
-                                                              dimension.values = list(year=2013,
+    proportion.msm.by.county <- SURVEILLANCE.MANAGER$pull(outcome = "proportion.msm",
+                                                              dimension.values = list(year=2011,
                                                                                       location=counties),
                                                               sources = "emory")
-    } else {
-        # OLD (7/27/2026 data manager and older)
-        proportion.msm.by.county = SURVEILLANCE.MANAGER$pull(outcome = 'proportion.msm',
-                                                             dimension.values = list(year=2013,
-                                                                                     location=counties,
-                                                                                     sex='male'),
-                                                             sources = 'emory')
-    }
+    
     
     
     if (is.null(proportion.msm.by.county) || !setequal(counties, dimnames(proportion.msm.by.county)$location))
@@ -218,45 +213,46 @@ get.best.guess.msm.proportions <- function(location,
     
     # step4: read proportion of msm by race from BRFSS
     # Estimate a proportion msm for each race
-    if (SURVEILLANCE.MANAGER$last.modified.date >= as.POSIXct("2026-08-01")) {
-        raw.proportion.msm.by.race = SURVEILLANCE.MANAGER$pull(outcome = 'proportion.msm',
-                                                               keep.dimensions = c('year','location','race'),
-                                                               dimension.values = list(location = states))
-    } else {
-        raw.proportion.msm.by.race = SURVEILLANCE.MANAGER$pull(outcome = 'proportion.msm',
-                                                               keep.dimensions = c('year','location','race'),
-                                                               dimension.values = list(location = states,
-                                                                                       sex = 'male'))
-    }
+    raw.proportion.msm.by.race = SURVEILLANCE.MANAGER$pull(outcome = 'proportion.msm',
+                                                           dimension.values = list(sex="male"),
+                                                           keep.dimensions = c('year','location','race')) # BRFSS year__location__race__sex is only the 3 JHEEM races
     # browser()
     raw.proportion.msm.by.race = apply(raw.proportion.msm.by.race, 'race', mean, na.rm=T)
     raw.races = names(raw.proportion.msm.by.race)
     
-    race.mapping = get.ontology.mapping(from.ontology = list(race=raw.races),
-                                        to.ontology = dimnames(males)['race'])
+    # This step doesn't work when the "from ontology" is the 3 JHEEM races and the "to ontology" is bigger, for instance the "census" races (or previously called "stratified census")
+    # race.mapping = get.ontology.mapping(from.ontology = list(race=raw.races),
+    #                                     to.ontology = dimnames(males)['race'])
+    race.mapping = get.ontology.mapping(from.ontology = dimnames(males)['race'],
+                                        to.ontology = list(race=raw.races))
     
     if (is.null(race.mapping))
-        stop("Cannot map from the BRFSS race ontology for proportion msm to the census ontology")
+        stop("Cannot map from the BRFSS race ontology for census ontology to brfss ontology")
     
     dim(raw.proportion.msm.by.race) = c(race=length(raw.proportion.msm.by.race))
     dimnames(raw.proportion.msm.by.race) = list(race=raw.races)
-    proportions.msm.by.race = race.mapping$apply(raw.proportion.msm.by.race)
     
-    if (all(is.na(proportions.msm.by.race)))
-        stop("Cannot get best-guess msm proportions: we are getting NA proportions MSM by race at the state level (from BRFSS)")
+    # NEW: Mapping goes the other way, now.
+    proportions.msm.by.race = raw.proportion.msm.by.race
     
-    proportions.msm.by.race[is.na(proportions.msm.by.race)] = mean(proportions.msm.by.race[setdiff(names(proportions.msm.by.race), 'american indian or alaska native')], na.rm=T)
+    population.male.by.race = race.mapping$apply(males)
+    # proportions.msm.by.race = race.mapping$apply(raw.proportion.msm.by.race)
+    
+    # if (all(is.na(proportions.msm.by.race)))
+    #     stop("Cannot get best-guess msm proportions: we are getting NA proportions MSM by race at the state level (from BRFSS)")
+    
+    # proportions.msm.by.race[is.na(proportions.msm.by.race)] = mean(proportions.msm.by.race[setdiff(names(proportions.msm.by.race), 'american indian or alaska native')], na.rm=T)
     
     # step6: now that we have sorted out the dimensions, we can use the race.specific estiamtes from BRFSS and apply them to the male population in each county
     # then we compare the calculated proportion of msm with the original proportions reported from EMORY and scale it so that they agree
     # First guess at the number of MSM in each county:
-    first.guess.n.msm = sapply(dimnames(males)$race, function(r){
+    first.guess.n.msm = sapply(dimnames(population.male.by.race)$race, function(r){
         if (length(dim(males)) == 2) 
-            males[,r] * proportions.msm.by.race[r]# for the national model, we have 2 dimentions, age and race
+            population.male.by.race[,r] * proportions.msm.by.race[r]# for the national model, we have 2 dimentions, age and race
         else 
-            males[,,r] * proportions.msm.by.race[r]  # For local models, we have 3 dimensions, age, location, race
+            population.male.by.race[,,r] * proportions.msm.by.race[r]  # For local models, we have 3 dimensions, age, location, race
     })# '@TODD: to be reviewed
-    dim.names = dimnames(males)
+    dim.names = dimnames(population.male.by.race)
     dim(first.guess.n.msm) = sapply(dim.names, length)
     dimnames(first.guess.n.msm) = dim.names
     
@@ -265,14 +261,14 @@ get.best.guess.msm.proportions <- function(location,
     adult.mask = parsed.census.ages$lower >=13 #emory only reports proporiton of msm among adult male
     
     
-    first.guess.p.by.county = rowSums(first.guess.n.msm[,adult.mask,,drop=F]) / rowSums(males[,adult.mask,,drop=F])
+    first.guess.p.by.county = rowSums(first.guess.n.msm[,adult.mask,,drop=F]) / rowSums(population.male.by.race[,adult.mask,,drop=F])
     
     scale.factor.by.county = proportion.msm.by.county / first.guess.p.by.county 
     
     fitted.n.msm = first.guess.n.msm * scale.factor.by.county 
     # This method ensures that the final estimates align with both the overall MSM proportion from Emory and the racial distribution from BRFSS, 
     # capturing both racial heterogeneity and county-level variation
-    
+    males = population.male.by.race
     # step7: reporting: 
     if (keep.race)
     {
