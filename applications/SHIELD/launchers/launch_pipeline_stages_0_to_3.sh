@@ -2,7 +2,8 @@
 #
 # USAGE
 #   Launch over SSH (survives logout):
-#       nohup bash applications/SHIELD/launchers/launch_pipeline_stages_0_to_3.sh > /dev/null 2>&1 &
+#       nohup bash applications/SHIELD/launchers/launch_pipeline_stages_0_to_3.sh shield1 > /dev/null 2>&1 &
+#       (use shield1, shield2 or shield3 - it picks that server's city list in the config block)
 #   Kill Runs:
 #       pkill -u pkasaie1 -x R
 #       pkill -u pkasaie1 -f "Rscript"
@@ -102,50 +103,55 @@ export OMP_NUM_THREADS=1
 export MKL_NUM_THREADS=1
 
 # ── config ─────────────────────────────────────────────────────────────────────
-allLocs=(
-    C.35620 C.33100 C.31080 C.12060 C.26420 C.19100 C.16980 C.47900
-    C.37980 C.36740 C.41860 C.38060 C.45300 C.40140 C.19820 C.12580
-    C.29820 C.14460 C.41740 C.16740 C.41700 C.27260 C.35380 C.32820
-    C.42660 C.12420 C.26900 C.17140 C.18140 C.12940 C.40900 C.17460
-)
-
-ten_cities=(
-    C.12060 C.12580 C.16980 C.26420 C.31080
-    C.33100 C.35620 C.37980 C.38060 C.42660
-)
-
-all_except_ten_cities=(
-    C.19100 C.47900 C.36740 C.41860 C.45300 C.40140 C.19820 C.29820
-    C.14460 C.41740 C.16740 C.41700 C.27260 C.35380 C.32820 C.12420
-    C.26900 C.17140 C.18140 C.12940 C.40900 C.17460
+# SHIELD v2: the 40 MSAs in SHIELD.MSAS.OF.INTEREST (commoncode/locations_of_interest.R)
+# 1. split across the 3 servers: 10 on shield1, 10 on shield2, 20 on shield3
+# 2. shield1 = the 10 paper-1 cities
+# 3. shield3 = the other 10 EHE cities + the 10 SHIELD-only cities
+shield1=(
+    C.35620 C.33100 C.31080 C.12060 C.26420     # NYC, Miami, LA, Atlanta, Houston
+    C.16980 C.37980 C.38060 C.12580 C.42660     # Chicago, Philadelphia, Phoenix, Baltimore, Seattle
 )
 shield2=(
-    C.35620 C.37980 C.38060 C.42660
+    C.19100 C.47900 C.36740 C.41860 C.45300     # Dallas, DC, Orlando, SF, Tampa
+    C.40140 C.19820 C.29820 C.14460 C.41740     # Riverside, Detroit, Vegas, Boston, San Diego
 )
 shield3=(
-    C.12060 C.12580 C.16980 C.26420 C.31080
-    C.33100 
+    C.16740 C.41700 C.27260 C.35380 C.32820     # Charlotte, San Antonio, Jacksonville, New Orleans, Memphis
+    C.12420 C.17140 C.18140 C.12940 C.40900     # Austin, Cincinnati, Columbus, Baton Rouge, Sacramento
+    C.19740 C.38900 C.28140 C.41180 C.33460     # Denver, Portland, Kansas City, St Louis, Minneapolis
+    C.36420 C.10740 C.33340 C.13820 C.40380     # Oklahoma City, Albuquerque, Milwaukee, Birmingham, Rochester
 )
 # ── set active cities and calibration codes here ───────────────────────────────
-CITIES=("${shield3[@]}")
+# pick the server's city list with the first argument, so the file is the same on every server:
+#   nohup bash applications/SHIELD/launchers/launch_pipeline_stages_0_to_3.sh shield1 > /dev/null 2>&1 &
+SERVER="${1:-}"
+case "$SERVER" in
+    shield1) CITIES=("${shield1[@]}") ;;
+    shield2) CITIES=("${shield2[@]}") ;;
+    shield3) CITIES=("${shield3[@]}") ;;
+    *) echo "Error: first argument must be shield1, shield2 or shield3 (got '$SERVER')" >&2; exit 1 ;;
+esac
+echo "[$(date '+%F %T')] SERVER $SERVER: ${#CITIES[@]} cities: ${CITIES[*]}"
 
 # Phase 1: sequential, single-chain calibration codes (one Rscript process per
 # code, so the OS fully reclaims memory between them).
+# v2: s0 only for now; add calib.v2.11.25.s1 after s0 is checked
 SEQ_SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
 SEQ_CALIBRATION_CODES=(
-    calib.10.20.stage2
+    calib.v2.11.25.s0
    )
 # 1 = resume the first SEQ code from its cache (after a killed run); 0 = start it fresh.
 # Every city in CITIES must have been interrupted in that same code.
 RESUME_FIRST_SEQ_CODE=0
 # SEQ_MAX_CITIES = max cities in flight in phase 1 (1 core each) -> peak cores = SEQ_MAX_CITIES.
-SEQ_MAX_CITIES=32
+# 20 = all cities at once on every server (shield3 has 20; shield1/2 have 10)
+SEQ_MAX_CITIES=20
 
 # Phase 2: parallel, multi-chain stage3.
 PAR_SCRIPT="$PARENT_DIR/shield_calib_setup_and_run_modular.R"
 # Leave empty - PAR_CALIBRATION_CODES=() - to skip phase 2 entirely.
+# v2: empty for now - stages 2-3 are not registered yet
 PAR_CALIBRATION_CODES=(
-    calib.10.20.stage3
 )
 N_CHAINS=4
 # PAR_MAX_CITIES = max cities in flight in phase 2. Each holds N_CHAINS cores, so

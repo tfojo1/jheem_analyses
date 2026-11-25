@@ -147,6 +147,7 @@ get.best.guess.msm.proportions <- function(location,
     # this is the total count for each county-not broken down by age/race
     
     # NEW
+    # we use 2011 because it is the only year with county-level Emory data in the Nov-2026 manager (2013 and 2020 are empty for counties)
     proportion.msm.by.county <- SURVEILLANCE.MANAGER$pull(outcome = "proportion.msm",
                                                               dimension.values = list(year=2011,
                                                                                       location=counties),
@@ -213,11 +214,37 @@ get.best.guess.msm.proportions <- function(location,
     
     # step4: read proportion of msm by race from BRFSS
     # Estimate a proportion msm for each race
+    # 1. pull BRFSS for the states that overlap this location only (male, 3 JHEEM races: black, hispanic, other)
+    #    without the state filter, the pull averages all 45 states + US, and every city gets the national race pattern
+    #    e.g. LA: CA black = 0.0225 vs all-states mean = 0.0452 -> black MSM share would be ~2x too high relative to other races
+    # 2. we name the source so a future race-stratified source can't be mixed in
     raw.proportion.msm.by.race = SURVEILLANCE.MANAGER$pull(outcome = 'proportion.msm',
-                                                           dimension.values = list(sex="male"),
+                                                           sources = 'brfss',
+                                                           dimension.values = list(location = states, sex = 'male'),
                                                            keep.dimensions = c('year','location','race')) # BRFSS year__location__race__sex is only the 3 JHEEM races
     # browser()
-    raw.proportion.msm.by.race = apply(raw.proportion.msm.by.race, 'race', mean, na.rm=T)
+    # 3. average over years and states
+    if (!is.null(raw.proportion.msm.by.race))
+        raw.proportion.msm.by.race = apply(raw.proportion.msm.by.race, 'race', mean, na.rm=T)
+
+    # 4. fallback: if these states have no BRFSS data (or a race is missing), use the mean over all states
+    #    BRFSS has no data for DC, ME, NE, NH, OR, SD - a city in only those states would otherwise get nothing
+    #    we leave out the 'US' row: its values are about half the state values (e.g. black 0.0227 vs ~0.045), so they don't match
+    if (is.null(raw.proportion.msm.by.race) || any(is.na(raw.proportion.msm.by.race))) {
+        all.states.proportion.msm.by.race = SURVEILLANCE.MANAGER$pull(outcome = 'proportion.msm',
+                                                                      sources = 'brfss',
+                                                                      dimension.values = list(sex = 'male'),
+                                                                      keep.dimensions = c('year','location','race'))
+        all.states.proportion.msm.by.race = apply(all.states.proportion.msm.by.race, c('location','race'), mean, na.rm=T) # location x race
+        all.states.proportion.msm.by.race = all.states.proportion.msm.by.race[rownames(all.states.proportion.msm.by.race) != 'US', , drop=F]
+        all.states.proportion.msm.by.race = colMeans(all.states.proportion.msm.by.race, na.rm=T)
+        if (is.null(raw.proportion.msm.by.race))
+            raw.proportion.msm.by.race = all.states.proportion.msm.by.race
+        missing.races = names(raw.proportion.msm.by.race)[is.na(raw.proportion.msm.by.race)]
+        raw.proportion.msm.by.race[missing.races] = all.states.proportion.msm.by.race[missing.races]
+    }
+    if (any(is.na(raw.proportion.msm.by.race)))
+        stop("Cannot get best-guess msm proportions: we are getting NA proportions MSM by race from BRFSS")
     raw.races = names(raw.proportion.msm.by.race)
     
     # This step doesn't work when the "from ontology" is the 3 JHEEM races and the "to ontology" is bigger, for instance the "census" races (or previously called "stratified census")
