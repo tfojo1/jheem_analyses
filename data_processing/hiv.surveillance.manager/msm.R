@@ -60,8 +60,6 @@ data.list.brfss.state.msm = lapply(data.list.brfss.state.sex.for.msm, function(f
     filter(!is.na(msm_total))%>%
      mutate(value = (msm_total/n_weighted))
 
-  data$value = round(data$value, digits=2)
-
   data<- data[!duplicated(data), ]
 
   #Need to add sex column in for put statment dimensions
@@ -134,8 +132,6 @@ data.list.brfss.state.msm.race = lapply(data.list.race.male.denom, function(file
     filter(!is.na(msm_total))%>%
     mutate(value = (msm_total/n_weighted))
    
-  data$value = round(data$value, digits=2)
-  
    data<- data[!duplicated(data), ]
    
    #Need to add sex column in for put statment dimensions
@@ -171,8 +167,6 @@ data.list.brfss.state.msm.age = lapply(data.list.age.male.denom, function(file){
     select(outcome, year, location, age, msm, msm_total, n_weighted, `_LLCPWT`)%>%
     filter(!is.na(msm_total))%>%
     mutate(value = (msm_total/n_weighted))
-  
-  data$value = round(data$value, digits=2)
   
   data<- data[!duplicated(data), ]
   
@@ -505,7 +499,6 @@ data.list.emory.msm.county = lapply(data.list.emory.msm, function(file){
   data$outcome= "proportion.msm"
 
   data$value = as.numeric(data$MSM5YEAR/data$ADULTMEN)
-  data$value = round(data$value, digits=2)
   
   #To create location- combine state and county FIPS
   data$state_code= str_pad(data$STATEFP, width=2, side="left", pad="0")
@@ -547,7 +540,6 @@ data.list.emory.msm.msa = lapply(data.list.emory.msm, function(file){
        mutate(sum_adult_men = sum(ADULTMEN))
     
     data$value = as.numeric(data$sum_msm/data$sum_adult_men)
-    data$value = round(data$value, digits=2)
     
     #Need to add sex column in for put statment dimensions
     data$sex = "male"
@@ -584,7 +576,6 @@ data.list.emory.msm.state = lapply(data.list.emory.msm, function(file){
     mutate(sum_adult_men = sum(ADULTMEN))
   
   data$value = as.numeric(data$sum_msm/data$sum_adult_men)
-  data$value = round(data$value, digits=2)
   
   #Need to add sex column in for put statement dimensions
   data$sex = "male"

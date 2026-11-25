@@ -61,7 +61,6 @@ data.list.brfss.state.msm = lapply(data.list.brfss.state.sex.for.msm, function(f
         filter(!is.na(msm_total))%>%
         mutate(value = (msm_total/n_weighted))
     
-    data$value = round(data$value, digits=2)
     
     data<- data[!duplicated(data), ]
     
@@ -131,8 +130,6 @@ data.list.brfss.state.msm.race = lapply(data.list.race.male.denom, function(file
         filter(!is.na(msm_total))%>%
         mutate(value = (msm_total/n_weighted))
     
-    data$value = round(data$value, digits=2)
-    
     data<- data[!duplicated(data), ]
     
     #Need to add sex column in for put statment dimensions
@@ -168,8 +165,6 @@ data.list.brfss.state.msm.age = lapply(data.list.age.male.denom, function(file){
         select(outcome, year, location, age, msm, msm_total, n_weighted, `_LLCPWT`)%>%
         filter(!is.na(msm_total))%>%
         mutate(value = (msm_total/n_weighted))
-    
-    data$value = round(data$value, digits=2)
     
     data<- data[!duplicated(data), ]
     
@@ -281,8 +276,6 @@ select(-sex)%>%
       mutate(sum_adult_men = sum(ADULTMEN))
     
     data$value = as.numeric(data$sum_msm/data$sum_adult_men)
-    data$value = round(data$value, digits=2)
-
     
     data <- data %>%
       select(year, location, outcome, value)
