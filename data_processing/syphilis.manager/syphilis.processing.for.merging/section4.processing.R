@@ -20,13 +20,13 @@ data.manager = create.data.manager('syphilis', description='syphilis data manage
 
 #Register outcomes:
 data.manager$register.outcome(
-  'population',
+  'adult.population',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
     display.name = 'Population',
-    axis.name = 'Population',
-    units = 'population',
-    description = "Population Estimate"))
+    axis.name = 'Adult Population',
+    units = 'count',
+    description = "Adult Population Estimate"))
 
 data.manager$register.outcome(
   'proportion.msm', 
@@ -35,7 +35,7 @@ data.manager$register.outcome(
     display.name = 'Proportion of MSM',
     axis.name = 'Proportion of MSM',
     units = '%',
-    description = "Proportion of Men who have sex with Men"), denominator.outcome = 'population') 
+    description = "Proportion of Men who have sex with Men"), denominator.outcome = 'adult.population') 
 
 data.manager$register.outcome( #Represents 2020 Emory Estimates
     'proportion.msm.last.year', 
@@ -44,7 +44,7 @@ data.manager$register.outcome( #Represents 2020 Emory Estimates
         display.name = 'Proportion of MSM Last Year',
         axis.name = 'Proportion of MSM Last Year',
         units = '%',
-        description = "Proportion of Men who have sex with Men Last Year Estimate"), denominator.outcome = 'population') 
+        description = "Proportion of Men who have sex with Men Last Year Estimate"), denominator.outcome = 'adult.population') 
 
 data.manager$register.outcome(
   'proportion.tested.for.hiv.n',       

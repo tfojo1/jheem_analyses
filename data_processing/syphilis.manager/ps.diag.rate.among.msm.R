@@ -21,7 +21,7 @@ proportion.msm.county <- as.data.frame.table(surveillance.manager$data$proportio
     filter(year == "2011") %>% select(-year)
 
 #2000-2025
-male.population.data <- as.data.frame.table(syphilis.manager$data$population$estimate$census.population$census$year__location__sex) %>% filter(sex == 'male')%>% rename(male.population.count = Freq)
+male.population.data <- as.data.frame.table(syphilis.manager$data$adult.population$estimate$census.population$census.adults$year__location__sex) %>% filter(sex == 'male')%>% rename(male.population.count = Freq)
 
 #Combine population data with MSM proportion data:
 all.male.data <- inner_join(male.population.data, proportion.msm.county, by=c( "location", "sex"))
