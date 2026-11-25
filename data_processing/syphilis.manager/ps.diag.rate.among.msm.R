@@ -18,7 +18,7 @@
 #I'm pulling the 2013 proportion msm from Emory#
 
 proportion.msm.county <- as.data.frame.table(surveillance.manager$data$proportion.msm$estimate$emory$emory$year__location)%>% rename(proprtion.msm = Freq) %>% filter(str_detect(location, "^\\d{5}$"))%>%
-    filter(year == "2013") %>% select(-year)
+    filter(year == "2011") %>% select(-year)
 
 #2000-2025
 male.population.data <- as.data.frame.table(syphilis.manager$data$population$estimate$census.population$census$year__location__sex) %>% filter(sex == 'male')%>% rename(male.population.count = Freq)
